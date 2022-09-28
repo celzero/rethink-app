@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -48,7 +47,6 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
@@ -127,8 +125,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         val cpDrawable = CircularProgressDrawable(requireContext())
         cpDrawable.setStyle(CircularProgressDrawable.DEFAULT)
         val color = fetchColor(requireContext(), R.attr.chipTextPositive)
-        cpDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-            color, BlendModeCompat.SRC_ATOP)
+        cpDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color,
+                                                                                             BlendModeCompat.SRC_ATOP)
         cpDrawable.start()
 
         chip.chipIcon = cpDrawable
@@ -142,13 +140,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun showUpdateCheckUi() {
-        if (!persistentState.periodicallyCheckBlocklistUpdate) {
-            b.bslbCheckUpdateBtn.visibility = View.VISIBLE
-            b.bslbRedownloadBtn.visibility = View.GONE
-            b.bslbUpdateAvailableBtn.visibility = View.GONE
-            return
-        }
-
         if (isBlocklistUpdateAvailable()) {
             b.bslbUpdateAvailableBtn.visibility = View.VISIBLE
             b.bslbRedownloadBtn.visibility = View.GONE
@@ -163,7 +154,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun isBlocklistUpdateAvailable(): Boolean {
-        return persistentState.updatableTimestampRemote != INIT_TIME_MS
+        return persistentState.newestRemoteBlocklistTimestamp != INIT_TIME_MS
     }
 
     private fun checkBlocklistUpdate() {
@@ -231,10 +222,22 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             download(getDownloadTimeStamp())
         }
 
+        b.frlSwitchMax.setOnClickListener {
+            if (b.frlSwitchMax.isChecked) {
+                io {
+                    appConfig.switchRethinkDnsToMax()
+                }
+            } else {
+                io {
+                    appConfig.switchRethinkDnsToBasic()
+                }
+            }
+        }
+
     }
 
     private fun getDownloadableTimestamp(): Long {
-        return persistentState.updatableTimestampRemote
+        return persistentState.newestRemoteBlocklistTimestamp
     }
 
     private fun download(timestamp: Long) {
@@ -308,7 +311,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun initObservers() {
         appDownloadManager.remoteDownloadStatus.observe(viewLifecycleOwner) {
-            Log.d(LoggerConstants.LOG_TAG_DOWNLOAD, "Remote blocklist download status id: $it")
+            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD, "Remote blocklist download status id: $it")
             if (!isDownloadInitiated) return@observe
 
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
@@ -350,7 +353,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
             if (!isDownloadInitiated) return@observe
 
-            Log.d(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Log.i(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
                 // no-op
                 return@observe

@@ -15,9 +15,9 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 
 @Dao
@@ -61,4 +61,7 @@ interface DnsCryptRelayEndpointDAO {
     @Transaction
     @Query("select count(*) from DNSCryptRelayEndpoint")
     fun getCount(): Int
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

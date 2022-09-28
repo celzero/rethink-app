@@ -17,22 +17,30 @@ package com.celzero.bravedns.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
+import androidx.work.*
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
+import com.celzero.bravedns.backup.BackupHelper
+import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
+import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
+import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
@@ -46,7 +54,9 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.RemoteFileTagUtil
@@ -57,6 +67,7 @@ import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
+import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,6 +77,7 @@ import org.koin.android.ext.android.inject
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
+
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -123,6 +135,85 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         observeAppState()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // handle intent receiver for backup/restore
+        handleIntent()
+    }
+
+    private fun handleIntent() {
+        val intent = this.intent ?: return
+        if (intent.scheme?.equals(INTENT_SCHEME) == true && intent.data?.path?.contains(
+                BACKUP_FILE_EXTN) == true) {
+            handleRestoreProcess(intent.data)
+        } else if (intent.scheme?.equals(INTENT_SCHEME) == true) {
+            showToastUiCentered(this, getString(R.string.brbs_restore_no_uri_toast),
+                                Toast.LENGTH_SHORT)
+        }
+    }
+
+    private fun handleRestoreProcess(uri: Uri?) {
+        if (uri == null) {
+            showToastUiCentered(this, getString(R.string.brbs_restore_failed_toast),
+                                Toast.LENGTH_SHORT)
+            return
+        }
+
+        showRestoreDialog(uri)
+    }
+
+    private fun showRestoreDialog(uri: Uri) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.brbs_restore_dialog_title)
+        builder.setMessage(R.string.brbs_restore_dialog_message)
+        builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
+            startRestore(uri)
+            observeRestoreWorker()
+        }
+
+        builder.setNegativeButton(getString(R.string.brbs_restore_dialog_negative)) { _, _ ->
+            // no-op
+        }
+
+        builder.setCancelable(true)
+        builder.create().show()
+    }
+
+    private fun startRestore(fileUri: Uri) {
+        Log.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the restore process")
+        val data = Data.Builder()
+        data.putString(BackupHelper.DATA_BUILDER_RESTORE_URI, fileUri.toString())
+
+        val importWorker = OneTimeWorkRequestBuilder<RestoreAgent>().setInputData(
+            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
+                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                                             TimeUnit.MILLISECONDS).addTag(RestoreAgent.TAG).build()
+        WorkManager.getInstance(this).beginWith(importWorker).enqueue()
+    }
+
+    private fun observeRestoreWorker() {
+        val workManager = WorkManager.getInstance(this.applicationContext)
+
+        // observer for custom download manager worker
+        workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(this) { workInfoList ->
+            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
+            Log.i(LOG_TAG_BACKUP_RESTORE,
+                  "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}")
+            if (WorkInfo.State.SUCCEEDED == workInfo.state) {
+                showToastUiCentered(this, getString(R.string.brbs_restore_complete_toast),
+                                    Toast.LENGTH_SHORT)
+                workManager.pruneWork()
+            } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+                showToastUiCentered(this, getString(R.string.brbs_restore_failed_toast),
+                                    Toast.LENGTH_SHORT)
+                workManager.pruneWork()
+                workManager.cancelAllWorkByTag(RestoreAgent.TAG)
+            } else { // state == blocked
+                // no-op
+            }
+        }
+    }
+
     private fun observeAppState() {
         VpnController.connectionStatus.observe(this) {
             if (it == BraveVPNService.State.PAUSED) {
@@ -132,6 +223,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
+        // for version v03k
+        changeDefaultInternetProtocol()
+        removeKeyFromSharedPref()
+
         // for version v054
         updateIfRethinkConnectedv053x()
         moveRemoteBlocklistFileFromAsset()
@@ -150,6 +245,23 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
 
+    }
+
+    private fun changeDefaultInternetProtocol() {
+        // (v053k) change the internet protocol version to IPv4 as default
+        persistentState.internetProtocolType = InternetProtocol.IPv4.id
+    }
+
+    private fun removeKeyFromSharedPref() {
+        // below keys are not used, remove from shared pref
+        val removeLocal = "local_blocklist_update_check"
+        val removeRemote = "remote_blocklist_update_check"
+
+        val sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = sharedPref.edit()
+        editor.remove(removeLocal)
+        editor.remove(removeRemote)
+        editor.apply()
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place

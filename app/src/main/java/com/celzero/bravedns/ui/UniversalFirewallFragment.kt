@@ -207,6 +207,9 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     private fun openCustomIpScreen() {
         val intent = Intent(requireContext(), CustomIpActivity::class.java)
+        // this activity is either being started in a new task or bringing to the top an
+        // existing task, then it will be launched as the front door of the task.
+        // This will result in the application to have that task in the proper state.
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }

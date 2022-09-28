@@ -15,9 +15,7 @@
  */
 package com.celzero.bravedns.database
 
-import android.util.Log
 import androidx.room.Entity
-import androidx.room.Index
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString

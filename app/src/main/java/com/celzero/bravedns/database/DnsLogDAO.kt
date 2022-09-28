@@ -16,13 +16,9 @@
 
 package com.celzero.bravedns.database
 
-import android.database.Cursor
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface DnsLogDAO {
@@ -55,7 +51,7 @@ interface DnsLogDAO {
     @Query("delete from DNSLogs where id < ((select max(id) from DNSLogs) - :count)")
     fun deleteOlderDataCount(count: Int)
 
-    @Query("select * from DNSLogs order by time desc")
-    fun dnsLogs(): Cursor
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 
 }

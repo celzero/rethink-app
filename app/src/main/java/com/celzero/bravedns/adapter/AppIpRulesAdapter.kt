@@ -83,6 +83,10 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
             }
 
             val bottomSheetFragment = AppConnectionBottomSheet()
+            // Fix: free-form window crash
+            // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
+            // the best practice is to simply never define any constructors at all.
+            // so sending the data using Bundles
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
@@ -99,7 +103,8 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
                 IpRulesManager.IpRuleStatus.NONE -> showNoRuleBtn()
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> showBypassAppRulesBtn()
                 IpRulesManager.IpRuleStatus.BLOCK -> showBlockedBtn()
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL ->  { /* no-op */}
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> { /* no-op */
+                }
             }
         }
 
@@ -138,7 +143,8 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
                                                                           context,
                                                                           R.drawable.ic_arrow_down_small),
                                                                       null)
-            b.aipStatusButton.text = context.resources.getString(R.string.ada_ip_rules_status_allowed)
+            b.aipStatusButton.text = context.resources.getString(
+                R.string.ada_ip_rules_status_allowed)
         }
     }
 }

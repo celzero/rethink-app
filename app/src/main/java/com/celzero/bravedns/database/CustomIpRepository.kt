@@ -56,7 +56,7 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         return customIpDao.getBlockedConnectionsCount()
     }
 
-    suspend fun getBlockedConnectionCountLiveData(): LiveData<Int> {
-        return customIpDao.getBlockedConnectionCountLiveData()
+    fun getCustomIpsLiveData(): LiveData<Int> {
+        return customIpDao.getCustomIpsLiveData()
     }
 }

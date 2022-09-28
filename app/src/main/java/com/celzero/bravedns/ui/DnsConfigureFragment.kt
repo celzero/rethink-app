@@ -51,7 +51,6 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 
-
 class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
                              LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
@@ -281,7 +280,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
                 persistentState.periodicallyCheckBlocklistUpdate = true
                 get<WorkScheduler>().scheduleBlocklistUpdateCheckJob()
             } else {
-                Log.d(LoggerConstants.LOG_TAG_SCHEDULER,
+                Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
                       "Cancel all the work related to blocklist update check")
                 WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
                     BLOCKLIST_UPDATE_CHECK_JOB_TAG)

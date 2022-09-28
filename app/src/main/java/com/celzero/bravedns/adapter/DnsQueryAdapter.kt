@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.FragmentActivity
-import androidx.paging.PagedListAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -141,7 +140,8 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
 
             val bottomSheetFragment = DnsBlocklistBottomSheetFragment()
             val bundle = Bundle()
-            bundle.putString(DnsBlocklistBottomSheetFragment.DNSLOG, Gson().toJson(dnsLog))
+            bundle.putString(DnsBlocklistBottomSheetFragment.INSTANCE_STATE_DNSLOGS,
+                             Gson().toJson(dnsLog))
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }

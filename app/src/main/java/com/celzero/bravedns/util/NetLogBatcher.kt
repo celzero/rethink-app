@@ -118,7 +118,8 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
                 if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue for buffer")
                 continue
             } else {
-                if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal sleep for $waitms for buffer")
+                if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER,
+                                 "signal sleep for $waitms for buffer")
             }
 
             // wait for 'batch' to dispatch

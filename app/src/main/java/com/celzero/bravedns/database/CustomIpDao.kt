@@ -17,9 +17,9 @@
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
 
 @Dao
@@ -49,7 +49,7 @@ interface CustomIpDao {
     fun clearIpRuleByUid(uid: Int)
 
     @Query(
-      "select * from CustomIp where isActive = 1 and uid = $UID_EVERYBODY order by modifiedDateTime desc")
+        "select * from CustomIp where isActive = 1 and uid = $UID_EVERYBODY order by modifiedDateTime desc")
     fun getUnivBlockedConnectionsLiveData(): PagingSource<Int, CustomIp>
 
     @Query(
@@ -70,7 +70,7 @@ interface CustomIpDao {
     fun getBlockedConnectionsCount(): Int
 
     @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY LIMIT 10000")
-    fun getBlockedConnectionCountLiveData(): LiveData<Int>
+    fun getCustomIpsLiveData(): LiveData<Int>
 
     @Query("select count(*) from CustomIp where uid = :uid")
     fun getBlockedConnectionCountForUid(uid: Int): LiveData<Int>
@@ -82,4 +82,7 @@ interface CustomIpDao {
     @Query(
         "select * from CustomIp where ipAddress like :query and uid = :uid and  isActive = 1 order by modifiedDateTime desc")
     fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

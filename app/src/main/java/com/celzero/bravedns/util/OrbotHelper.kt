@@ -192,7 +192,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
      */
     private val orbotStatusReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Log.d(LOG_TAG_VPN, "received status from orbot, action: ${intent.action}")
+            Log.i(LOG_TAG_VPN, "received status from orbot, action: ${intent.action}")
             if (ACTION_STATUS != intent.action) {
                 return
             }

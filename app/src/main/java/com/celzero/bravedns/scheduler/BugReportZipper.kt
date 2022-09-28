@@ -129,7 +129,7 @@ object BugReportZipper {
     }
 
     private fun addNewZipEntry(zo: ZipOutputStream, file: File) {
-        Log.d(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
+        Log.i(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
         val entry = ZipEntry(file.name)
         zo.putNextEntry(entry)
         FileInputStream(file).use { inStream ->

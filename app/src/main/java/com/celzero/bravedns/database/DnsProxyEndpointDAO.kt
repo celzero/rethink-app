@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 
 @Dao
@@ -62,5 +62,8 @@ interface DnsProxyEndpointDAO {
 
     @Query("select * from DNSProxyEndpoint where proxyName = 'Orbot' and isCustom = 0 LIMIT 1")
     fun getOrbotDnsDetail(): DnsProxyEndpoint?
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 
 }

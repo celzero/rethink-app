@@ -31,7 +31,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagedListAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -114,7 +113,8 @@ class FirewallAppListAdapter(private val context: Context,
                     R.string.firewall_status_whitelisted)
                 FirewallManager.FirewallStatus.BLOCK -> {
                     when {
-                        cStat.mobileData() -> context.getString(R.string.firewall_status_block_metered)
+                        cStat.mobileData() -> context.getString(
+                            R.string.firewall_status_block_metered)
                         cStat.wifi() -> context.getString(R.string.firewall_status_block_unmetered)
                         else -> context.getString(R.string.firewall_status_blocked)
                     }

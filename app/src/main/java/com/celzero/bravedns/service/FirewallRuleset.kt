@@ -37,6 +37,8 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
            R.string.firewall_rule_block_app_univ_mobile_desc, FirewallRuleset.stall),
     RULE2("Rule #2", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_desc,
           FirewallRuleset.stall),
+    RULE2D("Rule #2D", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_univ_desc,
+           FirewallRuleset.stall),
     RULE2B("Rule #2B", R.string.firewall_rule_bypass_apprule_ip,
            R.string.firewall_rule_bypass_app_rules_ip_desc, FirewallRuleset.allow),
     RULE2C("Rule #2C", R.string.firewall_rule_bypass_universal_ip,
@@ -142,7 +144,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             if (rule == null) return false
 
             return when (rule) {
-                RULE8.id ->  true
+                RULE8.id -> true
                 RULE9.id -> true
                 RULE7.id -> true
                 RULE2C.id -> true
