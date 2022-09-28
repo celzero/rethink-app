@@ -109,16 +109,17 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
         b.lbbsDownloadLl.visibility = View.VISIBLE
 
-        if (persistentState.updatableTimestampRemote == INIT_TIME_MS) {
+        if (persistentState.newestRemoteBlocklistTimestamp == INIT_TIME_MS) {
             showCheckUpdateUi()
             return
         }
 
         b.lbbsVersion.text = getString(R.string.settings_local_blocklist_version,
-                                       Utilities.convertLongToTime(persistentState.localBlocklistTimestamp,
-                                                                   Constants.TIME_FORMAT_2))
+                                       Utilities.convertLongToTime(
+                                           persistentState.localBlocklistTimestamp,
+                                           Constants.TIME_FORMAT_2))
 
-        if (persistentState.updatableTimestampLocal > persistentState.localBlocklistTimestamp) {
+        if (persistentState.newestLocalBlocklistTimestamp > persistentState.localBlocklistTimestamp) {
             showUpdateUi()
             return
         }
@@ -130,7 +131,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         observeWorkManager()
 
         appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
-            Log.d(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Log.i(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
                 // no-op
                 return@observe
@@ -149,7 +150,8 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                     showRedownloadUi()
                     Utilities.showToastUiCentered(requireContext(), getString(
                         R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
-                    appDownloadManager.timeStampToDownload.postValue(AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id)
+                    appDownloadManager.timeStampToDownload.postValue(
+                        AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id)
                 }
                 return@observe
             }
@@ -166,16 +168,22 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
             if (it == persistentState.localBlocklistTimestamp) {
                 showRedownloadUi()
+                appDownloadManager.timeStampToDownload.postValue(
+                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id)
                 return@observe
             }
 
             if (INIT_TIME_MS == persistentState.localBlocklistTimestamp) {
                 showUpdateUi()
+                appDownloadManager.timeStampToDownload.postValue(
+                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id)
                 return@observe
             }
 
             if (it != persistentState.localBlocklistTimestamp) {
                 showUpdateUi()
+                appDownloadManager.timeStampToDownload.postValue(
+                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id)
                 return@observe
             }
         }
@@ -200,7 +208,9 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsRedownloadProgress.visibility = View.GONE
         b.lbbsDownloadImg.visibility = View.VISIBLE
         b.lbbsRedownloadImg.visibility = View.VISIBLE
-        Utilities.showToastUiCentered(requireActivity(), getString(R.string.download_update_dialog_message_success), Toast.LENGTH_SHORT)
+        Utilities.showToastUiCentered(requireActivity(),
+                                      getString(R.string.download_update_dialog_message_success),
+                                      Toast.LENGTH_SHORT)
     }
 
     private fun onDownloadFail() {
@@ -210,25 +220,42 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsRedownloadProgress.visibility = View.GONE
         b.lbbsDownloadImg.visibility = View.VISIBLE
         b.lbbsRedownloadImg.visibility = View.VISIBLE
-        Utilities.showToastUiCentered(requireActivity(), getString(R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+        Utilities.showToastUiCentered(requireActivity(),
+                                      getString(R.string.blocklist_update_check_failure),
+                                      Toast.LENGTH_SHORT)
     }
 
     private fun showCheckUpdateUi() {
         b.lbbsCheckDownload.visibility = View.VISIBLE
         b.lbbsDownload.visibility = View.GONE
         b.lbbsRedownload.visibility = View.GONE
+
+        b.lbbsCheckDownloadImg.visibility = View.VISIBLE
+        b.lbbsCheckDownloadProgress.visibility = View.GONE
+        b.lbbsDownloadProgress.visibility = View.GONE
+        b.lbbsRedownloadProgress.visibility = View.GONE
     }
 
     private fun showUpdateUi() {
         b.lbbsCheckDownload.visibility = View.GONE
         b.lbbsDownload.visibility = View.VISIBLE
         b.lbbsRedownload.visibility = View.GONE
+
+        b.lbbsDownloadImg.visibility = View.VISIBLE
+        b.lbbsCheckDownloadProgress.visibility = View.GONE
+        b.lbbsDownloadProgress.visibility = View.GONE
+        b.lbbsRedownloadProgress.visibility = View.GONE
     }
 
     private fun showRedownloadUi() {
         b.lbbsCheckDownload.visibility = View.GONE
         b.lbbsDownload.visibility = View.GONE
         b.lbbsRedownload.visibility = View.VISIBLE
+
+        b.lbbsRedownloadImg.visibility = View.VISIBLE
+        b.lbbsCheckDownloadProgress.visibility = View.GONE
+        b.lbbsDownloadProgress.visibility = View.GONE
+        b.lbbsRedownloadProgress.visibility = View.GONE
     }
 
     private fun showDownloadDialog(isRedownload: Boolean) {
@@ -236,8 +263,9 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         if (isRedownload) {
             builder.setTitle(R.string.local_blocklist_redownload)
             builder.setMessage(getString(R.string.local_blocklist_redownload_desc,
-                                         Utilities.convertLongToTime(persistentState.localBlocklistTimestamp,
-                                                                     Constants.TIME_FORMAT_2)))
+                                         Utilities.convertLongToTime(
+                                             persistentState.localBlocklistTimestamp,
+                                             Constants.TIME_FORMAT_2)))
         } else {
             builder.setTitle(R.string.local_blocklist_download)
             builder.setMessage(R.string.local_blocklist_download_desc)
@@ -261,7 +289,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         val timestamp = if (isRedownload) {
             persistentState.localBlocklistTimestamp
         } else {
-            persistentState.updatableTimestampLocal
+            persistentState.newestLocalBlocklistTimestamp
         }
         appDownloadManager.downloadLocalBlocklist(timestamp)
     }

@@ -24,7 +24,6 @@ import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.bumptech.glide.load.engine.cache.LruResourceCache
 import com.bumptech.glide.module.AppGlideModule
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 
 /**
  * Defines the options to use when initializing Glide within an application.
@@ -39,14 +38,13 @@ class RethinkGlideModule : AppGlideModule() {
         val memoryCacheSizeBytes = 1024 * 1024 * 30 // 30 MB
         builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
 
+        // 350M disk cache is enough to store 35K favicons of 10KB size on average.
+        // 35K is a good guesstimate of unique domains a device may hit over 30 days
+        // Lowering disk-cache means an increase in data use (some reported, 600MB+)
         val diskCacheSizeBytes = 1024 * 1024 * 350 // 350 MB
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
 
-        if (DEBUG) {
-            builder.setLogLevel(Log.ERROR)
-        } else {
-            builder.setLogLevel(Log.ERROR)
-        }
+        builder.setLogLevel(Log.ERROR)
     }
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {

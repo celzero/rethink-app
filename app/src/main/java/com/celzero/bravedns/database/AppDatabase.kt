@@ -21,28 +21,35 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.celzero.bravedns.util.Constants
 
 @Database(
     entities = [AppInfo::class, ConnectionTracker::class, CustomIp::class, DoHEndpoint::class, DnsCryptEndpoint::class, DnsProxyEndpoint::class, DnsCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class, RethinkDnsEndpoint::class, RethinkRemoteFileTag::class, RethinkLocalFileTag::class],
-    version = 13, exportSchema = false)
+    version = 14, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     companion object {
-        private const val DATABASE_NAME = "bravedns.db"
+        const val DATABASE_NAME = "bravedns.db"
         private const val DATABASE_PATH = "database/rethink_v12.db"
+        private const val PRAGMA = "pragma wal_checkpoint(full)"
 
         // setJournalMode() is added as part of issue #344
+        // modified the journal mode from TRUNCATE to AUTOMATIC.
+        // The actual value will be TRUNCATE when the it is a low-RAM device.
+        // Otherwise, WRITE_AHEAD_LOGGING will be used.
+        // Ref: https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
         fun buildDatabase(context: Context) = Room.databaseBuilder(context.applicationContext,
                                                                    AppDatabase::class.java,
                                                                    DATABASE_NAME).createFromAsset(
-            DATABASE_PATH).setJournalMode(JournalMode.TRUNCATE).addMigrations(
+            DATABASE_PATH).setJournalMode(JournalMode.AUTOMATIC).addMigrations(
             MIGRATION_1_2).addMigrations(MIGRATION_2_3).addMigrations(MIGRATION_3_4).addMigrations(
             MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
             MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(
-            MIGRATION_10_11).addMigrations(MIGRATION_11_12).addMigrations(MIGRATION_12_13).build()
+            MIGRATION_10_11).addMigrations(MIGRATION_11_12).addMigrations(
+            MIGRATION_12_13).addMigrations(MIGRATION_13_14).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -366,6 +373,35 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // migration part of v053k
+        private val MIGRATION_13_14: Migration = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // modify the default blocklist to OISD
+                database.execSQL(
+                    "UPDATE RethinkDnsEndpoint set url  = 'https://basic.rethinkdns.com/1:IAAgAA==' where name = 'RDNS Default' and isCustom = 0")
+            }
+        }
+
+    }
+
+    fun checkPoint() {
+        appInfoDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        connectionTrackerDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        dohEndpointsDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        dnsCryptEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        dnsCryptRelayEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        dnsProxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        proxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        dnsLogDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        customDomainEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        customIpEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        rethinkEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        rethinkRemoteFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        rethinkLocalFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
+    }
+
+    fun rebuildDatabase(context: Context) {
+        buildDatabase(context)
     }
 
     abstract fun appInfoDAO(): AppInfoDAO

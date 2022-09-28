@@ -79,11 +79,12 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     enum class FirewallFilter(val id: Int) {
-        ALL(0), BLOCKED(2), WHITELISTED(3), EXCLUDED(4);
+        ALL(0), ALLOWED(1), BLOCKED(2), WHITELISTED(3), EXCLUDED(4);
 
         fun getFilter(): Set<Int> {
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3, 4)
+                ALLOWED -> setOf(0)
                 BLOCKED -> setOf(1)
                 WHITELISTED -> setOf(2)
                 EXCLUDED -> setOf(3)
@@ -94,6 +95,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
             fun filter(id: Int): FirewallFilter {
                 return when (id) {
                     ALL.id -> ALL
+                    ALLOWED.id -> ALLOWED
                     BLOCKED.id -> BLOCKED
                     WHITELISTED.id -> WHITELISTED
                     EXCLUDED.id -> EXCLUDED
@@ -205,16 +207,48 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         }
 
         b.ffaToggleAllWifi.setOnClickListener {
-            updateWifi()
+            showUpdateUnmeteredForBulkDialog()
         }
 
         b.ffaToggleAllMobileData.setOnClickListener {
-            updateMobileData()
+            showUpdateMeteredForBulkDialog()
         }
 
         b.ffaAppInfoIcon.setOnClickListener {
             showInfoDialog()
         }
+    }
+
+    private fun showUpdateUnmeteredForBulkDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(R.string.fapps_unmetered_dialog_title)
+        builder.setMessage(R.string.fapps_unmetered_dialog_message)
+        builder.setPositiveButton(getString(R.string.fapps_unmetered_positive)) { _, _ ->
+            updateUnmeteredBulk()
+        }
+
+        builder.setNegativeButton(getString(R.string.fapps_unmetered_negative)) { _, _ ->
+            // no-op
+        }
+
+        builder.setCancelable(true)
+        builder.create().show()
+    }
+
+    private fun showUpdateMeteredForBulkDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(R.string.fapps_metered_dialog_title)
+        builder.setMessage(R.string.fapps_metered_dialog_message)
+        builder.setPositiveButton(getString(R.string.fapps_metered_positive)) { _, _ ->
+            updateMeteredBulk()
+        }
+
+        builder.setNegativeButton(getString(R.string.fapps_metered_negative)) { _, _ ->
+            // no-op
+        }
+
+        builder.setCancelable(true)
+        builder.create().show()
     }
 
     private fun showInfoDialog() {
@@ -242,6 +276,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
         val none = makeFirewallChip(FirewallFilter.ALL.id,
                                     getString(R.string.fapps_firewall_filter_all), true)
+        val allowed = makeFirewallChip(FirewallFilter.ALLOWED.id,
+                                       getString(R.string.fapps_firewall_filter_allowed), false)
         val blocked = makeFirewallChip(FirewallFilter.BLOCKED.id,
                                        getString(R.string.fapps_firewall_filter_blocked), false)
         val whitelisted = makeFirewallChip(FirewallFilter.WHITELISTED.id,
@@ -251,6 +287,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                                         getString(R.string.fapps_firewall_filter_excluded), false)
 
         b.ffaFirewallChipGroup.addView(none)
+        b.ffaFirewallChipGroup.addView(allowed)
         b.ffaFirewallChipGroup.addView(blocked)
         b.ffaFirewallChipGroup.addView(whitelisted)
         b.ffaFirewallChipGroup.addView(excluded)
@@ -300,12 +337,12 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
     }
 
-    private fun updateMobileData() {
+    private fun updateMeteredBulk() {
         if (b.ffaToggleAllMobileData.tag == 0) {
             b.ffaToggleAllMobileData.tag = 1
             b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_off)
             io {
-                appInfoViewModel.updateMobileDataStatus(true)
+                appInfoViewModel.updateMeteredStatus(true)
             }
             return
         }
@@ -313,16 +350,16 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaToggleAllMobileData.tag = 0
         b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on)
         io {
-            appInfoViewModel.updateMobileDataStatus(false)
+            appInfoViewModel.updateMeteredStatus(false)
         }
     }
 
-    private fun updateWifi() {
+    private fun updateUnmeteredBulk() {
         if (b.ffaToggleAllWifi.tag == 0) {
             b.ffaToggleAllWifi.tag = 1
             b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_off)
             io {
-                appInfoViewModel.updateWifiStatus(true)
+                appInfoViewModel.updateUnmeteredStatus(true)
             }
             return
         }
@@ -330,7 +367,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaToggleAllWifi.tag = 0
         b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on)
         io {
-            appInfoViewModel.updateWifiStatus(false)
+            appInfoViewModel.updateUnmeteredStatus(false)
         }
     }
 

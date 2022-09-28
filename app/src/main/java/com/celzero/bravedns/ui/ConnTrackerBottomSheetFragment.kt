@@ -69,7 +69,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     private var ipDetails: ConnectionTracker? = null
 
     companion object {
-        const val IPDETAILS = "IPDETAILS"
+        const val INSTANCE_STATE_IPDETAILS = "IPDETAILS"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -90,7 +90,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val data = arguments?.getString(IPDETAILS)
+        val data = arguments?.getString(INSTANCE_STATE_IPDETAILS)
         ipDetails = Gson().fromJson(data, ConnectionTracker::class.java)
         initView()
     }
@@ -101,9 +101,11 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     private fun initView() {
         if (ipDetails == null) {
+            Log.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
             this.dismiss()
             return
         }
+
         b.bsConnConnectionTypeHeading.text = ipDetails!!.ipAddress
         b.bsConnConnectionFlag.text = ipDetails!!.flag
 
@@ -129,6 +131,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     override fun onResume() {
         super.onResume()
         if (ipDetails == null) {
+            Log.w(LOG_TAG_FIREWALL, "ip-details missing: initView called before onViewCreated?")
             this.dismiss()
             return
         }
@@ -148,7 +151,10 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun updateConnDetailsChip() {
-        if (ipDetails == null) return
+        if (ipDetails == null) {
+            Log.w(LOG_TAG_FIREWALL, "ip-details missing: not updating the chip details")
+            return
+        }
 
         val protocol = Protocol.getProtocolName(ipDetails!!.protocol).name
         val time = DateUtils.getRelativeTimeSpanString(ipDetails!!.timeStamp,
@@ -293,7 +299,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                 val fid = IpRulesManager.IpRuleStatus.getStatus(position)
 
                 // no need to apply rule, prev selection and current selection are same
-                if (IpRulesManager.getStatus(ipDetails!!.uid, ipDetails!!.ipAddress) == fid) return
+                if (IpRulesManager.hasRule(ipDetails!!.uid, ipDetails!!.ipAddress) == fid) return
 
                 applyIpRule(fid)
             }
@@ -341,7 +347,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun updateIpRulesUi(uid: Int, ipAddress: String) {
-        b.bsConnIpRuleSpinner.setSelection(IpRulesManager.getStatus(uid, ipAddress).id)
+        b.bsConnIpRuleSpinner.setSelection(IpRulesManager.hasRule(uid, ipAddress).id)
     }
 
     private fun showFirewallRulesDialog(blockedRule: String?) {
@@ -391,7 +397,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val protocol = Protocol.getProtocolName(ipDetails!!.protocol).name
         val connRules = ConnectionRules(ipDetails!!.ipAddress, ipDetails!!.port, protocol)
 
-        Log.d(LOG_TAG_FIREWALL,
+        Log.i(LOG_TAG_FIREWALL,
               "Apply ip rule for ${connRules.ipAddress}, ${FirewallRuleset.RULE2.name}")
         IpRulesManager.updateRule(ipDetails!!.uid, connRules.ipAddress, ipRuleStatus)
     }
@@ -435,7 +441,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             // b.root.invalidate()/ b.root.notify didn't help in this case.
             dialog.dismiss()
 
-            Log.d(LOG_TAG_FIREWALL,
+            Log.i(LOG_TAG_FIREWALL,
                   "Apply firewall rule for uid: ${ipDetails?.uid}, ${status.name}")
             FirewallManager.updateFirewallStatus(ipDetails!!.uid, status, connStatus)
             updateFirewallRulesUi(status, connStatus)

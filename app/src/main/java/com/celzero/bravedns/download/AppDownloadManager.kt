@@ -92,7 +92,8 @@ class AppDownloadManager(private val context: Context,
         val url = constructDownloadCheckUrl(type)
         val request = Request.Builder().url(url).build()
 
-        RetrofitManager.okHttpClient(getDnsTypeOnRetryCount(retryCount)).newCall(request).enqueue(object : Callback {
+        RetrofitManager.okHttpClient(getDnsTypeOnRetryCount(retryCount)).newCall(
+            request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.i(LOG_TAG_DOWNLOAD,
                       "onFailure attempt to retry($retryCount), cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()} with exception: ${e.message}")
@@ -113,7 +114,7 @@ class AppDownloadManager(private val context: Context,
 
     private fun getDnsTypeOnRetryCount(retryCount: Int): RetrofitManager.Companion.OkHttpDnsType {
         return when (retryCount) {
-            0 -> RetrofitManager.Companion.OkHttpDnsType.DEFAULT
+            0 -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
             1 -> RetrofitManager.Companion.OkHttpDnsType.CLOUDFLARE
             2 -> RetrofitManager.Companion.OkHttpDnsType.GOOGLE
             else -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
@@ -144,11 +145,6 @@ class AppDownloadManager(private val context: Context,
                 return
             }
 
-            if (type.isLocal()) {
-                persistentState.isLocalBlocklistUpdateAvailable = false
-            } else {
-                persistentState.isRemoteBlocklistUpdateAvailable = false
-            }
             timeStampToDownload.postValue(DownloadManagerStatus.NOT_REQUIRED.id)
         } catch (e: JSONException) {
             timeStampToDownload.postValue(DownloadManagerStatus.FAILURE.id)
@@ -157,9 +153,9 @@ class AppDownloadManager(private val context: Context,
 
     private fun setUpdatableTimestamp(timestamp: Long, type: DownloadType) {
         if (type.isLocal()) {
-            persistentState.updatableTimestampLocal = timestamp
+            persistentState.newestLocalBlocklistTimestamp = timestamp
         } else {
-            persistentState.updatableTimestampRemote = timestamp
+            persistentState.newestRemoteBlocklistTimestamp = timestamp
         }
     }
 
@@ -171,7 +167,7 @@ class AppDownloadManager(private val context: Context,
         }
         val appVersionCode = persistentState.appVersion
         val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
-        Log.d(LOG_TAG_DOWNLOAD, "Check for download, download type ${type.name} url: $url")
+        Log.i(LOG_TAG_DOWNLOAD, "Check for download, download type ${type.name} url: $url")
         return url
     }
 
@@ -192,7 +188,8 @@ class AppDownloadManager(private val context: Context,
         remoteDownloadStatus.postValue(DownloadManagerStatus.IN_PROGRESS.id)
         purge(context, timestamp, DownloadType.REMOTE)
 
-        val retrofit = RetrofitManager.getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT).addConverterFactory(
+        val retrofit = RetrofitManager.getBlocklistBaseBuilder(
+            RetrofitManager.Companion.OkHttpDnsType.DEFAULT).addConverterFactory(
             GsonConverterFactory.create()).build()
         val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
         val request = retrofitInterface.downloadRemoteBlocklistFile(
@@ -286,7 +283,6 @@ class AppDownloadManager(private val context: Context,
     }
 
     private fun startCustomDownloadWorker(timestamp: Long) {
-        WorkManager.getInstance(context).pruneWork()
         val data = Data.Builder()
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
         data.putLong("blocklistTimestamp", timestamp)
@@ -306,8 +302,6 @@ class AppDownloadManager(private val context: Context,
     }
 
     private fun initiateDownloadStatusCheck(timestamp: Long) {
-        WorkManager.getInstance(context).pruneWork()
-
         val data = Data.Builder()
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
         data.putLongArray("downloadIds", downloadIds)

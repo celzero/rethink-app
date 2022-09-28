@@ -78,7 +78,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                                                                      persistentState.theme)
 
     companion object {
-        const val DNSLOG = "DNSLOGS"
+        const val INSTANCE_STATE_DNSLOGS = "DNSLOGS"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -99,10 +99,11 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val data = arguments?.getString(DNSLOG)
+        val data = arguments?.getString(INSTANCE_STATE_DNSLOGS)
         transaction = Gson().fromJson(data, DnsLog::class.java)
 
         if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, dismiss the dialog")
             this.dismiss()
             return
         }
@@ -126,7 +127,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun displayRecordTypeChip() {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update chips")
+            return
+        }
 
         if (transaction!!.typeName.isEmpty()) {
             b.dnsRecordTypeChip.visibility = View.GONE
@@ -138,7 +142,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun handleCustomDomainUi() {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            return
+        }
 
         when (DomainRulesManager.matchesDomain(transaction!!.queryStr)) {
             DomainRulesManager.DomainStatus.BLOCK -> {
@@ -171,7 +178,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun applyDnsRule(status: DomainRulesManager.DomainStatus) {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to apply dns rules")
+            return
+        }
 
         DomainRulesManager.applyStatus(transaction!!.queryStr, transaction!!.responseIps,
                                        DomainRulesManager.DomainType.DOMAIN, status)
@@ -204,7 +214,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun displayDnsTransactionDetails() {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            return
+        }
 
         displayDescription()
 
@@ -242,7 +255,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun handleBlocklistChip() {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update chips")
+            return
+        }
 
         b.dnsBlockBlocklistChip.visibility = View.VISIBLE
         lightenUpChip(b.dnsBlockBlocklistChip, false)
@@ -315,7 +331,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun showIpsDialog() {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, not showing dialog")
+            return
+        }
 
         val dialogBinding = DialogIpDetailsLayoutBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
@@ -365,7 +384,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun displayDescription() {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            return
+        }
 
         val uptime = DateUtils.getRelativeTimeSpanString(transaction!!.time,
                                                          System.currentTimeMillis(),
@@ -379,7 +401,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun showResolvedState(uptime: String) {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            return
+        }
 
         if (transaction!!.isAnonymized()) { // anonymized queries answered by dns-crypt
             val text = getString(R.string.dns_btm_resolved_crypt, uptime, transaction!!.serverIP)
@@ -393,7 +418,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun showBlockedState(uptime: String) {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            return
+        }
 
         if (transaction!!.isLocallyAnswered()) { // usually true when query blocked by on-device blocklists
             b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, uptime)
@@ -404,7 +432,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun displayFavIcon() {
-        if (transaction == null) return
+        if (transaction == null) {
+            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            return
+        }
 
         if (!persistentState.fetchFavIcon || transaction!!.groundedQuery()) return
 

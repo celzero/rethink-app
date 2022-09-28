@@ -29,8 +29,7 @@ import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
 
-class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>,
-                           val uid: Int) :
+class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>, val uid: Int) :
         RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
         AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
@@ -79,7 +78,7 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
 
         private fun setupClickListeners(appConn: AppConnections, position: Int) {
             b.acdContainer.setOnClickListener {
-                val status = IpRulesManager.getStatus(uid, appConn.ipAddress)
+                val status = IpRulesManager.hasRule(uid, appConn.ipAddress)
                 // open bottom sheet for options
                 openBottomSheet(appConn.ipAddress, status, position)
             }
@@ -93,6 +92,7 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
             }
 
             val bottomSheetFragment = AppConnectionBottomSheet()
+            // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)

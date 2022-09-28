@@ -31,7 +31,7 @@ class RethinkDnsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        //turnOnStrictMode()
+        turnOnStrictMode()
 
         startKoin {
             if (BuildConfig.DEBUG) androidLogger()

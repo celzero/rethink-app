@@ -16,6 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.automaton
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.service.PersistentState
@@ -103,6 +104,10 @@ object IpRulesManager : KoinComponent {
     // returns CustomIp object based on uid and IP address
     private suspend fun getObj(uid: Int, ipAddress: String): CustomIp? {
         return customIpRepository.getCustomIpDetail(uid, ipAddress)
+    }
+
+    fun getCustomIpsLiveData(): LiveData<Int> {
+        return customIpRepository.getCustomIpsLiveData()
     }
 
     fun removeFirewallRules(uid: Int, ipAddress: String) {
@@ -248,22 +253,6 @@ object IpRulesManager : KoinComponent {
 
     private fun isIpv6ToV4FilterRequired(): Boolean {
         return persistentState.filterIpv4inIpv6
-    }
-
-    fun getStatus(uid: Int, ip: String): IpRuleStatus {
-        val ipAddress = IPAddressString(ip).address
-
-        if (!appIpRules.contains(ipAddress)) return IpRuleStatus.NONE
-
-        // get the status of the ipAddress from local list if available.
-        return appIpRules[ipAddress]?.status?.let {
-            val ruleUid = appIpRules[ipAddress]?.uid
-            if (uid == ruleUid) {
-                IpRuleStatus.getStatus(it)
-            } else {
-                IpRuleStatus.NONE
-            }
-        } ?: IpRuleStatus.NONE
     }
 
     fun clearAllIpRules() {

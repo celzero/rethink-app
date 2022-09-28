@@ -51,7 +51,7 @@ object FirewallManager : KoinComponent {
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
-    data class DnsCacheRecord(val ttl: Long, val fqdn: String)
+    data class DnsCacheRecord(val ttl: Long, val fqdn: String, val flag: String?)
 
     private const val CACHE_BUILDER_MAX_SIZE = 20000L
     private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
@@ -267,7 +267,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
-        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.ALLOW.id }
+        return getAppInfosLocked().filter { it.firewallStatus != FirewallStatus.BLOCK.id }
     }
 
     // TODO: Use the package-manager API instead
@@ -491,7 +491,7 @@ object FirewallManager : KoinComponent {
 
     fun updateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
                              connectionStatus: ConnectionStatus) {
-        Log.d(LOG_TAG_FIREWALL,
+        Log.i(LOG_TAG_FIREWALL,
               "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}")
         io {
             invalidateFirewallStatus(uid, firewallStatus, connectionStatus)

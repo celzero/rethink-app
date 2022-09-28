@@ -28,6 +28,7 @@ import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -92,7 +93,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        uid = arguments?.getInt(UID) ?: -1
+        uid = arguments?.getInt(UID) ?: INVALID_UID
         ipAddress = arguments?.getString(IPADDRESS) ?: ""
         val status = arguments?.getInt(IPRULESTATUS) ?: IpRulesManager.IpRuleStatus.NONE.id
         ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(status)
@@ -102,7 +103,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        if (uid == -1) {
+        if (uid == INVALID_UID) {
             this.dismiss()
             return
         }
@@ -125,7 +126,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (uid == -1) {
+        if (uid == INVALID_UID) {
             this.dismiss()
             return
         }

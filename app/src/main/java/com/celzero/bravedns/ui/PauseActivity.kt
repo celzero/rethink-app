@@ -68,24 +68,24 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     }
 
     private fun initView() {
-        FirewallManager.getApplistObserver().observe(this, {
+        FirewallManager.getApplistObserver().observe(this) {
             val blockedList = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
             b.pacTimerDesc.text = getString(R.string.pause_desc, blockedList.count().toString())
-        })
+        }
     }
 
     private fun observeAppState() {
-        VpnController.connectionStatus.observe(this, {
+        VpnController.connectionStatus.observe(this) {
             if (it != BraveVPNService.State.PAUSED) {
                 openHomeScreenAndFinish()
             }
-        })
+        }
     }
 
     private fun observeTimer() {
-        VpnController.getPauseCountDownObserver()?.observe(this, {
+        VpnController.getPauseCountDownObserver()?.observe(this) {
             b.pacTimer.text = humanReadableTime(it)
-        })
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

@@ -154,16 +154,6 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             if (packet != null) {
                 val addresses: List<InetAddress> = packet.responseAddresses
 
-                packet.answer.forEach { r ->
-                    val ip = r.ip ?: return@forEach
-                    // drop trailing period . from the fqdn sent in dns-answer, ie a.com. => a.com
-                    val dnsCacheRecord = FirewallManager.DnsCacheRecord(calculateTtl(r.ttl),
-                                                                        transaction.name.dropLast(
-                                                                            1))
-                    ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
-                }
-
-
                 if (addresses.isNotEmpty()) {
                     val destination = convertIpV6ToIpv4IfNeeded(addresses[0])
                     val countryCode: String? = getCountryCode(destination, context)
@@ -185,7 +175,18 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                     } else if (destination.hostAddress == UNSPECIFIED_IP_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
                         dnsLog.isBlocked = true
                     }
-                    dnsLog.flag = getFlag(countryCode)
+
+                    val flag = getFlagIfPresent(countryCode)
+                    dnsLog.flag = flag
+
+                    packet.answer.forEach { r ->
+                        val ip = r.ip ?: return@forEach
+                        // drop trailing period . from the fqdn sent in dns-answer, ie a.com. => a.com
+                        val dnsCacheRecord = FirewallManager.DnsCacheRecord(calculateTtl(r.ttl),
+                                                                            transaction.name.dropLast(
+                                                                                1), flag)
+                        ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
+                    }
                 } else {
                     // fixme: for queries with empty AAAA records, we are setting as NXDOMAIN
                     //  which needs a fix. need to check for the response's status
@@ -209,6 +210,13 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         fetchFavIcon(dnsLog)
 
         return dnsLog
+    }
+
+    private fun getFlagIfPresent(hostAddress: String?): String {
+        if (hostAddress == null) {
+            return context.getString(R.string.unicode_warning_sign)
+        }
+        return ipDomainLookup.getIfPresent(hostAddress)?.flag ?: getFlag(hostAddress)
     }
 
     suspend fun insertBatch(dnsLogs: List<DnsLog>) {

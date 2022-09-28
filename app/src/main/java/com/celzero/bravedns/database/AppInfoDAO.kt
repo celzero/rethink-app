@@ -16,9 +16,9 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface AppInfoDAO {
@@ -80,8 +80,7 @@ interface AppInfoDAO {
 
     @Query(
         "select * from AppInfo where appCategory in (:filter) and appCategory != 'Non-App System' order by lower(appName)")
-    fun getExcludedAppDetailsFilterForCategory(
-            filter: List<String>): PagingSource<Int, AppInfo>
+    fun getExcludedAppDetailsFilterForCategory(filter: List<String>): PagingSource<Int, AppInfo>
 
     @Query(
         "select * from AppInfo where appName like :filter and appCategory != 'Non-App System' order by lower(appName)")
@@ -115,10 +114,15 @@ interface AppInfoDAO {
                     firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where appName like :name and appCategory in (:cat)  and firewallStatus in (:firewall) ")
-    fun getFilteredApps(name: String, cat: Set<String>, firewall: Set<Int>): List<AppInfo>
+        "select * from AppInfo where appName like :name and appCategory in (:cat) and isSystemApp in (:appType) and firewallStatus in (:firewall) ")
+    fun getFilteredApps(name: String, cat: Set<String>, firewall: Set<Int>,
+                        appType: Set<Int>): List<AppInfo>
 
-    @Query("select * from AppInfo where appName like :name  and firewallStatus in (:firewall) ")
-    fun getFilteredApps(name: String, firewall: Set<Int>): List<AppInfo>
+    @Query(
+        "select * from AppInfo where appName like :name and isSystemApp in (:appType) and firewallStatus in (:firewall) ")
+    fun getFilteredApps(name: String, firewall: Set<Int>, appType: Set<Int>): List<AppInfo>
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 
 }
