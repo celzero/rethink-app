@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
+    <string name="app_name_rethink">Rethink</string>
     <string name="title_about">About</string>
     <string name="title_settings">Settings</string>
     <string name="pause_title_desc">taking a nap…</string>
@@ -132,6 +133,8 @@
 
     <string name="firewall_mode_info_title">Firewall</string>
     <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
+
+    <string name="apps_info_title">Apps</string>
 
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
 
@@ -291,6 +294,8 @@
         5. Other critical Firewall related bug fixes.
     </string>
 
+    <string name="connection_http3">HTTP3</string>
+
     <!-- Settings Fragment strings -->
     <string name="settings_firewall_header">firewall</string>
     <string name="settings_kill_app_heading">Kill app when firewalled (experimental)</string>
@@ -396,6 +401,9 @@
     <string name="settings_custom_downloader_heading">Use in-app downloader</string>
     <string name="settings_custom_downloader_desc">If disabled, Android\'s built-in <i>Download Manager</i> is used.</string>
 
+    <string name="settings_import_export_heading">Backup / Restore</string>
+    <string name="settings_import_export_desc">Manually back up or restore the app data and settings.</string>
+
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>
 
@@ -405,6 +413,7 @@
     <string name="settings_http_proxy_error_text2">Invalid port</string>
     <string name="settings_http_proxy_error_text3">Hostname is empty</string>
     <string name="settings_http_proxy_error_text4">Host connection failed. Try again.</string>
+    <string name="settings_http_proxy_error_text5">Invalid IP address</string>
     <string name="settings_http_proxy_toast_success">HTTP proxy is set</string>
 
     <string name="settings_http_proxy_hostname">Hostname</string>
@@ -438,10 +447,10 @@
     <string name="settings_theme_dialog_themes_4">True Black</string>
 
     <string name="settings_ip_dialog_title">Choose IP version</string>
-    <string name="settings_ip_dialog_ipv4">IPv4</string>
+    <string name="settings_ip_dialog_ipv4">IPv4 (default)</string>
     <string name="settings_ip_dialog_ipv6">IPv6</string>
-    <string name="settings_ip_dialog_ipv46">Auto (default)</string>
-    <string name="settings_ip_text_ipv46">Auto</string>
+    <string name="settings_ip_dialog_ipv46">Auto</string>
+    <string name="settings_ip_text_ipv4">IPv4</string>
 
     <string name="settings_selected_ip_desc">%1$s</string>
 
@@ -476,9 +485,9 @@
 
     <!-- Home screen -->
     <string name="firewall_card_status_inactive">Disabled</string>
-    <string name="firewall_card_status_active">%1$s apps blocked</string>
+    <string name="firewall_card_status_active">%1$s apps</string>
 
-    <string name="firewall_card_text_active">%1$s whitelisted, %2$s excluded.</string>
+    <string name="firewall_card_text_active">%1$s blocked\n%2$s by-passsed\n%3$s excluded</string>
     <string name="firewall_card_text_inactive">Enable firewall mode.</string>
     <string name="firewall_card_configure_btn">block apps</string>
 
@@ -487,6 +496,8 @@
     <string name="dns_card_latency_active">Latency: %1$sms</string>
     <string name="dns_card_latency_inactive">Enable DNS mode.</string>
     <string name="dns_card_configure_btn">change</string>
+
+    <string name="apps_card_ips_count">%1$s IP rules</string>
 
     <string name="hsf_start_btn_state">start</string>
     <string name="hsf_stop_btn_state">stop</string>
@@ -535,7 +546,7 @@
 
     <string name="dc_block_heading">rules</string>
     <string name="dc_other_dns_heading">type</string>
-    <string name="dc_other_settings_heading">general</string>
+    <string name="dc_other_settings_heading">advanced</string>
 
     <string name="dc_custom_dns_radio">Other DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
@@ -595,7 +606,7 @@
     <string name="about_mail_bugreport_subject">[RethinkDns]: Bug report</string>
     <string name="about_mail_bugreport_text">Send this email to : hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title">Select email provider</string>
-    <string name="about_telegram_link">http://www.telegram.me/rethinkdns</string>
+    <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
@@ -777,6 +788,7 @@
     <string name="fapps_filter_parent_system">System Apps</string>
 
     <string name="fapps_firewall_filter_all">All</string>
+    <string name="fapps_firewall_filter_allowed">Allowed</string>
     <string name="fapps_firewall_filter_blocked">Blocked</string>
     <string name="fapps_firewall_filter_whitelisted">Whitelisted</string>
     <string name="fapps_firewall_filter_excluded">Excluded</string>
@@ -784,6 +796,16 @@
     <string name="fapps_info_dialog_title">Info</string>
     <string name="fapps_info_dialog_message">Block apps from connecting to the Internet. Limiting access to the Internet helps prevent unwarranted data usage, as well as conserve battery.\n\nMetered (Mobile) / Unmetered (WiFi) firewall rules will not be honoured when:\n\n1. VPN is in lockdown mode (ie., <i>Block connections without VPN</i> is enabled).\n\n2. <i>Use all available networks</i> setting is enabled.</string>
     <string name="fapps_info_dialog_positive_btn">Okay</string>
+
+    <string name="fapps_unmetered_dialog_title">Unmetered</string>
+    <string name="fapps_unmetered_dialog_message">Blocking or unblockling the unmetered connections will apply for all the apps appear in the screen</string>
+    <string name="fapps_unmetered_positive">Proceed</string>
+    <string name="fapps_unmetered_negative">Cancel</string>
+
+    <string name="fapps_metered_dialog_title">Metered</string>
+    <string name="fapps_metered_dialog_message">Blocking or unblockling the metered connections will apply for all the apps appear in the screen</string>
+    <string name="fapps_metered_positive">Proceed</string>
+    <string name="fapps_metered_negative">Cancel</string>
 
     <string name="fapps_lockdown_hint">Vpn is in lockdown mode. Firewall will not honour Metered / Unmetered settings.</string>
     <string name="fapps_all_network_hint">Use all networks is enabled. Firewall will not honour Metered / Unmetered settings.</string>
@@ -868,7 +890,8 @@
     <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Unmetered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
     <string name="firewall_rule_block_app_mobile_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> network.<br/><br/> To change go to <i>All Apps</i> tab.]]></string>
     <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
-    <string name="firewall_rule_block_ip_desc"><![CDATA[A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_ip_univ_desc"><![CDATA[A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
     <string name="firewall_rule_bypass_app_rules_ip_desc"><![CDATA[This connection was allowed because the <i>destination IP</i> is set to bypass all app-specific rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
     <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[This connection was allowed because the <i>destination IP</i> is set to bypass all universal firewall rules.<br/><br/> To change go to <i>IP Rules<i> in <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_device_lock_desc"><![CDATA[This connection was firewalled because <i>device was locked</i> at the time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
@@ -877,7 +900,7 @@
     <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[This connection was allowed because the <i>source app</i> is set to <i>bypass universal</i> firewall rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
-    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change go to <i>Settings</i> page.]]></string>
+    <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> To change disable <i>Prevent DNS leaks</i> from DNS <i>Configure</i> screen.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[This connection was allowed because <i>one-click Tor-as-a-proxy</i> setup via Orbot was in progress.]]></string>
     <string name="firewall_rule_block_http_desc"><![CDATA[This connection was blocked because it likely used <i>insecure HTTP</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
 
@@ -1084,9 +1107,10 @@
 
     <string name="rt_download_start">Downloading blocklists…</string>
     <string name="rt_download">Download blocklists</string>
+    <string name="rt_cancel_download">Cancel</string>
 
     <string name="rt_chip_update_available">Update available</string>
-    <string name="rt_chip_check_update">Check for Update</string>
+    <string name="rt_chip_check_update">Check for update</string>
     <string name="rt_re_download">Re-download blocklists</string>
 
     <string name="rt_list_simple_btn_txt">simple</string>
@@ -1128,4 +1152,37 @@
     <string name="lbbs_download">Update blocklists</string>
     <string name="lbbs_heading">Configure 185+ blocklists</string>
     <string name="lbbs_version">version: %1$s</string>
+
+    <!-- backup / restore bottom sheet -->
+    <string name="brbs_title">Backup / Restore</string>
+    <string name="brbs_backup_title">Backup</string>
+    <string name="brbs_backup_desc">Manually back up data and settings</string>
+    <string name="brbs_restore_title">Restore</string>
+    <string name="brbs_restore_desc">Manually restore data and settings</string>
+
+    <string name="brbs_backup_dialog_title">Backup</string>
+    <string name="brbs_backup_dialog_message">Click on proceed to begin the backup process, this will stop the app\'s VPN connection</string>
+    <string name="brbs_backup_dialog_positive">Proceed</string>
+    <string name="brbs_backup_dialog_negative">Cancel</string>
+
+    <string name="brbs_restore_dialog_title">Restore</string>
+    <string name="brbs_restore_dialog_message">Click on proceed to begin the restore process, this will stop the app\'s VPN connection</string>
+    <string name="brbs_restore_dialog_positive">Proceed</string>
+    <string name="brbs_restore_dialog_negative">Cancel</string>
+
+    <string name="brbs_backup_dialog_failure_title">Backup failure</string>
+    <string name="brbs_backup_dialog_failure_message">Something went wrong. Backup file not stored.</string>
+    <string name="brbs_backup_dialog_failure_positive">Try again</string>
+    <string name="brbs_backup_dialog_failure_negative">Cancel</string>
+
+    <string name="brbs_restore_dialog_failure_title">Restore failure</string>
+    <string name="brbs_restore_dialog_failure_message">Something went wrong. Restore did not happen.</string>
+    <string name="brbs_restore_dialog_failure_positive">Try again</string>
+    <string name="brbs_restore_dialog_failure_negative">Cancel</string>
+
+    <string name="brbs_restore_complete_toast">Restore complete, restarting...</string>
+    <string name="brbs_backup_complete_toast">Backup complete</string>
+    <string name="brbs_restore_no_uri_toast">Restore failed. Try again later.</string>
+    <string name="brbs_restore_failed_toast">Restore Operation Failed</string>
+
 </resources>

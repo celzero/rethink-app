@@ -277,7 +277,8 @@ class Utilities {
         }
 
         fun isLanIpv4(ipAddress: String): Boolean {
-            val ip = IPAddressString(ipAddress).address
+            val ip = IPAddressString(ipAddress).address ?: return false
+
             return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip)
         }
 
@@ -368,17 +369,23 @@ class Utilities {
         }
 
         // ref: https://stackoverflow.com/a/41818556
-        fun copyWithStream(readStream: InputStream, writeStream: OutputStream) {
+        fun copyWithStream(readStream: InputStream, writeStream: OutputStream): Boolean {
             val length = 256
             val buffer = ByteArray(length)
-            var bytesRead: Int = readStream.read(buffer, 0, length)
-            // write the required bytes
-            while (bytesRead > 0) {
-                writeStream.write(buffer, 0, bytesRead)
-                bytesRead = readStream.read(buffer, 0, length)
+            return try {
+                var bytesRead: Int = readStream.read(buffer, 0, length)
+                // write the required bytes
+                while (bytesRead > 0) {
+                    writeStream.write(buffer, 0, bytesRead)
+                    bytesRead = readStream.read(buffer, 0, length)
+                }
+                readStream.close()
+                writeStream.close()
+                true
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DOWNLOAD, "Issue while copying files using streams: ${e.message}, $e")
+                false
             }
-            readStream.close()
-            writeStream.close()
         }
 
         fun isAlwaysOnEnabled(context: Context, vpnService: BraveVPNService?): Boolean {
@@ -588,9 +595,7 @@ class Utilities {
 
             return try {
                 val a = remoteBlocklistDownloadBasePath(ctx, which, timestamp)
-                Log.d(LoggerConstants.LOG_TAG_DNS, "Path: $a")
                 File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
-
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
