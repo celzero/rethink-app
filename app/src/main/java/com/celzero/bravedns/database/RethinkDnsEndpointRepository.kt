@@ -80,4 +80,12 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
     suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
         return rethinkDnsEndpointDao.getRethinkPlusEndpoint()
     }
+
+    suspend fun switchToMax() {
+        rethinkDnsEndpointDao.switchToMax()
+    }
+
+    suspend fun switchToBasic() {
+        rethinkDnsEndpointDao.switchToBasic()
+    }
 }

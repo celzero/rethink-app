@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="primaryLightColorText">#BDBDBD</color>
+    <color name="primaryLightColorText">#BFBDBDBD</color>
 
     <!-- 2nd Gradient color -->
     <color name="colorAmber_900">#FF1744</color>
@@ -134,7 +134,7 @@
     <color name="fillLight">#00000000</color>
 
     <color name="primaryTextLight">#000000</color>
-    <color name="primaryLightColorTextLight">#000000</color>
+    <color name="primaryLightColorTextLight">#BF000000</color>
     <color name="primaryDarkColorTextLight">#FFFFFF</color>
     <color name="chipTextColorLight">#FFFFFF</color>
     <color name="invertedPrimaryTextLight">#FFFFFF</color>
@@ -186,7 +186,7 @@
     <color name="fillBlack">#00000000</color>
 
     <color name="primaryTextBlack">#FDFDFD</color>
-    <color name="primaryLightColorTextBlack">#FDFDFD</color>
+    <color name="primaryLightColorTextBlack">#BFFDFDFD</color>
     <color name="chipTextColorBlack">#ececec</color>
     <color name="invertedPrimaryTextBlack">#4fc3f7</color>
     <color name="secondaryTextBlack">#4fc3f7</color>
