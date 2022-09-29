@@ -40,7 +40,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
-        UNIVERSAL(0), LOGS(1), ALL_APPS(2);
+        UNIVERSAL(0), LOGS(1);
 
         companion object {
             fun getCount(): Int {
@@ -67,7 +67,6 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
                 return when (position) {
                     Tabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
                     Tabs.LOGS.screen -> ConnectionTrackerFragment.newInstance()
-                    Tabs.ALL_APPS.screen -> FirewallAppFragment.newInstance()
                     else -> UniversalFirewallFragment.newInstance()
                 }
             }
@@ -82,7 +81,6 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
             tab.text = when (position) {
                 Tabs.UNIVERSAL.screen -> getString(R.string.firewall_act_universal_tab)
                 Tabs.LOGS.screen -> getString(R.string.firewall_act_network_monitor_tab)
-                Tabs.ALL_APPS.screen -> getString(R.string.firewall_act_apps_tab)
                 else -> getString(R.string.firewall_act_universal_tab)
             }
         }.attach()

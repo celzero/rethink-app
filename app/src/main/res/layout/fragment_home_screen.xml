@@ -18,7 +18,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/fhs_title_rethink"
@@ -35,10 +36,10 @@
                 android:id="@+id/fhs_sponsor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?android:attr/selectableItemBackground"
                 android:layout_alignParentEnd="true"
-                android:padding="10dp"
                 android:layout_centerVertical="true"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="10dp"
                 android:src="@drawable/ic_heart" />
 
         </RelativeLayout>
@@ -46,77 +47,47 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:baselineAligned="true"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal"
-            android:visibility="visible"
             android:weightSum="1">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginStart="10dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
                 android:layout_weight="0.5"
-                android:background="@drawable/rectangle_border_background">
+                android:orientation="vertical"
+                android:weightSum="1">
 
                 <LinearLayout
-                    android:id="@+id/fhs_card_dns_ll"
+                    android:id="@+id/fhs_sponsor_ll"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="0.25"
                     android:background="@drawable/rounded_corner_button_bg"
                     android:orientation="vertical">
 
                     <TextView
                         style="@style/TextAppearance.Widget.HomeScreen.Title"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/dns_mode_info_title"
-                        app:drawableEndCompat="@drawable/dns_home_screen" />
-
-                    <TextView
-                        android:id="@+id/fhs_card_dns_connected_dns"
-                        style="@style/TextAppearance.Widget.HomeScreen.Desc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:id="@+id/fhs_card_dns_latency"
-                        style="@style/TextAppearance.Widget.HomeScreen.Desc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:paddingBottom="5dp"
-                        android:textSize="@dimen/default_font_text_view" />
-
-                    <Button
-                        android:id="@+id/fhs_card_dns_configure"
-                        style="@style/Button.HomeScreen.Borderless"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_margin="1dp"
-                        android:background="@drawable/rounded_corner_button_bg"
-                        android:minHeight="40dp"
-                        android:text="@string/dns_card_configure_btn"
-                        android:textSize="@dimen/large_font_text_view"
-                        android:visibility="gone" />
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:text="@string/app_name_rethink"
+                        android:textColor="?attr/invertedPrimaryTextColor"
+                        app:drawableEndCompat="@drawable/ic_heart_accent" />
 
                 </LinearLayout>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="0.5"
-                android:background="@drawable/rectangle_border_background">
-
                 <LinearLayout
-                    android:id="@+id/fhs_card_firewall_ll"
+                    android:id="@+id/fhs_card_apps_ll"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.75"
                     android:background="@drawable/rounded_corner_button_bg"
                     android:orientation="vertical">
 
@@ -124,28 +95,27 @@
                         style="@style/TextAppearance.Widget.HomeScreen.Title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/firewall_mode_info_title"
+                        android:text="@string/apps_info_title"
                         android:textColor="?attr/invertedPrimaryTextColor"
                         app:drawableEndCompat="@drawable/firewall_home_screen" />
 
                     <TextView
-                        android:id="@+id/fhs_card_firewall_status"
-                        style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                        android:id="@+id/fhs_card_apps_status"
+                        style="@style/TextAppearance.Widget.HomeScreen.Desc.1"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp" />
 
                     <TextView
-                        android:id="@+id/fhs_card_firewall_apps"
-                        style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                        android:id="@+id/fhs_card_apps"
+                        style="@style/TextAppearance.Widget.HomeScreen.Desc.1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:paddingBottom="5dp"
                         android:textSize="@dimen/default_font_text_view" />
 
-
                     <Button
-                        android:id="@+id/fhs_card_firewall_configure"
                         style="@style/Button.HomeScreen.Borderless"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
@@ -155,6 +125,100 @@
                         android:text="@string/firewall_card_configure_btn"
                         android:textSize="@dimen/large_font_text_view"
                         android:visibility="gone" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="0.5"
+                android:baselineAligned="true"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="0.5">
+
+                    <LinearLayout
+                        android:id="@+id/fhs_card_dns_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_corner_button_bg"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextAppearance.Widget.HomeScreen.Title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dns_mode_info_title"
+                            app:drawableEndCompat="@drawable/dns_home_screen" />
+
+                        <TextView
+                            android:id="@+id/fhs_card_dns_connected_dns"
+                            style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/fhs_card_dns_latency"
+                            style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:paddingBottom="5dp"
+                            android:textSize="@dimen/default_font_text_view" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fhs_card_firewall_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.5">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_corner_button_bg"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextAppearance.Widget.HomeScreen.Title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/firewall_mode_info_title"
+                            android:textColor="?attr/invertedPrimaryTextColor"
+                            app:drawableEndCompat="@drawable/firewall_home_screen" />
+
+                        <TextView
+                            android:id="@+id/fhs_card_firewall_ips"
+                            style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/fhs_card_firewall_univ_rules"
+                            style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:paddingBottom="5dp"
+                            android:textSize="@dimen/default_font_text_view"
+                            android:visibility="invisible" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </LinearLayout>

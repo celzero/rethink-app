@@ -18,7 +18,8 @@
             android:layout_height="match_parent"
             android:clickable="true"
             android:focusable="true"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/lb_list_toggle_group"
@@ -171,11 +172,11 @@
             android:clickable="true"
             android:focusable="true"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
-                android:layout_height="350dp"
+                android:layout_height="300dp"
                 android:layout_gravity="bottom|center"
                 android:layout_margin="50dp"
                 android:src="@drawable/illustrations_download" />
@@ -222,6 +223,17 @@
                     android:text="@string/rt_download"
                     android:textColor="?attr/chipTextColor" />
             </RelativeLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/lb_cancel_download_btn"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:minHeight="40dp"
+                android:text="@string/rt_cancel_download"
+                android:textColor="?attr/primaryTextColor" />
         </LinearLayout>
 
     </LinearLayout>

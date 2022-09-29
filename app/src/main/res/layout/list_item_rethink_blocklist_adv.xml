@@ -82,6 +82,7 @@
                     android:background="@drawable/rectangle_border_background"
                     android:ellipsize="end"
                     android:padding="5dp"
+                    android:alpha="0.75"
                     android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
@@ -94,6 +95,7 @@
                     android:ellipsize="end"
                     android:padding="5dp"
                     android:text="Dummy Package"
+                    android:alpha="0.75"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
             </LinearLayout>
