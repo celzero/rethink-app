@@ -201,7 +201,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         when (persistentState.internetProtocolType) {
             InternetProtocol.IPv4.id -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_dialog_ipv4))
+                                                     getString(R.string.settings_ip_text_ipv4))
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
             InternetProtocol.IPv6.id -> {
@@ -211,12 +211,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
             InternetProtocol.IPv46.id -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_text_ipv46))
+                                                     getString(R.string.settings_ip_dialog_ipv46))
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
             else -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_text_ipv46))
+                                                     getString(R.string.settings_ip_text_ipv4))
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
         }
@@ -408,6 +408,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
                                     Toast.LENGTH_SHORT)
             }
         }
+
+        // settings_activity_import_export_rl
+        b.settingsActivityImportExportRl.setOnClickListener {
+            invokeImportExport()
+        }
+    }
+
+    private fun invokeImportExport() {
+        val bottomSheetFragment = BackupRestoreBottomSheetFragment()
+        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun handleOrbotUiEvent() {
@@ -830,8 +840,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             if (isValid && isIPValid) {
                 //Do the Socks5 Proxy setting there
                 persistentState.udpBlockedSettings = udpBlockCheckBox.isChecked
-                insertProxyEndpointDB(mode, appPackageName, ip, port, userName, password,
-                                      isUDPBlock)
+                insertSocks5ProxyEndpointDB(mode, appPackageName, ip, port, userName, password,
+                                            isUDPBlock)
                 b.settingsActivitySocks5Desc.text = getString(
                     R.string.settings_socks_forwarding_desc, ip, port.toString(), appName)
                 dialog.dismiss()
@@ -851,8 +861,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     }
 
 
-    private fun insertProxyEndpointDB(mode: String, appName: String?, ip: String, port: Int,
-                                      userName: String, password: String, isUDPBlock: Boolean) {
+    private fun insertSocks5ProxyEndpointDB(mode: String, appName: String?, ip: String, port: Int,
+                                            userName: String, password: String,
+                                            isUDPBlock: Boolean) {
         if (appName == null) return
 
         b.settingsActivitySocks5Switch.isEnabled = false
@@ -866,12 +877,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
         }
         io {
-            var proxyName = Constants.SOCKS
-            if (proxyName.isBlank()) {
-                proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
-                    appName
-                } else ip
-            }
+            val proxyName = Constants.SOCKS
             val proxyEndpoint = ProxyEndpoint(id = 0, proxyName, proxyMode = 1, mode, appName, ip,
                                               port, userName, password, isSelected = true,
                                               isCustom = true, isUDP = isUDPBlock,

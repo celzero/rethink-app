@@ -43,7 +43,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_U
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_OCTET
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_XZIP
 import com.celzero.bravedns.backup.RestoreAgent
-import com.celzero.bravedns.databinding.ActivityImportExportBinding
+import com.celzero.bravedns.databinding.ActivityBackupRestoreBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Themes
@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit
 
 
 class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
-    private var _binding: ActivityImportExportBinding? = null
+    private var _binding: ActivityBackupRestoreBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -76,7 +76,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        _binding = ActivityImportExportBinding.inflate(inflater, container, false)
+        _binding = ActivityBackupRestoreBinding.inflate(inflater, container, false)
         return b.root
     }
 

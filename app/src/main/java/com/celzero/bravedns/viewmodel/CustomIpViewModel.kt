@@ -46,7 +46,7 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
         }
     }
 
-    val customIpSize = customIpDao.getBlockedConnectionCountLiveData()
+    val customIpSize = customIpDao.getCustomIpsLiveData()
 
     fun setFilter(filter: String) {
         filteredList.value = filter

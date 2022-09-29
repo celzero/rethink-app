@@ -37,23 +37,21 @@ import com.celzero.bravedns.adapter.RethinkLocalAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RethinkRemoteAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RethinkSimpleViewAdapter
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
-import com.celzero.bravedns.customdownloader.LocalBlocklistDownloader
+import com.celzero.bravedns.customdownloader.LocalBlocklistDownloader.Companion.CUSTOM_DOWNLOAD
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.FragmentRethinkBlocklistBinding
 import com.celzero.bravedns.download.AppDownloadManager
-import com.celzero.bravedns.download.DownloadConstants
+import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
+import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_STAMP
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.RethinkBlocklistFragment.RethinkBlocklistType.Companion.getType
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_2
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.hasRemoteBlocklists
@@ -295,6 +293,10 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             }
         }
 
+        b.lbCancelDownloadBtn.setOnClickListener {
+            cancelDownloadWorkManager()
+        }
+
         b.lbBlocklistApplyBtn.setOnClickListener {
             // update rethink stamp
             setStamp(modifiedStamp)
@@ -331,13 +333,25 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
     private fun isLocalBlocklistDownloadInitiated(): Boolean {
         return if (persistentState.useCustomDownloadManager) {
-            WorkScheduler.isWorkScheduled(requireContext(),
-                                          LocalBlocklistDownloader.CUSTOM_DOWNLOAD)
+            WorkScheduler.isWorkScheduled(requireContext(), CUSTOM_DOWNLOAD)
         } else {
             WorkScheduler.isWorkScheduled(requireContext(),
-                                          DownloadConstants.DOWNLOAD_TAG) || WorkScheduler.isWorkScheduled(
-                requireContext(), DownloadConstants.FILE_TAG)
+                                          DOWNLOAD_TAG) || WorkScheduler.isWorkScheduled(
+                requireContext(), FILE_TAG)
         }
+    }
+
+    private fun cancelDownloadWorkManager() {
+        if (!isLocalBlocklistDownloadInitiated()) return
+
+        if (persistentState.useCustomDownloadManager) {
+            WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
+                CUSTOM_DOWNLOAD)
+        } else {
+            WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
+                DOWNLOAD_TAG)
+        }
+        WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(FILE_TAG)
     }
 
     private fun clearSelectedTags() {
@@ -378,7 +392,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun setStamp(stamp: String) {
-        Log.d(LoggerConstants.LOG_TAG_VPN,
+        Log.i(LoggerConstants.LOG_TAG_VPN,
               "Rethink dns, set stamp for blocklist type: ${type.name} with $stamp, count: ${selectedFileTags.value?.size}")
         if (type.isLocal()) {
             persistentState.localBlocklistStamp = stamp
@@ -599,11 +613,11 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
 
         // observer for custom download manager worker
-        workManager.getWorkInfosByTagLiveData(LocalBlocklistDownloader.CUSTOM_DOWNLOAD).observe(
+        workManager.getWorkInfosByTagLiveData(CUSTOM_DOWNLOAD).observe(
             viewLifecycleOwner) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
             Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "WorkManager state: ${workInfo.state} for ${LocalBlocklistDownloader.CUSTOM_DOWNLOAD}")
+                  "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD")
             if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
                 onDownloadStart()
             } else if (WorkInfo.State.SUCCEEDED == workInfo.state) {
@@ -612,48 +626,48 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
                 onDownloadFail()
                 workManager.pruneWork()
-                workManager.cancelAllWorkByTag(LocalBlocklistDownloader.CUSTOM_DOWNLOAD)
+                workManager.cancelAllWorkByTag(CUSTOM_DOWNLOAD)
             } else { // state == blocked
                 // no-op
             }
         }
 
         // observer for Androids default download manager
-        workManager.getWorkInfosByTagLiveData(DownloadConstants.DOWNLOAD_TAG).observe(
+        workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(
             viewLifecycleOwner) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
             Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "WorkManager state: ${workInfo.state} for ${DownloadConstants.DOWNLOAD_TAG}")
+                  "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG")
             if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
                 onDownloadStart()
             } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
                 onDownloadFail()
                 workManager.pruneWork()
-                workManager.cancelAllWorkByTag(DownloadConstants.DOWNLOAD_TAG)
-                workManager.cancelAllWorkByTag(DownloadConstants.FILE_TAG)
+                workManager.cancelAllWorkByTag(DOWNLOAD_TAG)
+                workManager.cancelAllWorkByTag(FILE_TAG)
             } else { // state == blocked, succeeded
                 // no-op
             }
         }
 
-        workManager.getWorkInfosByTagLiveData(DownloadConstants.FILE_TAG).observe(
+        workManager.getWorkInfosByTagLiveData(FILE_TAG).observe(
             viewLifecycleOwner) { workInfoList ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
                     Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager completed - ${DownloadConstants.FILE_TAG}")
+                          "AppDownloadManager Work Manager completed - $FILE_TAG")
                     onDownloadSuccess()
                     workManager.pruneWork()
                 } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
                     onDownloadFail()
                     workManager.pruneWork()
-                    workManager.cancelAllWorkByTag(DownloadConstants.FILE_TAG)
+                    workManager.cancelAllWorkByTag(FILE_TAG)
                     Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager failed - ${DownloadConstants.FILE_TAG}")
+                          "AppDownloadManager Work Manager failed - $FILE_TAG")
                 } else {
                     Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager - ${DownloadConstants.FILE_TAG}, ${workInfo.state}")
+                          "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}")
                 }
             }
         }
@@ -673,6 +687,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         b.lbDownloadProgress.visibility = View.GONE
         b.lbDownloadProgressRemote.visibility = View.GONE
         b.lbDownloadBtn.visibility = View.VISIBLE
+        b.lbDownloadBtn.isEnabled = true
         b.lbDownloadBtn.text = getString(R.string.rt_download)
         showDownloadUi()
         hideConfigureUi()
@@ -685,10 +700,12 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         b.lbDownloadProgressRemote.visibility = View.GONE
         b.lbDownloadBtn.text = getString(R.string.rt_download)
         hideDownloadUi()
-        showConfigureUi()
+        //showConfigureUi()
         hasBlocklist()
         b.lbListToggleGroup.check(R.id.lb_simple_toggle_btn)
-        showToastUiCentered(requireContext(), getString(R.string.download_update_dialog_message_success), Toast.LENGTH_SHORT)
+        showToastUiCentered(requireContext(),
+                            getString(R.string.download_update_dialog_message_success),
+                            Toast.LENGTH_SHORT)
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
