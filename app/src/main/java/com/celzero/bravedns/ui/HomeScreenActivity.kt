@@ -125,20 +125,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         setupNavigationItemSelectedListener()
 
-        // TODO: Remove this from home screen and move it to vpn service
-        IpRulesManager.loadIpRules()
+        // handle intent receiver for backup/restore
+        handleIntent()
 
         refreshDatabase.deleteOlderDataFromNetworkLogs()
 
         initUpdateCheck()
 
         observeAppState()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // handle intent receiver for backup/restore
-        handleIntent()
     }
 
     private fun handleIntent() {

@@ -285,21 +285,40 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     }
 
     private fun setupClickListeners() {
+        b.settingsActivityEnableLogsRl.setOnClickListener {
+            b.settingsActivityEnableLogsSwitch.isChecked = !b.settingsActivityEnableLogsSwitch.isChecked
+        }
+
         b.settingsActivityEnableLogsSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.logsEnabled = b
         }
 
+        b.settingsActivityAutoStartRl.setOnClickListener {
+            b.settingsActivityAutoStartSwitch.isChecked = !b.settingsActivityAutoStartSwitch.isChecked
+        }
+
         b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.prefAutoStartBootUp = b
+        }
+        
+        b.settingsActivityKillAppRl.setOnClickListener {
+            b.settingsActivityKillAppSwitch.isChecked = !b.settingsActivityKillAppSwitch.isChecked
         }
 
         b.settingsActivityKillAppSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.killAppOnFirewall = b
         }
 
+        b.settingsActivityCheckUpdateRl.setOnClickListener {
+            b.settingsActivityCheckUpdateSwitch.isChecked = !b.settingsActivityCheckUpdateSwitch.isChecked
+        }
 
         b.settingsActivityCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.checkForAppUpdate = b
+        }
+
+        b.settingsActivityAllNetworkRl.setOnClickListener {
+            b.settingsActivityAllNetworkSwitch.isChecked = !b.settingsActivityAllNetworkSwitch.isChecked
         }
 
         b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
@@ -309,6 +328,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
 
             persistentState.useMultipleNetworks = b
+        }
+
+        b.settingsActivityAllowBypassRl.setOnClickListener {
+            b.settingsActivityAllowBypassSwitch.isChecked = !b.settingsActivityAllowBypassSwitch.isChecked
         }
 
         b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
@@ -328,6 +351,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
 
         b.settingsActivityVpnLockdownDesc.setOnClickListener {
             openVpnProfile(requireContext())
+        }
+
+        b.settingsActivitySocks5Rl.setOnClickListener {
+            b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
         }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
@@ -355,6 +382,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
 
         b.settingsActivityOrbotContainer.setOnClickListener {
             handleOrbotUiEvent()
+        }
+
+        b.settingsActivityHttpProxyContainer.setOnClickListener {
+            b.settingsActivityHttpProxySwitch.isChecked = !b.settingsActivityHttpProxySwitch.isChecked
         }
 
         b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
@@ -389,6 +420,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             showNotificationActionDialog()
         }
 
+        b.settingsActivityDownloaderRl.setOnClickListener {
+            b.settingsActivityDownloaderSwitch.isChecked = !b.settingsActivityDownloaderSwitch.isChecked
+        }
+
         b.settingsActivityDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.useCustomDownloadManager = b
         }
@@ -396,6 +431,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityIpRl.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityIpRl)
             showIpDialog()
+        }
+
+        b.settingsActivityPtransRl.setOnClickListener {
+            b.settingsActivityPtransSwitch.isChecked = !b.settingsActivityPtransSwitch.isChecked
         }
 
         b.settingsActivityPtransSwitch.setOnCheckedChangeListener { _, isSelected ->
