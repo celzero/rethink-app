@@ -31,14 +31,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEFAULT_DOH_URL
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.blocklistFile
 import com.celzero.bravedns.util.Utilities.Companion.getNonLiveDnscryptServers
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
@@ -112,7 +107,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     }
 
     private fun setPreferredEngine(tunnelOptions: TunnelOptions) {
-        Log.d(LOG_TAG_VPN,
+        Log.i(LOG_TAG_VPN,
               "Preferred engine name:${tunnelOptions.preferredEngine.name},id: ${tunnelOptions.preferredEngine.getPreferredEngine()}")
         Tun2socks.preferredEngine(tunnelOptions.preferredEngine.getPreferredEngine())
     }
@@ -272,7 +267,8 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     private fun setProxyMode(userName: String?, password: String?, ipAddress: String?, port: Int) {
         try {
             tunnel?.startProxy(userName, password, ipAddress, port.toString())
-            Log.i(LOG_TAG_VPN, "Proxy mode set: $userName$ipAddress$port with tunnel proxyoptions: ${tunnel?.proxyOptions}")
+            Log.i(LOG_TAG_VPN,
+                  "Proxy mode set: $userName$ipAddress$port with tunnel proxyoptions: ${tunnel?.proxyOptions}")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: could not start proxy $userName@$ipAddress:$port",
                   e)
@@ -412,7 +408,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             // I/GoLog: Failed to read packet from TUN: read : bad file descriptor
             val dohTransport: Transport = makeDohTransport(dohURL, tunnelOptions.listener)
             tunnel?.dns = dohTransport
-            Log.i(LOG_TAG_VPN, "connect tunnel with doh: $dohURL, opts: $tunnelOptions")
+            Log.i(LOG_TAG_VPN, "update tun with doh: $dohURL, opts: $tunnelOptions")
 
             // Set brave dns to tunnel - Local/Remote
             setBraveDnsBlocklistMode(tunnelOptions.tunDnsMode, dohURL)
@@ -468,26 +464,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     }
 
     private fun makeLocalBraveDns(): BraveDNS? {
-        return try {
-            // FIXME: canonical path may go missing but is unhandled
-            val path: String = Utilities.localBlocklistDownloadBasePath(context,
-                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                        persistentState.localBlocklistTimestamp)
-            Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
-                                  path + ONDEVICE_BLOCKLIST_FILE_RD,
-                                  path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                                  path + ONDEVICE_BLOCKLIST_FILE_TAG)
-        } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
-            // Set local blocklist enabled to false and reset the timestamp
-            // if there is a failure creating bravedns
-            persistentState.blocklistEnabled = false
-            // this exception may occur when the local blocklist files are either missing
-            // or corrupted. Reset local blocklist timestamp to make sure
-            // user is prompted to download blocklists again on the next try
-            persistentState.localBlocklistTimestamp = 0
-            null
-        }
+        return appConfig.getBraveDnsObj()
     }
 
     companion object {

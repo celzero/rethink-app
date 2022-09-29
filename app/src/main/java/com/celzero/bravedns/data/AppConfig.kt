@@ -26,12 +26,21 @@ import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
+import com.celzero.bravedns.util.Utilities
+import dnsx.BraveDNS
+import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +60,7 @@ class AppConfig internal constructor(private val context: Context,
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
+    private var braveDns: BraveDNS? = null
 
     companion object {
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
@@ -63,6 +73,39 @@ class AppConfig internal constructor(private val context: Context,
     init {
         connectedDns.postValue(persistentState.connectedDnsName)
         setDnsMode()
+        createBraveDnsObjectIfNeeded()
+    }
+
+    private fun createBraveDnsObjectIfNeeded() {
+        if (!persistentState.blocklistEnabled) return
+
+        try {
+            // FIXME: canonical path may go missing but is unhandled
+            val path: String = Utilities.localBlocklistDownloadBasePath(context,
+                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                                        persistentState.localBlocklistTimestamp)
+            braveDns = Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
+                                             path + ONDEVICE_BLOCKLIST_FILE_RD,
+                                             path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                                             path + ONDEVICE_BLOCKLIST_FILE_TAG)
+        } catch (e: Exception) {
+            // Set local blocklist enabled to false and reset the timestamp
+            // if there is a failure creating bravedns
+            persistentState.blocklistEnabled = false
+            Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
+            // Set local blocklist enabled to false and reset the timestamp
+            // or corrupted. Reset local blocklist timestamp to make sure
+            // user is prompted to download blocklists again on the next try
+            persistentState.localBlocklistTimestamp = INIT_TIME_MS
+        }
+    }
+
+    fun getBraveDnsObj(): BraveDNS? {
+        if (braveDns == null) {
+            createBraveDnsObjectIfNeeded()
+        }
+
+        return braveDns
     }
 
     data class TunnelOptions(val tunDnsMode: TunDnsMode, val tunFirewallMode: TunFirewallMode,
@@ -442,6 +485,14 @@ class AppConfig internal constructor(private val context: Context,
 
     private fun isValidDnsType(dt: DnsType): Boolean {
         return (dt == DnsType.DOH || dt == DnsType.DNSCRYPT || dt == DnsType.DNS_PROXY || dt == DnsType.RETHINK_REMOTE || dt == DnsType.NETWORK_DNS)
+    }
+
+    suspend fun switchRethinkDnsToMax() {
+        rethinkDnsEndpointRepository.switchToMax()
+    }
+
+    suspend fun switchRethinkDnsToBasic() {
+        rethinkDnsEndpointRepository.switchToBasic()
     }
 
     fun getConnectedDns(): String {
