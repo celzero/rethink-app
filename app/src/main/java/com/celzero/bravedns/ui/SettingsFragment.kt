@@ -206,12 +206,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
             InternetProtocol.IPv6.id -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_dialog_ipv6))
+                                                     getString(R.string.settings_ip_text_ipv6))
                 b.settingsActivityPtransRl.visibility = View.VISIBLE
             }
             InternetProtocol.IPv46.id -> {
                 b.genSettingsIpDesc.text = getString(R.string.settings_selected_ip_desc,
-                                                     getString(R.string.settings_ip_dialog_ipv46))
+                                                     getString(R.string.settings_ip_text_ipv46))
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
             else -> {

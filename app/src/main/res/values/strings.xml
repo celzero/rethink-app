@@ -285,7 +285,7 @@
     <string name="app_mode_choose">Choose mode</string>
 
     <string name="whats_dialog_title">What\'s new in v053j</string>
-    <string name="whats_new_version_name">🌎&#128330; International Day of Peace (21 Sept) &#128330;🌎</string>
+    <string name="whats_new_version_name">🌎&#128330; World Student\'s Day (15 Oct) &#128330;🌎</string>
     <string name="whats_new_version_update"><b>Make IPv6 Work... Again</b>\n\n
         1. Fixes for connectivity issues seen by Meta apps (Facebook, Messenger, Instagram, etc).\n
         2. Improved Orbot integration.\n
@@ -448,9 +448,11 @@
 
     <string name="settings_ip_dialog_title">Choose IP version</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (default)</string>
-    <string name="settings_ip_dialog_ipv6">IPv6</string>
-    <string name="settings_ip_dialog_ipv46">Auto</string>
+    <string name="settings_ip_dialog_ipv6">IPv6 (experimental)</string>
+    <string name="settings_ip_dialog_ipv46">Auto (experimental)</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
+    <string name="settings_ip_text_ipv6">IPv6</string>
+    <string name="settings_ip_text_ipv46">Auto</string>
 
     <string name="settings_selected_ip_desc">%1$s</string>
 
