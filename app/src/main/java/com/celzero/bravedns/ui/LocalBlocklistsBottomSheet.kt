@@ -128,8 +128,6 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initializeObservers() {
-        observeWorkManager()
-
         appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
             Log.i(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
@@ -187,6 +185,8 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                 return@observe
             }
         }
+
+        observeWorkManager()
     }
 
     private fun showCheckDownloadProgressUi() {

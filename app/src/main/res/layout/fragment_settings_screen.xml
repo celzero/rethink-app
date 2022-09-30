@@ -75,6 +75,7 @@
             android:id="@+id/settings_activity_allow_bypass_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
@@ -136,6 +137,7 @@
             android:id="@+id/settings_activity_all_network_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
@@ -247,6 +249,7 @@
         <RelativeLayout
             android:id="@+id/settings_activity_ptrans_rl"
             android:layout_width="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
@@ -319,6 +322,7 @@
             android:id="@+id/settings_activity_socks5_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
@@ -380,6 +384,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingBottom="20dp"
             android:visibility="visible">
 
@@ -520,6 +525,7 @@
             android:id="@+id/settings_activity_enable_logs_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
@@ -627,6 +633,7 @@
             android:id="@+id/settings_activity_check_update_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
@@ -737,6 +744,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -789,6 +797,7 @@
             android:id="@+id/settings_activity_downloader_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
@@ -912,6 +921,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="80dp"
             android:paddingTop="20dp"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingBottom="15dp">
 
             <androidx.appcompat.widget.AppCompatImageView

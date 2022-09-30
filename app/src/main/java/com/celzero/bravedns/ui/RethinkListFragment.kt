@@ -43,6 +43,7 @@ import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_B
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.UID
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
@@ -169,6 +170,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private fun initView() {
         showBlocklistVersionUi()
         showUpdateCheckUi()
+        updateMaxSwitchUi()
 
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDohConnections.layoutManager = layoutManager
@@ -179,6 +181,16 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerDohConnections.adapter = recyclerAdapter
+    }
+
+    private fun updateMaxSwitchUi() {
+        ui {
+            var endpointUrl: String? = ""
+            ioCtx {
+                endpointUrl = appConfig.getRethinkPlusEndpoint().url
+            }
+            b.frlSwitchMax.isChecked = (endpointUrl?.contains(MAX_ENDPOINT) == true)
+        }
     }
 
     private fun initClickListeners() {
@@ -428,6 +440,9 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun onDownloadSuccess() {
         isDownloadInitiated = false
+        b.lbVersion.text = getString(R.string.settings_local_blocklist_version,
+                                     Utilities.convertLongToTime(getDownloadTimeStamp(),
+                                                                 Constants.TIME_FORMAT_2))
         enableChips()
         showRedownloadUi()
         Utilities.showToastUiCentered(requireContext(),
@@ -480,6 +495,12 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             withContext(Dispatchers.IO) {
                 f()
             }
+        }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            f()
         }
     }
 

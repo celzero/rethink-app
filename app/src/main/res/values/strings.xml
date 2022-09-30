@@ -1180,9 +1180,9 @@
     <string name="brbs_restore_dialog_failure_positive">Try again</string>
     <string name="brbs_restore_dialog_failure_negative">Cancel</string>
 
-    <string name="brbs_restore_complete_toast">Restore complete, restarting...</string>
+    <string name="brbs_restore_complete_toast">Restore complete, restarting…</string>
     <string name="brbs_backup_complete_toast">Backup complete</string>
     <string name="brbs_restore_no_uri_toast">Restore failed. Try again later.</string>
-    <string name="brbs_restore_failed_toast">Restore Operation Failed</string>
+
 
 </resources>

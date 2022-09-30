@@ -148,7 +148,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun handleRestoreProcess(uri: Uri?) {
         if (uri == null) {
-            showToastUiCentered(this, getString(R.string.brbs_restore_failed_toast),
+            showToastUiCentered(this, getString(R.string.brbs_restore_no_uri_toast),
                                 Toast.LENGTH_SHORT)
             return
         }
@@ -198,7 +198,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                                     Toast.LENGTH_SHORT)
                 workManager.pruneWork()
             } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
-                showToastUiCentered(this, getString(R.string.brbs_restore_failed_toast),
+                showToastUiCentered(this, getString(R.string.brbs_restore_no_uri_toast),
                                     Toast.LENGTH_SHORT)
                 workManager.pruneWork()
                 workManager.cancelAllWorkByTag(RestoreAgent.TAG)

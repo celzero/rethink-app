@@ -248,5 +248,8 @@ class Constants {
 
         // play services package name
         const val PKG_NAME_PLAY_STORE = "com.android.vending"
+
+        // max endpoint
+        const val MAX_ENDPOINT = "max"
     }
 }

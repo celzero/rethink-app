@@ -300,7 +300,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.prefAutoStartBootUp = b
         }
-        
+
         b.settingsActivityKillAppRl.setOnClickListener {
             b.settingsActivityKillAppSwitch.isChecked = !b.settingsActivityKillAppSwitch.isChecked
         }
