@@ -1,1 +1,1 @@
-RethinkDNS: Fast, private, and safe DNS + Firewall
+Rethink: DNS + Firewall
