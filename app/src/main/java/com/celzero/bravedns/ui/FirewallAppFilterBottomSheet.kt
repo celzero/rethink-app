@@ -59,12 +59,14 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        remakeParentFilterChipsUi()
-
         val filters = FirewallAppFragment.filters.value
+
+        remakeParentFilterChipsUi()
         if (filters == null) {
             applyParentFilter(FirewallAppFragment.TopLevelFilter.ALL.id)
             return
+        } else {
+            sortValues.firewallFilter = filters.firewallFilter
         }
 
         applyParentFilter(filters.topLevelFilter.id)
