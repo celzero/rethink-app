@@ -107,7 +107,10 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
-                    android:padding="10dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="15dp"
+                    android:paddingBottom="10dp"
                     android:text="@string/about_join_telegram"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
@@ -174,7 +177,10 @@
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
                     android:gravity="center"
-                    android:padding="10dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="15dp"
+                    android:paddingBottom="10dp"
                     android:text="@string/about_bug_report"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />

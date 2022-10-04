@@ -319,7 +319,7 @@
 
                     <Button
                         android:id="@+id/home_fragment_pause_icon"
-                        android:layout_width="50dp"
+                        android:layout_width="60dp"
                         android:layout_height="48dp"
                         android:layout_gravity="start"
                         android:background="?android:attr/selectableItemBackground"
@@ -330,13 +330,15 @@
                         style="@style/Button.HomeScreen.Main"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
                         android:drawableStart="@drawable/ic_pause"
                         android:drawableEnd="@drawable/ic_arrow_down"
                         android:text="@string/hsf_start_btn_state" />
 
                     <Button
                         android:id="@+id/home_fragment_bottom_sheet_icon"
-                        android:layout_width="50dp"
+                        android:layout_width="60dp"
                         android:layout_height="48dp"
                         android:layout_gravity="end"
                         android:background="?android:attr/selectableItemBackground"
