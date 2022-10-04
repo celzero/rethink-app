@@ -26,7 +26,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
     RULE1("Rule #1", R.string.firewall_rule_block_app, R.string.firewall_rule_block_app_desc,
           FirewallRuleset.stall),
     RULE1B("Rule #1B", R.string.firewall_rule_block_app_new_install,
-           R.string.firewall_rule_block_app_desc, FirewallRuleset.block),
+           R.string.firewall_rule_new_app_desc, FirewallRuleset.block),
     RULE1C("Rule #1C", R.string.firewall_rule_block_app_exception,
            R.string.firewall_rule_block_app_desc, FirewallRuleset.stall),
     RULE1D("Rule #1D", R.string.firewall_rule_block_unmetered,
