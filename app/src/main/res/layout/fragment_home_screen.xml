@@ -97,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/apps_info_title"
                         android:textColor="?attr/invertedPrimaryTextColor"
-                        app:drawableEndCompat="@drawable/firewall_home_screen" />
+                        app:drawableEndCompat="@drawable/ic_app_info_accent" />
 
                     <TextView
                         android:id="@+id/fhs_card_apps_status"
