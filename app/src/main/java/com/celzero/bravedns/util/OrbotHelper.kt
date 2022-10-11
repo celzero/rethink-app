@@ -204,7 +204,7 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
             when (status) {
                 STATUS_ON -> {
                     isResponseReceivedFromOrbot = true
-                    if (socks5Ip == null || httpsIp == null || socks5Ip == null || httpsIp == null || dnsPort == null) {
+                    if (socks5Ip == null || httpsIp == null || socks5Port == null || httpsPort == null || dnsPort == null) {
                         updateOrbotProxyData(intent)
                     }
                     setOrbotMode()
@@ -320,8 +320,18 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
     private fun enableOrbotDns() {
         if (dnsPort == null) return
 
+        // no need to set dns if Android's private-dns is enabled
+        if (Utilities.isPrivateDnsActive(context)) return
+
+        // no need to set dns if Rethink's DNS/DNS+Firewall mode is not set
+        if (!appConfig.getBraveMode().isDnsActive()) return
+
         io {
-            val endpoint = appConfig.getOrbotDnsProxyDetails() ?: return@io
+            val endpoint = appConfig.getOrbotDnsProxyEndpoint() ?: return@io
+
+            // no-need to update, as database has same config and already selected
+            if (endpoint.proxyPort == dnsPort && endpoint.isSelected) return@io
+
             endpoint.proxyPort = dnsPort!!
             endpoint.isSelected = true
             appConfig.handleOrbotDnsChange(endpoint)
