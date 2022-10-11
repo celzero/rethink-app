@@ -29,7 +29,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
-import com.celzero.bravedns.backup.BackupHelper.Companion.stopVpn
+import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
@@ -58,6 +58,8 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         Log.i(LOG_TAG_BACKUP_RESTORE,
               "completed backup process, is backup successful? $isBackupSucceed")
         if (isBackupSucceed) {
+            // start vpn on backup success
+            startVpn(context)
             return Result.success()
         }
         return Result.failure()
@@ -65,7 +67,6 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     private fun startBackupProcess(backupFileUri: Uri): Boolean {
         var successFull: Boolean
-        stopVpn(context)
         try {
             val tempDir = getTempDir(context)
 

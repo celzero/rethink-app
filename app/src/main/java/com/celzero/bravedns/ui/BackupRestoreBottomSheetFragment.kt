@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -35,6 +36,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.*
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupAgent
+import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME_DATETIME
@@ -92,6 +94,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun init() {
+        showVersion()
         b.brbsBackup.setOnClickListener {
             showBackupDialog()
         }
@@ -99,6 +102,26 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
         b.brbsRestore.setOnClickListener {
             showRestoreDialog()
         }
+    }
+
+    private fun showVersion() {
+        val version = getVersionName()
+        b.brbsAppVersion.text = getString(R.string.about_version_install_source, version,
+                                           getDownloadSource())
+    }
+
+    private fun getVersionName(): String {
+        val pInfo: PackageInfo? = Utilities.getPackageMetadata(requireContext().packageManager,
+                                                               requireContext().packageName)
+        return pInfo?.versionName ?: ""
+    }
+
+    private fun getDownloadSource(): String {
+        if (Utilities.isFdroidFlavour()) return getString(R.string.build__flavor_fdroid)
+
+        if (Utilities.isPlayStoreFlavour()) return getString(R.string.build__flavor_play_store)
+
+        return getString(R.string.build__flavor_website)
     }
 
     private fun backup() {
@@ -242,6 +265,9 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
             showBackupFailureDialog()
             return
         }
+
+        // stop vpn before beginning the backup process
+        BackupHelper.stopVpn(requireContext())
 
         Log.i(LOG_TAG_BACKUP_RESTORE, "invoke worker to initiate the backup process")
         val data = Data.Builder()

@@ -77,8 +77,13 @@ class BackupHelper {
         }
 
         fun stopVpn(context: Context) {
-            Log.i(LoggerConstants.LOG_TAG_BACKUP_RESTORE, "calling vpn stop from restore agent")
+            Log.i(LoggerConstants.LOG_TAG_BACKUP_RESTORE, "calling vpn stop from backup helper")
             VpnController.stop(context)
+        }
+
+        fun startVpn(context: Context) {
+            Log.i(LoggerConstants.LOG_TAG_BACKUP_RESTORE, "calling vpn start from backup helper")
+            VpnController.start(context)
         }
 
         fun deleteResidue(backupFile: File) {

@@ -68,7 +68,7 @@
                 android:alpha="0.5"
                 android:contentDescription="@string/apps_icon_content_desc"
                 android:padding="5dp"
-                android:src="@drawable/bs_dns_home_screen" />
+                android:src="@drawable/ic_backup" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -136,7 +136,7 @@
                 android:alpha="0.5"
                 android:contentDescription="@string/apps_icon_content_desc"
                 android:padding="5dp"
-                android:src="@drawable/bs_firewall_home_screen" />
+                android:src="@drawable/ic_restore" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -181,5 +181,15 @@
                 android:src="@drawable/ic_right_arrow_secondary"
                 android:text="" />
         </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/brbs_app_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="20dp"
+            android:textIsSelectable="true"
+            android:textSize="@dimen/default_font_text_view"
+            android:typeface="monospace" />
     </LinearLayout>
 </LinearLayout>
