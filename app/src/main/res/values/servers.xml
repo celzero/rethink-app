@@ -49,5 +49,5 @@
     <string name="ips14" translatable="false">95.216.24.230,2a01:4f9:2a:1919::9301</string>
 
     <string name="url15" translatable="false">https://basic.rethinkdns.com/dns-query</string>
-    <string name="ips15" translatable="false">172.67.154.200,104.21.13.53</string>
+    <string name="ips15" translatable="false">172.67.162.27,104.21.10.13</string>
 </resources>

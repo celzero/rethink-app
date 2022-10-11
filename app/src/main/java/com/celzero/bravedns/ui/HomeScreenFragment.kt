@@ -55,14 +55,18 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
+import com.celzero.bravedns.util.Utilities.Companion.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isOtherVpnHasAlwaysOn
+import com.celzero.bravedns.util.Utilities.Companion.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
@@ -145,7 +149,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
             if (it.name.isNotEmpty()) {
                 io {
-                    val url = getUrlForStamp(it.stamp)
+                    val rdnsUrl = appConfig.getRethinkPlusEndpoint().url
+                    val url = getUrlForStamp(rdnsUrl, it.stamp)
                     appConfig.updateRethinkEndpoint(it.name, url, it.count)
                     kotlinx.coroutines.delay(1000)
                     appConfig.enableRethinkDnsPlus()
@@ -156,8 +161,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private fun getUrlForStamp(stamp: String): String {
-        return Constants.RETHINK_BASE_URL + stamp
+    private fun getUrlForStamp(url: String, stamp: String): String {
+        return if (url.contains(MAX_ENDPOINT)) {
+            Constants.RETHINK_BASE_URL_MAX + stamp
+        } else {
+            Constants.RETHINK_BASE_URL_SKY + stamp
+        }
     }
 
     // Icons used in chips are re-used in other screens as well.
@@ -717,7 +726,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        if (isPrivateDnsActive()) {
+        if (isPrivateDnsActive(requireContext())) {
             showToastUiCentered(requireContext(), resources.getText(
                 R.string.private_dns_toast).toString().replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
@@ -935,7 +944,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         var statusId: Int
         var colorId: Int
         //val explanationId: Int
-        val privateDnsMode: PrivateDnsMode = getPrivateDnsMode()
+        val privateDnsMode: Utilities.Companion.PrivateDnsMode = getPrivateDnsMode(requireContext())
 
         if (appConfig.getBraveMode().isFirewallMode()) {
             status.connectionState = BraveVPNService.State.WORKING
@@ -971,38 +980,38 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             colorId = fetchTextColor(R.color.accentBad)
             statusId = when (privateDnsMode) {
-                PrivateDnsMode.STRICT -> R.string.status_strict
+                Utilities.Companion.PrivateDnsMode.STRICT -> R.string.status_strict
                 else -> R.string.status_exposed
             }
         }
 
         if (statusId == R.string.status_protected) {
-            if (appConfig.getBraveMode().isDnsMode() && isPrivateDnsActive()) {
+            if (appConfig.getBraveMode().isDnsMode() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.getBraveMode().isDnsMode()) {
                 statusId = R.string.status_protected
-            } else if (appConfig.isOrbotProxyEnabled() && isPrivateDnsActive()) {
+            } else if (appConfig.isOrbotProxyEnabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_tor_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isOrbotProxyEnabled()) {
                 statusId = R.string.status_protected_with_tor
-            } else if ((appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) && isPrivateDnsActive()) { // SOCKS5 + Http + PrivateDns
+            } else if ((appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) && isPrivateDnsActive(requireContext())) { // SOCKS5 + Http + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
                 statusId = R.string.status_protected_with_proxy
-            } else if (appConfig.isCustomSocks5Enabled() && isPrivateDnsActive()) {
+            } else if (appConfig.isCustomSocks5Enabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_socks5_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
-            } else if (appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive()) {
+            } else if (appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_http_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled()) {
                 statusId = R.string.status_protected_with_http
             } else if (appConfig.isCustomSocks5Enabled()) {
                 statusId = R.string.status_protected_with_socks5
-            } else if (isPrivateDnsActive()) {
+            } else if (isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             }
@@ -1010,35 +1019,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsProtectionLevelTxt.setTextColor(colorId)
         b.fhsProtectionLevelTxt.setText(statusId)
-    }
-
-    private fun getPrivateDnsMode(): PrivateDnsMode {
-        // https://github.com/celzero/rethink-app/issues/408
-        if (!isAtleastQ()) {
-            // Private DNS was introduced in P.
-            return PrivateDnsMode.NONE
-        }
-
-        val linkProperties: LinkProperties = getLinkProperties() ?: return PrivateDnsMode.NONE
-        if (linkProperties.privateDnsServerName != null) {
-            return PrivateDnsMode.STRICT
-        }
-        return if (linkProperties.isPrivateDnsActive) {
-            PrivateDnsMode.UPGRADED
-        } else {
-            PrivateDnsMode.NONE
-        }
-    }
-
-    private fun isPrivateDnsActive(): Boolean {
-        return getPrivateDnsMode() != PrivateDnsMode.NONE
-    }
-
-    private fun getLinkProperties(): LinkProperties? {
-        val connectivityManager = requireContext().getSystemService(
-            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork ?: return null
-        return connectivityManager.getLinkProperties(activeNetwork)
     }
 
     private fun isAnotherVpnActive(): Boolean {
@@ -1049,12 +1029,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             activeNetwork) ?: // It's not clear when this can happen, but it has occurred for at least one user.
         return false
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
-    }
-
-    enum class PrivateDnsMode {
-        NONE,  // The setting is "Off" or "Opportunistic", and the DNS connection is not using TLS.
-        UPGRADED,  // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
-        STRICT // The setting is "Strict".
     }
 
     private fun fetchTextColor(attr: Int): Int {

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -75,19 +76,46 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     enum class TopLevelFilter(val id: Int) {
-        ALL(0), INSTALLED(1), SYSTEM(2)
+        ALL(0), INSTALLED(1), SYSTEM(2);
+
+        fun getLabel(context: Context): String {
+            return when (this) {
+                ALL -> {
+                    // getLabel is used only to show the filtered details in ui,
+                    // no need to show "all" tag.
+                    ""
+                }
+                INSTALLED -> {
+                    context.getString(R.string.fapps_filter_parent_installed)
+                }
+                SYSTEM -> {
+                    context.getString(R.string.fapps_filter_parent_system)
+                }
+            }
+        }
     }
 
     enum class FirewallFilter(val id: Int) {
-        ALL(0), ALLOWED(1), BLOCKED(2), WHITELISTED(3), EXCLUDED(4);
+        ALL(0), ALLOWED(1), BLOCKED(2), BYPASS_UNIVERSAL(3), EXCLUDED(4);
 
         fun getFilter(): Set<Int> {
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3, 4)
                 ALLOWED -> setOf(0)
                 BLOCKED -> setOf(1)
-                WHITELISTED -> setOf(2)
+                BYPASS_UNIVERSAL -> setOf(2)
                 EXCLUDED -> setOf(3)
+            }
+        }
+
+        fun getLabel(context: Context): String {
+            return when (this) {
+                ALL -> context.getString(R.string.fapps_firewall_filter_all)
+                ALLOWED -> context.getString(R.string.fapps_firewall_filter_allowed)
+                BLOCKED -> context.getString(R.string.fapps_firewall_filter_blocked)
+                BYPASS_UNIVERSAL -> context.getString(
+                    R.string.fapps_firewall_filter_bypass_universal)
+                EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
             }
         }
 
@@ -97,7 +125,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                     ALL.id -> ALL
                     ALLOWED.id -> ALLOWED
                     BLOCKED.id -> BLOCKED
-                    WHITELISTED.id -> WHITELISTED
+                    BYPASS_UNIVERSAL.id -> BYPASS_UNIVERSAL
                     EXCLUDED.id -> EXCLUDED
                     else -> ALL
                 }
@@ -150,7 +178,22 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
             ui {
                 appInfoViewModel.setFilter(it)
                 b.ffaAppList.smoothScrollToPosition(0)
+                updateFilterText(it)
             }
+        }
+    }
+
+    private fun updateFilterText(filter: Filters) {
+        val filterLabel = filter.topLevelFilter.getLabel(requireContext())
+        val firewallLabel = filter.firewallFilter.getLabel(requireContext())
+        if (filter.categoryFilters.isEmpty()) {
+            b.firewallAppLabelTv.text = Utilities.updateHtmlEncodedText(
+                getString(R.string.fapps_firewall_filter_desc, firewallLabel.lowercase(),
+                          filterLabel))
+        } else {
+            b.firewallAppLabelTv.text = Utilities.updateHtmlEncodedText(
+                getString(R.string.fapps_firewall_filter_desc_category, firewallLabel.lowercase(),
+                          filterLabel, filter.categoryFilters))
         }
     }
 
@@ -207,11 +250,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         }
 
         b.ffaToggleAllWifi.setOnClickListener {
-            showUpdateUnmeteredForBulkDialog()
+            showUpdateUnmeteredForBulkDialog(getBulkTagUnmetered())
         }
 
         b.ffaToggleAllMobileData.setOnClickListener {
-            showUpdateMeteredForBulkDialog()
+            showUpdateMeteredForBulkDialog(getBulkTagMetered())
         }
 
         b.ffaAppInfoIcon.setOnClickListener {
@@ -219,10 +262,16 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         }
     }
 
-    private fun showUpdateUnmeteredForBulkDialog() {
+    private fun showUpdateUnmeteredForBulkDialog(isBlock: Boolean) {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.fapps_unmetered_dialog_title)
-        builder.setMessage(R.string.fapps_unmetered_dialog_message)
+        if (isBlock) {
+            builder.setTitle(R.string.fapps_unmetered_block_dialog_title)
+            builder.setMessage(R.string.fapps_unmetered_block_dialog_message)
+        } else {
+            builder.setTitle(R.string.fapps_unmetered_unblock_dialog_title)
+            builder.setMessage(R.string.fapps_unmetered_unblock_dialog_message)
+        }
+
         builder.setPositiveButton(getString(R.string.fapps_unmetered_positive)) { _, _ ->
             updateUnmeteredBulk()
         }
@@ -235,10 +284,15 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         builder.create().show()
     }
 
-    private fun showUpdateMeteredForBulkDialog() {
+    private fun showUpdateMeteredForBulkDialog(isBlock: Boolean) {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.fapps_metered_dialog_title)
-        builder.setMessage(R.string.fapps_metered_dialog_message)
+        if (isBlock) {
+            builder.setTitle(R.string.fapps_metered_block_dialog_title)
+            builder.setMessage(R.string.fapps_metered_block_dialog_message)
+        } else {
+            builder.setTitle(R.string.fapps_metered_unblock_dialog_title)
+            builder.setMessage(R.string.fapps_metered_unblock_dialog_message)
+        }
         builder.setPositiveButton(getString(R.string.fapps_metered_positive)) { _, _ ->
             updateMeteredBulk()
         }
@@ -280,16 +334,15 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                                        getString(R.string.fapps_firewall_filter_allowed), false)
         val blocked = makeFirewallChip(FirewallFilter.BLOCKED.id,
                                        getString(R.string.fapps_firewall_filter_blocked), false)
-        val whitelisted = makeFirewallChip(FirewallFilter.WHITELISTED.id,
-                                           getString(R.string.fapps_firewall_filter_whitelisted),
-                                           false)
+        val bypassUniversal = makeFirewallChip(FirewallFilter.BYPASS_UNIVERSAL.id, getString(
+            R.string.fapps_firewall_filter_bypass_universal), false)
         val excluded = makeFirewallChip(FirewallFilter.EXCLUDED.id,
                                         getString(R.string.fapps_firewall_filter_excluded), false)
 
         b.ffaFirewallChipGroup.addView(none)
         b.ffaFirewallChipGroup.addView(allowed)
         b.ffaFirewallChipGroup.addView(blocked)
-        b.ffaFirewallChipGroup.addView(whitelisted)
+        b.ffaFirewallChipGroup.addView(bypassUniversal)
         b.ffaFirewallChipGroup.addView(excluded)
     }
 
@@ -338,7 +391,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     private fun updateMeteredBulk() {
-        if (b.ffaToggleAllMobileData.tag == 0) {
+        if (getBulkTagMetered()) {
             b.ffaToggleAllMobileData.tag = 1
             b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_off)
             io {
@@ -355,7 +408,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     private fun updateUnmeteredBulk() {
-        if (b.ffaToggleAllWifi.tag == 0) {
+        if (getBulkTagUnmetered()) {
             b.ffaToggleAllWifi.tag = 1
             b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_off)
             io {
@@ -369,6 +422,14 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         io {
             appInfoViewModel.updateUnmeteredStatus(false)
         }
+    }
+
+    private fun getBulkTagUnmetered(): Boolean {
+        return b.ffaToggleAllWifi.tag == 0
+    }
+
+    private fun getBulkTagMetered(): Boolean {
+        return b.ffaToggleAllMobileData.tag == 0
     }
 
     private fun initView() {

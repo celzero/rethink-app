@@ -34,6 +34,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.celzero.bravedns.R
 import com.celzero.bravedns.customdownloader.LocalBlocklistDownloader
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetLocalBlocklistsBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.DownloadConstants
@@ -57,6 +58,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     private val b get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
     private val appDownloadManager by inject<AppDownloadManager>()
 
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
@@ -346,11 +348,19 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.lbbsCopy.setOnClickListener {
-            val url = Constants.RETHINK_BASE_URL + persistentState.localBlocklistStamp
-            Utilities.clipboardCopy(requireContext(), url,
-                                    requireContext().getString(R.string.copy_clipboard_label))
-            Utilities.showToastUiCentered(requireContext(), requireContext().getString(
-                R.string.info_dialog_rethink_toast_msg), Toast.LENGTH_SHORT)
+            ui {
+                var baseUrl = Constants.RETHINK_BASE_URL_SKY
+                go {
+                    if (appConfig.getRethinkPlusEndpoint().url.contains(Constants.MAX_ENDPOINT)) {
+                        baseUrl = Constants.RETHINK_BASE_URL_MAX
+                    }
+                }
+                val url = baseUrl + persistentState.localBlocklistStamp
+                Utilities.clipboardCopy(requireContext(), url,
+                                        requireContext().getString(R.string.copy_clipboard_label))
+                Utilities.showToastUiCentered(requireContext(), requireContext().getString(
+                    R.string.info_dialog_rethink_toast_msg), Toast.LENGTH_SHORT)
+            }
         }
 
         b.lbbsSearch.setOnClickListener {

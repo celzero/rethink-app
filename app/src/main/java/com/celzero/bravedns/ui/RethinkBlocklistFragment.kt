@@ -602,6 +602,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun isBlocklistUpdateAvailable(downloadType: AppDownloadManager.DownloadType) {
+        isDownloadInitiated = true
         appDownloadManager.isDownloadRequired(downloadType, retryCount = 0)
     }
 

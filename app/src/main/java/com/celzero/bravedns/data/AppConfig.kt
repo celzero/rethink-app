@@ -295,17 +295,6 @@ class AppConfig internal constructor(private val context: Context,
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
         PTMODEMAYBE46(Settings.PtModeMaybe46);
-
-        companion object {
-            fun getProtoTranslationMode(id: Long): ProtoTranslationMode {
-                return when (id) {
-                    PTMODEAUTO.id -> PTMODEAUTO
-                    PTMODEFORCE64.id -> PTMODEFORCE64
-                    PTMODEMAYBE46.id -> PTMODEMAYBE46
-                    else -> PTMODEAUTO
-                }
-            }
-        }
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -489,10 +478,18 @@ class AppConfig internal constructor(private val context: Context,
 
     suspend fun switchRethinkDnsToMax() {
         rethinkDnsEndpointRepository.switchToMax()
+        if (isRethinkDnsConnected()) {
+            persistentState.connectedDnsName = ""
+            onDnsChange(DnsType.RETHINK_REMOTE)
+        }
     }
 
-    suspend fun switchRethinkDnsToBasic() {
-        rethinkDnsEndpointRepository.switchToBasic()
+    suspend fun switchRethinkDnsToSky() {
+        rethinkDnsEndpointRepository.switchToSky()
+        if (isRethinkDnsConnected()) {
+            persistentState.connectedDnsName = ""
+            onDnsChange(DnsType.RETHINK_REMOTE)
+        }
     }
 
     fun getConnectedDns(): String {
@@ -626,9 +623,7 @@ class AppConfig internal constructor(private val context: Context,
     suspend fun isOrbotDns(): Boolean {
         if (!getDnsType().isDnsProxy()) return false
 
-        val dnsProxy = dnsProxyEndpointRepository.getConnectedProxy() ?: return false
-
-        return dnsProxy.proxyName == ORBOT_DNS
+        return dnsProxyEndpointRepository.getConnectedProxy()?.proxyName == ORBOT_DNS
     }
 
     suspend fun handleDnscryptChanges(dnsCryptEndpoint: DnsCryptEndpoint) {
@@ -641,8 +636,8 @@ class AppConfig internal constructor(private val context: Context,
         onDnsChange(DnsType.DNSCRYPT)
     }
 
-    suspend fun getOrbotDnsProxyDetails(): DnsProxyEndpoint? {
-        return dnsProxyEndpointRepository.getOrbotDnsDetail()
+    suspend fun getOrbotDnsProxyEndpoint(): DnsProxyEndpoint? {
+        return dnsProxyEndpointRepository.getOrbotDnsEndpoint()
     }
 
     suspend fun canRemoveDnscrypt(dnsCryptEndpoint: DnsCryptEndpoint): Boolean {

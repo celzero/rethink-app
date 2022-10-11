@@ -100,7 +100,8 @@ class Constants {
         const val RETHINK_APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
 
         // base-url for rethinkdns
-        const val RETHINK_BASE_URL = "https://basic.rethinkdns.com/"
+        const val RETHINK_BASE_URL_SKY = "https://sky.rethinkdns.com/"
+        const val RETHINK_BASE_URL_MAX = "https://max.rethinkdns.com/"
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 

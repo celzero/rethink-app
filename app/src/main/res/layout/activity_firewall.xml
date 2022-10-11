@@ -14,11 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/border" />
-
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/firewall_act_viewpager"
         android:layout_width="match_parent"

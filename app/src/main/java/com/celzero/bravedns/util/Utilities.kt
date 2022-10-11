@@ -29,6 +29,8 @@ import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.LinkProperties
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -53,6 +55,7 @@ import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
@@ -594,7 +597,6 @@ class Utilities {
             if (ctx == null) return null
 
             return try {
-                val a = remoteBlocklistDownloadBasePath(ctx, which, timestamp)
                 File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
@@ -719,6 +721,41 @@ class Utilities {
                 Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
                 ""
             }
+        }
+
+        enum class PrivateDnsMode {
+            NONE,  // The setting is "Off" or "Opportunistic", and the DNS connection is not using TLS.
+            UPGRADED,  // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
+            STRICT // The setting is "Strict".
+        }
+
+        fun getPrivateDnsMode(context: Context): PrivateDnsMode {
+            // https://github.com/celzero/rethink-app/issues/408
+            if (!isAtleastQ()) {
+                // Private DNS was introduced in P.
+                return PrivateDnsMode.NONE
+            }
+
+            val linkProperties: LinkProperties = getLinkProperties(context) ?: return PrivateDnsMode.NONE
+            if (linkProperties.privateDnsServerName != null) {
+                return PrivateDnsMode.STRICT
+            }
+            return if (linkProperties.isPrivateDnsActive) {
+                PrivateDnsMode.UPGRADED
+            } else {
+                PrivateDnsMode.NONE
+            }
+        }
+
+        fun isPrivateDnsActive(context: Context): Boolean {
+            return getPrivateDnsMode(context) != PrivateDnsMode.NONE
+        }
+
+        private fun getLinkProperties(context: Context): LinkProperties? {
+            val connectivityManager = context.getSystemService(
+                Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork ?: return null
+            return connectivityManager.getLinkProperties(activeNetwork)
         }
     }
 }
