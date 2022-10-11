@@ -3,238 +3,227 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background">
+    android:background="?attr/background"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/lb_configure_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
         android:focusable="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
-        <RelativeLayout
-            android:id="@+id/lb_configure_layout"
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/lb_list_toggle_group"
+            style="@style/toggleButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            app:checkedButton="@id/lb_simple_toggle_btn"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/lb_simple_toggle_btn"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="125dp"
+                android:tag="0"
+                android:text="@string/rt_list_simple_btn_txt"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/lb_adv_toggle_btn"
+                style="@style/toggleButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="125dp"
+                android:tag="1"
+                android:text="@string/rt_list_adv_btn_txt"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                app:cornerRadius="16dp" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
+            android:layout_above="@id/lb_apply_container"
+            android:layout_below="@id/lb_list_toggle_group"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/lb_simple_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="visible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/lb_simple_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lb_adv_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/lb_apply_container"
+            android:layout_below="@id/lb_list_toggle_group"
             android:orientation="vertical"
             android:visibility="gone">
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/lb_list_toggle_group"
-                style="@style/toggleButtonStyle"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/lb_adv_search_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                app:checkedButton="@id/lb_simple_toggle_btn"
-                app:selectionRequired="true"
-                app:singleSelection="true">
+                android:layout_margin="8dp"
+                android:elevation="8dp"
+                android:focusableInTouchMode="true"
+                app:cardCornerRadius="16dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/lb_simple_toggle_btn"
-                    style="@style/toggleButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="125dp"
-                    android:tag="0"
-                    android:text="@string/rt_list_simple_btn_txt"
-                    android:textColor="?attr/defaultToggleBtnTxt" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/lb_adv_toggle_btn"
-                    style="@style/toggleButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="125dp"
-                    android:tag="1"
-                    android:text="@string/rt_list_adv_btn_txt"
-                    android:textColor="?attr/defaultToggleBtnTxt" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/lb_apply_container"
-                android:layout_below="@id/lb_list_toggle_group"
-                android:orientation="vertical">
-
-                <ProgressBar
-                    android:id="@+id/lb_simple_progress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="visible" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/lb_simple_recycler"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/lb_adv_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/lb_apply_container"
-                android:layout_below="@id/lb_list_toggle_group"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/lb_adv_search_cv"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:elevation="8dp"
-                    android:focusableInTouchMode="true">
+                    android:gravity="start"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/lb_adv_search_sv"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_gravity="start"
+                        android:layout_weight="0.90"
+                        android:focusable="false"
+                        android:fontFamily="sans-serif"
+                        android:isScrollContainer="true"
+                        app:iconifiedByDefault="false"
+                        app:queryHint="@string/search_rethinkplus_file_tag" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="start"
-                            android:orientation="horizontal"
-                            android:weightSum="1">
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/lb_adv_search_filter_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.1"
+                        android:padding="5dp"
+                        android:src="@drawable/ic_filter" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                            <androidx.appcompat.widget.SearchView
-                                android:id="@+id/lb_adv_search_sv"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="start"
-                                android:layout_weight="0.90"
-                                android:focusable="false"
-                                android:fontFamily="sans-serif"
-                                android:isScrollContainer="true"
-                                app:iconifiedByDefault="false"
-                                app:queryHint="@string/search_rethinkplus_file_tag" />
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/lb_adv_search_filter_icon"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="0.1"
-                                android:padding="5dp"
-                                android:src="@drawable/ic_filter" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/lb_advanced_recycler"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/lb_apply_container"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/lb_advanced_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:weightSum="1">
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/lb_blocklist_cancel_btn"
-                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.5"
-                    android:text="@string/rt_cancel_btn"
-                    android:textColor="?attr/primaryTextColor" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/lb_blocklist_apply_btn"
-                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.5"
-                    android:text="@string/rt_apply_btn" />
-
-            </LinearLayout>
-        </RelativeLayout>
-
-        <ProgressBar
-            android:id="@+id/lb_download_progress_remote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/lb_download_layout"
+            android:id="@+id/lb_apply_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:orientation="vertical"
-            android:visibility="visible">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="300dp"
-                android:layout_gravity="bottom|center"
-                android:layout_margin="50dp"
-                android:src="@drawable/illustrations_download" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:gravity="center"
-                android:padding="5dp"
-                android:text="@string/rt_download_desc" />
-
-            <RelativeLayout
-                android:id="@+id/lb_download_rl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/accent_btn_bg">
-
-                <ProgressBar
-                    android:id="@+id/lb_download_progress"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:indeterminate="true"
-                    android:indeterminateTint="?attr/chipTextColor"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:visibility="gone" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/lb_download_btn"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/lb_download_progress"
-                    android:maxHeight="40dp"
-                    android:minHeight="40dp"
-                    android:text="@string/rt_download"
-                    android:textColor="?attr/chipTextColor" />
-            </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:weightSum="1">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/lb_cancel_download_btn"
+                android:id="@+id/lb_blocklist_cancel_btn"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:text="@string/rt_cancel_btn"
+                android:textColor="?attr/primaryTextColor" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/lb_blocklist_apply_btn"
+                style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:text="@string/rt_apply_btn" />
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/lb_download_progress_remote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/lb_download_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="50dp"
+            android:src="@drawable/illustrations_download" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/rt_download_desc" />
+
+        <RelativeLayout
+            android:id="@+id/lb_download_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/accent_btn_bg">
+
+            <ProgressBar
+                android:id="@+id/lb_download_progress"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:indeterminate="true"
+                android:indeterminateTint="?attr/chipTextColor"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/lb_download_btn"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_gravity="center"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/lb_download_progress"
+                android:maxHeight="40dp"
                 android:minHeight="40dp"
-                android:text="@string/rt_cancel_download"
-                android:textColor="?attr/primaryTextColor" />
-        </LinearLayout>
+                android:text="@string/rt_download"
+                android:textColor="?attr/chipTextColor" />
+        </RelativeLayout>
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/lb_cancel_download_btn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:minHeight="40dp"
+            android:text="@string/rt_cancel_download"
+            android:textColor="?attr/primaryTextColor" />
     </LinearLayout>
 </LinearLayout>

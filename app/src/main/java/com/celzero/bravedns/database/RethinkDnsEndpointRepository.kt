@@ -85,7 +85,7 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
         rethinkDnsEndpointDao.switchToMax()
     }
 
-    suspend fun switchToBasic() {
-        rethinkDnsEndpointDao.switchToBasic()
+    suspend fun switchToSky() {
+        rethinkDnsEndpointDao.switchToSky()
     }
 }

@@ -44,7 +44,8 @@ import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.UID
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
@@ -189,7 +190,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             ioCtx {
                 endpointUrl = appConfig.getRethinkPlusEndpoint().url
             }
-            b.frlSwitchMax.isChecked = (endpointUrl?.contains(MAX_ENDPOINT) == true)
+            updateRethinkRadioUi(isMax = endpointUrl?.contains(MAX_ENDPOINT) == true)
         }
     }
 
@@ -234,18 +235,37 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             download(getDownloadTimeStamp())
         }
 
-        b.frlSwitchMax.setOnClickListener {
-            if (b.frlSwitchMax.isChecked) {
+        b.radioMax.setOnCheckedChangeListener(null)
+        b.radioMax.setOnClickListener {
+            if (b.radioMax.isChecked) {
                 io {
                     appConfig.switchRethinkDnsToMax()
                 }
-            } else {
-                io {
-                    appConfig.switchRethinkDnsToBasic()
-                }
+                updateRethinkRadioUi(isMax = true)
             }
         }
 
+        b.radioSky.setOnCheckedChangeListener(null)
+        b.radioSky.setOnClickListener {
+            if (b.radioSky.isChecked) {
+                io {
+                    appConfig.switchRethinkDnsToSky()
+                }
+                updateRethinkRadioUi(isMax = false)
+            }
+        }
+    }
+
+    private fun updateRethinkRadioUi(isMax: Boolean) {
+        if (isMax) {
+            b.radioMax.isChecked = true
+            b.radioSky.isChecked = false
+            b.frlDesc.text = getString(R.string.rethink_max_desc)
+        } else {
+            b.radioSky.isChecked = true
+            b.radioMax.isChecked = false
+            b.frlDesc.text = getString(R.string.rethink_sky_desc)
+        }
     }
 
     private fun getDownloadableTimestamp(): Long {
@@ -257,7 +277,15 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun getUrlForStamp(stamp: String): String {
-        return RETHINK_BASE_URL + stamp
+        return getRethinkBaseUrl() + stamp
+    }
+
+    private fun getRethinkBaseUrl(): String {
+        return if (b.radioMax.isChecked) {
+            RETHINK_BASE_URL_MAX
+        } else {
+            RETHINK_BASE_URL_SKY
+        }
     }
 
     /**
@@ -282,7 +310,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         dialog.window?.attributes = lp
 
         dialogBinding.dialogCustomUrlConfigureBtn.visibility = View.GONE
-        dialogBinding.dialogCustomUrlEditText.append(RETHINK_BASE_URL + stamp)
+        dialogBinding.dialogCustomUrlEditText.append(getRethinkBaseUrl() + stamp)
 
         dialogBinding.dialogCustomNameEditText.setText(getString(R.string.rt_rethink_dns),
                                                        TextView.BufferType.EDITABLE)

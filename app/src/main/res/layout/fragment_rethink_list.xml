@@ -106,29 +106,53 @@
 
         </RelativeLayout>
 
+        <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_sky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:button="@null"
+                android:drawablePadding="5dp"
+                android:drawableBottom="?android:attr/listChoiceIndicatorSingle"
+                android:gravity="center_horizontal|bottom"
+
+                android:text="@string/radio_sky_btn" />
+
+            <RadioButton
+                android:id="@+id/radio_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:button="@null"
+                android:drawablePadding="5dp"
+                android:drawableBottom="?android:attr/listChoiceIndicatorSingle"
+                android:gravity="center_horizontal|bottom"
+                android:text="@string/radio_max_btn" />
+        </RadioGroup>
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/frl_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="0.7"
+            android:gravity="center"
             android:nestedScrollingEnabled="true"
             android:padding="10dp"
-            android:text="@string/rethink_desc"
+            android:layout_marginBottom="10dp"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view"
             android:textStyle="normal"
             app:layout_constraintTop_toBottomOf="@id/lb_header_layout" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/frl_switch_max"
-            style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/rectangle_border_background"
-            android:padding="10dp"
-            android:text="Switch to max"
-            app:layout_constraintTop_toBottomOf="@id/frl_desc" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_doh_connections"
@@ -139,7 +163,7 @@
             android:clipToPadding="false"
             android:nestedScrollingEnabled="true"
             android:paddingBottom="50dp"
-            app:layout_constraintTop_toBottomOf="@id/frl_switch_max" />
+            app:layout_constraintTop_toBottomOf="@id/frl_desc" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/doh_fab_add_server_icon"

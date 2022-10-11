@@ -35,7 +35,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
@@ -220,6 +219,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // for version v03k
         changeDefaultInternetProtocol()
         removeKeyFromSharedPref()
+        changeDefaultToMax()
 
         // for version v054
         updateIfRethinkConnectedv053x()
@@ -239,6 +239,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
 
+    }
+
+    private fun changeDefaultToMax() {
+        // only change the rethink dns to max for website and f-droid build
+        if (isPlayStoreFlavour()) return
+
+        io {
+            appConfig.switchRethinkDnsToMax()
+        }
     }
 
     private fun changeDefaultInternetProtocol() {

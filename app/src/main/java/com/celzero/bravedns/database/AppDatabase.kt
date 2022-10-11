@@ -379,6 +379,9 @@ abstract class AppDatabase : RoomDatabase() {
                 // modify the default blocklist to OISD
                 database.execSQL(
                     "UPDATE RethinkDnsEndpoint set url  = 'https://basic.rethinkdns.com/1:IAAgAA==' where name = 'RDNS Default' and isCustom = 0")
+                database.execSQL(
+                    "Update AppInfo set appCategory = 'System Services' where appCategory = 'Non-App System' and isSystemApp = 1")
+                database.execSQL("Update RethinkDnsEndpoint set url = REPLACE(url, 'basic', 'sky')")
             }
         }
 
@@ -398,10 +401,6 @@ abstract class AppDatabase : RoomDatabase() {
         rethinkEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
         rethinkRemoteFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
         rethinkLocalFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
-    }
-
-    fun rebuildDatabase(context: Context) {
-        buildDatabase(context)
     }
 
     abstract fun appInfoDAO(): AppInfoDAO

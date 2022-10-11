@@ -88,11 +88,11 @@ interface RethinkDnsEndpointDao {
         "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = :plus")
     fun updatePlusBlocklistCount(count: Int, plus: String = RETHINK_PLUS)
 
-    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'basic', 'max')")
+    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'sky', 'max')")
     fun switchToMax()
 
-    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'max', 'basic')")
-    fun switchToBasic()
+    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'max', 'sky')")
+    fun switchToSky()
 
     @RawQuery
     fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
