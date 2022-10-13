@@ -86,8 +86,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         // Auto start app after reboot
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
-        // Kill app when firewalled
-        b.settingsActivityKillAppSwitch.isChecked = persistentState.killAppOnFirewall
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
         // for protocol translation, enable only on DNS/DNS+Firewall mode
@@ -299,14 +297,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             persistentState.prefAutoStartBootUp = b
         }
 
-        b.settingsActivityKillAppRl.setOnClickListener {
-            b.settingsActivityKillAppSwitch.isChecked = !b.settingsActivityKillAppSwitch.isChecked
-        }
-
-        b.settingsActivityKillAppSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            persistentState.killAppOnFirewall = b
-        }
-
         b.settingsActivityCheckUpdateRl.setOnClickListener {
             b.settingsActivityCheckUpdateSwitch.isChecked = !b.settingsActivityCheckUpdateSwitch.isChecked
         }
@@ -401,7 +391,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
                 return@setOnCheckedChangeListener
             }
 
-            showHttpProxyDialog(checked)
+            showHttpProxyDialog()
         }
 
         b.settingsActivityThemeRl.setOnClickListener {
@@ -610,14 +600,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityHttpProxySwitch.isEnabled = canEnableProxy
     }
 
-    private fun showHttpProxyDialog(isEnabled: Boolean) {
-        if (!isEnabled) {
-            appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
-            b.settingsActivityHttpProxySwitch.isChecked = false
-            b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
-            return
-        }
-
+    private fun showHttpProxyDialog() {
         var isValid: Boolean
         var host: String
         var port = INVALID_PORT

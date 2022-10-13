@@ -34,6 +34,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -315,6 +316,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
 
         heading.text = getString(R.string.contributors_dialog_title)
+        heading.setCompoundDrawablesWithIntrinsicBounds(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_authors), null, null, null)
 
         descText.movementMethod = LinkMovementMethod.getInstance();
         descText.text = Utilities.updateHtmlEncodedText(getString(R.string.contributors_list))

@@ -43,6 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="@string/firewall_rules"
+                android:drawablePadding="15dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/heading_font_text_view" />

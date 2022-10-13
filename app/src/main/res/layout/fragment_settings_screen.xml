@@ -255,7 +255,7 @@
                         android:layout_centerVertical="true"
                         android:padding="10dp"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_right_arrow_small" />
+                        android:src="@drawable/ic_right_arrow_white" />
 
                 </RelativeLayout>
 
@@ -533,7 +533,7 @@
                         android:layout_centerVertical="true"
                         android:padding="10dp"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_arrow_down_accent" />
+                        android:src="@drawable/ic_arrow_down_small" />
 
                 </RelativeLayout>
 
@@ -559,6 +559,7 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
+            android:layout_marginBottom="80dp"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -671,7 +672,7 @@
                         android:layout_centerVertical="true"
                         android:padding="10dp"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_right_arrow_small" />
+                        android:src="@drawable/ic_right_arrow_white" />
 
                 </RelativeLayout>
 
@@ -781,7 +782,7 @@
                         android:layout_centerVertical="true"
                         android:padding="10dp"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_right_arrow_small" />
+                        android:src="@drawable/ic_right_arrow_white" />
 
                 </RelativeLayout>
 
@@ -892,89 +893,9 @@
                         android:layout_centerVertical="true"
                         android:padding="10dp"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_arrow_down_accent" />
+                        android:src="@drawable/ic_arrow_down_small" />
                 </RelativeLayout>
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:id="@+id/settings_heading_firewall"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="55dp"
-            android:fontFamily="sans-serif-smallcaps"
-            android:lineSpacingExtra="5dp"
-            android:padding="5dp"
-            android:text="@string/settings_firewall_header"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            android:layout_marginBottom="80dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <RelativeLayout
-                    android:id="@+id/settings_activity_kill_app_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="20dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_activity_kill_app_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_margin="5dp"
-                        android:alpha="0.5"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_kill_app" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toStartOf="@id/settings_activity_kill_app_switch"
-                        android:layout_toEndOf="@id/settings_activity_kill_app_icon"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/gen_settings_kill_app_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_kill_app_heading"
-                            android:textSize="@dimen/large_font_text_view" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="@string/settings_kill_app_desc"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settings_activity_kill_app_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp" />
-                </RelativeLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

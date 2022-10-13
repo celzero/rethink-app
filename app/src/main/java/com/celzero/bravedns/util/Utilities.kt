@@ -335,14 +335,6 @@ class Utilities {
             return vpnService?.isLockdownEnabled == true
         }
 
-        fun killBg(activityManager: ActivityManager, packageName: String) {
-            try {
-                activityManager.killBackgroundProcesses(packageName)
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_FIREWALL, "firewall - kill app - exception" + e.message, e)
-            }
-        }
-
         fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
             var metadata: PackageInfo? = null
 

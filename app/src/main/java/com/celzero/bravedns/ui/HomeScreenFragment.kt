@@ -578,15 +578,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 synchronized(it) {
                     copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList()
                 }
-                val blockedList = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+                val blockedApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
                 val whiteListApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id }
-                val excludedList = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }
+                val excludedApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }
+                val lockdownApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.LOCKDOWN.id }
                 b.fhsCardAppsStatus.text = getString(R.string.firewall_card_status_active,
                                                      copy.count().toString())
                 b.fhsCardApps.text = getString(R.string.firewall_card_text_active,
-                                               blockedList.count().toString(),
+                                               blockedApps.count().toString(),
                                                whiteListApps.count().toString(),
-                                               excludedList.count().toString())
+                                               excludedApps.count().toString(),
+                                               lockdownApps.count().toString())
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
             }

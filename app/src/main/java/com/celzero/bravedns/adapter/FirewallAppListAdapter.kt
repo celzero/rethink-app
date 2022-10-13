@@ -283,7 +283,6 @@ class FirewallAppListAdapter(private val context: Context,
                 FirewallManager.ConnectionStatus.WIFI -> {
                     updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.BOTH)
-                    killApps(appInfo.uid)
                 }
                 FirewallManager.ConnectionStatus.BOTH -> {
                     if (appStatus.blocked()) {
@@ -304,7 +303,6 @@ class FirewallAppListAdapter(private val context: Context,
                 FirewallManager.ConnectionStatus.MOBILE_DATA -> {
                     updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.BOTH)
-                    killApps(appInfo.uid)
                 }
                 FirewallManager.ConnectionStatus.WIFI -> {
                     updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.ALLOW,
@@ -360,17 +358,6 @@ class FirewallAppListAdapter(private val context: Context,
             val alertDialog: AlertDialog = builderSingle.create()
             alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.show()
-        }
-
-        private fun killApps(uid: Int) {
-            if (!persistentState.killAppOnFirewall) return
-
-            io {
-                val apps = FirewallManager.getNonSystemAppsPackageNameByUid(uid)
-                apps.forEach {
-                    Utilities.killBg(activityManager, it)
-                }
-            }
         }
     }
 

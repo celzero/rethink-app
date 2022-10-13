@@ -342,9 +342,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
             val appRuleset = appBlocked(appStatus, connectionStatus)
             if (appRuleset != null) {
-                if (persistentState.killAppOnFirewall) {
-                    killFirewalledApplication(uid)
-                }
                 return appRuleset
             }
 
@@ -773,18 +770,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             baseWaitMs
         } else {
             (1 shl pow) * baseWaitMs
-        }
-    }
-
-    private fun killFirewalledApplication(uid: Int) {
-        if (DEBUG) Log.i(LOG_TAG_VPN,
-                         "Firewalled application trying to connect - Kill app is enabled - uid - $uid")
-        io("killBgApps") {
-            val appUIDList = FirewallManager.getNonSystemAppsPackageNameByUid(uid)
-            appUIDList.forEach {
-                if (DEBUG) Log.d(LOG_TAG_VPN, "app $uid / $it killed")
-                Utilities.killBg(activityManager, it)
-            }
         }
     }
 

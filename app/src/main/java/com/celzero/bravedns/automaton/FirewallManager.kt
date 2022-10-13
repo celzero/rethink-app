@@ -332,10 +332,6 @@ object FirewallManager : KoinComponent {
         return getAppInfosByUidLocked(uid).map { it.appName }
     }
 
-    fun getNonSystemAppsPackageNameByUid(uid: Int): List<String> {
-        return getAppInfosByUidLocked(uid).filter { !it.isSystemApp }.map { it.packageInfo }
-    }
-
     fun getPackageNamesByUid(uid: Int): List<String> {
         return getAppInfosByUidLocked(uid).map { it.packageInfo }
     }

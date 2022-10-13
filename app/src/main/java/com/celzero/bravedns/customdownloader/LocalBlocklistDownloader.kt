@@ -93,6 +93,9 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
+        // issue fix: #575, chosen blocklists are not updating for first time
+        // the below operations need to be completed before returning the value
+        // from the worker
         ui {
             persistentState.localBlocklistTimestamp = timestamp
             persistentState.blocklistEnabled = true

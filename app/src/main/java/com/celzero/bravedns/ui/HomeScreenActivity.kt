@@ -259,11 +259,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // below keys are not used, remove from shared pref
         val removeLocal = "local_blocklist_update_check"
         val removeRemote = "remote_blocklist_update_check"
+        val killApp = "kill_app_on_firewall"
 
         val sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val editor = sharedPref.edit()
         editor.remove(removeLocal)
         editor.remove(removeRemote)
+        editor.remove(killApp)
         editor.apply()
     }
 

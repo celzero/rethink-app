@@ -207,30 +207,14 @@
 
             <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp">
 
-                <TextView
-                    android:id="@+id/aad_app_settings_heading"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="sans-serif-smallcaps"
-                    android:gravity="center_vertical"
-                    android:paddingStart="20dp"
-                    android:paddingTop="5dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="5dp"
-                    android:text="@string/ada_app_firewall_settings"
-                    android:textColor="?attr/secondaryTextColor"
-                    android:textSize="@dimen/large_font_text_view"
-                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:id="@+id/aad_app_settings_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/aad_app_settings_heading"
                     android:gravity="center"
                     android:padding="10dp"
                     android:weightSum="1">
@@ -505,8 +489,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/aad_ip_block_card"
             android:layout_margin="8dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="8dp">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"

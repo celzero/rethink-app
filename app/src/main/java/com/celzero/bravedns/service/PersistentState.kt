@@ -107,9 +107,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user set http proxy ip / hostname
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress").withDefault<String>("")
 
-    // whether RethinkDNS should signal activity-manager to kill a firewalled app
-    var killAppOnFirewall by booleanPref("kill_app_on_firewall").withDefault<Boolean>(true)
-
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     // default: false for fdroid flavour
     var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(
