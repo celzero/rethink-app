@@ -295,6 +295,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
         b.lbCancelDownloadBtn.setOnClickListener {
             cancelDownloadWorkManager()
+            requireActivity().finish()
         }
 
         b.lbBlocklistApplyBtn.setOnClickListener {
