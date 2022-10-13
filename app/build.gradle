@@ -15,7 +15,7 @@ try {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion '33.0.0'
 
     signingConfigs {
@@ -34,9 +34,9 @@ android {
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
-        targetSdkVersion 32
-        versionCode 21 // for version name 053j
-        versionName "053j"
+        targetSdkVersion 33
+        versionCode 22 // for version name 053k
+        versionName "053k"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -77,15 +77,15 @@ android {
 
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.4.0'
-    def koin_version = '3.2.0'
+    def koin_version = '3.2.1'
     def room_version = "2.4.3"
     def paging_version = "3.1.1"
 
     implementation "com.google.guava:guava:31.1-android"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.5.0'
-    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -96,12 +96,13 @@ dependencies {
     // For liveData implementation
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
 
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.9.1'
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-paging:$room_version"
+    implementation "android.arch.persistence.room:runtime:1.1.1"
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
@@ -109,7 +110,7 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.2"
+    implementation "androidx.fragment:fragment-ktx:1.5.3"
     implementation 'com.google.android.material:material:1.6.1'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
@@ -124,7 +125,7 @@ dependencies {
         exclude group: 'glide-parent'
     }
     // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
-    kapt 'com.github.bumptech.glide:compiler:4.13.2'
+    kapt 'com.github.bumptech.glide:compiler:4.14.2'
 
     // Swipe button animation
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
@@ -142,6 +143,7 @@ dependencies {
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
     implementation 'com.github.celzero:firestack:34ee72663a'
+    //implementation project(":tun2socks")
 
     // Work manager
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
