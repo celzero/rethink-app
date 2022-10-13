@@ -71,6 +71,7 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
     private var numRequests: Long = 0
     private var numBlockedRequests: Long = 0
     private val goStatusMap = LongSparseArray<Transaction.Status>()
+    private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
 
     init {
         // init values from persistence state
@@ -87,6 +88,14 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         goStatusMap.put(Dnsx.BadQuery, Transaction.Status.BAD_QUERY)
         goStatusMap.put(Dnsx.BadResponse, Transaction.Status.BAD_RESPONSE)
         goStatusMap.put(Dnsx.InternalError, Transaction.Status.INTERNAL_ERROR)
+
+        vpnStateMap[Transaction.Status.COMPLETE] = BraveVPNService.State.WORKING
+        vpnStateMap[Transaction.Status.SEND_FAIL] = BraveVPNService.State.NO_INTERNET
+        vpnStateMap[Transaction.Status.NO_RESPONSE] = BraveVPNService.State.DNS_SERVER_DOWN
+        vpnStateMap[Transaction.Status.TRANSPORT_ERROR] = BraveVPNService.State.DNS_SERVER_DOWN
+        vpnStateMap[Transaction.Status.BAD_QUERY] = BraveVPNService.State.DNS_ERROR
+        vpnStateMap[Transaction.Status.BAD_RESPONSE] = BraveVPNService.State.DNS_ERROR
+        vpnStateMap[Transaction.Status.INTERNAL_ERROR] = BraveVPNService.State.APP_ERROR
     }
 
     fun processOnResponse(summary: Summary): Transaction? {
@@ -154,16 +163,6 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             if (packet != null) {
                 val addresses: List<InetAddress> = packet.responseAddresses
 
-                packet.answer.forEach { r ->
-                    val ip = r.ip ?: return@forEach
-                    // drop trailing period . from the fqdn sent in dns-answer, ie a.com. => a.com
-                    val dnsCacheRecord = FirewallManager.DnsCacheRecord(calculateTtl(r.ttl),
-                                                                        transaction.name.dropLast(
-                                                                            1))
-                    ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
-                }
-
-
                 if (addresses.isNotEmpty()) {
                     val destination = convertIpV6ToIpv4IfNeeded(addresses[0])
                     val countryCode: String? = getCountryCode(destination, context)
@@ -185,7 +184,18 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                     } else if (destination.hostAddress == UNSPECIFIED_IP_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
                         dnsLog.isBlocked = true
                     }
-                    dnsLog.flag = getFlag(countryCode)
+
+                    val flag = getFlagIfPresent(countryCode)
+                    dnsLog.flag = flag
+
+                    packet.answer.forEach { r ->
+                        val ip = r.ip ?: return@forEach
+                        // drop trailing period . from the fqdn sent in dns-answer, ie a.com. => a.com
+                        val dnsCacheRecord = FirewallManager.DnsCacheRecord(calculateTtl(r.ttl),
+                                                                            transaction.name.dropLast(
+                                                                                1), flag)
+                        ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
+                    }
                 } else {
                     // fixme: for queries with empty AAAA records, we are setting as NXDOMAIN
                     //  which needs a fix. need to check for the response's status
@@ -211,6 +221,13 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         return dnsLog
     }
 
+    private fun getFlagIfPresent(hostAddress: String?): String {
+        if (hostAddress == null) {
+            return context.getString(R.string.unicode_warning_sign)
+        }
+        return ipDomainLookup.getIfPresent(hostAddress)?.flag ?: getFlag(hostAddress)
+    }
+
     suspend fun insertBatch(dnsLogs: List<DnsLog>) {
         dnsLogRepository.insertBatch(dnsLogs)
     }
@@ -230,7 +247,8 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             if (isLocallyResolved(transaction)) return
             VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
         } else if (transaction.status !== Transaction.Status.CANCELED) {
-            VpnController.onConnectionStateChanged(BraveVPNService.State.FAILING)
+            val vpnState = vpnStateMap[transaction.status] ?: BraveVPNService.State.FAILING
+            VpnController.onConnectionStateChanged(vpnState)
         }
     }
 

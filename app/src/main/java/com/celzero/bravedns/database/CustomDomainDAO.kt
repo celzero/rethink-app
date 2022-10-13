@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface CustomDomainDAO {
@@ -48,5 +48,8 @@ interface CustomDomainDAO {
     @Query(
         "select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc")
     fun getBlockedDomains(query: String, stat: Int): PagingSource<Int, CustomDomain>
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 
 }

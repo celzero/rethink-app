@@ -141,12 +141,14 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
-        persistentState.localBlocklistTimestamp = timestamp
-        persistentState.updatableTimestampLocal = INIT_TIME_MS
-        persistentState.blocklistEnabled = true
-        io {
-            RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
-                                             timestamp)
+        ui {
+            persistentState.localBlocklistTimestamp = timestamp
+            persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
+            persistentState.blocklistEnabled = true
+            io {
+                RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
+                                                 timestamp)
+            }
         }
     }
 
@@ -178,6 +180,12 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.Main).launch {
             f()
         }
     }

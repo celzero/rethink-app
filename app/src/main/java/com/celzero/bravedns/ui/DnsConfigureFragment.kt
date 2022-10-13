@@ -51,7 +51,6 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 
-
 class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
                              LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
@@ -87,6 +86,8 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
         b.dcPreventDnsLeaksSwitch.isChecked = persistentState.preventDnsLeaks
         // periodically check for blocklist update
         b.dcCheckUpdateSwitch.isChecked = persistentState.periodicallyCheckBlocklistUpdate
+        // use custom download manager
+        b.dcDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
 
         b.connectedStatusTitle.text = getConnectedDnsType()
     }
@@ -276,21 +277,33 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
             openLocalBlocklist()
         }
 
+        b.dcCheckUpdateRl.setOnClickListener {
+            b.dcCheckUpdateSwitch.isChecked = !b.dcCheckUpdateSwitch.isChecked
+        }
+
         b.dcCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             if (enabled) {
                 persistentState.periodicallyCheckBlocklistUpdate = true
                 get<WorkScheduler>().scheduleBlocklistUpdateCheckJob()
             } else {
-                Log.d(LoggerConstants.LOG_TAG_SCHEDULER,
+                Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
                       "Cancel all the work related to blocklist update check")
                 WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
                     BLOCKLIST_UPDATE_CHECK_JOB_TAG)
             }
         }
 
+        b.dcFaviconRl.setOnClickListener {
+            b.dcFaviconSwitch.isChecked = !b.dcFaviconSwitch.isChecked
+        }
+
         b.dcFaviconSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.fetchFavIcon = enabled
+        }
+
+        b.dcPreventDnsLeaksRl.setOnClickListener {
+            b.dcPreventDnsLeaksSwitch.isChecked = !b.dcPreventDnsLeaksSwitch.isChecked
         }
 
         b.dcPreventDnsLeaksSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
@@ -311,6 +324,14 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
         b.networkDnsRb.setOnClickListener {
             // network dns proxy
             setNetworkDns()
+        }
+
+        b.dcDownloaderRl.setOnClickListener {
+            b.dcDownloaderSwitch.isChecked = !b.dcDownloaderSwitch.isChecked
+        }
+
+        b.dcDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+            persistentState.useCustomDownloadManager = b
         }
     }
 

@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.ui
 
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
@@ -25,11 +26,15 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -38,6 +43,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
@@ -101,6 +107,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutVpnProfile.setOnClickListener(this)
         b.aboutCrashLog.setOnClickListener(this)
         b.aboutAppVersion.setOnClickListener(this)
+        b.aboutAppContributors.setOnClickListener(this)
 
         try {
             val version = getVersionName()
@@ -191,6 +198,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutAppNotification -> {
                 openNotificationSettings()
+            }
+            b.aboutAppContributors -> {
+                showContributors()
             }
         }
     }
@@ -286,6 +296,36 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun isFileAvailable(file: File): Boolean {
         return file.isFile && file.exists()
+    }
+
+    private fun showContributors() {
+        val dialogBinding = DialogInfoRulesLayoutBinding.inflate(layoutInflater)
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(dialogBinding.root)
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialog.window?.attributes = lp
+
+        val heading = dialogBinding.infoRulesDialogRulesTitle
+        val okBtn = dialogBinding.infoRulesDialogCancelImg
+        val descText = dialogBinding.infoRulesDialogRulesDesc
+        dialogBinding.infoRulesDialogRulesIcon.visibility = View.GONE
+
+        heading.text = getString(R.string.contributors_dialog_title)
+        heading.setCompoundDrawablesWithIntrinsicBounds(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_authors), null, null, null)
+
+        descText.movementMethod = LinkMovementMethod.getInstance();
+        descText.text = Utilities.updateHtmlEncodedText(getString(R.string.contributors_list))
+
+        okBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun promptCrashLogAction() {

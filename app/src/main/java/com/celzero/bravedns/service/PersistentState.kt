@@ -107,9 +107,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user set http proxy ip / hostname
     var httpProxyHostAddress by stringPref("http_proxy_ipaddress").withDefault<String>("")
 
-    // whether RethinkDNS should signal activity-manager to kill a firewalled app
-    var killAppOnFirewall by booleanPref("kill_app_on_firewall").withDefault<Boolean>(true)
-
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     // default: false for fdroid flavour
     var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(
@@ -191,21 +188,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var customDownloaderLastGeneratedId by longPref(
         "custom_downloader_last_generated_id").withDefault<Long>(0)
 
-    // remove this var in 054
-    var isLocalBlocklistUpdateAvailable by booleanPref(
-        "local_blocklist_update_check").withDefault<Boolean>(false)
-
     // local timestamp for which the update is available
-    var updatableTimestampLocal by longPref("local_blocklist_update_ts").withDefault<Long>(
+    var newestLocalBlocklistTimestamp by longPref("local_blocklist_update_ts").withDefault<Long>(
         INIT_TIME_MS)
 
     // remote timestamp for which the update is available
-    var updatableTimestampRemote by longPref("remote_blocklist_update_ts").withDefault<Long>(
+    var newestRemoteBlocklistTimestamp by longPref("remote_blocklist_update_ts").withDefault<Long>(
         INIT_TIME_MS)
-
-    // remove this var in 054
-    var isRemoteBlocklistUpdateAvailable by booleanPref(
-        "remote_blocklist_update_check").withDefault<Boolean>(false)
 
     // auto-check for blocklist update periodically (once in a day)
     var periodicallyCheckBlocklistUpdate by booleanPref(
@@ -213,7 +202,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user-preferred Internet Protocol type, default IPv4
     var internetProtocolType by intPref(INTERNET_PROTOCOL).withDefault<Int>(
-        InternetProtocol.IPv46.id)
+        InternetProtocol.IPv4.id)
 
     // user-preferred 6to4 protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION).withDefault<Boolean>(false)
@@ -227,6 +216,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // universal firewall settings to block all metered connections
     var blockMeteredConnections by booleanPref("block_metered_connections").withDefault<Boolean>(
         false)
+
+    // universal firewall settings to lockdown all apps
+    var universalLockdown by booleanPref("universal_lockdown").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

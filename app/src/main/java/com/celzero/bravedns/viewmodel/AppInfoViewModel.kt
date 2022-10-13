@@ -69,7 +69,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             }.liveData.cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                appInfoDAO.getInstalledApps("%search%", category, firewallFilter.getFilter())
+                appInfoDAO.getInstalledApps("%$search%", category, firewallFilter.getFilter())
             }.liveData.cachedIn(viewModelScope)
         }
     }
@@ -86,111 +86,101 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
-    fun updateWifiStatus(blocked: Boolean) {
+    fun updateUnmeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
 
         appList.distinctBy { it.uid }.forEach {
-            val appStatus = getAppStatusForWifi(blocked, it.firewallStatus, it.metered)
-            val connStatus = getConnStatusForWifi(blocked, it.firewallStatus, it.metered)
-
-            FirewallManager.updateFirewallStatus(it.uid, appStatus, connStatus)
+            val appStatus = getAppStateForWifi(blocked, it.firewallStatus, it.metered)
+            FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
         }
     }
 
-    private fun getAppStatusForWifi(blocked: Boolean, firewall: Int,
-                                    metered: Int): FirewallManager.FirewallStatus {
-        var appStatus = FirewallManager.FirewallStatus.ALLOW
-        if (blocked) {
-            appStatus = FirewallManager.FirewallStatus.BLOCK
-        }
+    private fun getAppStateForWifi(blocked: Boolean, firewall: Int, metered: Int): AppState {
+        val state: AppState
 
-        if (isBlockWifi(firewall, metered)) {
-            if (!blocked) {
-                return FirewallManager.FirewallStatus.BLOCK
-            }
-        }
-
-        return appStatus
-    }
-
-    private fun getConnStatusForWifi(blocked: Boolean, firewall: Int,
-                                     metered: Int): FirewallManager.ConnectionStatus {
-        var connStatus = FirewallManager.ConnectionStatus.BOTH
-
-        if (blocked) {
-            connStatus = FirewallManager.ConnectionStatus.WIFI
-        }
-
-        if (isBlockWifi(firewall, metered)) {
-            return if (blocked) {
-                FirewallManager.ConnectionStatus.BOTH
+        if (firewall == FirewallManager.FirewallStatus.BLOCK.id) {
+            state = if (blocked) {
+                if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
+                    AppState(FirewallManager.FirewallStatus.BLOCK,
+                             FirewallManager.ConnectionStatus.WIFI)
+                } else {
+                    AppState(FirewallManager.FirewallStatus.BLOCK,
+                             FirewallManager.ConnectionStatus.BOTH)
+                }
             } else {
-                FirewallManager.ConnectionStatus.MOBILE_DATA
+                if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
+                    AppState(FirewallManager.FirewallStatus.ALLOW,
+                             FirewallManager.ConnectionStatus.BOTH)
+                } else {
+                    AppState(FirewallManager.FirewallStatus.BLOCK,
+                             FirewallManager.ConnectionStatus.MOBILE_DATA)
+                }
+            }
+        } else {
+            state = if (blocked) {
+                AppState(FirewallManager.FirewallStatus.BLOCK,
+                         FirewallManager.ConnectionStatus.WIFI)
+            } else {
+                AppState(FirewallManager.FirewallStatus.ALLOW,
+                         FirewallManager.ConnectionStatus.BOTH)
             }
         }
 
-        return connStatus
+        return state
     }
 
-    fun updateMobileDataStatus(blocked: Boolean) {
+    data class AppState(val fid: FirewallManager.FirewallStatus,
+                        val cid: FirewallManager.ConnectionStatus)
+
+
+    fun updateMeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
 
         appList.distinctBy { it.uid }.forEach {
-            val appStatus = getAppStatusForMobileData(blocked, it.firewallStatus, it.metered)
-            val connStatus = getConnStatusForMobileData(blocked, it.firewallStatus, it.metered)
-            FirewallManager.updateFirewallStatus(it.uid, appStatus, connStatus)
+            val appStatus = getAppStateForMobileData(blocked, it.firewallStatus, it.metered)
+            FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
         }
     }
 
-    private fun getAppStatusForMobileData(blocked: Boolean, firewall: Int,
-                                          metered: Int): FirewallManager.FirewallStatus {
-        var appStatus = FirewallManager.FirewallStatus.ALLOW
-
+    private fun getAppStateForMobileData(blocked: Boolean, firewall: Int, metered: Int): AppState {
         if (blocked) {
-            appStatus = FirewallManager.FirewallStatus.BLOCK
-        }
-
-        if (isBlockMobileData(firewall, metered)) {
-            if (!blocked) {
-                return FirewallManager.FirewallStatus.BLOCK
+            val fid = FirewallManager.FirewallStatus.BLOCK
+            var cid = FirewallManager.ConnectionStatus.BOTH
+            if (metered == FirewallManager.ConnectionStatus.MOBILE_DATA.id) {
+                cid = FirewallManager.ConnectionStatus.MOBILE_DATA
+            } else if (firewall != FirewallManager.FirewallStatus.BLOCK.id) {
+                cid = FirewallManager.ConnectionStatus.MOBILE_DATA
             }
-        }
-
-        return appStatus
-    }
-
-    private fun getConnStatusForMobileData(blocked: Boolean, firewall: Int,
-                                           metered: Int): FirewallManager.ConnectionStatus {
-        var connStatus = FirewallManager.ConnectionStatus.BOTH
-
-        if (blocked) {
-            connStatus = FirewallManager.ConnectionStatus.MOBILE_DATA
-        }
-
-        if (isBlockMobileData(firewall, metered)) {
-            return if (blocked) {
-                FirewallManager.ConnectionStatus.BOTH
-            } else {
-                FirewallManager.ConnectionStatus.WIFI
+            return AppState(fid, cid)
+        } else {
+            var fid = FirewallManager.FirewallStatus.ALLOW
+            var cid = FirewallManager.ConnectionStatus.BOTH
+            if (firewall != FirewallManager.FirewallStatus.BLOCK.id) {
+                cid = FirewallManager.ConnectionStatus.BOTH
+            } else if (metered != FirewallManager.ConnectionStatus.MOBILE_DATA.id) {
+                fid = FirewallManager.FirewallStatus.BLOCK
+                cid = FirewallManager.ConnectionStatus.WIFI
             }
+            return AppState(fid, cid)
         }
-
-        return connStatus
-    }
-
-    private fun isBlockWifi(firewall: Int, metered: Int): Boolean {
-        return (firewall == FirewallManager.FirewallStatus.BLOCK.id && (metered == FirewallManager.ConnectionStatus.BOTH.id || metered == FirewallManager.ConnectionStatus.MOBILE_DATA.id))
-    }
-
-    private fun isBlockMobileData(firewall: Int, metered: Int): Boolean {
-        return firewall == FirewallManager.FirewallStatus.BLOCK.id && (metered == FirewallManager.ConnectionStatus.BOTH.id || metered == FirewallManager.ConnectionStatus.WIFI.id)
     }
 
     private fun getFilteredApps(): List<AppInfo> {
+        val appType = when (topLevelFilter) {
+            FirewallAppFragment.TopLevelFilter.ALL -> {
+                setOf(0, 1)
+            }
+            FirewallAppFragment.TopLevelFilter.INSTALLED -> {
+                setOf(0)
+            }
+            FirewallAppFragment.TopLevelFilter.SYSTEM -> {
+                setOf(1)
+            }
+        }
         return if (category.isEmpty()) {
-            appInfoDAO.getFilteredApps("%$search%", firewallFilter.getFilter())
+            appInfoDAO.getFilteredApps("%$search%", firewallFilter.getFilter(), appType)
         } else {
-            appInfoDAO.getFilteredApps("%$search%", category, firewallFilter.getFilter())
+            appInfoDAO.getFilteredApps("%$search%", category, firewallFilter.getFilter(), appType)
         }
     }
 }

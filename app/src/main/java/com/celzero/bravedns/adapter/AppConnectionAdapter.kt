@@ -29,8 +29,7 @@ import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
 
-class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>,
-                           val uid: Int) :
+class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>, val uid: Int) :
         RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
         AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
@@ -79,23 +78,25 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
 
         private fun setupClickListeners(appConn: AppConnections, position: Int) {
             b.acdContainer.setOnClickListener {
-                val status = IpRulesManager.getStatus(uid, appConn.ipAddress)
+                val status = IpRulesManager.hasRule(uid, appConn.ipAddress, appConn.port)
                 // open bottom sheet for options
-                openBottomSheet(appConn.ipAddress, status, position)
+                openBottomSheet(appConn.ipAddress, appConn.port, status, position)
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, ipRuleStatus: IpRulesManager.IpRuleStatus,
-                                    position: Int) {
+        private fun openBottomSheet(ipAddress: String, port: Int,
+                                    ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
                 return
             }
 
             val bottomSheetFragment = AppConnectionBottomSheet()
+            // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
+            bundle.putInt(AppConnectionBottomSheet.PORT, port)
             bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(adapter, position)
@@ -107,7 +108,7 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
 
             b.acdCount.text = conn.count.toString()
             b.acdFlag.text = conn.flag
-            b.acdIpAddress.text = conn.ipAddress
+            b.acdIpAddress.text = "${conn.ipAddress}:${conn.port}"
             if (conn.dnsQuery != null) {
                 b.acdDomainName.text = conn.dnsQuery
             }

@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_DEFAULT
 import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_PLUS
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
@@ -87,5 +87,14 @@ interface RethinkDnsEndpointDao {
     @Query(
         "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = :plus")
     fun updatePlusBlocklistCount(count: Int, plus: String = RETHINK_PLUS)
+
+    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'sky', 'max')")
+    fun switchToMax()
+
+    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'max', 'sky')")
+    fun switchToSky()
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 
 }

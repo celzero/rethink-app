@@ -16,9 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.FileTag
 
@@ -77,4 +77,7 @@ interface RethinkRemoteFileTagDao {
 
     @Query("Update RethinkRemoteFileTag set isSelected = 0")
     fun clearSelectedTags()
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

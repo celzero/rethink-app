@@ -96,6 +96,7 @@ class RefreshDatabase internal constructor(private var context: Context,
                 // Get app details from Global variable
                 val trackedApps = FirewallManager.getPackageNames()
 
+                // installedPackages will also include apps which are disabled by the user
                 val installedPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(
                     PackageManager.GET_META_DATA) as List<PackageInfo>
 

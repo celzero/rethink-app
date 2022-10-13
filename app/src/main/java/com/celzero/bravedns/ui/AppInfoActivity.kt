@@ -77,7 +77,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
 
     private var ipListState: Boolean = false
     private var ipRulesState: Boolean = false
-    private var appDetailsState: Boolean = true
+    private var appDetailsState: Boolean = false
 
     private var appStatus = FirewallManager.FirewallStatus.ALLOW
     private var connStatus = FirewallManager.ConnectionStatus.BOTH
@@ -181,6 +181,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
             FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                 enableAppWhitelistedUi()
             }
+            FirewallManager.FirewallStatus.LOCKDOWN -> {
+                disableFirewallStatusUi()
+                enableLockdownUi()
+            }
             FirewallManager.FirewallStatus.UNTRACKED -> {
                 // no-op
             }
@@ -272,6 +276,25 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
             }
 
             removeAppDns(uid)
+        }
+
+        b.aadAapLockdownRl.setOnClickListener {
+            b.aadAapLockdownSwitch.isChecked = !b.aadAapLockdownSwitch.isChecked
+        }
+
+        b.aadAapLockdownSwitch.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+            if (isSelected) {
+                updateFirewallStatus(FirewallManager.FirewallStatus.LOCKDOWN,
+                                     FirewallManager.ConnectionStatus.BOTH)
+                disableFirewallStatusUi()
+                enableLockdownUi()
+                return@setOnCheckedChangeListener
+            }
+
+            updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
+                                 FirewallManager.ConnectionStatus.BOTH)
+            enableAllow()
+            disableLockdownUi()
         }
 
         b.aadAppDnsRethinkConfigure.setOnClickListener {
@@ -485,6 +508,31 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
     }
 
+    private fun disableFirewallStatusUi() {
+        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
+    }
+
+    private fun enableLockdownUi() {
+        b.aadAapLockdownSwitch.isChecked = true
+
+        b.aadAppSettingsWhitelist.isEnabled = false
+        b.aadAppSettingsExclude.isEnabled = false
+        b.aadAppSettingsBlock.isEnabled = false
+        b.aadAppSettingsBlockMd.isEnabled = false
+    }
+
+    private fun disableLockdownUi() {
+        b.aadAapLockdownSwitch.isChecked = false
+
+        b.aadAppSettingsWhitelist.isEnabled = true
+        b.aadAppSettingsExclude.isEnabled = true
+        b.aadAppSettingsBlock.isEnabled = true
+        b.aadAppSettingsBlockMd.isEnabled = true
+    }
+
     private fun enableAllow() {
         setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
@@ -531,6 +579,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
                     else -> getString(R.string.ada_app_status_block)
                 }
             }
+            FirewallManager.FirewallStatus.LOCKDOWN -> getString(R.string.ada_app_status_lockdown)
             FirewallManager.FirewallStatus.UNTRACKED -> getString(R.string.ada_app_status_unknown)
         }
     }

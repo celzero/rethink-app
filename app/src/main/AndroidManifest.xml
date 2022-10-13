@@ -2,13 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.celzero.bravedns">
 
+    <permission android:name="com.celzero.bravedns.contentprovider.READ_WRITE" />
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <!-- Allows applications to change network connectivity state -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <!-- Android 11 introduces changes related to package visibility. These changes affect
     apps only if they target Android 11.
     https://developer.android.com/training/package-visibility -->
@@ -42,6 +46,18 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.rbk" />
+                <data android:host="*" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.DnsDetailActivity"
@@ -64,6 +80,9 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.ConfigureRethinkBasicActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.AppDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"
@@ -124,7 +143,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.celzero.bravedns.provider"
+            android:authorities="com.celzero.bravedns.provider;com.celzero.bravedns.backup.BackupAgent"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

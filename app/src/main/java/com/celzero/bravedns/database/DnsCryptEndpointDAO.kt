@@ -16,9 +16,9 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 
 @Dao
@@ -74,4 +74,7 @@ interface DnsCryptEndpointDAO {
     @Transaction
     @Query("update DNSCryptEndpoint set isSelected=0")
     fun updateFailingConnections()
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

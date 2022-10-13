@@ -118,6 +118,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
+                    android:alpha="0.75"
                     android:text="@string/orbot_http_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -168,6 +169,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
+                    android:alpha="0.75"
                     android:text="@string/orbot_socks5_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -222,6 +224,7 @@
                     android:gravity="center_vertical"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
+                    android:alpha="0.75"
                     android:text="@string/orbot_both_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -275,6 +278,7 @@
                     android:gravity="center_vertical"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
+                    android:alpha="0.75"
                     android:text="@string/orbot_none_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />

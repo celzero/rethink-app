@@ -20,10 +20,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -123,11 +123,12 @@ object VpnController : KoinComponent {
         // and actual-start scenarios just fine; ref: isNewVpn bool in vpnService.onStartCommand
 
         val startServiceIntent = Intent(context, BraveVPNService::class.java)
-        if (isAtleastO()) {
-            context.startForegroundService(startServiceIntent)
-        } else {
-            context.startService(startServiceIntent)
-        }
+
+        // ContextCompat will take care of calling the proper service based on the API version.
+        // before Android O, context.startService(intent) should be invoked.
+        // on or after Android O, context.startForegroundService(intent) should be invoked.
+        ContextCompat.startForegroundService(context, startServiceIntent)
+
         onConnectionStateChanged(state().connectionState)
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
 
@@ -216,7 +217,7 @@ object VpnController : KoinComponent {
             protoString = "IPv4, IPv6"
         } else if (ipv4Size >= 1) {
             protoString = "IPv4"
-        }else if (ipv6Size >= 1) {
+        } else if (ipv6Size >= 1) {
             protoString = "IPv6"
         } else {
             // no-op

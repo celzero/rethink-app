@@ -15,6 +15,7 @@
             android:padding="14dp"
             android:text="@string/whats_new_version_name"
             android:textColor="?attr/primaryTextColor"
+            android:visibility="gone"
             android:textSize="@dimen/heading_font_text_view"
             android:textStyle="bold" />
 

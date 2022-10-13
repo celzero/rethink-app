@@ -24,8 +24,8 @@
 
         <ImageView
             android:id="@+id/connection_app_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"
             android:contentDescription="@string/apps_icon_content_desc"

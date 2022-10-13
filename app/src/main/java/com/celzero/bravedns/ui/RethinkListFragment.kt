@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -44,11 +43,12 @@ import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_B
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.UID
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
+import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
@@ -127,8 +127,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         val cpDrawable = CircularProgressDrawable(requireContext())
         cpDrawable.setStyle(CircularProgressDrawable.DEFAULT)
         val color = fetchColor(requireContext(), R.attr.chipTextPositive)
-        cpDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-            color, BlendModeCompat.SRC_ATOP)
+        cpDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color,
+                                                                                             BlendModeCompat.SRC_ATOP)
         cpDrawable.start()
 
         chip.chipIcon = cpDrawable
@@ -142,13 +142,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun showUpdateCheckUi() {
-        if (!persistentState.periodicallyCheckBlocklistUpdate) {
-            b.bslbCheckUpdateBtn.visibility = View.VISIBLE
-            b.bslbRedownloadBtn.visibility = View.GONE
-            b.bslbUpdateAvailableBtn.visibility = View.GONE
-            return
-        }
-
         if (isBlocklistUpdateAvailable()) {
             b.bslbUpdateAvailableBtn.visibility = View.VISIBLE
             b.bslbRedownloadBtn.visibility = View.GONE
@@ -163,7 +156,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun isBlocklistUpdateAvailable(): Boolean {
-        return persistentState.updatableTimestampRemote != INIT_TIME_MS
+        return persistentState.newestRemoteBlocklistTimestamp != INIT_TIME_MS
     }
 
     private fun checkBlocklistUpdate() {
@@ -178,6 +171,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private fun initView() {
         showBlocklistVersionUi()
         showUpdateCheckUi()
+        updateMaxSwitchUi()
 
         layoutManager = LinearLayoutManager(requireContext())
         b.recyclerDohConnections.layoutManager = layoutManager
@@ -188,6 +182,16 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             recyclerAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.recyclerDohConnections.adapter = recyclerAdapter
+    }
+
+    private fun updateMaxSwitchUi() {
+        ui {
+            var endpointUrl: String? = ""
+            ioCtx {
+                endpointUrl = appConfig.getRethinkPlusEndpoint().url
+            }
+            updateRethinkRadioUi(isMax = endpointUrl?.contains(MAX_ENDPOINT) == true)
+        }
     }
 
     private fun initClickListeners() {
@@ -231,10 +235,41 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             download(getDownloadTimeStamp())
         }
 
+        b.radioMax.setOnCheckedChangeListener(null)
+        b.radioMax.setOnClickListener {
+            if (b.radioMax.isChecked) {
+                io {
+                    appConfig.switchRethinkDnsToMax()
+                }
+                updateRethinkRadioUi(isMax = true)
+            }
+        }
+
+        b.radioSky.setOnCheckedChangeListener(null)
+        b.radioSky.setOnClickListener {
+            if (b.radioSky.isChecked) {
+                io {
+                    appConfig.switchRethinkDnsToSky()
+                }
+                updateRethinkRadioUi(isMax = false)
+            }
+        }
+    }
+
+    private fun updateRethinkRadioUi(isMax: Boolean) {
+        if (isMax) {
+            b.radioMax.isChecked = true
+            b.radioSky.isChecked = false
+            b.frlDesc.text = getString(R.string.rethink_max_desc)
+        } else {
+            b.radioSky.isChecked = true
+            b.radioMax.isChecked = false
+            b.frlDesc.text = getString(R.string.rethink_sky_desc)
+        }
     }
 
     private fun getDownloadableTimestamp(): Long {
-        return persistentState.updatableTimestampRemote
+        return persistentState.newestRemoteBlocklistTimestamp
     }
 
     private fun download(timestamp: Long) {
@@ -242,7 +277,15 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun getUrlForStamp(stamp: String): String {
-        return RETHINK_BASE_URL + stamp
+        return getRethinkBaseUrl() + stamp
+    }
+
+    private fun getRethinkBaseUrl(): String {
+        return if (b.radioMax.isChecked) {
+            RETHINK_BASE_URL_MAX
+        } else {
+            RETHINK_BASE_URL_SKY
+        }
     }
 
     /**
@@ -267,7 +310,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         dialog.window?.attributes = lp
 
         dialogBinding.dialogCustomUrlConfigureBtn.visibility = View.GONE
-        dialogBinding.dialogCustomUrlEditText.append(RETHINK_BASE_URL + stamp)
+        dialogBinding.dialogCustomUrlEditText.append(getRethinkBaseUrl() + stamp)
 
         dialogBinding.dialogCustomNameEditText.setText(getString(R.string.rt_rethink_dns),
                                                        TextView.BufferType.EDITABLE)
@@ -308,7 +351,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun initObservers() {
         appDownloadManager.remoteDownloadStatus.observe(viewLifecycleOwner) {
-            Log.d(LoggerConstants.LOG_TAG_DOWNLOAD, "Remote blocklist download status id: $it")
+            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD, "Remote blocklist download status id: $it")
             if (!isDownloadInitiated) return@observe
 
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
@@ -350,7 +393,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
             if (!isDownloadInitiated) return@observe
 
-            Log.d(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Log.i(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
                 // no-op
                 return@observe
@@ -425,6 +468,9 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun onDownloadSuccess() {
         isDownloadInitiated = false
+        b.lbVersion.text = getString(R.string.settings_local_blocklist_version,
+                                     Utilities.convertLongToTime(getDownloadTimeStamp(),
+                                                                 Constants.TIME_FORMAT_2))
         enableChips()
         showRedownloadUi()
         Utilities.showToastUiCentered(requireContext(),
@@ -477,6 +523,12 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             withContext(Dispatchers.IO) {
                 f()
             }
+        }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            f()
         }
     }
 

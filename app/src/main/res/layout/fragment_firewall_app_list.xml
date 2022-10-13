@@ -15,6 +15,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
             android:layout_margin="4dp"
             android:elevation="4dp">
 
@@ -128,7 +129,6 @@
         android:id="@+id/ffa_toggle_all_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_below="@id/ffa_search_view_top"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp">
@@ -138,6 +138,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerVertical="true"
+            android:alpha="0.5"
             android:src="@drawable/ic_info_white" />
 
         <TextView
@@ -149,8 +150,8 @@
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@id/ffa_toggle_all_wifi"
             android:layout_toEndOf="@id/ffa_app_info_icon"
+            android:textAlignment="textStart"
             android:fontFamily="sans-serif"
-            android:gravity="end"
             android:padding="5dp"
             android:text="@string/fapps_firewall_filter_hint"
             android:textSize="@dimen/default_font_text_view" />

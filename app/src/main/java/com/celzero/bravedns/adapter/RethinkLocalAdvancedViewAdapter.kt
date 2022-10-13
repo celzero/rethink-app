@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import androidx.paging.PagedListAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -105,14 +104,14 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
 
         // fixme: remove this method, add it in strings.xml
         private fun getGroupName(group: String): String {
-            if (group == "parentalcontrol") {
-                return context.getString(R.string.rbl_parental_control)
+            return if (group == "parentalcontrol") {
+                context.getString(R.string.rbl_parental_control)
             } else if (group == "privacy") {
-                return context.getString(R.string.rbl_privacy)
+                context.getString(R.string.rbl_privacy)
             } else if (group == "security") {
-                return context.getString(R.string.rbl_security)
+                context.getString(R.string.rbl_security)
             } else {
-                return ""
+                ""
             }
         }
 
@@ -128,14 +127,11 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
             b.crpCheckBox.isChecked = isSelected
             setCardBackground(isSelected)
 
-            io {
-                if (isSelected) {
-                    addBlocklistTag(filetag)
-                    return@io
-                }
-
-                removeBlocklistTag(filetag)
+            if (isSelected) {
+                addBlocklistTag(filetag)
+                return
             }
+            removeBlocklistTag(filetag)
         }
 
         private fun addBlocklistTag(filetag: RethinkLocalFileTag) {

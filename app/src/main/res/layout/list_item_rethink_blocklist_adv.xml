@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="@android:color/transparent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
 
     <RelativeLayout
         android:id="@+id/crp_title_ll"
@@ -37,8 +37,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="5dp"
-            android:background="@android:color/transparent">
+            android:background="@android:color/transparent"
+            android:padding="5dp">
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/crp_check_box"
@@ -47,9 +47,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layoutDirection="rtl"
-                android:padding="5dp"
                 android:minWidth="48dp"
-                android:minHeight="48dp" />
+                android:minHeight="48dp"
+                android:padding="5dp" />
 
             <TextView
                 android:id="@+id/crp_label_tv"
@@ -69,9 +69,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/crp_label_tv"
                 android:layout_alignParentStart="true"
-                android:background="@android:color/transparent"
                 android:layout_marginTop="5dp"
                 android:layout_toEndOf="@+id/crp_check_box"
+                android:background="@android:color/transparent"
                 android:padding="5dp">
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -79,9 +79,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
+                    android:alpha="0.75"
                     android:background="@drawable/rectangle_border_background"
                     android:ellipsize="end"
-                    android:padding="5dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="5dp"
                     android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />
@@ -90,9 +94,14 @@
                     android:id="@+id/crp_desc_entries_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="0.75"
                     android:background="@drawable/rectangle_border_background"
                     android:ellipsize="end"
                     android:padding="5dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="5dp"
                     android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/large_font_text_view" />

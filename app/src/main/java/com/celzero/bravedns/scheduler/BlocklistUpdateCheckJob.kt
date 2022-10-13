@@ -75,13 +75,11 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
                 Log.i(LOG_TAG_SCHEDULER,
                       "Response for update check for blocklist: version? $version, update? $shouldUpdate, download type: ${type.name}")
                 if (type == AppDownloadManager.DownloadType.LOCAL) {
-                    persistentState.isLocalBlocklistUpdateAvailable = shouldUpdate
-                    if (shouldUpdate) persistentState.updatableTimestampLocal = timestamp
+                    if (shouldUpdate) persistentState.newestLocalBlocklistTimestamp = timestamp
                     return
                 }
 
-                persistentState.isRemoteBlocklistUpdateAvailable = shouldUpdate
-                if (shouldUpdate) persistentState.updatableTimestampRemote = timestamp
+                if (shouldUpdate) persistentState.newestRemoteBlocklistTimestamp = timestamp
             }
         })
     }
@@ -93,9 +91,7 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
             persistentState.remoteBlocklistTimestamp
         }
         val appVersionCode = persistentState.appVersion
-        val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
-        Log.d(LOG_TAG_SCHEDULER, "Check for download, download type ${type.name} url: $url")
-        return url
+        return "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
     }
 
 }

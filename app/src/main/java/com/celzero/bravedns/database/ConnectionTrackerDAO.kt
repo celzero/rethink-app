@@ -15,9 +15,9 @@
  */
 package com.celzero.bravedns.database
 
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.data.AppConnections
 
 
@@ -51,7 +51,7 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select ipAddress as ipAddress, count(ipAddress) as count, flag, dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc")
+        "select ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc")
     fun getLogsForApp(uid: Int): List<AppConnections>?
 
     @Query(
@@ -83,4 +83,6 @@ interface ConnectionTrackerDAO {
     fun getAllowedConnectionsFiltered(query: String,
                                       filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

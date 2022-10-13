@@ -15,11 +15,11 @@
  */
 package com.celzero.bravedns.database
 
-import android.util.Log
 import androidx.room.Entity
-import androidx.room.Index
+import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import inet.ipaddr.IPAddress
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
+import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 
 /**
@@ -33,9 +33,9 @@ import inet.ipaddr.IPAddressString
  */
 @Entity(primaryKeys = ["uid", "ipAddress", "port", "protocol"], tableName = "CustomIp")
 class CustomIp {
-    var uid: Int = 0
+    var uid: Int = IpRulesManager.UID_EVERYBODY
     var ipAddress: String = ""
-    var port: Int = 0
+    var port: Int = UNSPECIFIED_PORT
     var protocol: String = ""
     var isActive: Boolean = true
 
@@ -61,19 +61,27 @@ class CustomIp {
         return result
     }
 
-    fun getCustomIpAddress(): IPAddress {
-        return IPAddressString(ipAddress).address
+    fun getCustomIpAddress(): HostName {
+        return if (port == UNSPECIFIED_PORT) {
+            HostName(ipAddress)
+        } else {
+            HostName(IPAddressString(ipAddress).address, port)
+        }
     }
 
     fun setCustomIpAddress(ipAddress: String) {
         var ip = ipAddress
-        if (IPAddressString(ipAddress).isIPv4) {
+        if (HostName(ipAddress).address.isIPv4) {
             if (ipAddress.count { it == '.' } < 3) {
                 ip = getPaddedIp(ip)
             }
         }
 
-        this.ipAddress = IPAddressString(ip).address.toNormalizedString()
+        this.ipAddress = HostName(ip).address.toNormalizedString()
+    }
+
+    fun setCustomIpAddress(hostName: HostName) {
+        this.ipAddress = hostName.address.toNormalizedString()
     }
 
     private fun getPaddedIp(ip: String): String {

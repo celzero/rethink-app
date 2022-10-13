@@ -93,19 +93,30 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
-        persistentState.localBlocklistTimestamp = timestamp
-        persistentState.blocklistEnabled = true
-        // reset updatable time stamp
-        persistentState.updatableTimestampLocal = INIT_TIME_MS
-        // write the file tag json file into database
-        io {
-            RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
-                                             timestamp)
+        // issue fix: #575, chosen blocklists are not updating for first time
+        // the below operations need to be completed before returning the value
+        // from the worker
+        ui {
+            persistentState.localBlocklistTimestamp = timestamp
+            persistentState.blocklistEnabled = true
+            // reset updatable time stamp
+            persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
+            // write the file tag json file into database
+            io {
+                RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
+                                                 timestamp)
+            }
         }
     }
 
     private fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
+            f()
+        }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.Main).launch {
             f()
         }
     }

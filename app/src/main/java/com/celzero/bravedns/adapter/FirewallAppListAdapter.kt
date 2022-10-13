@@ -31,7 +31,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagedListAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -110,11 +109,14 @@ class FirewallAppListAdapter(private val context: Context,
                     R.string.firewall_status_allow)
                 FirewallManager.FirewallStatus.EXCLUDE -> context.getString(
                     R.string.firewall_status_excluded)
+                FirewallManager.FirewallStatus.LOCKDOWN -> context.getString(
+                    R.string.firewall_status_lockdown)
                 FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> context.getString(
                     R.string.firewall_status_whitelisted)
                 FirewallManager.FirewallStatus.BLOCK -> {
                     when {
-                        cStat.mobileData() -> context.getString(R.string.firewall_status_block_metered)
+                        cStat.mobileData() -> context.getString(
+                            R.string.firewall_status_block_metered)
                         cStat.wifi() -> context.getString(R.string.firewall_status_block_unmetered)
                         else -> context.getString(R.string.firewall_status_blocked)
                     }
@@ -152,6 +154,10 @@ class FirewallAppListAdapter(private val context: Context,
                     showWifiUnused()
                 }
                 FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
+                    showMobileDataUnused()
+                    showWifiUnused()
+                }
+                FirewallManager.FirewallStatus.LOCKDOWN -> {
                     showMobileDataUnused()
                     showWifiUnused()
                 }
@@ -206,6 +212,9 @@ class FirewallAppListAdapter(private val context: Context,
                         context.getColor(R.color.primaryLightColorText))
                 }
                 FirewallManager.FirewallStatus.BLOCK -> {
+                    mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
+                }
+                FirewallManager.FirewallStatus.LOCKDOWN -> {
                     mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
                 }
                 FirewallManager.FirewallStatus.UNTRACKED -> { /* no-op */
@@ -274,7 +283,6 @@ class FirewallAppListAdapter(private val context: Context,
                 FirewallManager.ConnectionStatus.WIFI -> {
                     updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.BOTH)
-                    killApps(appInfo.uid)
                 }
                 FirewallManager.ConnectionStatus.BOTH -> {
                     if (appStatus.blocked()) {
@@ -295,7 +303,6 @@ class FirewallAppListAdapter(private val context: Context,
                 FirewallManager.ConnectionStatus.MOBILE_DATA -> {
                     updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.BLOCK,
                                          FirewallManager.ConnectionStatus.BOTH)
-                    killApps(appInfo.uid)
                 }
                 FirewallManager.ConnectionStatus.WIFI -> {
                     updateFirewallStatus(appInfo.uid, FirewallManager.FirewallStatus.ALLOW,
@@ -351,17 +358,6 @@ class FirewallAppListAdapter(private val context: Context,
             val alertDialog: AlertDialog = builderSingle.create()
             alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.show()
-        }
-
-        private fun killApps(uid: Int) {
-            if (!persistentState.killAppOnFirewall) return
-
-            io {
-                val apps = FirewallManager.getNonSystemAppsPackageNameByUid(uid)
-                apps.forEach {
-                    Utilities.killBg(activityManager, it)
-                }
-            }
         }
     }
 

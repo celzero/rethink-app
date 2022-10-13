@@ -49,8 +49,6 @@ class ConnectionTrackerAdapter(private val context: Context) :
             DIFF_CALLBACK) {
 
     companion object {
-        const val HTTP3: String = "HTTP3"
-
         private val DIFF_CALLBACK = object :
 
                 DiffUtil.ItemCallback<ConnectionTracker>() {
@@ -102,8 +100,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
             }
 
             val bottomSheetFragment = ConnTrackerBottomSheetFragment()
+            // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
-            bundle.putString(ConnTrackerBottomSheetFragment.IPDETAILS, Gson().toJson(ct))
+            bundle.putString(ConnTrackerBottomSheetFragment.INSTANCE_STATE_IPDETAILS,
+                             Gson().toJson(ct))
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
@@ -151,7 +151,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
             val resolvedPort = KnownPorts.resolvePort(port)
             // case: for UDP/443 label it as HTTP3 instead of HTTPS
             b.connLatencyTxt.text = if (port == KnownPorts.HTTPS_PORT && proto == Protocol.UDP.protocolType) {
-                HTTP3
+                context.getString(R.string.connection_http3)
             } else if (resolvedPort != KnownPorts.PORT_VAL_UNKNOWN) {
                 resolvedPort.uppercase(Locale.ROOT)
             } else {

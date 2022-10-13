@@ -59,12 +59,14 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        remakeParentFilterChipsUi()
-
         val filters = FirewallAppFragment.filters.value
+
+        remakeParentFilterChipsUi()
         if (filters == null) {
             applyParentFilter(FirewallAppFragment.TopLevelFilter.ALL.id)
             return
+        } else {
+            sortValues.firewallFilter = filters.firewallFilter
         }
 
         applyParentFilter(filters.topLevelFilter.id)
@@ -150,14 +152,17 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         when (tag) {
             FirewallAppFragment.TopLevelFilter.ALL.id -> {
                 sortValues.topLevelFilter = FirewallAppFragment.TopLevelFilter.ALL
+                sortValues.categoryFilters.clear()
                 remakeChildFilterChipsUi(FirewallManager.getAllCategories())
             }
             FirewallAppFragment.TopLevelFilter.INSTALLED.id -> {
                 sortValues.topLevelFilter = FirewallAppFragment.TopLevelFilter.INSTALLED
+                sortValues.categoryFilters.clear()
                 remakeChildFilterChipsUi(FirewallManager.getCategoriesForInstalledApps())
             }
             FirewallAppFragment.TopLevelFilter.SYSTEM.id -> {
                 sortValues.topLevelFilter = FirewallAppFragment.TopLevelFilter.SYSTEM
+                sortValues.categoryFilters.clear()
                 remakeChildFilterChipsUi(FirewallManager.getCategoriesForSystemApps())
             }
         }

@@ -82,8 +82,8 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         dnsCryptRecyclerAdapter = DnsCryptEndpointAdapter(requireContext(), viewLifecycleOwner,
                                                           get())
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner) {
-                    dnsCryptRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-                }
+            dnsCryptRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
         b.recyclerDnsCryptConnections.adapter = dnsCryptRecyclerAdapter
     }
 
@@ -146,7 +146,7 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             relayNextIndex = appConfig.getDnscryptRelayCount().plus(1)
             uiCtx {
                 cryptNameEditText.setText(
-                    getString(R.string.cd_custom_dns_proxy_name, dnscryptNextIndex.toString()),
+                    getString(R.string.cd_dns_crypt_name, dnscryptNextIndex.toString()),
                     TextView.BufferType.EDITABLE)
             }
         }

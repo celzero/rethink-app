@@ -82,8 +82,7 @@ object RethinkBlocklistManager : KoinComponent {
                                                     "Block adult & pirated content, online gambling & dating, and social media.")
     private val SECURITY = RethinkBlockType("Security",
                                             "Block malware, ransomware, cryptoware, phishers, and other threats.")
-    private val PRIVACY = RethinkBlockType("Privacy",
-                                           "Block adware, spyware, scareware, and trackers.")
+    private val PRIVACY = RethinkBlockType("Privacy", "Block attentionware, spyware, scareware.")
 
     private val ADULT = SimpleViewTag(0, "Adult", "Blocks over 30,000 adult websites.",
                                       mutableListOf(), PARENTAL_CONTROL)
@@ -104,10 +103,10 @@ object RethinkBlocklistManager : KoinComponent {
     private val SEC_EXTRA = SimpleViewTag(6, "Extra", "Blocks over 3000+ cryptoware websites",
                                           mutableListOf(), SECURITY)
     private val PRIVACY_LITE = SimpleViewTag(7, "Lite",
-                                             "Blocks over 50,000+ adware and trackers through some of the most well-curated blocklists.",
+                                             "Blocks over 50,000+ attentionware through some of the most well-curated blocklists.",
                                              mutableListOf(), PRIVACY)
     private val PRIVACY_AGGRESSIVE = SimpleViewTag(8, "Aggressive",
-                                                   "Blocks over 100,000+ adware, spyware, and trackers through some of the most extensive blocklists.",
+                                                   "Blocks over 100,000+ attentionware, spyware through some of the most extensive blocklists.",
                                                    mutableListOf(), PRIVACY)
     private val PRIVACY_EXTREME = SimpleViewTag(9, "Extreme",
                                                 "Blocks over 1,000,000+ suspected websites.",

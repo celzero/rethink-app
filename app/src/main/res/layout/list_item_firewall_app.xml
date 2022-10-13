@@ -41,13 +41,13 @@
 
                     <ImageView
                         android:id="@+id/firewall_app_icon_iv"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="5dp"
                         android:contentDescription="@string/apps_icon_content_desc"
-                        android:maxWidth="60dp"
-                        android:maxHeight="60dp"
+                        android:maxWidth="48dp"
+                        android:maxHeight="48dp"
                         android:src="@drawable/ic_launcher_foreground" />
 
                     <androidx.appcompat.widget.LinearLayoutCompat

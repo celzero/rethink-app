@@ -56,7 +56,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         const val MSG_LINK_PROPERTY = 3
     }
 
-    data class NetworkProperties(val network: Network, val linkedProperties: LinkProperties)
+    data class NetworkProperties(val network: Network, val linkProperties: LinkProperties)
 
     init {
         connectivityManager.registerNetworkCallback(networkRequest, this)
@@ -161,7 +161,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     data class UnderlyingNetworks(val allNet: Set<Network>?, val ipv4Net: Set<Network>,
                                   val ipv6Net: Set<Network>, val useActive: Boolean,
-                                                      var `isActiveNetworkMetered`: Boolean, var lastUpdated: Long)
+                                  var `isActiveNetworkMetered`: Boolean, var lastUpdated: Long)
 
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(context: Context, looper: Looper,
@@ -251,7 +251,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 val underlyingNetworks = UnderlyingNetworks(currentNetworks, trackedIpv4Networks,
                                                             trackedIpv6Networks,
                                                             !requireAllNetworks,
-                                                            isActiveNetworkMetered, SystemClock.elapsedRealtime())
+                                                            isActiveNetworkMetered,
+                                                            SystemClock.elapsedRealtime())
                 networkListener.onNetworkConnected(underlyingNetworks)
             } else {
                 networkListener.onNetworkDisconnected()
@@ -269,7 +270,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         }
 
         private fun processLinkPropertyChange(networkProperties: NetworkProperties) {
-            val linkedProperties = networkProperties.linkedProperties
+            val linkProperties = networkProperties.linkProperties
             val network = networkProperties.network
 
             // do not add network if there is no internet/is VPN
@@ -277,7 +278,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 return
             }
 
-            linkedProperties.linkAddresses.forEach {
+            linkProperties.linkAddresses.forEach {
+                // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
                 if (it.scope != RT_SCOPE_UNIVERSE) return@forEach
 
                 val address = IPAddressString(it.address.hostAddress?.toString()) ?: return@forEach
@@ -296,10 +298,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val ipv4: MutableSet<Network> = mutableSetOf()
 
             networks.forEach { network ->
-                val linkedProperties = connectivityManager.getLinkProperties(
+                val linkProperties = connectivityManager.getLinkProperties(
                     network) ?: return@forEach
 
-                linkedProperties.linkAddresses.forEach inner@{ prop ->
+                linkProperties.linkAddresses.forEach inner@{ prop ->
+                    // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
                     if (prop.scope != RT_SCOPE_UNIVERSE) return@inner
 
                     val address = IPAddressString(prop.address.hostAddress?.toString())

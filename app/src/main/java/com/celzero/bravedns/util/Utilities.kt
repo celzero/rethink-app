@@ -29,6 +29,8 @@ import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.LinkProperties
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -277,7 +279,8 @@ class Utilities {
         }
 
         fun isLanIpv4(ipAddress: String): Boolean {
-            val ip = IPAddressString(ipAddress).address
+            val ip = IPAddressString(ipAddress).address ?: return false
+
             return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip)
         }
 
@@ -332,14 +335,6 @@ class Utilities {
             return vpnService?.isLockdownEnabled == true
         }
 
-        fun killBg(activityManager: ActivityManager, packageName: String) {
-            try {
-                activityManager.killBackgroundProcesses(packageName)
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_FIREWALL, "firewall - kill app - exception" + e.message, e)
-            }
-        }
-
         fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
             var metadata: PackageInfo? = null
 
@@ -368,17 +363,23 @@ class Utilities {
         }
 
         // ref: https://stackoverflow.com/a/41818556
-        fun copyWithStream(readStream: InputStream, writeStream: OutputStream) {
+        fun copyWithStream(readStream: InputStream, writeStream: OutputStream): Boolean {
             val length = 256
             val buffer = ByteArray(length)
-            var bytesRead: Int = readStream.read(buffer, 0, length)
-            // write the required bytes
-            while (bytesRead > 0) {
-                writeStream.write(buffer, 0, bytesRead)
-                bytesRead = readStream.read(buffer, 0, length)
+            return try {
+                var bytesRead: Int = readStream.read(buffer, 0, length)
+                // write the required bytes
+                while (bytesRead > 0) {
+                    writeStream.write(buffer, 0, bytesRead)
+                    bytesRead = readStream.read(buffer, 0, length)
+                }
+                readStream.close()
+                writeStream.close()
+                true
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_DOWNLOAD, "Issue while copying files using streams: ${e.message}, $e")
+                false
             }
-            readStream.close()
-            writeStream.close()
         }
 
         fun isAlwaysOnEnabled(context: Context, vpnService: BraveVPNService?): Boolean {
@@ -587,10 +588,7 @@ class Utilities {
             if (ctx == null) return null
 
             return try {
-                val a = remoteBlocklistDownloadBasePath(ctx, which, timestamp)
-                Log.d(LoggerConstants.LOG_TAG_DNS, "Path: $a")
                 File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
-
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
@@ -714,6 +712,42 @@ class Utilities {
                 Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
                 ""
             }
+        }
+
+        enum class PrivateDnsMode {
+            NONE,  // The setting is "Off" or "Opportunistic", and the DNS connection is not using TLS.
+            UPGRADED,  // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
+            STRICT // The setting is "Strict".
+        }
+
+        fun getPrivateDnsMode(context: Context): PrivateDnsMode {
+            // https://github.com/celzero/rethink-app/issues/408
+            if (!isAtleastQ()) {
+                // Private DNS was introduced in P.
+                return PrivateDnsMode.NONE
+            }
+
+            val linkProperties: LinkProperties = getLinkProperties(
+                context) ?: return PrivateDnsMode.NONE
+            if (linkProperties.privateDnsServerName != null) {
+                return PrivateDnsMode.STRICT
+            }
+            return if (linkProperties.isPrivateDnsActive) {
+                PrivateDnsMode.UPGRADED
+            } else {
+                PrivateDnsMode.NONE
+            }
+        }
+
+        fun isPrivateDnsActive(context: Context): Boolean {
+            return getPrivateDnsMode(context) != PrivateDnsMode.NONE
+        }
+
+        private fun getLinkProperties(context: Context): LinkProperties? {
+            val connectivityManager = context.getSystemService(
+                Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork ?: return null
+            return connectivityManager.getLinkProperties(activeNetwork)
         }
     }
 }

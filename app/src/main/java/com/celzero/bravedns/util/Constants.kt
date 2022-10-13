@@ -68,15 +68,21 @@ class Constants {
 
         const val REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME = "remote_blocklist"
 
+        // url_param_compress_blob
+        // search param
+        const val URL_SEARCHPARAM_COMPRESS_BLOB = "?compressed"
+
         val ONDEVICE_BLOCKLISTS = listOf(OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/blocklists",
                                                                     ONDEVICE_BLOCKLIST_FILE_TAG),
                                          OnDeviceBlocklistsMetadata(
                                              "$DOWNLOAD_BASE_URL/basicconfig",
                                              ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
-                                         OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/rank",
-                                                                    ONDEVICE_BLOCKLIST_FILE_RD),
-                                         OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/trie",
-                                                                    ONDEVICE_BLOCKLIST_FILE_TD))
+                                         OnDeviceBlocklistsMetadata(
+                                             "$DOWNLOAD_BASE_URL/rank$URL_SEARCHPARAM_COMPRESS_BLOB",
+                                             ONDEVICE_BLOCKLIST_FILE_RD),
+                                         OnDeviceBlocklistsMetadata(
+                                             "$DOWNLOAD_BASE_URL/trie$URL_SEARCHPARAM_COMPRESS_BLOB",
+                                             ONDEVICE_BLOCKLIST_FILE_TD))
 
         val ONDEVICE_IPDB = listOf(
             OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v4", ONDEVICE_GEOIP_IPV4),
@@ -94,7 +100,8 @@ class Constants {
         const val RETHINK_APP_DOWNLOAD_LINK = "https://rethinkdns.com/download"
 
         // base-url for rethinkdns
-        const val RETHINK_BASE_URL = "https://basic.rethinkdns.com/"
+        const val RETHINK_BASE_URL_SKY = "https://sky.rethinkdns.com/"
+        const val RETHINK_BASE_URL_MAX = "https://max.rethinkdns.com/"
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
@@ -242,5 +249,8 @@ class Constants {
 
         // play services package name
         const val PKG_NAME_PLAY_STORE = "com.android.vending"
+
+        // max endpoint
+        const val MAX_ENDPOINT = "max"
     }
 }

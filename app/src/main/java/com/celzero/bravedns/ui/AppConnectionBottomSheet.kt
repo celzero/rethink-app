@@ -28,6 +28,8 @@ import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -56,11 +58,13 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private var position: Int = -1
     private var uid: Int = -1
     private var ipAddress: String = ""
+    private var port: Int = UNSPECIFIED_PORT
     private var ipRuleStatus: IpRulesManager.IpRuleStatus = IpRulesManager.IpRuleStatus.NONE
 
     companion object {
         const val UID = "UID"
         const val IPADDRESS = "IPADDRESS"
+        const val PORT = "PORT"
         const val IPRULESTATUS = "IPRULESTATUS"
     }
 
@@ -92,8 +96,9 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        uid = arguments?.getInt(UID) ?: -1
+        uid = arguments?.getInt(UID) ?: INVALID_UID
         ipAddress = arguments?.getString(IPADDRESS) ?: ""
+        port = arguments?.getInt(PORT) ?: UNSPECIFIED_PORT
         val status = arguments?.getInt(IPRULESTATUS) ?: IpRulesManager.IpRuleStatus.NONE.id
         ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(status)
 
@@ -102,7 +107,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        if (uid == -1) {
+        if (uid == INVALID_UID) {
             this.dismiss()
             return
         }
@@ -125,7 +130,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (uid == -1) {
+        if (uid == INVALID_UID) {
             this.dismiss()
             return
         }
@@ -154,7 +159,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private fun initializeClickListeners() {
         b.bsacBlock.setOnClickListener {
-            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.BLOCK,
+            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.BLOCK,
                       getString(R.string.bsac_block_toast, ipAddress))
         }
 
@@ -165,12 +170,12 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         }*/
 
         b.bsacUnblock.setOnClickListener {
-            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE,
+            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.NONE,
                       getString(R.string.bsac_unblock_toast, ipAddress))
         }
 
         b.bsacBypassAppRules.setOnClickListener {
-            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
+            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
                       getString(R.string.bsac_whitelist_toast, ipAddress))
         }
 
@@ -181,28 +186,28 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
          }*/
 
         b.bsacGopassAppRules.setOnClickListener {
-            applyRule(uid, ipAddress, IpRulesManager.IpRuleStatus.NONE,
+            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.NONE,
                       getString(R.string.bsac_whitelist_remove_toast, ipAddress))
         }
 
         b.bsacDelete.setOnClickListener {
-            deleteRule(uid, ipAddress, getString(R.string.bsac_delete_toast, ipAddress))
+            deleteRule(uid, ipAddress, port, getString(R.string.bsac_delete_toast, ipAddress))
             return@setOnClickListener
         }
     }
 
-    private fun applyRule(uid: Int, ipAddress: String, status: IpRulesManager.IpRuleStatus,
-                          toastMsg: String) {
+    private fun applyRule(uid: Int, ipAddress: String, port: Int,
+                          status: IpRulesManager.IpRuleStatus, toastMsg: String) {
         io {
-            IpRulesManager.addIpRule(uid, ipAddress, status)
+            IpRulesManager.addIpRule(uid, ipAddress, port, status)
         }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()
     }
 
-    private fun deleteRule(uid: Int, ipAddress: String, toastMsg: String) {
+    private fun deleteRule(uid: Int, ipAddress: String, port: Int, toastMsg: String) {
         io {
-            IpRulesManager.removeFirewallRules(uid, ipAddress)
+            IpRulesManager.removeFirewallRules(uid, ipAddress, port)
         }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()

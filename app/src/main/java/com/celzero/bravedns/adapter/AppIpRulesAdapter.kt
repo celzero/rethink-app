@@ -71,21 +71,26 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
             b.aipStatusButton.setOnClickListener {
                 val ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(customIp.status)
                 // open bottom sheet for options
-                openBottomSheet(customIp.ipAddress, ipRuleStatus, position)
+                openBottomSheet(customIp.ipAddress, customIp.port, ipRuleStatus, position)
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, ipRuleStatus: IpRulesManager.IpRuleStatus,
-                                    position: Int) {
+        private fun openBottomSheet(ipAddress: String, port: Int,
+                                    ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
                 return
             }
 
             val bottomSheetFragment = AppConnectionBottomSheet()
+            // Fix: free-form window crash
+            // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
+            // the best practice is to simply never define any constructors at all.
+            // so sending the data using Bundles
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
+            bundle.putInt(AppConnectionBottomSheet.PORT, port)
             bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(null, position)
@@ -93,13 +98,14 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
         }
 
         private fun displayIpDetails(customIp: CustomIp) {
-            b.aipIpAddress.text = customIp.ipAddress
+            b.aipIpAddress.text = "${customIp.ipAddress}:${customIp.port}"
 
             when (IpRulesManager.IpRuleStatus.getStatus(customIp.status)) {
                 IpRulesManager.IpRuleStatus.NONE -> showNoRuleBtn()
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> showBypassAppRulesBtn()
                 IpRulesManager.IpRuleStatus.BLOCK -> showBlockedBtn()
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL ->  { /* no-op */}
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> { /* no-op */
+                }
             }
         }
 
@@ -138,7 +144,8 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
                                                                           context,
                                                                           R.drawable.ic_arrow_down_small),
                                                                       null)
-            b.aipStatusButton.text = context.resources.getString(R.string.ada_ip_rules_status_allowed)
+            b.aipStatusButton.text = context.resources.getString(
+                R.string.ada_ip_rules_status_allowed)
         }
     }
 }

@@ -32,7 +32,8 @@ class RetrofitManager {
         }
 
         fun getBlocklistBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
-            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient(dnsType))
+            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(
+                okHttpClient(dnsType))
         }
 
         fun okHttpClient(dnsType: OkHttpDnsType): OkHttpClient {
@@ -43,12 +44,13 @@ class RetrofitManager {
             okhttpClientBuilder.writeTimeout(20, TimeUnit.MINUTES)
             okhttpClientBuilder.retryOnConnectionFailure(true)
             okhttpClientBuilder.addInterceptor(NetworkConnectionInterceptor())
-            okhttpClientBuilder.dns(customDns(dnsType))
+            // If unset, the system-wide default DNS will be used.
+            customDns(dnsType)?.let { okhttpClientBuilder.dns(it) }
             return okhttpClientBuilder.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
-        private fun customDns(dnsType: OkHttpDnsType): Dns {
+        private fun customDns(dnsType: OkHttpDnsType): Dns? {
             when (dnsType) {
                 OkHttpDnsType.DEFAULT -> {
                     return DnsOverHttps.Builder().client(OkHttpClient()).url(
@@ -72,7 +74,7 @@ class RetrofitManager {
                         InetAddress.getByName("2001:4860:4860:0:0:0:0:8844")).build()
                 }
                 OkHttpDnsType.SYSTEM_DNS -> {
-                    return DnsOverHttps.Builder().build()
+                    return null
                 }
             }
         }

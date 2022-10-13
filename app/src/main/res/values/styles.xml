@@ -407,6 +407,17 @@
         <item name="android:textSize">@dimen/extra_large_font_text_view</item>
     </style>
 
+    <style name="TextAppearance.Widget.HomeScreen.Desc.1" parent="">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:alpha">0.8</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">?attr/chipTextColor</item>
+        <item name="android:textSize">@dimen/extra_large_font_text_view</item>
+    </style>
+
     <style name="Button.HomeScreen.Borderless" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textAlignment">viewStart</item>
         <item name="android:textColor">?attr/invertedPrimaryTextColor</item>

@@ -22,7 +22,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.paging.PagedListAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -72,14 +71,14 @@ class CustomIpAdapter(private val context: Context) :
         private lateinit var customIp: CustomIp
         fun update(ci: CustomIp) {
             customIp = ci
-            b.customIpLabelTv.text = customIp.ipAddress
+            b.customIpLabelTv.text = "${customIp.ipAddress}:${customIp.port}"
             b.customIpToggleGroup.tag = 1
-            val status = IpRulesManager.IpRuleStatus.getStatus(customIp.status)
+            val status = findSelectedIpRule(customIp.status) ?: return
 
             // whether to show the toggle group
             toggleActionsUi()
             // update toggle group button based on the status
-            updateToggleGroup(customIp.status)
+            updateToggleGroup(status)
             // update flag for the available ips
             updateFlagIfAvailable(customIp)
             // update status in desc and status flag (N/B/W)
@@ -97,31 +96,29 @@ class CustomIpAdapter(private val context: Context) :
 
         }
 
-        private fun updateToggleGroup(id: Int) {
-            val fid = findSelectedIpRule(id) ?: return
-
-            val t = toggleBtnUi(fid)
+        private fun updateToggleGroup(id: IpRulesManager.IpRuleStatus) {
+            val t = toggleBtnUi(id)
 
             when (id) {
-                IpRulesManager.IpRuleStatus.NONE.id -> {
+                IpRulesManager.IpRuleStatus.NONE -> {
                     b.customIpToggleGroup.check(b.customIpTgNoRule.id)
                     selectToggleBtnUi(b.customIpTgNoRule, t)
                     unselectToggleBtnUi(b.customIpTgBlock)
                     unselectToggleBtnUi(b.customIpTgBypassUniv)
                 }
-                IpRulesManager.IpRuleStatus.BLOCK.id -> {
+                IpRulesManager.IpRuleStatus.BLOCK -> {
                     b.customIpToggleGroup.check(b.customIpTgBlock.id)
                     selectToggleBtnUi(b.customIpTgBlock, t)
                     unselectToggleBtnUi(b.customIpTgNoRule)
                     unselectToggleBtnUi(b.customIpTgBypassUniv)
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL.id -> {
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     b.customIpToggleGroup.check(b.customIpTgBypassUniv.id)
                     selectToggleBtnUi(b.customIpTgBypassUniv, t)
                     unselectToggleBtnUi(b.customIpTgBlock)
                     unselectToggleBtnUi(b.customIpTgNoRule)
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES.id -> {
+                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
                     // no-op
                 }
             }
@@ -285,7 +282,7 @@ class CustomIpAdapter(private val context: Context) :
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
-                IpRulesManager.removeFirewallRules(UID_EVERYBODY, customIp.ipAddress)
+                IpRulesManager.removeFirewallRules(UID_EVERYBODY, customIp.ipAddress, customIp.port)
                 Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast,
                                                           customIp.ipAddress),
                                Toast.LENGTH_SHORT).show()
