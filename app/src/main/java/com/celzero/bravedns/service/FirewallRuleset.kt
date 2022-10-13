@@ -35,14 +35,16 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
            R.string.firewall_rule_block_app_mobile_desc, FirewallRuleset.stall),
     RULE1F("Rule #1F", R.string.firewall_rule_univ_block_metered,
            R.string.firewall_rule_block_app_univ_mobile_desc, FirewallRuleset.stall),
+    RULE1G("Rule #1G", R.string.firewall_rule_lockdown, R.string.firewall_rule_lockdown_desc,
+           FirewallRuleset.stall),
     RULE2("Rule #2", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_desc,
           FirewallRuleset.stall),
-    RULE2D("Rule #2D", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_univ_desc,
-           FirewallRuleset.stall),
     RULE2B("Rule #2B", R.string.firewall_rule_bypass_apprule_ip,
            R.string.firewall_rule_bypass_app_rules_ip_desc, FirewallRuleset.allow),
     RULE2C("Rule #2C", R.string.firewall_rule_bypass_universal_ip,
            R.string.firewall_rule_bypass_universal_ip_desc, FirewallRuleset.allow),
+    RULE2D("Rule #2D", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_univ_desc,
+           FirewallRuleset.stall),
     RULE3("Rule #3", R.string.firewall_rule_device_lock, R.string.firewall_rule_device_lock_desc,
           FirewallRuleset.stall),
     RULE4("Rule #4", R.string.firewall_rule_foreground, R.string.firewall_rule_foreground_desc,
@@ -60,7 +62,9 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
     RULE9B("Orbot setup", R.string.firewall_rule_exempt_orbot_setup,
            R.string.firewall_rule_exempt_orbot_setup_desc, FirewallRuleset.allow),
     RULE10("Http block", R.string.firewall_rule_block_http, R.string.firewall_rule_block_http_desc,
-           FirewallRuleset.block);
+           FirewallRuleset.block),
+    RULE11("Universal Lockdown", R.string.firewall_rule_global_lockdown,
+           R.string.firewall_rule_global_lockdown_desc, FirewallRuleset.block);
 
     companion object {
 
@@ -77,9 +81,11 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE1D.id -> RULE1D
                 RULE1E.id -> RULE1E
                 RULE1F.id -> RULE1F
+                RULE1G.id -> RULE1G
                 RULE2.id -> RULE2
                 RULE2B.id -> RULE2B
                 RULE2C.id -> RULE2C
+                RULE2D.id -> RULE2D
                 RULE3.id -> RULE3
                 RULE4.id -> RULE4
                 RULE5.id -> RULE5
@@ -89,6 +95,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE9.id -> RULE9
                 RULE9B.id -> RULE9B
                 RULE10.id -> RULE10
+                RULE11.id -> RULE11
                 else -> null
             }
         }
@@ -103,9 +110,11 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE1D.id -> R.drawable.ic_firewall_wifi_on_grey
                 RULE1E.id -> R.drawable.ic_firewall_data_on_grey_alpha
                 RULE1F.id -> R.drawable.ic_univ_metered
+                RULE1G.id -> R.drawable.ic_lockdown
                 RULE2.id -> R.drawable.spinner_firewall
                 RULE2B.id -> R.drawable.ic_bypass
                 RULE2C.id -> R.drawable.ic_bypass
+                RULE2D.id -> R.drawable.ic_bypass
                 RULE3.id -> R.drawable.ic_device_lock
                 RULE4.id -> R.drawable.ic_foreground
                 RULE5.id -> R.drawable.ic_unknown_app
@@ -115,6 +124,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE9.id -> R.drawable.bs_dns_home_screen
                 RULE9B.id -> R.drawable.ic_orbot
                 RULE10.id -> R.drawable.ic_http
+                RULE11.id -> R.drawable.ic_global_lockdown
                 else -> R.drawable.bs_dns_home_screen
             }
         }

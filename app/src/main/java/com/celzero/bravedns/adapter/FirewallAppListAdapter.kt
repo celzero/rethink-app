@@ -109,6 +109,8 @@ class FirewallAppListAdapter(private val context: Context,
                     R.string.firewall_status_allow)
                 FirewallManager.FirewallStatus.EXCLUDE -> context.getString(
                     R.string.firewall_status_excluded)
+                FirewallManager.FirewallStatus.LOCKDOWN -> context.getString(
+                    R.string.firewall_status_lockdown)
                 FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> context.getString(
                     R.string.firewall_status_whitelisted)
                 FirewallManager.FirewallStatus.BLOCK -> {
@@ -152,6 +154,10 @@ class FirewallAppListAdapter(private val context: Context,
                     showWifiUnused()
                 }
                 FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
+                    showMobileDataUnused()
+                    showWifiUnused()
+                }
+                FirewallManager.FirewallStatus.LOCKDOWN -> {
                     showMobileDataUnused()
                     showWifiUnused()
                 }
@@ -206,6 +212,9 @@ class FirewallAppListAdapter(private val context: Context,
                         context.getColor(R.color.primaryLightColorText))
                 }
                 FirewallManager.FirewallStatus.BLOCK -> {
+                    mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
+                }
+                FirewallManager.FirewallStatus.LOCKDOWN -> {
                     mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
                 }
                 FirewallManager.FirewallStatus.UNTRACKED -> { /* no-op */

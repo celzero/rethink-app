@@ -71,12 +71,12 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
             b.aipStatusButton.setOnClickListener {
                 val ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(customIp.status)
                 // open bottom sheet for options
-                openBottomSheet(customIp.ipAddress, ipRuleStatus, position)
+                openBottomSheet(customIp.ipAddress, customIp.port, ipRuleStatus, position)
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, ipRuleStatus: IpRulesManager.IpRuleStatus,
-                                    position: Int) {
+        private fun openBottomSheet(ipAddress: String, port: Int,
+                                    ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
                 return
@@ -90,6 +90,7 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
+            bundle.putInt(AppConnectionBottomSheet.PORT, port)
             bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(null, position)
@@ -97,7 +98,7 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
         }
 
         private fun displayIpDetails(customIp: CustomIp) {
-            b.aipIpAddress.text = customIp.ipAddress
+            b.aipIpAddress.text = "${customIp.ipAddress}:${customIp.port}"
 
             when (IpRulesManager.IpRuleStatus.getStatus(customIp.status)) {
                 IpRulesManager.IpRuleStatus.NONE -> showNoRuleBtn()

@@ -163,7 +163,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
     enum class State {
-        NEW, WORKING, FAILING, PAUSED
+        NEW, WORKING, FAILING, PAUSED, NO_INTERNET, DNS_SERVER_DOWN, DNS_ERROR, APP_ERROR
     }
 
     override fun bind4(fid: Long) {
@@ -296,10 +296,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             val appStatus = FirewallManager.appStatus(uid)
             val connectionStatus = FirewallManager.connectionStatus(uid)
 
-            if (isDns(connInfo.destPort) && appConfig.preventDnsLeaks()) {
-                return FirewallRuleset.RULE9
-            }
-
             if (allowOrbot(uid)) {
                 return FirewallRuleset.RULE9B
             }
@@ -309,7 +305,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             }
 
             // if the app is new (ie unknown), refresh the db
-            if (FirewallManager.FirewallStatus.UNTRACKED == appStatus) {
+            if (appStatus.isUntracked()) {
                 io("dbRefresh") {
                     refreshDatabase.handleNewlyConnectedApp(uid)
                 }
@@ -319,9 +315,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             }
 
             // IP rules
-            when (ipStatus(uid, connInfo.destIP)) {
+            when (ipStatus(uid, connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    return FirewallRuleset.RULE2D
+                    return FirewallRuleset.RULE2
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
                     return FirewallRuleset.RULE2B
@@ -335,6 +331,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
             }
 
+            // lockdown mode
+            if (appStatus.lockdown()) {
+                return FirewallRuleset.RULE1G
+            }
+
             val appRuleset = appBlocked(appStatus, connectionStatus)
             if (appRuleset != null) {
                 if (persistentState.killAppOnFirewall) {
@@ -343,10 +344,19 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 return appRuleset
             }
 
+            // should firewall rules by-pass universal firewall rules (previously whitelist)
+            if (appStatus.bypassUniversal()) {
+                return if (dnsProxied(connInfo.destPort)) {
+                    FirewallRuleset.RULE9
+                } else {
+                    FirewallRuleset.RULE8
+                }
+            }
+
             // should ip rules by-pass or block universal firewall rules
-            when (globalIpStatus(connInfo.destIP)) {
+            when (globalIpStatus(connInfo.destIP, connInfo.destPort)) {
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    return FirewallRuleset.RULE2
+                    return FirewallRuleset.RULE2D
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     return FirewallRuleset.RULE2C
@@ -359,13 +369,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
             }
 
-            // should firewall rules by-pass universal firewall rules (previously whitelist)
-            if (FirewallManager.FirewallStatus.BYPASS_UNIVERSAL == appStatus) {
-                return if (dnsProxied(connInfo.destPort)) {
-                    FirewallRuleset.RULE9
-                } else {
-                    FirewallRuleset.RULE8
-                }
+            // block apps when universal lockdown is enabled
+            if (universalLockdown()) {
+                return FirewallRuleset.RULE11
             }
 
             if (httpBlocked(connInfo.destPort)) {
@@ -401,6 +407,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
 
         return FirewallRuleset.RULE0
+    }
+
+    private fun universalLockdown(): Boolean {
+        return persistentState.universalLockdown
     }
 
     private fun httpBlocked(port: Int): Boolean {
@@ -445,12 +455,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
     }
 
-    private fun ipStatus(uid: Int, destIp: String): IpRulesManager.IpRuleStatus {
-        return IpRulesManager.hasRule(uid, destIp)
+    private fun ipStatus(uid: Int, destIp: String, destPort: Int): IpRulesManager.IpRuleStatus {
+        return IpRulesManager.hasRule(uid, destIp, destPort)
     }
 
-    private fun globalIpStatus(destIp: String): IpRulesManager.IpRuleStatus {
-        return IpRulesManager.hasRule(UID_EVERYBODY, destIp)
+    private fun globalIpStatus(destIp: String, destPort: Int): IpRulesManager.IpRuleStatus {
+        return IpRulesManager.hasRule(UID_EVERYBODY, destIp, destPort)
     }
 
     private fun unknownAppBlocked(uid: Int): Boolean {

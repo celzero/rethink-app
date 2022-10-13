@@ -25,7 +25,6 @@ import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.net.ConnectivityManager
-import android.net.LinkProperties
 import android.net.NetworkCapabilities
 import android.net.VpnService
 import android.os.Bundle
@@ -64,7 +63,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.Companion.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
@@ -966,6 +964,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 status.connectionState === BraveVPNService.State.WORKING -> {
                     R.string.status_protected
                 }
+                status.connectionState === BraveVPNService.State.APP_ERROR -> {
+                    colorId = fetchTextColor(R.color.accentBad)
+                    R.string.status_app_error
+                }
+                status.connectionState === BraveVPNService.State.DNS_ERROR -> {
+                    colorId = fetchTextColor(R.color.accentBad)
+                    R.string.status_dns_error
+                }
+                status.connectionState === BraveVPNService.State.DNS_SERVER_DOWN -> {
+                    colorId = fetchTextColor(R.color.accentBad)
+                    R.string.status_dns_server_down
+                }
+                status.connectionState === BraveVPNService.State.NO_INTERNET -> {
+                    colorId = fetchTextColor(R.color.accentBad)
+                    R.string.status_no_internet
+                }
                 else -> {
                     colorId = fetchTextColor(R.color.accentBad)
                     R.string.status_failing
@@ -996,7 +1010,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isOrbotProxyEnabled()) {
                 statusId = R.string.status_protected_with_tor
-            } else if ((appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) && isPrivateDnsActive(requireContext())) { // SOCKS5 + Http + PrivateDns
+            } else if ((appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) && isPrivateDnsActive(
+                    requireContext())) { // SOCKS5 + Http + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
@@ -1004,7 +1019,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else if (appConfig.isCustomSocks5Enabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_socks5_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
-            } else if (appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive(requireContext())) {
+            } else if (appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive(
+                    requireContext())) {
                 statusId = R.string.status_protected_with_http_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled()) {

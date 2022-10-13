@@ -107,7 +107,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
     private fun showVersion() {
         val version = getVersionName()
         b.brbsAppVersion.text = getString(R.string.about_version_install_source, version,
-                                           getDownloadSource())
+                                          getDownloadSource())
     }
 
     private fun getVersionName(): String {

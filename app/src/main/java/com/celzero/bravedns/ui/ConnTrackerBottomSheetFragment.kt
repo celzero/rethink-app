@@ -117,7 +117,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         // setup click and item selected listeners
         setupClickListeners()
         // updates the ip rules button
-        updateIpRulesUi(ipDetails!!.uid, ipDetails!!.ipAddress)
+        updateIpRulesUi(ipDetails!!.uid, ipDetails!!.ipAddress, ipDetails!!.port)
         // updates the blocked rules chip
         updateBlockedRulesChip()
         // updates the connection detail chip
@@ -299,7 +299,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                 val fid = IpRulesManager.IpRuleStatus.getStatus(position)
 
                 // no need to apply rule, prev selection and current selection are same
-                if (IpRulesManager.hasRule(ipDetails!!.uid, ipDetails!!.ipAddress) == fid) return
+                if (IpRulesManager.hasRule(ipDetails!!.uid, ipDetails!!.ipAddress,
+                                           ipDetails!!.port) == fid) return
 
                 applyIpRule(fid)
             }
@@ -339,6 +340,9 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             FirewallManager.FirewallStatus.EXCLUDE -> {
                 b.bsConnFirewallSpinner.setSelection(5, true)
             }
+            FirewallManager.FirewallStatus.LOCKDOWN -> {
+                b.bsConnFirewallSpinner.setSelection(6, true)
+            }
             else -> {
                 // no-op
             }
@@ -346,8 +350,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     }
 
-    private fun updateIpRulesUi(uid: Int, ipAddress: String) {
-        b.bsConnIpRuleSpinner.setSelection(IpRulesManager.hasRule(uid, ipAddress).id)
+    private fun updateIpRulesUi(uid: Int, ipAddress: String, port: Int) {
+        b.bsConnIpRuleSpinner.setSelection(IpRulesManager.hasRule(uid, ipAddress, port).id)
     }
 
     private fun showFirewallRulesDialog(blockedRule: String?) {
@@ -399,7 +403,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
         Log.i(LOG_TAG_FIREWALL,
               "Apply ip rule for ${connRules.ipAddress}, ${FirewallRuleset.RULE2.name}")
-        IpRulesManager.updateRule(ipDetails!!.uid, connRules.ipAddress, ipRuleStatus)
+        IpRulesManager.updateRule(ipDetails!!.uid, connRules.ipAddress, connRules.port,
+                                  ipRuleStatus)
     }
 
     private fun getAppName(): String {

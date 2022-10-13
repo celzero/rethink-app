@@ -220,6 +220,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var blockMeteredConnections by booleanPref("block_metered_connections").withDefault<Boolean>(
         false)
 
+    // universal firewall settings to lockdown all apps
+    var universalLockdown by booleanPref("universal_lockdown").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()

@@ -37,10 +37,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KMutableProperty0
 
@@ -49,8 +47,6 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
-
-    private val customIpViewModel: CustomIpViewModel by viewModel()
 
     companion object {
         fun newInstance() = UniversalFirewallFragment()
@@ -115,6 +111,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         // uncomment the below code if enabled
         //includeView.firewallCheckIpv4Check.isChecked = persistentState.filterIpv4inIpv6
         includeView.firewallBlockHttpCheck.isChecked = persistentState.blockHttpConnections
+        includeView.firewallUnivLockdownCheck.isChecked = persistentState.universalLockdown
 
         setupClickListeners(includeView)
     }
@@ -202,6 +199,14 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         includeView.firewallBlockMeteredTxt.setOnClickListener {
             toggle(includeView.firewallBlockMeteredCheck, persistentState::blockMeteredConnections)
+        }
+
+        includeView.firewallUnivLockdownCheck.setOnCheckedChangeListener { _, b ->
+            persistentState.universalLockdown = b
+        }
+
+        includeView.firewallUnivLockdownTxt.setOnClickListener {
+            toggle(includeView.firewallUnivLockdownCheck, persistentState::universalLockdown)
         }
     }
 

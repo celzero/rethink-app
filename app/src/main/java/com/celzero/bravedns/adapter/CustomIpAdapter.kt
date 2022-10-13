@@ -71,7 +71,7 @@ class CustomIpAdapter(private val context: Context) :
         private lateinit var customIp: CustomIp
         fun update(ci: CustomIp) {
             customIp = ci
-            b.customIpLabelTv.text = customIp.ipAddress
+            b.customIpLabelTv.text = "${customIp.ipAddress}:${customIp.port}"
             b.customIpToggleGroup.tag = 1
             val status = findSelectedIpRule(customIp.status) ?: return
 
@@ -282,7 +282,7 @@ class CustomIpAdapter(private val context: Context) :
             builder.setCancelable(true)
             builder.setPositiveButton(
                 context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
-                IpRulesManager.removeFirewallRules(UID_EVERYBODY, customIp.ipAddress)
+                IpRulesManager.removeFirewallRules(UID_EVERYBODY, customIp.ipAddress, customIp.port)
                 Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast,
                                                           customIp.ipAddress),
                                Toast.LENGTH_SHORT).show()

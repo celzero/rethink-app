@@ -96,15 +96,16 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     enum class FirewallFilter(val id: Int) {
-        ALL(0), ALLOWED(1), BLOCKED(2), BYPASS_UNIVERSAL(3), EXCLUDED(4);
+        ALL(0), ALLOWED(1), BLOCKED(2), BYPASS_UNIVERSAL(3), EXCLUDED(4), LOCKDOWN(5);
 
         fun getFilter(): Set<Int> {
             return when (this) {
-                ALL -> setOf(0, 1, 2, 3, 4)
+                ALL -> setOf(0, 1, 2, 3, 4, 5)
                 ALLOWED -> setOf(0)
                 BLOCKED -> setOf(1)
                 BYPASS_UNIVERSAL -> setOf(2)
                 EXCLUDED -> setOf(3)
+                LOCKDOWN -> setOf(4)
             }
         }
 
@@ -116,6 +117,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                 BYPASS_UNIVERSAL -> context.getString(
                     R.string.fapps_firewall_filter_bypass_universal)
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
+                LOCKDOWN -> context.getString(R.string.fapps_firewall_filter_lockdown)
             }
         }
 
@@ -127,6 +129,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                     BLOCKED.id -> BLOCKED
                     BYPASS_UNIVERSAL.id -> BYPASS_UNIVERSAL
                     EXCLUDED.id -> EXCLUDED
+                    LOCKDOWN.id -> LOCKDOWN
                     else -> ALL
                 }
             }
@@ -338,12 +341,15 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
             R.string.fapps_firewall_filter_bypass_universal), false)
         val excluded = makeFirewallChip(FirewallFilter.EXCLUDED.id,
                                         getString(R.string.fapps_firewall_filter_excluded), false)
+        val lockdown = makeFirewallChip(FirewallFilter.LOCKDOWN.id,
+                                        getString(R.string.fapps_firewall_filter_lockdown), false)
 
         b.ffaFirewallChipGroup.addView(none)
         b.ffaFirewallChipGroup.addView(allowed)
         b.ffaFirewallChipGroup.addView(blocked)
         b.ffaFirewallChipGroup.addView(bypassUniversal)
         b.ffaFirewallChipGroup.addView(excluded)
+        b.ffaFirewallChipGroup.addView(lockdown)
     }
 
     private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {

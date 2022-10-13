@@ -40,6 +40,8 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import inet.ipaddr.HostName
+import inet.ipaddr.HostNameException
 import inet.ipaddr.IPAddressString
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -163,7 +165,9 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
             val input = dBind.daciIpEditText.text.toString()
 
             val ipString = Utilities.removeLeadingAndTrailingDots(input)
-            val ip = IPAddressString(ipString).address
+
+            val hostName = getHostName(ipString)
+            val ip = hostName?.address
             if (ip == null || ipString.isEmpty()) {
                 dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
                 dBind.daciFailureTextView.visibility = View.VISIBLE
@@ -171,7 +175,7 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
             }
 
             dBind.daciIpEditText.text.clear()
-            insertCustomIp(input)
+            insertCustomIp(hostName)
 
         }
 
@@ -181,7 +185,18 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
         dialog.show()
     }
 
-    private fun insertCustomIp(ip: String) {
+    private fun getHostName(ip: String): HostName? {
+        return try {
+            val host = HostName(ip)
+            host.validate()
+            host
+        } catch (e: HostNameException) {
+            val ipAddress = IPAddressString(ip).address ?: return null
+            HostName(ipAddress)
+        }
+    }
+
+    private fun insertCustomIp(ip: HostName) {
         IpRulesManager.addIpRule(IpRulesManager.UID_EVERYBODY, ip,
                                  IpRulesManager.IpRuleStatus.BLOCK)
         Utilities.showToastUiCentered(this, getString(R.string.ci_dialog_added_success),

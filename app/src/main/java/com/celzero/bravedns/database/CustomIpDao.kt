@@ -38,8 +38,8 @@ interface CustomIpDao {
     @Query("select * from CustomIp order by uid")
     fun getCustomIpRules(): List<CustomIp>
 
-    @Query("select * from CustomIp where ipAddress = :ipAddress and uid = :uid")
-    fun getCustomIpDetail(uid: Int, ipAddress: String): CustomIp?
+    @Query("select * from CustomIp where ipAddress = :ipAddress and uid = :uid and port = :port")
+    fun getCustomIpDetail(uid: Int, ipAddress: String, port: Int): CustomIp?
 
     @Transaction
     @Query("select uid,* from CustomIp where uid = :uid and isActive = 1")
@@ -56,12 +56,13 @@ interface CustomIpDao {
         "select * from CustomIp where ipAddress like :query and uid = $UID_EVERYBODY and  isActive = 1 order by modifiedDateTime desc")
     fun getUnivBlockedConnectionsByIP(query: String): PagingSource<Int, CustomIp>
 
-    @Query("delete from CustomIp where ipAddress = :ipAddress and uid = $UID_EVERYBODY")
-    fun deleteIPRulesUniversal(ipAddress: String)
+    @Query(
+        "delete from CustomIp where ipAddress = :ipAddress and uid = $UID_EVERYBODY and port = :port")
+    fun deleteIPRulesUniversal(ipAddress: String, port: Int)
 
     @Transaction
-    @Query("delete from CustomIp where ipAddress = :ipAddress and uid = :uid")
-    fun deleteIPRulesForUID(uid: Int, ipAddress: String)
+    @Query("delete from CustomIp where ipAddress = :ipAddress and uid = :uid and port = :port")
+    fun deleteIPRulesForUID(uid: Int, ipAddress: String, port: Int)
 
     @Query("delete from CustomIp where uid = $UID_EVERYBODY")
     fun deleteAllIPRulesUniversal()

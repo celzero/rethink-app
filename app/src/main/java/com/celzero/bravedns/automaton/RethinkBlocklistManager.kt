@@ -82,8 +82,7 @@ object RethinkBlocklistManager : KoinComponent {
                                                     "Block adult & pirated content, online gambling & dating, and social media.")
     private val SECURITY = RethinkBlockType("Security",
                                             "Block malware, ransomware, cryptoware, phishers, and other threats.")
-    private val PRIVACY = RethinkBlockType("Privacy",
-                                           "Block attentionware, spyware, scareware.")
+    private val PRIVACY = RethinkBlockType("Privacy", "Block attentionware, spyware, scareware.")
 
     private val ADULT = SimpleViewTag(0, "Adult", "Blocks over 30,000 adult websites.",
                                       mutableListOf(), PARENTAL_CONTROL)

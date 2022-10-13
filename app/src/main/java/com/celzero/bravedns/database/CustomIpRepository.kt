@@ -36,12 +36,12 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         return customIpDao.getCustomIpRules()
     }
 
-    suspend fun getCustomIpDetail(uid: Int, ipAddress: String): CustomIp? {
-        return customIpDao.getCustomIpDetail(uid, ipAddress)
+    suspend fun getCustomIpDetail(uid: Int, ipAddress: String, port: Int): CustomIp? {
+        return customIpDao.getCustomIpDetail(uid, ipAddress, port)
     }
 
-    suspend fun deleteIPRulesForUID(uid: Int, ipAddress: String) {
-        customIpDao.deleteIPRulesForUID(uid, ipAddress)
+    suspend fun deleteIPRulesForUID(uid: Int, ipAddress: String, port: Int) {
+        customIpDao.deleteIPRulesForUID(uid, ipAddress, port)
     }
 
     suspend fun deleteIpRule(customIp: CustomIp) {

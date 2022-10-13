@@ -78,9 +78,10 @@
                 android:id="@+id/cip_search_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
                 android:layout_below="@id/custom_dialog_heading"
-                android:layout_margin="8dp"
-                android:elevation="8dp"
+                android:layout_margin="4dp"
+                android:elevation="4dp"
                 android:visibility="visible">
 
                 <LinearLayout

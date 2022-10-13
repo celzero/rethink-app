@@ -55,7 +55,6 @@ import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.HomeScreenFragment
 import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
@@ -736,7 +735,8 @@ class Utilities {
                 return PrivateDnsMode.NONE
             }
 
-            val linkProperties: LinkProperties = getLinkProperties(context) ?: return PrivateDnsMode.NONE
+            val linkProperties: LinkProperties = getLinkProperties(
+                context) ?: return PrivateDnsMode.NONE
             if (linkProperties.privateDnsServerName != null) {
                 return PrivateDnsMode.STRICT
             }

@@ -71,6 +71,7 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
     private var numRequests: Long = 0
     private var numBlockedRequests: Long = 0
     private val goStatusMap = LongSparseArray<Transaction.Status>()
+    private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
 
     init {
         // init values from persistence state
@@ -87,6 +88,14 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         goStatusMap.put(Dnsx.BadQuery, Transaction.Status.BAD_QUERY)
         goStatusMap.put(Dnsx.BadResponse, Transaction.Status.BAD_RESPONSE)
         goStatusMap.put(Dnsx.InternalError, Transaction.Status.INTERNAL_ERROR)
+
+        vpnStateMap[Transaction.Status.COMPLETE] = BraveVPNService.State.WORKING
+        vpnStateMap[Transaction.Status.SEND_FAIL] = BraveVPNService.State.NO_INTERNET
+        vpnStateMap[Transaction.Status.NO_RESPONSE] = BraveVPNService.State.DNS_SERVER_DOWN
+        vpnStateMap[Transaction.Status.TRANSPORT_ERROR] = BraveVPNService.State.DNS_SERVER_DOWN
+        vpnStateMap[Transaction.Status.BAD_QUERY] = BraveVPNService.State.DNS_ERROR
+        vpnStateMap[Transaction.Status.BAD_RESPONSE] = BraveVPNService.State.DNS_ERROR
+        vpnStateMap[Transaction.Status.INTERNAL_ERROR] = BraveVPNService.State.APP_ERROR
     }
 
     fun processOnResponse(summary: Summary): Transaction? {
@@ -238,7 +247,8 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             if (isLocallyResolved(transaction)) return
             VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
         } else if (transaction.status !== Transaction.Status.CANCELED) {
-            VpnController.onConnectionStateChanged(BraveVPNService.State.FAILING)
+            val vpnState = vpnStateMap[transaction.status] ?: BraveVPNService.State.FAILING
+            VpnController.onConnectionStateChanged(vpnState)
         }
     }
 

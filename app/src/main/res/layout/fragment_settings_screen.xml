@@ -74,9 +74,8 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="?attr/background"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -89,7 +88,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
+                    android:paddingTop="20dp"
                     android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -255,6 +254,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp"
+                        android:layout_marginEnd="10dp"
                         android:src="@drawable/ic_right_arrow_small" />
 
                 </RelativeLayout>
@@ -265,7 +265,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
+                    android:paddingBottom="20dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_activity_ptrans_icon"
@@ -336,9 +336,8 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="?attr/background"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -416,7 +415,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
-                    android:paddingBottom="20dp"
+                    android:paddingBottom="15dp"
                     android:visibility="visible">
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -533,7 +532,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp"
-                        android:src="@drawable/ic_right_arrow_small" />
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_arrow_down_accent" />
 
                 </RelativeLayout>
 
@@ -557,8 +557,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardBackgroundColor="?attr/background"
+            app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
@@ -671,6 +670,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp"
+                        android:layout_marginEnd="10dp"
                         android:src="@drawable/ic_right_arrow_small" />
 
                 </RelativeLayout>
@@ -780,6 +780,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp"
+                        android:layout_marginEnd="10dp"
                         android:src="@drawable/ic_right_arrow_small" />
 
                 </RelativeLayout>
@@ -845,7 +846,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
+                    android:paddingBottom="20dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_activity_import_export_icon"
@@ -890,7 +891,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:padding="10dp"
-                        android:src="@drawable/ic_right_arrow_small" />
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_arrow_down_accent" />
                 </RelativeLayout>
 
             </LinearLayout>
@@ -913,8 +915,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="?attr/background"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="16dp"
             android:layout_marginBottom="80dp"
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
@@ -928,10 +929,9 @@
                     android:id="@+id/settings_activity_kill_app_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="15dp">
+                    android:paddingTop="15dp"
+                    android:paddingBottom="20dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_activity_kill_app_icon"
