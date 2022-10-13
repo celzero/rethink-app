@@ -320,7 +320,11 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                     return FirewallRuleset.RULE2
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
-                    return FirewallRuleset.RULE2B
+                    // case: if the global lockdown is enabled, don't allow the bypassed ips
+                    // unless the app is set to bypass universal
+                    if (canAllowConnection(appStatus)) {
+                        return FirewallRuleset.RULE2B
+                    }
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     // no-op; pass-through
@@ -407,6 +411,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         }
 
         return FirewallRuleset.RULE0
+    }
+
+    private fun canAllowConnection(appStatus: FirewallManager.FirewallStatus): Boolean {
+        return !(universalLockdown() && appStatus.bypassUniversal())
     }
 
     private fun universalLockdown(): Boolean {
