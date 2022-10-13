@@ -1,6 +1,0 @@
-** v053j: Make IPv6 Work... Again ** 
-1. Fixes for connectivity issues seen by Meta apps (Facebook, Messenger, Instagram, etc).
-2. Improved Orbot integration.
-3. Overhaul SOCKS5 Proxy implementation.
-4. A few Download Manager changes.
-5. Other critical Firewall related bug fixes.
