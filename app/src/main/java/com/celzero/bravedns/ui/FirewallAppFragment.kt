@@ -449,8 +449,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         b.ffaAppList.setHasFixedSize(true)
         layoutManager = CustomLinearLayoutManager(requireContext())
         b.ffaAppList.layoutManager = layoutManager
-        val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner,
-                                                     persistentState)
+        val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner)
         appInfoViewModel.appInfo.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
