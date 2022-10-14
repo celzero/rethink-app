@@ -218,20 +218,11 @@
         <item name="materialThemeOverlay">@style/CustomCompoundButtonSwitch</item>
     </style>
 
-    <style name="CustomWidget.MaterialComponents.CompoundButton.Switch.Bad" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="materialThemeOverlay">@style/CustomCompoundButtonSwitchBad</item>
-    </style>
 
     <style name="CustomCompoundButtonSwitch">
         <item name="colorSurface">?attr/colorPrimary</item>
         <item name="colorOnSurface">?attr/switchNormal</item>
         <item name="colorControlActivated">?attr/controlActivated</item>
-    </style>
-
-    <style name="CustomCompoundButtonSwitchBad">
-        <item name="colorSurface">?attr/colorPrimary</item>
-        <item name="colorOnSurface">?attr/switchNormal</item>
-        <item name="colorControlActivated">?attr/controlActivatedBad</item>
     </style>
 
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">

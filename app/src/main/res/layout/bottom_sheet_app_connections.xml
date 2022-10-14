@@ -60,19 +60,6 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/bsac_block_all"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
-        android:text="@string/bsac_block_all"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
-
-    <TextView
         android:id="@+id/bsac_bypass_app_rules"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -82,19 +69,6 @@
         android:padding="10dp"
         android:text="@string/bsac_bypass_app_rules"
         app:drawableEndCompat="@drawable/ic_bypass"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/bsac_whitelist_all"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
-        android:text="@string/bsac_whitelist_all"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />

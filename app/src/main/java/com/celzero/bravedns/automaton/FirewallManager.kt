@@ -69,6 +69,29 @@ object FirewallManager : KoinComponent {
     enum class FirewallStatus(val id: Int) {
         ALLOW(0), BLOCK(1), BYPASS_UNIVERSAL(2), EXCLUDE(3), LOCKDOWN(4), UNTRACKED(5);
 
+        fun getLabelId(): Int {
+            return when (this) {
+                ALLOW -> {
+                    R.string.allow
+                }
+                BLOCK -> {
+                    R.string.block
+                }
+                BYPASS_UNIVERSAL -> {
+                    R.string.bypass_universal
+                }
+                EXCLUDE -> {
+                    R.string.exclude
+                }
+                LOCKDOWN -> {
+                    R.string.lockdown
+                }
+                UNTRACKED -> {
+                    R.string.untracked
+                }
+            }
+        }
+
         companion object {
 
             // labels for spinner / toggle ui

@@ -139,22 +139,16 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun showButtonForStatusBlock() {
         b.bsacUnblock.visibility = View.VISIBLE
         b.bsacBypassAppRules.visibility = View.VISIBLE
-        //b.bsacBlockAll.visibility = View.VISIBLE
-        //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun showByPassAppRulesUi() {
         b.bsacBlock.visibility = View.VISIBLE
         b.bsacGopassAppRules.visibility = View.VISIBLE
-        //b.bsacBlockAll.visibility = View.VISIBLE
-        //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusNone() {
         b.bsacBlock.visibility = View.VISIBLE
         b.bsacBypassAppRules.visibility = View.VISIBLE
-        //b.bsacBlockAll.visibility = View.VISIBLE
-        //b.bsacWhitelistAll.visibility = View.VISIBLE
     }
 
     private fun initializeClickListeners() {
@@ -162,12 +156,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.BLOCK,
                       getString(R.string.bsac_block_toast, ipAddress))
         }
-
-        // introduce this when IP firewall has universal rules in-app
-        /*b.bsacBlockAll.setOnClickListener {
-            applyRule(IpRulesManager.UID_EVERYBODY, ipAddress, IpRulesManager.IpRuleStatus.BLOCK,
-                      "Blocking $ipAddress for all apps")
-        }*/
 
         b.bsacUnblock.setOnClickListener {
             applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.NONE,
@@ -178,12 +166,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
                       getString(R.string.bsac_whitelist_toast, ipAddress))
         }
-
-        // introduce this when IP firewall has universal rules in-app
-        /* b.bsacWhitelistAll.setOnClickListener {
-             applyRule(IpRulesManager.UID_EVERYBODY, ipAddress, IpRulesManager.IpRuleStatus.WHITELIST,
-                       "Whitelisted $ipAddress for all apps")
-         }*/
 
         b.bsacGopassAppRules.setOnClickListener {
             applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.NONE,

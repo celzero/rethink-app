@@ -206,7 +206,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.75"
                 android:padding="5dp"
-                android:text="@string/univ_block_unknown_connections"
+                android:text="@string/univ_firewall_rule_3"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
