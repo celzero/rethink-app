@@ -15,12 +15,10 @@
  */
 package com.celzero.bravedns.adapter
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.net.VpnService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +38,6 @@ import com.celzero.bravedns.automaton.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ListItemFirewallAppBinding
 import com.celzero.bravedns.glide.GlideApp
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.AppInfoActivity
 import com.celzero.bravedns.ui.AppInfoActivity.Companion.UID_INTENT_NAME
 import com.celzero.bravedns.util.Utilities
@@ -51,12 +48,8 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter(private val context: Context,
-                             private val lifecycleOwner: LifecycleOwner,
-                             private val persistentState: PersistentState) :
+                             private val lifecycleOwner: LifecycleOwner) :
         PagingDataAdapter<AppInfo, FirewallAppListAdapter.AppListViewHolder>(DIFF_CALLBACK) {
-
-    private var activityManager: ActivityManager = context.getSystemService(
-        VpnService.ACTIVITY_SERVICE) as ActivityManager
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AppInfo>() {
@@ -240,11 +233,6 @@ class FirewallAppListAdapter(private val context: Context,
             }
 
             b.firewallAppDetailsLl.setOnClickListener {
-                enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
-                openAppDetailActivity(appInfo.uid)
-            }
-
-            b.indicator.setOnClickListener {
                 enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.firewallAppIconIv)
                 openAppDetailActivity(appInfo.uid)
             }

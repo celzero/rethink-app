@@ -102,20 +102,11 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
-                    android:layout_toStartOf="@id/indicator"
+                    android:layout_alignParentEnd="true"
                     android:maxWidth="24dp"
                     android:maxHeight="24dp"
                     android:padding="5dp"
                     android:src="@drawable/ic_firewall_data_on" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_keyboard_arrow_down_small" />
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
