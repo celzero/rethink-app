@@ -52,6 +52,13 @@
         <item>Lockdown</item>
     </string-array>
 
+    <string name="allow">allow</string>
+    <string name="block">block</string>
+    <string name="bypass_universal">bypass universal</string>
+    <string name="exclude">exclude</string>
+    <string name="lockdown">lockdown</string>
+    <string name="untracked">untracked</string>
+
     <string name="warning_title" description="Status indicator text shown in a warning notification.">
     Warning: RethinkDNS has been deactivated
     </string>
@@ -173,7 +180,7 @@
 
     <string name="bsct_app_info">App Info</string>
     <string name="bsct_block_app">Block, bypass &lt;u>this IP&lt;/u> for &lt;u>this app&lt;/u></string>
-    <string name="bsct_block">Block, bypass, exclude &lt;u>this app&lt;/u></string>
+    <string name="bsct_block">Block, bypass, exclude, lockdown &lt;u>this app&lt;/u></string>
     <string name="bsct_conn_block_desc">blocked %1$s by %2$s</string>
     <string name="bsct_conn_block_desc_device">blocked %1$s on device</string>
     <string name="bsct_conn_desc_allowed">allowed on %1$s %2$s</string>
@@ -202,7 +209,7 @@
     <string name="always_on_dialog_neutral">Settings</string>
 
     <string name="firewall_act_universal_tab">Universal</string>
-    <string name="firewall_act_apps_tab">All Apps</string>
+
     <string name="firewall_act_network_monitor_tab">Network Logs</string>
 
     <string name="dns_act_configure_tab">Configure</string>
@@ -231,18 +238,10 @@
     <string name="local_blocklist_download">Download Blocklists</string>
     <string name="local_blocklist_download_desc">Download blocklists (around 60MB) to use this feature?</string>
 
-    <string name="local_blocklist_lockdown_redownload">Up-to-date!</string>
-    <string name="local_blocklist_lockdown_redownload_desc">On-device blocklists are already at the latest version v%1$s.</string>
-    <string name="local_blocklist_lockdown_positive">Okay</string>
-
     <string name="local_blocklist_redownload">Up-to-date!</string>
     <string name="local_blocklist_redownload_desc">On-device blocklists are already at the latest version v%1$s.</string>
-    <string name="local_blocklist_positive">Okay</string>
-    <string name="local_blocklist_neutral">Download again</string>
 
     <string name="blocklist_update_check_failure">Something went wrong. Try again later!</string>
-    <string name="blocklist_update_check_not_required_local">On-device blocklists are already at latest version.</string>
-    <string name="blocklist_update_check_not_required_remote">Remote blocklists are already at latest version.</string>
     <string name="blocklist_update_check_not_required">Blocklists are already at latest version.</string>
 
     <string name="refresh_complete">App list re-sync complete.</string>
@@ -341,7 +340,6 @@
     <string name="orbot_bs_status_3">Forwarding %1$s to Orbot, HTTP Proxy also set.</string>
     <string name="orbot_bs_status_4">One-click Tor-as-a-Proxy (Orbot) setup.</string>
 
-    <string name="orbot_status_arg_1">DNS</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_status_arg_3">DNS and TCP</string>
 
@@ -402,8 +400,6 @@
     <string name="settings_all_networks_dialog_positive_btn">Enable anyway</string>
     <string name="settings_all_networks_dialog_negative_btn">Cancel</string>
 
-    <string name="settings_sync_app_details_desc_completed">Re-sync completed</string>
-
     <string name="settings_check_update_heading">Check for app updates</string>
     <string name="settings_check_update_desc">Automatically check for app updates once a week.</string>
 
@@ -422,7 +418,6 @@
     <string name="settings_http_proxy_error_text2">Invalid port</string>
     <string name="settings_http_proxy_error_text3">Hostname is empty</string>
     <string name="settings_http_proxy_error_text4">Host connection failed. Try again.</string>
-    <string name="settings_http_proxy_error_text5">Invalid IP address</string>
     <string name="settings_http_proxy_toast_success">HTTP proxy is set</string>
 
     <string name="settings_http_proxy_hostname">Hostname</string>
@@ -507,7 +502,6 @@
 
     <string name="dns_card_latency_active">Latency: %1$sms</string>
     <string name="dns_card_latency_inactive">Enable DNS mode.</string>
-    <string name="dns_card_configure_btn">change</string>
 
     <string name="apps_card_ips_count">%1$s IP &amp; Port rules</string>
 
@@ -657,14 +651,22 @@
                                               <a href="https://github.com/PeterDaveHello">PeterDaveHello</a><br/>
                                               <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
                                               <br/>📚 Resolver <br/>
+                                              <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a><br/>
                                               <a href="https://github.com/amithm7">amithm7</a><br/>
+                                              <a href="https://github.com/arfshl">arfshl</a><br/>
+                                              <a href="https://github.com/badmojr">badmojr</a><br/>
+                                              <a href="https://github.com/bongochong">bongochong</a><br/>
+                                              <a href="https://github.com/elliotwutingfeng">elliotwutingfeng</a><br/>
                                               <a href="https://github.com/georgyo">georgyo</a><br/>
                                               <a href="https://github.com/harish83a">harish83a</a><br/>
                                               <a href="https://github.com/ignoramous">ignoramous</a><br/>
+                                              <a href="https://github.com/MasterKia">MasterKia</a><br/>
+                                              <a href="https://github.com/mtxadmin">mtxadmin</a><br/>
                                               <a href="https://github.com/neneeen">neneeen</a><br/>
                                               <a href="https://github.com/PeterDaveHello">PeterDaveHello</a><br/>
                                               <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a><br/>
                                               <a href="https://github.com/shruuub">shruuub</a><br/>
+                                              <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
                                               <br/>⚜ Community mods <br/>
                                               <a href="https://t.me/amithm7">amithm7</a><br/>
                                               <a href="https://t.me/ppatra">ppatra</a><br/>
@@ -730,7 +732,6 @@
     <string name="ctbs_block_other_apps">Rules applied for %1$s will also be applicable for %2$s other apps</string>
     <string name="ctbs_proceed_positive_text">Proceed</string>
     <string name="ctbs_dialog_negative_btn">Go Back</string>
-
     <!-- DNS Log fragment -->
 
     <string name="dns_log_dialog_positive">Delete logs</string>
@@ -778,8 +779,6 @@
     <string name="univ_firewall_rule_8">Block port 80 (insecure HTTP) traffic</string>
     <string name="univ_firewall_rule_9">Block on metered (mobile) network</string>
     <string name="univ_firewall_rule_10">Block all except bypassed apps and IPs</string>
-
-    <string name="univ_block_unknown_connections">Block connections when source app is unknown</string>
 
     <string name="univ_view_blocked_ip">ip &amp; port rules</string>
     <string name="univ_view_blocked_ip_desc">Modify blocked or bypassed IP / Port rules.</string>
@@ -940,7 +939,7 @@
     <string name="firewall_rule_unknown">Source Unknown</string>
     <string name="firewall_rule_block_udp_ntp">UDP Blocked</string>
     <string name="firewall_rule_block_dns_bypass">DNS Bypassed</string>
-    <string name="firewall_rule_exempt_app_bypass_univ">Priv App</string>
+    <string name="firewall_rule_exempt_app_bypass_univ">Bypassed App</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS Proxied</string>
     <string name="firewall_rule_exempt_orbot_setup">Orbot Setup</string>
     <string name="firewall_rule_block_http">Insecure HTTP</string>
@@ -1115,7 +1114,6 @@
 
     <string name="ada_network_log_title">network log for this app</string>
 
-    <string name="ada_app_firewall_settings">firewall settings</string>
     <string name="ada_app_metered">Metered</string>
     <string name="ada_app_unmetered">Unmetered</string>
     <string name="ada_app_whitelist">Bypass Universal</string>
@@ -1127,9 +1125,7 @@
     <string name="bsac_title_desc">Rules apply to this app only.</string>
     <string name="bsac_unblock">Unblock</string>
     <string name="bsac_block">Block</string>
-    <string name="bsac_block_all">Block for all apps ⭐</string>
     <string name="bsac_bypass_app_rules">Bypass app rules</string>
-    <string name="bsac_whitelist_all">Whitelist for all apps  ⭐</string>
     <string name="bsac_go_pass_app_rules">Remove Bypass</string>
     <string name="bsac_delete">Delete</string>
 
@@ -1223,7 +1219,6 @@
     <string name="lbbs_redownload">Redownload blocklists</string>
     <string name="lbbs_download">Update blocklists</string>
     <string name="lbbs_heading">Configure 185+ blocklists</string>
-    <string name="lbbs_version">version: %1$s</string>
 
     <!-- backup / restore bottom sheet -->
     <string name="brbs_title">Backup &amp; restore</string>
