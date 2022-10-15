@@ -48,13 +48,6 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
 
-    // call this method to cancel a coroutine
-    // e.g. when user clicks on cancel on the download dialog
-    fun cancelDownload() {
-        downloadIds.clear()
-        job.cancel()
-    }
-
     companion object {
         private const val DOWNLOAD_NOTICATION_TAG = "DOWNLOAD_ALERTS"
         private const val DOWNLOAD_NOTICATION_ID = 110
@@ -135,7 +128,7 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
         try {
             // below code will download the code with additional calculation of
             // file size and download percentage
-            var totalFileSize = 0.0
+            var totalFileSize: Double
             var count: Int
             val data = ByteArray(1024 * 4)
             val fileSize = body.contentLength()

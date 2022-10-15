@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui
 import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
-import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -39,6 +38,7 @@ import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
+import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -140,7 +140,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         applyURLBtn.setOnClickListener {
             var port = 0
             var isPortValid: Boolean
-            val isIPValid: Boolean
+            val isIpValid: Boolean
             val name = proxyNameEditText.text.toString()
             val mode = getString(R.string.cd_dns_proxy_mode_external)
             val ip = ipAddressEditText.text.toString()
@@ -154,11 +154,11 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                 FirewallManager.getPackageNameByAppName(appName)
             }
 
-            if (Patterns.IP_ADDRESS.matcher(ip).matches()) {
-                isIPValid = true
+            if (IPAddressString(ip).isIPAddress) {
+                isIpValid = true
             } else {
                 errorTxt.text = getString(R.string.cd_dns_proxy_error_text_1)
-                isIPValid = false
+                isIpValid = false
             }
 
             try {
@@ -177,7 +177,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                 isPortValid = false
             }
 
-            if (isPortValid && isIPValid) {
+            if (isPortValid && isIpValid) {
                 //Do the DNS Proxy setting there
                 if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
                                                                    "new value inserted into DNSProxy")

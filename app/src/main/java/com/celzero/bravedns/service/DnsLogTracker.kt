@@ -172,11 +172,11 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                                                       addresses[0].hostAddress)
 
                     dnsLog.responseIps = addresses.joinToString(separator = ",") {
-                        val inetAddress = convertIpV6ToIpv4IfNeeded(it)
-                        makeAddressPair(getCountryCode(inetAddress, context), it.hostAddress)
+                        val addr = convertIpV6ToIpv4IfNeeded(it)
+                        makeAddressPair(getCountryCode(addr, context), it.hostAddress)
                     }
 
-                    if (destination.hostAddress.contains(UNSPECIFIED_IP_IPV4)) {
+                    if (destination.hostAddress?.contains(UNSPECIFIED_IP_IPV4) == true) {
                         dnsLog.isBlocked = true
                     }
                     if (destination.isLoopbackAddress) {
@@ -194,7 +194,7 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                         val dnsCacheRecord = FirewallManager.DnsCacheRecord(calculateTtl(r.ttl),
                                                                             transaction.name.dropLast(
                                                                                 1), flag)
-                        ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
+                        ip.hostAddress?.let { ipDomainLookup.put(it, dnsCacheRecord) }
                     }
                 } else {
                     // fixme: for queries with empty AAAA records, we are setting as NXDOMAIN

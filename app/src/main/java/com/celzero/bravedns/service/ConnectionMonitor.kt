@@ -211,9 +211,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val newNetworks = createNetworksSet(newActiveNetwork)
             val isNewNetwork = hasDifference(currentNetworks, newNetworks)
 
-            Log.i(LOG_TAG_CONNECTION, "Connected network: ${
-                connectivityManager.getNetworkInfo(newActiveNetwork)?.typeName.toString()
-            }, Is new network? $isNewNetwork, is force update? $isForceUpdate")
+            Log.i(LOG_TAG_CONNECTION,
+                  "Connected network: ${newActiveNetwork?.networkHandle}, Is new network? $isNewNetwork, is force update? $isForceUpdate")
 
             if (isNewNetwork || isForceUpdate) {
                 currentNetworks = newNetworks
@@ -282,7 +281,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
                 if (it.scope != RT_SCOPE_UNIVERSE) return@forEach
 
-                val address = IPAddressString(it.address.hostAddress?.toString()) ?: return@forEach
+                val address = IPAddressString(it.address.hostAddress?.toString())
 
                 if (address.isIPv6) {
                     trackedIpv6Networks.add(network)

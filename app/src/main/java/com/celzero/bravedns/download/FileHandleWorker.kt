@@ -109,7 +109,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
                 val to = localBlocklistDownloadPath(context, children[i], timestamp)
-                if (to == null) {
+                if (to.isEmpty()) {
                     Log.w(LOG_TAG_DOWNLOAD, "Copy failed from $from, to: $to")
                     return false
                 }

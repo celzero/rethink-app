@@ -90,11 +90,6 @@ class Utilities {
 
     companion object {
 
-        fun getPermissionDetails(context: Context, packageName: String): PackageInfo {
-            return context.packageManager.getPackageInfo(packageName,
-                                                         PackageManager.GET_PERMISSIONS)
-        }
-
         // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
         fun getETldPlus1(fqdn: String): String? {
             return try {
@@ -209,10 +204,14 @@ class Utilities {
             return String(Character.toChars(firstHalf)) + String(Character.toChars(secondHalf))
         }
 
-        fun makeAddressPair(countryCode: String?, ipAddress: String): String {
-            return if (countryCode == null) {
+        fun makeAddressPair(countryCode: String?, ipAddress: String?): String {
+            return if (ipAddress == null) {
+                ""
+            } else if (countryCode == null) {
                 ipAddress
-            } else String.format("%s (%s)", countryCode, ipAddress)
+            } else {
+                String.format("%s (%s)", countryCode, ipAddress)
+            }
         }
 
         fun convertLongToTime(time: Long, template: String): String {
@@ -469,6 +468,10 @@ class Utilities {
             return null
         }
 
+        fun isAtleastN(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+        }
+
         fun isAtleastO(): Boolean {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         }
@@ -563,7 +566,7 @@ class Utilities {
         fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
                 val localBlocklist = localBlocklistDownloadPath(ctx, which,
-                                                                timestamp) ?: return null
+                                                                timestamp)
 
                 return File(localBlocklist)
             } catch (e: IOException) {
