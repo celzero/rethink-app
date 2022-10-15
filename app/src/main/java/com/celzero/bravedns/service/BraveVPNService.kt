@@ -63,6 +63,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIB
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isMissingOrInvalidUid
@@ -321,7 +322,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
                     // case: if the global lockdown is enabled, don't allow the bypassed ips
-                    // unless the app is set to bypass universal
+                    // unless the app is set to bypass universal or lockdown
+                    // honor app rules over universal rules: here app is in lockdown state and the
+                    // ips should be allowed.
                     if (canAllowConnection(appStatus)) {
                         return FirewallRuleset.RULE2B
                     }
@@ -411,7 +414,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     }
 
     private fun canAllowConnection(appStatus: FirewallManager.FirewallStatus): Boolean {
-        return !(universalLockdown() && appStatus.bypassUniversal())
+        return !(universalLockdown() && (appStatus.bypassUniversal() || appStatus.lockdown()))
     }
 
     private fun universalLockdown(): Boolean {
@@ -1558,7 +1561,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         vpnScope.cancel("VpnService onDestroy")
 
         Log.w(LOG_TAG_VPN, "Destroying VPN service")
-        stopForeground(true)
+
+        if (isAtleastN()) {
+            stopForeground(STOP_FOREGROUND_DETACH)
+        } else {
+            stopForeground(true)
+        }
     }
 
     private fun startPauseTimer() {
