@@ -726,6 +726,8 @@
     <string name="ct_filter_parent_allowed">Allowed</string>
     <string name="ct_filter_parent_blocked">Blocked</string>
 
+    <string name="ct_ip_port">%1$s:%2$s</string>
+
     <!-- Connection tracker bottom sheet fragment string -->
     <string name="ctbs_app_info_not_available_toast">App settings page not found</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s other app(s)</string>
@@ -816,7 +818,6 @@
     <string name="dns_proxy_dialog_message_no_app">IP address: %1$s\n\nPort number: %2$s</string>
 
     <string name="dns_query_latency">%1$sms</string>
-
 
     <string name="dns_proxy_dialog_header_dns">Add DNS Proxy</string>
     <string name="dns_proxy_name">Proxy Name</string>

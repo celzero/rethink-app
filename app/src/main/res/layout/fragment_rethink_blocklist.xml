@@ -169,7 +169,10 @@
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:layout_gravity="bottom|center"
-            android:layout_margin="50dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
             android:src="@drawable/illustrations_download" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -209,8 +212,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/lb_download_progress"
-                android:maxHeight="40dp"
-                android:minHeight="40dp"
+                android:padding="10dp"
                 android:text="@string/rt_download"
                 android:textColor="?attr/chipTextColor" />
         </RelativeLayout>

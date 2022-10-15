@@ -19,6 +19,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -108,9 +109,12 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
 
             b.acdCount.text = conn.count.toString()
             b.acdFlag.text = conn.flag
-            b.acdIpAddress.text = "${conn.ipAddress}:${conn.port}"
-            if (conn.dnsQuery != null) {
+            b.acdIpAddress.text = context.getString(R.string.ct_ip_port, conn.ipAddress, conn.port.toString())
+            if (!conn.dnsQuery.isNullOrEmpty()) {
+                b.acdDomainName.visibility = View.VISIBLE
                 b.acdDomainName.text = conn.dnsQuery
+            } else {
+                b.acdDomainName.visibility = View.GONE
             }
 
         }
