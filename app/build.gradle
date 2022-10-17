@@ -121,7 +121,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // Glide implementation
-    implementation('com.github.bumptech.glide:glide:4.13.2') {
+    implementation('com.github.bumptech.glide:glide:4.14.2') {
         exclude group: 'glide-parent'
     }
     // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
