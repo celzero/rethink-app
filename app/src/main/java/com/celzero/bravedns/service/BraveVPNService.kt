@@ -1148,7 +1148,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     }
 
     private fun unobserveOrbotStartStatus() {
-        persistentState.orbotConnectionStatus.removeObserver(orbotStartStatusObserver)
+        if (this::orbotStartStatusObserver.isInitialized) {
+            persistentState.orbotConnectionStatus.removeObserver(orbotStartStatusObserver)
+        }
     }
 
     private fun registerAccessibilityServiceState() {
