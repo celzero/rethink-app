@@ -350,7 +350,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         b.lbbsCopy.setOnClickListener {
             ui {
                 var baseUrl = Constants.RETHINK_BASE_URL_SKY
-                go {
+                io {
                     if (appConfig.getRethinkPlusEndpoint().url.contains(Constants.MAX_ENDPOINT)) {
                         baseUrl = Constants.RETHINK_BASE_URL_MAX
                     }
@@ -515,6 +515,14 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     private fun ui(f: suspend () -> Unit) {
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
+                f()
+            }
+        }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
                 f()
             }
         }
