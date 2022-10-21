@@ -39,5 +39,5 @@
     <attr name="firewallExcludeToggleBtnBg" format="reference" />
     <attr name="defaultToggleBtnTxt" format="reference" />
     <attr name="defaultToggleBtnBg" format="reference" />
-    <attr name="selectedCardBg" format="reference"/>
+    <attr name="selectedCardBg" format="reference" />
 </resources>

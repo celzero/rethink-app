@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="drawable_padding">24dp</dimen>
     <dimen name="bottom_sheet_corner_radius">16dp</dimen>
     <dimen name="bottom_sheet_top_padding">8dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
     <dimen name="dots_height">40dp</dimen>
     <dimen name="dots_margin_bottom">10dp</dimen>
     <dimen name="img_width_height">150dp</dimen>
     <dimen name="slide_title">30dp</dimen>
-    <dimen name="slide_desc">18dp</dimen>
     <dimen name="desc_padding">30dp</dimen>
     <dimen name="default_padding">16dp</dimen>
 
     <dimen name="defaultStrokeWidth">1dp</dimen>
-    <dimen name="rippleStrokeWidth">1dp</dimen>
-    <dimen name="rippleRadius">16dp</dimen>
     <dimen name="maxSize">1000dp</dimen>
 
     <dimen name="mini_font_text_view">8sp</dimen>

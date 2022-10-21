@@ -29,7 +29,7 @@ import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteFileTagDao) :
-        ViewModel() {
+    ViewModel() {
 
     private var list: MutableLiveData<String> = MutableLiveData()
     private var blocklistFilter: RethinkBlocklistFragment.Filters? = null
@@ -72,7 +72,7 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
         }
     }))
 
-    suspend fun allFileTags(): List<FileTag> {
+    fun allFileTags(): List<FileTag> {
         return rethinkRemoteDao.getAllTags()
     }
 

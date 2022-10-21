@@ -36,7 +36,8 @@ interface RethinkDnsEndpointDao {
     fun insertReplace(rethinkDnsEndpoint: RethinkDnsEndpoint)
 
     @Query(
-        "Update RethinkDnsEndpoint set url = :url, blocklistCount = :count where name = :name and uid = $MISSING_UID")
+        "Update RethinkDnsEndpoint set url = :url, blocklistCount = :count where name = :name and uid = $MISSING_UID"
+    )
     fun updateEndpoint(name: String, url: String, count: Int)
 
     @Delete
@@ -49,7 +50,8 @@ interface RethinkDnsEndpointDao {
     fun removeAppWiseDns(uid: Int)
 
     @Query(
-        "delete from RethinkDnsEndpoint where name = :name and url =:url and uid = :uid and isCustom = 1 and uid = $MISSING_UID")
+        "delete from RethinkDnsEndpoint where name = :name and url =:url and uid = :uid and isCustom = 1 and uid = $MISSING_UID"
+    )
     fun deleteDoHEndpoint(name: String, url: String, uid: Int)
 
     @Transaction
@@ -65,7 +67,8 @@ interface RethinkDnsEndpointDao {
 
     @Transaction
     @Query(
-        "select * from RethinkDnsEndpoint where name like :query or url like :query and uid = $MISSING_UID order by isActive desc")
+        "select * from RethinkDnsEndpoint where name like :query or url like :query and uid = $MISSING_UID order by isActive desc"
+    )
     fun getRethinkEndpointsByName(query: String): PagingSource<Int, RethinkDnsEndpoint>
 
     @Query("select * from RethinkDnsEndpoint where isActive = 1 and uid = $MISSING_UID LIMIT 1")
@@ -85,7 +88,8 @@ interface RethinkDnsEndpointDao {
 
     // TODO: remove this method post v054 versions
     @Query(
-        "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = :plus")
+        "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = :plus"
+    )
     fun updatePlusBlocklistCount(count: Int, plus: String = RETHINK_PLUS)
 
     @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'sky', 'max')")

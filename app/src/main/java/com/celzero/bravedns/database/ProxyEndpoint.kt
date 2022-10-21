@@ -21,23 +21,30 @@ import androidx.room.PrimaryKey
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "ProxyEndpoint")
-class ProxyEndpoint {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
-    var proxyName: String = ""
+class ProxyEndpoint// Room auto-increments id when its set to zero.
+// A non-zero id overrides and sets caller-specified id instead.
+    (
+    @PrimaryKey(autoGenerate = true) var id: Int,
+    var proxyName: String,//Set as 1 for Socks5
+    var proxyMode: Int,
+    var proxyType: String,
+    proxyAppName: String,
+    proxyIP: String,
+    var proxyPort: Int,
+    userName: String,
+    password: String,
+    var isSelected: Boolean,
+    var isCustom: Boolean,
+    var isUDP: Boolean,
+    modifiedDataTime: Long,
+    var latency: Int
+) {
 
-    //Set as 1 for Socks5
-    var proxyMode: Int = 0
-    var proxyType: String = ""
-    var proxyAppName: String? = null
-    var proxyIP: String? = null
-    var proxyPort: Int = 0
-    var userName: String? = null
-    var password: String? = null
-    var isSelected: Boolean = true
-    var isCustom: Boolean = true
-    var isUDP: Boolean = false
+    var proxyAppName: String? = proxyAppName
+    var proxyIP: String? = proxyIP
+    var userName: String? = userName
+    var password: String? = password
     var modifiedDataTime: Long = INIT_TIME_MS
-    var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is ProxyEndpoint) return false
@@ -50,27 +57,9 @@ class ProxyEndpoint {
     }
 
 
-    constructor(id: Int, proxyName: String, proxyMode: Int, proxyType: String, proxyAppName: String,
-                proxyIP: String, proxyPort: Int, userName: String, password: String,
-                isSelected: Boolean, isCustom: Boolean, isUDP: Boolean, modifiedDataTime: Long,
-                latency: Int) {
-        // Room auto-increments id when its set to zero.
-        // A non-zero id overrides and sets caller-specified id instead.
-        this.id = id
-        this.proxyMode = proxyMode
-        this.proxyName = proxyName
-        this.proxyType = proxyType
-        this.proxyAppName = proxyAppName
-        this.proxyIP = proxyIP
-        this.proxyPort = proxyPort
-        this.isSelected = isSelected
-        this.isCustom = isCustom
-        this.isUDP = isUDP
-        this.userName = userName
-        this.password = password
+    init {
         if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
-        this.latency = latency
     }
 
 }

@@ -20,16 +20,15 @@ import android.content.Context
 import android.os.SystemClock
 import android.util.Log
 import androidx.collection.LongSparseArray
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.util.Constants.Companion.LOOPBACK_IPV6
 import com.celzero.bravedns.util.Constants.Companion.NXDOMAIN
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
@@ -54,9 +53,11 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRepository,
-                                         private val persistentState: PersistentState,
-                                         private val context: Context) {
+class DnsLogTracker internal constructor(
+    private val dnsLogRepository: DnsLogRepository,
+    private val persistentState: PersistentState,
+    private val context: Context
+) {
 
     companion object {
         private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
@@ -146,8 +147,10 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         val serverAddress = IpManager.getIpAddress(transaction.serverIp)
 
         if (serverAddress?.toInetAddress()?.hostAddress != null) {
-            val countryCode: String? = getCountryCode(serverAddress.toInetAddress(),
-                                                      context) //TODO: Country code things
+            val countryCode: String? = getCountryCode(
+                serverAddress.toInetAddress(),
+                context
+            ) //TODO: Country code things
             dnsLog.resolver = makeAddressPair(countryCode, transaction.serverIp)
         } else {
             dnsLog.resolver = transaction.serverIp
@@ -168,15 +171,24 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                     val countryCode: String? = getCountryCode(destination, context)
 
                     val inetAddress = convertIpV6ToIpv4IfNeeded(addresses[0])
-                    dnsLog.response = makeAddressPair(getCountryCode(inetAddress, context),
-                                                      addresses[0].hostAddress)
+                    dnsLog.response = addresses[0].hostAddress?.let {
+                        makeAddressPair(
+                            getCountryCode(inetAddress, context),
+                            it
+                        )
+                    }.toString()
 
                     dnsLog.responseIps = addresses.joinToString(separator = ",") {
-                        val inetAddress = convertIpV6ToIpv4IfNeeded(it)
-                        makeAddressPair(getCountryCode(inetAddress, context), it.hostAddress)
+                        val ipv4address = convertIpV6ToIpv4IfNeeded(it)
+                        it.hostAddress?.let { it1 ->
+                            makeAddressPair(
+                                getCountryCode(ipv4address, context),
+                                it1
+                            )
+                        }.toString()
                     }
 
-                    if (destination.hostAddress.contains(UNSPECIFIED_IP_IPV4)) {
+                    if (destination.hostAddress?.contains(UNSPECIFIED_IP_IPV4) == true) {
                         dnsLog.isBlocked = true
                     }
                     if (destination.isLoopbackAddress) {
@@ -191,17 +203,21 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                     packet.answer.forEach { r ->
                         val ip = r.ip ?: return@forEach
                         // drop trailing period . from the fqdn sent in dns-answer, ie a.com. => a.com
-                        val dnsCacheRecord = FirewallManager.DnsCacheRecord(calculateTtl(r.ttl),
-                                                                            transaction.name.dropLast(
-                                                                                1), flag)
-                        ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
+                        val dnsCacheRecord = FirewallManager.DnsCacheRecord(
+                            calculateTtl(r.ttl),
+                            transaction.name.dropLast(
+                                1
+                            ), flag
+                        )
+                        ip.hostAddress?.let { ipDomainLookup.put(it, dnsCacheRecord) }
                     }
                 } else {
                     // fixme: for queries with empty AAAA records, we are setting as NXDOMAIN
                     //  which needs a fix. need to check for the response's status
                     dnsLog.response = NXDOMAIN
                     dnsLog.flag = context.getString(
-                        R.string.unicode_question_sign) // White question mark
+                        R.string.unicode_question_sign
+                    ) // White question mark
                 }
             } else {
                 dnsLog.response = err
@@ -228,7 +244,7 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         return ipDomainLookup.getIfPresent(hostAddress)?.flag ?: getFlag(hostAddress)
     }
 
-    suspend fun insertBatch(dnsLogs: List<DnsLog>) {
+    fun insertBatch(dnsLogs: List<DnsLog>) {
         dnsLogRepository.insertBatch(dnsLogs)
     }
 
@@ -263,7 +279,8 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             // Post number of requests and blocked count to livedata.
             persistentState.dnsRequestsCountLiveData.postValue(++numRequests)
             if (dnsLog.isBlocked) persistentState.dnsBlockedCountLiveData.postValue(
-                ++numBlockedRequests)
+                ++numBlockedRequests
+            )
 
             // avoid excessive disk I/O from syncing the counter to disk after every request
             if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {

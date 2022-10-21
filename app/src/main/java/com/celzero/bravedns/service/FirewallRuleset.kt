@@ -18,60 +18,98 @@ package com.celzero.bravedns.service
 
 import com.celzero.bravedns.R
 
-// TODO: Add label and description from strings.xml
 enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val act: Int) {
 
-    RULE0("No Rule", R.string.firewall_rule_no_rule, R.string.firewall_rule_no_rule_desc,
-          FirewallRuleset.allow),
-    RULE1("Rule #1", R.string.firewall_rule_block_app, R.string.firewall_rule_block_app_desc,
-          FirewallRuleset.stall),
-    RULE1B("Rule #1B", R.string.firewall_rule_block_app_new_install,
-           R.string.firewall_rule_new_app_desc, FirewallRuleset.block),
-    RULE1C("Rule #1C", R.string.firewall_rule_block_app_exception,
-           R.string.firewall_rule_block_app_desc, FirewallRuleset.stall),
-    RULE1D("Rule #1D", R.string.firewall_rule_block_unmetered,
-           R.string.firewall_rule_block_app_unmetered_desc, FirewallRuleset.stall),
-    RULE1E("Rule #1E", R.string.firewall_rule_block_metered,
-           R.string.firewall_rule_block_app_mobile_desc, FirewallRuleset.stall),
-    RULE1F("Rule #1F", R.string.firewall_rule_univ_block_metered,
-           R.string.firewall_rule_block_app_univ_mobile_desc, FirewallRuleset.stall),
-    RULE1G("Rule #1G", R.string.firewall_rule_lockdown, R.string.firewall_rule_lockdown_desc,
-           FirewallRuleset.stall),
-    RULE2("Rule #2", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_desc,
-          FirewallRuleset.stall),
-    RULE2B("Rule #2B", R.string.firewall_rule_bypass_apprule_ip,
-           R.string.firewall_rule_bypass_app_rules_ip_desc, FirewallRuleset.allow),
-    RULE2C("Rule #2C", R.string.firewall_rule_bypass_universal_ip,
-           R.string.firewall_rule_bypass_universal_ip_desc, FirewallRuleset.allow),
-    RULE2D("Rule #2D", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_univ_desc,
-           FirewallRuleset.stall),
-    RULE3("Rule #3", R.string.firewall_rule_device_lock, R.string.firewall_rule_device_lock_desc,
-          FirewallRuleset.stall),
-    RULE4("Rule #4", R.string.firewall_rule_foreground, R.string.firewall_rule_foreground_desc,
-          FirewallRuleset.block),
-    RULE5("Rule #5", R.string.firewall_rule_unknown, R.string.firewall_rule_unknown_desc,
-          FirewallRuleset.stall),
-    RULE6("Rule #6", R.string.firewall_rule_block_udp_ntp,
-          R.string.firewall_rule_block_udp_ntp_desc, FirewallRuleset.stall),
-    RULE7("Rule #7", R.string.firewall_rule_block_dns_bypass,
-          R.string.firewall_rule_block_dns_bypass_desc, FirewallRuleset.block),
-    RULE8("Whitelist", R.string.firewall_rule_exempt_app_bypass_univ,
-          R.string.firewall_rule_exempt_app_bypass_univ_desc, FirewallRuleset.allow),
-    RULE9("Proxied", R.string.firewall_rule_exempt_dns_proxied,
-          R.string.firewall_rule_exempt_dns_proxied_desc, FirewallRuleset.allow),
-    RULE9B("Orbot setup", R.string.firewall_rule_exempt_orbot_setup,
-           R.string.firewall_rule_exempt_orbot_setup_desc, FirewallRuleset.allow),
-    RULE10("Http block", R.string.firewall_rule_block_http, R.string.firewall_rule_block_http_desc,
-           FirewallRuleset.block),
-    RULE11("Universal Lockdown", R.string.firewall_rule_global_lockdown,
-           R.string.firewall_rule_global_lockdown_desc, FirewallRuleset.block);
+    RULE0(
+        "No Rule", R.string.firewall_rule_no_rule, R.string.firewall_rule_no_rule_desc,
+        R.integer.allow
+    ),
+    RULE1(
+        "Rule #1", R.string.firewall_rule_block_app, R.string.firewall_rule_block_app_desc,
+        R.integer.stall
+    ),
+    RULE1B(
+        "Rule #1B", R.string.firewall_rule_block_app_new_install,
+        R.string.firewall_rule_new_app_desc, R.integer.block
+    ),
+    RULE1C(
+        "Rule #1C", R.string.firewall_rule_block_app_exception,
+        R.string.firewall_rule_block_app_desc, R.integer.stall
+    ),
+    RULE1D(
+        "Rule #1D", R.string.firewall_rule_block_unmetered,
+        R.string.firewall_rule_block_app_unmetered_desc, R.integer.stall
+    ),
+    RULE1E(
+        "Rule #1E", R.string.firewall_rule_block_metered,
+        R.string.firewall_rule_block_app_mobile_desc, R.integer.stall
+    ),
+    RULE1F(
+        "Rule #1F", R.string.firewall_rule_univ_block_metered,
+        R.string.firewall_rule_block_app_univ_mobile_desc, R.integer.stall
+    ),
+    RULE1G(
+        "Rule #1G", R.string.firewall_rule_lockdown, R.string.firewall_rule_lockdown_desc,
+        R.integer.stall
+    ),
+    RULE2(
+        "Rule #2", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_desc,
+        R.integer.stall
+    ),
+    RULE2B(
+        "Rule #2B", R.string.firewall_rule_bypass_apprule_ip,
+        R.string.firewall_rule_bypass_app_rules_ip_desc, R.integer.allow
+    ),
+    RULE2C(
+        "Rule #2C", R.string.firewall_rule_bypass_universal_ip,
+        R.string.firewall_rule_bypass_universal_ip_desc, R.integer.allow
+    ),
+    RULE2D(
+        "Rule #2D", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_univ_desc,
+        R.integer.stall
+    ),
+    RULE3(
+        "Rule #3", R.string.firewall_rule_device_lock, R.string.firewall_rule_device_lock_desc,
+        R.integer.stall
+    ),
+    RULE4(
+        "Rule #4", R.string.firewall_rule_foreground, R.string.firewall_rule_foreground_desc,
+        R.integer.block
+    ),
+    RULE5(
+        "Rule #5", R.string.firewall_rule_unknown, R.string.firewall_rule_unknown_desc,
+        R.integer.stall
+    ),
+    RULE6(
+        "Rule #6", R.string.firewall_rule_block_udp_ntp,
+        R.string.firewall_rule_block_udp_ntp_desc, R.integer.stall
+    ),
+    RULE7(
+        "Rule #7", R.string.firewall_rule_block_dns_bypass,
+        R.string.firewall_rule_block_dns_bypass_desc, R.integer.block
+    ),
+    RULE8(
+        "Whitelist", R.string.firewall_rule_exempt_app_bypass_univ,
+        R.string.firewall_rule_exempt_app_bypass_univ_desc, R.integer.allow
+    ),
+    RULE9(
+        "Proxied", R.string.firewall_rule_exempt_dns_proxied,
+        R.string.firewall_rule_exempt_dns_proxied_desc, R.integer.allow
+    ),
+    RULE9B(
+        "Orbot setup", R.string.firewall_rule_exempt_orbot_setup,
+        R.string.firewall_rule_exempt_orbot_setup_desc, R.integer.allow
+    ),
+    RULE10(
+        "Http block", R.string.firewall_rule_block_http, R.string.firewall_rule_block_http_desc,
+        R.integer.block
+    ),
+    RULE11(
+        "Universal Lockdown", R.string.firewall_rule_global_lockdown,
+        R.string.firewall_rule_global_lockdown_desc, R.integer.block
+    );
 
     companion object {
-
-        private const val allow = 0
-        private const val block = 1
-        private const val stall = 2
-
         fun getFirewallRule(ruleId: String): FirewallRuleset? {
             return when (ruleId) {
                 RULE0.id -> RULE0
@@ -129,25 +167,20 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             }
         }
 
-        // TODO: return a Set
-        fun getAllRules(): List<FirewallRuleset> {
-            return values().toList()
-        }
-
         fun getAllowedRules(): List<FirewallRuleset> {
-            return values().toList().filter { it.act == allow }
+            return values().toList().filter { it.act == R.integer.allow }
         }
 
         fun getBlockedRules(): List<FirewallRuleset> {
-            return values().toList().filter { it.act != allow }
+            return values().toList().filter { it.act != R.integer.allow }
         }
 
         fun stall(rule: FirewallRuleset): Boolean {
-            return rule.act == stall
+            return rule.act == R.integer.stall
         }
 
         fun ground(rule: FirewallRuleset): Boolean {
-            return rule.act != allow
+            return rule.act != R.integer.allow
         }
 
         fun shouldShowHint(rule: String?): Boolean {

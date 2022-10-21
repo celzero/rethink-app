@@ -27,10 +27,16 @@ class AdminReceiver : DeviceAdminReceiver() {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEnabled(context: Context, intent: Intent) = showToast(context, context.getString(
-        R.string.admin_receiver_status_enabled))
+    override fun onEnabled(context: Context, intent: Intent) = showToast(
+        context, context.getString(
+            R.string.admin_receiver_status_enabled
+        )
+    )
 
-    override fun onDisabled(context: Context, intent: Intent) = showToast(context,
-                                                                          context.getString(
-                                                                              R.string.admin_receiver_status_disabled))
+    override fun onDisabled(context: Context, intent: Intent) = showToast(
+        context,
+        context.getString(
+            R.string.admin_receiver_status_disabled
+        )
+    )
 }

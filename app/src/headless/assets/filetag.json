@@ -1,1 +1,1892 @@
-{"171":{"value":171,"uname":"171","vname":"1Hosts (Xtra)","group":"privacy","subg":"","url":"https://badmojr.github.io/1Hosts/Xtra/domains.txt","show":1,"entries":482654},"172":{"value":172,"uname":"172","vname":"Spotify Ads (GoodbyeAds)","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-Spotify-AdBlock.txt","show":1,"entries":3784},"173":{"value":173,"uname":"173","vname":"AVG + Avast (ftprivacy)","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/ftpmorph/ftprivacy/master/blocklists/avg-avast-data-mining-full-block.txt","show":1,"entries":349},"174":{"value":174,"uname":"174","vname":"Hola VPN (ftprivacy)","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/ftpmorph/ftprivacy/master/blocklists/hola-luminati-full-block.txt","show":1,"entries":117},"175":{"value":175,"uname":"175","vname":"Combined Privacy Block Lists: Final (bongochong)","group":"privacy","subg":"notracking","url":"https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/newhosts-final.hosts","show":1,"entries":114379},"176":{"value":176,"uname":"176","vname":"Torrent (The Block List Project)","group":"parentalcontrol","subg":"piracy","url":"https://blocklistproject.github.io/Lists/torrent.txt","show":1,"entries":2622},"177":{"value":177,"uname":"177","vname":"Drugs (The Block List Project)","group":"parentalcontrol","subg":"","url":"https://blocklistproject.github.io/Lists/drugs.txt","show":1,"entries":26588},"178":{"value":178,"uname":"178","vname":"Ransomware (The Block List Project)","group":"security","subg":"threat-intelligence-feeds","url":"https://blocklistproject.github.io/Lists/ransomware.txt","show":1,"entries":1904},"179":{"value":179,"uname":"179","vname":"TikTok (The Block List Project)","group":"parentalcontrol","subg":"services","url":"https://blocklistproject.github.io/Lists/tiktok.txt","show":1,"entries":3698},"180":{"value":180,"uname":"180","vname":"Cryptojacking (The Block List Project)","group":"security","subg":"cryptojacking","url":"https://blocklistproject.github.io/Lists/crypto.txt","show":1,"entries":23789},"181":{"value":181,"uname":"181","vname":"WhatsApp (The Block List Project)","group":"parentalcontrol","subg":"services","url":"https://blocklistproject.github.io/Lists/whatsapp.txt","show":1,"entries":226},"182":{"value":182,"uname":"182","vname":"Vaping (The Block List Project)","group":"parentalcontrol","subg":"","url":"https://blocklistproject.github.io/Lists/vaping.txt","show":1,"entries":108},"183":{"value":183,"uname":"183","vname":"Piracy (The Block List Project)","group":"parentalcontrol","subg":"piracy","url":"https://blocklistproject.github.io/Lists/piracy.txt","show":1,"entries":2128},"184":{"value":184,"uname":"184","vname":"Facebook (The Block List Project)","group":"parentalcontrol","subg":"services","url":"https://blocklistproject.github.io/Lists/facebook.txt","show":1,"entries":22459},"185":{"value":185,"uname":"185","vname":"Gambling (The Block List Project)","group":"parentalcontrol","subg":"gambling","url":"https://blocklistproject.github.io/Lists/gambling.txt","show":1,"entries":2480},"186":{"value":186,"uname":"186","vname":"Strict No Porn (Clefspeare13)","group":"parentalcontrol","subg":"porn","url":"https://raw.githubusercontent.com/Clefspeare13/pornhosts/master/download_here/strict/0.0.0.0/hosts","show":0,"entries":0},"187":{"value":187,"uname":"187","vname":"Energized Unified","group":"privacy","subg":"","url":"https://block.energized.pro/unified/formats/domains.txt","show":1,"entries":720027},"188":{"value":188,"uname":"188","vname":"Yet another small uBlock filter list","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/mtxadmin/ublock/master/hosts.txt","show":1,"entries":994302},"MTF":{"value":0,"uname":"MTF","vname":"Prevent bypass","group":"parentalcontrol","subg":"bypass-methods","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/bypass-methods","show":1,"entries":634},"KBI":{"value":1,"uname":"KBI","vname":"Safesearch-only","group":"parentalcontrol","subg":"safesearch","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/safesearch-not-supported","show":1,"entries":160},"YAC":{"value":2,"uname":"YAC","vname":"Dating (olbat)","group":"parentalcontrol","subg":"dating","url":"https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/dating/domains","show":1,"entries":3803},"HBP":{"value":3,"uname":"HBP","vname":"Gambling (olbat)","group":"parentalcontrol","subg":"gambling","url":"https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/gambling/domains","show":1,"entries":1328},"NIM":{"value":4,"uname":"NIM","vname":"Gambling (Sinfonietta)","group":"parentalcontrol","subg":"gambling","url":"https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts","show":1,"entries":2554},"YWG":{"value":5,"uname":"YWG","vname":"Torrents (DHT-nodes)","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/dht-bootstrap-nodes","show":1,"entries":5},"SMQ":{"value":6,"uname":"SMQ","vname":"File hosting","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/file-hosting","show":1,"entries":110},"AQX":{"value":7,"uname":"AQX","vname":"Proxies","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/proxies","show":1,"entries":40},"BTG":{"value":8,"uname":"BTG","vname":"Streaming Audio","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/streaming-audio","show":1,"entries":65},"GUN":{"value":9,"uname":"GUN","vname":"Streaming Video","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/streaming-video","show":1,"entries":600},"KSH":{"value":10,"uname":"KSH","vname":"Torrent Clients","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/torrent-clients","show":1,"entries":31},"WAS":{"value":11,"uname":"WAS","vname":"Torrent Trackers","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/torrent-trackers","show":1,"entries":351},"AZY":{"value":12,"uname":"AZY","vname":"Torrent Websites","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/torrent-websites","show":1,"entries":1105},"GWB":{"value":13,"uname":"GWB","vname":"Usenet","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/usenet","show":1,"entries":12},"YMG":{"value":14,"uname":"YMG","vname":"Warez","group":"parentalcontrol","subg":"piracy","url":"https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/warez","show":1,"entries":107},"CZM":{"value":15,"uname":"CZM","vname":"Porn (Tiuxo)","group":"parentalcontrol","subg":"porn","url":"https://raw.githubusercontent.com/tiuxo/hosts/master/porn","show":0,"entries":1},"HYS":{"value":16,"uname":"HYS","vname":"Porn (Clefspeare13)","group":"parentalcontrol","subg":"porn","url":"https://raw.githubusercontent.com/Clefspeare13/pornhosts/master/download_here/mobile/hosts","show":0,"entries":0},"XIF":{"value":17,"uname":"XIF","vname":"Porn (Mahadi Xion)","group":"parentalcontrol","subg":"porn","url":"https://raw.githubusercontent.com/mhxion/pornaway/master/hosts/porn_sites.txt","show":1,"entries":31178},"TQN":{"value":18,"uname":"TQN","vname":"Porn (Sinfonietta)","group":"parentalcontrol","subg":"porn","url":"https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts","show":1,"entries":18460},"ZVO":{"value":19,"uname":"ZVO","vname":"Social networks (oblat)","group":"parentalcontrol","subg":"social-networks","url":"https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/social_networks/domains","show":1,"entries":681},"YOM":{"value":20,"uname":"YOM","vname":"9Gag","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/9gag","show":1,"entries":2},"THR":{"value":21,"uname":"THR","vname":"Amazon","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/amazon","show":1,"entries":23},"RPW":{"value":22,"uname":"RPW","vname":"Blizzard","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/blizzard","show":1,"entries":2},"AMG":{"value":23,"uname":"AMG","vname":"Daily Motion","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/dailymotion","show":1,"entries":3},"WTJ":{"value":24,"uname":"WTJ","vname":"Discord","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/discord","show":1,"entries":5},"ZXU":{"value":25,"uname":"ZXU","vname":"Disneyplus","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/disneyplus","show":1,"entries":6},"FJG":{"value":26,"uname":"FJG","vname":"EBay","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/ebay","show":1,"entries":27},"NYS":{"value":27,"uname":"NYS","vname":"Facebook","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/facebook","show":1,"entries":9},"OKG":{"value":28,"uname":"OKG","vname":"Fortnite","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/fortnite","show":0,"entries":1},"KNP":{"value":29,"uname":"KNP","vname":"Hulu","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/hulu","show":0,"entries":1},"FLI":{"value":30,"uname":"FLI","vname":"Imgur","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/imgur","show":0,"entries":1},"RYX":{"value":31,"uname":"RYX","vname":"Instagram","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/instagram","show":1,"entries":2},"CIH":{"value":32,"uname":"CIH","vname":"League of Legends","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/leagueoflegends","show":1,"entries":2},"PTE":{"value":33,"uname":"PTE","vname":"Facebook Messenger","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/messenger","show":1,"entries":3},"KEA":{"value":34,"uname":"KEA","vname":"Minecraft","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/minecraft","show":1,"entries":3},"CMR":{"value":35,"uname":"CMR","vname":"Netflix","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/netflix","show":1,"entries":6},"DDO":{"value":36,"uname":"DDO","vname":"Pinterest","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/pinterest","show":1,"entries":49},"VLM":{"value":37,"uname":"VLM","vname":"Reddit","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/reddit","show":1,"entries":5},"JEH":{"value":38,"uname":"JEH","vname":"Roblox","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/roblox","show":1,"entries":2},"XLX":{"value":39,"uname":"XLX","vname":"Skype","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/skype","show":1,"entries":5},"OQW":{"value":40,"uname":"OQW","vname":"Snapchat","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/snapchat","show":1,"entries":10},"FXC":{"value":41,"uname":"FXC","vname":"Spotify","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/spotify","show":1,"entries":10},"HZJ":{"value":42,"uname":"HZJ","vname":"Steam","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/steam","show":1,"entries":12},"SWK":{"value":43,"uname":"SWK","vname":"Telegram","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/telegram","show":1,"entries":3},"VAM":{"value":44,"uname":"VAM","vname":"Tiktok","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/tiktok","show":1,"entries":14},"AOS":{"value":45,"uname":"AOS","vname":"Tinder","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/tinder","show":1,"entries":3},"FAL":{"value":46,"uname":"FAL","vname":"Tumblr","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/tumblr","show":0,"entries":1},"CZK":{"value":47,"uname":"CZK","vname":"Twitch","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/twitch","show":1,"entries":7},"FZB":{"value":48,"uname":"FZB","vname":"Twitter","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/twitter","show":1,"entries":5},"PYW":{"value":49,"uname":"PYW","vname":"Vimeo","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/vimeo","show":1,"entries":4},"JXA":{"value":50,"uname":"JXA","vname":"VK","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/vk","show":1,"entries":8},"KOR":{"value":51,"uname":"KOR","vname":"WhatsApp","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/whatsapp","show":1,"entries":2},"DEP":{"value":52,"uname":"DEP","vname":"YouTube","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/youtube","show":1,"entries":17},"RFX":{"value":53,"uname":"RFX","vname":"Zoom","group":"parentalcontrol","subg":"services","url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/zoom","show":1,"entries":4},"DTT":{"value":54,"uname":"DTT","vname":"Adblock Nocoin List (hoshsadiq)","group":"security","subg":"cryptojacking","url":"https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt","show":1,"entries":680},"VZP":{"value":55,"uname":"VZP","vname":"Coin blocker (Zerodot1)","group":"security","subg":"cryptojacking","url":"https://zerodot1.gitlab.io/CoinBlockerLists/hosts_browser","show":1,"entries":3496},"RAF":{"value":56,"uname":"RAF","vname":"Parked domains (NextDNS)","group":"security","subg":"parked-domains-cname","url":"https://raw.githubusercontent.com/nextdns/metadata/master/security/parked-domains-cname","show":1,"entries":5},"THG":{"value":57,"uname":"THG","vname":"Malware (malwaredomainlist.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://www.malwaredomainlist.com/hostslist/hosts.txt","show":0,"entries":0},"YVH":{"value":58,"uname":"YVH","vname":"Security (StevenBlack)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/StevenBlack/hosts/master/data/add.Dead/hosts","show":1,"entries":14},"XQV":{"value":59,"uname":"XQV","vname":"KADHosts (PolishFiltersTeam)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/PolishFiltersTeam/KADhosts/master/KADhosts.txt","show":1,"entries":51285},"PIB":{"value":60,"uname":"PIB","vname":"Malware (malwaredomains.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://mirror1.malwaredomains.com/files/justdomains","show":0,"entries":0},"EEN":{"value":61,"uname":"EEN","vname":"Malware (Disconnect.me)","group":"security","subg":"threat-intelligence-feeds","url":"https://s3.amazonaws.com/lists.disconnect.me/simple_malware.txt","show":0,"entries":0},"GDA":{"value":62,"uname":"GDA","vname":"Phishing.Army","group":"security","subg":"threat-intelligence-feeds","url":"https://phishing.army/download/phishing_army_blocklist.txt","show":1,"entries":69741},"MAD":{"value":63,"uname":"MAD","vname":"Spam404","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/Spam404/lists/master/main-blacklist.txt","show":1,"entries":8147},"NAK":{"value":64,"uname":"NAK","vname":"Malware (quidsup)","group":"security","subg":"threat-intelligence-feeds","url":"https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-malware.txt","show":1,"entries":303},"BPZ":{"value":65,"uname":"BPZ","vname":"Badd Boyz Hosts (Mitchell Krogza)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/mitchellkrogza/Badd-Boyz-Hosts/master/hosts","show":1,"entries":1385},"HWO":{"value":66,"uname":"HWO","vname":"Malware (Mitchell Krogza)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/mitchellkrogza/The-Big-List-of-Hacked-Malware-Web-Sites/master/hosts","show":1,"entries":13821},"YUC":{"value":67,"uname":"YUC","vname":"Domain blocklist basic (joewein.net) ","group":"security","subg":"threat-intelligence-feeds","url":"https://joewein.net/dl/bl/dom-bl-base.txt","show":0,"entries":0},"IKY":{"value":68,"uname":"IKY","vname":"Domain blocklist full (joewein.net)","group":"security","subg":"threat-intelligence-feeds","url":"https://joewein.net/dl/bl/dom-bl.txt","show":0,"entries":0},"LSS":{"value":69,"uname":"LSS","vname":"Malware (mirror.cedia.org.ec)","group":"security","subg":"threat-intelligence-feeds","url":"https://mirror.cedia.org.ec/malwaredomains/immortal_domains.txt","show":0,"entries":0},"NOE":{"value":70,"uname":"NOE","vname":"Bad lists (ethanr)","group":"security","subg":"threat-intelligence-feeds","url":"https://bitbucket.org/ethanr/dns-blacklists/raw/master/bad_lists/Mandiant_APT1_Report_Appendix_D.txt","show":1,"entries":2046},"PLR":{"value":71,"uname":"PLR","vname":"Malware (Olbat)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/malware/domains","show":1,"entries":63795},"FIT":{"value":72,"uname":"FIT","vname":"Phising (Olbat)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/phishing/domains","show":1,"entries":63952},"LHX":{"value":73,"uname":"LHX","vname":"Spyware (Chris Buijs)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/cbuijs/shallalist/master/spyware/domains","show":1,"entries":18460},"FOF":{"value":74,"uname":"FOF","vname":"Malware (DandelionSprout)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt","show":1,"entries":7560},"DYA":{"value":75,"uname":"DYA","vname":"Malware (azorult-tracker.net)","group":"security","subg":"threat-intelligence-feeds","url":"https://azorult-tracker.net/api/list/domain?format=plain","show":1,"entries":948},"JAN":{"value":76,"uname":"JAN","vname":"Blackbook (Miroslav Stampar)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/stamparm/blackbook/master/blackbook.txt","show":1,"entries":17620},"FHQ":{"value":77,"uname":"FHQ","vname":"Bad sites (phishing.mailscanner.info)","group":"security","subg":"threat-intelligence-feeds","url":"http://phishing.mailscanner.info/phishing.bad.sites.conf","show":1,"entries":9837},"CMC":{"value":78,"uname":"CMC","vname":"Scam and phising (infinitytec)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/infinitytec/blocklists/master/scams-and-phishing.txt","show":1,"entries":5786},"RKG":{"value":79,"uname":"RKG","vname":"Threats (infosec.cert-pa.it)","group":"security","subg":"threat-intelligence-feeds","url":"https://infosec.cert-pa.it/analyze/listdomains.txt","show":0,"entries":0},"XMK":{"value":80,"uname":"XMK","vname":"Toxic domains (stopforumspam.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://www.stopforumspam.com/downloads/toxic_domains_whole.txt","show":1,"entries":38380},"GAX":{"value":81,"uname":"GAX","vname":"Mailtrail Malware (Miroslav Stampar)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt","show":1,"entries":186849},"RFI":{"value":82,"uname":"RFI","vname":"Malware Rescure (rescure.fruxlabs.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://rescure.fruxlabs.com/rescure_domain_blacklist.txt","show":1,"entries":500},"AZR":{"value":83,"uname":"AZR","vname":"Malware Maze (rescure.fruxlabs.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://rescure.fruxlabs.com/malware/maze.txt","show":0,"entries":0},"CEN":{"value":84,"uname":"CEN","vname":"Malware Ekans (rescure.fruxlabs.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://rescure.fruxlabs.com/malware/ekans.txt","show":0,"entries":0},"SPR":{"value":85,"uname":"SPR","vname":"Malware Wastedlocker (rescure.fruxlabs.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://rescure.fruxlabs.com/malware/wastedlocker.txt","show":0,"entries":0},"MZT":{"value":86,"uname":"MZT","vname":"Malware domains (blocklist.cyberthreatcoalition.org)","group":"security","subg":"threat-intelligence-feeds","url":"https://blocklist.cyberthreatcoalition.org/vetted/domain.txt","show":0,"entries":0},"NHM":{"value":87,"uname":"NHM","vname":"Malicious domains (Sophos Labs)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/sophoslabs/covid-iocs/master/malicious_domains.txt","show":1,"entries":1959},"GLV":{"value":88,"uname":"GLV","vname":"Malware domains (Sophos Labs)","group":"security","subg":"threat-intelligence-feeds","url":"https://raw.githubusercontent.com/sophoslabs/covid-iocs/master/malware_domains.txt","show":1,"entries":139},"NUY":{"value":89,"uname":"NUY","vname":"Covid List (rescure.fruxlabs.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://rescure.fruxlabs.com/covid.txt","show":1,"entries":500},"EDM":{"value":90,"uname":"EDM","vname":"Covid-19 Domains (managedsentinel.com)","group":"security","subg":"threat-intelligence-feeds","url":"https://managedsentinel.com/downloads/covid19_domains.txt","show":0,"entries":0},"ZFC":{"value":91,"uname":"ZFC","vname":"hole.cert.pl","group":"security","subg":"threat-intelligence-feeds","url":"https://hole.cert.pl/domains/domains.txt","show":1,"entries":58428},"DOP":{"value":92,"uname":"DOP","vname":"osint.digitalside.it","group":"security","subg":"threat-intelligence-feeds","url":"https://osint.digitalside.it/Threat-Intel/lists/latestdomains.txt","show":1,"entries":188},"XGC":{"value":93,"uname":"XGC","vname":"Affiliate and Tracking (NextDNS)","group":"privacy","subg":"affiliate-tracking-domains","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/affiliate-tracking-domains","show":1,"entries":432},"OHE":{"value":94,"uname":"OHE","vname":"1Hosts (Lite)","group":"privacy","subg":"","url":"https://badmojr.github.io/1Hosts/Lite/domains.txt","show":1,"entries":101383},"MYS":{"value":95,"uname":"MYS","vname":"1Hosts (Mini)","group":"privacy","subg":"","url":"https://badmojr.github.io/1Hosts/mini/domains.txt","show":1,"entries":65846},"IAJ":{"value":96,"uname":"IAJ","vname":"1Hosts (Pro)","group":"privacy","subg":"rethinkdns-recommended","url":"https://badmojr.github.io/1Hosts/Pro/domains.txt","show":1,"entries":214719},"EAQ":{"value":97,"uname":"EAQ","vname":"280blocker","group":"privacy","subg":"","url":"https://280blocker.net/files/280blocker_domain.txt","show":0,"entries":0},"AOC":{"value":98,"uname":"AOC","vname":"ABPindo","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt","show":1,"entries":530},"XAT":{"value":99,"uname":"XAT","vname":"ABPVN List","group":"privacy","subg":"","url":"https://abpvn.com/android/abpvn.txt","show":1,"entries":17787},"OSE":{"value":100,"uname":"OSE","vname":"Ad-Wars","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/jdlingyu/ad-wars/master/hosts","show":1,"entries":1604},"IBB":{"value":101,"uname":"IBB","vname":"AdAway","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt","show":1,"entries":7039},"EGX":{"value":102,"uname":"EGX","vname":"Add.2o7Net","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.2o7Net/hosts","show":1,"entries":1286},"HZD":{"value":103,"uname":"HZD","vname":"AdGuard DNS filters","group":"privacy","subg":"","url":"https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt","show":1,"entries":46561},"FLW":{"value":104,"uname":"FLW","vname":"Anti Ad","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-domains.txt","show":1,"entries":61120},"ULZ":{"value":105,"uname":"ULZ","vname":"Anti Pop Ads","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/Yhonay/antipopads/master/hosts","show":1,"entries":755},"OFY":{"value":106,"uname":"OFY","vname":"Anudeep's Blacklist","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt","show":1,"entries":42380},"MLE":{"value":107,"uname":"MLE","vname":"BarbBlock","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/paulgb/BarbBlock/master/blacklists/domain-list.txt","show":1,"entries":544},"YER":{"value":108,"uname":"YER","vname":"Turkey Adlist (bkrucarci)","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/bkrucarci/turk-adlist/master/hosts","show":1,"entries":1186},"DMC":{"value":109,"uname":"DMC","vname":"Bulgarian list (Adblock)","group":"privacy","subg":"","url":"https://stanev.org/abp/adblock_bg.txt","show":1,"entries":9},"IJO":{"value":110,"uname":"IJO","vname":"Cameleon","group":"privacy","subg":"","url":"http://sysctl.org/cameleon/hosts","show":1,"entries":20563},"OWW":{"value":111,"uname":"OWW","vname":"Polish filters (CertyficateIT)","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-pihole-filters/hostfile.txt","show":1,"entries":172},"EMY":{"value":112,"uname":"EMY","vname":"Disconnect (Ads)","group":"privacy","subg":"","url":"https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt","show":1,"entries":2701},"XKM":{"value":113,"uname":"XKM","vname":"Disconnect (Malvertising)","group":"privacy","subg":"","url":"https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt","show":1,"entries":2736},"CQT":{"value":114,"uname":"CQT","vname":"Disconnect (Tracking)","group":"privacy","subg":"","url":"https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt","show":1,"entries":34},"ANW":{"value":115,"uname":"ANW","vname":"EasyList China","group":"privacy","subg":"","url":"https://easylist-downloads.adblockplus.org/easylistchina.txt","show":1,"entries":9055},"DGE":{"value":116,"uname":"DGE","vname":"EasyList Czech and Slovak","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt","show":1,"entries":89},"BBS":{"value":117,"uname":"BBS","vname":"EasyList Dutch","group":"privacy","subg":"","url":"https://easylist-downloads.adblockplus.org/easylistdutch.txt","show":1,"entries":41},"OKW":{"value":118,"uname":"OKW","vname":"EasyList Germany","group":"privacy","subg":"","url":"https://easylist.to/easylistgermany/easylistgermany.txt","show":1,"entries":366},"ONV":{"value":119,"uname":"ONV","vname":"EasyList Hebrew","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/easylist/EasyListHebrew/master/EasyListHebrew.txt","show":1,"entries":146},"CDE":{"value":120,"uname":"CDE","vname":"EasyList Italy","group":"privacy","subg":"","url":"https://easylist-downloads.adblockplus.org/easylistitaly.txt","show":1,"entries":447},"PAL":{"value":121,"uname":"PAL","vname":"EasyList Lithuania","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt","show":1,"entries":36},"DBP":{"value":122,"uname":"DBP","vname":"EasyList","group":"privacy","subg":"","url":"https://easylist.to/easylist/easylist.txt","show":1,"entries":21038},"MHP":{"value":123,"uname":"MHP","vname":"EasyPrivacy","group":"privacy","subg":"","url":"https://easylist.to/easylist/easyprivacy.txt","show":1,"entries":17299},"EPR":{"value":124,"uname":"EPR","vname":"Energized Basic","group":"privacy","subg":"","url":"https://block.energized.pro/basic/formats/domains.txt","show":1,"entries":356427},"OUU":{"value":125,"uname":"OUU","vname":"Energized Blu Go","group":"privacy","subg":"","url":"https://block.energized.pro/bluGo/formats/domains.txt","show":1,"entries":105717},"YXS":{"value":126,"uname":"YXS","vname":"Energized Blu","group":"privacy","subg":"","url":"https://block.energized.pro/blu/formats/domains.txt","show":1,"entries":222438},"UQK":{"value":127,"uname":"UQK","vname":"Energized Regional Extension","group":"privacy","subg":"","url":"https://block.energized.pro/extensions/regional/formats/domains.txt","show":1,"entries":42057},"GVI":{"value":128,"uname":"GVI","vname":"Energized Spark","group":"privacy","subg":"","url":"https://block.energized.pro/spark/formats/domains.txt","show":1,"entries":71777},"TXJ":{"value":129,"uname":"TXJ","vname":"Energized Ultimate","group":"privacy","subg":"","url":"https://block.energized.pro/ultimate/formats/domains.txt","show":1,"entries":468021},"DPY":{"value":130,"uname":"DPY","vname":"Energized Xtreme Extension","group":"privacy","subg":"","url":"https://block.energized.pro/extensions/xtreme/formats/domains.txt","show":1,"entries":4315},"DUC":{"value":131,"uname":"DUC","vname":"Fanboy's Annoyance List","group":"privacy","subg":"","url":"https://easylist.to/easylist/fanboy-annoyance.txt","show":1,"entries":811},"WYE":{"value":132,"uname":"WYE","vname":"Fanboy's Enhanced Tracking List","group":"privacy","subg":"","url":"https://fanboy.co.nz/enhancedstats.txt","show":1,"entries":123},"CGF":{"value":133,"uname":"CGF","vname":"Finnish Easylist Addition","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/finnish-easylist-addition/finnish-easylist-addition/master/Finland_adb.txt","show":1,"entries":17},"JRV":{"value":134,"uname":"JRV","vname":"Frellwit's Swedish Hosts File","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/master/Frellwits-Swedish-Hosts-File.txt","show":1,"entries":897},"EOK":{"value":135,"uname":"EOK","vname":"GoodbyeAds (jerryn70)","group":"privacy","subg":"rethinkdns-recommended","url":"https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt","show":1,"entries":213272},"HQL":{"value":136,"uname":"HQL","vname":"HostsVN","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/bigdargon/hostsVN/master/hosts","show":1,"entries":17109},"NNH":{"value":137,"uname":"NNH","vname":"Hu Filter","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/hufilter/hufilter/master/hufilter.txt","show":1,"entries":99},"KRM":{"value":138,"uname":"KRM","vname":"Latvian List","group":"privacy","subg":"","url":"https://notabug.org/latvian-list/adblock-latvian/raw/master/lists/latvian-list.txt","show":1,"entries":53},"QKN":{"value":139,"uname":"QKN","vname":"Ads & Tracking Extended (Lighswitch05)","group":"privacy","subg":"","url":"https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt","show":1,"entries":421545},"MPR":{"value":140,"uname":"MPR","vname":"Tracking Aggressive (Lightswitch05)","group":"privacy","subg":"","url":"https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt","show":1,"entries":135607},"EOO":{"value":141,"uname":"EOO","vname":"Liste AR","group":"privacy","subg":"","url":"https://easylist-downloads.adblockplus.org/Liste_AR.txt","show":1,"entries":98},"MDE":{"value":142,"uname":"MDE","vname":"Liste FR","group":"privacy","subg":"","url":"https://easylist-downloads.adblockplus.org/liste_fr.txt","show":1,"entries":8613},"WWI":{"value":143,"uname":"WWI","vname":"AdAway Blocklist for Japan (logroid)","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/logroid/adaway-hosts/master/hosts.txt","show":1,"entries":18299},"TTI":{"value":144,"uname":"TTI","vname":"MVPS HOSTS","group":"privacy","subg":"","url":"http://winhelp2002.mvps.org/hosts.txt","show":1,"entries":8731},"GFJ":{"value":145,"uname":"GFJ","vname":"StevenBlack","group":"privacy","subg":"rethinkdns-recommended","url":"https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts","show":1,"entries":109887},"WOD":{"value":146,"uname":"WOD","vname":"VeleSila (yhosts)","group":"privacy","subg":"rethinkdns-recommended","url":"https://raw.githubusercontent.com/VeleSila/yhosts/master/hosts","show":1,"entries":6420},"YJR":{"value":147,"uname":"YJR","vname":"Tiuxo (ads)","group":"privacy","subg":"rethinkdns-recommended","url":"https://raw.githubusercontent.com/tiuxo/hosts/master/ads","show":1,"entries":1730},"WIB":{"value":148,"uname":"WIB","vname":"No Facebook","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/facebook/all","show":1,"entries":2098},"NUI":{"value":149,"uname":"NUI","vname":"No Google","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/nickspaargaren/no-google/master/wildcards-domains","show":1,"entries":304},"XIO":{"value":150,"uname":"XIO","vname":"NoTrack Tracker Blocklist","group":"privacy","subg":"","url":"https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-blocklist.txt","show":1,"entries":14722},"OBW":{"value":151,"uname":"OBW","vname":"NoTracking HostName","group":"privacy","subg":"notracking","url":"https://raw.githubusercontent.com/notracking/hosts-blocklists/master/hostnames.txt","show":1,"entries":106526},"YBO":{"value":152,"uname":"YBO","vname":"Perflyst's Smart TV Blocklist","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SmartTV.txt","show":1,"entries":214},"TTW":{"value":153,"uname":"TTW","vname":"Peter Lowe","group":"privacy","subg":"","url":"https://pgl.yoyo.org/as/serverlist.php?hostformat=domains&mimetype=plaintext","show":1,"entries":3644},"NML":{"value":154,"uname":"NML","vname":"RU AdList","group":"privacy","subg":"","url":"https://easylist-downloads.adblockplus.org/advblock.txt","show":1,"entries":9425},"MIN":{"value":155,"uname":"MIN","vname":"Shalla's Blacklists (adv)","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/cbuijs/shallalist/master/adv/domains","show":1,"entries":9922},"IFD":{"value":156,"uname":"IFD","vname":"Shalla's Blacklists (tracker)","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/cbuijs/shallalist/master/tracker/domains","show":1,"entries":1491},"AMI":{"value":157,"uname":"AMI","vname":"someonewhocares.org (Dan Pollock)","group":"privacy","subg":"","url":"https://someonewhocares.org/hosts/hosts","show":1,"entries":10379},"TZF":{"value":158,"uname":"TZF","vname":"UncheckyAds","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/FadeMind/hosts.extras/master/UncheckyAds/hosts","show":1,"entries":9},"VKE":{"value":159,"uname":"VKE","vname":"Personal Blocklist by WaLLy3K","group":"privacy","subg":"","url":"https://v.firebog.net/hosts/static/w3kbl.txt","show":1,"entries":350},"PWQ":{"value":160,"uname":"PWQ","vname":"WindowsSpyBlocker (CrazyMax)","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt","show":1,"entries":347},"KUA":{"value":161,"uname":"KUA","vname":"YousList","group":"privacy","subg":"","url":"https://raw.githubusercontent.com/yous/YousList/master/youslist.txt","show":1,"entries":162},"FHW":{"value":162,"uname":"FHW","vname":"Alexa (Amazon)","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/alexa","show":1,"entries":3},"AGZ":{"value":163,"uname":"AGZ","vname":"Apple","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/apple","show":1,"entries":10},"IVN":{"value":164,"uname":"IVN","vname":"Huawei","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/huawei","show":1,"entries":8},"FIB":{"value":165,"uname":"FIB","vname":"Roku","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/roku","show":0,"entries":1},"FGF":{"value":166,"uname":"FGF","vname":"Samsung","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/samsung","show":1,"entries":4},"FLL":{"value":167,"uname":"FLL","vname":"Sonos","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/sonos","show":1,"entries":2},"IVO":{"value":168,"uname":"IVO","vname":"Windows","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/windows","show":1,"entries":23},"ALQ":{"value":169,"uname":"ALQ","vname":"Xiaomi","group":"privacy","subg":"native","url":"https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/xiaomi","show":1,"entries":9},"FHM":{"value":170,"uname":"FHM","vname":"OISD (full)","group":"privacy","subg":"rethinkdns-recommended","url":"https://dbl.oisd.nl/","show":1,"entries":1009065}}
+{
+  "171": {
+    "value": 171,
+    "uname": "171",
+    "vname": "1Hosts (Xtra)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://badmojr.github.io/1Hosts/Xtra/domains.txt",
+    "show": 1,
+    "entries": 482654
+  },
+  "172": {
+    "value": 172,
+    "uname": "172",
+    "vname": "Spotify Ads (GoodbyeAds)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-Spotify-AdBlock.txt",
+    "show": 1,
+    "entries": 3784
+  },
+  "173": {
+    "value": 173,
+    "uname": "173",
+    "vname": "AVG + Avast (ftprivacy)",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/ftpmorph/ftprivacy/master/blocklists/avg-avast-data-mining-full-block.txt",
+    "show": 1,
+    "entries": 349
+  },
+  "174": {
+    "value": 174,
+    "uname": "174",
+    "vname": "Hola VPN (ftprivacy)",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/ftpmorph/ftprivacy/master/blocklists/hola-luminati-full-block.txt",
+    "show": 1,
+    "entries": 117
+  },
+  "175": {
+    "value": 175,
+    "uname": "175",
+    "vname": "Combined Privacy Block Lists: Final (bongochong)",
+    "group": "privacy",
+    "subg": "notracking",
+    "url": "https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/newhosts-final.hosts",
+    "show": 1,
+    "entries": 114379
+  },
+  "176": {
+    "value": 176,
+    "uname": "176",
+    "vname": "Torrent (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://blocklistproject.github.io/Lists/torrent.txt",
+    "show": 1,
+    "entries": 2622
+  },
+  "177": {
+    "value": 177,
+    "uname": "177",
+    "vname": "Drugs (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "",
+    "url": "https://blocklistproject.github.io/Lists/drugs.txt",
+    "show": 1,
+    "entries": 26588
+  },
+  "178": {
+    "value": 178,
+    "uname": "178",
+    "vname": "Ransomware (The Block List Project)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://blocklistproject.github.io/Lists/ransomware.txt",
+    "show": 1,
+    "entries": 1904
+  },
+  "179": {
+    "value": 179,
+    "uname": "179",
+    "vname": "TikTok (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://blocklistproject.github.io/Lists/tiktok.txt",
+    "show": 1,
+    "entries": 3698
+  },
+  "180": {
+    "value": 180,
+    "uname": "180",
+    "vname": "Cryptojacking (The Block List Project)",
+    "group": "security",
+    "subg": "cryptojacking",
+    "url": "https://blocklistproject.github.io/Lists/crypto.txt",
+    "show": 1,
+    "entries": 23789
+  },
+  "181": {
+    "value": 181,
+    "uname": "181",
+    "vname": "WhatsApp (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://blocklistproject.github.io/Lists/whatsapp.txt",
+    "show": 1,
+    "entries": 226
+  },
+  "182": {
+    "value": 182,
+    "uname": "182",
+    "vname": "Vaping (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "",
+    "url": "https://blocklistproject.github.io/Lists/vaping.txt",
+    "show": 1,
+    "entries": 108
+  },
+  "183": {
+    "value": 183,
+    "uname": "183",
+    "vname": "Piracy (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://blocklistproject.github.io/Lists/piracy.txt",
+    "show": 1,
+    "entries": 2128
+  },
+  "184": {
+    "value": 184,
+    "uname": "184",
+    "vname": "Facebook (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://blocklistproject.github.io/Lists/facebook.txt",
+    "show": 1,
+    "entries": 22459
+  },
+  "185": {
+    "value": 185,
+    "uname": "185",
+    "vname": "Gambling (The Block List Project)",
+    "group": "parentalcontrol",
+    "subg": "gambling",
+    "url": "https://blocklistproject.github.io/Lists/gambling.txt",
+    "show": 1,
+    "entries": 2480
+  },
+  "186": {
+    "value": 186,
+    "uname": "186",
+    "vname": "Strict No Porn (Clefspeare13)",
+    "group": "parentalcontrol",
+    "subg": "porn",
+    "url": "https://raw.githubusercontent.com/Clefspeare13/pornhosts/master/download_here/strict/0.0.0.0/hosts",
+    "show": 0,
+    "entries": 0
+  },
+  "187": {
+    "value": 187,
+    "uname": "187",
+    "vname": "Energized Unified",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/unified/formats/domains.txt",
+    "show": 1,
+    "entries": 720027
+  },
+  "188": {
+    "value": 188,
+    "uname": "188",
+    "vname": "Yet another small uBlock filter list",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/mtxadmin/ublock/master/hosts.txt",
+    "show": 1,
+    "entries": 994302
+  },
+  "MTF": {
+    "value": 0,
+    "uname": "MTF",
+    "vname": "Prevent bypass",
+    "group": "parentalcontrol",
+    "subg": "bypass-methods",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/bypass-methods",
+    "show": 1,
+    "entries": 634
+  },
+  "KBI": {
+    "value": 1,
+    "uname": "KBI",
+    "vname": "Safesearch-only",
+    "group": "parentalcontrol",
+    "subg": "safesearch",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/safesearch-not-supported",
+    "show": 1,
+    "entries": 160
+  },
+  "YAC": {
+    "value": 2,
+    "uname": "YAC",
+    "vname": "Dating (olbat)",
+    "group": "parentalcontrol",
+    "subg": "dating",
+    "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/dating/domains",
+    "show": 1,
+    "entries": 3803
+  },
+  "HBP": {
+    "value": 3,
+    "uname": "HBP",
+    "vname": "Gambling (olbat)",
+    "group": "parentalcontrol",
+    "subg": "gambling",
+    "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/gambling/domains",
+    "show": 1,
+    "entries": 1328
+  },
+  "NIM": {
+    "value": 4,
+    "uname": "NIM",
+    "vname": "Gambling (Sinfonietta)",
+    "group": "parentalcontrol",
+    "subg": "gambling",
+    "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts",
+    "show": 1,
+    "entries": 2554
+  },
+  "YWG": {
+    "value": 5,
+    "uname": "YWG",
+    "vname": "Torrents (DHT-nodes)",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/dht-bootstrap-nodes",
+    "show": 1,
+    "entries": 5
+  },
+  "SMQ": {
+    "value": 6,
+    "uname": "SMQ",
+    "vname": "File hosting",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/file-hosting",
+    "show": 1,
+    "entries": 110
+  },
+  "AQX": {
+    "value": 7,
+    "uname": "AQX",
+    "vname": "Proxies",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/proxies",
+    "show": 1,
+    "entries": 40
+  },
+  "BTG": {
+    "value": 8,
+    "uname": "BTG",
+    "vname": "Streaming Audio",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/streaming-audio",
+    "show": 1,
+    "entries": 65
+  },
+  "GUN": {
+    "value": 9,
+    "uname": "GUN",
+    "vname": "Streaming Video",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/streaming-video",
+    "show": 1,
+    "entries": 600
+  },
+  "KSH": {
+    "value": 10,
+    "uname": "KSH",
+    "vname": "Torrent Clients",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/torrent-clients",
+    "show": 1,
+    "entries": 31
+  },
+  "WAS": {
+    "value": 11,
+    "uname": "WAS",
+    "vname": "Torrent Trackers",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/torrent-trackers",
+    "show": 1,
+    "entries": 351
+  },
+  "AZY": {
+    "value": 12,
+    "uname": "AZY",
+    "vname": "Torrent Websites",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/torrent-websites",
+    "show": 1,
+    "entries": 1105
+  },
+  "GWB": {
+    "value": 13,
+    "uname": "GWB",
+    "vname": "Usenet",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/usenet",
+    "show": 1,
+    "entries": 12
+  },
+  "YMG": {
+    "value": 14,
+    "uname": "YMG",
+    "vname": "Warez",
+    "group": "parentalcontrol",
+    "subg": "piracy",
+    "url": "https://raw.githubusercontent.com/nextdns/piracy-blocklists/master/warez",
+    "show": 1,
+    "entries": 107
+  },
+  "CZM": {
+    "value": 15,
+    "uname": "CZM",
+    "vname": "Porn (Tiuxo)",
+    "group": "parentalcontrol",
+    "subg": "porn",
+    "url": "https://raw.githubusercontent.com/tiuxo/hosts/master/porn",
+    "show": 0,
+    "entries": 1
+  },
+  "HYS": {
+    "value": 16,
+    "uname": "HYS",
+    "vname": "Porn (Clefspeare13)",
+    "group": "parentalcontrol",
+    "subg": "porn",
+    "url": "https://raw.githubusercontent.com/Clefspeare13/pornhosts/master/download_here/mobile/hosts",
+    "show": 0,
+    "entries": 0
+  },
+  "XIF": {
+    "value": 17,
+    "uname": "XIF",
+    "vname": "Porn (Mahadi Xion)",
+    "group": "parentalcontrol",
+    "subg": "porn",
+    "url": "https://raw.githubusercontent.com/mhxion/pornaway/master/hosts/porn_sites.txt",
+    "show": 1,
+    "entries": 31178
+  },
+  "TQN": {
+    "value": 18,
+    "uname": "TQN",
+    "vname": "Porn (Sinfonietta)",
+    "group": "parentalcontrol",
+    "subg": "porn",
+    "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts",
+    "show": 1,
+    "entries": 18460
+  },
+  "ZVO": {
+    "value": 19,
+    "uname": "ZVO",
+    "vname": "Social networks (oblat)",
+    "group": "parentalcontrol",
+    "subg": "social-networks",
+    "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/social_networks/domains",
+    "show": 1,
+    "entries": 681
+  },
+  "YOM": {
+    "value": 20,
+    "uname": "YOM",
+    "vname": "9Gag",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/9gag",
+    "show": 1,
+    "entries": 2
+  },
+  "THR": {
+    "value": 21,
+    "uname": "THR",
+    "vname": "Amazon",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/amazon",
+    "show": 1,
+    "entries": 23
+  },
+  "RPW": {
+    "value": 22,
+    "uname": "RPW",
+    "vname": "Blizzard",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/blizzard",
+    "show": 1,
+    "entries": 2
+  },
+  "AMG": {
+    "value": 23,
+    "uname": "AMG",
+    "vname": "Daily Motion",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/dailymotion",
+    "show": 1,
+    "entries": 3
+  },
+  "WTJ": {
+    "value": 24,
+    "uname": "WTJ",
+    "vname": "Discord",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/discord",
+    "show": 1,
+    "entries": 5
+  },
+  "ZXU": {
+    "value": 25,
+    "uname": "ZXU",
+    "vname": "Disneyplus",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/disneyplus",
+    "show": 1,
+    "entries": 6
+  },
+  "FJG": {
+    "value": 26,
+    "uname": "FJG",
+    "vname": "EBay",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/ebay",
+    "show": 1,
+    "entries": 27
+  },
+  "NYS": {
+    "value": 27,
+    "uname": "NYS",
+    "vname": "Facebook",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/facebook",
+    "show": 1,
+    "entries": 9
+  },
+  "OKG": {
+    "value": 28,
+    "uname": "OKG",
+    "vname": "Fortnite",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/fortnite",
+    "show": 0,
+    "entries": 1
+  },
+  "KNP": {
+    "value": 29,
+    "uname": "KNP",
+    "vname": "Hulu",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/hulu",
+    "show": 0,
+    "entries": 1
+  },
+  "FLI": {
+    "value": 30,
+    "uname": "FLI",
+    "vname": "Imgur",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/imgur",
+    "show": 0,
+    "entries": 1
+  },
+  "RYX": {
+    "value": 31,
+    "uname": "RYX",
+    "vname": "Instagram",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/instagram",
+    "show": 1,
+    "entries": 2
+  },
+  "CIH": {
+    "value": 32,
+    "uname": "CIH",
+    "vname": "League of Legends",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/leagueoflegends",
+    "show": 1,
+    "entries": 2
+  },
+  "PTE": {
+    "value": 33,
+    "uname": "PTE",
+    "vname": "Facebook Messenger",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/messenger",
+    "show": 1,
+    "entries": 3
+  },
+  "KEA": {
+    "value": 34,
+    "uname": "KEA",
+    "vname": "Minecraft",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/minecraft",
+    "show": 1,
+    "entries": 3
+  },
+  "CMR": {
+    "value": 35,
+    "uname": "CMR",
+    "vname": "Netflix",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/netflix",
+    "show": 1,
+    "entries": 6
+  },
+  "DDO": {
+    "value": 36,
+    "uname": "DDO",
+    "vname": "Pinterest",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/pinterest",
+    "show": 1,
+    "entries": 49
+  },
+  "VLM": {
+    "value": 37,
+    "uname": "VLM",
+    "vname": "Reddit",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/reddit",
+    "show": 1,
+    "entries": 5
+  },
+  "JEH": {
+    "value": 38,
+    "uname": "JEH",
+    "vname": "Roblox",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/roblox",
+    "show": 1,
+    "entries": 2
+  },
+  "XLX": {
+    "value": 39,
+    "uname": "XLX",
+    "vname": "Skype",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/skype",
+    "show": 1,
+    "entries": 5
+  },
+  "OQW": {
+    "value": 40,
+    "uname": "OQW",
+    "vname": "Snapchat",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/snapchat",
+    "show": 1,
+    "entries": 10
+  },
+  "FXC": {
+    "value": 41,
+    "uname": "FXC",
+    "vname": "Spotify",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/spotify",
+    "show": 1,
+    "entries": 10
+  },
+  "HZJ": {
+    "value": 42,
+    "uname": "HZJ",
+    "vname": "Steam",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/steam",
+    "show": 1,
+    "entries": 12
+  },
+  "SWK": {
+    "value": 43,
+    "uname": "SWK",
+    "vname": "Telegram",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/telegram",
+    "show": 1,
+    "entries": 3
+  },
+  "VAM": {
+    "value": 44,
+    "uname": "VAM",
+    "vname": "Tiktok",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/tiktok",
+    "show": 1,
+    "entries": 14
+  },
+  "AOS": {
+    "value": 45,
+    "uname": "AOS",
+    "vname": "Tinder",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/tinder",
+    "show": 1,
+    "entries": 3
+  },
+  "FAL": {
+    "value": 46,
+    "uname": "FAL",
+    "vname": "Tumblr",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/tumblr",
+    "show": 0,
+    "entries": 1
+  },
+  "CZK": {
+    "value": 47,
+    "uname": "CZK",
+    "vname": "Twitch",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/twitch",
+    "show": 1,
+    "entries": 7
+  },
+  "FZB": {
+    "value": 48,
+    "uname": "FZB",
+    "vname": "Twitter",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/twitter",
+    "show": 1,
+    "entries": 5
+  },
+  "PYW": {
+    "value": 49,
+    "uname": "PYW",
+    "vname": "Vimeo",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/vimeo",
+    "show": 1,
+    "entries": 4
+  },
+  "JXA": {
+    "value": 50,
+    "uname": "JXA",
+    "vname": "VK",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/vk",
+    "show": 1,
+    "entries": 8
+  },
+  "KOR": {
+    "value": 51,
+    "uname": "KOR",
+    "vname": "WhatsApp",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/whatsapp",
+    "show": 1,
+    "entries": 2
+  },
+  "DEP": {
+    "value": 52,
+    "uname": "DEP",
+    "vname": "YouTube",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/youtube",
+    "show": 1,
+    "entries": 17
+  },
+  "RFX": {
+    "value": 53,
+    "uname": "RFX",
+    "vname": "Zoom",
+    "group": "parentalcontrol",
+    "subg": "services",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/services/zoom",
+    "show": 1,
+    "entries": 4
+  },
+  "DTT": {
+    "value": 54,
+    "uname": "DTT",
+    "vname": "Adblock Nocoin List (hoshsadiq)",
+    "group": "security",
+    "subg": "cryptojacking",
+    "url": "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt",
+    "show": 1,
+    "entries": 680
+  },
+  "VZP": {
+    "value": 55,
+    "uname": "VZP",
+    "vname": "Coin blocker (Zerodot1)",
+    "group": "security",
+    "subg": "cryptojacking",
+    "url": "https://zerodot1.gitlab.io/CoinBlockerLists/hosts_browser",
+    "show": 1,
+    "entries": 3496
+  },
+  "RAF": {
+    "value": 56,
+    "uname": "RAF",
+    "vname": "Parked domains (NextDNS)",
+    "group": "security",
+    "subg": "parked-domains-cname",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/security/parked-domains-cname",
+    "show": 1,
+    "entries": 5
+  },
+  "THG": {
+    "value": 57,
+    "uname": "THG",
+    "vname": "Malware (malwaredomainlist.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://www.malwaredomainlist.com/hostslist/hosts.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "YVH": {
+    "value": 58,
+    "uname": "YVH",
+    "vname": "Security (StevenBlack)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/data/add.Dead/hosts",
+    "show": 1,
+    "entries": 14
+  },
+  "XQV": {
+    "value": 59,
+    "uname": "XQV",
+    "vname": "KADHosts (PolishFiltersTeam)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/PolishFiltersTeam/KADhosts/master/KADhosts.txt",
+    "show": 1,
+    "entries": 51285
+  },
+  "PIB": {
+    "value": 60,
+    "uname": "PIB",
+    "vname": "Malware (malwaredomains.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://mirror1.malwaredomains.com/files/justdomains",
+    "show": 0,
+    "entries": 0
+  },
+  "EEN": {
+    "value": 61,
+    "uname": "EEN",
+    "vname": "Malware (Disconnect.me)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://s3.amazonaws.com/lists.disconnect.me/simple_malware.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "GDA": {
+    "value": 62,
+    "uname": "GDA",
+    "vname": "Phishing.Army",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://phishing.army/download/phishing_army_blocklist.txt",
+    "show": 1,
+    "entries": 69741
+  },
+  "MAD": {
+    "value": 63,
+    "uname": "MAD",
+    "vname": "Spam404",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/Spam404/lists/master/main-blacklist.txt",
+    "show": 1,
+    "entries": 8147
+  },
+  "NAK": {
+    "value": 64,
+    "uname": "NAK",
+    "vname": "Malware (quidsup)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-malware.txt",
+    "show": 1,
+    "entries": 303
+  },
+  "BPZ": {
+    "value": 65,
+    "uname": "BPZ",
+    "vname": "Badd Boyz Hosts (Mitchell Krogza)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/mitchellkrogza/Badd-Boyz-Hosts/master/hosts",
+    "show": 1,
+    "entries": 1385
+  },
+  "HWO": {
+    "value": 66,
+    "uname": "HWO",
+    "vname": "Malware (Mitchell Krogza)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/mitchellkrogza/The-Big-List-of-Hacked-Malware-Web-Sites/master/hosts",
+    "show": 1,
+    "entries": 13821
+  },
+  "YUC": {
+    "value": 67,
+    "uname": "YUC",
+    "vname": "Domain blocklist basic (joewein.net) ",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://joewein.net/dl/bl/dom-bl-base.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "IKY": {
+    "value": 68,
+    "uname": "IKY",
+    "vname": "Domain blocklist full (joewein.net)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://joewein.net/dl/bl/dom-bl.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "LSS": {
+    "value": 69,
+    "uname": "LSS",
+    "vname": "Malware (mirror.cedia.org.ec)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://mirror.cedia.org.ec/malwaredomains/immortal_domains.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "NOE": {
+    "value": 70,
+    "uname": "NOE",
+    "vname": "Bad lists (ethanr)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://bitbucket.org/ethanr/dns-blacklists/raw/master/bad_lists/Mandiant_APT1_Report_Appendix_D.txt",
+    "show": 1,
+    "entries": 2046
+  },
+  "PLR": {
+    "value": 71,
+    "uname": "PLR",
+    "vname": "Malware (Olbat)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/malware/domains",
+    "show": 1,
+    "entries": 63795
+  },
+  "FIT": {
+    "value": 72,
+    "uname": "FIT",
+    "vname": "Phising (Olbat)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/master/blacklists/phishing/domains",
+    "show": 1,
+    "entries": 63952
+  },
+  "LHX": {
+    "value": 73,
+    "uname": "LHX",
+    "vname": "Spyware (Chris Buijs)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/cbuijs/shallalist/master/spyware/domains",
+    "show": 1,
+    "entries": 18460
+  },
+  "FOF": {
+    "value": 74,
+    "uname": "FOF",
+    "vname": "Malware (DandelionSprout)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt",
+    "show": 1,
+    "entries": 7560
+  },
+  "DYA": {
+    "value": 75,
+    "uname": "DYA",
+    "vname": "Malware (azorult-tracker.net)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://azorult-tracker.net/api/list/domain?format=plain",
+    "show": 1,
+    "entries": 948
+  },
+  "JAN": {
+    "value": 76,
+    "uname": "JAN",
+    "vname": "Blackbook (Miroslav Stampar)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/stamparm/blackbook/master/blackbook.txt",
+    "show": 1,
+    "entries": 17620
+  },
+  "FHQ": {
+    "value": 77,
+    "uname": "FHQ",
+    "vname": "Bad sites (phishing.mailscanner.info)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "http://phishing.mailscanner.info/phishing.bad.sites.conf",
+    "show": 1,
+    "entries": 9837
+  },
+  "CMC": {
+    "value": 78,
+    "uname": "CMC",
+    "vname": "Scam and phising (infinitytec)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/infinitytec/blocklists/master/scams-and-phishing.txt",
+    "show": 1,
+    "entries": 5786
+  },
+  "RKG": {
+    "value": 79,
+    "uname": "RKG",
+    "vname": "Threats (infosec.cert-pa.it)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://infosec.cert-pa.it/analyze/listdomains.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "XMK": {
+    "value": 80,
+    "uname": "XMK",
+    "vname": "Toxic domains (stopforumspam.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://www.stopforumspam.com/downloads/toxic_domains_whole.txt",
+    "show": 1,
+    "entries": 38380
+  },
+  "GAX": {
+    "value": 81,
+    "uname": "GAX",
+    "vname": "Mailtrail Malware (Miroslav Stampar)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
+    "show": 1,
+    "entries": 186849
+  },
+  "RFI": {
+    "value": 82,
+    "uname": "RFI",
+    "vname": "Malware Rescure (rescure.fruxlabs.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://rescure.fruxlabs.com/rescure_domain_blacklist.txt",
+    "show": 1,
+    "entries": 500
+  },
+  "AZR": {
+    "value": 83,
+    "uname": "AZR",
+    "vname": "Malware Maze (rescure.fruxlabs.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://rescure.fruxlabs.com/malware/maze.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "CEN": {
+    "value": 84,
+    "uname": "CEN",
+    "vname": "Malware Ekans (rescure.fruxlabs.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://rescure.fruxlabs.com/malware/ekans.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "SPR": {
+    "value": 85,
+    "uname": "SPR",
+    "vname": "Malware Wastedlocker (rescure.fruxlabs.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://rescure.fruxlabs.com/malware/wastedlocker.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "MZT": {
+    "value": 86,
+    "uname": "MZT",
+    "vname": "Malware domains (blocklist.cyberthreatcoalition.org)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://blocklist.cyberthreatcoalition.org/vetted/domain.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "NHM": {
+    "value": 87,
+    "uname": "NHM",
+    "vname": "Malicious domains (Sophos Labs)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/sophoslabs/covid-iocs/master/malicious_domains.txt",
+    "show": 1,
+    "entries": 1959
+  },
+  "GLV": {
+    "value": 88,
+    "uname": "GLV",
+    "vname": "Malware domains (Sophos Labs)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://raw.githubusercontent.com/sophoslabs/covid-iocs/master/malware_domains.txt",
+    "show": 1,
+    "entries": 139
+  },
+  "NUY": {
+    "value": 89,
+    "uname": "NUY",
+    "vname": "Covid List (rescure.fruxlabs.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://rescure.fruxlabs.com/covid.txt",
+    "show": 1,
+    "entries": 500
+  },
+  "EDM": {
+    "value": 90,
+    "uname": "EDM",
+    "vname": "Covid-19 Domains (managedsentinel.com)",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://managedsentinel.com/downloads/covid19_domains.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "ZFC": {
+    "value": 91,
+    "uname": "ZFC",
+    "vname": "hole.cert.pl",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://hole.cert.pl/domains/domains.txt",
+    "show": 1,
+    "entries": 58428
+  },
+  "DOP": {
+    "value": 92,
+    "uname": "DOP",
+    "vname": "osint.digitalside.it",
+    "group": "security",
+    "subg": "threat-intelligence-feeds",
+    "url": "https://osint.digitalside.it/Threat-Intel/lists/latestdomains.txt",
+    "show": 1,
+    "entries": 188
+  },
+  "XGC": {
+    "value": 93,
+    "uname": "XGC",
+    "vname": "Affiliate and Tracking (NextDNS)",
+    "group": "privacy",
+    "subg": "affiliate-tracking-domains",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/affiliate-tracking-domains",
+    "show": 1,
+    "entries": 432
+  },
+  "OHE": {
+    "value": 94,
+    "uname": "OHE",
+    "vname": "1Hosts (Lite)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://badmojr.github.io/1Hosts/Lite/domains.txt",
+    "show": 1,
+    "entries": 101383
+  },
+  "MYS": {
+    "value": 95,
+    "uname": "MYS",
+    "vname": "1Hosts (Mini)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://badmojr.github.io/1Hosts/mini/domains.txt",
+    "show": 1,
+    "entries": 65846
+  },
+  "IAJ": {
+    "value": 96,
+    "uname": "IAJ",
+    "vname": "1Hosts (Pro)",
+    "group": "privacy",
+    "subg": "rethinkdns-recommended",
+    "url": "https://badmojr.github.io/1Hosts/Pro/domains.txt",
+    "show": 1,
+    "entries": 214719
+  },
+  "EAQ": {
+    "value": 97,
+    "uname": "EAQ",
+    "vname": "280blocker",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://280blocker.net/files/280blocker_domain.txt",
+    "show": 0,
+    "entries": 0
+  },
+  "AOC": {
+    "value": 98,
+    "uname": "AOC",
+    "vname": "ABPindo",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt",
+    "show": 1,
+    "entries": 530
+  },
+  "XAT": {
+    "value": 99,
+    "uname": "XAT",
+    "vname": "ABPVN List",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://abpvn.com/android/abpvn.txt",
+    "show": 1,
+    "entries": 17787
+  },
+  "OSE": {
+    "value": 100,
+    "uname": "OSE",
+    "vname": "Ad-Wars",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/jdlingyu/ad-wars/master/hosts",
+    "show": 1,
+    "entries": 1604
+  },
+  "IBB": {
+    "value": 101,
+    "uname": "IBB",
+    "vname": "AdAway",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt",
+    "show": 1,
+    "entries": 7039
+  },
+  "EGX": {
+    "value": 102,
+    "uname": "EGX",
+    "vname": "Add.2o7Net",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.2o7Net/hosts",
+    "show": 1,
+    "entries": 1286
+  },
+  "HZD": {
+    "value": 103,
+    "uname": "HZD",
+    "vname": "AdGuard DNS filters",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt",
+    "show": 1,
+    "entries": 46561
+  },
+  "FLW": {
+    "value": 104,
+    "uname": "FLW",
+    "vname": "Anti Ad",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-domains.txt",
+    "show": 1,
+    "entries": 61120
+  },
+  "ULZ": {
+    "value": 105,
+    "uname": "ULZ",
+    "vname": "Anti Pop Ads",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/Yhonay/antipopads/master/hosts",
+    "show": 1,
+    "entries": 755
+  },
+  "OFY": {
+    "value": 106,
+    "uname": "OFY",
+    "vname": "Anudeep's Blacklist",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt",
+    "show": 1,
+    "entries": 42380
+  },
+  "MLE": {
+    "value": 107,
+    "uname": "MLE",
+    "vname": "BarbBlock",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/paulgb/BarbBlock/master/blacklists/domain-list.txt",
+    "show": 1,
+    "entries": 544
+  },
+  "YER": {
+    "value": 108,
+    "uname": "YER",
+    "vname": "Turkey Adlist (bkrucarci)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/bkrucarci/turk-adlist/master/hosts",
+    "show": 1,
+    "entries": 1186
+  },
+  "DMC": {
+    "value": 109,
+    "uname": "DMC",
+    "vname": "Bulgarian list (Adblock)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://stanev.org/abp/adblock_bg.txt",
+    "show": 1,
+    "entries": 9
+  },
+  "IJO": {
+    "value": 110,
+    "uname": "IJO",
+    "vname": "Cameleon",
+    "group": "privacy",
+    "subg": "",
+    "url": "http://sysctl.org/cameleon/hosts",
+    "show": 1,
+    "entries": 20563
+  },
+  "OWW": {
+    "value": 111,
+    "uname": "OWW",
+    "vname": "Polish filters (CertyficateIT)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-pihole-filters/hostfile.txt",
+    "show": 1,
+    "entries": 172
+  },
+  "EMY": {
+    "value": 112,
+    "uname": "EMY",
+    "vname": "Disconnect (Ads)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt",
+    "show": 1,
+    "entries": 2701
+  },
+  "XKM": {
+    "value": 113,
+    "uname": "XKM",
+    "vname": "Disconnect (Malvertising)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt",
+    "show": 1,
+    "entries": 2736
+  },
+  "CQT": {
+    "value": 114,
+    "uname": "CQT",
+    "vname": "Disconnect (Tracking)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt",
+    "show": 1,
+    "entries": 34
+  },
+  "ANW": {
+    "value": 115,
+    "uname": "ANW",
+    "vname": "EasyList China",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist-downloads.adblockplus.org/easylistchina.txt",
+    "show": 1,
+    "entries": 9055
+  },
+  "DGE": {
+    "value": 116,
+    "uname": "DGE",
+    "vname": "EasyList Czech and Slovak",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt",
+    "show": 1,
+    "entries": 89
+  },
+  "BBS": {
+    "value": 117,
+    "uname": "BBS",
+    "vname": "EasyList Dutch",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist-downloads.adblockplus.org/easylistdutch.txt",
+    "show": 1,
+    "entries": 41
+  },
+  "OKW": {
+    "value": 118,
+    "uname": "OKW",
+    "vname": "EasyList Germany",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist.to/easylistgermany/easylistgermany.txt",
+    "show": 1,
+    "entries": 366
+  },
+  "ONV": {
+    "value": 119,
+    "uname": "ONV",
+    "vname": "EasyList Hebrew",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/easylist/EasyListHebrew/master/EasyListHebrew.txt",
+    "show": 1,
+    "entries": 146
+  },
+  "CDE": {
+    "value": 120,
+    "uname": "CDE",
+    "vname": "EasyList Italy",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist-downloads.adblockplus.org/easylistitaly.txt",
+    "show": 1,
+    "entries": 447
+  },
+  "PAL": {
+    "value": 121,
+    "uname": "PAL",
+    "vname": "EasyList Lithuania",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt",
+    "show": 1,
+    "entries": 36
+  },
+  "DBP": {
+    "value": 122,
+    "uname": "DBP",
+    "vname": "EasyList",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist.to/easylist/easylist.txt",
+    "show": 1,
+    "entries": 21038
+  },
+  "MHP": {
+    "value": 123,
+    "uname": "MHP",
+    "vname": "EasyPrivacy",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist.to/easylist/easyprivacy.txt",
+    "show": 1,
+    "entries": 17299
+  },
+  "EPR": {
+    "value": 124,
+    "uname": "EPR",
+    "vname": "Energized Basic",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/basic/formats/domains.txt",
+    "show": 1,
+    "entries": 356427
+  },
+  "OUU": {
+    "value": 125,
+    "uname": "OUU",
+    "vname": "Energized Blu Go",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/bluGo/formats/domains.txt",
+    "show": 1,
+    "entries": 105717
+  },
+  "YXS": {
+    "value": 126,
+    "uname": "YXS",
+    "vname": "Energized Blu",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/blu/formats/domains.txt",
+    "show": 1,
+    "entries": 222438
+  },
+  "UQK": {
+    "value": 127,
+    "uname": "UQK",
+    "vname": "Energized Regional Extension",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/extensions/regional/formats/domains.txt",
+    "show": 1,
+    "entries": 42057
+  },
+  "GVI": {
+    "value": 128,
+    "uname": "GVI",
+    "vname": "Energized Spark",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/spark/formats/domains.txt",
+    "show": 1,
+    "entries": 71777
+  },
+  "TXJ": {
+    "value": 129,
+    "uname": "TXJ",
+    "vname": "Energized Ultimate",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/ultimate/formats/domains.txt",
+    "show": 1,
+    "entries": 468021
+  },
+  "DPY": {
+    "value": 130,
+    "uname": "DPY",
+    "vname": "Energized Xtreme Extension",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://block.energized.pro/extensions/xtreme/formats/domains.txt",
+    "show": 1,
+    "entries": 4315
+  },
+  "DUC": {
+    "value": 131,
+    "uname": "DUC",
+    "vname": "Fanboy's Annoyance List",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist.to/easylist/fanboy-annoyance.txt",
+    "show": 1,
+    "entries": 811
+  },
+  "WYE": {
+    "value": 132,
+    "uname": "WYE",
+    "vname": "Fanboy's Enhanced Tracking List",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://fanboy.co.nz/enhancedstats.txt",
+    "show": 1,
+    "entries": 123
+  },
+  "CGF": {
+    "value": 133,
+    "uname": "CGF",
+    "vname": "Finnish Easylist Addition",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/finnish-easylist-addition/finnish-easylist-addition/master/Finland_adb.txt",
+    "show": 1,
+    "entries": 17
+  },
+  "JRV": {
+    "value": 134,
+    "uname": "JRV",
+    "vname": "Frellwit's Swedish Hosts File",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/master/Frellwits-Swedish-Hosts-File.txt",
+    "show": 1,
+    "entries": 897
+  },
+  "EOK": {
+    "value": 135,
+    "uname": "EOK",
+    "vname": "GoodbyeAds (jerryn70)",
+    "group": "privacy",
+    "subg": "rethinkdns-recommended",
+    "url": "https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt",
+    "show": 1,
+    "entries": 213272
+  },
+  "HQL": {
+    "value": 136,
+    "uname": "HQL",
+    "vname": "HostsVN",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/bigdargon/hostsVN/master/hosts",
+    "show": 1,
+    "entries": 17109
+  },
+  "NNH": {
+    "value": 137,
+    "uname": "NNH",
+    "vname": "Hu Filter",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/hufilter/hufilter/master/hufilter.txt",
+    "show": 1,
+    "entries": 99
+  },
+  "KRM": {
+    "value": 138,
+    "uname": "KRM",
+    "vname": "Latvian List",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://notabug.org/latvian-list/adblock-latvian/raw/master/lists/latvian-list.txt",
+    "show": 1,
+    "entries": 53
+  },
+  "QKN": {
+    "value": 139,
+    "uname": "QKN",
+    "vname": "Ads & Tracking Extended (Lighswitch05)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt",
+    "show": 1,
+    "entries": 421545
+  },
+  "MPR": {
+    "value": 140,
+    "uname": "MPR",
+    "vname": "Tracking Aggressive (Lightswitch05)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt",
+    "show": 1,
+    "entries": 135607
+  },
+  "EOO": {
+    "value": 141,
+    "uname": "EOO",
+    "vname": "Liste AR",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist-downloads.adblockplus.org/Liste_AR.txt",
+    "show": 1,
+    "entries": 98
+  },
+  "MDE": {
+    "value": 142,
+    "uname": "MDE",
+    "vname": "Liste FR",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist-downloads.adblockplus.org/liste_fr.txt",
+    "show": 1,
+    "entries": 8613
+  },
+  "WWI": {
+    "value": 143,
+    "uname": "WWI",
+    "vname": "AdAway Blocklist for Japan (logroid)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/logroid/adaway-hosts/master/hosts.txt",
+    "show": 1,
+    "entries": 18299
+  },
+  "TTI": {
+    "value": 144,
+    "uname": "TTI",
+    "vname": "MVPS HOSTS",
+    "group": "privacy",
+    "subg": "",
+    "url": "http://winhelp2002.mvps.org/hosts.txt",
+    "show": 1,
+    "entries": 8731
+  },
+  "GFJ": {
+    "value": 145,
+    "uname": "GFJ",
+    "vname": "StevenBlack",
+    "group": "privacy",
+    "subg": "rethinkdns-recommended",
+    "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
+    "show": 1,
+    "entries": 109887
+  },
+  "WOD": {
+    "value": 146,
+    "uname": "WOD",
+    "vname": "VeleSila (yhosts)",
+    "group": "privacy",
+    "subg": "rethinkdns-recommended",
+    "url": "https://raw.githubusercontent.com/VeleSila/yhosts/master/hosts",
+    "show": 1,
+    "entries": 6420
+  },
+  "YJR": {
+    "value": 147,
+    "uname": "YJR",
+    "vname": "Tiuxo (ads)",
+    "group": "privacy",
+    "subg": "rethinkdns-recommended",
+    "url": "https://raw.githubusercontent.com/tiuxo/hosts/master/ads",
+    "show": 1,
+    "entries": 1730
+  },
+  "WIB": {
+    "value": 148,
+    "uname": "WIB",
+    "vname": "No Facebook",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/jmdugan/blocklists/master/corporations/facebook/all",
+    "show": 1,
+    "entries": 2098
+  },
+  "NUI": {
+    "value": 149,
+    "uname": "NUI",
+    "vname": "No Google",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/nickspaargaren/no-google/master/wildcards-domains",
+    "show": 1,
+    "entries": 304
+  },
+  "XIO": {
+    "value": 150,
+    "uname": "XIO",
+    "vname": "NoTrack Tracker Blocklist",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-blocklist.txt",
+    "show": 1,
+    "entries": 14722
+  },
+  "OBW": {
+    "value": 151,
+    "uname": "OBW",
+    "vname": "NoTracking HostName",
+    "group": "privacy",
+    "subg": "notracking",
+    "url": "https://raw.githubusercontent.com/notracking/hosts-blocklists/master/hostnames.txt",
+    "show": 1,
+    "entries": 106526
+  },
+  "YBO": {
+    "value": 152,
+    "uname": "YBO",
+    "vname": "Perflyst's Smart TV Blocklist",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SmartTV.txt",
+    "show": 1,
+    "entries": 214
+  },
+  "TTW": {
+    "value": 153,
+    "uname": "TTW",
+    "vname": "Peter Lowe",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://pgl.yoyo.org/as/serverlist.php?hostformat=domains&mimetype=plaintext",
+    "show": 1,
+    "entries": 3644
+  },
+  "NML": {
+    "value": 154,
+    "uname": "NML",
+    "vname": "RU AdList",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://easylist-downloads.adblockplus.org/advblock.txt",
+    "show": 1,
+    "entries": 9425
+  },
+  "MIN": {
+    "value": 155,
+    "uname": "MIN",
+    "vname": "Shalla's Blacklists (adv)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/cbuijs/shallalist/master/adv/domains",
+    "show": 1,
+    "entries": 9922
+  },
+  "IFD": {
+    "value": 156,
+    "uname": "IFD",
+    "vname": "Shalla's Blacklists (tracker)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/cbuijs/shallalist/master/tracker/domains",
+    "show": 1,
+    "entries": 1491
+  },
+  "AMI": {
+    "value": 157,
+    "uname": "AMI",
+    "vname": "someonewhocares.org (Dan Pollock)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://someonewhocares.org/hosts/hosts",
+    "show": 1,
+    "entries": 10379
+  },
+  "TZF": {
+    "value": 158,
+    "uname": "TZF",
+    "vname": "UncheckyAds",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/FadeMind/hosts.extras/master/UncheckyAds/hosts",
+    "show": 1,
+    "entries": 9
+  },
+  "VKE": {
+    "value": 159,
+    "uname": "VKE",
+    "vname": "Personal Blocklist by WaLLy3K",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://v.firebog.net/hosts/static/w3kbl.txt",
+    "show": 1,
+    "entries": 350
+  },
+  "PWQ": {
+    "value": 160,
+    "uname": "PWQ",
+    "vname": "WindowsSpyBlocker (CrazyMax)",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt",
+    "show": 1,
+    "entries": 347
+  },
+  "KUA": {
+    "value": 161,
+    "uname": "KUA",
+    "vname": "YousList",
+    "group": "privacy",
+    "subg": "",
+    "url": "https://raw.githubusercontent.com/yous/YousList/master/youslist.txt",
+    "show": 1,
+    "entries": 162
+  },
+  "FHW": {
+    "value": 162,
+    "uname": "FHW",
+    "vname": "Alexa (Amazon)",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/alexa",
+    "show": 1,
+    "entries": 3
+  },
+  "AGZ": {
+    "value": 163,
+    "uname": "AGZ",
+    "vname": "Apple",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/apple",
+    "show": 1,
+    "entries": 10
+  },
+  "IVN": {
+    "value": 164,
+    "uname": "IVN",
+    "vname": "Huawei",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/huawei",
+    "show": 1,
+    "entries": 8
+  },
+  "FIB": {
+    "value": 165,
+    "uname": "FIB",
+    "vname": "Roku",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/roku",
+    "show": 0,
+    "entries": 1
+  },
+  "FGF": {
+    "value": 166,
+    "uname": "FGF",
+    "vname": "Samsung",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/samsung",
+    "show": 1,
+    "entries": 4
+  },
+  "FLL": {
+    "value": 167,
+    "uname": "FLL",
+    "vname": "Sonos",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/sonos",
+    "show": 1,
+    "entries": 2
+  },
+  "IVO": {
+    "value": 168,
+    "uname": "IVO",
+    "vname": "Windows",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/windows",
+    "show": 1,
+    "entries": 23
+  },
+  "ALQ": {
+    "value": 169,
+    "uname": "ALQ",
+    "vname": "Xiaomi",
+    "group": "privacy",
+    "subg": "native",
+    "url": "https://raw.githubusercontent.com/nextdns/metadata/master/privacy/native/xiaomi",
+    "show": 1,
+    "entries": 9
+  },
+  "FHM": {
+    "value": 170,
+    "uname": "FHM",
+    "vname": "OISD (full)",
+    "group": "privacy",
+    "subg": "rethinkdns-recommended",
+    "url": "https://dbl.oisd.nl/",
+    "show": 1,
+    "entries": 1009065
+  }
+}

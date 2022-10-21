@@ -32,9 +32,9 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.databinding.ActivityCustomIpBinding
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -48,7 +48,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
-                         SearchView.OnQueryTextListener {
+    SearchView.OnQueryTextListener {
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val b by viewBinding(ActivityCustomIpBinding::bind)
@@ -198,10 +198,14 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
     }
 
     private fun insertCustomIp(ip: HostName) {
-        IpRulesManager.addIpRule(UID_EVERYBODY, ip,
-                                 IpRulesManager.IpRuleStatus.BLOCK)
-        Utilities.showToastUiCentered(this, getString(R.string.ci_dialog_added_success),
-                                      Toast.LENGTH_SHORT)
+        IpRulesManager.addIpRule(
+            UID_EVERYBODY, ip,
+            IpRulesManager.IpRuleStatus.BLOCK
+        )
+        Utilities.showToastUiCentered(
+            this, getString(R.string.ci_dialog_added_success),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun showIpRulesDeleteDialog() {
@@ -210,8 +214,10 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
             IpRulesManager.clearAllIpRules()
-            Utilities.showToastUiCentered(this, getString(R.string.univ_ip_delete_toast_success),
-                                          Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(
+                this, getString(R.string.univ_ip_delete_toast_success),
+                Toast.LENGTH_SHORT
+            )
         }
 
         builder.setNegativeButton(getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->

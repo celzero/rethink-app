@@ -38,7 +38,7 @@ import java.io.*
 
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
-        Worker(context, workerParams), KoinComponent {
+    Worker(context, workerParams), KoinComponent {
 
     private val appDatabase by inject<AppDatabase>()
 
@@ -66,16 +66,22 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val tempDir = getTempDir(context)
             inputStream = context.contentResolver.openInputStream(importUri)
 
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                             "restore process, temp file dir: ${tempDir.path}")
+            if (DEBUG) Log.d(
+                LOG_TAG_BACKUP_RESTORE,
+                "restore process, temp file dir: ${tempDir.path}"
+            )
             // unzip the backup files to tempDir
             if (!unzip(inputStream, tempDir.path)) {
-                Log.w(LOG_TAG_BACKUP_RESTORE,
-                      "failed to unzip the uri to temp dir $importUri, ${tempDir.path}, return failure")
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "failed to unzip the uri to temp dir $importUri, ${tempDir.path}, return failure"
+                )
                 return false
             } else {
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                                 "restore process, unzipped the files to temp dir")
+                if (DEBUG) Log.d(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "restore process, unzipped the files to temp dir"
+                )
                 // proceed
             }
 
@@ -101,8 +107,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
             // open the database if its not open
             if (!appDatabase.isOpen) {
-                Log.i(LOG_TAG_BACKUP_RESTORE,
-                      "database is not open, perform writableDatabase operation")
+                Log.i(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "database is not open, perform writableDatabase operation"
+                )
                 appDatabase.openHelper.writableDatabase
                 //appDatabase.rebuildDatabase(context)
             } else {
@@ -111,8 +119,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
             return true
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BACKUP_RESTORE, "exception during restore process, reason? ${e.message}",
-                  e)
+            Log.e(
+                LOG_TAG_BACKUP_RESTORE, "exception during restore process, reason? ${e.message}",
+                e
+            )
             return false
         } finally {
             inputStream?.close()
@@ -124,8 +134,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     private fun restoreDatabaseFile(tempDir: File): Boolean {
         checkPoint()
 
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                         "begin restore database to temp dir: ${tempDir.path}")
+        if (DEBUG) Log.d(
+            LOG_TAG_BACKUP_RESTORE,
+            "begin restore database to temp dir: ${tempDir.path}"
+        )
 
         val files = tempDir.listFiles()
         if (files == null) {
@@ -133,15 +145,21 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             return false
         }
 
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                         "List of files in backup folder: ${files.size}, path: ${tempDir.path}")
+        if (DEBUG) Log.d(
+            LOG_TAG_BACKUP_RESTORE,
+            "List of files in backup folder: ${files.size}, path: ${tempDir.path}"
+        )
         for (file in files) {
             val currentDbFile = File(context.getDatabasePath(file.name).path)
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                             "db file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}")
+            if (DEBUG) Log.d(
+                LOG_TAG_BACKUP_RESTORE,
+                "db file: ${file.name} backed up from ${file.path} to ${currentDbFile.path}"
+            )
             if (!Utilities.copy(file.path, currentDbFile.path)) {
-                Log.w(LOG_TAG_BACKUP_RESTORE,
-                      "restore process, failure copying database file: ${file.path} to ${currentDbFile.path}")
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "restore process, failure copying database file: ${file.path} to ${currentDbFile.path}"
+                )
                 return false
             }
         }
@@ -160,8 +178,10 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         var input: ObjectInputStream? = null
         context.filesDir
         val prefsBackupFile = File(tempDirectory, SHARED_PREFS_BACKUP_FILE_NAME)
-        val currentSharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(
-            context)
+        val currentSharedPreferences: SharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(
+                context
+            )
 
         if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "shared pref file path: ${prefsBackupFile.path}")
         try {
@@ -181,12 +201,16 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 else if (v is String) prefsEditor.putString(key, v as String?)
             }
             prefsEditor.apply()
-            Log.i(LOG_TAG_BACKUP_RESTORE,
-                  "completed restore of shared pref values, ${pref.entries}")
+            Log.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "completed restore of shared pref values, ${pref.entries}"
+            )
             return true
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BACKUP_RESTORE,
-                  "exception while restoring shared pref, reason? ${e.message}", e)
+            Log.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "exception while restoring shared pref, reason? ${e.message}", e
+            )
             return false
         } finally {
             deleteResidue(prefsBackupFile)

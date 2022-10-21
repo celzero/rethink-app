@@ -56,29 +56,39 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
 
                 // load the Rethink remote dns configure screen (default)
                 val rr = RethinkBlocklistFragment.newInstance()
-                var bundle = createBundle(RETHINK_BLOCKLIST_TYPE,
-                                          RethinkBlocklistManager.RethinkBlocklistType.REMOTE.ordinal)
+                var bundle = createBundle(
+                    RETHINK_BLOCKLIST_TYPE,
+                    RethinkBlocklistManager.RethinkBlocklistType.REMOTE.ordinal
+                )
                 bundle = updateBundle(bundle, RETHINK_BLOCKLIST_NAME, name)
                 rr.arguments = updateBundle(bundle, RETHINK_BLOCKLIST_STAMP, stamp)
-                supportFragmentManager.beginTransaction().replace(R.id.root_container, rr,
-                                                                  rr.javaClass.simpleName).commit()
+                supportFragmentManager.beginTransaction().replace(
+                    R.id.root_container, rr,
+                    rr.javaClass.simpleName
+                ).commit()
                 return
             }
             FragmentLoader.LOCAL.ordinal -> {
                 // load the local blocklist configure screen
                 val rl = RethinkBlocklistFragment.newInstance()
-                rl.arguments = createBundle(RETHINK_BLOCKLIST_TYPE,
-                                            RethinkBlocklistManager.RethinkBlocklistType.LOCAL.ordinal)
-                supportFragmentManager.beginTransaction().replace(R.id.root_container, rl,
-                                                                  rl.javaClass.simpleName).commit()
+                rl.arguments = createBundle(
+                    RETHINK_BLOCKLIST_TYPE,
+                    RethinkBlocklistManager.RethinkBlocklistType.LOCAL.ordinal
+                )
+                supportFragmentManager.beginTransaction().replace(
+                    R.id.root_container, rl,
+                    rl.javaClass.simpleName
+                ).commit()
                 return
             }
             FragmentLoader.DB_LIST.ordinal -> {
                 // load the list of already added rethink doh urls
                 val r = RethinkListFragment.newInstance()
                 r.arguments = createBundle(UID, Constants.MISSING_UID)
-                supportFragmentManager.beginTransaction().replace(R.id.root_container, r,
-                                                                  r.javaClass.simpleName).commit()
+                supportFragmentManager.beginTransaction().replace(
+                    R.id.root_container, r,
+                    r.javaClass.simpleName
+                ).commit()
                 return
             }
         }

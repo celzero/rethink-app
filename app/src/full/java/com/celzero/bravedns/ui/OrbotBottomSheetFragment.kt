@@ -34,10 +34,10 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.animation.Rotate3dAnimation
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
@@ -68,8 +68,10 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetOrbotBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -79,8 +81,10 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(
+        isDarkThemeOn(),
+        persistentState.theme
+    )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -214,11 +218,15 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 b.bsOrbotRadioSocks5.isChecked = true
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 if (isOrbotDns) {
-                    b.orbotStatus.text = getString(R.string.orbot_bs_status_1,
-                                                   getString(R.string.orbot_status_arg_3))
+                    b.orbotStatus.text = getString(
+                        R.string.orbot_bs_status_1,
+                        getString(R.string.orbot_status_arg_3)
+                    )
                 } else {
-                    b.orbotStatus.text = getString(R.string.orbot_bs_status_1,
-                                                   getString(R.string.orbot_status_arg_2))
+                    b.orbotStatus.text = getString(
+                        R.string.orbot_bs_status_1,
+                        getString(R.string.orbot_status_arg_2)
+                    )
                 }
             }
             AppConfig.ProxyType.HTTP.name -> {
@@ -231,11 +239,15 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 b.orbotIcon.setImageResource(R.drawable.orbot_enabled)
                 b.orbotStatus.text = getString(R.string.orbot_bs_status_3)
                 if (isOrbotDns) {
-                    b.orbotStatus.text = getString(R.string.orbot_bs_status_3,
-                                                   getString(R.string.orbot_status_arg_3))
+                    b.orbotStatus.text = getString(
+                        R.string.orbot_bs_status_3,
+                        getString(R.string.orbot_status_arg_3)
+                    )
                 } else {
-                    b.orbotStatus.text = getString(R.string.orbot_bs_status_3,
-                                                   getString(R.string.orbot_status_arg_2))
+                    b.orbotStatus.text = getString(
+                        R.string.orbot_bs_status_3,
+                        getString(R.string.orbot_status_arg_2)
+                    )
                 }
             }
             AppConfig.ProxyType.NONE.name -> {
@@ -373,9 +385,11 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
         } else {
-            Utilities.showToastUiCentered(requireContext(),
-                                          getString(R.string.settings_socks5_vpn_disabled_error),
-                                          Toast.LENGTH_LONG)
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.settings_socks5_vpn_disabled_error),
+                Toast.LENGTH_LONG
+            )
         }
     }
 
@@ -385,20 +399,29 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         builder.setCancelable(true)
         builder.setPositiveButton(
-            getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
+            getString(R.string.orbot_stop_dialog_positive)
+        ) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
-        builder.setNegativeButton(getString(
-            R.string.orbot_stop_dialog_negative)) { dialogInterface: DialogInterface, _: Int ->
+        builder.setNegativeButton(
+            getString(
+                R.string.orbot_stop_dialog_negative
+            )
+        ) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
             orbotHelper.openOrbotApp()
         }
         if (isOrbotDns) {
-            builder.setMessage(getString(R.string.orbot_stop_dialog_message_combo,
-                                         getString(R.string.orbot_stop_dialog_message),
-                                         getString(R.string.orbot_stop_dialog_dns_message)))
+            builder.setMessage(
+                getString(
+                    R.string.orbot_stop_dialog_message_combo,
+                    getString(R.string.orbot_stop_dialog_message),
+                    getString(R.string.orbot_stop_dialog_dns_message)
+                )
+            )
             builder.setNeutralButton(
-                getString(R.string.orbot_stop_dialog_neutral)) { dialogInterface, _ ->
+                getString(R.string.orbot_stop_dialog_neutral)
+            ) { dialogInterface, _ ->
                 dialogInterface.dismiss()
                 gotoDnsConfigureScreen()
             }
@@ -412,8 +435,10 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         this.dismiss()
         val intent = Intent(requireContext(), DnsDetailActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD,
-                        DnsDetailActivity.Tabs.CONFIGURE.screen)
+        intent.putExtra(
+            Constants.VIEW_PAGER_SCREEN_TO_LOAD,
+            DnsDetailActivity.Tabs.CONFIGURE.screen
+        )
         startActivity(intent)
     }
 

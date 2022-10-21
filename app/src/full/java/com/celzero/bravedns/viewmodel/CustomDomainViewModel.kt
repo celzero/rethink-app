@@ -16,44 +16,16 @@
 package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
-import androidx.paging.liveData
 import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.database.CustomDomainDAO
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
-class CustomDomainViewModel(private val customDomainDAO: CustomDomainDAO) : ViewModel() {
+class CustomDomainViewModel : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
     private var status: DomainRulesManager.DomainStatus = DomainRulesManager.DomainStatus.NONE
 
     init {
         filteredList.value = ""
-    }
-
-    val customDomainList = Transformations.switchMap(filteredList) { input ->
-        when (status) {
-            DomainRulesManager.DomainStatus.NONE -> {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    customDomainDAO.getAllDomainsLiveData("%$input%")
-                }.liveData.cachedIn(viewModelScope)
-            }
-            DomainRulesManager.DomainStatus.WHITELIST -> {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    customDomainDAO.getWhitelistedDomains("%$input%", status.id)
-                }.liveData.cachedIn(viewModelScope)
-            }
-            DomainRulesManager.DomainStatus.BLOCK -> {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    customDomainDAO.getBlockedDomains("%$input%", status.id)
-                }.liveData.cachedIn(viewModelScope)
-            }
-        }
     }
 
     fun setFilter(filter: String, status: DomainRulesManager.DomainStatus) {

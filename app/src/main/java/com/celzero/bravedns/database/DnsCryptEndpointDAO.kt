@@ -39,7 +39,8 @@ interface DnsCryptEndpointDAO {
 
     @Transaction
     @Query(
-        "select * from DNSCryptEndpoint where dnsCryptURL like :query or dnsCryptName like :query order by isSelected desc")
+        "select * from DNSCryptEndpoint where dnsCryptURL like :query or dnsCryptName like :query order by isSelected desc"
+    )
     fun getDNSCryptEndpointLiveDataByName(query: String): PagingSource<Int, DnsCryptEndpoint>
 
     @Query("delete from DNSCryptEndpoint where modifiedDataTime < :date")

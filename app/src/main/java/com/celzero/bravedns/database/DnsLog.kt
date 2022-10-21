@@ -28,7 +28,8 @@ import java.util.*
 @Entity(tableName = "DNSLogs")
 class DnsLog {
 
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
     var queryStr: String = ""
     var time: Long = INIT_TIME_MS
     var flag: String = ""

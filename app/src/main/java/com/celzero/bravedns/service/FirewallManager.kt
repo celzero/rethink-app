@@ -19,13 +19,13 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.OrbotHelper
@@ -57,8 +57,11 @@ object FirewallManager : KoinComponent {
     private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
 
     val ipDomainLookup: Cache<String, DnsCacheRecord> = CacheBuilder.newBuilder().maximumSize(
-        CACHE_BUILDER_MAX_SIZE).expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_HRS,
-                                                 TimeUnit.HOURS).build()
+        CACHE_BUILDER_MAX_SIZE
+    ).expireAfterWrite(
+        CACHE_BUILDER_WRITE_EXPIRE_HRS,
+        TimeUnit.HOURS
+    ).build()
 
     // Below are the firewall rule set
     // app-status | connection-status |  Rule
@@ -156,16 +159,8 @@ object FirewallManager : KoinComponent {
             return this == BYPASS_UNIVERSAL
         }
 
-        fun excluded(): Boolean {
-            return this == EXCLUDE
-        }
-
         fun lockdown(): Boolean {
             return this == LOCKDOWN
-        }
-
-        fun allowed(): Boolean {
-            return this == ALLOW
         }
 
         fun blocked(): Boolean {
@@ -229,21 +224,6 @@ object FirewallManager : KoinComponent {
         OTHER(R.string.category_name_others),
         NON_APP(R.string.category_name_non_app_sys),
         INSTALLED(R.string.category_name_installed);
-
-        companion object {
-            fun isSystemComponent(context: Context, name: String): Boolean {
-                return context.getString(SYSTEM_COMPONENT.nameResId) == name
-            }
-
-            fun isAnySystemCategory(context: Context, name: String): Boolean {
-                return context.getString(SYSTEM_COMPONENT.nameResId) == name || context.getString(
-                    SYSTEM_APP.nameResId) == name || context.getString(NON_APP.nameResId) == name
-            }
-
-            fun isNonApp(context: Context, name: String): Boolean {
-                return context.getString(NON_APP.nameResId) == name
-            }
-        }
     }
 
     object GlobalVariable {
@@ -251,25 +231,19 @@ object FirewallManager : KoinComponent {
         var appInfos: Multimap<Int, AppInfo> = HashMultimap.create()
 
         // TODO: protect access to the foregroundUids (read/write)
-        @Volatile var foregroundUids: HashSet<Int> = HashSet()
+        @Volatile
+        var foregroundUids: HashSet<Int> = HashSet()
 
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
     }
 
     data class AppInfoTuple(val uid: Int, var packageName: String)
 
-    @Volatile private var isFirewallRulesLoaded: Boolean = false
+    @Volatile
+    private var isFirewallRulesLoaded: Boolean = false
 
     fun isUidFirewalled(uid: Int): Boolean {
         return appStatus(uid) == FirewallStatus.BLOCK
-    }
-
-    fun isUidWhitelisted(uid: Int): Boolean {
-        return appStatus(uid) == FirewallStatus.BYPASS_UNIVERSAL
-    }
-
-    fun isUidExcluded(uid: Int): Boolean {
-        return appStatus(uid) == FirewallStatus.EXCLUDE
     }
 
     fun isUidSystemApp(uid: Int): Boolean {
@@ -288,7 +262,8 @@ object FirewallManager : KoinComponent {
         lock.write {
             packagesToDelete.forEach { tuple ->
                 appInfos.get(
-                    tuple.uid).filter { tuple.packageName == it.packageInfo }.forEach { ai ->
+                    tuple.uid
+                ).filter { tuple.packageName == it.packageInfo }.forEach { ai ->
                     appInfos.remove(tuple.uid, ai)
                 }
             }
@@ -344,7 +319,8 @@ object FirewallManager : KoinComponent {
     }
 
     fun getExcludedApps(): MutableSet<String> {
-        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }.map { it.packageInfo }.toMutableSet()
+        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
+            .map { it.packageInfo }.toMutableSet()
     }
 
     fun getPackageNameByAppName(appName: String): String? {
@@ -405,8 +381,9 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private fun invalidateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
-                                         connectionStatus: ConnectionStatus
+    private fun invalidateFirewallStatus(
+        uid: Int, firewallStatus: FirewallStatus,
+        connectionStatus: ConnectionStatus
     ) {
         lock.write {
             appInfos.get(uid).forEach {
@@ -417,7 +394,7 @@ object FirewallManager : KoinComponent {
         informObservers()
     }
 
-    suspend fun persistAppInfo(appInfo: AppInfo) {
+    fun persistAppInfo(appInfo: AppInfo) {
         appInfoRepository.insert(appInfo)
 
         lock.write {
@@ -426,7 +403,7 @@ object FirewallManager : KoinComponent {
         informObservers()
     }
 
-    suspend fun reloadAppList() {
+    fun reloadAppList() {
         val apps = appInfoRepository.getAppInfo()
         if (apps.isEmpty()) {
             Log.w(LOG_TAG_FIREWALL, "no apps found in db, no app-based rules to load")
@@ -445,8 +422,10 @@ object FirewallManager : KoinComponent {
     }
 
     fun untrackForegroundApps() {
-        Log.i(LOG_TAG_FIREWALL,
-              "launcher in the foreground, clear foreground uids: $foregroundUids")
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "launcher in the foreground, clear foreground uids: $foregroundUids"
+        )
         foregroundUids.clear()
     }
 
@@ -474,23 +453,31 @@ object FirewallManager : KoinComponent {
         // should be blocked.
         val locked = keyguardManager?.isKeyguardLocked == false
         val isForeground = foregroundUids.contains(uid)
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground")
+        if (DEBUG) Log.d(
+            LOG_TAG_FIREWALL,
+            "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground"
+        )
         return locked && isForeground
     }
 
     fun updateFirewalledApps(uid: Int, firewallStatus: FirewallStatus) {
         io {
             invalidateFirewallStatus(uid, firewallStatus, ConnectionStatus.BOTH)
-            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id,
-                                                        ConnectionStatus.BOTH.id)
+            appInfoRepository.updateFirewallStatusByUid(
+                uid, firewallStatus.id,
+                ConnectionStatus.BOTH.id
+            )
         }
     }
 
-    fun updateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
-                             connectionStatus: ConnectionStatus) {
-        Log.i(LOG_TAG_FIREWALL,
-              "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}")
+    fun updateFirewallStatus(
+        uid: Int, firewallStatus: FirewallStatus,
+        connectionStatus: ConnectionStatus
+    ) {
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}"
+        )
         io {
             invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
             appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)

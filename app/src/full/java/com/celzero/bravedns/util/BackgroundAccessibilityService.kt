@@ -18,13 +18,15 @@ package com.celzero.bravedns.util
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.ResolveInfoFlags
+import android.os.Build
 import android.text.TextUtils
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
@@ -39,10 +41,6 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
 
     override fun onRebind(intent: Intent?) {
         super.onRebind(intent)
-    }
-
-    override fun onServiceConnected() {
-        super.onServiceConnected()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -120,13 +118,16 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
 
         if (latestTrackedPackage.isNullOrEmpty()) return
 
-        val hasContentChanged = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED || event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        } else {
-            event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        }
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged")
+        val hasContentChanged =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED || event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+            } else {
+                event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+            }
+        if (DEBUG) Log.d(
+            LOG_TAG_FIREWALL,
+            "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged"
+        )
 
         if (!hasContentChanged) return
 
@@ -176,8 +177,17 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         val intent = Intent("android.intent.action.MAIN")
         intent.addCategory("android.intent.category.HOME")
         // package manager returns null,
-        val thisPackage = this.packageManager.resolveActivity(intent,
-                                                              PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
+        val thisPackage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this.packageManager.resolveActivity(
+                intent,
+                ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong())
+            )?.activityInfo?.packageName
+        } else {
+            this.packageManager.resolveActivity(
+                intent,
+                PackageManager.MATCH_DEFAULT_ONLY
+            )?.activityInfo?.packageName
+        }
         return thisPackage == packageName
     }
 

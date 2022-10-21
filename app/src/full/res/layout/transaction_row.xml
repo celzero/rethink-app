@@ -20,9 +20,9 @@
         <TextView
             android:id="@+id/query_log_indicator"
             android:layout_width="2dp"
-            android:layout_marginStart="5dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
+            android:layout_marginStart="5dp"
             android:layout_weight="0"
             android:background="?attr/accentBad"
             android:visibility="invisible"

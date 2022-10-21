@@ -25,8 +25,8 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.databinding.BottomSheetFirewallSortFilterBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -43,11 +43,15 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     private val persistentState by inject<PersistentState>()
     private val sortValues = FirewallAppFragment.Filters()
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(
+        isDarkThemeOn(),
+        persistentState.theme
+    )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetFirewallSortFilterBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -85,8 +89,10 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setFilter(topLevelFilter: FirewallAppFragment.TopLevelFilter,
-                          categories: MutableSet<String>) {
+    private fun setFilter(
+        topLevelFilter: FirewallAppFragment.TopLevelFilter,
+        categories: MutableSet<String>
+    ) {
         val topView: Chip = b.ffaParentChipGroup.findViewWithTag(topLevelFilter.id) ?: return
         b.ffaParentChipGroup.check(topView.id)
         colorUpChipIcon(topView)
@@ -109,12 +115,18 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     private fun remakeParentFilterChipsUi() {
         b.ffaParentChipGroup.removeAllViews()
 
-        val all = makeParentChip(FirewallAppFragment.TopLevelFilter.ALL.id,
-                                 getString(R.string.fapps_filter_parent_all), true)
-        val allowed = makeParentChip(FirewallAppFragment.TopLevelFilter.INSTALLED.id,
-                                     getString(R.string.fapps_filter_parent_installed), false)
-        val blocked = makeParentChip(FirewallAppFragment.TopLevelFilter.SYSTEM.id,
-                                     getString(R.string.fapps_filter_parent_system), false)
+        val all = makeParentChip(
+            FirewallAppFragment.TopLevelFilter.ALL.id,
+            getString(R.string.fapps_filter_parent_all), true
+        )
+        val allowed = makeParentChip(
+            FirewallAppFragment.TopLevelFilter.INSTALLED.id,
+            getString(R.string.fapps_filter_parent_installed), false
+        )
+        val blocked = makeParentChip(
+            FirewallAppFragment.TopLevelFilter.SYSTEM.id,
+            getString(R.string.fapps_filter_parent_system), false
+        )
 
         b.ffaParentChipGroup.addView(all)
         b.ffaParentChipGroup.addView(allowed)
@@ -142,7 +154,8 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun colorUpChipIcon(chip: Chip) {
         val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN
+        )
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
     }

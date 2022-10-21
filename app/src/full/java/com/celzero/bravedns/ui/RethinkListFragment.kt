@@ -85,8 +85,10 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         var modifiedStamp: MutableLiveData<ModifiedStamp?> = MutableLiveData()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val bundle = this.arguments
         uid = bundle?.getInt(UID, Constants.MISSING_UID) ?: Constants.MISSING_UID
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -119,17 +121,23 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             return
         }
 
-        b.lbVersion.text = getString(R.string.settings_local_blocklist_version,
-                                     Utilities.convertLongToTime(getDownloadTimeStamp(),
-                                                                 Constants.TIME_FORMAT_2))
+        b.lbVersion.text = getString(
+            R.string.settings_local_blocklist_version,
+            Utilities.convertLongToTime(
+                getDownloadTimeStamp(),
+                Constants.TIME_FORMAT_2
+            )
+        )
     }
 
     private fun showProgress(chip: Chip) {
         val cpDrawable = CircularProgressDrawable(requireContext())
         cpDrawable.setStyle(CircularProgressDrawable.DEFAULT)
         val color = fetchColor(requireContext(), R.attr.chipTextPositive)
-        cpDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color,
-                                                                                             BlendModeCompat.SRC_ATOP)
+        cpDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+            color,
+            BlendModeCompat.SRC_ATOP
+        )
         cpDrawable.start()
 
         chip.chipIcon = cpDrawable
@@ -163,7 +171,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private fun checkBlocklistUpdate() {
         appDownloadManager.isDownloadRequired(
             RethinkBlocklistManager.DownloadType.REMOTE,
-                                              retryCount = 0)
+            retryCount = 0
+        )
     }
 
     private fun getDownloadTimeStamp(): Long {
@@ -201,8 +210,10 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             emptyTempStampInfo()
 
             val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
-            intent.putExtra(RETHINK_BLOCKLIST_TYPE,
-                            RethinkBlocklistManager.RethinkBlocklistType.REMOTE)
+            intent.putExtra(
+                RETHINK_BLOCKLIST_TYPE,
+                RethinkBlocklistManager.RethinkBlocklistType.REMOTE
+            )
             requireContext().startActivity(intent)
         }
 
@@ -224,9 +235,11 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                 download(timestamp)
             } else {
                 showUpdateCheckUi()
-                Utilities.showToastUiCentered(requireContext(),
-                                              getString(R.string.blocklist_update_check_failure),
-                                              Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.blocklist_update_check_failure),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 
@@ -314,8 +327,10 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         dialogBinding.dialogCustomUrlConfigureBtn.visibility = View.GONE
         dialogBinding.dialogCustomUrlEditText.append(getRethinkBaseUrl() + stamp)
 
-        dialogBinding.dialogCustomNameEditText.setText(getString(R.string.rt_rethink_dns),
-                                                       TextView.BufferType.EDITABLE)
+        dialogBinding.dialogCustomNameEditText.setText(
+            getString(R.string.rt_rethink_dns),
+            TextView.BufferType.EDITABLE
+        )
 
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
@@ -336,7 +351,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                 dialog.dismiss()
             } else {
                 dialogBinding.dialogCustomUrlFailureText.text = resources.getString(
-                    R.string.custom_url_error_invalid_url)
+                    R.string.custom_url_error_invalid_url
+                )
                 dialogBinding.dialogCustomUrlFailureText.visibility = View.VISIBLE
                 dialogBinding.dialogCustomUrlCancelBtn.visibility = View.VISIBLE
                 dialogBinding.dialogCustomUrlOkBtn.visibility = View.VISIBLE
@@ -364,8 +380,11 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                 ui {
                     hideProgress()
                     onRemoteDownloadFailure()
-                    Utilities.showToastUiCentered(requireContext(), getString(
-                        R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(
+                        requireContext(), getString(
+                            R.string.blocklist_update_check_failure
+                        ), Toast.LENGTH_SHORT
+                    )
                     requireActivity().finish()
                 }
                 return@observe
@@ -386,10 +405,13 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                 }
                 // reset live-data value to initial state, as previous state is completed
                 appDownloadManager.remoteDownloadStatus.postValue(
-                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id)
+                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id
+                )
             }
-            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "Remote blocklist, Is download successful? $it(timestamp/status)")
+            Log.i(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "Remote blocklist, Is download successful? $it(timestamp/status)"
+            )
         }
 
         appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
@@ -402,8 +424,11 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             }
             if (it == AppDownloadManager.DownloadManagerStatus.FAILURE.id) {
                 ui {
-                    Utilities.showToastUiCentered(requireContext(), getString(
-                        R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(
+                        requireContext(), getString(
+                            R.string.blocklist_update_check_failure
+                        ), Toast.LENGTH_SHORT
+                    )
                 }
                 return@observe
             }
@@ -411,8 +436,11 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED.id) {
                 ui {
                     showRedownloadUi()
-                    Utilities.showToastUiCentered(requireContext(), getString(
-                        R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(
+                        requireContext(), getString(
+                            R.string.blocklist_update_check_not_required
+                        ), Toast.LENGTH_SHORT
+                    )
                 }
                 return@observe
             }
@@ -470,14 +498,20 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun onDownloadSuccess() {
         isDownloadInitiated = false
-        b.lbVersion.text = getString(R.string.settings_local_blocklist_version,
-                                     Utilities.convertLongToTime(getDownloadTimeStamp(),
-                                                                 Constants.TIME_FORMAT_2))
+        b.lbVersion.text = getString(
+            R.string.settings_local_blocklist_version,
+            Utilities.convertLongToTime(
+                getDownloadTimeStamp(),
+                Constants.TIME_FORMAT_2
+            )
+        )
         enableChips()
         showRedownloadUi()
-        Utilities.showToastUiCentered(requireContext(),
-                                      getString(R.string.download_update_dialog_message_success),
-                                      Toast.LENGTH_SHORT)
+        Utilities.showToastUiCentered(
+            requireContext(),
+            getString(R.string.download_update_dialog_message_success),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun emptyTempStampInfo() {
@@ -491,9 +525,11 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             if (name.isBlank()) {
                 dohName = url
             }
-            val endpoint = RethinkDnsEndpoint(dohName, url, uid = Constants.MISSING_UID, desc = "",
-                                              isActive = false, isCustom = true, latency = 0, count,
-                                              modifiedDataTime = Constants.INIT_TIME_MS)
+            val endpoint = RethinkDnsEndpoint(
+                dohName, url, uid = Constants.MISSING_UID, desc = "",
+                isActive = false, isCustom = true, latency = 0, count,
+                modifiedDataTime = INIT_TIME_MS
+            )
             appConfig.insertReplaceEndpoint(endpoint)
             endpoint.isActive = true
             appConfig.handleRethinkChanges(endpoint)

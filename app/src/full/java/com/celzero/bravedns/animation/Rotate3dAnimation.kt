@@ -42,9 +42,11 @@ class Rotate3dAnimation
  * @param mCenterY the Y center of the 3D rotation
  * @param mReverse true if the translation should be reversed, false otherwise
  */
-    (private val mFromDegrees: Float, private val mToDegrees: Float, private val mCenterX: Float,
-     private val mCenterY: Float, private val mDepthZ: Float, private val mReverse: Boolean) :
-        Animation() {
+    (
+    private val mFromDegrees: Float, private val mToDegrees: Float, private val mCenterX: Float,
+    private val mCenterY: Float, private val mDepthZ: Float, private val mReverse: Boolean
+) :
+    Animation() {
     private lateinit var mCamera: Camera
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
         super.initialize(width, height, parentWidth, parentHeight)

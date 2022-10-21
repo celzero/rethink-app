@@ -89,8 +89,10 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     private fun observeDnsStats() {
         persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
             val lifeTimeConversion = formatDecimal(it)
-            includeView.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
-                                                         lifeTimeConversion)
+            includeView.totalQueriesTxt.text = getString(
+                R.string.dns_logs_lifetime_queries,
+                lifeTimeConversion
+            )
         }
 
         persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner) {
@@ -102,8 +104,10 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
 
     private fun formatDecimal(i: Long?): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            CompactDecimalFormat.getInstance(Locale.US,
-                                             CompactDecimalFormat.CompactStyle.SHORT).format(i)
+            CompactDecimalFormat.getInstance(
+                Locale.US,
+                CompactDecimalFormat.CompactStyle.SHORT
+            ).format(i)
         } else {
             i.toString()
         }
@@ -173,10 +177,14 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
         includeView.filterChipGroup.removeAllViews()
 
         val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.dns_filter_parent_all), true)
-        val allowed = makeChip(DnsLogFilter.ALLOWED.id,
-                               getString(R.string.dns_filter_parent_allowed), false)
-        val blocked = makeChip(ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
-                               getString(R.string.dns_filter_parent_blocked), false)
+        val allowed = makeChip(
+            DnsLogFilter.ALLOWED.id,
+            getString(R.string.dns_filter_parent_allowed), false
+        )
+        val blocked = makeChip(
+            ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
+            getString(R.string.dns_filter_parent_blocked), false
+        )
 
         includeView.filterChipGroup.addView(all)
         includeView.filterChipGroup.addView(allowed)

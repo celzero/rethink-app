@@ -44,12 +44,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
         // const val APP_STATE = "app_state"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
-
-        fun expandUrl(context: Context, url: String?): String {
-            return if (url == null || url.isEmpty()) {
-                context.resources.getStringArray(R.array.doh_endpoint_names)[3]
-            } else url
-        }
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -69,7 +63,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // the last-set app version; useful to detect an update where the current
     // app version is going to be greater than the one stored, and so, update flow
     // can be triggered accordingly, if any,
-    var appVersion by intPref("app_version").withDefault<Int>(0)
+    var appVersion by longPref("app_version").withDefault<Long>(0)
 
     // Last known time when app update checks were done (successful?)
     var lastAppUpdateCheck by longPref("app_update_last_check").withDefault<Long>(0)
@@ -82,24 +76,29 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // whether all udp connection except dns must be dropped
     var udpBlockedSettings by booleanPref("block_udp_traffic_other_than_dns").withDefault<Boolean>(
-        false)
+        false
+    )
 
     // user chosen blocklists stored custom dictionary indexed in base64
     var localBlocklistStamp by stringPref("local_block_list_stamp").withDefault<String>(
         if (Utilities.isHeadlessFlavour()) "1:0B__A___-v-gHTaQgADkAgAo"
-            else "")
+        else ""
+    )
 
     // whether to drop packets when the source app originating the reqs couldn't be determined
     var blockUnknownConnections by booleanPref("block_unknown_connections").withDefault<Boolean>(
-        false)
+        false
+    )
 
     // whether user has enable on-device blocklists
     var blocklistEnabled by booleanPref("enable_local_list").withDefault<Boolean>(
-        Utilities.isHeadlessFlavour())
+        Utilities.isHeadlessFlavour()
+    )
 
     // the version (which is a unix timestamp) of the current rethinkdns+ remote blocklist files
     var remoteBlocklistTimestamp by longPref("remote_block_list_downloaded_time").withDefault<Long>(
-        INIT_TIME_MS)
+        INIT_TIME_MS
+    )
 
     // the version (which is a unix timestamp) of the current on-device blocklist files
     var localBlocklistTimestamp by longPref("local_block_list_downloaded_time")
@@ -114,20 +113,20 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     // default: false for fdroid flavour
     var allowBypass by booleanPref("allow_bypass").withDefault<Boolean>(
-        !Utilities.isFdroidFlavour())
+        !Utilities.isFdroidFlavour()
+    )
 
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
-    var dnsType by intPref("dns_type").withDefault<Int>(if (!Utilities.isHeadlessFlavour())
-        AppConfig.DnsType.RETHINK_REMOTE.type else AppConfig.DnsType.NETWORK_DNS.type)
+    var dnsType by intPref("dns_type").withDefault<Int>(
+        if (!Utilities.isHeadlessFlavour())
+            AppConfig.DnsType.RETHINK_REMOTE.type else AppConfig.DnsType.NETWORK_DNS.type
+    )
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot").withDefault<Boolean>(true)
 
     // user set preference whether firewall should block all connections when device is locked
     var blockWhenDeviceLocked by booleanPref("screen_state").withDefault<Boolean>(false)
-
-    var oldNumberRequests by intPref("number_request").withDefault<Int>(0)
-    var oldBlockedRequests by intPref("blocked_request").withDefault<Int>(0)
 
     // total dns requests the app has served since installation (or post clear data)
     var numberOfRequests by longPref("dns_number_request").withDefault<Long>(0)
@@ -143,7 +142,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // last connected dns label name
     var connectedDnsName by stringPref("connected_dns_name").withDefault<String>(
-        context.getString(R.string.default_dns_name))
+        context.getString(R.string.default_dns_name)
+    )
 
     // the current light/dark theme; 0's the default which is "Set by System"
     var theme by intPref("app_theme").withDefault<Int>(0)
@@ -156,11 +156,13 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user selected proxy type (e.g., http, socks5)
     var proxyType by stringPref("proxy_proxytype").withDefault<String>(
-        AppConfig.ProxyType.NONE.name)
+        AppConfig.ProxyType.NONE.name
+    )
 
     // user selected proxy provider, as of now two providers (custom, orbot)
     var proxyProvider by stringPref("proxy_proxyprovider").withDefault<String>(
-        AppConfig.ProxyProvider.NONE.name)
+        AppConfig.ProxyProvider.NONE.name
+    )
 
     // total dnscrypt server currently connected to
     private var _dnsCryptRelayCount by intPref("dnscrypt_relay").withDefault<Int>(0)
@@ -170,7 +172,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // fetch fav icons for domains in dns request
     var fetchFavIcon by booleanPref("fav_icon_enabled").withDefault<Boolean>(
-        !Utilities.isFdroidFlavour())
+        !Utilities.isFdroidFlavour()
+    )
 
     // whether to show "what's new" chip on the homescreen, usually
     // shown after a update and until the user dismisses it
@@ -187,27 +190,33 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user setting to use custom download manager or android's default download manager
     var useCustomDownloadManager by booleanPref("use_custom_download_managet").withDefault<Boolean>(
-        true)
+        true
+    )
 
     // custom download manager's last generated id
     var customDownloaderLastGeneratedId by longPref(
-        "custom_downloader_last_generated_id").withDefault<Long>(0)
+        "custom_downloader_last_generated_id"
+    ).withDefault<Long>(0)
 
     // local timestamp for which the update is available
     var newestLocalBlocklistTimestamp by longPref("local_blocklist_update_ts").withDefault<Long>(
-        INIT_TIME_MS)
+        INIT_TIME_MS
+    )
 
     // remote timestamp for which the update is available
     var newestRemoteBlocklistTimestamp by longPref("remote_blocklist_update_ts").withDefault<Long>(
-        INIT_TIME_MS)
+        INIT_TIME_MS
+    )
 
     // auto-check for blocklist update periodically (once in a day)
     var periodicallyCheckBlocklistUpdate by booleanPref(
-        "check_blocklist_update").withDefault<Boolean>(false)
+        "check_blocklist_update"
+    ).withDefault<Boolean>(false)
 
     // user-preferred Internet Protocol type, default IPv4
     var internetProtocolType by intPref(INTERNET_PROTOCOL).withDefault<Int>(
-        if (Utilities.isHeadlessFlavour()) InternetProtocol.IPv46.id else InternetProtocol.IPv4.id)
+        if (Utilities.isHeadlessFlavour()) InternetProtocol.IPv46.id else InternetProtocol.IPv4.id
+    )
 
     // user-preferred 6to4 protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION).withDefault<Boolean>(false)
@@ -220,7 +229,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // universal firewall settings to block all metered connections
     var blockMeteredConnections by booleanPref("block_metered_connections").withDefault<Boolean>(
-        false)
+        false
+    )
 
     // universal firewall settings to lockdown all apps
     var universalLockdown by booleanPref("universal_lockdown").withDefault<Boolean>(false)
@@ -239,10 +249,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     fun setDnsCryptRelayCount(count: Int) {
         _dnsCryptRelayCount = count
-    }
-
-    fun getDnsCryptRelayCount(): Int {
-        return _dnsCryptRelayCount
     }
 
     fun setVpnEnabled(isOn: Boolean) {

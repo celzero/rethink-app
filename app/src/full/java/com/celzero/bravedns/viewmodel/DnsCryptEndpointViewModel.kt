@@ -27,7 +27,7 @@ import com.celzero.bravedns.database.DnsCryptEndpointDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DnsCryptEndpointViewModel(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) :
-        ViewModel() {
+    ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
 

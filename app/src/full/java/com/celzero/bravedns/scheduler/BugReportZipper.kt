@@ -166,7 +166,7 @@ object BugReportZipper {
         }
     }
 
-    fun writeTrace(file: File, inputStream: InputStream?) {
+    private fun writeTrace(file: File, inputStream: InputStream?) {
         if (inputStream == null) return
 
         FileOutputStream(file, true).use { outputStream ->
@@ -176,9 +176,10 @@ object BugReportZipper {
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun write(it: ApplicationExitInfo, file: File) {
-        val reportDetails = "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
-            Utilities.convertLongToTime(it.timestamp, Constants.TIME_FORMAT_3)
-        }\n"
+        val reportDetails =
+            "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
+                Utilities.convertLongToTime(it.timestamp, Constants.TIME_FORMAT_3)
+            }\n"
         file.appendText(reportDetails)
 
         // capture traces for ANR exit-infos

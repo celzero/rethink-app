@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit
  * Else, the Result.retry() will be triggered to check again.
  */
 class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) :
-        Worker(context, workerParameters), KoinComponent {
+    Worker(context, workerParameters), KoinComponent {
 
     companion object {
         // Maximum time out for the DownloadManager to wait for download of local blocklist.
@@ -85,7 +85,8 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
             val query = DownloadManager.Query()
             query.setFilterById(downloadID)
             val downloadManager = context.getSystemService(
-                Context.DOWNLOAD_SERVICE) as DownloadManager
+                Context.DOWNLOAD_SERVICE
+            ) as DownloadManager
             val cursor = downloadManager.query(query)
             if (cursor == null) {
                 Log.i(LOG_TAG_DOWNLOAD, "status is $downloadID cursor null")
@@ -102,9 +103,12 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                         downloadIdsIterator.remove()
                     } else if (status == DownloadManager.STATUS_FAILED) {
                         val reason = cursor.getInt(
-                            cursor.getColumnIndex(DownloadManager.COLUMN_REASON))
-                        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                         "download status failure for $downloadID, $reason")
+                            cursor.getColumnIndex(DownloadManager.COLUMN_REASON)
+                        )
+                        if (DEBUG) Log.d(
+                            LOG_TAG_DOWNLOAD,
+                            "download status failure for $downloadID, $reason"
+                        )
                         return DOWNLOAD_FAILURE
                     }
                 } else {

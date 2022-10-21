@@ -31,8 +31,8 @@
                 android:id="@+id/info_rules_dialog_rules_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_margin="5dp"
                 android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:visibility="gone" />
 
@@ -42,8 +42,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@string/firewall_rules"
                 android:drawablePadding="15dp"
+                android:text="@string/firewall_rules"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/heading_font_text_view" />

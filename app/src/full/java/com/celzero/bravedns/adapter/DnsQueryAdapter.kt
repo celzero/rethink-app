@@ -34,28 +34,32 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.DnsBlocklistBottomSheetFragment
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.google.gson.Gson
 
 class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
-        PagingDataAdapter<DnsLog, DnsQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
+    PagingDataAdapter<DnsLog, DnsQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         const val TYPE_TRANSACTION: Int = 1
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DnsLog>() {
 
-            override fun areItemsTheSame(oldConnection: DnsLog,
-                                         newConnection: DnsLog) = oldConnection.id == newConnection.id
+            override fun areItemsTheSame(
+                oldConnection: DnsLog,
+                newConnection: DnsLog
+            ) = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: DnsLog,
-                                            newConnection: DnsLog) = oldConnection == newConnection
+            override fun areContentsTheSame(
+                oldConnection: DnsLog,
+                newConnection: DnsLog
+            ) = oldConnection == newConnection
         }
     }
 
@@ -71,13 +75,15 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
-        val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent,
-                                                        false)
+        val itemBinding = TransactionRowBinding.inflate(
+            LayoutInflater.from(parent.context), parent,
+            false
+        )
         return TransactionViewHolder(itemBinding)
     }
 
     inner class TransactionViewHolder(private val b: TransactionRowBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
         fun update(dnsLog: DnsLog?) {
             if (dnsLog == null) return
 
@@ -127,21 +133,27 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             b.responseTime.text = dnsLog.wallTime()
             b.fqdn.text = dnsLog.queryStr
 
-            b.latencyVal.text = context.getString(R.string.dns_query_latency,
-                                                  dnsLog.latency.toString())
+            b.latencyVal.text = context.getString(
+                R.string.dns_query_latency,
+                dnsLog.latency.toString()
+            )
         }
 
         private fun openBottomSheet(dnsLog: DnsLog) {
             if (context !is FragmentActivity) {
-                Log.wtf(LoggerConstants.LOG_TAG_UI,
-                        "Can not open bottom sheet. Context is not attached to activity")
+                Log.wtf(
+                    LoggerConstants.LOG_TAG_UI,
+                    "Can not open bottom sheet. Context is not attached to activity"
+                )
                 return
             }
 
             val bottomSheetFragment = DnsBlocklistBottomSheetFragment()
             val bundle = Bundle()
-            bundle.putString(DnsBlocklistBottomSheetFragment.INSTANCE_STATE_DNSLOGS,
-                             Gson().toJson(dnsLog))
+            bundle.putString(
+                DnsBlocklistBottomSheetFragment.INSTANCE_STATE_DNSLOGS,
+                Gson().toJson(dnsLog)
+            )
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
@@ -157,19 +169,28 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                 GlideApp.with(context.applicationContext).load(url).onlyRetrieveFromCache(
-                    true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(SIZE_ORIGINAL,
-                                                                                  SIZE_ORIGINAL).error(
+                    true
+                ).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(
+                    SIZE_ORIGINAL,
+                    SIZE_ORIGINAL
+                ).error(
                     GlideApp.with(context.applicationContext).load(
-                        subDomainURL).onlyRetrieveFromCache(true)).transition(
-                    withCrossFade(factory)).into(object : CustomViewTarget<ImageView, Drawable>(
-                    b.favIcon) {
+                        subDomainURL
+                    ).onlyRetrieveFromCache(true)
+                ).transition(
+                    withCrossFade(factory)
+                ).into(object : CustomViewTarget<ImageView, Drawable>(
+                    b.favIcon
+                ) {
                     override fun onLoadFailed(errorDrawable: Drawable?) {
                         showFlag()
                         hideFavIcon()
                     }
 
-                    override fun onResourceReady(resource: Drawable,
-                                                 transition: Transition<in Drawable>?) {
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        transition: Transition<in Drawable>?
+                    ) {
                         hideFlag()
                         showFavIcon(resource)
                     }

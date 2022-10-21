@@ -42,12 +42,12 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -103,10 +103,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         persistentState.dnsBlockedCountLiveData.postValue(persistentState.numberOfBlockedRequests)
         isVpnActivated = VpnController.state().activationRequested
 
-        themeNames = arrayOf(getString(R.string.settings_theme_dialog_themes_1),
-                             getString(R.string.settings_theme_dialog_themes_2),
-                             getString(R.string.settings_theme_dialog_themes_3),
-                             getString(R.string.settings_theme_dialog_themes_4))
+        themeNames = arrayOf(
+            getString(R.string.settings_theme_dialog_themes_1),
+            getString(R.string.settings_theme_dialog_themes_2),
+            getString(R.string.settings_theme_dialog_themes_3),
+            getString(R.string.settings_theme_dialog_themes_4)
+        )
 
         appConfig.getBraveModeObservable().postValue(appConfig.getBraveMode().mode)
 
@@ -133,8 +135,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             View.GONE
         }
 
-        b.fhsThemeChip.text = getString(R.string.hsf_chip_appearance,
-                                        themeNames[persistentState.theme])
+        b.fhsThemeChip.text = getString(
+            R.string.hsf_chip_appearance,
+            themeNames[persistentState.theme]
+        )
     }
 
     private fun observeRethinkPlusConfiguration() {
@@ -168,7 +172,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     // are applied for the icons which are part of chips
     private fun lightenUpChipIcons() {
         val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN
+        )
         b.fhsWhatsNewChip.chipIcon?.colorFilter = colorFilter
         b.fhsProxyChip.chipIcon?.colorFilter = colorFilter
         b.fhsDnsConfigureChip.chipIcon?.colorFilter = colorFilter
@@ -315,11 +320,15 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setMessage(getString(R.string.orbot_stop_dialog_dns_message))
         builder.setCancelable(true)
         builder.setPositiveButton(
-            getString(R.string.orbot_stop_dialog_positive)) { dialogInterface, _ ->
+            getString(R.string.orbot_stop_dialog_positive)
+        ) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
-        builder.setNegativeButton(getString(
-            R.string.orbot_stop_dialog_neutral)) { dialogInterface: DialogInterface, _: Int ->
+        builder.setNegativeButton(
+            getString(
+                R.string.orbot_stop_dialog_neutral
+            )
+        ) { dialogInterface: DialogInterface, _: Int ->
             dialogInterface.dismiss()
             startDnsActivity(DnsDetailActivity.Tabs.CONFIGURE.screen)
         }
@@ -334,32 +343,42 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
             b.fhsProxyChip.visibility = View.GONE
             b.fhsProxyChip.isEnabled = true
-            showToastUiCentered(requireContext(), getString(R.string.hsf_proxy_chip_removed_toast),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(), getString(R.string.hsf_proxy_chip_removed_toast),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 
     private fun openEditConfiguration(stamp: String) {
         val intent = Intent(context, ConfigureRethinkBasicActivity::class.java)
-        intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,
-                        RethinkBlocklistManager.RethinkBlocklistType.REMOTE)
-        intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME,
-                        RethinkDnsEndpoint.RETHINK_PLUS)
+        intent.putExtra(
+            ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,
+            RethinkBlocklistManager.RethinkBlocklistType.REMOTE
+        )
+        intent.putExtra(
+            ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME,
+            RethinkDnsEndpoint.RETHINK_PLUS
+        )
         intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_STAMP, stamp)
         requireContext().startActivity(intent)
     }
 
     private fun handlePause() {
         if (!VpnController.hasTunnel()) {
-            showToastUiCentered(requireContext(),
-                                requireContext().getString(R.string.hsf_pause_vpn_failure),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(),
+                requireContext().getString(R.string.hsf_pause_vpn_failure),
+                Toast.LENGTH_SHORT
+            )
             return
         }
 
         if (VpnController.isVpnLockdown()) {
-            showToastUiCentered(requireContext(), getString(R.string.hsf_pause_lockdown_failure),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(), getString(R.string.hsf_pause_lockdown_failure),
+                Toast.LENGTH_SHORT
+            )
             return
         }
 
@@ -468,7 +487,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
 
         builder.setPositiveButton(
-            getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
+            getString(R.string.about_dialog_positive_button)
+        ) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
 
@@ -574,17 +594,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 synchronized(it) {
                     copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList()
                 }
-                val blockedApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
-                val whiteListApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id }
-                val excludedApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }
-                val lockdownApps = copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.LOCKDOWN.id }
-                b.fhsCardAppsStatus.text = getString(R.string.firewall_card_status_active,
-                                                     copy.count().toString())
-                b.fhsCardApps.text = getString(R.string.firewall_card_text_active,
-                                               blockedApps.count().toString(),
-                                               whiteListApps.count().toString(),
-                                               excludedApps.count().toString(),
-                                               lockdownApps.count().toString())
+                val blockedApps =
+                    copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+                val whiteListApps =
+                    copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id }
+                val excludedApps =
+                    copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id }
+                val lockdownApps =
+                    copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.LOCKDOWN.id }
+                b.fhsCardAppsStatus.text = getString(
+                    R.string.firewall_card_status_active,
+                    copy.count().toString()
+                )
+                b.fhsCardApps.text = getString(
+                    R.string.firewall_card_text_active,
+                    blockedApps.count().toString(),
+                    whiteListApps.count().toString(),
+                    excludedApps.count().toString(),
+                    lockdownApps.count().toString()
+                )
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
             }
@@ -624,7 +652,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(R.string.always_on_dialog_stop_heading)
         if (VpnController.isVpnLockdown()) {
             builder.setMessage(
-                updateHtmlEncodedText(getString(R.string.always_on_dialog_lockdown_stop_message)))
+                updateHtmlEncodedText(getString(R.string.always_on_dialog_lockdown_stop_message))
+            )
         } else {
             builder.setMessage(R.string.always_on_dialog_stop_message)
         }
@@ -723,10 +752,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         if (isPrivateDnsActive(requireContext())) {
-            showToastUiCentered(requireContext(), resources.getText(
-                R.string.private_dns_toast).toString().replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-            }, Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(), resources.getText(
+                    R.string.private_dns_toast
+                ).toString().replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+                }, Toast.LENGTH_SHORT
+            )
             return
         }
 
@@ -736,16 +768,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         openBottomSheet()
-        showToastUiCentered(requireContext(), resources.getText(
-            R.string.brave_dns_connect_mode_change_firewall).toString().replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-        }, Toast.LENGTH_SHORT)
+        showToastUiCentered(
+            requireContext(), resources.getText(
+                R.string.brave_dns_connect_mode_change_firewall
+            ).toString().replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+            }, Toast.LENGTH_SHORT
+        )
 
     }
 
     private fun startFirewallActivity(screenToLoad: Int) {
-        if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}")
+        if (DEBUG) Log.d(
+            LOG_TAG_VPN,
+            "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}"
+        )
         if (!isVpnActivated) {
             //when the dns/firewall is not enabled and VPN is not active. show the dialog to start VPN
             showStartDialog()
@@ -758,15 +795,20 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         openBottomSheet()
-        showToastUiCentered(requireContext(), resources.getText(
-            R.string.brave_dns_connect_mode_change_firewall).toString().replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-        }, Toast.LENGTH_SHORT)
+        showToastUiCentered(
+            requireContext(), resources.getText(
+                R.string.brave_dns_connect_mode_change_firewall
+            ).toString().replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+            }, Toast.LENGTH_SHORT
+        )
     }
 
     private fun startAppsActivity() {
-        if (DEBUG) Log.d(LOG_TAG_VPN,
-                         "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}")
+        if (DEBUG) Log.d(
+            LOG_TAG_VPN,
+            "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}"
+        )
         if (!isVpnActivated) {
             //when the dns/firewall is not enabled and VPN is not active. show the dialog to start VPN
             showStartDialog()
@@ -781,10 +823,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         openBottomSheet()
-        showToastUiCentered(requireContext(), resources.getText(
-            R.string.brave_dns_connect_mode_change_firewall).toString().replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-        }, Toast.LENGTH_SHORT)
+        showToastUiCentered(
+            requireContext(), resources.getText(
+                R.string.brave_dns_connect_mode_change_firewall
+            ).toString().replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+            }, Toast.LENGTH_SHORT
+        )
     }
 
     private fun startActivity(isDns: Boolean, screenToLoad: Int) {
@@ -815,10 +860,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
                 if (isVpnActivated) {
                     openBottomSheet()
-                    showToastUiCentered(requireContext(), resources.getText(
-                        R.string.brave_dns_connect_mode_change_dns).toString().replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                    }, Toast.LENGTH_SHORT)
+                    showToastUiCentered(
+                        requireContext(), resources.getText(
+                            R.string.brave_dns_connect_mode_change_dns
+                        ).toString().replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+                        }, Toast.LENGTH_SHORT
+                    )
                 }
             }
         }
@@ -899,15 +947,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun startActivityForResult() {
         startForResult = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
             when (result.resultCode) {
                 Activity.RESULT_OK -> {
                     startVpnService()
                 }
                 Activity.RESULT_CANCELED -> {
-                    showToastUiCentered(requireContext(),
-                                        getString(R.string.hsf_vpn_prepare_failure),
-                                        Toast.LENGTH_LONG)
+                    showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.hsf_vpn_prepare_failure),
+                        Toast.LENGTH_LONG
+                    )
                 }
                 else -> {
                     stopVpnService()
@@ -1009,7 +1060,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else if (appConfig.isOrbotProxyEnabled()) {
                 statusId = R.string.status_protected_with_tor
             } else if ((appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) && isPrivateDnsActive(
-                    requireContext())) { // SOCKS5 + Http + PrivateDns
+                    requireContext()
+                )
+            ) { // SOCKS5 + Http + PrivateDns
                 statusId = R.string.status_protected_with_proxy_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
@@ -1018,7 +1071,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 statusId = R.string.status_protected_with_socks5_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled() && isPrivateDnsActive(
-                    requireContext())) {
+                    requireContext()
+                )
+            ) {
                 statusId = R.string.status_protected_with_http_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
             } else if (appConfig.isCustomHttpProxyEnabled()) {
@@ -1037,10 +1092,12 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun isAnotherVpnActive(): Boolean {
         val connectivityManager = requireContext().getSystemService(
-            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(
-            activeNetwork) ?: // It's not clear when this can happen, but it has occurred for at least one user.
+            activeNetwork
+        ) ?: // It's not clear when this can happen, but it has occurred for at least one user.
         return false
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
     }
@@ -1064,8 +1121,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             R.attr.accentGood
         }
         val typedValue = TypedValue()
-        val a: TypedArray = requireContext().obtainStyledAttributes(typedValue.data,
-                                                                    intArrayOf(attributeFetch))
+        val a: TypedArray = requireContext().obtainStyledAttributes(
+            typedValue.data,
+            intArrayOf(attributeFetch)
+        )
         val color = a.getColor(0, 0)
         a.recycle()
         return color

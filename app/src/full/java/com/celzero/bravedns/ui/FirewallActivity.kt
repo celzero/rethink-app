@@ -76,8 +76,10 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
             }
         }
 
-        TabLayoutMediator(b.firewallActTabLayout,
-                          b.firewallActViewpager) { tab, position -> // Styling each tab here
+        TabLayoutMediator(
+            b.firewallActTabLayout,
+            b.firewallActViewpager
+        ) { tab, position -> // Styling each tab here
             tab.text = when (position) {
                 Tabs.UNIVERSAL.screen -> getString(R.string.firewall_act_universal_tab)
                 Tabs.LOGS.screen -> getString(R.string.firewall_act_network_monitor_tab)

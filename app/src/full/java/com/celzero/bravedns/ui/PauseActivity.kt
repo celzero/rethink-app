@@ -26,9 +26,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.databinding.ActivityPauseBinding
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -42,14 +42,17 @@ import java.util.concurrent.TimeUnit
 class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     private val b by viewBinding(ActivityPauseBinding::bind)
     private val persistentState by inject<PersistentState>()
-    @Volatile var j: CompletableJob? = null
+
+    @Volatile
+    var j: CompletableJob? = null
 
     enum class AutoOp {
         INCREASE, DECREASE, NONE
     }
 
-    @Volatile var autoOp = AutoOp.NONE
-    var lastStopActivityInvokeTime: Long = INIT_TIME_MS
+    @Volatile
+    var autoOp = AutoOp.NONE
+    private var lastStopActivityInvokeTime: Long = INIT_TIME_MS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
@@ -69,7 +72,8 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
     private fun initView() {
         FirewallManager.getApplistObserver().observe(this) {
-            val blockedList = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+            val blockedList =
+                it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
             b.pacTimerDesc.text = getString(R.string.pause_desc, blockedList.count().toString())
         }
     }
@@ -141,7 +145,9 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     private fun openHomeScreenAndFinish() {
         // refrain from calling start activity multiple times
         if (SystemClock.elapsedRealtime() - lastStopActivityInvokeTime < TimeUnit.SECONDS.toMillis(
-                1L)) {
+                1L
+            )
+        ) {
             return
         }
 

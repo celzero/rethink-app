@@ -253,8 +253,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp"
                         android:layout_marginEnd="10dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_right_arrow_white" />
 
                 </RelativeLayout>
@@ -531,8 +531,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp"
                         android:layout_marginEnd="10dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_arrow_down_small" />
 
                 </RelativeLayout>
@@ -557,9 +557,9 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="80dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
-            android:layout_marginBottom="80dp"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -670,8 +670,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp"
                         android:layout_marginEnd="10dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_right_arrow_white" />
 
                 </RelativeLayout>
@@ -780,8 +780,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp"
                         android:layout_marginEnd="10dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_right_arrow_white" />
 
                 </RelativeLayout>
@@ -891,8 +891,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:padding="10dp"
                         android:layout_marginEnd="10dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_arrow_down_small" />
                 </RelativeLayout>
 

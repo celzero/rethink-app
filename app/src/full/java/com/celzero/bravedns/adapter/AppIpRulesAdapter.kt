@@ -26,30 +26,38 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.ListItemAppIpRulesBinding
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 
 class AppIpRulesAdapter(private val context: Context, val uid: Int) :
-        PagingDataAdapter<CustomIp, AppIpRulesAdapter.CustomIpViewHolder>(DIFF_CALLBACK) {
+    PagingDataAdapter<CustomIp, AppIpRulesAdapter.CustomIpViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CustomIp>() {
 
-            override fun areItemsTheSame(oldConnection: CustomIp,
-                                         newConnection: CustomIp) = oldConnection.ipAddress == newConnection.ipAddress && oldConnection.status == newConnection.status
+            override fun areItemsTheSame(
+                oldConnection: CustomIp,
+                newConnection: CustomIp
+            ) =
+                oldConnection.ipAddress == newConnection.ipAddress && oldConnection.status == newConnection.status
 
-            override fun areContentsTheSame(oldConnection: CustomIp,
-                                            newConnection: CustomIp) = oldConnection.ipAddress == newConnection.ipAddress && oldConnection.status == newConnection.status
+            override fun areContentsTheSame(
+                oldConnection: CustomIp,
+                newConnection: CustomIp
+            ) =
+                oldConnection.ipAddress == newConnection.ipAddress && oldConnection.status == newConnection.status
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomIpViewHolder {
-        val itemBinding = ListItemAppIpRulesBinding.inflate(LayoutInflater.from(parent.context),
-                                                            parent, false)
+        val itemBinding = ListItemAppIpRulesBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent, false
+        )
         return CustomIpViewHolder(itemBinding)
     }
 
@@ -60,7 +68,7 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
     }
 
     inner class CustomIpViewHolder(private val b: ListItemAppIpRulesBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(customIp: CustomIp, position: Int) {
             displayIpDetails(customIp)
@@ -75,8 +83,10 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, port: Int,
-                                    ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int) {
+        private fun openBottomSheet(
+            ipAddress: String, port: Int,
+            ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int
+        ) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
                 return
@@ -113,39 +123,51 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
             b.aipStatusButton.tag = IpRulesManager.IpRuleStatus.BLOCK.id
             b.aipStatusButton.setBackgroundResource(R.drawable.rectangle_border_background)
             b.aipStatusButton.setTextColor(fetchColor(context, R.attr.primaryTextColor))
-            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(null, null,
-                                                                      ContextCompat.getDrawable(
-                                                                          context,
-                                                                          R.drawable.ic_arrow_down_small),
-                                                                      null)
+            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(
+                null, null,
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_arrow_down_small
+                ),
+                null
+            )
             b.aipStatusButton.text = context.resources.getString(
-                R.string.ada_ip_rules_status_blocked)
+                R.string.ada_ip_rules_status_blocked
+            )
         }
 
         private fun showBypassAppRulesBtn() {
             b.aipStatusButton.tag = IpRulesManager.IpRuleStatus.BYPASS_APP_RULES.id
             b.aipStatusButton.setBackgroundResource(R.drawable.rectangle_border_background)
             b.aipStatusButton.setTextColor(fetchColor(context, R.attr.primaryTextColor))
-            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(null, null,
-                                                                      ContextCompat.getDrawable(
-                                                                          context,
-                                                                          R.drawable.ic_arrow_down_small),
-                                                                      null)
+            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(
+                null, null,
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_arrow_down_small
+                ),
+                null
+            )
             b.aipStatusButton.text = context.resources.getString(
-                R.string.ada_ip_rules_status_bypass_app_rules)
+                R.string.ada_ip_rules_status_bypass_app_rules
+            )
         }
 
         private fun showNoRuleBtn() {
             b.aipStatusButton.tag = IpRulesManager.IpRuleStatus.NONE.id
             b.aipStatusButton.setBackgroundResource(R.drawable.rectangle_border_background)
             b.aipStatusButton.setTextColor(fetchColor(context, R.attr.primaryTextColor))
-            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(null, null,
-                                                                      ContextCompat.getDrawable(
-                                                                          context,
-                                                                          R.drawable.ic_arrow_down_small),
-                                                                      null)
+            b.aipStatusButton.setCompoundDrawablesWithIntrinsicBounds(
+                null, null,
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_arrow_down_small
+                ),
+                null
+            )
             b.aipStatusButton.text = context.resources.getString(
-                R.string.ada_ip_rules_status_allowed)
+                R.string.ada_ip_rules_status_allowed
+            )
         }
     }
 }

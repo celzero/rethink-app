@@ -60,8 +60,10 @@ class BackupHelper {
 
         fun getTempDir(context: Context): File {
             // temp dir (files/RethinkDns/)
-            val backupDirectoryPath: String = context.filesDir.absolutePath + File.separator + context.getString(
-                R.string.app_name)
+            val backupDirectoryPath: String =
+                context.filesDir.absolutePath + File.separator + context.getString(
+                    R.string.app_name
+                )
             val file = File(backupDirectoryPath)
             if (!file.exists()) {
                 file.mkdir()
@@ -72,7 +74,8 @@ class BackupHelper {
 
         fun getRethinkDatabase(context: Context): File? {
             val path = (context.getDatabasePath(
-                AppDatabase.DATABASE_NAME).parentFile?.path ?: return null) + File.separator
+                AppDatabase.DATABASE_NAME
+            ).parentFile?.path ?: return null) + File.separator
             return File(path)
         }
 

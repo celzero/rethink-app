@@ -21,6 +21,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -34,8 +35,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.adapter.AppIpRulesAdapter
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.database.AppInfo
@@ -43,6 +42,8 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.glide.GlideApp
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
@@ -60,7 +61,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
-                        SearchView.OnQueryTextListener {
+    SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityAppDetailsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -136,8 +137,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         updateBasicAppInfo()
         updateDnsDetails()
 
-        displayIcon(Utilities.getIcon(this, appInfo.packageInfo, appInfo.appName),
-                    b.aadAppDetailIcon)
+        displayIcon(
+            Utilities.getIcon(this, appInfo.packageInfo, appInfo.appName),
+            b.aadAppDetailIcon
+        )
 
         appCustomIpViewModel.setUid(appInfo.uid)
         displayIpRulesIfAny(appInfo.uid)
@@ -160,11 +163,19 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
 
     }
 
-    private fun updateFirewallStatusUi(firewallStatus: FirewallManager.FirewallStatus,
-                                       connectionStatus: FirewallManager.ConnectionStatus) {
-        b.aadFirewallStatus.text = updateHtmlEncodedText(getString(R.string.ada_firewall_status,
-                                                                   getFirewallText(firewallStatus,
-                                                                                   connectionStatus)))
+    private fun updateFirewallStatusUi(
+        firewallStatus: FirewallManager.FirewallStatus,
+        connectionStatus: FirewallManager.ConnectionStatus
+    ) {
+        b.aadFirewallStatus.text = updateHtmlEncodedText(
+            getString(
+                R.string.ada_firewall_status,
+                getFirewallText(
+                    firewallStatus,
+                    connectionStatus
+                )
+            )
+        )
 
         when (firewallStatus) {
             FirewallManager.FirewallStatus.ALLOW -> {
@@ -212,31 +223,41 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         b.aadAppSettingsWhitelist.setOnClickListener {
             // change the status to allowed if already app is whitelisted
             if (appStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL) {
-                updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
-                                     FirewallManager.ConnectionStatus.BOTH)
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
                 return@setOnClickListener
             }
 
-            updateFirewallStatus(FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
-                                 FirewallManager.ConnectionStatus.BOTH)
+            updateFirewallStatus(
+                FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
+                FirewallManager.ConnectionStatus.BOTH
+            )
         }
 
         b.aadAppSettingsExclude.setOnClickListener {
             if (VpnController.isVpnLockdown()) {
-                Utilities.showToastUiCentered(this, getString(R.string.hsf_exclude_error),
-                                              Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(
+                    this, getString(R.string.hsf_exclude_error),
+                    Toast.LENGTH_SHORT
+                )
                 return@setOnClickListener
             }
 
             // change the status to allowed if already app is excluded
             if (appStatus == FirewallManager.FirewallStatus.EXCLUDE) {
-                updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
-                                     FirewallManager.ConnectionStatus.BOTH)
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
                 return@setOnClickListener
             }
 
-            updateFirewallStatus(FirewallManager.FirewallStatus.EXCLUDE,
-                                 FirewallManager.ConnectionStatus.BOTH)
+            updateFirewallStatus(
+                FirewallManager.FirewallStatus.EXCLUDE,
+                FirewallManager.ConnectionStatus.BOTH
+            )
         }
 
         b.aadConnDetailIndicator.setOnClickListener {
@@ -284,15 +305,19 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
 
         b.aadAapLockdownSwitch.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
-                updateFirewallStatus(FirewallManager.FirewallStatus.LOCKDOWN,
-                                     FirewallManager.ConnectionStatus.BOTH)
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.LOCKDOWN,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
                 disableFirewallStatusUi()
                 enableLockdownUi()
                 return@setOnCheckedChangeListener
             }
 
-            updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
-                                 FirewallManager.ConnectionStatus.BOTH)
+            updateFirewallStatus(
+                FirewallManager.FirewallStatus.ALLOW,
+                FirewallManager.ConnectionStatus.BOTH
+            )
             enableAllow()
             disableLockdownUi()
         }
@@ -304,10 +329,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
 
     private fun setAppDns(url: String) {
         io {
-            val endpoint = RethinkDnsEndpoint("app_${appInfo.appName}", url, uid, desc = "",
-                                              isActive = false, isCustom = true, latency = 0,
-                                              blocklistCount = 0,
-                                              modifiedDataTime = Constants.INIT_TIME_MS)
+            val endpoint = RethinkDnsEndpoint(
+                "app_${appInfo.appName}", url, uid, desc = "",
+                isActive = false, isCustom = true, latency = 0,
+                blocklistCount = 0,
+                modifiedDataTime = Constants.INIT_TIME_MS
+            )
             appConfig.insertReplaceEndpoint(endpoint)
         }
     }
@@ -392,8 +419,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         updateFirewallStatus(aStat, cStat)
     }
 
-    private fun updateFirewallStatus(aStat: FirewallManager.FirewallStatus,
-                                     cStat: FirewallManager.ConnectionStatus) {
+    private fun updateFirewallStatus(
+        aStat: FirewallManager.FirewallStatus,
+        cStat: FirewallManager.ConnectionStatus
+    ) {
         val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
         if (appNames.count() > 1) {
             showDialog(appNames, appInfo, aStat, cStat)
@@ -403,8 +432,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         completeFirewallChanges(aStat, cStat)
     }
 
-    private fun completeFirewallChanges(aStat: FirewallManager.FirewallStatus,
-                                        cStat: FirewallManager.ConnectionStatus) {
+    private fun completeFirewallChanges(
+        aStat: FirewallManager.FirewallStatus,
+        cStat: FirewallManager.ConnectionStatus
+    ) {
         appStatus = aStat
         connStatus = cStat
         updateFirewallStatus(appInfo.uid, aStat, cStat)
@@ -438,8 +469,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
                 }
 
                 // asserting as the null check is above
-                b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count,
-                                                     connIpList!!.size.toString())
+                b.aadConnDetailDesc.text = getString(
+                    R.string.ada_ip_connection_count,
+                    connIpList!!.size.toString()
+                )
                 // set listview adapter
                 b.aadConnDetailRecycler.setHasFixedSize(true)
                 val layoutManager = LinearLayoutManager(this)
@@ -565,13 +598,16 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         txt.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null)
     }
 
-    private fun getFirewallText(aStat: FirewallManager.FirewallStatus,
-                                cStat: FirewallManager.ConnectionStatus): CharSequence {
+    private fun getFirewallText(
+        aStat: FirewallManager.FirewallStatus,
+        cStat: FirewallManager.ConnectionStatus
+    ): CharSequence {
         return when (aStat) {
             FirewallManager.FirewallStatus.ALLOW -> getString(R.string.ada_app_status_allow)
             FirewallManager.FirewallStatus.EXCLUDE -> getString(R.string.ada_app_status_exclude)
             FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> getString(
-                R.string.ada_app_status_whitelist)
+                R.string.ada_app_status_whitelist
+            )
             FirewallManager.FirewallStatus.BLOCK -> {
                 when {
                     cStat.mobileData() -> getString(R.string.ada_app_status_block_md)
@@ -586,8 +622,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
 
     private fun appName(packageCount: Int): String {
         return if (packageCount >= 2) {
-            getString(R.string.ctbs_app_other_apps, appInfo.appName,
-                      packageCount.minus(1).toString())
+            getString(
+                R.string.ctbs_app_other_apps, appInfo.appName,
+                packageCount.minus(1).toString()
+            )
         } else {
             appInfo.appName
         }
@@ -599,23 +637,27 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         builder.setMessage(getString(R.string.ada_noapp_dialog_message))
         builder.setCancelable(false)
         builder.setPositiveButton(
-            getString(R.string.ada_noapp_dialog_positive)) { dialogInterface, _ ->
+            getString(R.string.ada_noapp_dialog_positive)
+        ) { dialogInterface, _ ->
             dialogInterface.dismiss()
             finish()
         }
         builder.create().show()
     }
 
-    private fun showDialog(packageList: List<String>, appInfo: AppInfo,
-                           aStat: FirewallManager.FirewallStatus,
-                           cStat: FirewallManager.ConnectionStatus) {
+    private fun showDialog(
+        packageList: List<String>, appInfo: AppInfo,
+        aStat: FirewallManager.FirewallStatus,
+        cStat: FirewallManager.ConnectionStatus
+    ) {
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(this)
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
         val count = packageList.count()
         builderSingle.setTitle(
-            this.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString()))
+            this.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())
+        )
 
         val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
         arrayAdapter.addAll(packageList)
@@ -627,7 +669,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
             di.dismiss()
             completeFirewallChanges(aStat, cStat)
         }.setNeutralButton(
-            this.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
+            this.getString(R.string.ctbs_dialog_negative_btn)
+        ) { _: DialogInterface, _: Int ->
         }
 
         val alertDialog: AlertDialog = builderSingle.create()
@@ -640,14 +683,28 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         // details of the application as well. Need to add when the permission manager is
         // introduced.
         try {
-            val packageInfo: PackageInfo = this.packageManager.getPackageInfo(appInfo.packageInfo,
-                                                                              PackageManager.GET_PERMISSIONS)
-            val installTime = Utilities.convertLongToTime(packageInfo.firstInstallTime,
-                                                          TIME_FORMAT_3)
+            val packageInfo: PackageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                this.packageManager.getPackageInfo(
+                    appInfo.packageInfo,
+                    PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+                )
+            } else {
+                this.packageManager.getPackageInfo(
+                    appInfo.packageInfo,
+                    PackageManager.GET_PERMISSIONS
+                )
+            }
+            val installTime = Utilities.convertLongToTime(
+                packageInfo.firstInstallTime,
+                TIME_FORMAT_3
+            )
             val updateTime = Utilities.convertLongToTime(packageInfo.lastUpdateTime, TIME_FORMAT_3)
             b.aadDetails.text = updateHtmlEncodedText(
-                getString(R.string.ada_uid, appInfo.uid.toString(), appInfo.appCategory,
-                          installTime, updateTime))
+                getString(
+                    R.string.ada_uid, appInfo.uid.toString(), appInfo.appCategory,
+                    installTime, updateTime
+                )
+            )
             toggleAppDetailsState(appDetailsState)
             enableAppInfoIndicators()
         } catch (ignored: PackageManager.NameNotFoundException) {
@@ -678,7 +735,8 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
         GlideApp.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(
-            mIconImageView)
+            mIconImageView
+        )
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

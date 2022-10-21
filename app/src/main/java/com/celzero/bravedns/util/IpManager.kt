@@ -7,11 +7,6 @@ class IpManager {
 
     companion object {
 
-        fun isIpV6(ip: String): Boolean {
-            val ipAddress = getIpAddress(ip)
-            return ipAddress?.isIPv6 == true
-        }
-
         fun isIpV6(ip: IPAddress): Boolean {
             return ip.isIPv6
         }

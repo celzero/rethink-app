@@ -33,9 +33,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
-class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragment?,
-                                           private val fileTags: List<FileTag>) :
-        BottomSheetDialogFragment() {
+class RethinkPlusFilterBottomSheetFragment(
+    val activity: RethinkBlocklistFragment?,
+    private val fileTags: List<FileTag>
+) :
+    BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetRethinkPlusFilterBinding? = null
 
@@ -46,11 +48,15 @@ class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragmen
 
     private var filters: RethinkBlocklistFragment.Filters? = null
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(
+        isDarkThemeOn(),
+        persistentState.theme
+    )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetRethinkPlusFilterBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -141,7 +147,8 @@ class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragmen
 
     private fun colorUpChipIcon(chip: Chip) {
         val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN
+        )
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
     }

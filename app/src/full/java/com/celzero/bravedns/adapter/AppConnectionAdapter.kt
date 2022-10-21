@@ -23,15 +23,15 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
 
 class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>, val uid: Int) :
-        RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
-        AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
+    RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
+    AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     private lateinit var adapter: AppConnectionAdapter
     private var ips: List<AppConnections>
@@ -40,16 +40,22 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
         ips = connLists
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): AppConnectionAdapter.ConnectionDetailsViewHolder {
-        val itemBinding = ListItemAppConnDetailsBinding.inflate(LayoutInflater.from(parent.context),
-                                                                parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): AppConnectionAdapter.ConnectionDetailsViewHolder {
+        val itemBinding = ListItemAppConnDetailsBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent, false
+        )
         adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
-    override fun onBindViewHolder(holder: AppConnectionAdapter.ConnectionDetailsViewHolder,
-                                  position: Int) {
+    override fun onBindViewHolder(
+        holder: AppConnectionAdapter.ConnectionDetailsViewHolder,
+        position: Int
+    ) {
         // updates the app-wise connections from network log to AppInfo screen
         holder.update(position)
     }
@@ -70,7 +76,7 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
     }
 
     inner class ConnectionDetailsViewHolder(private val b: ListItemAppConnDetailsBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
         fun update(position: Int) {
             displayTransactionDetails(position)
             setupClickListeners(ips[position], position)
@@ -84,8 +90,10 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, port: Int,
-                                    ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int) {
+        private fun openBottomSheet(
+            ipAddress: String, port: Int,
+            ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int
+        ) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
                 return

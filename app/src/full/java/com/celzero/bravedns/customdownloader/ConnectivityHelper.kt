@@ -15,23 +15,11 @@
  */
 package com.celzero.bravedns.customdownloader
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-
 object ConnectivityHelper {
 
     // download request status
     enum class DownloadStatus {
         FAILED, PAUSED, RUNNING, SUCCESSFUL
-    }
-
-    fun isInternetAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(
-            Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-        val activeNetworkInfo = connectivityManager?.activeNetwork
-        return activeNetworkInfo != null && connectivityManager.getNetworkCapabilities(
-            activeNetworkInfo)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
     }
 
     var downloadIds: MutableMap<Long, DownloadStatus> = hashMapOf()

@@ -38,29 +38,39 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
-                                   private val appConfig: AppConfig) :
-        PagingDataAdapter<DnsCryptRelayEndpoint, DnsCryptRelayEndpointAdapter.DnsCryptRelayEndpointViewHolder>(
-            DIFF_CALLBACK) {
+class DnsCryptRelayEndpointAdapter(
+    private val context: Context, val lifecycleOwner: LifecycleOwner,
+    private val appConfig: AppConfig
+) :
+    PagingDataAdapter<DnsCryptRelayEndpoint, DnsCryptRelayEndpointAdapter.DnsCryptRelayEndpointViewHolder>(
+        DIFF_CALLBACK
+    ) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DnsCryptRelayEndpoint>() {
-            override fun areItemsTheSame(oldConnection: DnsCryptRelayEndpoint,
-                                         newConnection: DnsCryptRelayEndpoint): Boolean {
+            override fun areItemsTheSame(
+                oldConnection: DnsCryptRelayEndpoint,
+                newConnection: DnsCryptRelayEndpoint
+            ): Boolean {
                 return (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
             }
 
-            override fun areContentsTheSame(oldConnection: DnsCryptRelayEndpoint,
-                                            newConnection: DnsCryptRelayEndpoint): Boolean {
+            override fun areContentsTheSame(
+                oldConnection: DnsCryptRelayEndpoint,
+                newConnection: DnsCryptRelayEndpoint
+            ): Boolean {
                 return (oldConnection.id == newConnection.id && oldConnection.isSelected != newConnection.isSelected)
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): DnsCryptRelayEndpointViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): DnsCryptRelayEndpointViewHolder {
         val itemBinding = DnsCryptEndpointListItemBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+            LayoutInflater.from(parent.context), parent, false
+        )
         return DnsCryptRelayEndpointViewHolder(itemBinding)
     }
 
@@ -70,7 +80,7 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
     }
 
     inner class DnsCryptRelayEndpointViewHolder(private val b: DnsCryptEndpointListItemBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(endpoint: DnsCryptRelayEndpoint) {
             displayDetails(endpoint)
@@ -79,7 +89,8 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
 
         private fun setupClickListener(endpoint: DnsCryptRelayEndpoint) {
             b.root.setOnClickListener {
-                b.dnsCryptEndpointListActionImage.isChecked = !b.dnsCryptEndpointListActionImage.isChecked
+                b.dnsCryptEndpointListActionImage.isChecked =
+                    !b.dnsCryptEndpointListActionImage.isChecked
                 updateDNSCryptRelayDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
             }
 
@@ -96,7 +107,8 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptRelayName
             if (endpoint.isSelected) {
                 b.dnsCryptEndpointListUrlExplanation.text = context.getString(
-                    R.string.dns_connected)
+                    R.string.dns_connected
+                )
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
@@ -104,18 +116,22 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
             b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
             if (endpoint.isDeletable()) {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall)
+                )
             } else {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_info))
+                    ContextCompat.getDrawable(context, R.drawable.ic_info)
+                )
             }
         }
 
         private fun promptUser(endpoint: DnsCryptRelayEndpoint) {
             if (endpoint.isDeletable()) showDeleteDialog(endpoint.id)
             else {
-                showDialogExplanation(endpoint.dnsCryptRelayName, endpoint.dnsCryptRelayURL,
-                                      endpoint.dnsCryptRelayExplanation)
+                showDialogExplanation(
+                    endpoint.dnsCryptRelayName, endpoint.dnsCryptRelayURL,
+                    endpoint.dnsCryptRelayExplanation
+                )
             }
         }
 
@@ -126,16 +142,23 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
             else builder.setMessage(url)
             builder.setCancelable(true)
             builder.setPositiveButton(
-                context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
+                context.getString(R.string.dns_info_positive)
+            ) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
 
             builder.setNeutralButton(
-                context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-                Utilities.clipboardCopy(context, url,
-                                        context.getString(R.string.copy_clipboard_label))
-                Utilities.showToastUiCentered(context, context.getString(
-                    R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
+                context.getString(R.string.dns_info_neutral)
+            ) { _: DialogInterface, _: Int ->
+                Utilities.clipboardCopy(
+                    context, url,
+                    context.getString(R.string.copy_clipboard_label)
+                )
+                Utilities.showToastUiCentered(
+                    context, context.getString(
+                        R.string.info_dialog_url_copy_toast_msg
+                    ), Toast.LENGTH_SHORT
+                )
             }
             builder.create().show()
         }
@@ -154,15 +177,19 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
             builder.create().show()
         }
 
-        private fun updateDNSCryptRelayDetails(endpoint: DnsCryptRelayEndpoint,
-                                               isSelected: Boolean) {
+        private fun updateDNSCryptRelayDetails(
+            endpoint: DnsCryptRelayEndpoint,
+            isSelected: Boolean
+        ) {
 
             io {
                 if (isSelected && !appConfig.isDnscryptRelaySelectable()) {
                     uiCtx {
-                        Toast.makeText(context,
-                                       context.getString(R.string.dns_crypt_relay_error_toast),
-                                       Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.dns_crypt_relay_error_toast),
+                            Toast.LENGTH_LONG
+                        ).show()
                         b.dnsCryptEndpointListActionImage.isChecked = false
                     }
                     return@io
@@ -181,8 +208,10 @@ class DnsCryptRelayEndpointAdapter(private val context: Context, val lifecycleOw
             io {
                 appConfig.deleteDnscryptRelayEndpoint(id)
                 uiCtx {
-                    Toast.makeText(context, R.string.dns_crypt_relay_remove_success,
-                                   Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context, R.string.dns_crypt_relay_remove_success,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

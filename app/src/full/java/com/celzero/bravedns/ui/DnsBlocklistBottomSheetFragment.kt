@@ -39,16 +39,16 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.glide.GlideApp
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
@@ -74,15 +74,19 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(
+        isDarkThemeOn(),
+        persistentState.theme
+    )
 
     companion object {
         const val INSTANCE_STATE_DNSLOGS = "DNSLOGS"
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetDnsLogBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -111,8 +115,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         b.dnsBlockUrl.text = transaction!!.queryStr
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = transaction!!.flag
-        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms,
-                                             transaction!!.latency.toString())
+        b.dnsBlockIpLatency.text = getString(
+            R.string.dns_btm_latency_ms,
+            transaction!!.latency.toString()
+        )
 
         handleCustomDomainUi()
         displayFavIcon()
@@ -183,8 +189,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             return
         }
 
-        DomainRulesManager.applyStatus(transaction!!.queryStr, transaction!!.responseIps,
-                                       DomainRulesManager.DomainType.DOMAIN, status)
+        DomainRulesManager.applyStatus(
+            transaction!!.queryStr, transaction!!.responseIps,
+            DomainRulesManager.DomainType.DOMAIN, status
+        )
     }
 
     private fun getTag(tag: Any): Int {
@@ -301,16 +309,20 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         if (isPositive) {
             chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
             val colorFilter = PorterDuffColorFilter(
-                fetchColor(requireContext(), R.attr.chipTextPositive), PorterDuff.Mode.SRC_IN)
+                fetchColor(requireContext(), R.attr.chipTextPositive), PorterDuff.Mode.SRC_IN
+            )
             chip.chipBackgroundColor = ColorStateList.valueOf(
-                fetchColor(requireContext(), R.attr.chipBgColorPositive))
+                fetchColor(requireContext(), R.attr.chipBgColorPositive)
+            )
             chip.chipIcon?.colorFilter = colorFilter
         } else {
             chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
             val colorFilter = PorterDuffColorFilter(
-                fetchColor(requireContext(), R.attr.chipTextNegative), PorterDuff.Mode.SRC_IN)
+                fetchColor(requireContext(), R.attr.chipTextNegative), PorterDuff.Mode.SRC_IN
+            )
             chip.chipBackgroundColor = ColorStateList.valueOf(
-                fetchColor(requireContext(), R.attr.chipBgColorNegative))
+                fetchColor(requireContext(), R.attr.chipBgColorNegative)
+            )
             chip.chipIcon?.colorFilter = colorFilter
         }
     }
@@ -346,7 +358,8 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         dialog.window?.setLayout(width, height)
 
         if (b.dnsBlockFavIcon.isVisible) dialogBinding.ipDetailsFavIcon.setImageDrawable(
-            b.dnsBlockFavIcon.drawable)
+            b.dnsBlockFavIcon.drawable
+        )
         else dialogBinding.ipDetailsFavIcon.visibility = View.GONE
 
         dialogBinding.ipDetailsFqdnTxt.text = transaction!!.queryStr
@@ -363,8 +376,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         var text = ""
 
         list.forEach {
-            text += getString(R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..2)),
-                              it)
+            text += getString(
+                R.string.dns_btm_sheet_dialog_ips, Utilities.getFlag(it.slice(0..2)),
+                it
+            )
         }
         return updateHtmlEncodedText(text)
     }
@@ -375,9 +390,11 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             val heading = it.replaceFirstChar { a ->
                 if (a.isLowerCase()) a.titlecase(Locale.getDefault()) else a.toString()
             }
-            text += getString(R.string.dns_btm_sheet_dialog_message, heading,
-                              groupNames.get(it).count().toString(),
-                              TextUtils.join(", ", groupNames.get(it)))
+            text += getString(
+                R.string.dns_btm_sheet_dialog_message, heading,
+                groupNames.get(it).count().toString(),
+                TextUtils.join(", ", groupNames.get(it))
+            )
         }
         text = text.replace(",", ", ")
         return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
@@ -389,10 +406,12 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             return
         }
 
-        val uptime = DateUtils.getRelativeTimeSpanString(transaction!!.time,
-                                                         System.currentTimeMillis(),
-                                                         DateUtils.MINUTE_IN_MILLIS,
-                                                         DateUtils.FORMAT_ABBREV_RELATIVE).toString()
+        val uptime = DateUtils.getRelativeTimeSpanString(
+            transaction!!.time,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        ).toString()
         if (transaction!!.isBlocked) {
             showBlockedState(uptime)
         } else {
@@ -412,8 +431,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         } else if (transaction!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)
         } else {
-            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, uptime,
-                                                   transaction!!.serverIP)
+            b.dnsBlockBlockedDesc.text = getString(
+                R.string.dns_btm_resolved_doh, uptime,
+                transaction!!.serverIP
+            )
         }
     }
 
@@ -426,8 +447,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         if (transaction!!.isLocallyAnswered()) { // usually true when query blocked by on-device blocklists
             b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, uptime)
         } else {
-            b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc, uptime,
-                                                   transaction!!.serverIP)
+            b.dnsBlockBlockedDesc.text = getString(
+                R.string.bsct_conn_block_desc, uptime,
+                transaction!!.serverIP
+            )
         }
     }
 
@@ -448,27 +471,40 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun updateImage(url: String, subDomainUrl: String) {
         try {
-            if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                             "Glide - TransactionViewHolder updateImage() -$url, $subDomainUrl")
+            if (DEBUG) Log.d(
+                LOG_TAG_DNS_LOG,
+                "Glide - TransactionViewHolder updateImage() -$url, $subDomainUrl"
+            )
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             GlideApp.with(requireContext().applicationContext).load(url).onlyRetrieveFromCache(
-                true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(Target.SIZE_ORIGINAL,
-                                                                              Target.SIZE_ORIGINAL).error(
+                true
+            ).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(
+                Target.SIZE_ORIGINAL,
+                Target.SIZE_ORIGINAL
+            ).error(
                 GlideApp.with(requireContext().applicationContext).load(
-                    subDomainUrl).onlyRetrieveFromCache(true)).transition(
-                DrawableTransitionOptions.withCrossFade(factory)).into(object :
-                                                                               CustomViewTarget<ImageView, Drawable>(
-                                                                                   b.dnsBlockFavIcon) {
+                    subDomainUrl
+                ).onlyRetrieveFromCache(true)
+            ).transition(
+                DrawableTransitionOptions.withCrossFade(factory)
+            ).into(object :
+                CustomViewTarget<ImageView, Drawable>(
+                    b.dnsBlockFavIcon
+                ) {
                 override fun onLoadFailed(errorDrawable: Drawable?) {
                     if (!isAdded) return
 
                     b.dnsBlockFavIcon.visibility = View.GONE
                 }
 
-                override fun onResourceReady(resource: Drawable,
-                                             transition: Transition<in Drawable>?) {
-                    if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                                     "Glide - CustomViewTarget onResourceReady() -$url")
+                override fun onResourceReady(
+                    resource: Drawable,
+                    transition: Transition<in Drawable>?
+                ) {
+                    if (DEBUG) Log.d(
+                        LOG_TAG_DNS_LOG,
+                        "Glide - CustomViewTarget onResourceReady() -$url"
+                    )
                     if (!isAdded) return
 
                     b.dnsBlockFavIcon.visibility = View.VISIBLE
@@ -482,8 +518,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             })
         } catch (e: Exception) {
-            if (DEBUG) Log.d(LOG_TAG_DNS_LOG,
-                             "Glide - TransactionViewHolder Exception() -${e.message}")
+            if (DEBUG) Log.d(
+                LOG_TAG_DNS_LOG,
+                "Glide - TransactionViewHolder Exception() -${e.message}"
+            )
             if (!isAdded) return
 
             b.dnsBlockFavIcon.visibility = View.GONE

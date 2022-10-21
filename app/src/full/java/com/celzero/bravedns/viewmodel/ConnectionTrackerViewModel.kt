@@ -25,29 +25,34 @@ import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
-        ViewModel() {
+    ViewModel() {
 
     private var filterString: MutableLiveData<String> = MutableLiveData()
     private var filterRules: MutableSet<String> = mutableSetOf()
-    private var filterType: ConnectionTrackerFragment.TopLevelFilter = ConnectionTrackerFragment.TopLevelFilter.ALL
+    private var filterType: ConnectionTrackerFragment.TopLevelFilter =
+        ConnectionTrackerFragment.TopLevelFilter.ALL
 
     init {
         filterString.value = ""
     }
 
-    val connectionTrackerList = Transformations.switchMap(filterString,
-                                                          (Function<String, LiveData<PagingData<ConnectionTracker>>> { input ->
-                                                              fetchNetworkLogs(input)
-                                                          }))
+    val connectionTrackerList = Transformations.switchMap(
+        filterString,
+        (Function<String, LiveData<PagingData<ConnectionTracker>>> { input ->
+            fetchNetworkLogs(input)
+        })
+    )
 
-    fun setFilter(searchString: String, filter: Set<String>,
-                  type: ConnectionTrackerFragment.TopLevelFilter) {
+    fun setFilter(
+        searchString: String, filter: Set<String>,
+        type: ConnectionTrackerFragment.TopLevelFilter
+    ) {
         filterRules.clear()
 
         filterRules.addAll(filter)
         filterType = type
 
-        if (!searchString.isBlank()) filterString.value = searchString
+        if (searchString.isNotBlank()) filterString.value = searchString
         else filterString.value = ""
     }
 

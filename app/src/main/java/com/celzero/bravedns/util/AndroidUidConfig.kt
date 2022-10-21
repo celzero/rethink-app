@@ -178,9 +178,6 @@ enum class AndroidUidConfig(val uid: Int) {
             return (uid >= APP_START.uid && uid <= APP_END.uid)
         }
 
-        fun isValidUid(uid: Int): Boolean {
-            return (uid > 0 && uid < USER_OFFSET.uid)
-        }
     }
 
 }

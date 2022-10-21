@@ -25,12 +25,12 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
@@ -52,15 +52,19 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                              persistentState.theme)
+    override fun getTheme(): Int = getBottomsheetCurrentTheme(
+        isDarkThemeOn(),
+        persistentState.theme
+    )
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetHomeScreenBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -146,8 +150,10 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.bsHsWireguardRl.setOnClickListener {
-            showToastUiCentered(requireContext(), getString(R.string.coming_soon_toast),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(), getString(R.string.coming_soon_toast),
+                Toast.LENGTH_SHORT
+            )
         }
 
         b.bsHomeScreenVpnLockdownDesc.setOnClickListener {
@@ -202,8 +208,10 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         val protocols = VpnController.protocols()
         val now = System.currentTimeMillis()
         // returns a string describing 'time' as a time relative to 'now'
-        val t = DateUtils.getRelativeTimeSpanString(now - uptimeMs, now, DateUtils.MINUTE_IN_MILLIS,
-                                                    DateUtils.FORMAT_ABBREV_RELATIVE)
+        val t = DateUtils.getRelativeTimeSpanString(
+            now - uptimeMs, now, DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_RELATIVE
+        )
 
         b.bsHomeScreenAppUptime.text = if (uptimeMs < INIT_TIME_MS) {
             b.bsHomeScreenAppUptime.visibility = View.GONE

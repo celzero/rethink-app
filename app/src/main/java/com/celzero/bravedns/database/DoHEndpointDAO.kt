@@ -42,7 +42,8 @@ interface DoHEndpointDAO {
 
     @Transaction
     @Query(
-        "select * from DoHEndpoint where dohURL like :query or dohName like :query order by isSelected desc")
+        "select * from DoHEndpoint where dohURL like :query or dohName like :query order by isSelected desc"
+    )
     fun getDoHEndpointLiveDataByName(query: String): PagingSource<Int, DoHEndpoint>
 
     @Query("delete from DoHEndpoint where modifiedDataTime < :date")

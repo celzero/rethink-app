@@ -38,10 +38,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_marginStart="5dp"
             android:gravity="center"
             android:padding="5dp"
             android:text="@string/settings_orbot_header"
-            android:layout_marginStart="5dp"
             android:textAlignment="center"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/heading_font_text_view" />
@@ -116,9 +116,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="0.75"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_http_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -167,9 +167,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="0.75"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_socks5_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -221,10 +221,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:alpha="0.75"
                     android:gravity="center_vertical"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_both_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -275,10 +275,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:alpha="0.75"
                     android:gravity="center_vertical"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_none_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />

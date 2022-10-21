@@ -33,9 +33,9 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
@@ -43,12 +43,7 @@ import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
-import com.celzero.bravedns.download.AppDownloadManager
-import com.celzero.bravedns.service.AppUpdater
-import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.service.*
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -117,9 +112,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         if (savedInstanceState == null) {
             homeScreenFragment = HomeScreenFragment()
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                              homeScreenFragment,
-                                                              homeScreenFragment.javaClass.simpleName).commit()
+            supportFragmentManager.beginTransaction().replace(
+                R.id.fragment_container,
+                homeScreenFragment,
+                homeScreenFragment.javaClass.simpleName
+            ).commit()
         }
 
         setupNavigationItemSelectedListener()
@@ -137,18 +134,24 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun handleIntent() {
         val intent = this.intent ?: return
         if (intent.scheme?.equals(INTENT_SCHEME) == true && intent.data?.path?.contains(
-                BACKUP_FILE_EXTN) == true) {
+                BACKUP_FILE_EXTN
+            ) == true
+        ) {
             handleRestoreProcess(intent.data)
         } else if (intent.scheme?.equals(INTENT_SCHEME) == true) {
-            showToastUiCentered(this, getString(R.string.brbs_restore_no_uri_toast),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                this, getString(R.string.brbs_restore_no_uri_toast),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 
     private fun handleRestoreProcess(uri: Uri?) {
         if (uri == null) {
-            showToastUiCentered(this, getString(R.string.brbs_restore_no_uri_toast),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                this, getString(R.string.brbs_restore_no_uri_toast),
+                Toast.LENGTH_SHORT
+            )
             return
         }
 
@@ -178,9 +181,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         data.putString(BackupHelper.DATA_BUILDER_RESTORE_URI, fileUri.toString())
 
         val importWorker = OneTimeWorkRequestBuilder<RestoreAgent>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(RestoreAgent.TAG).build()
+            data.build()
+        ).setBackoffCriteria(
+            BackoffPolicy.LINEAR,
+            OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+            TimeUnit.MILLISECONDS
+        ).addTag(RestoreAgent.TAG).build()
         WorkManager.getInstance(this).beginWith(importWorker).enqueue()
     }
 
@@ -190,15 +196,21 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // observer for custom download manager worker
         workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(this) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LOG_TAG_BACKUP_RESTORE,
-                  "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}")
+            Log.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}"
+            )
             if (WorkInfo.State.SUCCEEDED == workInfo.state) {
-                showToastUiCentered(this, getString(R.string.brbs_restore_complete_toast),
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    this, getString(R.string.brbs_restore_complete_toast),
+                    Toast.LENGTH_SHORT
+                )
                 workManager.pruneWork()
             } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
-                showToastUiCentered(this, getString(R.string.brbs_restore_no_uri_toast),
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    this, getString(R.string.brbs_restore_no_uri_toast),
+                    Toast.LENGTH_SHORT
+                )
                 workManager.pruneWork()
                 workManager.cancelAllWorkByTag(RestoreAgent.TAG)
             } else { // state == blocked
@@ -235,8 +247,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
             // already there is a local blocklist file available, complete the initial filetag read
             if (persistentState.localBlocklistTimestamp != INIT_TIME_MS) {
-                RethinkBlocklistManager.readJson(this, RethinkBlocklistManager.DownloadType.LOCAL,
-                                                 persistentState.localBlocklistTimestamp)
+                RethinkBlocklistManager.readJson(
+                    this, RethinkBlocklistManager.DownloadType.LOCAL,
+                    persistentState.localBlocklistTimestamp
+                )
             }
         }
 
@@ -275,8 +289,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         io {
             // already there is a remote blocklist file available
             if (persistentState.remoteBlocklistTimestamp != INIT_TIME_MS) {
-                RethinkBlocklistManager.readJson(this, RethinkBlocklistManager.DownloadType.REMOTE,
-                                                 persistentState.remoteBlocklistTimestamp)
+                RethinkBlocklistManager.readJson(
+                    this, RethinkBlocklistManager.DownloadType.REMOTE,
+                    persistentState.remoteBlocklistTimestamp
+                )
                 return@io
             }
 
@@ -306,12 +322,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     // move the files of local blocklist to specific folder (../files/local_blocklist/<timestamp>)
     private fun changeDefaultLocalBlocklistLocation() {
-        val baseDir = localBlocklistDownloadBasePath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                     persistentState.localBlocklistTimestamp)
+        val baseDir = localBlocklistDownloadBasePath(
+            this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+            persistentState.localBlocklistTimestamp
+        )
         File(baseDir).mkdirs()
         Constants.ONDEVICE_BLOCKLISTS.forEach {
-            val currentFile = File(oldLocalBlocklistDownloadDir(this,
-                                                                persistentState.localBlocklistTimestamp) + it.filename)
+            val currentFile = File(
+                oldLocalBlocklistDownloadDir(
+                    this,
+                    persistentState.localBlocklistTimestamp
+                ) + it.filename
+            )
             val newFile = File(baseDir + File.separator + it.filename)
             com.google.common.io.Files.move(currentFile, newFile)
         }
@@ -354,12 +376,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun isNewVersion(): Boolean {
         val versionStored = persistentState.appVersion
         val version = getLatestVersion()
-        return (version != 0 && version != versionStored)
+        return (version != 0L && version != versionStored)
     }
 
-    private fun getLatestVersion(): Int {
+    private fun getLatestVersion(): Long {
         val pInfo: PackageInfo? = getPackageMetadata(this.packageManager, this.packageName)
-        return pInfo?.versionCode ?: 0
+        return pInfo?.longVersionCode ?: 0
     }
 
     //FIXME - Move it to Android's built-in WorkManager
@@ -382,21 +404,28 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     fun checkForUpdate(
-            isInteractive: AppUpdater.UserPresent = AppUpdater.UserPresent.NONINTERACTIVE) {
+        isInteractive: AppUpdater.UserPresent = AppUpdater.UserPresent.NONINTERACTIVE
+    ) {
 
         // Check updates only for play store / website version. Not fDroid.
         if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
-            if (DEBUG) Log.d(LOG_TAG_APP_UPDATE,
-                             "Check for update: Not play or website- ${BuildConfig.FLAVOR}")
+            if (DEBUG) Log.d(
+                LOG_TAG_APP_UPDATE,
+                "Check for update: Not play or website- ${BuildConfig.FLAVOR}"
+            )
             return
         }
 
         if (isGooglePlayServicesAvailable() && isPlayStoreFlavour()) {
-            appUpdateManager.checkForAppUpdate(isInteractive, this,
-                                               installStateUpdatedListener) // Might be play updater or web updater
+            appUpdateManager.checkForAppUpdate(
+                isInteractive, this,
+                installStateUpdatedListener
+            ) // Might be play updater or web updater
         } else {
-            get<NonStoreAppUpdater>().checkForAppUpdate(isInteractive, this,
-                                                        installStateUpdatedListener) // Always web updater
+            get<NonStoreAppUpdater>().checkForAppUpdate(
+                isInteractive, this,
+                installStateUpdatedListener
+            ) // Always web updater
         }
     }
 
@@ -422,81 +451,106 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
 
-        override fun onUpdateCheckFailed(installSource: AppUpdater.InstallSource,
-                                         isInteractive: AppUpdater.UserPresent) {
+        override fun onUpdateCheckFailed(
+            installSource: AppUpdater.InstallSource,
+            isInteractive: AppUpdater.UserPresent
+        ) {
             runOnUiThread {
                 if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
-                    showDownloadDialog(installSource,
-                                       getString(R.string.download_update_dialog_failure_title),
-                                       getString(R.string.download_update_dialog_failure_message))
+                    showDownloadDialog(
+                        installSource,
+                        getString(R.string.download_update_dialog_failure_title),
+                        getString(R.string.download_update_dialog_failure_message)
+                    )
                 }
             }
         }
 
-        override fun onUpToDate(installSource: AppUpdater.InstallSource,
-                                isInteractive: AppUpdater.UserPresent) {
+        override fun onUpToDate(
+            installSource: AppUpdater.InstallSource,
+            isInteractive: AppUpdater.UserPresent
+        ) {
             runOnUiThread {
                 if (isInteractive == AppUpdater.UserPresent.INTERACTIVE) {
-                    showDownloadDialog(installSource,
-                                       getString(R.string.download_update_dialog_message_ok_title),
-                                       getString(R.string.download_update_dialog_message_ok))
+                    showDownloadDialog(
+                        installSource,
+                        getString(R.string.download_update_dialog_message_ok_title),
+                        getString(R.string.download_update_dialog_message_ok)
+                    )
                 }
             }
         }
 
         override fun onUpdateAvailable(installSource: AppUpdater.InstallSource) {
             runOnUiThread {
-                showDownloadDialog(installSource, getString(R.string.download_update_dialog_title),
-                                   getString(R.string.download_update_dialog_message))
+                showDownloadDialog(
+                    installSource, getString(R.string.download_update_dialog_title),
+                    getString(R.string.download_update_dialog_message)
+                )
             }
         }
 
         override fun onUpdateQuotaExceeded(installSource: AppUpdater.InstallSource) {
             runOnUiThread {
-                showDownloadDialog(installSource,
-                                   getString(R.string.download_update_dialog_trylater_title),
-                                   getString(R.string.download_update_dialog_trylater_message))
+                showDownloadDialog(
+                    installSource,
+                    getString(R.string.download_update_dialog_trylater_title),
+                    getString(R.string.download_update_dialog_trylater_message)
+                )
             }
         }
     }
 
     private fun showUpdateCompleteSnackbar() {
-        val snack = Snackbar.make(b.container, getString(R.string.update_complete_snack_message),
-                                  Snackbar.LENGTH_INDEFINITE)
+        val snack = Snackbar.make(
+            b.container, getString(R.string.update_complete_snack_message),
+            Snackbar.LENGTH_INDEFINITE
+        )
         snack.setAction(
-            getString(R.string.update_complete_action_snack)) { appUpdateManager.completeUpdate() }
+            getString(R.string.update_complete_action_snack)
+        ) { appUpdateManager.completeUpdate() }
         snack.setActionTextColor(ContextCompat.getColor(this, R.color.primaryLightColorText))
         snack.show()
     }
 
-    private fun showDownloadDialog(source: AppUpdater.InstallSource, title: String,
-                                   message: String) {
+    private fun showDownloadDialog(
+        source: AppUpdater.InstallSource, title: String,
+        message: String
+    ) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
         builder.setMessage(message)
         builder.setCancelable(true)
         if (message == getString(
-                R.string.download_update_dialog_message_ok) || message == getString(
-                R.string.download_update_dialog_failure_message) || message == getString(
-                R.string.download_update_dialog_trylater_message)) {
+                R.string.download_update_dialog_message_ok
+            ) || message == getString(
+                R.string.download_update_dialog_failure_message
+            ) || message == getString(
+                R.string.download_update_dialog_trylater_message
+            )
+        ) {
             builder.setPositiveButton(
-                getString(R.string.hs_download_positive_default)) { dialogInterface, _ ->
+                getString(R.string.hs_download_positive_default)
+            ) { dialogInterface, _ ->
                 dialogInterface.dismiss()
             }
         } else {
             if (source == AppUpdater.InstallSource.STORE) {
                 builder.setPositiveButton(
-                    getString(R.string.hs_download_positive_play_store)) { _, _ ->
+                    getString(R.string.hs_download_positive_play_store)
+                ) { _, _ ->
                     appUpdateManager.completeUpdate()
                 }
             } else {
                 builder.setPositiveButton(
-                    getString(R.string.hs_download_positive_website)) { _, _ ->
+                    getString(R.string.hs_download_positive_website)
+                ) { _, _ ->
                     initiateDownload()
                 }
             }
             builder.setNegativeButton(
-                getString(R.string.hs_download_negative_default)) { dialogInterface, _ ->
+                getString(R.string.hs_download_negative_default)
+            ) { dialogInterface, _ ->
                 persistentState.lastAppUpdateCheck = System.currentTimeMillis()
                 dialogInterface.dismiss()
             }
@@ -530,25 +584,31 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             when (item.itemId) {
                 R.id.navigation_internet_manager -> {
                     homeScreenFragment = HomeScreenFragment()
-                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                      homeScreenFragment,
-                                                                      homeScreenFragment.javaClass.simpleName).commit()
+                    supportFragmentManager.beginTransaction().replace(
+                        R.id.fragment_container,
+                        homeScreenFragment,
+                        homeScreenFragment.javaClass.simpleName
+                    ).commit()
                     return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_settings -> {
                     settingsFragment = SettingsFragment()
-                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                      settingsFragment,
-                                                                      settingsFragment.javaClass.simpleName).commit()
+                    supportFragmentManager.beginTransaction().replace(
+                        R.id.fragment_container,
+                        settingsFragment,
+                        settingsFragment.javaClass.simpleName
+                    ).commit()
                     return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_about -> {
                     aboutFragment = AboutFragment()
-                    supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
-                                                                      aboutFragment,
-                                                                      aboutFragment.javaClass.simpleName).commit()
+                    supportFragmentManager.beginTransaction().replace(
+                        R.id.fragment_container,
+                        aboutFragment,
+                        aboutFragment.javaClass.simpleName
+                    ).commit()
                     return@setOnItemSelectedListener true
                 }
             }
@@ -561,12 +621,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             withContext(Dispatchers.IO) {
                 f()
             }
-        }
-    }
-
-    private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            f()
         }
     }
 

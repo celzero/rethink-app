@@ -69,15 +69,19 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var backupActivityResult: ActivityResultLauncher<Intent>
     private lateinit var restoreActivityResult: ActivityResultLauncher<Intent>
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(
+        isDarkThemeOn(),
+        persistentState.theme
+    )
 
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = ActivityBackupRestoreBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -106,13 +110,17 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun showVersion() {
         val version = getVersionName()
-        b.brbsAppVersion.text = getString(R.string.about_version_install_source, version,
-                                          getDownloadSource())
+        b.brbsAppVersion.text = getString(
+            R.string.about_version_install_source, version,
+            getDownloadSource()
+        )
     }
 
     private fun getVersionName(): String {
-        val pInfo: PackageInfo? = Utilities.getPackageMetadata(requireContext().packageManager,
-                                                               requireContext().packageName)
+        val pInfo: PackageInfo? = Utilities.getPackageMetadata(
+            requireContext().packageManager,
+            requireContext().packageName
+        )
         return pInfo?.versionName ?: ""
     }
 
@@ -143,11 +151,14 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
 
         // observer for backup agent worker
         workManager.getWorkInfosByTagLiveData(BackupAgent.TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+            viewLifecycleOwner
+        ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
 
-            Log.i(LOG_TAG_BACKUP_RESTORE,
-                  "WorkManager state: ${workInfo.state} for ${BackupAgent.TAG}")
+            Log.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "WorkManager state: ${workInfo.state} for ${BackupAgent.TAG}"
+            )
             if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                 showBackupSuccessUi()
                 workManager.pruneWork()
@@ -166,10 +177,13 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
 
         // observer for restore agent worker
         workManager.getWorkInfosByTagLiveData(RestoreAgent.TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+            viewLifecycleOwner
+        ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LOG_TAG_BACKUP_RESTORE,
-                  "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}")
+            Log.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "WorkManager state: ${workInfo.state} for ${RestoreAgent.TAG}"
+            )
             if (WorkInfo.State.SUCCEEDED == workInfo.state) {
                 showRestoreSuccessUi()
                 workManager.pruneWork()
@@ -195,7 +209,8 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun result() {
         restoreActivityResult = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
             when (result.resultCode) {
                 Activity.RESULT_OK -> {
                     // result data contains the uri from the file picker
@@ -203,8 +218,10 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
                     result.data?.also { uri ->
                         fileUri = uri.data
                     }
-                    Log.i(LOG_TAG_BACKUP_RESTORE,
-                          "activity result for restore process with uri: $fileUri")
+                    Log.i(
+                        LOG_TAG_BACKUP_RESTORE,
+                        "activity result for restore process with uri: $fileUri"
+                    )
                     startRestoreProcess(fileUri)
                 }
                 Activity.RESULT_CANCELED -> {
@@ -217,7 +234,8 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         backupActivityResult = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
             when (result.resultCode) {
                 Activity.RESULT_OK -> {
                     // get URI of file created by picker
@@ -225,8 +243,10 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
                     result.data?.also { uri ->
                         backupFileUri = uri.data
                     }
-                    Log.i(LOG_TAG_BACKUP_RESTORE,
-                          "activity result for backup process with uri: $backupFileUri")
+                    Log.i(
+                        LOG_TAG_BACKUP_RESTORE,
+                        "activity result for backup process with uri: $backupFileUri"
+                    )
                     startBackupProcess(backupFileUri)
                 }
                 Activity.RESULT_CANCELED -> {
@@ -241,8 +261,10 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun startRestoreProcess(fileUri: Uri?) {
         if (fileUri == null) {
-            Log.w(LOG_TAG_BACKUP_RESTORE,
-                  "uri received from activity result is null, cancel restore process")
+            Log.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "uri received from activity result is null, cancel restore process"
+            )
             showRestoreFailureDialog()
             return
         }
@@ -252,16 +274,21 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
         data.putString(DATA_BUILDER_RESTORE_URI, fileUri.toString())
 
         val importWorker = OneTimeWorkRequestBuilder<RestoreAgent>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(RestoreAgent.TAG).build()
+            data.build()
+        ).setBackoffCriteria(
+            BackoffPolicy.LINEAR,
+            OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+            TimeUnit.MILLISECONDS
+        ).addTag(RestoreAgent.TAG).build()
         WorkManager.getInstance(requireContext()).beginWith(importWorker).enqueue()
     }
 
     private fun startBackupProcess(backupUri: Uri?) {
         if (backupUri == null) {
-            Log.w(LOG_TAG_BACKUP_RESTORE,
-                  "uri received from activity result is null, cancel backup process")
+            Log.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "uri received from activity result is null, cancel backup process"
+            )
             showBackupFailureDialog()
             return
         }
@@ -274,9 +301,12 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
 
         data.putString(DATA_BUILDER_BACKUP_URI, backupUri.toString())
         val downloadWatcher = OneTimeWorkRequestBuilder<BackupAgent>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(BackupAgent.TAG).build()
+            data.build()
+        ).setBackoffCriteria(
+            BackoffPolicy.LINEAR,
+            OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+            TimeUnit.MILLISECONDS
+        ).addTag(BackupAgent.TAG).build()
         WorkManager.getInstance(requireContext()).beginWith(downloadWatcher).enqueue()
     }
 
@@ -298,15 +328,19 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun showBackupSuccessUi() {
-        Utilities.showToastUiCentered(requireContext(),
-                                      getString(R.string.brbs_backup_complete_toast),
-                                      Toast.LENGTH_SHORT)
+        Utilities.showToastUiCentered(
+            requireContext(),
+            getString(R.string.brbs_backup_complete_toast),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun showRestoreSuccessUi() {
-        Utilities.showToastUiCentered(requireContext(),
-                                      getString(R.string.brbs_restore_complete_toast),
-                                      Toast.LENGTH_LONG)
+        Utilities.showToastUiCentered(
+            requireContext(),
+            getString(R.string.brbs_restore_complete_toast),
+            Toast.LENGTH_LONG
+        )
         delay(TimeUnit.MILLISECONDS.toMillis(1000), lifecycleScope) {
             restartApp(requireContext())
         }
@@ -332,13 +366,15 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
         builder.setTitle(R.string.brbs_restore_dialog_failure_title)
         builder.setMessage(R.string.brbs_restore_dialog_failure_message)
         builder.setPositiveButton(
-            getString(R.string.brbs_restore_dialog_failure_positive)) { _, _ ->
+            getString(R.string.brbs_restore_dialog_failure_positive)
+        ) { _, _ ->
             restore()
             observeRestoreWorker()
         }
 
         builder.setNegativeButton(
-            getString(R.string.brbs_restore_dialog_failure_negative)) { _, _ ->
+            getString(R.string.brbs_restore_dialog_failure_negative)
+        ) { _, _ ->
             // no-op
         }
 

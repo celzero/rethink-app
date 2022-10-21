@@ -48,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="1">
 
@@ -330,10 +331,10 @@
                         style="@style/Button.HomeScreen.Main"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
                         android:drawableStart="@drawable/ic_pause"
                         android:drawableEnd="@drawable/ic_arrow_down"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
                         android:text="@string/hsf_start_btn_state" />
 
                     <Button

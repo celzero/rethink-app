@@ -23,8 +23,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                app:cardCornerRadius="16dp"
-                android:elevation="10dp">
+                android:elevation="10dp"
+                app:cardCornerRadius="16dp">
 
                 <LinearLayout
 
@@ -107,10 +107,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center"
                 android:layout_weight="0.45"
+                android:alpha="0.5"
                 android:fontFamily="sans-serif"
                 android:paddingStart="5dp"
                 android:paddingEnd="5dp"
-                android:alpha="0.5"
                 android:text="@string/dns_logs_blocked_queries"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/default_font_text_view" />
@@ -120,11 +120,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.55"
+                android:alpha="0.5"
                 android:fontFamily="sans-serif"
                 android:gravity="end"
                 android:paddingStart="5dp"
                 android:paddingEnd="5dp"
-                android:alpha="0.5"
                 android:text="@string/dns_logs_lifetime_queries"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/default_font_text_view" />
@@ -152,9 +152,9 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_query"
             android:layout_width="match_parent"
-            android:layout_marginTop="5dp"
             android:layout_height="match_parent"
             android:layout_below="@id/query_list_logs_disabled_tv"
+            android:layout_marginTop="5dp"
             android:nestedScrollingEnabled="true"
             android:orientation="vertical"
             app:fastScrollEnabled="true"

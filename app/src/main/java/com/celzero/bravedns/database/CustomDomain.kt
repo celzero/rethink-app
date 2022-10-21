@@ -15,20 +15,22 @@
  */
 package com.celzero.bravedns.database
 
-import android.os.SystemClock
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.service.DomainRulesManager
 
 @Entity(tableName = "CustomDomain")
-class CustomDomain {
-    @PrimaryKey var domain: String = ""
-    var ips: String = ""
-    var status: Int = 0
-    var type: Int = 0
-    var createdTs: Long = SystemClock.elapsedRealtime()
-    var deletedTs: Long = SystemClock.elapsedRealtime()
-    var version: Long = getCurrentVersion()
+class CustomDomain(
+    domain: String,
+    var ips: String,
+    var type: Int,
+    var status: Int,
+    var createdTs: Long,
+    var deletedTs: Long,
+    var version: Long
+) {
+    @PrimaryKey
+    var domain: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is CustomDomain) return false
@@ -40,15 +42,8 @@ class CustomDomain {
         return this.domain.hashCode()
     }
 
-    constructor(domain: String, ips: String, type: Int, status: Int, createdTs: Long,
-                deletedTs: Long, version: Long) {
+    init {
         this.domain = domain.dropLastWhile { it == '.' }
-        this.ips = ips
-        this.status = status
-        this.type = type
-        this.createdTs = createdTs
-        this.deletedTs = deletedTs
-        this.version = version
     }
 
     companion object {
@@ -63,7 +58,4 @@ class CustomDomain {
         return this.status == DomainRulesManager.DomainStatus.BLOCK.id
     }
 
-    fun isWhitelisted(): Boolean {
-        return this.status == DomainRulesManager.DomainStatus.WHITELIST.id
-    }
 }

@@ -9,8 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:padding="5dp"
         android:orientation="horizontal"
+        android:padding="5dp"
         android:weightSum="1">
 
         <TextView
@@ -30,18 +30,18 @@
             android:id="@+id/aip_status_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:padding="5dp"
-            android:layout_weight="0.3"
             android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:layout_weight="0.3"
             android:background="@drawable/rectangle_border_background"
             android:drawableEnd="@drawable/ic_arrow_down_small"
             android:drawablePadding="-5dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
             android:fontFamily="sans-serif-medium"
-            android:visibility="visible"
-            android:textAllCaps="false" />
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="5dp"
+            android:textAllCaps="false"
+            android:visibility="visible" />
 
 
     </LinearLayout>

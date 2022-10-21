@@ -74,8 +74,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
             override fun onPageScrollStateChanged(state: Int) {
             }
 
-            override fun onPageScrolled(position: Int, positionOffset: Float,
-                                        positionOffsetPixels: Int) {
+            override fun onPageScrolled(
+                position: Int, positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
             }
 
             override fun onPageSelected(position: Int) {
@@ -90,11 +92,6 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
                 }
             }
         })
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        return
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -116,8 +113,10 @@ class WelcomeActivity : AppCompatActivity(R.layout.activity_welcome) {
         b.layoutDots.removeAllViews()
         for (i in dots.indices) {
             dots[i] = TextView(this)
-            dots[i]?.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                                              ViewGroup.LayoutParams.WRAP_CONTENT)
+            dots[i]?.layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             dots[i]?.text = HtmlCompat.fromHtml("&#8226;", HtmlCompat.FROM_HTML_MODE_LEGACY)
             dots[i]?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30F)
             dots[i]?.setTextColor(colorInActive[currentPage])

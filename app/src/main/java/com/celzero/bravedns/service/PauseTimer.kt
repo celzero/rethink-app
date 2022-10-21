@@ -52,7 +52,9 @@ object PauseTimer {
 
                     // Check vpn lockdown state every 30 secs
                     if (TimeUnit.MILLISECONDS.toSeconds(
-                            c) % LOCKDOWN_STATUS_CHECK_TIME_IN_SEC == 0L) {
+                            c
+                        ) % LOCKDOWN_STATUS_CHECK_TIME_IN_SEC == 0L
+                    ) {
                         resumeAppIfVpnLockdown()
                     }
                 }

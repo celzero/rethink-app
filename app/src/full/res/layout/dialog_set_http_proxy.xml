@@ -45,11 +45,11 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:inputType="none"
-            android:typeface="monospace"
             android:maxLines="1"
             android:padding="10dp"
             android:text=""
             android:textSize="@dimen/large_font_text_view"
+            android:typeface="monospace"
             app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -70,10 +70,10 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:inputType="number"
-            android:typeface="monospace"
             android:maxLines="1"
             android:padding="10dp"
             android:textSize="@dimen/large_font_text_view"
+            android:typeface="monospace"
             app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 

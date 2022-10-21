@@ -42,13 +42,14 @@ object DomainRulesManager : KoinComponent {
     private const val CACHE_MAX_SIZE = 10000L
 
     var domains: HashMap<String, CustomDomain> = HashMap()
-    var wildcards: HashMap<String, CustomDomain> = HashMap()
-    var tlds: HashMap<String, CustomDomain> = HashMap()
+    private var wildcards: HashMap<String, CustomDomain> = HashMap()
+    private var tlds: HashMap<String, CustomDomain> = HashMap()
 
     // stores all the previous response sent
-    private val domainLookupCache: Cache<String, DomainStatus> = CacheBuilder.newBuilder().maximumSize(
-        CACHE_MAX_SIZE
-    ).build()
+    private val domainLookupCache: Cache<String, DomainStatus> =
+        CacheBuilder.newBuilder().maximumSize(
+            CACHE_MAX_SIZE
+        ).build()
 
     enum class DomainStatus(val id: Int) {
         NONE(0), BLOCK(1), WHITELIST(2);
@@ -69,10 +70,6 @@ object DomainRulesManager : KoinComponent {
         DOMAIN(0), WILDCARD(1), TLD(2);
 
         companion object {
-            fun getAllDomainTypes(): Array<String> {
-                return arrayOf("Domain", "Wildcard", "TLD")
-            }
-
             fun getType(id: Int): DomainType {
                 return when (id) {
                     TLD.id -> TLD
@@ -207,14 +204,6 @@ object DomainRulesManager : KoinComponent {
         domainLookupCache.put(domain, status)
     }
 
-    fun whitelist(cd: CustomDomain) {
-        io {
-            cd.status = DomainStatus.WHITELIST.id
-            dbInsertOrUpdate(cd)
-            updateCache(cd)
-        }
-    }
-
     fun applyStatus(domain: String, ips: String, type: DomainType, status: DomainStatus) {
         io {
             val cd = constructObject(domain, ips, type, status.id)
@@ -239,54 +228,18 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    fun noRule(cd: CustomDomain) {
-        io {
-            cd.status = DomainStatus.NONE.id
-            dbInsertOrUpdate(cd)
-            updateCache(cd)
-        }
-    }
-
-    private suspend fun dbInsertOrUpdate(cd: CustomDomain) {
+    private fun dbInsertOrUpdate(cd: CustomDomain) {
         customDomainsRepository.insert(cd)
     }
 
-    private suspend fun dbDelte(cd: CustomDomain) {
-        customDomainsRepository.delete(cd)
-    }
-
-    fun deleteDomain(cd: CustomDomain) {
-        io {
-            dbDelte(cd)
-            removeFromCache(cd)
-        }
-    }
-
-    private fun removeFromCache(cd: CustomDomain) {
-        when (DomainType.getType(cd.type)) {
-            DomainType.DOMAIN -> {
-                lock.write {
-                    domains.remove(cd.domain)
-                }
-            }
-            DomainType.TLD -> {
-                lock.write {
-                    tlds.remove(cd.domain)
-                }
-            }
-            DomainType.WILDCARD -> {
-                lock.write {
-                    wildcards.remove(cd.domain)
-                }
-            }
-        }
-        domainLookupCache.invalidateAll()
-    }
-
-    private fun constructObject(domain: String, ips: String = "", type: DomainType,
-                                status: Int): CustomDomain {
-        return CustomDomain(domain, ips, type.id, status, Calendar.getInstance().timeInMillis,
-                            Constants.INIT_TIME_MS, CustomDomain.getCurrentVersion())
+    private fun constructObject(
+        domain: String, ips: String = "", type: DomainType,
+        status: Int
+    ): CustomDomain {
+        return CustomDomain(
+            domain, ips, type.id, status, Calendar.getInstance().timeInMillis,
+            Constants.INIT_TIME_MS, CustomDomain.getCurrentVersion()
+        )
     }
 
     private fun io(f: suspend () -> Unit) {

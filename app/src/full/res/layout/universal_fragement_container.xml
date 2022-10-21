@@ -7,7 +7,7 @@
     android:background="?attr/background"
     tools:context=".ui.UniversalFirewallFragment">
 
-  <include
-      android:id="@+id/app_scrolling_incl_firewall"
-      layout="@layout/fragment_universal_firewall" />
+    <include
+        android:id="@+id/app_scrolling_incl_firewall"
+        layout="@layout/fragment_universal_firewall" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

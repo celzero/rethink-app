@@ -3,8 +3,8 @@ package com.celzero.bravedns
 import android.app.Application
 import android.os.StrictMode
 import android.util.Log
-import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -34,7 +34,7 @@ class RethinkDnsApplication : Application() {
         turnOnStrictMode()
 
         startKoin {
-            if (BuildConfig.DEBUG) androidLogger()
+            if (DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
@@ -45,12 +45,16 @@ class RethinkDnsApplication : Application() {
     }
 
     private fun turnOnStrictMode() {
-        if (!BuildConfig.DEBUG) return
+        if (!DEBUG) return
         // Uncomment the code below to enable the StrictModes.
         // To test the apps disk read/writes, network usages.
         StrictMode.setThreadPolicy(
-            StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().permitDiskReads().permitDiskWrites().permitNetwork().build())
+            StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().permitDiskReads()
+                .permitDiskWrites().permitNetwork().build()
+        )
         StrictMode.setVmPolicy(
-            StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog().build())
+            StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog()
+                .build()
+        )
     }
 }

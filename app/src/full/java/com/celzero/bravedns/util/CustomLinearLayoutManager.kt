@@ -25,8 +25,10 @@ class CustomLinearLayoutManager(context: Context) : LinearLayoutManager(context)
         return true
     }
 
-    override fun smoothScrollToPosition(recyclerView: RecyclerView?, state: RecyclerView.State?,
-                                        position: Int) {
+    override fun smoothScrollToPosition(
+        recyclerView: RecyclerView?, state: RecyclerView.State?,
+        position: Int
+    ) {
         super.smoothScrollToPosition(recyclerView, state, position)
     }
 

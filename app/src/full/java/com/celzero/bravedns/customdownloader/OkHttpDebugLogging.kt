@@ -33,8 +33,10 @@ object OkHttpDebugLogging {
     private fun logHandler() = ConsoleHandler().apply {
         level = Level.FINEST
         formatter = object : SimpleFormatter() {
-            override fun format(record: LogRecord) = String.format("[%1\$tF %1\$tT] %2\$s %n",
-                                                                   record.millis, record.message)
+            override fun format(record: LogRecord) = String.format(
+                "[%1\$tF %1\$tT] %2\$s %n",
+                record.millis, record.message
+            )
         }
     }
 

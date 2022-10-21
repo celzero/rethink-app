@@ -30,15 +30,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RethinkSimpleViewAdapter(val context: Context,
-                               var fileTags: List<RethinkBlocklistManager.SimpleViewTag>,
-                               val type: RethinkBlocklistManager.RethinkBlocklistType
+class RethinkSimpleViewAdapter(
+    val context: Context,
+    var fileTags: List<RethinkBlocklistManager.SimpleViewTag>,
+    val type: RethinkBlocklistManager.RethinkBlocklistType
 ) :
-        RecyclerView.Adapter<RethinkSimpleViewAdapter.RethinkSimpleViewHolder>() {
+    RecyclerView.Adapter<RethinkSimpleViewAdapter.RethinkSimpleViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RethinkSimpleViewHolder {
         val itemBinding = ListItemRethinkBlocklistSimpleBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+            LayoutInflater.from(parent.context), parent, false
+        )
         return RethinkSimpleViewHolder(itemBinding)
     }
 
@@ -51,7 +53,7 @@ class RethinkSimpleViewAdapter(val context: Context,
     }
 
     inner class RethinkSimpleViewHolder(private val b: ListItemRethinkBlocklistSimpleBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(position: Int) {
             displayMetaData(position)

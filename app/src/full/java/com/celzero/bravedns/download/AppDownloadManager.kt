@@ -23,13 +23,13 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
-import com.celzero.bravedns.service.RethinkBlocklistManager.DownloadType
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.customdownloader.*
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.RethinkBlocklistManager.DownloadType
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -58,8 +58,10 @@ import java.util.concurrent.TimeUnit
  * to listen for the download complete and for copying the files from external to canonical path.
  * TODO remote blocklist - implementation pending.
  */
-class AppDownloadManager(private val context: Context,
-                         private val persistentState: PersistentState) {
+class AppDownloadManager(
+    private val context: Context,
+    private val persistentState: PersistentState
+) {
 
     private lateinit var downloadManager: DownloadManager
     private lateinit var downloadIds: LongArray
@@ -82,10 +84,13 @@ class AppDownloadManager(private val context: Context,
         val request = Request.Builder().url(url).build()
 
         RetrofitManager.okHttpClient(getDnsTypeOnRetryCount(retryCount)).newCall(
-            request).enqueue(object : Callback {
+            request
+        ).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG_DOWNLOAD,
-                      "onFailure attempt to retry($retryCount), cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()} with exception: ${e.message}")
+                Log.i(
+                    LOG_TAG_DOWNLOAD,
+                    "onFailure attempt to retry($retryCount), cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()} with exception: ${e.message}"
+                )
 
                 if (retryCount > 3) {
                     timeStampToDownload.postValue(DownloadManagerStatus.FAILURE.id)
@@ -111,13 +116,15 @@ class AppDownloadManager(private val context: Context,
     }
 
     private fun processCheckDownloadResponse(type: DownloadType, response: Response) {
-        val stringResponse = response.body?.string() ?: return
-        response.body?.close()
+        val stringResponse = response.body.string()
+        response.body.close()
         try {
             val json = JSONObject(stringResponse)
             val version = json.optInt(Constants.JSON_VERSION, 0)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                             "client onResponse for refresh blocklist files:  $version")
+            if (DEBUG) Log.d(
+                LOG_TAG_DOWNLOAD,
+                "client onResponse for refresh blocklist files:  $version"
+            )
             if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
                 timeStampToDownload.postValue(DownloadManagerStatus.NOT_REQUIRED.id)
                 return
@@ -155,7 +162,8 @@ class AppDownloadManager(private val context: Context,
             persistentState.remoteBlocklistTimestamp
         }
         val appVersionCode = persistentState.appVersion
-        val url = "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
+        val url =
+            "${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL}$timestamp&${Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE}$appVersionCode"
         Log.i(LOG_TAG_DOWNLOAD, "Check for download, download type ${type.name} url: $url")
         return url
     }
@@ -178,33 +186,44 @@ class AppDownloadManager(private val context: Context,
         purge(context, timestamp, DownloadType.REMOTE)
 
         val retrofit = RetrofitManager.getBlocklistBaseBuilder(
-            RetrofitManager.Companion.OkHttpDnsType.DEFAULT).addConverterFactory(
-            GsonConverterFactory.create()).build()
+            RetrofitManager.Companion.OkHttpDnsType.DEFAULT
+        ).addConverterFactory(
+            GsonConverterFactory.create()
+        ).build()
         val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
         val request = retrofitInterface.downloadRemoteBlocklistFile(
-            Constants.FILETAG_TEMP_DOWNLOAD_URL)
+            Constants.FILETAG_TEMP_DOWNLOAD_URL
+        )
 
-        Log.i(LOG_TAG_DOWNLOAD,
-              "Remote blocklist download request with $request with url? ${request.request().url} ")
+        Log.i(
+            LOG_TAG_DOWNLOAD,
+            "Remote blocklist download request with $request with url? ${request.request().url} "
+        )
 
         request.enqueue(object : retrofit2.Callback<JsonObject?> {
-            override fun onResponse(call: retrofit2.Call<JsonObject?>,
-                                    response: retrofit2.Response<JsonObject?>) {
+            override fun onResponse(
+                call: retrofit2.Call<JsonObject?>,
+                response: retrofit2.Response<JsonObject?>
+            ) {
                 if (response.isSuccessful) {
                     saveFileTag(response.body(), timestamp)
                     // reset updatable time stamp
                     setUpdatableTimestamp(INIT_TIME_MS, DownloadType.REMOTE)
                     remoteDownloadStatus.postValue(DownloadManagerStatus.SUCCESS.id)
                 } else {
-                    Log.i(LOG_TAG_DOWNLOAD,
-                          "Remote blocklist download failure, call? ${call.isExecuted}, response: $response ")
+                    Log.i(
+                        LOG_TAG_DOWNLOAD,
+                        "Remote blocklist download failure, call? ${call.isExecuted}, response: $response "
+                    )
                     remoteDownloadStatus.postValue(DownloadManagerStatus.FAILURE.id)
                 }
             }
 
             override fun onFailure(call: retrofit2.Call<JsonObject?>, t: Throwable) {
-                Log.i(LOG_TAG_DOWNLOAD,
-                      "Remote blocklist download failure with error: ${t.message}")
+                Log.i(
+                    LOG_TAG_DOWNLOAD,
+                    "Remote blocklist download failure with error: ${t.message}"
+                )
                 remoteDownloadStatus.postValue(DownloadManagerStatus.FAILURE.id)
             }
         })
@@ -227,9 +246,11 @@ class AppDownloadManager(private val context: Context,
     }
 
     private fun makeFile(timestamp: Long): File? {
-        val dir = Utilities.remoteBlocklistFile(context,
-                                                Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                timestamp) ?: return null
+        val dir = Utilities.remoteBlocklistFile(
+            context,
+            Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+            timestamp
+        ) ?: return null
 
         if (!dir.exists()) {
             dir.mkdirs()
@@ -260,8 +281,11 @@ class AppDownloadManager(private val context: Context,
             Constants.ONDEVICE_BLOCKLISTS_TEMP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
                 val id = generateCustomDownloadId()
                 val file = File(
-                    localBlocklistDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                   timestamp))
+                    localBlocklistDownloadBasePath(
+                        context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                        timestamp
+                    )
+                )
                 file.mkdirs()
                 val filename = file.absolutePath + onDeviceBlocklistsMetadata.filename
                 customDownloadManager.download(id, filename, onDeviceBlocklistsMetadata.url)
@@ -276,10 +300,14 @@ class AppDownloadManager(private val context: Context,
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
         data.putLong("blocklistTimestamp", timestamp)
         val downloadWatcher = OneTimeWorkRequestBuilder<LocalBlocklistDownloader>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(
-            LocalBlocklistDownloader.CUSTOM_DOWNLOAD).build()
+            data.build()
+        ).setBackoffCriteria(
+            BackoffPolicy.LINEAR,
+            OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+            TimeUnit.MILLISECONDS
+        ).addTag(
+            LocalBlocklistDownloader.CUSTOM_DOWNLOAD
+        ).build()
 
         WorkManager.getInstance(context).beginWith(downloadWatcher).enqueue()
     }
@@ -296,17 +324,24 @@ class AppDownloadManager(private val context: Context,
         data.putLongArray("downloadIds", downloadIds)
 
         val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(
-            DOWNLOAD_TAG).setInitialDelay(10, TimeUnit.SECONDS).build()
+            data.build()
+        ).setBackoffCriteria(
+            BackoffPolicy.LINEAR,
+            OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+            TimeUnit.MILLISECONDS
+        ).addTag(
+            DOWNLOAD_TAG
+        ).setInitialDelay(10, TimeUnit.SECONDS).build()
 
         val timestampWorkerData = workDataOf("blocklistDownloadInitiatedTime" to timestamp)
 
         val fileHandler = OneTimeWorkRequestBuilder<FileHandleWorker>().setInputData(
-            timestampWorkerData).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                                    TimeUnit.MILLISECONDS).addTag(FILE_TAG).build()
+            timestampWorkerData
+        ).setBackoffCriteria(
+            BackoffPolicy.LINEAR,
+            OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+            TimeUnit.MILLISECONDS
+        ).addTag(FILE_TAG).build()
 
         WorkManager.getInstance(context).beginWith(downloadWatcher).then(fileHandler).enqueue()
 
@@ -329,9 +364,12 @@ class AppDownloadManager(private val context: Context,
         request.apply {
             setTitle(fileName)
             setDescription(fileName)
-            request.setDestinationInExternalFilesDir(context,
-                                                     BlocklistDownloadHelper.getExternalFilePath(
-                                                         timestamp), fileName)
+            request.setDestinationInExternalFilesDir(
+                context,
+                BlocklistDownloadHelper.getExternalFilePath(
+                    timestamp
+                ), fileName
+            )
             val downloadId = downloadManager.enqueue(this)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename - $fileName, downloadID - $downloadId")
             return downloadId

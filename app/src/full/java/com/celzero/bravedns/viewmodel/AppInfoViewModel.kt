@@ -2,9 +2,9 @@ package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.FirewallAppFragment
 import com.celzero.bravedns.util.Constants
 
@@ -101,36 +101,50 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         if (firewall == FirewallManager.FirewallStatus.BLOCK.id) {
             state = if (blocked) {
                 if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
-                    AppState(FirewallManager.FirewallStatus.BLOCK,
-                             FirewallManager.ConnectionStatus.WIFI)
+                    AppState(
+                        FirewallManager.FirewallStatus.BLOCK,
+                        FirewallManager.ConnectionStatus.WIFI
+                    )
                 } else {
-                    AppState(FirewallManager.FirewallStatus.BLOCK,
-                             FirewallManager.ConnectionStatus.BOTH)
+                    AppState(
+                        FirewallManager.FirewallStatus.BLOCK,
+                        FirewallManager.ConnectionStatus.BOTH
+                    )
                 }
             } else {
                 if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
-                    AppState(FirewallManager.FirewallStatus.ALLOW,
-                             FirewallManager.ConnectionStatus.BOTH)
+                    AppState(
+                        FirewallManager.FirewallStatus.ALLOW,
+                        FirewallManager.ConnectionStatus.BOTH
+                    )
                 } else {
-                    AppState(FirewallManager.FirewallStatus.BLOCK,
-                             FirewallManager.ConnectionStatus.MOBILE_DATA)
+                    AppState(
+                        FirewallManager.FirewallStatus.BLOCK,
+                        FirewallManager.ConnectionStatus.MOBILE_DATA
+                    )
                 }
             }
         } else {
             state = if (blocked) {
-                AppState(FirewallManager.FirewallStatus.BLOCK,
-                         FirewallManager.ConnectionStatus.WIFI)
+                AppState(
+                    FirewallManager.FirewallStatus.BLOCK,
+                    FirewallManager.ConnectionStatus.WIFI
+                )
             } else {
-                AppState(FirewallManager.FirewallStatus.ALLOW,
-                         FirewallManager.ConnectionStatus.BOTH)
+                AppState(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
             }
         }
 
         return state
     }
 
-    data class AppState(val fid: FirewallManager.FirewallStatus,
-                        val cid: FirewallManager.ConnectionStatus)
+    data class AppState(
+        val fid: FirewallManager.FirewallStatus,
+        val cid: FirewallManager.ConnectionStatus
+    )
 
 
     fun updateMeteredStatus(blocked: Boolean) {

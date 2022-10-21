@@ -26,7 +26,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.SpinnerItemFirewallStatusBinding
 
 class FirewallStatusSpinnerAdapter(val context: Context, private val spinnerLabels: Array<String>) :
-        BaseAdapter() {
+    BaseAdapter() {
 
     override fun getCount(): Int {
         return spinnerLabels.size
@@ -42,7 +42,8 @@ class FirewallStatusSpinnerAdapter(val context: Context, private val spinnerLabe
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val itemBinding = convertView ?: SpinnerItemFirewallStatusBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false).root
+            LayoutInflater.from(parent.context), parent, false
+        ).root
 
         setItem(itemBinding, getItem(position))
         return itemBinding
@@ -50,7 +51,8 @@ class FirewallStatusSpinnerAdapter(val context: Context, private val spinnerLabe
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
         val itemBinding = convertView ?: SpinnerItemFirewallStatusBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false).root
+            LayoutInflater.from(parent.context), parent, false
+        ).root
 
         setItem(itemBinding, getItem(position))
         return itemBinding

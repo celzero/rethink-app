@@ -69,8 +69,10 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
             }
         }
 
-        TabLayoutMediator(b.otherDnsActTabLayout,
-                          b.otherDnsActViewpager) { tab, position -> // Styling each tab here
+        TabLayoutMediator(
+            b.otherDnsActTabLayout,
+            b.otherDnsActViewpager
+        ) { tab, position -> // Styling each tab here
             tab.text = when (position) {
                 0 -> getString(R.string.other_dns_list_tab1)
                 1 -> getString(R.string.other_dns_list_tab2)

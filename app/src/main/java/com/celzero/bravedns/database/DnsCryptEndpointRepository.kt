@@ -28,27 +28,27 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         dnsCryptEndpointDAO.update(dnsCryptEndpoint)
     }
 
-    suspend fun insertAsync(dnsCryptEndpoint: DnsCryptEndpoint) {
+    fun insertAsync(dnsCryptEndpoint: DnsCryptEndpoint) {
         dnsCryptEndpointDAO.insert(dnsCryptEndpoint)
     }
 
-    suspend fun deleteOlderData(date: Long) {
+    fun deleteOlderData(date: Long) {
         dnsCryptEndpointDAO.deleteOlderData(date)
     }
 
-    suspend fun deleteDNSCryptEndpoint(id: Int) {
+    fun deleteDNSCryptEndpoint(id: Int) {
         dnsCryptEndpointDAO.deleteDNSCryptEndpoint(id)
     }
 
-    suspend fun removeConnectionStatus() {
+    fun removeConnectionStatus() {
         dnsCryptEndpointDAO.removeConnectionStatus()
     }
 
-    suspend fun getConnectedDNSCrypt(): List<DnsCryptEndpoint> {
+    fun getConnectedDNSCrypt(): List<DnsCryptEndpoint> {
         return dnsCryptEndpointDAO.getConnectedDNSCrypt()
     }
 
-    suspend fun getConnectedCount(): Int {
+    fun getConnectedCount(): Int {
         return dnsCryptEndpointDAO.getConnectedCount()
     }
 
@@ -56,18 +56,18 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         return dnsCryptEndpointDAO.getConnectedCountLiveData()
     }
 
-    suspend fun getCount(): Int {
+    fun getCount(): Int {
         return dnsCryptEndpointDAO.getCount()
     }
 
-    suspend fun updateConnectionStatus(liveServersID: String?) {
+    fun updateConnectionStatus(liveServersID: String?) {
         removeConnectionStatus()
         liveServersID?.split(",")?.forEach {
             dnsCryptEndpointDAO.updateConnectionStatus(it.trim().toInt())
         }
     }
 
-    suspend fun getServersToAdd(): String {
+    fun getServersToAdd(): String {
         val servers = getConnectedDNSCrypt().joinToString(separator = ",") {
             "${it.id}#${it.dnsCryptURL}"
         }
@@ -75,7 +75,7 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         return servers
     }
 
-    suspend fun getServersToRemove(): String {
+    fun getServersToRemove(): String {
         return getConnectedDNSCrypt().joinToString(separator = ",") { "${it.id}" }
     }
 }

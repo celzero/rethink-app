@@ -90,7 +90,6 @@ android {
 
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.4.0'
-    def koin_version = '3.2.3'
     def room_version = "2.4.3"
     def paging_version = "3.1.1"
 

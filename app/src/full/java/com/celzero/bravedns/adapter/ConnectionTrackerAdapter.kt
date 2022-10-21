@@ -29,10 +29,10 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
@@ -45,25 +45,31 @@ import com.google.gson.Gson
 import java.util.*
 
 class ConnectionTrackerAdapter(private val context: Context) :
-        PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
-            DIFF_CALLBACK) {
+    PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
+        DIFF_CALLBACK
+    ) {
 
     companion object {
         private val DIFF_CALLBACK = object :
 
-                DiffUtil.ItemCallback<ConnectionTracker>() {
+            DiffUtil.ItemCallback<ConnectionTracker>() {
 
-            override fun areItemsTheSame(oldConnection: ConnectionTracker,
-                                         newConnection: ConnectionTracker) = oldConnection.id == newConnection.id
+            override fun areItemsTheSame(
+                oldConnection: ConnectionTracker,
+                newConnection: ConnectionTracker
+            ) = oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: ConnectionTracker,
-                                            newConnection: ConnectionTracker) = oldConnection == newConnection
+            override fun areContentsTheSame(
+                oldConnection: ConnectionTracker,
+                newConnection: ConnectionTracker
+            ) = oldConnection == newConnection
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
         val itemBinding = ConnectionTransactionRowBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+            LayoutInflater.from(parent.context), parent, false
+        )
         return ConnectionTrackerViewHolder(itemBinding)
     }
 
@@ -75,7 +81,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
     }
 
     inner class ConnectionTrackerViewHolder(private val b: ConnectionTransactionRowBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(connTracker: ConnectionTracker) {
             displayTransactionDetails(connTracker)
@@ -102,8 +108,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
             val bottomSheetFragment = ConnTrackerBottomSheetFragment()
             // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
-            bundle.putString(ConnTrackerBottomSheetFragment.INSTANCE_STATE_IPDETAILS,
-                             Gson().toJson(ct))
+            bundle.putString(
+                ConnTrackerBottomSheetFragment.INSTANCE_STATE_IPDETAILS,
+                Gson().toJson(ct)
+            )
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
@@ -116,9 +124,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
             if (connTracker.dnsQuery.isNullOrEmpty()) {
                 b.connectionIpAddress.text = connTracker.ipAddress
             } else {
-                b.connectionIpAddress.text = context.getString(R.string.ct_ip_details,
-                                                               connTracker.ipAddress,
-                                                               connTracker.dnsQuery)
+                b.connectionIpAddress.text = context.getString(
+                    R.string.ct_ip_details,
+                    connTracker.ipAddress,
+                    connTracker.dnsQuery
+                )
             }
         }
 
@@ -127,15 +137,17 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
             val apps = FirewallManager.getPackageNamesByUid(ct.uid)
 
-            if (apps.isNullOrEmpty()) {
+            if (apps.isEmpty()) {
                 loadAppIcon(Utilities.getDefaultIcon(context))
                 return
             }
 
             val count = apps.count()
             val appName = if (count > 1) {
-                context.getString(R.string.ctbs_app_other_apps, ct.appName,
-                                  (count).minus(1).toString())
+                context.getString(
+                    R.string.ctbs_app_other_apps, ct.appName,
+                    (count).minus(1).toString()
+                )
             } else {
                 ct.appName
             }
@@ -150,13 +162,14 @@ class ConnectionTrackerAdapter(private val context: Context) :
             // https://github.com/celzero/rethink-app/issues/42 - #3 - transport + protocol.
             val resolvedPort = KnownPorts.resolvePort(port)
             // case: for UDP/443 label it as HTTP3 instead of HTTPS
-            b.connLatencyTxt.text = if (port == KnownPorts.HTTPS_PORT && proto == Protocol.UDP.protocolType) {
-                context.getString(R.string.connection_http3)
-            } else if (resolvedPort != KnownPorts.PORT_VAL_UNKNOWN) {
-                resolvedPort.uppercase(Locale.ROOT)
-            } else {
-                Protocol.getProtocolName(proto).name
-            }
+            b.connLatencyTxt.text =
+                if (port == KnownPorts.HTTPS_PORT && proto == Protocol.UDP.protocolType) {
+                    context.getString(R.string.connection_http3)
+                } else if (resolvedPort != KnownPorts.PORT_VAL_UNKNOWN) {
+                    resolvedPort.uppercase(Locale.ROOT)
+                } else {
+                    Protocol.getProtocolName(proto).name
+                }
         }
 
         private fun displayFirewallRulesetHint(isBlocked: Boolean, ruleName: String?) {
@@ -165,13 +178,15 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 isBlocked -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.colorRed_A400))
+                        ContextCompat.getColor(context, R.color.colorRed_A400)
+                    )
                 }
                 // hint white when whitelisted
                 (FirewallRuleset.shouldShowHint(ruleName)) -> {
                     b.connectionStatusIndicator.visibility = View.VISIBLE
                     b.connectionStatusIndicator.setBackgroundColor(
-                        ContextCompat.getColor(context, R.color.primaryLightColorText))
+                        ContextCompat.getColor(context, R.color.primaryLightColorText)
+                    )
                 }
                 // no hints, otherwise
                 else -> {
@@ -182,7 +197,8 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private fun loadAppIcon(drawable: Drawable?) {
             GlideApp.with(context).load(drawable).error(Utilities.getDefaultIcon(context)).into(
-                b.connectionAppIcon)
+                b.connectionAppIcon
+            )
         }
     }
 

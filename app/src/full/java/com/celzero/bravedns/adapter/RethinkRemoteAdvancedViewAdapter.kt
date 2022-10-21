@@ -35,28 +35,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RethinkRemoteAdvancedViewAdapter(val context: Context) :
-        PagingDataAdapter<RethinkRemoteFileTag, RethinkRemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder>(
-            DIFF_CALLBACK) {
+    PagingDataAdapter<RethinkRemoteFileTag, RethinkRemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder>(
+        DIFF_CALLBACK
+    ) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<RethinkRemoteFileTag>() {
 
-            override fun areItemsTheSame(oldConnection: RethinkRemoteFileTag,
-                                         newConnection: RethinkRemoteFileTag): Boolean {
+            override fun areItemsTheSame(
+                oldConnection: RethinkRemoteFileTag,
+                newConnection: RethinkRemoteFileTag
+            ): Boolean {
                 return oldConnection == newConnection
             }
 
-            override fun areContentsTheSame(oldConnection: RethinkRemoteFileTag,
-                                            newConnection: RethinkRemoteFileTag): Boolean {
+            override fun areContentsTheSame(
+                oldConnection: RethinkRemoteFileTag,
+                newConnection: RethinkRemoteFileTag
+            ): Boolean {
                 return (oldConnection.value == newConnection.value && oldConnection.isSelected == newConnection.isSelected)
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): RethinkRemoteFileTagViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RethinkRemoteFileTagViewHolder {
         val itemBinding = ListItemRethinkBlocklistAdvBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+            LayoutInflater.from(parent.context), parent, false
+        )
         return RethinkRemoteFileTagViewHolder(itemBinding)
     }
 
@@ -68,7 +76,7 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
 
 
     inner class RethinkRemoteFileTagViewHolder(private val b: ListItemRethinkBlocklistAdvBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(filetag: RethinkRemoteFileTag, position: Int) {
             displayHeaderIfNeeded(filetag, position)
@@ -96,8 +104,10 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
             } else {
                 b.crpDescGroupTv.text = filetag.subg
             }
-            b.crpDescEntriesTv.text = context.getString(R.string.dc_entries,
-                                                        filetag.entries.toString())
+            b.crpDescEntriesTv.text = context.getString(
+                R.string.dc_entries,
+                filetag.entries.toString()
+            )
 
             b.crpCheckBox.isChecked = filetag.isSelected
             setCardBackground(filetag.isSelected)
@@ -163,14 +173,19 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
 
         // fixme: remove this method, add it in strings.xml
         private fun getGroupName(group: String): String {
-            if (group == "parentalcontrol") {
-                return context.getString(R.string.rbl_parental_control)
-            } else if (group == "privacy") {
-                return context.getString(R.string.rbl_privacy)
-            } else if (group == "security") {
-                return context.getString(R.string.rbl_security)
-            } else {
-                return ""
+            return when (group) {
+                "parentalcontrol" -> {
+                    context.getString(R.string.rbl_parental_control)
+                }
+                "privacy" -> {
+                    context.getString(R.string.rbl_privacy)
+                }
+                "security" -> {
+                    context.getString(R.string.rbl_security)
+                }
+                else -> {
+                    ""
+                }
             }
         }
 

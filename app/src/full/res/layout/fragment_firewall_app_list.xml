@@ -15,9 +15,9 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
             android:layout_margin="4dp"
-            android:elevation="4dp">
+            android:elevation="4dp"
+            app:cardCornerRadius="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -150,10 +150,10 @@
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@id/ffa_toggle_all_wifi"
             android:layout_toEndOf="@id/ffa_app_info_icon"
-            android:textAlignment="textStart"
             android:fontFamily="sans-serif"
             android:padding="5dp"
             android:text="@string/fapps_firewall_filter_hint"
+            android:textAlignment="textStart"
             android:textSize="@dimen/default_font_text_view" />
 
         <androidx.appcompat.widget.AppCompatImageView

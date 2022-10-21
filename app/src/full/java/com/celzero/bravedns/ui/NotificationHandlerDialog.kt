@@ -73,8 +73,10 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun trampoline(trampolineType: TrampolineType) {
-        Log.i(LoggerConstants.LOG_TAG_VPN,
-              "act on notification, notification type: $trampolineType")
+        Log.i(
+            LoggerConstants.LOG_TAG_VPN,
+            "act on notification, notification type: $trampolineType"
+        )
         when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()
@@ -112,11 +114,13 @@ class NotificationHandlerDialog : AppCompatActivity() {
         builder.setTitle(R.string.alert_permission_accessibility_regrant)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
         builder.setPositiveButton(
-            getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
+            getString(R.string.univ_accessibility_crash_dialog_positive)
+        ) { _, _ ->
             openRethinkAppInfo(this)
         }
         builder.setNegativeButton(
-            getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
+            getString(R.string.univ_accessibility_crash_dialog_negative)
+        ) { _, _ ->
             finish()
         }
         builder.setCancelable(false)

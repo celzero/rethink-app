@@ -21,40 +21,43 @@ import kotlinx.coroutines.launch
 
 
 class DnsCryptRelayEndpointRepository(
-        private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO) {
+    private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO
+) {
 
-    suspend fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint) {
+    fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointDAO.update(dnsCryptRelayEndpoint)
     }
 
-    suspend fun insertAsync(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
-                            coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
+    fun insertAsync(
+        dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
+        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    ) {
         coroutineScope.launch {
             dnsCryptRelayEndpointDAO.insert(dnsCryptRelayEndpoint)
         }
     }
 
-    suspend fun deleteOlderData(date: Long) {
+    fun deleteOlderData(date: Long) {
         dnsCryptRelayEndpointDAO.deleteOlderData(date)
     }
 
-    suspend fun deleteDnsCryptRelayEndpoint(id: Int) {
+    fun deleteDnsCryptRelayEndpoint(id: Int) {
         dnsCryptRelayEndpointDAO.deleteDnsCryptRelayEndpoint(id)
     }
 
-    suspend fun removeConnectionStatus() {
+    fun removeConnectionStatus() {
         dnsCryptRelayEndpointDAO.removeConnectionStatus()
     }
 
-    suspend fun getConnectedRelays(): List<DnsCryptRelayEndpoint> {
+    fun getConnectedRelays(): List<DnsCryptRelayEndpoint> {
         return dnsCryptRelayEndpointDAO.getConnectedRelays()
     }
 
-    suspend fun getCount(): Int {
+    fun getCount(): Int {
         return dnsCryptRelayEndpointDAO.getCount()
     }
 
-    suspend fun getServersToAdd(): String {
+    fun getServersToAdd(): String {
         val relays = getConnectedRelays()
         return relays.joinToString(separator = ",") {
             it.dnsCryptRelayURL

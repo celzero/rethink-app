@@ -77,15 +77,19 @@ object RethinkBlocklistManager : KoinComponent {
         }
     }
 
-    data class SimpleViewTag(val id: Int, val name: String, val desc: String,
-                             val tags: MutableList<Int>, val rethinkBlockType: RethinkBlockType)
+    data class SimpleViewTag(
+        val id: Int, val name: String, val desc: String,
+        val tags: MutableList<Int>, val rethinkBlockType: RethinkBlockType
+    )
 
     data class RethinkBlockType(val name: String, val desc: String)
 
-    suspend fun getSimpleViewTags(type: RethinkBlocklistType): List<SimpleViewTag> {
+    fun getSimpleViewTags(type: RethinkBlocklistType): List<SimpleViewTag> {
 
-        val simpleTags = mutableListOf(ADULT, PIRACY, GAMBLING, DATING, SOCIAL_MEDIA, SEC_FULL,
-                                       SEC_EXTRA, PRIVACY_LITE, PRIVACY_AGGRESSIVE, PRIVACY_EXTREME)
+        val simpleTags = mutableListOf(
+            ADULT, PIRACY, GAMBLING, DATING, SOCIAL_MEDIA, SEC_FULL,
+            SEC_EXTRA, PRIVACY_LITE, PRIVACY_AGGRESSIVE, PRIVACY_EXTREME
+        )
 
         val tags = if (type.isRemote()) {
             remoteFileTagRepository.getSimpleViewTags()
@@ -105,43 +109,67 @@ object RethinkBlocklistManager : KoinComponent {
 
     // fixme: remove the below code when the filetag is updated from version 1 to 2.
     // TODO: move this strings to strings.xml
-    private val PARENTAL_CONTROL = RethinkBlockType("Parental Control",
-                                                    "Block adult & pirated content, online gambling & dating, and social media.")
-    private val SECURITY = RethinkBlockType("Security",
-                                            "Block malware, ransomware, cryptoware, phishers, and other threats.")
+    private val PARENTAL_CONTROL = RethinkBlockType(
+        "Parental Control",
+        "Block adult & pirated content, online gambling & dating, and social media."
+    )
+    private val SECURITY = RethinkBlockType(
+        "Security",
+        "Block malware, ransomware, cryptoware, phishers, and other threats."
+    )
     private val PRIVACY = RethinkBlockType("Privacy", "Block attentionware, spyware, scareware.")
 
-    private val ADULT = SimpleViewTag(0, "Adult", "Blocks over 30,000 adult websites.",
-                                      mutableListOf(), PARENTAL_CONTROL)
-    private val PIRACY = SimpleViewTag(1, "Piracy",
-                                       "Blocks torrent, dubious video streaming and file sharing websites.",
-                                       mutableListOf(), PARENTAL_CONTROL)
-    private val GAMBLING = SimpleViewTag(2, "Gambling",
-                                         "Blocks over 2000+ online gambling websites.",
-                                         mutableListOf(), PARENTAL_CONTROL)
-    private val DATING = SimpleViewTag(3, "Dating", "Blocks over 3000+ online dating websites.",
-                                       mutableListOf(), PARENTAL_CONTROL)
-    private val SOCIAL_MEDIA = SimpleViewTag(4, "Social Media",
-                                             "Blocks popular social media including Facebook, Instagram, and WhatsApp.",
-                                             mutableListOf(), PARENTAL_CONTROL)
-    private val SEC_FULL = SimpleViewTag(5, "Full",
-                                         "Blocks over 150,000 malware, ransomware, phishing and other threats.",
-                                         mutableListOf(), SECURITY)
-    private val SEC_EXTRA = SimpleViewTag(6, "Extra", "Blocks over 3000+ cryptoware websites",
-                                          mutableListOf(), SECURITY)
-    private val PRIVACY_LITE = SimpleViewTag(7, "Lite",
-                                             "Blocks over 50,000+ attentionware through some of the most well-curated blocklists.",
-                                             mutableListOf(), PRIVACY)
-    private val PRIVACY_AGGRESSIVE = SimpleViewTag(8, "Aggressive",
-                                                   "Blocks over 100,000+ attentionware, spyware through some of the most extensive blocklists.",
-                                                   mutableListOf(), PRIVACY)
-    private val PRIVACY_EXTREME = SimpleViewTag(9, "Extreme",
-                                                "Blocks over 1,000,000+ suspected websites.",
-                                                mutableListOf(), PRIVACY)
+    private val ADULT = SimpleViewTag(
+        0, "Adult", "Blocks over 30,000 adult websites.",
+        mutableListOf(), PARENTAL_CONTROL
+    )
+    private val PIRACY = SimpleViewTag(
+        1, "Piracy",
+        "Blocks torrent, dubious video streaming and file sharing websites.",
+        mutableListOf(), PARENTAL_CONTROL
+    )
+    private val GAMBLING = SimpleViewTag(
+        2, "Gambling",
+        "Blocks over 2000+ online gambling websites.",
+        mutableListOf(), PARENTAL_CONTROL
+    )
+    private val DATING = SimpleViewTag(
+        3, "Dating", "Blocks over 3000+ online dating websites.",
+        mutableListOf(), PARENTAL_CONTROL
+    )
+    private val SOCIAL_MEDIA = SimpleViewTag(
+        4, "Social Media",
+        "Blocks popular social media including Facebook, Instagram, and WhatsApp.",
+        mutableListOf(), PARENTAL_CONTROL
+    )
+    private val SEC_FULL = SimpleViewTag(
+        5, "Full",
+        "Blocks over 150,000 malware, ransomware, phishing and other threats.",
+        mutableListOf(), SECURITY
+    )
+    private val SEC_EXTRA = SimpleViewTag(
+        6, "Extra", "Blocks over 3000+ cryptoware websites",
+        mutableListOf(), SECURITY
+    )
+    private val PRIVACY_LITE = SimpleViewTag(
+        7, "Lite",
+        "Blocks over 50,000+ attentionware through some of the most well-curated blocklists.",
+        mutableListOf(), PRIVACY
+    )
+    private val PRIVACY_AGGRESSIVE = SimpleViewTag(
+        8, "Aggressive",
+        "Blocks over 100,000+ attentionware, spyware through some of the most extensive blocklists.",
+        mutableListOf(), PRIVACY
+    )
+    private val PRIVACY_EXTREME = SimpleViewTag(
+        9, "Extreme",
+        "Blocks over 1,000,000+ suspected websites.",
+        mutableListOf(), PRIVACY
+    )
 
     // read and parse the json file, either remote or local blocklist
     // returns the parsed FileTag list, on error return empty array list
-    suspend fun readJson(context: Context, type: DownloadType, timestamp: Long) {
+    fun readJson(context: Context, type: DownloadType, timestamp: Long) {
         if (type.isRemote()) {
             readRemoteJson(context, timestamp)
         } else {
@@ -149,12 +177,14 @@ object RethinkBlocklistManager : KoinComponent {
         }
     }
 
-    private suspend fun readLocalJson(context: Context, timestamp: Long) {
+    private fun readLocalJson(context: Context, timestamp: Long) {
         try {
             val dbFileTagLocal: MutableList<RethinkLocalFileTag> = mutableListOf()
-            val dir = Utilities.localBlocklistDownloadBasePath(context,
-                                                               LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                               timestamp)
+            val dir = Utilities.localBlocklistDownloadBasePath(
+                context,
+                LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                timestamp
+            )
 
             val file = Utilities.blocklistFile(dir, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
 
@@ -173,19 +203,23 @@ object RethinkBlocklistManager : KoinComponent {
             localFileTagRepository.insertAll(dbFileTagLocal.toList())
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Local blocklist files inserted into database")
         } catch (ioException: IOException) {
-            Log.e(LoggerConstants.LOG_TAG_DNS,
-                  "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
-                  ioException)
+            Log.e(
+                LoggerConstants.LOG_TAG_DNS,
+                "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
+                ioException
+            )
         }
     }
 
-    private suspend fun readRemoteJson(context: Context, timestamp: Long) {
+    private fun readRemoteJson(context: Context, timestamp: Long) {
         try {
             val dbFileTagRemote: MutableList<RethinkRemoteFileTag> = mutableListOf()
 
-            val dir = Utilities.remoteBlocklistDownloadBasePath(context,
-                                                                REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                timestamp)
+            val dir = Utilities.remoteBlocklistDownloadBasePath(
+                context,
+                REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                timestamp
+            )
 
             val file = Utilities.blocklistFile(dir, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
 
@@ -205,56 +239,66 @@ object RethinkBlocklistManager : KoinComponent {
             remoteFileTagRepository.insertAll(dbFileTagRemote.toList())
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Remote blocklist files inserted into database")
         } catch (ioException: IOException) {
-            Log.e(LoggerConstants.LOG_TAG_DNS,
-                  "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
-                  ioException)
+            Log.e(
+                LoggerConstants.LOG_TAG_DNS,
+                "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
+                ioException
+            )
         }
     }
 
-    suspend fun updateSelectedFiletagRemote(remote: RethinkRemoteFileTag) {
+    fun updateSelectedFiletagRemote(remote: RethinkRemoteFileTag) {
         remoteFileTagRepository.update(remote)
     }
 
-    suspend fun updateSelectedFiletagLocal(local: RethinkLocalFileTag) {
+    fun updateSelectedFiletagLocal(local: RethinkLocalFileTag) {
         localFileTagRepository.update(local)
     }
 
-    suspend fun updateSelectedFiletagsRemote(values: Set<Int>, isSelected: Int) {
+    fun updateSelectedFiletagsRemote(values: Set<Int>, isSelected: Int) {
         remoteFileTagRepository.updateSelectedTags(values, isSelected)
     }
 
-    suspend fun updateSelectedFiletagsLocal(values: Set<Int>, isSelected: Int) {
+    fun updateSelectedFiletagsLocal(values: Set<Int>, isSelected: Int) {
         localFileTagRepository.updateSelectedTags(values, isSelected)
     }
 
-    suspend fun clearSelectedTagsRemote() {
+    fun clearSelectedTagsRemote() {
         remoteFileTagRepository.clearSelectedTags()
     }
 
-    suspend fun clearSelectedTagsLocal() {
+    fun clearSelectedTagsLocal() {
         localFileTagRepository.clearSelectedTags()
     }
 
-    fun getStamp(context: Context, timestamp: Long, fileValues: Set<Int>,
-                 type: RethinkBlocklistType): String {
+    fun getStamp(
+        context: Context, timestamp: Long, fileValues: Set<Int>,
+        type: RethinkBlocklistType
+    ): String {
         return try {
             val flags = convertListToCsv(fileValues)
             getBraveDns(context, timestamp, type)?.flagsToStamp(flags) ?: ""
         } catch (e: java.lang.Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN,
-                  "Exception while fetching stamp from tags: ${e.message}, $e ")
+            Log.e(
+                LoggerConstants.LOG_TAG_VPN,
+                "Exception while fetching stamp from tags: ${e.message}, $e "
+            )
             ""
         }
     }
 
-    fun getSelectedFileTags(context: Context, timestamp: Long, stamp: String,
-                            type: RethinkBlocklistType): Set<Int> {
+    fun getSelectedFileTags(
+        context: Context, timestamp: Long, stamp: String,
+        type: RethinkBlocklistType
+    ): Set<Int> {
         // fixme: make go call to fetch the file tag list for the given stamp
         return try {
             convertCsvToList(getBraveDns(context, timestamp, type)?.stampToFlags(stamp))
         } catch (e: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN,
-                  "Exception while fetching tags from stamp: ${e.message}, $e ")
+            Log.e(
+                LoggerConstants.LOG_TAG_VPN,
+                "Exception while fetching tags from stamp: ${e.message}, $e "
+            )
             setOf()
         }
     }
@@ -275,22 +319,30 @@ object RethinkBlocklistManager : KoinComponent {
             return braveDnsRemote
         }
 
-        val dir = Utilities.remoteBlocklistFile(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                timestamp) ?: return null
-        val file = Utilities.blocklistFile(dir.absolutePath,
-                                           ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
+        val dir = Utilities.remoteBlocklistFile(
+            context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+            timestamp
+        ) ?: return null
+        val file = Utilities.blocklistFile(
+            dir.absolutePath,
+            ONDEVICE_BLOCKLIST_FILE_TAG
+        ) ?: return null
 
         braveDnsRemote = try {
             if (file.exists()) {
                 Dnsx.newBraveDNSRemote(file.absolutePath)
             } else {
-                Log.e(LoggerConstants.LOG_TAG_VPN,
-                      "File does not exist in path: ${file.absolutePath}")
+                Log.e(
+                    LoggerConstants.LOG_TAG_VPN,
+                    "File does not exist in path: ${file.absolutePath}"
+                )
                 null
             }
         } catch (e: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN,
-                  "Exception creating BraveDNS object, ${e.message}, $e ")
+            Log.e(
+                LoggerConstants.LOG_TAG_VPN,
+                "Exception creating BraveDNS object, ${e.message}, $e "
+            )
             null
         }
         return braveDnsRemote
@@ -301,28 +353,38 @@ object RethinkBlocklistManager : KoinComponent {
             return braveDnsLocal
         }
 
-        val dir = Utilities.remoteBlocklistFile(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                timestamp) ?: return null
-        val file = Utilities.blocklistFile(dir.absolutePath,
-                                           ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
+        val dir = Utilities.remoteBlocklistFile(
+            context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+            timestamp
+        ) ?: return null
+        val file = Utilities.blocklistFile(
+            dir.absolutePath,
+            ONDEVICE_BLOCKLIST_FILE_TAG
+        ) ?: return null
         try {
-            if (file.exists()) {
-                braveDnsLocal = Dnsx.newBraveDNSRemote(file.absolutePath)
+            braveDnsLocal = if (file.exists()) {
+                Dnsx.newBraveDNSRemote(file.absolutePath)
             } else {
-                Log.e(LoggerConstants.LOG_TAG_VPN,
-                      "File does not exist in path: ${file.absolutePath}")
-                braveDnsLocal = null
+                Log.e(
+                    LoggerConstants.LOG_TAG_VPN,
+                    "File does not exist in path: ${file.absolutePath}"
+                )
+                null
             }
         } catch (e: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN,
-                  "Exception creating BraveDNS object, ${e.message}, $e ")
+            Log.e(
+                LoggerConstants.LOG_TAG_VPN,
+                "Exception creating BraveDNS object, ${e.message}, $e "
+            )
             braveDnsLocal = null
         }
         return braveDnsLocal
     }
 
-    private fun getBraveDns(context: Context, timestamp: Long,
-                            type: RethinkBlocklistType): BraveDNS? {
+    private fun getBraveDns(
+        context: Context, timestamp: Long,
+        type: RethinkBlocklistType
+    ): BraveDNS? {
         if (type.isRemote()) {
             return getBraveDnsRemote(context, timestamp)
         }

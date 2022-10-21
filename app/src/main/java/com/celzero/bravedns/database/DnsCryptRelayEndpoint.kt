@@ -20,15 +20,20 @@ import androidx.room.PrimaryKey
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "DNSCryptRelayEndpoint")
-class DnsCryptRelayEndpoint {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
-    var dnsCryptRelayName: String = ""
-    var dnsCryptRelayURL: String = ""
-    var dnsCryptRelayExplanation: String? = null
-    var isSelected: Boolean = true
-    var isCustom: Boolean = true
+class DnsCryptRelayEndpoint// Room auto-increments id when its set to zero.
+// A non-zero id overrides and sets caller-specified id instead.
+    (
+    @PrimaryKey(autoGenerate = true) var id: Int,
+    var dnsCryptRelayName: String,
+    var dnsCryptRelayURL: String,
+    dnsCryptRelayExplanation: String,
+    var isSelected: Boolean,
+    var isCustom: Boolean,
+    modifiedDataTime: Long,
+    var latency: Int
+) {
+    var dnsCryptRelayExplanation: String? = dnsCryptRelayExplanation
     var modifiedDataTime: Long = INIT_TIME_MS
-    var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsCryptRelayEndpoint) return false
@@ -40,20 +45,9 @@ class DnsCryptRelayEndpoint {
         return this.id.hashCode()
     }
 
-    constructor(id: Int, dnsCryptRelayName: String, dnsCryptRelayURL: String,
-                dnsCryptRelayExplanation: String, isSelected: Boolean, isCustom: Boolean,
-                modifiedDataTime: Long, latency: Int) {
-        // Room auto-increments id when its set to zero.
-        // A non-zero id overrides and sets caller-specified id instead.
-        this.id = id
-        this.dnsCryptRelayName = dnsCryptRelayName
-        this.dnsCryptRelayURL = dnsCryptRelayURL
-        this.dnsCryptRelayExplanation = dnsCryptRelayExplanation
-        this.isSelected = isSelected
-        this.isCustom = isCustom
+    init {
         if (modifiedDataTime != INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
-        this.latency = latency
     }
 
     fun isDeletable(): Boolean {

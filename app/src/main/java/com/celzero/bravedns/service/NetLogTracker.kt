@@ -30,11 +30,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 
-class NetLogTracker internal constructor(private val context: Context,
-                                         private val connectionTrackerRepository: ConnectionTrackerRepository,
-                                         private val dnsLogRepository: DnsLogRepository,
-                                         private val persistentState: PersistentState) :
-        KoinComponent {
+class NetLogTracker internal constructor(
+    private val context: Context,
+    private val connectionTrackerRepository: ConnectionTrackerRepository,
+    private val dnsLogRepository: DnsLogRepository,
+    private val persistentState: PersistentState
+) :
+    KoinComponent {
 
     private val dnsLatencyTracker by inject<QueryTracker>()
 

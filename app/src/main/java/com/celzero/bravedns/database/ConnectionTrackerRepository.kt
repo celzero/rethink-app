@@ -20,27 +20,27 @@ import com.celzero.bravedns.util.Constants
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
-    suspend fun insert(connectionTracker: ConnectionTracker) {
+    fun insert(connectionTracker: ConnectionTracker) {
         connectionTrackerDAO.insert(connectionTracker)
     }
 
-    suspend fun insertBatch(conns: List<ConnectionTracker>) {
+    fun insertBatch(conns: List<ConnectionTracker>) {
         connectionTrackerDAO.insertBatch(conns)
     }
 
-    suspend fun getLogsForApp(uid: Int): List<AppConnections>? {
+    fun getLogsForApp(uid: Int): List<AppConnections>? {
         return connectionTrackerDAO.getLogsForApp(uid)
     }
 
-    suspend fun deleteConnectionTrackerCount() {
+    fun deleteConnectionTrackerCount() {
         connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
     }
 
-    suspend fun deleteOlderData(date: Long) {
+    fun deleteOlderData(date: Long) {
         connectionTrackerDAO.deleteOlderData(date)
     }
 
-    suspend fun clearAllData() {
+    fun clearAllData() {
         connectionTrackerDAO.clearAllData()
     }
 

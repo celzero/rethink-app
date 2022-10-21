@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -37,27 +36,22 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 
 class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
-                             LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
+    LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
-
-    private val customDomainViewModel: CustomDomainViewModel by viewModel()
 
     companion object {
         fun newInstance() = DnsConfigureFragment()
@@ -99,10 +93,13 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
 
         if (persistentState.blocklistEnabled) {
             b.dcLocalBlocklistCount.text = getString(R.string.dc_local_block_enabled)
-            b.dcLocalBlocklistDesc.text = getString(R.string.settings_local_blocklist_in_use,
-                                                    persistentState.numberOfLocalBlocklists.toString())
+            b.dcLocalBlocklistDesc.text = getString(
+                R.string.settings_local_blocklist_in_use,
+                persistentState.numberOfLocalBlocklists.toString()
+            )
             b.dcLocalBlocklistCount.setTextColor(
-                fetchColor(requireContext(), R.attr.secondaryTextColor))
+                fetchColor(requireContext(), R.attr.secondaryTextColor)
+            )
             return
         }
 
@@ -120,7 +117,12 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     private fun observeAppState() {
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
             if (it == BraveVPNService.State.PAUSED) {
-                startActivity(context?.let { it1 -> Intent().setClass(it1, PauseActivity::class.java) })
+                startActivity(context?.let { it1 ->
+                    Intent().setClass(
+                        it1,
+                        PauseActivity::class.java
+                    )
+                })
             }
         }
 
@@ -133,31 +135,40 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_doh_status)
+                    R.string.configure_dns_connected_doh_status
+                )
                 b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                    R.string.configure_dns_connection_name, connectedDns
+                )
             }
             AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_crypt_status)
+                    R.string.configure_dns_connected_dns_crypt_status
+                )
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_proxy_status)
+                    R.string.configure_dns_connected_dns_proxy_status
+                )
                 b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                    R.string.configure_dns_connection_name, connectedDns
+                )
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_doh_status)
+                    R.string.configure_dns_connected_doh_status
+                )
                 b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                    R.string.configure_dns_connection_name, connectedDns
+                )
             }
             AppConfig.DnsType.NETWORK_DNS -> {
                 b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_proxy_status)
+                    R.string.configure_dns_connected_dns_proxy_status
+                )
                 b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                    R.string.configure_dns_connection_name, connectedDns
+                )
             }
         }
     }
@@ -221,10 +232,13 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
 
         // handle the check for blocklist switch based on the work manager's status
         workManager.getWorkInfosByTagLiveData(BLOCKLIST_UPDATE_CHECK_JOB_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+            viewLifecycleOwner
+        ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
-                  "WorkManager state: ${workInfo.state} for $BLOCKLIST_UPDATE_CHECK_JOB_TAG")
+            Log.i(
+                LoggerConstants.LOG_TAG_SCHEDULER,
+                "WorkManager state: ${workInfo.state} for $BLOCKLIST_UPDATE_CHECK_JOB_TAG"
+            )
             // disable the switch only when the work is in a CANCELLED state.
             // enable the switch for all the other states (ENQUEUED, RUNNING, SUCCEEDED, FAILED, BLOCKED)
             b.dcCheckUpdateSwitch.isChecked = WorkInfo.State.CANCELLED != workInfo.state
@@ -285,10 +299,13 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
                 persistentState.periodicallyCheckBlocklistUpdate = true
                 get<WorkScheduler>().scheduleBlocklistUpdateCheckJob()
             } else {
-                Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
-                      "Cancel all the work related to blocklist update check")
+                Log.i(
+                    LoggerConstants.LOG_TAG_SCHEDULER,
+                    "Cancel all the work related to blocklist update check"
+                )
                 WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
-                    BLOCKLIST_UPDATE_CHECK_JOB_TAG)
+                    BLOCKLIST_UPDATE_CHECK_JOB_TAG
+                )
             }
         }
 
@@ -380,18 +397,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
             val sysDns = appConfig.getSystemDns()
             appConfig.setSystemDns(sysDns.ipAddress, sysDns.port)
         }
-    }
-
-    private fun openCustomDomainDialog() {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-
-        val customDialog = CustomDomainDialog(requireActivity(), customDomainViewModel, themeId)
-        customDialog.setCanceledOnTouchOutside(false)
-        customDialog.show()
-    }
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

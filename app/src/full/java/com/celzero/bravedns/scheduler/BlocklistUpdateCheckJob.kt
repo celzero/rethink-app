@@ -20,7 +20,6 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.customdownloader.RetrofitManager
-import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.Constants
@@ -35,7 +34,7 @@ import org.koin.core.component.inject
 import java.io.IOException
 
 class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerParameters) :
-        CoroutineWorker(context, workerParameters), KoinComponent {
+    CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
 
@@ -54,14 +53,16 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.i(LOG_TAG_SCHEDULER,
-                      "onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()}")
+                Log.i(
+                    LOG_TAG_SCHEDULER,
+                    "onFailure, cancelled? ${call.isCanceled()}, exec? ${call.isExecuted()}"
+                )
 
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val stringResponse = response.body?.string() ?: return
-                response.body?.close()
+                val stringResponse = response.body.string()
+                response.body.close()
                 client.connectionPool.evictAll()
 
                 val json = JSONObject(stringResponse)
@@ -73,8 +74,10 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
 
                 val shouldUpdate = json.optBoolean(Constants.JSON_UPDATE, false)
                 val timestamp = json.optLong(Constants.JSON_LATEST, Constants.INIT_TIME_MS)
-                Log.i(LOG_TAG_SCHEDULER,
-                      "Response for update check for blocklist: version? $version, update? $shouldUpdate, download type: ${type.name}")
+                Log.i(
+                    LOG_TAG_SCHEDULER,
+                    "Response for update check for blocklist: version? $version, update? $shouldUpdate, download type: ${type.name}"
+                )
                 if (type == RethinkBlocklistManager.DownloadType.LOCAL) {
                     if (shouldUpdate) persistentState.newestLocalBlocklistTimestamp = timestamp
                     return

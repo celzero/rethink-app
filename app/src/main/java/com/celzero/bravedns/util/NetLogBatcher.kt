@@ -26,11 +26,12 @@ import kotlinx.coroutines.channels.Channel
 // producer or a time-based monitor (signal) running in a single-threaded co-routine context.
 class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
     // i keeps track of currently in-use buffer
-    var lsn = 0
+    private var lsn = 0
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
-    @OptIn(DelicateCoroutinesApi::class) val looper = newSingleThreadContext("netlogprovider")
+    @OptIn(DelicateCoroutinesApi::class)
+    val looper = newSingleThreadContext("netlogprovider")
 
     private val n1 = CoroutineName("producer")
     private val n2 = CoroutineName("signal")
@@ -51,21 +52,19 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
     // signal channel, holds at most 1 signal, and drops the oldest
     private val signal = Channel<Int>(Channel.Factory.CONFLATED)
 
-    var batches = mutableListOf<T>()
+    private var batches = mutableListOf<T>()
 
     fun begin(scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
-            golooper(scope) {
+            golooperAsync(scope) {
                 sig()
-            }
-            golooper(scope) {
                 consume()
             }
             monitorCancellation()
         }
     }
 
-    private suspend fun golooper(s: CoroutineScope, f: suspend () -> Unit): Deferred<Unit> {
+    private suspend fun golooperAsync(s: CoroutineScope, f: suspend () -> Unit): Deferred<Unit> {
         return s.async(s.coroutineContext + looper + n2, CoroutineStart.DEFAULT) {
             f()
         }
@@ -92,7 +91,7 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
 
     private suspend fun txswap() {
         val b = batches
-        batches = mutableListOf<T>() // swap buffers
+        batches = mutableListOf() // swap buffers
         if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "transfer and swap (${lsn}) ${b.size}")
         lsn = (lsn + 1)
         buffers.send(b)
@@ -118,14 +117,18 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
                 if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue for buffer")
                 continue
             } else {
-                if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER,
-                                 "signal sleep for $waitms for buffer")
+                if (DEBUG) Log.d(
+                    LoggerConstants.LOG_BATCH_LOGGER,
+                    "signal sleep for $waitms for buffer"
+                )
             }
 
             // wait for 'batch' to dispatch
             delay(waitms)
-            if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER,
-                             "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})")
+            if (DEBUG) Log.d(
+                LoggerConstants.LOG_BATCH_LOGGER,
+                "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})"
+            )
 
             // 'l' is the current buffer, that is, 'l == i',
             // and 'batch' hasn't dispatched it,

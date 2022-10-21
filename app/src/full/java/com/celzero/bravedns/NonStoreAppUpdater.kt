@@ -33,11 +33,15 @@ import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 
-class NonStoreAppUpdater(private val baseUrl: String,
-                         private val persistentState: PersistentState) : AppUpdater {
+class NonStoreAppUpdater(
+    private val baseUrl: String,
+    private val persistentState: PersistentState
+) : AppUpdater {
 
-    override fun checkForAppUpdate(isInteractive: AppUpdater.UserPresent, activity: Activity,
-                                   listener: AppUpdater.InstallStateListener) {
+    override fun checkForAppUpdate(
+        isInteractive: AppUpdater.UserPresent, activity: Activity,
+        listener: AppUpdater.InstallStateListener
+    ) {
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
@@ -53,8 +57,8 @@ class NonStoreAppUpdater(private val baseUrl: String,
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val res = response.body?.string()
-                    if (res.isNullOrBlank()) {
+                    val res = response.body.string()
+                    if (res.isBlank()) {
                         listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)
                         return
                     }
@@ -63,12 +67,15 @@ class NonStoreAppUpdater(private val baseUrl: String,
                     val version = json.optInt(JSON_VERSION, 0)
                     val shouldUpdate = json.optBoolean(JSON_UPDATE, false)
                     val latest = json.optLong(JSON_LATEST, INIT_TIME_MS)
-                    persistentState.lastAppUpdateCheck = System.currentTimeMillis() // FIXME move to NTP
+                    persistentState.lastAppUpdateCheck =
+                        System.currentTimeMillis() // FIXME move to NTP
 
                     response.close()
                     client.connectionPool.evictAll()
-                    Log.i(LOG_TAG_APP_UPDATE,
-                          "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest")
+                    Log.i(
+                        LOG_TAG_APP_UPDATE,
+                        "Server response for the new version download is $shouldUpdate (json version: $version), version number:  $latest"
+                    )
 
                     if (version != UPDATE_CHECK_RESPONSE_VERSION) {
                         listener.onUpdateCheckFailed(AppUpdater.InstallSource.OTHER, isInteractive)

@@ -24,11 +24,11 @@ import android.net.VpnService
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.customdownloader.ConnectivityHelper.downloadIds
 import com.celzero.bravedns.customdownloader.RetrofitManager.Companion.getBlocklistBaseBuilder
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
@@ -47,13 +47,6 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
     private var job: Job = SupervisorJob()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
-
-    // call this method to cancel a coroutine
-    // e.g. when user clicks on cancel on the download dialog
-    fun cancelDownload() {
-        downloadIds.clear()
-        job.cancel()
-    }
 
     companion object {
         private const val DOWNLOAD_NOTICATION_TAG = "DOWNLOAD_ALERTS"
@@ -75,15 +68,19 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
 
             // create okhttp client with base url as https://download.rethinkdns.com
             val retrofit = getBlocklistBaseBuilder(
-                RetrofitManager.Companion.OkHttpDnsType.DEFAULT).build().create(
-                IBlocklistDownload::class.java)
+                RetrofitManager.Companion.OkHttpDnsType.DEFAULT
+            ).build().create(
+                IBlocklistDownload::class.java
+            )
             val request = retrofit.downloadLocalBlocklistFile(url)
 
             var status: ConnectivityHelper.DownloadStatus
 
             request?.enqueue(object : Callback<ResponseBody?> {
-                override fun onResponse(call: Call<ResponseBody?>,
-                                        response: Response<ResponseBody?>) {
+                override fun onResponse(
+                    call: Call<ResponseBody?>,
+                    response: Response<ResponseBody?>
+                ) {
                     io {
                         if (response.isSuccessful) {
                             status = downloadFile(response.body(), fileName)
@@ -122,8 +119,10 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
         if (status) notifyDownloadSuccess()
     }
 
-    private fun downloadFile(body: ResponseBody?,
-                             fileName: String): ConnectivityHelper.DownloadStatus {
+    private fun downloadFile(
+        body: ResponseBody?,
+        fileName: String
+    ): ConnectivityHelper.DownloadStatus {
 
         if (body == null) {
             return ConnectivityHelper.DownloadStatus.FAILED
@@ -135,7 +134,7 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
         try {
             // below code will download the code with additional calculation of
             // file size and download percentage
-            var totalFileSize = 0.0
+            var totalFileSize: Double
             var count: Int
             val data = ByteArray(1024 * 4)
             val fileSize = body.contentLength()
@@ -202,17 +201,24 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
 
     private fun showNotification() {
         val notificationManager = context.getSystemService(
-            VpnService.NOTIFICATION_SERVICE) as NotificationManager
+            VpnService.NOTIFICATION_SERVICE
+        ) as NotificationManager
 
         val intent = Intent(context, NotificationHandlerDialog::class.java)
-        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
-                        Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE)
+        intent.putExtra(
+            Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
+            Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
+        )
 
 
-        val pendingIntent = Utilities.getActivityPendingIntent(context, Intent(context,
-                                                                               HomeScreenActivity::class.java),
-                                                               PendingIntent.FLAG_UPDATE_CURRENT,
-                                                               mutable = false)
+        val pendingIntent = Utilities.getActivityPendingIntent(
+            context, Intent(
+                context,
+                HomeScreenActivity::class.java
+            ),
+            PendingIntent.FLAG_UPDATE_CURRENT,
+            mutable = false
+        )
 
         if (Utilities.isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_download)
@@ -229,7 +235,8 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
         val contentTitle = context.getString(R.string.notif_download_content_title)
         val contentText = context.getString(R.string.notif_download_content_text)
         builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            pendingIntent).setContentText(contentText)
+            pendingIntent
+        ).setContentText(contentText)
         builder.setProgress(100, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
@@ -249,14 +256,16 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
 
     private fun updateProgress(progress: Int) {
         val notificationManager = context.getSystemService(
-            VpnService.NOTIFICATION_SERVICE) as NotificationManager
+            VpnService.NOTIFICATION_SERVICE
+        ) as NotificationManager
         builder.setProgress(100, progress, false)
         notificationManager.notify(DOWNLOAD_NOTICATION_TAG, DOWNLOAD_NOTICATION_ID, builder.build())
     }
 
     private fun notifyDownloadFailure() {
         val notificationManager = context.getSystemService(
-            VpnService.NOTIFICATION_SERVICE) as NotificationManager
+            VpnService.NOTIFICATION_SERVICE
+        ) as NotificationManager
         val contentText = context.getString(R.string.notif_download_failure_content)
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
@@ -265,7 +274,8 @@ class CustomDownloadManager(private val context: Context) : CoroutineScope {
 
     private fun notifyDownloadSuccess() {
         val notificationManager = context.getSystemService(
-            VpnService.NOTIFICATION_SERVICE) as NotificationManager
+            VpnService.NOTIFICATION_SERVICE
+        ) as NotificationManager
         val contentText = context.getString(R.string.notif_download_success_content)
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))

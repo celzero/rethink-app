@@ -27,31 +27,31 @@ class DnsProxyEndpointRepository(private val dnsProxyEndpointDAO: DnsProxyEndpoi
         dnsProxyEndpointDAO.update(dnsProxyEndpoint)
     }
 
-    suspend fun insertAsync(dnsCryptEndpoint: DnsProxyEndpoint) {
+    fun insertAsync(dnsCryptEndpoint: DnsProxyEndpoint) {
         dnsProxyEndpointDAO.insert(dnsCryptEndpoint)
     }
 
-    suspend fun deleteOlderData(date: Long) {
+    fun deleteOlderData(date: Long) {
         dnsProxyEndpointDAO.deleteOlderData(date)
     }
 
-    suspend fun deleteDnsProxyEndpoint(id: Int) {
+    fun deleteDnsProxyEndpoint(id: Int) {
         dnsProxyEndpointDAO.deleteDnsProxyEndpoint(id)
     }
 
-    suspend fun removeConnectionStatus() {
+    fun removeConnectionStatus() {
         dnsProxyEndpointDAO.removeConnectionStatus()
     }
 
-    suspend fun getCount(): Int {
+    fun getCount(): Int {
         return dnsProxyEndpointDAO.getCount()
     }
 
-    suspend fun getConnectedProxy(): DnsProxyEndpoint? {
+    fun getConnectedProxy(): DnsProxyEndpoint? {
         return dnsProxyEndpointDAO.getConnectedProxy()
     }
 
-    suspend fun getOrbotDnsEndpoint(): DnsProxyEndpoint? {
+    fun getOrbotDnsEndpoint(): DnsProxyEndpoint? {
         return dnsProxyEndpointDAO.getOrbotDnsEndpoint()
     }
 

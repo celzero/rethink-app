@@ -49,15 +49,18 @@ interface CustomIpDao {
     fun clearIpRuleByUid(uid: Int)
 
     @Query(
-        "select * from CustomIp where isActive = 1 and uid = $UID_EVERYBODY order by modifiedDateTime desc")
+        "select * from CustomIp where isActive = 1 and uid = $UID_EVERYBODY order by modifiedDateTime desc"
+    )
     fun getUnivBlockedConnectionsLiveData(): PagingSource<Int, CustomIp>
 
     @Query(
-        "select * from CustomIp where ipAddress like :query and uid = $UID_EVERYBODY and  isActive = 1 order by modifiedDateTime desc")
+        "select * from CustomIp where ipAddress like :query and uid = $UID_EVERYBODY and  isActive = 1 order by modifiedDateTime desc"
+    )
     fun getUnivBlockedConnectionsByIP(query: String): PagingSource<Int, CustomIp>
 
     @Query(
-        "delete from CustomIp where ipAddress = :ipAddress and uid = $UID_EVERYBODY and port = :port")
+        "delete from CustomIp where ipAddress = :ipAddress and uid = $UID_EVERYBODY and port = :port"
+    )
     fun deleteIPRulesUniversal(ipAddress: String, port: Int)
 
     @Transaction
@@ -77,11 +80,13 @@ interface CustomIpDao {
     fun getBlockedConnectionCountForUid(uid: Int): LiveData<Int>
 
     @Query(
-        "select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc")
+        "select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc"
+    )
     fun getAppWiseCustomIp(uid: Int): PagingSource<Int, CustomIp>
 
     @Query(
-        "select * from CustomIp where ipAddress like :query and uid = :uid and  isActive = 1 order by modifiedDateTime desc")
+        "select * from CustomIp where ipAddress like :query and uid = :uid and  isActive = 1 order by modifiedDateTime desc"
+    )
     fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
 
     @RawQuery

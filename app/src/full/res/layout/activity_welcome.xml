@@ -30,21 +30,21 @@
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:padding="5dp"
-        android:visibility="gone"
-        android:layout_alignParentEnd="true"
         android:text="@string/next"
-        android:textColor="?attr/accentGood" />
+        android:textColor="?attr/accentGood"
+        android:visibility="gone" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_skip"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:padding="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
+        android:padding="5dp"
         android:text="@string/skip"
         android:textColor="?attr/accentGood" />
 

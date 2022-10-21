@@ -32,7 +32,7 @@ import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
 
 class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParameters) :
-        Worker(context, workerParams), KoinComponent {
+    Worker(context, workerParams), KoinComponent {
 
     val persistentState by inject<PersistentState>()
 
@@ -103,8 +103,10 @@ class LocalBlocklistDownloader(val context: Context, workerParams: WorkerParamet
             persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
             // write the file tag json file into database
             io {
-                RethinkBlocklistManager.readJson(context, RethinkBlocklistManager.DownloadType.LOCAL,
-                                                 timestamp)
+                RethinkBlocklistManager.readJson(
+                    context, RethinkBlocklistManager.DownloadType.LOCAL,
+                    timestamp
+                )
             }
         }
     }

@@ -17,8 +17,8 @@ package com.celzero.bravedns.util
 
 import android.content.Context
 import android.util.Log
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.IOException
@@ -34,24 +34,33 @@ class RemoteFileTagUtil : KoinComponent {
                 val assetMgr = context.assets
                 val readStream: InputStream = assetMgr.open(Constants.FILE_TAG)
 
-                val to = makeFile(context,
-                                  Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP) ?: throw IOException()
+                val to = makeFile(
+                    context,
+                    Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
+                ) ?: throw IOException()
 
                 Utilities.copyWithStream(readStream, to.outputStream())
-                RethinkBlocklistManager.readJson(context, RethinkBlocklistManager.DownloadType.REMOTE,
-                                                 Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP)
-                persistentState.remoteBlocklistTimestamp = Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
+                RethinkBlocklistManager.readJson(
+                    context, RethinkBlocklistManager.DownloadType.REMOTE,
+                    Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
+                )
+                persistentState.remoteBlocklistTimestamp =
+                    Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
             } catch (e: IOException) {
-                Log.e(LoggerConstants.LOG_TAG_DOWNLOAD,
-                      "Issue moving file from asset folder: ${e.message}", e)
+                Log.e(
+                    LoggerConstants.LOG_TAG_DOWNLOAD,
+                    "Issue moving file from asset folder: ${e.message}", e
+                )
                 persistentState.remoteBlocklistTimestamp = Constants.INIT_TIME_MS
             }
         }
 
         private fun makeFile(context: Context, timestamp: Long): File? {
-            val dir = Utilities.remoteBlocklistFile(context,
-                                                    Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                    timestamp) ?: return null
+            val dir = Utilities.remoteBlocklistFile(
+                context,
+                Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                timestamp
+            ) ?: return null
             if (!dir.exists()) {
                 dir.mkdirs()
             }

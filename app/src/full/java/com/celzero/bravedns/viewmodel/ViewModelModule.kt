@@ -42,7 +42,7 @@ object ViewModelModule {
             AppInfoViewModel(get())
         }
         viewModel {
-            CustomDomainViewModel(get())
+            CustomDomainViewModel()
         }
         viewModel {
             CustomIpViewModel(get())

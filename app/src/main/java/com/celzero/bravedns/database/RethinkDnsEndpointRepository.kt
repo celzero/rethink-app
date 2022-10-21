@@ -22,70 +22,62 @@ import androidx.room.Transaction
 class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) {
 
     @Transaction
-    suspend fun update(rethinkDnsEndpoint: RethinkDnsEndpoint) {
+    fun update(rethinkDnsEndpoint: RethinkDnsEndpoint) {
         rethinkDnsEndpointDao.removeConnectionStatus()
         rethinkDnsEndpointDao.update(rethinkDnsEndpoint)
     }
 
-    suspend fun insertAsync(rethinkDnsEndpoint: RethinkDnsEndpoint) {
-        rethinkDnsEndpointDao.insert(rethinkDnsEndpoint)
-    }
-
-    suspend fun insertWithReplace(rethinkDnsEndpoint: RethinkDnsEndpoint) {
+    fun insertWithReplace(rethinkDnsEndpoint: RethinkDnsEndpoint) {
         rethinkDnsEndpointDao.insertReplace(rethinkDnsEndpoint)
     }
 
-    suspend fun removeConnectionStatus() {
+    fun removeConnectionStatus() {
         rethinkDnsEndpointDao.removeConnectionStatus()
     }
 
-    suspend fun removeAppWiseDns(uid: Int) {
+    fun removeAppWiseDns(uid: Int) {
         rethinkDnsEndpointDao.removeAppWiseDns(uid)
     }
 
-    suspend fun deleteRethinkEndpoint(name: String, url: String, uid: Int) {
-        rethinkDnsEndpointDao.deleteDoHEndpoint(name, url, uid)
-    }
-
-    suspend fun isAppWiseDnsEnabled(uid: Int): Boolean {
+    fun isAppWiseDnsEnabled(uid: Int): Boolean {
         return rethinkDnsEndpointDao.isAppWiseDnsEnabled(uid) ?: false
     }
 
-    suspend fun getConnectedEndpoint(): RethinkDnsEndpoint? {
+    fun getConnectedEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointDao.getConnectedEndpoint()
     }
 
-    suspend fun updateConnectionDefault() {
+    fun updateConnectionDefault() {
         rethinkDnsEndpointDao.removeConnectionStatus()
         rethinkDnsEndpointDao.updateConnectionDefault()
     }
 
-    suspend fun setRethinkPlus() {
+    fun setRethinkPlus() {
         rethinkDnsEndpointDao.removeConnectionStatus()
         rethinkDnsEndpointDao.setRethinkPlus()
     }
 
-    suspend fun getCount(): Int {
+    fun getCount(): Int {
         return rethinkDnsEndpointDao.getCount()
     }
 
-    suspend fun updatePlusBlocklistCount(count: Int) {
+    fun updatePlusBlocklistCount(count: Int) {
         rethinkDnsEndpointDao.updatePlusBlocklistCount(count)
     }
 
-    suspend fun updateEndpoint(name: String, url: String, count: Int) {
+    fun updateEndpoint(name: String, url: String, count: Int) {
         rethinkDnsEndpointDao.updateEndpoint(name, url, count)
     }
 
-    suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
+    fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
         return rethinkDnsEndpointDao.getRethinkPlusEndpoint()
     }
 
-    suspend fun switchToMax() {
+    fun switchToMax() {
         rethinkDnsEndpointDao.switchToMax()
     }
 
-    suspend fun switchToSky() {
+    fun switchToSky() {
         rethinkDnsEndpointDao.switchToSky()
     }
 }

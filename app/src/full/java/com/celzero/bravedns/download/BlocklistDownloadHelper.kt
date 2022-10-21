@@ -45,8 +45,10 @@ class BlocklistDownloadHelper {
                 Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${e.message}", e)
             }
 
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                             "Valid on-device blocklist ($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}")
+            if (DEBUG) Log.d(
+                LOG_TAG_DOWNLOAD,
+                "Valid on-device blocklist ($timestamp) download? $result, files: $total, dir? ${dir?.isDirectory}"
+            )
             return result
         }
 
@@ -57,28 +59,38 @@ class BlocklistDownloadHelper {
          * Now in v053 we are moving the files from external dir to canonical path.
          * So deleting the old files in the external directory.
          */
-        fun deleteOldFiles(context: Context, timestamp: Long,
-                           type: RethinkBlocklistManager.DownloadType) {
+        fun deleteOldFiles(
+            context: Context, timestamp: Long,
+            type: RethinkBlocklistManager.DownloadType
+        ) {
             val path = if (type == RethinkBlocklistManager.DownloadType.LOCAL) {
                 Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
             } else {
                 Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH
             }
             val dir = File(context.getExternalFilesDir(null).toString() + path + timestamp)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                             "deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}")
+            if (DEBUG) Log.d(
+                LOG_TAG_DOWNLOAD,
+                "deleteOldFiles, File : ${dir.path}, ${dir.isDirectory}"
+            )
             deleteRecursive(dir)
         }
 
         fun deleteFromCanonicalPath(context: Context) {
-            val canonicalPath = File(localBlocklistCanonicalPath(context,
-                                                                 Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME))
+            val canonicalPath = File(
+                localBlocklistCanonicalPath(
+                    context,
+                    Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+                )
+            )
             deleteRecursive(canonicalPath)
         }
 
         fun getExternalFilePath(context: Context, timestamp: String): String {
             return context.getExternalFilesDir(
-                null).toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
+                null
+            )
+                .toString() + Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
 
         // getExternalFilePath is similar to the above function without use of default external files dir

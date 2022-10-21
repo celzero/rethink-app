@@ -24,8 +24,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
@@ -33,7 +33,7 @@ import org.koin.core.component.inject
 import java.io.File
 
 class AppExitInfoCollector(val context: Context, workerParameters: WorkerParameters) :
-        Worker(context, workerParameters), KoinComponent {
+    Worker(context, workerParameters), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
 
@@ -74,8 +74,10 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
         }
 
         // Store the last exit reason time stamp
-        persistentState.lastAppExitInfoTimestamp = persistentState.lastAppExitInfoTimestamp.coerceAtLeast(
-            maxTimestamp)
+        persistentState.lastAppExitInfoTimestamp =
+            persistentState.lastAppExitInfoTimestamp.coerceAtLeast(
+                maxTimestamp
+            )
 
         BugReportZipper.build(applicationContext, file)
     }

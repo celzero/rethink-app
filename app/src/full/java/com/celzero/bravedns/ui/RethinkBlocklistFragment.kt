@@ -36,7 +36,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkLocalAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RethinkRemoteAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RethinkSimpleViewAdapter
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.customdownloader.LocalBlocklistDownloader.Companion.CUSTOM_DOWNLOAD
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.databinding.FragmentRethinkBlocklistBinding
@@ -45,11 +44,12 @@ import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType
+import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_STAMP
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
-import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType
-import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
@@ -68,7 +68,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
-                                 SearchView.OnQueryTextListener {
+    SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentRethinkBlocklistBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -102,14 +102,19 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         var selectedFileTags: MutableLiveData<MutableSet<Int>> = MutableLiveData()
 
         const val SIMPLE_VIEW = "0"
-        const val ADVANCED_VIEW = "1"
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val bundle = this.arguments
-        type = getType(bundle?.getInt(RETHINK_BLOCKLIST_TYPE,
-                                      RethinkBlocklistType.REMOTE.ordinal) ?: RethinkBlocklistType.REMOTE.ordinal)
+        type = getType(
+            bundle?.getInt(
+                RETHINK_BLOCKLIST_TYPE,
+                RethinkBlocklistType.REMOTE.ordinal
+            ) ?: RethinkBlocklistType.REMOTE.ordinal
+        )
         remoteName = bundle?.getString(RETHINK_BLOCKLIST_NAME, "") ?: ""
         remoteStamp = bundle?.getString(RETHINK_BLOCKLIST_STAMP, "") ?: ""
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -140,8 +145,10 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         selectedFileTags.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
-            modifiedStamp = RethinkBlocklistManager.getStamp(requireContext(),
-                                                             getDownloadTimeStamp(), it, type)
+            modifiedStamp = RethinkBlocklistManager.getStamp(
+                requireContext(),
+                getDownloadTimeStamp(), it, type
+            )
         }
 
         appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
@@ -154,18 +161,22 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             }
             if (it == AppDownloadManager.DownloadManagerStatus.FAILURE.id) {
                 ui {
-                    showToastUiCentered(requireContext(),
-                                        getString(R.string.blocklist_update_check_failure),
-                                        Toast.LENGTH_SHORT)
+                    showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.blocklist_update_check_failure),
+                        Toast.LENGTH_SHORT
+                    )
                 }
                 return@observe
             }
 
             if (it == AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED.id) {
                 ui {
-                    showToastUiCentered(requireContext(),
-                                        getString(R.string.blocklist_update_check_not_required),
-                                        Toast.LENGTH_SHORT)
+                    showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.blocklist_update_check_not_required),
+                        Toast.LENGTH_SHORT
+                    )
                 }
                 return@observe
             }
@@ -200,8 +211,10 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
                     hasBlocklists()
                 }
                 if (blocklistsExist) {
-                    RethinkBlocklistManager.createBraveDns(requireContext(), getDownloadTimeStamp(),
-                                                           type)
+                    RethinkBlocklistManager.createBraveDns(
+                        requireContext(), getDownloadTimeStamp(),
+                        type
+                    )
                     setListAdapter(getDownloadTimeStamp())
                     showConfigureUi()
                     hideDownloadUi()
@@ -317,9 +330,12 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         return if (persistentState.useCustomDownloadManager) {
             WorkScheduler.isWorkScheduled(requireContext(), CUSTOM_DOWNLOAD)
         } else {
-            WorkScheduler.isWorkScheduled(requireContext(),
-                                          DOWNLOAD_TAG) || WorkScheduler.isWorkScheduled(
-                requireContext(), FILE_TAG)
+            WorkScheduler.isWorkScheduled(
+                requireContext(),
+                DOWNLOAD_TAG
+            ) || WorkScheduler.isWorkScheduled(
+                requireContext(), FILE_TAG
+            )
         }
     }
 
@@ -328,10 +344,12 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
         if (persistentState.useCustomDownloadManager) {
             WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
-                CUSTOM_DOWNLOAD)
+                CUSTOM_DOWNLOAD
+            )
         } else {
             WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
-                DOWNLOAD_TAG)
+                DOWNLOAD_TAG
+            )
         }
         WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(FILE_TAG)
     }
@@ -374,8 +392,10 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun setStamp(stamp: String) {
-        Log.i(LoggerConstants.LOG_TAG_VPN,
-              "Rethink dns, set stamp for blocklist type: ${type.name} with $stamp, count: ${selectedFileTags.value?.size}")
+        Log.i(
+            LoggerConstants.LOG_TAG_VPN,
+            "Rethink dns, set stamp for blocklist type: ${type.name} with $stamp, count: ${selectedFileTags.value?.size}"
+        )
         if (type.isLocal()) {
             persistentState.localBlocklistStamp = stamp
 
@@ -393,22 +413,25 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
 
         // set stamp for remote blocklist
-        val rs = RethinkListFragment.ModifiedStamp(remoteName, stamp,
-                                                   selectedFileTags.value?.size ?: 0)
+        val rs = RethinkListFragment.ModifiedStamp(
+            remoteName, stamp,
+            selectedFileTags.value?.size ?: 0
+        )
         RethinkListFragment.modifiedStamp.postValue(rs)
         selectedFileTags.value = mutableSetOf()
     }
 
-    private val listViewToggleListener = MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
-        val mb: MaterialButton = b.lbListToggleGroup.findViewById(checkedId)
-        if (isChecked) {
-            selectToggleBtnUi(mb)
-            showList(mb.tag.toString())
-            return@OnButtonCheckedListener
-        }
+    private val listViewToggleListener =
+        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
+            val mb: MaterialButton = b.lbListToggleGroup.findViewById(checkedId)
+            if (isChecked) {
+                selectToggleBtnUi(mb)
+                showList(mb.tag.toString())
+                return@OnButtonCheckedListener
+            }
 
-        unselectToggleBtnUi(mb)
-    }
+            unselectToggleBtnUi(mb)
+        }
 
     private fun showList(id: String) {
         // change the check based on the tag
@@ -425,12 +448,14 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
     private fun selectToggleBtnUi(b: MaterialButton) {
         b.backgroundTintList = ColorStateList.valueOf(
-            fetchToggleBtnColors(requireContext(), R.color.accentGood))
+            fetchToggleBtnColors(requireContext(), R.color.accentGood)
+        )
     }
 
     private fun unselectToggleBtnUi(b: MaterialButton) {
         b.backgroundTintList = ColorStateList.valueOf(
-            fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg))
+            fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg)
+        )
     }
 
     private fun setListAdapter(timestamp: Long) {
@@ -445,8 +470,10 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun getSelectedFileTags(timestamp: Long) {
-        val list = RethinkBlocklistManager.getSelectedFileTags(requireContext(), timestamp,
-                                                               getStamp(), type)
+        val list = RethinkBlocklistManager.getSelectedFileTags(
+            requireContext(), timestamp,
+            getStamp(), type
+        )
 
         if (selectedFileTags.value.isNullOrEmpty()) {
             selectedFileTags.value = list.toMutableSet()
@@ -470,11 +497,15 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             }
 
             if (type.isLocal()) {
-                RethinkBlocklistManager.updateSelectedFiletagsLocal(selectedTags,
-                                                                    1 /* isSelected: true */)
+                RethinkBlocklistManager.updateSelectedFiletagsLocal(
+                    selectedTags,
+                    1 /* isSelected: true */
+                )
             } else {
-                RethinkBlocklistManager.updateSelectedFiletagsRemote(selectedTags,
-                                                                     1 /* isSelected: true */)
+                RethinkBlocklistManager.updateSelectedFiletagsRemote(
+                    selectedTags,
+                    1 /* isSelected: true */
+                )
             }
         }
     }
@@ -597,10 +628,13 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
         // observer for custom download manager worker
         workManager.getWorkInfosByTagLiveData(CUSTOM_DOWNLOAD).observe(
-            viewLifecycleOwner) { workInfoList ->
+            viewLifecycleOwner
+        ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD")
+            Log.i(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD"
+            )
             if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
                 onDownloadStart()
             } else if (WorkInfo.State.SUCCEEDED == workInfo.state) {
@@ -617,10 +651,13 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
         // observer for Androids default download manager
         workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+            viewLifecycleOwner
+        ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG")
+            Log.i(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG"
+            )
             if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
                 onDownloadStart()
             } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
@@ -634,23 +671,30 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
 
         workManager.getWorkInfosByTagLiveData(FILE_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+            viewLifecycleOwner
+        ) { workInfoList ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager completed - $FILE_TAG")
+                    Log.i(
+                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        "AppDownloadManager Work Manager completed - $FILE_TAG"
+                    )
                     onDownloadSuccess()
                     workManager.pruneWork()
                 } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
                     onDownloadFail()
                     workManager.pruneWork()
                     workManager.cancelAllWorkByTag(FILE_TAG)
-                    Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager failed - $FILE_TAG")
+                    Log.i(
+                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        "AppDownloadManager Work Manager failed - $FILE_TAG"
+                    )
                 } else {
-                    Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}")
+                    Log.i(
+                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}"
+                    )
                 }
             }
         }
@@ -686,9 +730,11 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         //showConfigureUi()
         hasBlocklist()
         b.lbListToggleGroup.check(R.id.lb_simple_toggle_btn)
-        showToastUiCentered(requireContext(),
-                            getString(R.string.download_update_dialog_message_success),
-                            Toast.LENGTH_SHORT)
+        showToastUiCentered(
+            requireContext(),
+            getString(R.string.download_update_dialog_message_success),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

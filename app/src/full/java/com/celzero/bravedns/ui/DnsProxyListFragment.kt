@@ -16,9 +16,9 @@
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
+import android.net.InetAddresses
 import android.os.Bundle
 import android.util.Log
-import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -31,11 +31,11 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsProxyEndpointAdapter
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
@@ -70,8 +70,10 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         dnsProxyLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsProxyConnections.layoutManager = dnsProxyLayoutManager
 
-        dnsProxyRecyclerAdapter = DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner,
-                                                          get())
+        dnsProxyRecyclerAdapter = DnsProxyEndpointAdapter(
+            requireContext(), viewLifecycleOwner,
+            get()
+        )
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner) {
             dnsProxyRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
@@ -119,20 +121,27 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             uiCtx {
                 proxyNameEditText.setText(
                     getString(R.string.cd_custom_dns_proxy_name, nextIndex.toString()),
-                    TextView.BufferType.EDITABLE)
+                    TextView.BufferType.EDITABLE
+                )
             }
         }
 
-        proxyNameEditText.setText(getString(R.string.cd_custom_dns_proxy_name_default),
-                                  TextView.BufferType.EDITABLE)
-        ipAddressEditText.setText(getString(R.string.cd_custom_dns_proxy_default_ip),
-                                  TextView.BufferType.EDITABLE)
+        proxyNameEditText.setText(
+            getString(R.string.cd_custom_dns_proxy_name_default),
+            TextView.BufferType.EDITABLE
+        )
+        ipAddressEditText.setText(
+            getString(R.string.cd_custom_dns_proxy_default_ip),
+            TextView.BufferType.EDITABLE
+        )
         val appNames: MutableList<String> = ArrayList()
         appNames.add(getString(R.string.cd_custom_dns_proxy_default_app))
         appNames.addAll(FirewallManager.getAllAppNames())
-        val proxySpinnerAdapter = ArrayAdapter(requireContext(),
-                                               android.R.layout.simple_spinner_dropdown_item,
-                                               appNames)
+        val proxySpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            appNames
+        )
         appNameSpinner.adapter = proxySpinnerAdapter
         llSpinnerHeader.visibility = View.VISIBLE
         llIPHeader.visibility = View.VISIBLE
@@ -148,13 +157,16 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
             val appName = appNames[appNameSpinner.selectedItemPosition]
             val appPackageName = if (appName.isBlank() || appName == getString(
-                    R.string.cd_custom_dns_proxy_default_app)) {
+                    R.string.cd_custom_dns_proxy_default_app
+                )
+            ) {
                 appNames[0]
             } else {
                 FirewallManager.getPackageNameByAppName(appName)
             }
 
-            if (Patterns.IP_ADDRESS.matcher(ip).matches()) {
+
+            if (InetAddresses.isNumericAddress(ip)) {
                 isIPValid = true
             } else {
                 errorTxt.text = getString(R.string.cd_dns_proxy_error_text_1)
@@ -179,13 +191,17 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
             if (isPortValid && isIPValid) {
                 //Do the DNS Proxy setting there
-                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
-                                                                   "new value inserted into DNSProxy")
+                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(
+                    LoggerConstants.LOG_TAG_UI,
+                    "new value inserted into DNSProxy"
+                )
                 insertDNSProxyEndpointDB(mode, name, appPackageName, ip, port)
                 dialog.dismiss()
             } else {
-                Log.i(LoggerConstants.LOG_TAG_UI,
-                      "cannot insert invalid dns-proxy IPs: $name, $appName")
+                Log.i(
+                    LoggerConstants.LOG_TAG_UI,
+                    "cannot insert invalid dns-proxy IPs: $name, $appName"
+                )
             }
 
         }
@@ -197,8 +213,10 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     }
 
 
-    private fun insertDNSProxyEndpointDB(mode: String, name: String, appName: String?, ip: String,
-                                         port: Int) {
+    private fun insertDNSProxyEndpointDB(
+        mode: String, name: String, appName: String?, ip: String,
+        port: Int
+    ) {
         if (appName == null) return
 
         io {
@@ -208,12 +226,16 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                     appName
                 } else ip
             }
-            val dnsProxyEndpoint = DnsProxyEndpoint(id = 0, proxyName, mode, appName, ip, port,
-                                                    isSelected = false, isCustom = true,
-                                                    modifiedDataTime = 0L, latency = 0)
+            val dnsProxyEndpoint = DnsProxyEndpoint(
+                id = 0, proxyName, mode, appName, ip, port,
+                isSelected = false, isCustom = true,
+                modifiedDataTime = 0L, latency = 0
+            )
             appConfig.insertDnsproxyEndpoint(dnsProxyEndpoint)
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
-                                                               "Insert into DNSProxy database- $appName, $port")
+            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(
+                LoggerConstants.LOG_TAG_UI,
+                "Insert into DNSProxy database- $appName, $port"
+            )
         }
     }
 

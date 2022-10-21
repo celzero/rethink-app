@@ -27,15 +27,6 @@ import com.celzero.bravedns.net.go.GoProber;
 //TODO : Why you are not using it ???????
 public class Race {
 
-    public interface Listener {
-        /**
-         * This method is called once, when the race has concluded.
-         *
-         * @param index The index in urls of the fastest server, or -1 if all probes failed.
-         */
-        void onResult(int index);
-    }
-
     /**
      * Starts a race between different servers.
      *
@@ -54,6 +45,15 @@ public class Race {
         for (int i = 0; i < urls.length; ++i) {
             prober.probe(urls[i], new Callback(i, collector));
         }
+    }
+
+    public interface Listener {
+        /**
+         * This method is called once, when the race has concluded.
+         *
+         * @param index The index in urls of the fastest server, or -1 if all probes failed.
+         */
+        void onResult(int index);
     }
 
     private static class Collector {

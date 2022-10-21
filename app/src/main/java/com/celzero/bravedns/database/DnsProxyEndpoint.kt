@@ -23,17 +23,23 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.service.FirewallManager
 
 @Entity(tableName = "DNSProxyEndpoint")
-class DnsProxyEndpoint {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
-    var proxyName: String = ""
-    var proxyType: String = ""
-    var proxyAppName: String? = null
-    var proxyIP: String? = null
-    var proxyPort: Int = 0
-    var isSelected: Boolean = true
-    var isCustom: Boolean = true
+class DnsProxyEndpoint// Room auto-increments id when its set to zero.
+// A non-zero id overrides and sets caller-specified id instead.
+    (
+    @PrimaryKey(autoGenerate = true) var id: Int,
+    var proxyName: String,
+    var proxyType: String,
+    proxyAppName: String,
+    proxyIP: String,
+    var proxyPort: Int,
+    var isSelected: Boolean,
+    var isCustom: Boolean,
+    modifiedDataTime: Long,
+    var latency: Int
+) {
+    var proxyAppName: String? = proxyAppName
+    var proxyIP: String? = proxyIP
     var modifiedDataTime: Long = 0L
-    var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsProxyEndpoint) return false
@@ -45,22 +51,9 @@ class DnsProxyEndpoint {
         return this.id.hashCode()
     }
 
-    constructor(id: Int, proxyName: String, proxyType: String, proxyAppName: String,
-                proxyIP: String, proxyPort: Int, isSelected: Boolean, isCustom: Boolean,
-                modifiedDataTime: Long, latency: Int) {
-        // Room auto-increments id when its set to zero.
-        // A non-zero id overrides and sets caller-specified id instead.
-        this.id = id
-        this.proxyName = proxyName
-        this.proxyType = proxyType
-        this.proxyAppName = proxyAppName
-        this.proxyIP = proxyIP
-        this.proxyPort = proxyPort
-        this.isSelected = isSelected
-        this.isCustom = isCustom
+    init {
         if (modifiedDataTime != 0L) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
-        this.latency = latency
     }
 
     fun isDeletable(): Boolean {
@@ -74,20 +67,28 @@ class DnsProxyEndpoint {
             // for no app.
             if (this.proxyAppName != context.getString(R.string.cd_custom_dns_proxy_default_app)) {
                 val app = FirewallManager.getAppInfoByPackage(this.proxyAppName)?.appName
-                context.getString(R.string.settings_socks_forwarding_desc, this.proxyIP,
-                                  this.proxyPort.toString(), app)
+                context.getString(
+                    R.string.settings_socks_forwarding_desc, this.proxyIP,
+                    this.proxyPort.toString(), app
+                )
             } else {
-                context.getString(R.string.settings_socks_forwarding_desc_no_app, this.proxyIP,
-                                  this.proxyPort.toString())
+                context.getString(
+                    R.string.settings_socks_forwarding_desc_no_app, this.proxyIP,
+                    this.proxyPort.toString()
+                )
             }
         } else {
             if (this.proxyAppName != context.getString(R.string.cd_custom_dns_proxy_default_app)) {
                 val app = FirewallManager.getAppInfoByPackage(this.proxyAppName)?.appName
-                context.getString(R.string.dns_proxy_desc, this.proxyIP, this.proxyPort.toString(),
-                                  app)
+                context.getString(
+                    R.string.dns_proxy_desc, this.proxyIP, this.proxyPort.toString(),
+                    app
+                )
             } else {
-                context.getString(R.string.dns_proxy_desc_no_app, this.proxyIP,
-                                  this.proxyPort.toString())
+                context.getString(
+                    R.string.dns_proxy_desc_no_app, this.proxyIP,
+                    this.proxyPort.toString()
+                )
             }
 
         }

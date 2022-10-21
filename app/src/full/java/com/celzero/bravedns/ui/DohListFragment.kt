@@ -112,13 +112,17 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         io {
             val nextIndex = appConfig.getDohCount().plus(1)
             uiCtx {
-                customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
-                                   TextView.BufferType.EDITABLE)
+                customName.setText(
+                    getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
+                    TextView.BufferType.EDITABLE
+                )
             }
         }
 
-        customName.setText(getString(R.string.cd_custom_doh_url_name_default),
-                           TextView.BufferType.EDITABLE)
+        customName.setText(
+            getString(R.string.cd_custom_doh_url_name_default),
+            TextView.BufferType.EDITABLE
+        )
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()
@@ -147,9 +151,11 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
             if (name.isBlank()) {
                 dohName = url
             }
-            val doHEndpoint = DoHEndpoint(id = 0, dohName, url, dohExplanation = "",
-                                          isSelected = false, isCustom = true, modifiedDataTime = 0,
-                                          latency = 0)
+            val doHEndpoint = DoHEndpoint(
+                id = 0, dohName, url, dohExplanation = "",
+                isSelected = false, isCustom = true, modifiedDataTime = 0,
+                latency = 0
+            )
             appConfig.insertDohEndpoint(doHEndpoint)
         }
     }

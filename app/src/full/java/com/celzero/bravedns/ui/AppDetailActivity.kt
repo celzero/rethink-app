@@ -35,8 +35,10 @@ class AppDetailActivity : AppCompatActivity(R.layout.activity_app_detail) {
 
     private fun loadFragment() {
         val rr = FirewallAppFragment.newInstance()
-        supportFragmentManager.beginTransaction().replace(R.id.root_container, rr,
-                                                          rr.javaClass.simpleName).commit()
+        supportFragmentManager.beginTransaction().replace(
+            R.id.root_container, rr,
+            rr.javaClass.simpleName
+        ).commit()
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

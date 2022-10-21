@@ -76,7 +76,6 @@
     <color name="fill">#00000000</color>
 
     <color name="primaryText">#FDFDFD</color>
-    <color name="primaryDarkColorText">#FDFDFD</color>
     <color name="chipTextColor">#FDFDFD</color>
     <color name="invertedPrimaryText">#18ffff</color>
     <color name="secondaryText">#18ffff</color>
@@ -135,7 +134,6 @@
 
     <color name="primaryTextLight">#000000</color>
     <color name="primaryLightColorTextLight">#BF000000</color>
-    <color name="primaryDarkColorTextLight">#FFFFFF</color>
     <color name="chipTextColorLight">#FFFFFF</color>
     <color name="invertedPrimaryTextLight">#FFFFFF</color>
     <color name="secondaryTextLight">#005cb2</color>
@@ -160,7 +158,6 @@
     <color name="colorPrimaryBlack">#383838</color>
     <color name="colorPrimaryDarkBlack">#000000</color>
     <color name="colorSecondaryBlack">#4fc3f7</color>
-    <color name="colorBackgroundFloatingBlack">#383838</color>
 
     <color name="navBarColorBlack">#000000</color>
 

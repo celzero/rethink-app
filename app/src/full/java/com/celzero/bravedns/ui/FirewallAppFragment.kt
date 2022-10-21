@@ -49,7 +49,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
-                            SearchView.OnQueryTextListener {
+    SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentFirewallAppListBinding::bind)
 
     private val appInfoViewModel: AppInfoViewModel by viewModel()
@@ -115,7 +115,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                 ALLOWED -> context.getString(R.string.fapps_firewall_filter_allowed)
                 BLOCKED -> context.getString(R.string.fapps_firewall_filter_blocked)
                 BYPASS_UNIVERSAL -> context.getString(
-                    R.string.fapps_firewall_filter_bypass_universal)
+                    R.string.fapps_firewall_filter_bypass_universal
+                )
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
                 LOCKDOWN -> context.getString(R.string.fapps_firewall_filter_lockdown)
             }
@@ -191,12 +192,18 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         val firewallLabel = filter.firewallFilter.getLabel(requireContext())
         if (filter.categoryFilters.isEmpty()) {
             b.firewallAppLabelTv.text = Utilities.updateHtmlEncodedText(
-                getString(R.string.fapps_firewall_filter_desc, firewallLabel.lowercase(),
-                          filterLabel))
+                getString(
+                    R.string.fapps_firewall_filter_desc, firewallLabel.lowercase(),
+                    filterLabel
+                )
+            )
         } else {
             b.firewallAppLabelTv.text = Utilities.updateHtmlEncodedText(
-                getString(R.string.fapps_firewall_filter_desc_category, firewallLabel.lowercase(),
-                          filterLabel, filter.categoryFilters))
+                getString(
+                    R.string.fapps_firewall_filter_desc_category, firewallLabel.lowercase(),
+                    filterLabel, filter.categoryFilters
+                )
+            )
         }
     }
 
@@ -245,9 +252,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                 if (isAdded) {
                     b.ffaRefreshList.isEnabled = true
                     b.ffaRefreshList.clearAnimation()
-                    Utilities.showToastUiCentered(requireContext(),
-                                                  getString(R.string.refresh_complete),
-                                                  Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.refresh_complete),
+                        Toast.LENGTH_SHORT
+                    )
                 }
             }
         }
@@ -331,18 +340,31 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     private fun remakeFirewallChipsUi() {
         b.ffaFirewallChipGroup.removeAllViews()
 
-        val none = makeFirewallChip(FirewallFilter.ALL.id,
-                                    getString(R.string.fapps_firewall_filter_all), true)
-        val allowed = makeFirewallChip(FirewallFilter.ALLOWED.id,
-                                       getString(R.string.fapps_firewall_filter_allowed), false)
-        val blocked = makeFirewallChip(FirewallFilter.BLOCKED.id,
-                                       getString(R.string.fapps_firewall_filter_blocked), false)
-        val bypassUniversal = makeFirewallChip(FirewallFilter.BYPASS_UNIVERSAL.id, getString(
-            R.string.fapps_firewall_filter_bypass_universal), false)
-        val excluded = makeFirewallChip(FirewallFilter.EXCLUDED.id,
-                                        getString(R.string.fapps_firewall_filter_excluded), false)
-        val lockdown = makeFirewallChip(FirewallFilter.LOCKDOWN.id,
-                                        getString(R.string.fapps_firewall_filter_lockdown), false)
+        val none = makeFirewallChip(
+            FirewallFilter.ALL.id,
+            getString(R.string.fapps_firewall_filter_all), true
+        )
+        val allowed = makeFirewallChip(
+            FirewallFilter.ALLOWED.id,
+            getString(R.string.fapps_firewall_filter_allowed), false
+        )
+        val blocked = makeFirewallChip(
+            FirewallFilter.BLOCKED.id,
+            getString(R.string.fapps_firewall_filter_blocked), false
+        )
+        val bypassUniversal = makeFirewallChip(
+            FirewallFilter.BYPASS_UNIVERSAL.id, getString(
+                R.string.fapps_firewall_filter_bypass_universal
+            ), false
+        )
+        val excluded = makeFirewallChip(
+            FirewallFilter.EXCLUDED.id,
+            getString(R.string.fapps_firewall_filter_excluded), false
+        )
+        val lockdown = makeFirewallChip(
+            FirewallFilter.LOCKDOWN.id,
+            getString(R.string.fapps_firewall_filter_lockdown), false
+        )
 
         b.ffaFirewallChipGroup.addView(none)
         b.ffaFirewallChipGroup.addView(allowed)
@@ -386,7 +408,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
     private fun colorUpChipIcon(chip: Chip) {
         val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN
+        )
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
     }
@@ -463,9 +486,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     private fun addAnimation() {
-        animation = RotateAnimation(ANIMATION_START_DEGREE, ANIMATION_END_DEGREE,
-                                    Animation.RELATIVE_TO_SELF, ANIMATION_PIVOT_VALUE,
-                                    Animation.RELATIVE_TO_SELF, ANIMATION_PIVOT_VALUE)
+        animation = RotateAnimation(
+            ANIMATION_START_DEGREE, ANIMATION_END_DEGREE,
+            Animation.RELATIVE_TO_SELF, ANIMATION_PIVOT_VALUE,
+            Animation.RELATIVE_TO_SELF, ANIMATION_PIVOT_VALUE
+        )
         animation.repeatCount = ANIMATION_REPEAT_COUNT
         animation.duration = ANIMATION_DURATION
     }

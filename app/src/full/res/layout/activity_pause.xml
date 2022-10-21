@@ -18,17 +18,11 @@
             android:id="@+id/pac_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:padding="15dp"
             android:visibility="visible"
             android:weightSum="1">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:gravity="center"
-                android:orientation="vertical" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -77,9 +71,9 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_above="@id/pac_timer"
             android:fontFamily="sans-serif-smallcaps"
             android:gravity="center"
-            android:layout_above="@id/pac_timer"
             android:text="@string/pause_text"
             android:textColor="?attr/primaryTextColor"
             android:textSize="40sp"
@@ -90,9 +84,9 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_marginTop="70dp"
             android:layout_marginBottom="50dp"
-            android:layout_centerInParent="true"
             android:gravity="center"
             android:text="10:00"
             android:textColor="?attr/secondaryTextColor"
@@ -137,12 +131,12 @@
             android:id="@+id/pac_timer_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_alignParentBottom="true"
             android:layout_margin="20dp"
+            android:gravity="center"
             android:paddingBottom="40dp"
-            android:textSize="@dimen/small_font_subheading_text"
-            android:text="@string/pause_desc" />
+            android:text="@string/pause_desc"
+            android:textSize="@dimen/small_font_subheading_text" />
     </RelativeLayout>
 
 </RelativeLayout>

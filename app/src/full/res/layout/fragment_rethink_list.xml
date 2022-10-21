@@ -110,8 +110,8 @@
             android:id="@+id/radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -122,8 +122,8 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:button="@null"
-                android:drawablePadding="5dp"
                 android:drawableBottom="?android:attr/listChoiceIndicatorSingle"
+                android:drawablePadding="5dp"
                 android:gravity="center_horizontal|bottom"
 
                 android:text="@string/radio_sky_btn" />
@@ -135,8 +135,8 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:button="@null"
-                android:drawablePadding="5dp"
                 android:drawableBottom="?android:attr/listChoiceIndicatorSingle"
+                android:drawablePadding="5dp"
                 android:gravity="center_horizontal|bottom"
                 android:text="@string/radio_max_btn" />
         </RadioGroup>
@@ -145,11 +145,11 @@
             android:id="@+id/frl_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:alpha="0.7"
             android:gravity="center"
             android:nestedScrollingEnabled="true"
             android:padding="10dp"
-            android:layout_marginBottom="10dp"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view"
             android:textStyle="normal"

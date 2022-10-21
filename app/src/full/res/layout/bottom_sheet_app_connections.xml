@@ -22,9 +22,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
+        android:gravity="center"
         android:padding="5dp"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"
@@ -40,10 +40,10 @@
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/bsac_unblock"
-        app:drawableEndCompat="@drawable/ic_tick_normal"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:drawableEndCompat="@drawable/ic_tick_normal" />
 
     <TextView
         android:id="@+id/bsac_block"
@@ -54,10 +54,10 @@
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/bsac_block"
-        app:drawableEndCompat="@drawable/ic_disallowed_16"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:drawableEndCompat="@drawable/ic_disallowed_16" />
 
     <TextView
         android:id="@+id/bsac_bypass_app_rules"
@@ -68,10 +68,10 @@
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
         android:text="@string/bsac_bypass_app_rules"
-        app:drawableEndCompat="@drawable/ic_bypass"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:drawableEndCompat="@drawable/ic_bypass" />
 
 
     <TextView
@@ -84,9 +84,9 @@
         android:padding="10dp"
         android:text="@string/bsac_go_pass_app_rules"
         android:textColor="?attr/primaryTextColor"
-        app:drawableEndCompat="@drawable/ic_bypass"
         android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:drawableEndCompat="@drawable/ic_bypass" />
 
     <TextView
         android:id="@+id/bsac_delete"
@@ -107,9 +107,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:alpha="0.7"
         android:gravity="center"
         android:padding="5dp"
-        android:alpha="0.7"
         android:text="@string/bsac_title_desc"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view" />

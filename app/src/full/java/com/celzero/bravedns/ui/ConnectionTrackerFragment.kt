@@ -46,7 +46,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * Captures network logs and stores in ConnectionTracker, a room database.
  */
 class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker),
-                                  SearchView.OnQueryTextListener {
+    SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -168,12 +168,18 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private fun remakeParentFilterChipsUi() {
         b.filterChipParentGroup.removeAllViews()
 
-        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all),
-                                 true)
-        val allowed = makeParentChip(TopLevelFilter.ALLOWED.id,
-                                     getString(R.string.ct_filter_parent_allowed), false)
-        val blocked = makeParentChip(TopLevelFilter.BLOCKED.id,
-                                     getString(R.string.ct_filter_parent_blocked), false)
+        val all = makeParentChip(
+            TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all),
+            true
+        )
+        val allowed = makeParentChip(
+            TopLevelFilter.ALLOWED.id,
+            getString(R.string.ct_filter_parent_allowed), false
+        )
+        val blocked = makeParentChip(
+            TopLevelFilter.BLOCKED.id,
+            getString(R.string.ct_filter_parent_blocked), false
+        )
 
         b.filterChipParentGroup.addView(all)
         b.filterChipParentGroup.addView(allowed)
@@ -200,8 +206,10 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private fun makeChildChip(id: String, titleResId: Int): Chip {
         val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.text = getString(titleResId)
-        chip.chipIcon = ContextCompat.getDrawable(requireContext(),
-                                                  FirewallRuleset.getRulesIcon(id))
+        chip.chipIcon = ContextCompat.getDrawable(
+            requireContext(),
+            FirewallRuleset.getRulesIcon(id)
+        )
         chip.isCheckedIconVisible = false
         chip.tag = id
 

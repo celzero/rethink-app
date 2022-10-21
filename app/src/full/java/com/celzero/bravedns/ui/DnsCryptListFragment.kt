@@ -79,8 +79,10 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         dnsCryptLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsCryptConnections.layoutManager = dnsCryptLayoutManager
 
-        dnsCryptRecyclerAdapter = DnsCryptEndpointAdapter(requireContext(), viewLifecycleOwner,
-                                                          get())
+        dnsCryptRecyclerAdapter = DnsCryptEndpointAdapter(
+            requireContext(), viewLifecycleOwner,
+            get()
+        )
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner) {
             dnsCryptRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
@@ -98,15 +100,19 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     }
 
     private fun openDnsCryptRelaysDialog() {
-        dnsCryptRelayRecyclerAdapter = DnsCryptRelayEndpointAdapter(requireContext(),
-                                                                    viewLifecycleOwner, get())
+        dnsCryptRelayRecyclerAdapter = DnsCryptRelayEndpointAdapter(
+            requireContext(),
+            viewLifecycleOwner, get()
+        )
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner) {
             dnsCryptRelayRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val customDialog = DnsCryptRelaysDialog(requireActivity(), dnsCryptRelayRecyclerAdapter,
-                                                themeId)
+        val customDialog = DnsCryptRelaysDialog(
+            requireActivity(), dnsCryptRelayRecyclerAdapter,
+            themeId
+        )
         customDialog.show()
     }
 
@@ -147,23 +153,28 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             uiCtx {
                 cryptNameEditText.setText(
                     getString(R.string.cd_dns_crypt_name, dnscryptNextIndex.toString()),
-                    TextView.BufferType.EDITABLE)
+                    TextView.BufferType.EDITABLE
+                )
             }
         }
 
-        cryptNameEditText.setText(getString(R.string.cd_dns_crypt_name_default),
-                                  TextView.BufferType.EDITABLE)
+        cryptNameEditText.setText(
+            getString(R.string.cd_dns_crypt_name_default),
+            TextView.BufferType.EDITABLE
+        )
 
         radioServer.setOnClickListener {
             cryptNameEditText.setText(
                 getString(R.string.cd_dns_crypt_name, dnscryptNextIndex.toString()),
-                TextView.BufferType.EDITABLE)
+                TextView.BufferType.EDITABLE
+            )
         }
 
         radioRelay.setOnClickListener {
             cryptNameEditText.setText(
                 getString(R.string.cd_dns_crypt_relay_name, relayNextIndex.toString()),
-                TextView.BufferType.EDITABLE)
+                TextView.BufferType.EDITABLE
+            )
         }
 
         applyURLBtn.setOnClickListener {
@@ -205,9 +216,11 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             if (serverName.isBlank()) {
                 serverName = urlStamp
             }
-            val dnsCryptRelayEndpoint = DnsCryptRelayEndpoint(id = 0, serverName, urlStamp, desc,
-                                                              isSelected = false, isCustom = true,
-                                                              modifiedDataTime = 0L, latency = 0)
+            val dnsCryptRelayEndpoint = DnsCryptRelayEndpoint(
+                id = 0, serverName, urlStamp, desc,
+                isSelected = false, isCustom = true,
+                modifiedDataTime = 0L, latency = 0
+            )
             appConfig.insertDnscryptRelayEndpoint(dnsCryptRelayEndpoint)
         }
     }
@@ -219,9 +232,11 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
                 serverName = urlStamp
             }
 
-            val dnsCryptEndpoint = DnsCryptEndpoint(id = 0, serverName, urlStamp, desc,
-                                                    isSelected = false, isCustom = true,
-                                                    modifiedDataTime = 0L, latency = 0)
+            val dnsCryptEndpoint = DnsCryptEndpoint(
+                id = 0, serverName, urlStamp, desc,
+                isSelected = false, isCustom = true,
+                modifiedDataTime = 0L, latency = 0
+            )
             appConfig.insertDnscryptEndpoint(dnsCryptEndpoint)
         }
     }
