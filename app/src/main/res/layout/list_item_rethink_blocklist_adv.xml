@@ -60,6 +60,7 @@
                 android:layout_toStartOf="@+id/crp_check_box"
                 android:ellipsize="end"
                 android:padding="5dp"
+                android:layout_marginStart="10dp"
                 android:text="Dummy Label"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
@@ -80,7 +81,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
                     android:alpha="0.75"
-                    android:background="@drawable/rectangle_border_background"
                     android:ellipsize="end"
                     android:paddingStart="10dp"
                     android:paddingTop="5dp"
@@ -88,7 +88,7 @@
                     android:paddingBottom="5dp"
                     android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/crp_desc_entries_tv"
@@ -104,7 +104,7 @@
                     android:paddingBottom="5dp"
                     android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
 

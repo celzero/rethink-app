@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
@@ -43,7 +44,6 @@ import com.celzero.bravedns.databinding.FragmentRethinkBlocklistBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
-import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_STAMP
@@ -52,6 +52,7 @@ import com.celzero.bravedns.ui.RethinkBlocklistFragment.RethinkBlocklistType.Com
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.Companion.hasRemoteBlocklists
@@ -60,6 +61,7 @@ import com.celzero.bravedns.viewmodel.RethinkLocalFileTagViewModel
 import com.celzero.bravedns.viewmodel.RethinkRemoteFileTagViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -87,11 +89,14 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     private val localFileTagViewModel: RethinkLocalFileTagViewModel by viewModel()
 
     private var modifiedStamp: String = ""
-    private var isDownloadInitiated = false
 
+    enum class BlocklistSelectionFilter(val id: Int) {
+        ALL(0), SELECTED(1)
+    }
 
     class Filters {
         var query: String = "%%"
+        var filterSelected: BlocklistSelectionFilter = BlocklistSelectionFilter.ALL
         var groups: MutableSet<String> = mutableSetOf()
         var subGroups: MutableSet<String> = mutableSetOf()
     }
@@ -151,54 +156,19 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
             if (type.isRemote()) {
                 remoteFileTagViewModel.setFilter(it)
+                b.lbAdvancedRecycler.smoothScrollToPosition(0)
             } else {
                 localFileTagViewModel.setFilter(it)
+                b.lbAdvancedRecycler.smoothScrollToPosition(0)
             }
+            updateFilteredTxtUi(it)
         }
 
         selectedFileTags.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
             modifiedStamp = RethinkBlocklistManager.getStamp(requireContext(),
-                                                             getDownloadTimeStamp(), it, type)
-        }
-
-        appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
-            if (!isDownloadInitiated) return@observe
-
-            Log.d(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
-            if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
-                // no-op
-                return@observe
-            }
-            if (it == AppDownloadManager.DownloadManagerStatus.FAILURE.id) {
-                ui {
-                    showToastUiCentered(requireContext(),
-                                        getString(R.string.blocklist_update_check_failure),
-                                        Toast.LENGTH_SHORT)
-                }
-                return@observe
-            }
-
-            if (it == AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED.id) {
-                ui {
-                    showToastUiCentered(requireContext(),
-                                        getString(R.string.blocklist_update_check_not_required),
-                                        Toast.LENGTH_SHORT)
-                }
-                return@observe
-            }
-
-            if (it == AppDownloadManager.DownloadManagerStatus.IN_PROGRESS.id) {
-                // no-op
-                return@observe
-            }
-
-            if (it == getDownloadTimeStamp()) {
-                return@observe
-            }
-
-            downloadLocalBlocklist(it)
+                                                             currentDownloadTimeStamp(), it, type)
         }
     }
 
@@ -210,6 +180,26 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         // be default, select the simple blocklist view
         selectToggleBtnUi(b.lbSimpleToggleBtn)
         unselectToggleBtnUi(b.lbAdvToggleBtn)
+
+        remakeFilterChipsUi()
+    }
+
+    private fun updateFilteredTxtUi(filter: Filters) {
+        if (filter.groups.isEmpty()) {
+            b.lbAdvancedFilterLabelTv.text = Utilities.updateHtmlEncodedText(
+                getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase()))
+        } else {
+            if (filter.subGroups.isEmpty()) {
+                b.lbAdvancedFilterLabelTv.text = Utilities.updateHtmlEncodedText(
+                    getString(R.string.rt_filter_desc_groups,
+                              filter.filterSelected.name.lowercase(), filter.groups))
+            } else {
+                b.lbAdvancedFilterLabelTv.text = Utilities.updateHtmlEncodedText(
+                    getString(R.string.rt_filter_desc_subgroups,
+                              filter.filterSelected.name.lowercase(), filter.groups,
+                              filter.subGroups))
+            }
+        }
     }
 
     private fun hasBlocklist() {
@@ -219,9 +209,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
                     hasBlocklists()
                 }
                 if (blocklistsExist) {
-                    RethinkBlocklistManager.createBraveDns(requireContext(), getDownloadTimeStamp(),
-                                                           type)
-                    setListAdapter(getDownloadTimeStamp())
+                    RethinkBlocklistManager.createBraveDns(requireContext(),
+                                                           currentDownloadTimeStamp(), type)
+                    setListAdapter(currentDownloadTimeStamp())
                     showConfigureUi()
                     hideDownloadUi()
                     return@uiCtx
@@ -242,7 +232,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
     }
 
-    private fun getDownloadTimeStamp(): Long {
+    private fun currentDownloadTimeStamp(): Long {
         return if (type.isLocal()) {
             persistentState.localBlocklistTimestamp
         } else {
@@ -255,7 +245,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             b.lbDownloadLayout.visibility = View.VISIBLE
         } else {
             b.lbDownloadProgressRemote.visibility = View.VISIBLE
-            isBlocklistUpdateAvailable(getDownloadType())
+            downloadBlocklist(type)
         }
     }
 
@@ -282,19 +272,11 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             b.lbDownloadBtn.isEnabled = false
             b.lbDownloadBtn.isClickable = false
 
-            // no-op if download already in progress
-            if (isLocalBlocklistDownloadInitiated()) return@setOnClickListener
-
-            isDownloadInitiated = true
-            go {
-                uiCtx {
-                    isBlocklistUpdateAvailable(getDownloadType())
-                }
-            }
+            downloadBlocklist(type)
         }
 
         b.lbCancelDownloadBtn.setOnClickListener {
-            cancelDownloadWorkManager()
+            cancelDownload()
             requireActivity().finish()
         }
 
@@ -332,27 +314,35 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
     }
 
-    private fun isLocalBlocklistDownloadInitiated(): Boolean {
-        return if (persistentState.useCustomDownloadManager) {
-            WorkScheduler.isWorkScheduled(requireContext(), CUSTOM_DOWNLOAD)
-        } else {
-            WorkScheduler.isWorkScheduled(requireContext(),
-                                          DOWNLOAD_TAG) || WorkScheduler.isWorkScheduled(
-                requireContext(), FILE_TAG)
-        }
+    private fun cancelDownload() {
+        // cancel the local blocklist download
+        appDownloadManager.cancelDownload(type = AppDownloadManager.DownloadType.LOCAL)
     }
 
-    private fun cancelDownloadWorkManager() {
-        if (!isLocalBlocklistDownloadInitiated()) return
-
-        if (persistentState.useCustomDownloadManager) {
-            WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
-                CUSTOM_DOWNLOAD)
-        } else {
-            WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
-                DOWNLOAD_TAG)
+    private fun downloadBlocklist(type: RethinkBlocklistType) {
+        ui {
+            if (type.isLocal()) {
+                // ideally the downloadBlocklist call made from this screen should
+                // progress to download (as download ui shown when there is no valid blocklist
+                // available), only case where the download won't be initiated
+                // is when the timestamp from server is not valid.
+                var initiated = false
+                ioCtx {
+                    initiated = appDownloadManager.downloadLocalBlocklist(
+                        persistentState.localBlocklistTimestamp, isRedownload = false)
+                }
+                if (!initiated) {
+                    onDownloadFail()
+                }
+            } else { // remote blocklist
+                // default remote download will happen from rethink-dns list screen
+                // check RethinkListFragment.kt
+                ioCtx {
+                    appDownloadManager.downloadRemoteBlocklist(
+                        persistentState.remoteBlocklistTimestamp, isRedownload = false)
+                }
+            }
         }
-        WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(FILE_TAG)
     }
 
     private fun clearSelectedTags() {
@@ -382,14 +372,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             requireActivity().finish()
         }
         builder.create().show()
-    }
-
-    private fun getDownloadType(): AppDownloadManager.DownloadType {
-        if (type.isLocal()) {
-            return AppDownloadManager.DownloadType.LOCAL
-        }
-
-        return AppDownloadManager.DownloadType.REMOTE
     }
 
     private fun setStamp(stamp: String) {
@@ -553,6 +535,47 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
     }
 
+    private fun remakeFilterChipsUi() {
+        b.filterChipGroup.removeAllViews()
+
+        val all = makeChip(BlocklistSelectionFilter.ALL.id,
+                           getString(R.string.rt_filter_parent_all), true)
+        val selected = makeChip(BlocklistSelectionFilter.SELECTED.id,
+                                getString(R.string.rt_filter_parent_selected), false)
+
+        b.filterChipGroup.addView(all)
+        b.filterChipGroup.addView(selected)
+    }
+
+    private fun makeChip(id: Int, label: String, checked: Boolean): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
+        chip.tag = id
+        chip.text = label
+        chip.isChecked = checked
+
+        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
+            if (isSelected) { // apply filter only when the CompoundButton is selected
+                applyFilter(button.tag)
+            }
+        }
+
+        return chip
+    }
+
+    private fun applyFilter(tag: Any) {
+        val a = filterObserver().value ?: Filters()
+
+        when (tag) {
+            BlocklistSelectionFilter.ALL.id -> {
+                a.filterSelected = BlocklistSelectionFilter.ALL
+            }
+            BlocklistSelectionFilter.SELECTED.id -> {
+                a.filterSelected = BlocklistSelectionFilter.SELECTED
+            }
+        }
+        filters.postValue(a)
+    }
+
     private fun openFilterBottomSheet() {
         io {
             val bottomSheetFragment = RethinkPlusFilterBottomSheetFragment(this, getAllList())
@@ -600,15 +623,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             advanceLocalListAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.lbAdvancedRecycler.adapter = advanceLocalListAdapter
-    }
-
-    private fun isBlocklistUpdateAvailable(downloadType: AppDownloadManager.DownloadType) {
-        isDownloadInitiated = true
-        appDownloadManager.isDownloadRequired(downloadType, retryCount = 0)
-    }
-
-    private fun downloadLocalBlocklist(timestamp: Long) {
-        appDownloadManager.downloadLocalBlocklist(timestamp)
     }
 
     private fun observeWorkManager() {
@@ -684,7 +698,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun onDownloadFail() {
-        isDownloadInitiated = false
         // update ui for download fail
         b.lbDownloadProgress.visibility = View.GONE
         b.lbDownloadProgressRemote.visibility = View.GONE
@@ -696,7 +709,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun onDownloadSuccess() {
-        isDownloadInitiated = false
         // update ui for download success
         b.lbDownloadProgress.visibility = View.GONE
         b.lbDownloadProgressRemote.visibility = View.GONE
@@ -712,6 +724,12 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) {
+            f()
+        }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
             f()
         }
     }

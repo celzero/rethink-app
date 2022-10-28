@@ -41,24 +41,25 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
     val localFiletags = Transformations.switchMap(list, ({ input: String ->
         if (blocklistFilter != null) {
             val query = blocklistFilter?.query ?: "%%"
+            val selected = getSelectedFilter()
             val groups = blocklistFilter?.groups ?: mutableSetOf()
             val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
             if (groups.isNotEmpty() && subg.isNotEmpty()) {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTags(query, groups, subg)
+                    rethinkLocalDao.getLocalFileTags(query, selected, groups, subg)
                 }.liveData.cachedIn(viewModelScope)
             } else if (groups.isNotEmpty()) {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTagsGroup(query, groups)
+                    rethinkLocalDao.getLocalFileTagsGroup(query, selected, groups)
                 }.liveData.cachedIn(viewModelScope)
             } else if (subg.isNotEmpty()) {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTagsSubg(query, subg)
+                    rethinkLocalDao.getLocalFileTagsSubg(query, selected, subg)
                 }.liveData.cachedIn(viewModelScope)
             } else {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTagsWithFilter(query)
+                    rethinkLocalDao.getLocalFileTagsWithFilter(query, selected)
                 }.liveData.cachedIn(viewModelScope)
             }
         } else if (input.isBlank()) {
@@ -67,10 +68,17 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
             }.liveData.cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                rethinkLocalDao.getLocalFileTagsWithFilter("%$input%")
+                rethinkLocalDao.getLocalFileTagsWithFilter("%$input%", getSelectedFilter())
             }.liveData.cachedIn(viewModelScope)
         }
     }))
+
+    private fun getSelectedFilter(): MutableSet<Int> {
+        if (blocklistFilter?.filterSelected == RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED) {
+            return mutableSetOf(1)
+        }
+        return mutableSetOf(0, 1)
+    }
 
     suspend fun allFileTags(): List<FileTag> {
         return rethinkLocalDao.getAllTags()
