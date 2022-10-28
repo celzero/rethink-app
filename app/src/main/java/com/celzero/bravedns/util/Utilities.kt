@@ -19,7 +19,6 @@ package com.celzero.bravedns.util
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
@@ -488,6 +487,10 @@ class Utilities {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         }
 
+        fun isAtleastT(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        }
+
         fun isFdroidFlavour(): Boolean {
             return BuildConfig.FLAVOR == FLAVOR_FDROID
         }
@@ -539,9 +542,9 @@ class Utilities {
             }
         }
 
-        fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
-            return localBlocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                  timestamp) + File.separator + which
+        fun localBlocklistFileDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+            return blocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                             timestamp) + File.separator + which
         }
 
         fun oldLocalBlocklistDownloadDir(ctx: Context, timestamp: Long): String {
@@ -555,18 +558,22 @@ class Utilities {
             return a
         }
 
-        fun localBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+        fun tempDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
+            // instead of creating folder for actual timestamp, create for its negative value
+            return blocklistCanonicalPath(ctx, which) + File.separator + (-1 * timestamp)
         }
 
-        fun localBlocklistCanonicalPath(ctx: Context, which: String): String {
+        fun blocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
+            return blocklistCanonicalPath(ctx, which) + File.separator + timestamp
+        }
+
+        fun blocklistCanonicalPath(ctx: Context, which: String): String {
             return ctx.filesDir.canonicalPath + File.separator + which
         }
 
-        fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
-                val localBlocklist = localBlocklistDownloadPath(ctx, which,
-                                                                timestamp)
+                val localBlocklist = localBlocklistFileDownloadPath(ctx, which, timestamp)
 
                 return File(localBlocklist)
             } catch (e: IOException) {
@@ -591,15 +598,11 @@ class Utilities {
             if (ctx == null) return null
 
             return try {
-                File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+                File(blocklistDownloadBasePath(ctx, which, timestamp))
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
-        }
-
-        fun remoteBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
         }
 
         fun blocklistFile(dirPath: String, fileName: String): File? {
@@ -751,6 +754,10 @@ class Utilities {
                 Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork = connectivityManager.activeNetwork ?: return null
             return connectivityManager.getLinkProperties(activeNetwork)
+        }
+
+        fun removeBeginningTrailingCommas(value: String): String {
+            return value.removePrefix(",").dropLastWhile { it == ',' }
         }
     }
 }

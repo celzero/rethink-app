@@ -15,11 +15,13 @@
  */
 package com.celzero.bravedns.ui
 
+import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.PorterDuff
@@ -53,13 +55,10 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.NotificationActionType
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
@@ -70,6 +69,7 @@ import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.facebook.shimmer.Shimmer
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -87,10 +87,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private lateinit var themeNames: Array<String>
     private lateinit var startForResult: ActivityResultLauncher<Intent>
+    private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        startActivityForResult()
+        registerForActivityResult()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -490,7 +491,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             disableFirewallCard()
             unobserveUniversalStates()
         } else {
-            b.fhsCardFirewallUnivRules.visibility = View.INVISIBLE
+            b.fhsCardFirewallUnivRules.visibility = View.GONE
             observeUniversalStates()
         }
     }
@@ -651,7 +652,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun openBottomSheet() {
         val bottomSheetFragment = HomeScreenSettingBottomSheet()
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun handleAlwaysOnVpn(): Boolean {
@@ -860,7 +861,30 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun startVpnService() {
+        // runtime permission for notification (Android 13)
+        getNotificationPermissionIfNeeded()
         VpnController.start(requireContext())
+    }
+
+    private fun getNotificationPermissionIfNeeded() {
+        if (!Utilities.isAtleastT()) {
+            // notification permission is needed for version 13 or above
+            return
+        }
+
+        if (ContextCompat.checkSelfPermission(requireContext(),
+                                              Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            // notification permission is granted to the app, do nothing
+            return
+        }
+
+        if (!persistentState.shouldRequestNotificationPermission) {
+            // user rejected notification permission
+            Log.w(LOG_TAG_VPN, "User rejected notification permission for the app")
+            return
+        }
+
+        notificationPermissionResult.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     @Throws(ActivityNotFoundException::class)
@@ -901,7 +925,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.create().show()
     }
 
-    private fun startActivityForResult() {
+    private fun registerForActivityResult() {
         startForResult = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             when (result.resultCode) {
@@ -916,6 +940,22 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 else -> {
                     stopVpnService()
                 }
+            }
+        }
+
+        // Sets up permissions request launcher.
+        notificationPermissionResult = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                Log.i(LoggerConstants.LOG_TAG_UI, "User accepted notification permission")
+                showToastUiCentered(requireContext(), "User accepted the permission",
+                                    Toast.LENGTH_SHORT)
+            } else {
+                persistentState.shouldRequestNotificationPermission = false
+                Log.w(LoggerConstants.LOG_TAG_UI, "User rejected notification permission")
+                Snackbar.make(requireActivity().findViewById<View>(android.R.id.content).rootView,
+                              getString(R.string.hsf_notification_permission_failure),
+                              Snackbar.LENGTH_LONG).show()
             }
         }
     }
