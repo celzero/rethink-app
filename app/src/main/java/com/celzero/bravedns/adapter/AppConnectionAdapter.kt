@@ -29,6 +29,7 @@ import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
 
 class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>, val uid: Int) :
         RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
@@ -109,14 +110,20 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
 
             b.acdCount.text = conn.count.toString()
             b.acdFlag.text = conn.flag
-            b.acdIpAddress.text = context.getString(R.string.ct_ip_port, conn.ipAddress, conn.port.toString())
+            b.acdIpAddress.text = context.getString(R.string.ct_ip_port, conn.ipAddress,
+                                                    conn.port.toString())
             if (!conn.dnsQuery.isNullOrEmpty()) {
                 b.acdDomainName.visibility = View.VISIBLE
-                b.acdDomainName.text = conn.dnsQuery
+                b.acdDomainName.text = beautifyDomainString(conn.dnsQuery)
             } else {
                 b.acdDomainName.visibility = View.GONE
             }
+        }
 
+        private fun beautifyDomainString(d: String): String {
+            // replace two commas in the string to one
+            // add space after all the commas
+            return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
     }
 

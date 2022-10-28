@@ -51,7 +51,7 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc")
+        "select ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, GROUP_CONCAT(DISTINCT dnsQuery) as dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc")
     fun getLogsForApp(uid: Int): List<AppConnections>?
 
     @Query(
