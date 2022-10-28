@@ -46,10 +46,7 @@ interface DnsLogDAO {
     fun clearAllData()
 
     @Query("delete from DNSLogs where time < :date")
-    fun deleteOlderData(date: Long)
-
-    @Query("delete from DNSLogs where id < ((select max(id) from DNSLogs) - :count)")
-    fun deleteOlderDataCount(count: Int)
+    fun purgeDnsLogsByDate(date: Long)
 
     @RawQuery
     fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int

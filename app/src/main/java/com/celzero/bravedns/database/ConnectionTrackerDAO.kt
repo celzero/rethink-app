@@ -20,7 +20,6 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.data.AppConnections
 
-
 @Dao
 interface ConnectionTrackerDAO {
 
@@ -36,15 +35,9 @@ interface ConnectionTrackerDAO {
     @Delete
     fun delete(connectionTracker: ConnectionTracker)
 
-    @Query("select * from ConnectionTracker order by timeStamp desc")
-    fun getConnectionTrackerLiveData(): PagingSource<Int, ConnectionTracker>
-
     @Query(
         "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc")
     fun getConnectionTrackerByName(query: String): PagingSource<Int, ConnectionTracker>
-
-    @Query("select * from ConnectionTracker where isBlocked = 1 order by timeStamp desc")
-    fun getConnectionBlockedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and isBlocked = 1 order by timeStamp desc")
@@ -59,20 +52,11 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnectionsFiltered(query: String,
                                       filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
-    @Query(
-        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by timeStamp desc")
-    fun getConnectionsFiltered(query: String,
-                               filter: List<String>): PagingSource<Int, ConnectionTracker>
-
-    @Query("delete from ConnectionTracker where timeStamp < :date")
-    fun deleteOlderData(date: Long)
-
     @Query("delete from ConnectionTracker")
     fun clearAllData()
 
-    @Query(
-        "delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
-    fun deleteOlderDataCount(count: Int)
+    @Query("DELETE FROM ConnectionTracker WHERE  timeStamp < :date")
+    fun purgeLogsByDate(date: Long)
 
     @Query(
         "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query)  order by timeStamp desc")

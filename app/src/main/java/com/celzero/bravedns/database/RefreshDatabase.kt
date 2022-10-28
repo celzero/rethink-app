@@ -44,7 +44,10 @@ import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isNonApp
 import com.google.common.collect.Sets
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -497,17 +500,10 @@ class RefreshDatabase internal constructor(private var context: Context,
         return s.replace("_", " ")
     }
 
-    fun deleteOlderDataFromNetworkLogs() {
-        CoroutineScope(Dispatchers.IO).launch {
-            /**
-             * Removing the logs delete code based on the days. Instead added a count to keep
-             * in the table.
-             * Come up with some other configuration/logic to delete the user logs.(both
-             * ConnectionTracker and DNSLogs.
-             */
-            dnsLogRepository.deleteConnectionTrackerCount()
-            connTrackerRepository.deleteConnectionTrackerCount()
-        }
+    suspend fun purgeConnectionLogs(date: Long) {
+        // purge logs older than specified date
+        dnsLogRepository.purgeDnsLogsByDate(date)
+        connTrackerRepository.purgeLogsByDate(date)
     }
 
     /**
