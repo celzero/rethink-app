@@ -339,7 +339,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     private fun openLocalBlocklist() {
         val bottomSheetFragment = LocalBlocklistsBottomSheet()
         bottomSheetFragment.setDismissListener(this)
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun invokeRethinkActivity(type: ConfigureRethinkBasicActivity.FragmentLoader) {

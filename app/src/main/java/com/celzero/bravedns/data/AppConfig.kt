@@ -78,9 +78,9 @@ class AppConfig internal constructor(private val context: Context,
 
         try {
             // FIXME: canonical path may go missing but is unhandled
-            val path: String = Utilities.localBlocklistDownloadBasePath(context,
-                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                        persistentState.localBlocklistTimestamp)
+            val path: String = Utilities.blocklistDownloadBasePath(context,
+                                                                   LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                                   persistentState.localBlocklistTimestamp)
             braveDns = Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
                                              path + ONDEVICE_BLOCKLIST_FILE_RD,
                                              path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
@@ -443,11 +443,9 @@ class AppConfig internal constructor(private val context: Context,
             }
             DnsType.DNSCRYPT -> {
                 val count = getDNSCryptServerCount()
-                val relayCount = dnsCryptRelayEndpointRepository.getConnectedRelays()
                 val text = context.getString(R.string.configure_dns_crypt, count.toString())
                 connectedDns.postValue(text)
                 persistentState.connectedDnsName = text
-                persistentState.setDnsCryptRelayCount(relayCount.count())
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return

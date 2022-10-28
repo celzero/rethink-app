@@ -31,11 +31,15 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
 
     private val refreshDatabase by inject<RefreshDatabase>()
 
+    companion object {
+        const val NUMBER_OF_DAYS_TO_PURGE = -7
+    }
+
     override suspend fun doWork(): Result {
         if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_SCHEDULER,
                                                            "starting purge-database job")
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -7)
+        calendar.add(Calendar.DAY_OF_YEAR, NUMBER_OF_DAYS_TO_PURGE)
         val date = calendar.time.time
 
         /**

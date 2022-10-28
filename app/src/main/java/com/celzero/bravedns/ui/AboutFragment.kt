@@ -249,7 +249,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
+            showToastUiCentered(requireContext(), getString(R.string.notification_screen_error),
                                 Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
