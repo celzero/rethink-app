@@ -438,7 +438,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
         builderSingle.setItems(packageList.toTypedArray(), null)
 
-        builderSingle.setPositiveButton(getString(status.getLabelId())) { dialog: DialogInterface, _: Int ->
+        builderSingle.setPositiveButton(
+            getString(status.getLabelId())) { dialog: DialogInterface, _: Int ->
             // call dialog.dismiss() before updating the details.
             // Without dismissing this dialog, the bottom sheet dialog is not
             // refreshing/updating its UI. One way is to dismiss the dialog

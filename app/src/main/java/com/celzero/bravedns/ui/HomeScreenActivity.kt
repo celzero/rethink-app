@@ -41,7 +41,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.AppUpdater
@@ -61,10 +60,10 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
-import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.snackbar.Snackbar
@@ -80,8 +79,6 @@ import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
-
-    private val refreshDatabase by inject<RefreshDatabase>()
 
     private lateinit var settingsFragment: SettingsFragment
     private lateinit var homeScreenFragment: HomeScreenFragment
@@ -126,8 +123,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // handle intent receiver for backup/restore
         handleIntent()
-
-        refreshDatabase.deleteOlderDataFromNetworkLogs()
 
         initUpdateCheck()
 
@@ -260,12 +255,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val removeLocal = "local_blocklist_update_check"
         val removeRemote = "remote_blocklist_update_check"
         val killApp = "kill_app_on_firewall"
+        val dnsCryptRelay = "dnscrypt_relay"
 
         val sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val editor = sharedPref.edit()
         editor.remove(removeLocal)
         editor.remove(removeRemote)
         editor.remove(killApp)
+        editor.remove(dnsCryptRelay)
         editor.apply()
     }
 
@@ -305,8 +302,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     // move the files of local blocklist to specific folder (../files/local_blocklist/<timestamp>)
     private fun changeDefaultLocalBlocklistLocation() {
-        val baseDir = localBlocklistDownloadBasePath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                     persistentState.localBlocklistTimestamp)
+        val baseDir = blocklistDownloadBasePath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                persistentState.localBlocklistTimestamp)
         File(baseDir).mkdirs()
         Constants.ONDEVICE_BLOCKLISTS.forEach {
             val currentFile = File(oldLocalBlocklistDownloadDir(this,
@@ -537,17 +534,21 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
                 R.id.navigation_settings -> {
                     settingsFragment = SettingsFragment()
+                    supportFragmentManager.popBackStackImmediate()
                     supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
                                                                       settingsFragment,
-                                                                      settingsFragment.javaClass.simpleName).commit()
+                                                                      settingsFragment.javaClass.simpleName).setReorderingAllowed(
+                        true).addToBackStack(null).commit()
                     return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_about -> {
                     aboutFragment = AboutFragment()
+                    supportFragmentManager.popBackStackImmediate()
                     supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
                                                                       aboutFragment,
-                                                                      aboutFragment.javaClass.simpleName).commit()
+                                                                      aboutFragment.javaClass.simpleName).setReorderingAllowed(
+                        true).addToBackStack(null).commit()
                     return@setOnItemSelectedListener true
                 }
             }
@@ -562,11 +563,4 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
     }
-
-    private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            f()
-        }
-    }
-
 }

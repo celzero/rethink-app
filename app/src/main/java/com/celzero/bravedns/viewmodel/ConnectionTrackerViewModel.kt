@@ -47,7 +47,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         filterRules.addAll(filter)
         filterType = type
 
-        if (!searchString.isBlank()) filterString.value = searchString
+        if (searchString.isNotBlank()) filterString.value = searchString
         else filterString.value = ""
     }
 
