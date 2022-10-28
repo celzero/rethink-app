@@ -104,7 +104,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE1D.id -> R.drawable.ic_firewall_wifi_on_grey
                 RULE1E.id -> R.drawable.ic_firewall_data_on_grey_alpha
                 RULE1F.id -> R.drawable.ic_univ_metered
-                RULE1G.id -> R.drawable.ic_lockdown
+                RULE1G.id -> R.drawable.ic_firewall_lockdown_off
                 RULE2.id -> R.drawable.spinner_firewall
                 RULE2B.id -> R.drawable.ic_bypass
                 RULE2C.id -> R.drawable.ic_bypass

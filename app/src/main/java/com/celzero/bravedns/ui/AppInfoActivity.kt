@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageInfo
@@ -23,11 +24,15 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -36,12 +41,14 @@ import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.adapter.AppIpRulesAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.updateFirewallStatus
+import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
+import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -53,6 +60,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.celzero.bravedns.viewmodel.AppCustomIpViewModel
+import inet.ipaddr.HostName
+import inet.ipaddr.HostNameException
+import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,9 +85,10 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
     private var connIpList: List<AppConnections>? = null
     private var appConnAdapter: AppConnectionAdapter? = null
 
-    private var ipListState: Boolean = false
-    private var ipRulesState: Boolean = false
-    private var appDetailsState: Boolean = false
+    private var ipListUiState: Boolean = true
+    private var ipRulesUiState: Boolean = false
+    private var appDetailsUiState: Boolean = false
+    private var firewallUiState: Boolean = false
 
     private var appStatus = FirewallManager.FirewallStatus.ALLOW
     private var connStatus = FirewallManager.ConnectionStatus.BOTH
@@ -131,8 +142,9 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         appStatus = FirewallManager.appStatus(appInfo.uid)
         connStatus = FirewallManager.connectionStatus(appInfo.uid)
         updateFirewallStatusUi(appStatus, connStatus)
-        toggleIpConnectionsState(ipListState)
-        toggleIpRulesState(ipRulesState)
+        toggleIpConnectionsState(ipListUiState)
+        toggleIpRulesState(ipRulesUiState)
+        toggleFirewallUiState(firewallUiState)
         updateBasicAppInfo()
         updateDnsDetails()
 
@@ -239,32 +251,52 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
                                  FirewallManager.ConnectionStatus.BOTH)
         }
 
+        b.aadAppSettingsLockdown.setOnClickListener {
+
+            if (appStatus == FirewallManager.FirewallStatus.LOCKDOWN) {
+                updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
+                                     FirewallManager.ConnectionStatus.BOTH)
+                return@setOnClickListener
+            }
+
+            updateFirewallStatus(FirewallManager.FirewallStatus.LOCKDOWN,
+                                 FirewallManager.ConnectionStatus.BOTH)
+        }
+
         b.aadConnDetailIndicator.setOnClickListener {
-            toggleIpConnectionsState(ipListState)
+            toggleIpConnectionsState(ipListUiState)
         }
 
         b.aadConnDetailRl.setOnClickListener {
-            toggleIpConnectionsState(ipListState)
+            toggleIpConnectionsState(ipListUiState)
+        }
+
+        b.aadAapFirewallIndicator.setOnClickListener {
+            toggleFirewallUiState(firewallUiState)
+        }
+
+        b.aadFirewallTitleRl.setOnClickListener {
+            toggleFirewallUiState(firewallUiState)
         }
 
         b.aadIpBlockIndicator.setOnClickListener {
-            toggleIpRulesState(ipRulesState)
+            toggleIpRulesState(ipRulesUiState)
         }
 
         b.aadIpBlockRl.setOnClickListener {
-            toggleIpRulesState(ipRulesState)
+            toggleIpRulesState(ipRulesUiState)
         }
 
         b.aadDownArrowIcon.setOnClickListener {
-            toggleAppDetailsState(appDetailsState)
+            toggleAppDetailsState(appDetailsUiState)
         }
 
         b.aadAppDetailIcon.setOnClickListener {
-            toggleAppDetailsState(appDetailsState)
+            toggleAppDetailsState(appDetailsUiState)
         }
 
         b.aadAppDetailLl.setOnClickListener {
-            toggleAppDetailsState(appDetailsState)
+            toggleAppDetailsState(appDetailsUiState)
         }
 
         b.aadDnsHeading.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
@@ -278,27 +310,12 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
             removeAppDns(uid)
         }
 
-        b.aadAapLockdownRl.setOnClickListener {
-            b.aadAapLockdownSwitch.isChecked = !b.aadAapLockdownSwitch.isChecked
-        }
-
-        b.aadAapLockdownSwitch.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                updateFirewallStatus(FirewallManager.FirewallStatus.LOCKDOWN,
-                                     FirewallManager.ConnectionStatus.BOTH)
-                disableFirewallStatusUi()
-                enableLockdownUi()
-                return@setOnCheckedChangeListener
-            }
-
-            updateFirewallStatus(FirewallManager.FirewallStatus.ALLOW,
-                                 FirewallManager.ConnectionStatus.BOTH)
-            enableAllow()
-            disableLockdownUi()
-        }
-
         b.aadAppDnsRethinkConfigure.setOnClickListener {
             rethinkListBottomSheet()
+        }
+
+        b.aadIpAddIndicator.setOnClickListener {
+            showAddIpDialog()
         }
     }
 
@@ -434,6 +451,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
                     b.aadConnDetailSearchContainer.visibility = View.GONE
                     b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
                     b.aadConnDetailRecycler.visibility = View.GONE
+                    toggleFirewallUiState(firewallUiState)
                     return@uiCtx
                 }
 
@@ -451,34 +469,47 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
     }
 
     private fun toggleIpConnectionsState(state: Boolean) {
-        ipListState = !state
+        ipListUiState = !state
         if (state) {
             b.aadConnDetailTopLl.visibility = View.VISIBLE
             b.aadConnDetailSearchLl.visibility = View.VISIBLE
-            b.aadConnDetailIndicator.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
-            return
+            b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_up)
+        } else {
+            b.aadConnDetailSearchLl.visibility = View.GONE
+            b.aadConnDetailTopLl.visibility = View.GONE
+            b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_down)
         }
+    }
 
-        b.aadConnDetailSearchLl.visibility = View.GONE
-        b.aadConnDetailTopLl.visibility = View.GONE
-        b.aadConnDetailIndicator.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
+    private fun toggleFirewallUiState(state: Boolean) {
+        firewallUiState = !state
+
+        if (state) {
+            b.aadAppSettingsLl.visibility = View.VISIBLE
+            b.aadAapFirewallIndicator.setImageResource(R.drawable.ic_arrow_up)
+        } else {
+            b.aadAppSettingsLl.visibility = View.GONE
+            b.aadAapFirewallIndicator.setImageResource(R.drawable.ic_arrow_down)
+        }
     }
 
     private fun toggleIpRulesState(state: Boolean) {
-        ipRulesState = !state
+        ipRulesUiState = !state
 
         if (state) {
             b.aadIpBlockTopLl.visibility = View.VISIBLE
-            b.aadIpBlockIndicator.setImageResource(R.drawable.ic_keyboard_arrow_up_gray_24dp)
+            b.aadIpBlockIndicator.setImageResource(R.drawable.ic_arrow_up)
+            b.aadIpAddIndicator.visibility = View.VISIBLE
             return
         }
 
         b.aadIpBlockTopLl.visibility = View.GONE
-        b.aadIpBlockIndicator.setImageResource(R.drawable.ic_keyboard_arrow_down_gray_24dp)
+        b.aadIpAddIndicator.visibility = View.GONE
+        b.aadIpBlockIndicator.setImageResource(R.drawable.ic_arrow_down)
     }
 
     private fun toggleAppDetailsState(state: Boolean) {
-        appDetailsState = !state
+        appDetailsUiState = !state
         if (state) {
             b.aadAppStatsCard.visibility = View.VISIBLE
             b.aadDownArrowIcon.setImageResource(R.drawable.ic_arrow_up)
@@ -494,6 +525,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_on, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
 
     private fun enableAppExcludedUi() {
@@ -501,36 +533,29 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_on, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
 
     private fun disableWhitelistExcludeUi() {
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
 
     private fun disableFirewallStatusUi() {
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
     }
 
     private fun enableLockdownUi() {
-        b.aadAapLockdownSwitch.isChecked = true
-
-        b.aadAppSettingsWhitelist.isEnabled = false
-        b.aadAppSettingsExclude.isEnabled = false
-        b.aadAppSettingsBlock.isEnabled = false
-        b.aadAppSettingsBlockMd.isEnabled = false
-    }
-
-    private fun disableLockdownUi() {
-        b.aadAapLockdownSwitch.isChecked = false
-
-        b.aadAppSettingsWhitelist.isEnabled = true
-        b.aadAppSettingsExclude.isEnabled = true
-        b.aadAppSettingsBlock.isEnabled = true
-        b.aadAppSettingsBlockMd.isEnabled = true
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
+        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_on, b.aadAppSettingsLockdown)
     }
 
     private fun enableAllow() {
@@ -538,6 +563,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
 
     // update the BLOCK status based on connection status (mobile data + wifi + both)
@@ -606,6 +632,71 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
         builder.create().show()
     }
 
+    private fun showAddIpDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setTitle(getString(R.string.ci_dialog_title))
+        val dBind = DialogAddCustomIpBinding.inflate(layoutInflater)
+        dialog.setContentView(dBind.root)
+
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialog.show()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.window?.attributes = lp
+
+        dBind.daciIpTitle.text = getString(R.string.ci_dialog_title)
+
+        dBind.daciIpEditText.addTextChangedListener {
+            if (dBind.daciFailureTextView.isVisible) {
+                dBind.daciFailureTextView.visibility = View.GONE
+            }
+        }
+
+        dBind.daciAddBtn.setOnClickListener {
+            val input = dBind.daciIpEditText.text.toString()
+
+            val ipString = Utilities.removeLeadingAndTrailingDots(input)
+
+            val hostName = getHostName(ipString)
+            val ip = hostName?.address
+            if (ip == null || ipString.isEmpty()) {
+                dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
+                dBind.daciFailureTextView.visibility = View.VISIBLE
+                return@setOnClickListener
+            }
+
+            dBind.daciIpEditText.text.clear()
+            insertCustomIp(hostName)
+
+        }
+
+        dBind.daciCancelBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun getHostName(ip: String): HostName? {
+        return try {
+            val host = HostName(ip)
+            host.validate()
+            host
+        } catch (e: HostNameException) {
+            val ipAddress = IPAddressString(ip).address ?: return null
+            HostName(ipAddress)
+        }
+    }
+
+    private fun insertCustomIp(ip: HostName) {
+        IpRulesManager.addIpRule(uid, ip, IpRulesManager.IpRuleStatus.BLOCK)
+        Utilities.showToastUiCentered(this, getString(R.string.ci_dialog_added_success),
+                                      Toast.LENGTH_SHORT)
+    }
+
     private fun showDialog(packageList: List<String>, appInfo: AppInfo,
                            aStat: FirewallManager.FirewallStatus,
                            cStat: FirewallManager.ConnectionStatus) {
@@ -648,7 +739,7 @@ class AppInfoActivity : AppCompatActivity(R.layout.activity_app_details),
             b.aadDetails.text = updateHtmlEncodedText(
                 getString(R.string.ada_uid, appInfo.uid.toString(), appInfo.appCategory,
                           installTime, updateTime))
-            toggleAppDetailsState(appDetailsState)
+            toggleAppDetailsState(appDetailsUiState)
             enableAppInfoIndicators()
         } catch (ignored: PackageManager.NameNotFoundException) {
             // pass the app state to false; so that the toggle will

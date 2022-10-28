@@ -76,6 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:alpha="0.5"
                     android:minWidth="24dp"
                     android:minHeight="24dp"
                     android:src="@drawable/ic_arrow_down" />
@@ -108,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:orientation="vertical"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:visibility="visible">
 
                 <TextView
@@ -125,7 +126,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/aad_aap_lockdown_card"
+            android:id="@+id/aad_aap_firewall_new_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/aad_app_stats_card"
@@ -138,171 +139,172 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <RelativeLayout
-                    android:id="@+id/aad_aap_lockdown_rl"
+                    android:id="@+id/aad_firewall_title_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="15dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/aad_aap_lockdown_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:alpha="0.5"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_lockdown" />
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:padding="5dp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toStartOf="@id/aad_aap_lockdown_switch"
-                        android:layout_toEndOf="@id/aad_aap_lockdown_icon"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_toStartOf="@id/aad_aap_firewall_indicator"
                         android:orientation="vertical">
 
                         <TextView
                             style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/ada_lockdown_title"
-                            android:textSize="@dimen/large_font_text_view" />
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:gravity="center_vertical"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
+                            android:text="@string/ada_firewall_title"
+                            android:textColor="?attr/secondaryTextColor"
+                            android:textSize="@dimen/large_font_text_view"
+                            android:textStyle="bold" />
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/aad_firewall_status"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="@string/ada_lockdown_desc"
-                            android:textSize="@dimen/default_font_text_view" />
+                            android:layout_marginBottom="10dp"
+                            android:text="@string/ada_firewall_status"
+                            android:textColor="?primaryTextColor"
+                            android:textSize="@dimen/large_font_text_view" />
+
                     </LinearLayout>
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/aad_aap_lockdown_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/aad_aap_firewall_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp" />
+                        android:alpha="0.5"
+                        android:minWidth="24dp"
+                        android:minHeight="24dp"
+                        android:src="@drawable/ic_arrow_up" />
                 </RelativeLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/aad_aap_firewall_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/aad_aap_lockdown_card"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="16dp">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp">
-
 
                 <LinearLayout
                     android:id="@+id/aad_app_settings_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:weightSum="1">
+                    android:layout_marginBottom="5dp"
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/aad_app_settings_block"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.25"
-                        android:drawablePadding="5dp"
-                        android:fontFamily="sans-serif-medium"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:padding="5dp"
-                        android:text="@string/ada_app_unmetered"
-                        android:textColor="?primaryTextColor"
-                        android:textSize="@dimen/default_font_text_view"
-                        app:drawableTopCompat="@drawable/ic_firewall_wifi_on_grey" />
+                        android:weightSum="1">
 
-                    <TextView
-                        android:id="@+id/aad_app_settings_block_md"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.25"
-                        android:drawablePadding="5dp"
-                        android:fontFamily="sans-serif-medium"
+                        <TextView
+                            android:id="@+id/aad_app_settings_block"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.5"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="@string/ada_app_unmetered"
+                            android:textColor="?primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:drawableTopCompat="@drawable/ic_firewall_wifi_on_grey" />
+
+                        <TextView
+                            android:id="@+id/aad_app_settings_block_md"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.5"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="@string/ada_app_metered"
+                            android:textColor="?primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:drawableTopCompat="@drawable/ic_firewall_data_on_grey" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
                         android:gravity="center"
                         android:padding="5dp"
-                        android:text="@string/ada_app_metered"
-                        android:textColor="?primaryTextColor"
-                        android:textSize="@dimen/default_font_text_view"
-                        app:drawableTopCompat="@drawable/ic_firewall_data_on_grey" />
+                        android:weightSum="1">
 
-                    <TextView
-                        android:id="@+id/aad_app_settings_whitelist"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.25"
-                        android:drawablePadding="5dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center"
-                        android:padding="5dp"
-                        android:text="@string/ada_app_whitelist"
-                        android:textColor="?primaryTextColor"
-                        android:textSize="@dimen/default_font_text_view"
-                        app:drawableTopCompat="@drawable/ic_whitelist" />
+                        <TextView
+                            android:id="@+id/aad_app_settings_lockdown"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.33"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="@string/ada_app_lockdown"
+                            android:textColor="?primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:drawableTopCompat="@drawable/ic_firewall_lockdown_off" />
 
-                    <TextView
-                        android:id="@+id/aad_app_settings_exclude"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.25"
-                        android:drawablePadding="5dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:gravity="center"
-                        android:padding="5dp"
-                        android:text="@string/ada_app_exclude"
-                        android:textColor="?primaryTextColor"
-                        android:textSize="@dimen/default_font_text_view"
-                        app:drawableTopCompat="@drawable/ic_exclude" />
+
+                        <TextView
+                            android:id="@+id/aad_app_settings_whitelist"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.33"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="@string/ada_app_whitelist"
+                            android:textColor="?primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:drawableTopCompat="@drawable/ic_whitelist" />
+
+                        <TextView
+                            android:id="@+id/aad_app_settings_exclude"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.33"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="@string/ada_app_exclude"
+                            android:textColor="?primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:drawableTopCompat="@drawable/ic_exclude" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/aad_firewall_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/aad_app_settings_ll"
-                    android:layout_marginBottom="10dp"
-                    android:paddingStart="20dp"
-                    android:paddingTop="5dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="20dp"
-                    android:text="@string/ada_firewall_status"
-                    android:textColor="?primaryTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
-
-            </RelativeLayout>
+            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/aad_dns_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/aad_aap_firewall_card"
+            android:layout_below="@id/aad_aap_firewall_new_card"
             android:layout_margin="8dp"
             android:visibility="gone"
             app:cardCornerRadius="8dp"
@@ -366,18 +368,11 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/aad_dns_card"
-            android:background="?attr/border"
-            android:visibility="gone" />
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/aad_ip_block_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/aad_aap_firewall_card"
+            android:layout_below="@id/aad_aap_firewall_new_card"
             android:layout_margin="8dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="16dp">
@@ -385,35 +380,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="5dp">
 
                 <RelativeLayout
                     android:id="@+id/aad_ip_block_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="2dp"
-                    android:padding="10dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/aad_ip_block_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_local_blocklist"
-                        android:visibility="gone" />
+                    android:padding="5dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
-                        android:layout_toStartOf="@id/aad_ip_block_indicator"
-                        android:layout_toEndOf="@id/aad_ip_block_icon"
-                        android:orientation="vertical"
-                        android:paddingBottom="10dp">
+                        android:layout_toStartOf="@id/aad_ip_add_indicator"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/aad_ip_block_header"
@@ -441,11 +425,26 @@
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/aad_ip_add_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/aad_ip_block_indicator"
+                        android:minWidth="24dp"
+                        android:minHeight="24dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_add" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/aad_ip_block_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:src="@drawable/ic_keyboard_arrow_up_gray_24dp" />
+                        android:alpha="0.5"
+                        android:minWidth="24dp"
+                        android:minHeight="24dp"
+                        android:src="@drawable/ic_arrow_up" />
+
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -502,9 +501,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
-                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="2dp"
-                    android:padding="10dp">
+                    android:padding="5dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/aad_conn_detail_icon"
@@ -555,7 +553,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:src="@drawable/ic_keyboard_arrow_up_gray_24dp" />
+                        android:alpha="0.5"
+                        android:minWidth="24dp"
+                        android:minHeight="24dp"
+                        android:src="@drawable/ic_arrow_up" />
                 </RelativeLayout>
 
                 <LinearLayout
