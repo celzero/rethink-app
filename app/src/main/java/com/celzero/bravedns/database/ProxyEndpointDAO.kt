@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -60,6 +61,9 @@ interface ProxyEndpointDAO {
 
     @Query("select * from ProxyEndpoint where isSelected = 1")
     fun getConnectedProxy(): ProxyEndpoint?
+
+    @Query("select * from ProxyEndpoint where isSelected = 1")
+    fun getConnectedProxyLiveData(): LiveData<ProxyEndpoint?>
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and proxyName = 'ORBOT'")
     fun getConnectedOrbotProxy(): ProxyEndpoint

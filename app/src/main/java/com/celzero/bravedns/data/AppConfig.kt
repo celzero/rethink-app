@@ -20,7 +20,6 @@ import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
@@ -43,8 +42,6 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import protect.Blocker
 import settings.Settings
 import java.net.InetAddress
@@ -1004,9 +1001,5 @@ class AppConfig internal constructor(private val context: Context,
         proxyEndpointRepository.insert(proxyEndpoint)
     }
 
-    val connectedProxy: LiveData<ProxyEndpoint> = liveData {
-        withContext(Dispatchers.IO) {
-            proxyEndpointRepository.getConnectedProxy()?.let { emit(it) }
-        }
-    }
+    val connectedProxy: LiveData<ProxyEndpoint?> = proxyEndpointRepository.getConnectedProxyLiveData()
 }
