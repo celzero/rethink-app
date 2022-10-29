@@ -17,23 +17,30 @@ package com.celzero.bravedns.download
 
 import android.content.Context
 import android.util.Log
+import com.celzero.bravedns.customdownloader.IBlocklistDownload
+import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Utilities.Companion.blocklistCanonicalPath
 import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
-import com.celzero.bravedns.util.Utilities.Companion.localBlocklistCanonicalPath
+import org.json.JSONException
+import org.json.JSONObject
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.io.IOException
 
 class BlocklistDownloadHelper {
 
     companion object {
-        fun isDownloadComplete(context: Context, timestamp: String): Boolean {
+        fun isDownloadComplete(context: Context, timestamp: Long): Boolean {
             var result = false
             var total: Int? = 0
             var dir: File? = null
             try {
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: $timestamp")
-                dir = File(getExternalFilePath(context, timestamp))
+                dir = File(getExternalFilePath(context, timestamp.toString()))
                 total = if (dir.isDirectory) {
                     dir.list()?.count()
                 } else {
@@ -69,9 +76,21 @@ class BlocklistDownloadHelper {
             deleteRecursive(dir)
         }
 
+        fun deleteBlocklistResidue(context: Context, which: String, timestamp: Long) {
+            val dir = File(blocklistCanonicalPath(context, which))
+            if (!dir.exists()) return
+
+            dir.listFiles()?.forEach {
+                // delete all the dir other than current timestamp dir
+                if (it.name != timestamp.toString()) {
+                    deleteRecursive(dir)
+                }
+            }
+        }
+
         fun deleteFromCanonicalPath(context: Context) {
-            val canonicalPath = File(localBlocklistCanonicalPath(context,
-                                                                 Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME))
+            val canonicalPath = File(
+                blocklistCanonicalPath(context, Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME))
             deleteRecursive(canonicalPath)
         }
 
@@ -85,6 +104,66 @@ class BlocklistDownloadHelper {
         // external files dir (api: setDestinationInExternalFilesDir)
         fun getExternalFilePath(timestamp: String): String {
             return Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
+        }
+
+        suspend fun getDownloadableTimestamp(timestamp: Long, vcode: Int, retryCount: Int): Long {
+            try {
+                val retrofit = RetrofitManager.getBlocklistBaseBuilder(
+                    getDnsTypeOnRetryCount(retryCount)).addConverterFactory(
+                    GsonConverterFactory.create()).build()
+                val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
+                val response = retrofitInterface.downloadAvailabilityCheck(
+                    Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1,
+                    Constants.ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2, timestamp, vcode)
+
+                if (response?.isSuccessful == true) {
+                    val r = response.body()?.toString()?.let { JSONObject(it) }
+                    return processCheckDownloadResponse(r)
+                } else {
+                    retryIfRequired(timestamp, vcode, retryCount)
+                }
+            } catch (e: Exception) {
+                retryIfRequired(timestamp, vcode, retryCount)
+            }
+            return INIT_TIME_MS
+        }
+
+        private suspend fun retryIfRequired(timestamp: Long, vcode: Int, retryCount: Int) {
+            if (retryCount > 3) {
+                return
+            }
+
+            getDownloadableTimestamp(timestamp, vcode, retryCount + 1)
+        }
+
+        private fun getDnsTypeOnRetryCount(
+                retryCount: Int): RetrofitManager.Companion.OkHttpDnsType {
+            return when (retryCount) {
+                0 -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
+                1 -> RetrofitManager.Companion.OkHttpDnsType.CLOUDFLARE
+                2 -> RetrofitManager.Companion.OkHttpDnsType.GOOGLE
+                else -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
+            }
+        }
+
+        private fun processCheckDownloadResponse(response: JSONObject?): Long {
+            if (response == null) return INIT_TIME_MS
+
+            try {
+                val version = response.optInt(Constants.JSON_VERSION, 0)
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
+                                 "client onResponse for refresh blocklist files:  $version")
+                if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
+                    return INIT_TIME_MS
+                }
+
+                val shouldUpdate = response.optBoolean(Constants.JSON_UPDATE, false)
+                val timestamp = response.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse:  update? $shouldUpdate")
+                return timestamp
+            } catch (e: JSONException) {
+                throw IOException()
+            }
         }
     }
 

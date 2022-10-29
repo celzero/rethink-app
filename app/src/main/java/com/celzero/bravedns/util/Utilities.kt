@@ -429,10 +429,6 @@ class Utilities {
             return !isNonApp(packageName) && Constants.UNKNOWN_APP != appName
         }
 
-        fun isValidAppName(appName: String?): Boolean {
-            return (!appName.isNullOrEmpty() && appName != Constants.UNKNOWN_APP)
-        }
-
         fun getDefaultIcon(context: Context): Drawable? {
             return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
         }
@@ -577,7 +573,7 @@ class Utilities {
 
                 return File(localBlocklist)
             } catch (e: IOException) {
-                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                Log.e(LOG_TAG_VPN, "Could not fetch local blocklist: " + e.message, e)
                 null
             }
         }

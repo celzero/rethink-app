@@ -30,7 +30,7 @@ import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FO
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
-import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadPath
+import com.celzero.bravedns.util.Utilities.Companion.localBlocklistFileDownloadPath
 import dnsx.Dnsx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +83,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
 
     private fun copyFiles(context: Context, timestamp: Long): Boolean {
         try {
-            if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp.toString())) {
+            if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp)) {
                 return false
             }
 
@@ -108,7 +108,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             // during the next download downloadLocalBlocklist
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
-                val to = localBlocklistDownloadPath(context, children[i], timestamp)
+                val to = localBlocklistFileDownloadPath(context, children[i], timestamp)
                 if (to.isEmpty()) {
                     Log.w(LOG_TAG_DOWNLOAD, "Copy failed from $from, to: $to")
                     return false
@@ -162,9 +162,9 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      */
     private fun isDownloadValid(timestamp: Long): Boolean {
         try {
-            val path: String = Utilities.localBlocklistDownloadBasePath(context,
-                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                        timestamp)
+            val path: String = Utilities.blocklistDownloadBasePath(context,
+                                                                   LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                                   timestamp)
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,

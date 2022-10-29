@@ -30,9 +30,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkEndpointAdapter
+import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
+import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.DialogSetRethinkBinding
@@ -41,6 +45,7 @@ import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.UID
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -74,8 +79,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private val viewModel: RethinkEndpointViewModel by viewModel()
 
     private var uid: Int = Constants.MISSING_UID
-
-    private var isDownloadInitiated = false
 
     data class ModifiedStamp(val name: String, val stamp: String, val count: Int)
 
@@ -156,12 +159,15 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun isBlocklistUpdateAvailable(): Boolean {
-        return persistentState.newestRemoteBlocklistTimestamp != INIT_TIME_MS
+        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_DOWNLOAD,
+                         "Update available? newest: ${persistentState.newestRemoteBlocklistTimestamp}, available: ${persistentState.remoteBlocklistTimestamp}")
+        return (persistentState.newestRemoteBlocklistTimestamp != INIT_TIME_MS && persistentState.newestRemoteBlocklistTimestamp > persistentState.remoteBlocklistTimestamp)
     }
 
     private fun checkBlocklistUpdate() {
-        appDownloadManager.isDownloadRequired(AppDownloadManager.DownloadType.REMOTE,
-                                              retryCount = 0)
+        io {
+            appDownloadManager.isDownloadRequired(AppDownloadManager.DownloadType.REMOTE)
+        }
     }
 
     private fun getDownloadTimeStamp(): Long {
@@ -205,34 +211,24 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         }
 
         b.bslbCheckUpdateBtn.setOnClickListener {
-            isDownloadInitiated = true
             b.bslbCheckUpdateBtn.isEnabled = false
             showProgress(b.bslbCheckUpdateBtn)
             checkBlocklistUpdate()
         }
 
         b.bslbUpdateAvailableBtn.setOnClickListener {
-            isDownloadInitiated = true
             b.bslbUpdateAvailableBtn.isEnabled = false
-            val timestamp = getDownloadableTimestamp()
+            val timestamp = getDownloadTimeStamp()
 
-            if (getDownloadTimeStamp() < timestamp) {
-                // show dialog if the download type is local
-                showProgress(b.bslbUpdateAvailableBtn)
-                download(timestamp)
-            } else {
-                showUpdateCheckUi()
-                Utilities.showToastUiCentered(requireContext(),
-                                              getString(R.string.blocklist_update_check_failure),
-                                              Toast.LENGTH_SHORT)
-            }
+            // show dialog if the download type is local
+            showProgress(b.bslbUpdateAvailableBtn)
+            download(timestamp, isRedownload = false)
         }
 
         b.bslbRedownloadBtn.setOnClickListener {
-            isDownloadInitiated = true
             b.bslbRedownloadBtn.isEnabled = false
             showProgress(b.bslbRedownloadBtn)
-            download(getDownloadTimeStamp())
+            download(getDownloadTimeStamp(), isRedownload = true)
         }
 
         b.radioMax.setOnCheckedChangeListener(null)
@@ -268,12 +264,15 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         }
     }
 
-    private fun getDownloadableTimestamp(): Long {
-        return persistentState.newestRemoteBlocklistTimestamp
-    }
-
-    private fun download(timestamp: Long) {
-        appDownloadManager.downloadRemoteBlocklist(timestamp)
+    private fun download(timestamp: Long, isRedownload: Boolean) {
+        io {
+            val initiated = appDownloadManager.downloadRemoteBlocklist(timestamp, isRedownload)
+            uiCtx {
+                if (!initiated) {
+                    onRemoteDownloadFailure()
+                }
+            }
+        }
     }
 
     private fun getUrlForStamp(stamp: String): String {
@@ -350,100 +349,78 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun initObservers() {
-        appDownloadManager.remoteDownloadStatus.observe(viewLifecycleOwner) {
-            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD, "Remote blocklist download status id: $it")
-            if (!isDownloadInitiated) return@observe
-
-            if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
-                // no-op
-                return@observe
-            }
-            if (it == AppDownloadManager.DownloadManagerStatus.FAILURE.id) {
-                ui {
-                    hideProgress()
-                    onRemoteDownloadFailure()
-                    Utilities.showToastUiCentered(requireContext(), getString(
-                        R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
-                    requireActivity().finish()
-                }
-                return@observe
-            }
-
-            if (it == AppDownloadManager.DownloadManagerStatus.IN_PROGRESS.id) {
-                ui {
-                    // no-op for remote download
-                    // onDownloadStart()
-                }
-                return@observe
-            }
-
-            if (it == AppDownloadManager.DownloadManagerStatus.SUCCESS.id) {
-                ui {
-                    hideProgress()
-                    onDownloadSuccess()
-                }
-                // reset live-data value to initial state, as previous state is completed
-                appDownloadManager.remoteDownloadStatus.postValue(
-                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id)
-            }
+        val workManager = WorkManager.getInstance(requireContext().applicationContext)
+        // observer for custom download manager worker
+        workManager.getWorkInfosByTagLiveData(
+            RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER).observe(
+            viewLifecycleOwner) { workInfoList ->
+            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
             Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "Remote blocklist, Is download successful? $it(timestamp/status)")
+                  "WorkManager state: ${workInfo.state} for ${RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER}")
+            if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
+                // no-op
+            } else if (WorkInfo.State.SUCCEEDED == workInfo.state) {
+                hideProgress()
+                onDownloadSuccess()
+                workManager.pruneWork()
+            } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+                hideProgress()
+                onRemoteDownloadFailure()
+                Utilities.showToastUiCentered(requireContext(),
+                                              getString(R.string.blocklist_update_check_failure),
+                                              Toast.LENGTH_SHORT)
+                workManager.pruneWork()
+                workManager.cancelAllWorkByTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
+            } else { // state == blocked
+                // no-op
+            }
         }
 
-        appDownloadManager.timeStampToDownload.observe(viewLifecycleOwner) {
-            if (!isDownloadInitiated) return@observe
-
+        appDownloadManager.downloadRequired.observe(viewLifecycleOwner) {
             Log.i(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
-            if (it == AppDownloadManager.DownloadManagerStatus.NOT_STARTED.id) {
-                // no-op
-                return@observe
-            }
-            if (it == AppDownloadManager.DownloadManagerStatus.FAILURE.id) {
-                ui {
-                    Utilities.showToastUiCentered(requireContext(), getString(
-                        R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+            if (it == null) return@observe
+
+            when (it) {
+                AppDownloadManager.DownloadManagerStatus.NOT_STARTED -> {
+                    // no-op
                 }
-                return@observe
-            }
-
-            if (it == AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED.id) {
-                ui {
-                    showRedownloadUi()
-                    Utilities.showToastUiCentered(requireContext(), getString(
-                        R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
+                AppDownloadManager.DownloadManagerStatus.IN_PROGRESS -> {
+                    // no-op
                 }
-                return@observe
-            }
+                AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED -> {
+                    ui {
+                        hideProgress()
+                        showRedownloadUi()
+                        Utilities.showToastUiCentered(requireContext(), getString(
+                            R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
+                    }
+                    appDownloadManager.downloadRequired.postValue(
+                        AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
+                }
+                AppDownloadManager.DownloadManagerStatus.FAILURE -> {
+                    ui {
+                        hideProgress()
+                        Utilities.showToastUiCentered(requireContext(), getString(
+                            R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                    }
+                    appDownloadManager.downloadRequired.postValue(
+                        AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
+                }
+                AppDownloadManager.DownloadManagerStatus.SUCCESS -> {
+                    ui {
+                        hideProgress()
+                        showNewUpdateUi()
+                    }
+                    appDownloadManager.downloadRequired.postValue(
+                        AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
+                }
 
-            if (it == AppDownloadManager.DownloadManagerStatus.IN_PROGRESS.id) {
-                // no-op
-                return@observe
             }
-
-            if (it == getDownloadTimeStamp()) {
-                hideProgress()
-                showRedownloadUi()
-                return@observe
-            }
-
-            if (getDownloadTimeStamp() == INIT_TIME_MS) {
-                download(it)
-                return@observe
-            }
-
-            if (getDownloadTimeStamp() != it) {
-                hideProgress()
-                showNewUpdateUi(it)
-                return@observe
-            }
-
-            download(it)
         }
     }
 
-    private fun showNewUpdateUi(t: Long) {
+    private fun showNewUpdateUi() {
         enableChips()
-        b.bslbUpdateAvailableBtn.tag = t
         b.bslbUpdateAvailableBtn.visibility = View.VISIBLE
         b.bslbCheckUpdateBtn.visibility = View.GONE
     }
@@ -456,7 +433,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun onRemoteDownloadFailure() {
-        isDownloadInitiated = false
         enableChips()
     }
 
@@ -467,7 +443,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun onDownloadSuccess() {
-        isDownloadInitiated = false
         b.lbVersion.text = getString(R.string.settings_local_blocklist_version,
                                      Utilities.convertLongToTime(getDownloadTimeStamp(),
                                                                  Constants.TIME_FORMAT_2))
@@ -491,7 +466,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             }
             val endpoint = RethinkDnsEndpoint(dohName, url, uid = Constants.MISSING_UID, desc = "",
                                               isActive = false, isCustom = true, latency = 0, count,
-                                              modifiedDataTime = Constants.INIT_TIME_MS)
+                                              modifiedDataTime = INIT_TIME_MS)
             appConfig.insertReplaceEndpoint(endpoint)
             endpoint.isActive = true
             appConfig.handleRethinkChanges(endpoint)

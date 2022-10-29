@@ -77,7 +77,6 @@ class AppConfig internal constructor(private val context: Context,
         if (!persistentState.blocklistEnabled) return
 
         try {
-            // FIXME: canonical path may go missing but is unhandled
             val path: String = Utilities.blocklistDownloadBasePath(context,
                                                                    LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                                                                    persistentState.localBlocklistTimestamp)
@@ -90,8 +89,7 @@ class AppConfig internal constructor(private val context: Context,
             // if there is a failure creating bravedns
             persistentState.blocklistEnabled = false
             Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
-            // Set local blocklist enabled to false and reset the timestamp
-            // or corrupted. Reset local blocklist timestamp to make sure
+            // Set local blocklist enabled to false and reset the timestamp to make sure
             // user is prompted to download blocklists again on the next try
             persistentState.localBlocklistTimestamp = INIT_TIME_MS
         }
@@ -103,6 +101,10 @@ class AppConfig internal constructor(private val context: Context,
         }
 
         return braveDns
+    }
+
+    fun recreateBraveDnsObj() {
+        createBraveDnsObjectIfNeeded()
     }
 
     data class TunnelOptions(val tunDnsMode: TunDnsMode, val tunFirewallMode: TunFirewallMode,
