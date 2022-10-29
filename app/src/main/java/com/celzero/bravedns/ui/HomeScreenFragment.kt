@@ -497,7 +497,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun enableAppsCardIfNeeded() {
-        if (appConfig.getBraveMode().isDnsMode()) {
+        // apps screen can be accessible on all app modes.
+        if (!isVpnActivated) {
             disableAppsCard()
             unobserveFirewallStates()
         } else {
@@ -778,18 +779,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        if (appConfig.getBraveMode().isFirewallActive()) {
-            val intent = Intent(requireContext(), AppDetailActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-            startActivity(intent)
-            return
-        }
-
-        openBottomSheet()
-        showToastUiCentered(requireContext(), resources.getText(
-            R.string.brave_dns_connect_mode_change_firewall).toString().replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-        }, Toast.LENGTH_SHORT)
+        // no need to check for app modes to open this activity
+        // one use case: https://github.com/celzero/rethink-app/issues/611
+        val intent = Intent(requireContext(), AppDetailActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        startActivity(intent)
     }
 
     private fun startActivity(isDns: Boolean, screenToLoad: Int) {
