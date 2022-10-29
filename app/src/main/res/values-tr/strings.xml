@@ -1,2 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_rethink">Rethink</string>
+    <string name="title_about">Hakkında</string>
+    <string name="pause_title_desc">ara veriliyor…</string>
+    <string name="settings_title_desc">Son derece özelleştirilebilir bir DNS ve güvenlik duvarı</string>
+    <string name="txt_home">Ana sayfa</string>
+    <string name="admin_receiver_status_enabled">DNS tabanlı içerik engelleyici ayarlanmaya hazır.</string>
+    <string name="accessibility_service_description">RethinkDNS, arka plan uygulamalarını algılamak ve güvenlik duvarı oluşturmak için erişilebilirlik hizmetini kullanır. RethinkDNS herhangi bir bilgi toplamaz veya satmaz.</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="next">İleri</string>
+    <string name="skip">Atla</string>
+    <string name="finish">Bitir</string>
+    <string name="slide_1_title">Özgür ve Açık Kaynaklı</string>
+    <string name="slide_1_desc">RethinkDNS, Mozilla Builders MVP programı tarafından desteklenen açık kaynaklı bir yazılımdır.</string>
+    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="untracked">izlenmiyor</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Uyarı: RethinkDNS devre dışı bırakıldı</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Koruma ayarını değiştirmek için dokunun</string>
+    <string name="dns_mode_notification_title">Korunuyor! Hızlı ve Güvenli DNS\'e Bağlandı.</string>
+    <string name="firewall_mode_notification_title">Korunuyor! Güvenlik Duvarına Bağlandı.</string>
+    <string name="app_name">RethinkDNS</string>
+    <string name="hybrid_mode_notification_title">Korunuyor! DNS ve Güvenlik Duvarına Bağlandı.</string>
+    <string name="title_settings">Ayarlar</string>
+    <string name="about_title_desc">Ağ güvenliği tehditlerini tespit edin ve engelleyin</string>
+    <string name="block">engelle</string>
+    <string name="bypass_universal">genel olarak atla</string>
+    <string name="lockdown">kilitle</string>
+    <string name="admin_receiver_status_disabled">İçerik engelleyici artık etkin değil.</string>
+    <string name="slide_2_title">Hoş Geldiniz</string>
+    <string name="rdns_plus">RDNS Plus</string>
+    <string name="exclude">hariç tut</string>
+    <string name="slide_2_desc">RethinkDNS, Android aygıtınızda ağ etkinliğini izlemenin, İnternet sansürünü ve güvenlik duvarı uygulamalarını atlamanın en kolay yoludur.</string>
+    <string name="allow">izin ver</string>
+    <string name="pause_mode_notification_title">Duraklatıldı! Engellenen uygulamalar güvenlik duvarıyla korunmaya devam edecek.</string>
+</resources>
