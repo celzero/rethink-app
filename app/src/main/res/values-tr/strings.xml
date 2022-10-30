@@ -34,4 +34,34 @@
     <string name="slide_2_desc">RethinkDNS, Android aygıtınızda ağ etkinliğini izlemenin, İnternet sansürünü ve güvenlik duvarı uygulamalarını atlamanın en kolay yoludur.</string>
     <string name="allow">izin ver</string>
     <string name="pause_mode_notification_title">Duraklatıldı! Engellenen uygulamalar güvenlik duvarıyla korunmaya devam edecek.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">bekliyor</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">başarısız</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">korunuyor</string>
+    <string name="status_app_error">uygulama hatası</string>
+    <string name="status_dns_error">dns hatası</string>
+    <string name="status_dns_server_down">dns sunucusu kapalı</string>
+    <string name="status_no_internet">internet yok</string>
+    <string name="status_protected_with_tor">tor ile korunuyor</string>
+    <string name="status_protected_with_private_dns">özel dns ile korunuyor</string>
+    <string name="status_protected_with_tor_private_dns">tor ve özel dns ile korunuyor</string>
+    <string name="status_protected_with_proxy_private_dns">vekil sunucu ve özel dns ile korunuyor</string>
+    <string name="status_protected_with_socks5_private_dns">socks5 ve özel dns ile korunuyor</string>
+    <string name="status_protected_with_socks5">socks vekil sunucusu ile korunuyor</string>
+    <string name="status_protected_with_http">http vekil sunucusu ile korunuyor</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">RethinkDNS ve güvenlik duvarına bağlandı</string>
+    <string name="universal_firewall_explanation">Aygıt olaylarına göre tüm uygulamalara güvenlik duvarı kuralları uygulayın; örneğin, aygıt kilitlendiğinde veya belirli bir uygulama kullanımda olmadığında güvenlik duvarı uygulayın.</string>
+    <string name="notification_action_resume_vpn">SÜRDÜR</string>
+    <string name="notification_action_pause_vpn">DURAKLAT</string>
+    <string name="notification_action_stop_vpn">DURDUR</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="notification_action_dns_firewall_mode">DNS + Güvenlik Duvarı</string>
+    <string name="dns_mode_info_title">DNS</string>
+    <string name="firewall_rules">Ağ Kuralları</string>
+    <string name="firewall_mode_info_title">Güvenlik Duvarı</string>
+    <string name="status_protected_with_proxy">vekil sunucu ile korunuyor</string>
+    <string name="status_protected_with_http_private_dns">http vekil sunucu ve özel dns ile korunuyor</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">özel dns etkin</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">korunmuyor</string>
+    <string name="dns_explanation_firewall_connected">Güvenlik duvarına bağlandı</string>
+    <string name="dns_explanation_dns_connected">RethinkDNS\'e bağlandı</string>
 </resources>
