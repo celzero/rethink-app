@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="txt_home">Hjem</string>
+    <string name="admin_receiver_status_enabled">Klar til å sette DNS-basert innholdsblokkering.</string>
+    <string name="admin_receiver_status_disabled">Innholdsblokkering ikke lenger aktiv.</string>
+    <string name="block">blokker</string>
+    <string name="slide_2_title">Velkommen</string>
+    <string name="app_name">RethinkDNS</string>
+    <string name="title_settings">Innstillinger</string>
+    <string name="title_about">Om</string>
+    <string name="pause_title_desc">tar en lur …</string>
+    <string name="next">Neste</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="skip">Hopp over</string>
+    <string name="finish">Fullfør</string>
+    <string name="allow">tillat</string>
+    <string name="exclude">utelat</string>
+    <string name="dns_mode_info_explanation_new">Hold øye med, blokker, og krypter DNS-forespørsler.</string>
+    <string name="wireguard_mode_info_explanation_new">Kommer snart</string>
+</resources>
