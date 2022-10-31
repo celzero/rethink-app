@@ -82,49 +82,49 @@
     <string name="pause_mode_notification_title">Paused. Firewalling of blocked apps will continue.</string>
 
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the device is offline.">
-    Waiting…
+    Waiting
     </string>
 
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">
-    Failing.
+    Failing
     </string>
 
     <string name="status_protected" description="This is a large message in a reassuring color. It indicates DNS queries can't be surveilled or modified in transit.">
-    Protected.
+    Protected
     </string>
 
-    <string name="status_app_error">App error.</string>
+    <string name="status_app_error">App error</string>
 
-    <string name="status_dns_error">DNS error.</string>
+    <string name="status_dns_error">DNS error</string>
 
-    <string name="status_dns_server_down">DNS server down.</string>
+    <string name="status_dns_server_down">DNS server down</string>
 
-    <string name="status_no_internet">Not connected to the Internet.</string>
+    <string name="status_no_internet">Not connected to the Internet</string>
 
     <string name="status_protected_with_tor">Protected with Tor</string>
 
-    <string name="status_protected_with_private_dns">Protected with private DNS.</string>
+    <string name="status_protected_with_private_dns">Protected with private DNS</string>
 
-    <string name="status_protected_with_tor_private_dns">Protected with Tor and private DNS.</string>
+    <string name="status_protected_with_tor_private_dns">Protected with Tor and private DNS</string>
 
-    <string name="status_protected_with_proxy_private_dns">protected with proxy and private DNS.</string>
+    <string name="status_protected_with_proxy_private_dns">Protected with proxy and private DNS</string>
 
-    <string name="status_protected_with_socks5_private_dns">Protected with SOCKS5 and private DNS.</string>
+    <string name="status_protected_with_socks5_private_dns">Protected with SOCKS5 and private DNS</string>
 
-    <string name="status_protected_with_http_private_dns">Protected with http proxy and private DNS.</string>
+    <string name="status_protected_with_http_private_dns">Protected with http proxy and private DNS</string>
 
-    <string name="status_protected_with_socks5">Protected with SOCKS proxy.</string>
+    <string name="status_protected_with_socks5">Protected with SOCKS proxy</string>
 
-    <string name="status_protected_with_http">Protected with HTTP proxy.</string>
+    <string name="status_protected_with_http">Protected with HTTP proxy</string>
 
-    <string name="status_protected_with_proxy">Protected with proxy.</string>
+    <string name="status_protected_with_proxy">Protected with proxy</string>
 
     <string name="status_strict" description="Similar to dns_on, but the protection is provided by the operating system, not by Rethink. It is not color-highlighted.">
     Private DNS on.
     </string>
 
     <string name="status_exposed" description="This is a large message in a scary color. It indicates DNS queries can be surveilled or modified in transit.">
-    Not protected.
+    Not protected
     </string>
 
     <string name="dns_explanation_dns_connected">Connected to RethinkDNS</string>
@@ -236,7 +236,7 @@
     <string name="dns_proxy_remove_success">DNS Proxy deleted.</string>
 
     <string name="local_blocklist_download">Download Blocklists</string>
-    <string name="local_blocklist_download_desc">Download blocklists (~60 MB) to use this feature?</string>
+    <string name="local_blocklist_download_desc">Download blocklists (around 60 MB) to use this feature?</string>
 
     <string name="local_blocklist_redownload">All is well</string>
     <string name="local_blocklist_redownload_desc">On-device blocklists at latest (v%1$s) version.</string>
@@ -285,7 +285,7 @@
 
     <string name="info_dialog_copy_toast_msg">IP address copied.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copied</string>
-    <string name="info_dialog_rethink_toast_msg">Copied as RDNS + DNS-over-HTTPS URL</string>
+    <string name="info_dialog_rethink_toast_msg">Copied as RDNS+ DNS-over-HTTPS URL</string>
 
     <string name="settings_enable_logs_desc">Store DNS and firewall logs locally on device.</string>
     <string name="settings_enable_logs">On-device logging</string>
@@ -316,7 +316,7 @@
     <string name="settings_ptrans_desc">Translate outbound IPv6 traffic to IPv4 on-device. Use this if you are connected to an IPv4-only network.</string>
 
     <string name="settings_allow_bypass_heading">Allow Bypass</string>
-    <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like the (considered harmful) Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
+    <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
     <string name="settings_lock_down_mode_desc">Cannot allow bypass, or set up proxies when VPN is running in lockdown mode. <u>Go to VPN settings</u>.</string>
 
     <string name="settings_proxy_header">proxy</string>
@@ -396,7 +396,7 @@
     <string name="settings_network_all_networks">All networks (experimental)</string>
     <string name="settings_network_all_networks_desc">Uses all available networks to connect to Internet insted of only the <i>active</i> one in Android.</string>
     <string name="settings_all_networks_dialog_title">Attention</string>
-    <string name="settings_all_networks_dialog_message">Continue and ignore app firewall rules for metered (Wi-Fi) and non-metered (mobile)?</string>
+    <string name="settings_all_networks_dialog_message">Continue and ignore app firewall rules for metered (mobile) and non-metered (Wi-Fi)?</string>
     <string name="settings_all_networks_dialog_positive_btn">Turn on anyway</string>
     <string name="settings_all_networks_dialog_negative_btn">Cancel</string>
 
@@ -417,7 +417,7 @@
     <string name="settings_http_proxy_error_text1">Port range should be from 1024–65535</string>
     <string name="settings_http_proxy_error_text2">Invalid port</string>
     <string name="settings_http_proxy_error_text3">Hostname empty</string>
-    <string name="settings_http_proxy_error_text4">Could not connect to host connection. Try again.</string>
+    <string name="settings_http_proxy_error_text4">Could not connect to host. Try again.</string>
     <string name="settings_http_proxy_toast_success">HTTP proxy set</string>
 
     <string name="settings_http_proxy_hostname">Hostname</string>
@@ -569,9 +569,9 @@
     <string name="dc_dns_website_desc">Fetches website icons from <i>duckduckgo.com</i>. Consumes up to 350 MB of storage space.</string>
 
     <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
-    <string name="dc_dns_leaks_desc">Makes RethinkDNS capture all packets on port 53 and forward them to a user-set DNS endpoint.</string>
+    <string name="dc_dns_leaks_desc">Capture all packets on port 53 and forwards them to a user-set DNS endpoint.</string>
 
-    <string name="dc_check_update_heading">Prompt on blocklist updates</string>
+    <string name="dc_check_update_heading">Confirm before implementing blocklists</string>
     <string name="dc_check_update_desc">Check for blocklist updates every <i>three</i> days</string>
 
     <!-- About fragment -->
@@ -596,7 +596,7 @@
     <string name="about_sponsor">sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_app">app</string>
-    <string name="about_email">E-mail us</string>
+    <string name="about_email">E-mail</string>
     <string name="about_settings">system</string>
     <string name="about_settings_app_info">App info</string>
     <string name="about_settings_vpn_profile">VPN profile</string>
@@ -692,12 +692,12 @@
     <string name="cd_dns_proxy_error_text_1">Invalid IP address</string>
     <string name="cd_dns_proxy_error_text_2">Port range should be from 1024–65535</string>
     <string name="cd_dns_proxy_error_text_3">Invalid port</string>
-    <string name="cd_dns_crypt_dialog_title">Add DNSCrypt resolver or relay</string>
+    <string name="cd_dns_crypt_dialog_title">Add DNSCrypt resolver or -relay</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
 
-    <string name="cd_dns_crypt_dialog_heading">Add DNSCrypt resolver or relay</string>
+    <string name="cd_dns_crypt_dialog_heading">Add DNSCrypt resolver or -relay</string>
     <string name="cd_dns_crypt_resolver_heading">Resolver</string>
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_name">Name</string>
@@ -1183,7 +1183,7 @@
     <string name="rt_cancel_btn">Cancel</string>
     <string name="rt_apply_btn">Apply</string>
 
-    <string name="rt_download_desc">Download blocklists (~60 MB) to use this feature.</string>
+    <string name="rt_download_desc">Download blocklists (around 60 MB) to use this feature.</string>
 
     <string name="rethink_dns_txt">RethinkDNS %1$s</string>
 
@@ -1249,7 +1249,7 @@
 
     <string name="brbs_restore_complete_toast">Restore completed. Restarting app…</string>
     <string name="brbs_backup_complete_toast">Backup completed</string>
-    <string name="brbs_restore_no_uri_toast">Could not perform restoration. Try again.</string>
+    <string name="brbs_restore_no_uri_toast">Could not restore the Rethink app database and settings. Try again.</string>
 
 
 </resources>
