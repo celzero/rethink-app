@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RethinkDNS</string>
+    <string name="app_name">Rethink</string>
     <string name="app_name_small_case">rethink</string>
     <string name="app_name_rethink">Rethink</string>
     <string name="title_about">About</string>
@@ -14,32 +14,32 @@
     <string name="admin_receiver_status_disabled">Content blocker turned off.</string>
 
     <string name="accessibility_service_description">
-        RethinkDNS uses accessibility service to detect and firewall background apps.
-        RethinkDNS does not collect or sell your info.
+        Rethink uses the accessibility service to detect and firewall background apps.
+        Rethink does not collect or sell your info.
     </string>
 
-    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="accessibility_service_label">Rethink</string>
 
     <string name="next">Next</string>
     <string name="skip">Skip</string>
     <string name="finish">Finish</string>
 
     <string name="slide_2_title">Welcome</string>
-    <string name="slide_2_desc">RethinkDNS monitor lets you network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
+    <string name="slide_2_desc">Rethink lets you monitor your network activity, bypass Internet censorship, and firewall apps.</string>
 
     <string name="slide_1_title">Free and Open Source</string>
-    <string name="slide_1_desc">RethinkDNS is open source software backed by Mozilla Builders MVP program.</string>
+    <string name="slide_1_desc">Rethink is open source software backed by the Mozilla Builders MVP program.</string>
 
     <string-array name="doh_endpoint_names">
         <item>Cloudflare</item>
-        <item>Cloudflare Family</item>
-        <item>Cloudflare Security</item>
-        <item>RethinkDNS Basic (default)</item>
+        <item>Cloudflare family</item>
+        <item>Cloudflare security</item>
+        <item>Rethink Basic (default)</item>
         <item>Custom</item>
-        <item>RethinkDNS Plus</item>
+        <item>Rethink Plus</item>
     </string-array>
 
-    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="rethink_plus">Rethink Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
 
     <string-array name="firewall_rules">
@@ -60,7 +60,7 @@
     <string name="untracked">untracked</string>
 
     <string name="warning_title" description="Status indicator text shown in a warning notification.">
-    Warning: RethinkDNS turned off.
+    Warning: Rethink turned off.
     </string>
 
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">
@@ -127,11 +127,11 @@
     Not protected
     </string>
 
-    <string name="dns_explanation_dns_connected">Connected to RethinkDNS</string>
+    <string name="dns_explanation_dns_connected">Connected to Rethink</string>
     <string name="dns_explanation_firewall_connected">Connected to firewall</string>
 
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">
-        Connected to RethinkDNS and firewall
+        Connected to Rethink and firewall
     </string>
 
     <string name="universal_firewall_explanation">
@@ -203,7 +203,7 @@
 
     <string name="always_on_dialog_stop_heading">Always-on VPN</string>
     <string name="always_on_dialog_stop_message">Stop Rethink even though it uses always-on VPN in Android?</string>
-    <string name="always_on_dialog_lockdown_stop_message">Stop RethinkDNS when running VPN in <i>Lockdown</i> mode (disconnecting this user from the Internet)?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Stop Rethink when running VPN in <i>Lockdown</i> mode (disconnecting this user from the Internet)?</string>
     <string name="always_on_dialog_positive">Stop</string>
     <string name="always_on_dialog_negative">Cancel</string>
     <string name="always_on_dialog_neutral">Settings</string>
@@ -316,7 +316,7 @@
     <string name="settings_ptrans_desc">Translate outbound IPv6 traffic to IPv4 on-device. Use this if you are connected to an IPv4-only network.</string>
 
     <string name="settings_allow_bypass_heading">Allow Bypass</string>
-    <string name="settings_allow_bypass_desc">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
+    <string name="settings_allow_bypass_desc">Allow requesting apps to bypass Rethink firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
     <string name="settings_lock_down_mode_desc">Cannot allow bypass, or set up proxies when VPN is running in lockdown mode. <u>Go to VPN settings</u>.</string>
 
     <string name="settings_proxy_header">proxy</string>
@@ -348,8 +348,8 @@
 
     <string name="orbot_stop_dialog_title">Action needed</string>
     <string name="orbot_stop_dialog_message_combo">%1$s\n\n%2$s</string>
-    <string name="orbot_stop_dialog_message">RethinkDNS has stopped forwarding connections to Orbot, but Orbot may be running in the background.</string>
-    <string name="orbot_stop_dialog_dns_message">RethinkDNS is set up to forward DNS queries to Orbot. Change as required.</string>
+    <string name="orbot_stop_dialog_message">Rethink has stopped forwarding connections to Orbot, but Orbot may be running in the background.</string>
+    <string name="orbot_stop_dialog_dns_message">Rethink is set up to forward DNS queries to Orbot. Change as required.</string>
     <string name="orbot_stop_dialog_negative">Stop Orbot</string>
     <string name="orbot_stop_dialog_neutral">Change DNS</string>
     <string name="orbot_stop_dialog_positive">Dismiss</string>
@@ -358,8 +358,8 @@
     <string name="orbot_explanation">
             Orbot is a free proxy app that empowers other apps to use the Internet more &lt;u>securely&lt;/u>.
             \nOrbot uses &lt;u>Tor&lt;/u> to encrypt your Internet traffic, helping you &lt;u>bypass censorship&lt;/u> and defend against &lt;u>network surveillance&lt;/u> to strengthen personal freedom and privacy.
-            \n&lt;u>TCP Proxy&lt;/u>: RethinkDNS forwards only TCP connections of all but excluded apps to Orbot.
-        \n&lt;u>HTTP Proxy&lt;/u>: RethinkDNS &lt;i>sets&lt;/i> a HTTP proxy, but does not require apps to use it. Usually, browsers like Chrome and Firefox do use it. Apps using HTTP(S) proxy will bypass both Firewall and DNS rules.
+            \n&lt;u>TCP Proxy&lt;/u>: Rethink forwards only TCP connections of all but excluded apps to Orbot.
+        \n&lt;u>HTTP Proxy&lt;/u>: Rethink &lt;i>sets&lt;/i> a HTTP proxy, but does not require apps to use it. Usually, browsers like Chrome and Firefox do use it. Apps using a HTTP(S) proxy will bypass both Firewall and DNS rules.
     </string>
 
 
@@ -378,7 +378,7 @@
     <string name="settings_orbot_install_desc">Tap here to install Orbot</string>
 
     <string name="settings_socks5_disabled_error">Connected to Orbot. Turn it off to continue.</string>
-    <string name="settings_socks5_vpn_disabled_error">Start RethinkDNS to proceed.</string>
+    <string name="settings_socks5_vpn_disabled_error">Start Rethink to proceed.</string>
 
     <string name="settings_orbot_disabled_error">Turn off HTTP(S) and/or SOCKS5 proxy to continue with Tor-as-a-proxy setup.</string>
     <string name="settings_https_disabled_error">Connected to Orbot. Turn it off to continue.</string>
@@ -391,7 +391,7 @@
     <string name="settings_general_header">general</string>
 
     <string name="settings_autostart_bootup_heading">Auto-start on power-up (experimental)</string>
-    <string name="settings_autostart_bootup_desc">Start up RethinkDNS with the device if it was running when it was shut off or restarted.</string>
+    <string name="settings_autostart_bootup_desc">Start up Rethink with the device if it was running when it was shut off or restarted.</string>
 
     <string name="settings_network_all_networks">All networks (experimental)</string>
     <string name="settings_network_all_networks_desc">Uses all available networks to connect to Internet insted of only the <i>active</i> one in Android.</string>
@@ -461,13 +461,13 @@
     <string name="settings_selected_ip_desc">%1$s</string>
 
     <string name="settings_notification_heading">Choose notification action</string>
-    <string name="settings_notification_desc">Action buttons to show with the RethinkDNS notification: %1$s</string>
+    <string name="settings_notification_desc">Action buttons to show with the Rethink notification: %1$s</string>
     <string name="settings_notification_desc1">Pause / stop (default)</string>
     <string name="settings_notification_desc2">DNS / DNS + firewall</string>
     <string name="settings_notification_desc3">None</string>
 
     <string name="settings_notification_dialog_title">Choose notification action</string>
-    <string name="settings_notification_dialog_option_1">\nPause / stop (default):\nTwo buttons, to quickly pause and stop RethinkDNS.</string>
+    <string name="settings_notification_dialog_option_1">\nPause / stop (default):\nTwo buttons, to quickly pause and stop Rethink.</string>
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nTwo buttons to quickly switch between the battery-saver DNS mode and the regular DNS + firewall mode.</string>
     <string name="settings_notification_dialog_option_3">\nNone:\nNo buttons.\n</string>
 
@@ -512,7 +512,7 @@
     <string name="hsf_downtime">(inactive since %1$s)</string>
 
     <string name="hsf_vpn_dialog_header">Action needed</string>
-    <string name="hsf_vpn_dialog_message">Grant RethinkDNS permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethinkDNS does not collect any info or spy on you in any way.</string>
+    <string name="hsf_vpn_dialog_message">Grant Rethink permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethink does not collect any info or spy on you in any way.</string>
     <string name="hsf_vpn_dialog_positive">Proceed</string>
     <string name="hsf_vpn_dialog_negative">Cancel</string>
 
@@ -526,8 +526,8 @@
     <string name="hsf_whats_new_chip_text">What\'s new</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
     <string name="hsf_blocklist_chip_text">%1$s blocklists configured</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS in use</string>
-    <string name="hsf_blocklist_chip_text_no_data">Turn on RethinkDNS+</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">Rethink in use</string>
+    <string name="hsf_blocklist_chip_text_no_data">Turn on Rethink Plus</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
     <string name="hsf_network_logs_chip_text">Network logs</string>
 
@@ -541,8 +541,8 @@
     <string name="hsf_blocklist_updating_text">Applying…</string>
 
     <string name="hsf_chip_appearance">Theme: %1$s</string>
-    <string name="hsf_pause_vpn_failure">Cannot pause: RethinkDNS not active</string>
-    <string name="hsf_pause_lockdown_failure">Cannot pause: RethinkDNS in lockdown mode</string>
+    <string name="hsf_pause_vpn_failure">Cannot pause: Rethink not active</string>
+    <string name="hsf_pause_lockdown_failure">Cannot pause: Rethink in lockdown mode</string>
 
     <!-- DNS logs screen -->
     <string name="dns_logs_lifetime_queries">Lifetime queries: %1$s</string>
@@ -555,7 +555,7 @@
     <string name="dc_other_settings_heading">advanced</string>
 
     <string name="dc_custom_dns_radio">Other DNS</string>
-    <string name="dc_rethink_dns_radio">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio">Rethink</string>
 
     <string name="dc_entries">%1$s entries 🔗</string>
 
@@ -575,8 +575,8 @@
     <string name="dc_check_update_desc">Check for blocklist updates every <i>three</i> days</string>
 
     <!-- About fragment -->
-    <string name="about_bravedns_explantion">RethinkDNS lets you monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
-    <string name="about_bravedns_whoarewe">RethinkDNS is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
+    <string name="about_bravedns_explantion">Rethink lets you monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
+    <string name="about_bravedns_whoarewe">Rethink is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
     <string name="about_bravedns_toreport_text">help and feedback</string>
     <string name="about_bug_report_desc">e-mail crash logs</string>
     <string name="about_join_telegram">Telegram</string>
@@ -603,14 +603,14 @@
     <string name="about_settings_notification">Notification settings</string>
     <string name="about_whats_new">What\'s new in %1$s</string>
     <string name="about_twitter">Follow us on Twitter</string>
-    <string name="about_mozilla">RethinkDNS is part of the Mozilla Builders MVP program.</string>
+    <string name="about_mozilla">Rethink is part of the Mozilla Builders MVP program.</string>
     <string name="about_app_update_check">Check for app updates</string>
     <string name="about_app_contributors">Authors</string>
     <string name="about_dialog_positive_button">Let\'s Go</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_to_string">mailto:</string>
-    <string name="about_mail_subject">[RethinkDNS]:</string>
-    <string name="about_mail_bugreport_subject">[RethinkDns]: Bug report</string>
+    <string name="about_mail_subject">[Rethink]:</string>
+    <string name="about_mail_bugreport_subject">[Rethink]: Bug report</string>
     <string name="about_mail_bugreport_text">Send this e-mail to: hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title">Select e-mail provider</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
@@ -904,9 +904,9 @@
     <string name="settings_local_blocklist_version">Version: v%1$s</string>
 
     <string name="accessibility_notification_title">Action Required</string>
-    <string name="accessibility_notification_content">RethinkDNS accessibility service stopped or crashed. No longer blocking backgrounded apps. Tap to re-enable.</string>
+    <string name="accessibility_notification_content">Rethink accessibility service stopped or crashed. No longer blocking backgrounded apps. Tap to re-enable.</string>
 
-    <string name="accessibility_failure_toast">RethinkDNS accessibility service stopped or crashed. No longer blocking backgrounded apps.</string>
+    <string name="accessibility_failure_toast">Rethink accessibility service stopped or crashed. No longer blocking backgrounded apps.</string>
 
     <string name="coming_soon_toast">coming soon</string>
 
@@ -969,9 +969,9 @@
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title">Attention</string>
-    <string name="new_app_bulk_notification_content">RethinkDNS blocked %1$s new apps. Tap to view or modify.</string>
+    <string name="new_app_bulk_notification_content">Rethink blocked %1$s new apps. Tap to view or modify.</string>
     <string name="new_app_notification_title">Action Required</string>
-    <string name="new_app_notification_content">RethinkDNS blocked recently installed app, %1$s.</string>
+    <string name="new_app_notification_content">Rethink blocked recently installed app, %1$s.</string>
 
     <string name="new_app_notification_action_allow">Allow</string>
     <string name="new_app_notification_action_deny">Keep blocking</string>
@@ -993,8 +993,8 @@
     <string name="notif_channel_proxy_failure">Proxy Alerts</string>
     <string name="notif_channel_download">Download Alerts</string>
 
-    <string name="notif_channel_desc_vpn_notification">Inform when RethinkDNS is up and running in the background</string>
-    <string name="notif_channel_desc_vpn_failure">Inform when RethinkDNS is stopped by Android or by another VPN app</string>
+    <string name="notif_channel_desc_vpn_notification">Inform when Rethink is up and running in the background</string>
+    <string name="notif_channel_desc_vpn_failure">Inform when Rethink is stopped by Android or by another VPN app</string>
     <string name="notif_channel_desc_firewall_alerts">Alert for Firewall errors and anomalies</string>
     <string name="notif_channel_desc_proxy_failure">Alert for Proxy errors and anomalies</string>
     <string name="notif_channed_desc_download">Alert of Download Progress for On-device blocklists</string>
@@ -1159,7 +1159,7 @@
     <string name="rbl_security">Security</string>
 
     <!-- Rethink list fragment -->
-    <string name="rt_rethink_dns">RethinkDNS</string>
+    <string name="rt_rethink_dns">Rethink</string>
 
     <string name="rt_dialog_title">Save Changes</string>
     <string name="rt_dialog_message">Apply newly configured blocklists?</string>
@@ -1185,7 +1185,7 @@
 
     <string name="rt_download_desc">Download blocklists (around 60 MB) to use this feature.</string>
 
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
+    <string name="rethink_dns_txt">Rethink %1$s</string>
 
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
