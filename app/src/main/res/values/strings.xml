@@ -482,7 +482,7 @@
     <string name="firewall_status_excluded">excluded from dns and firewall</string>
     <string name="firewall_status_lockdown">lockdown</string>
     <string name="firewall_status_whitelisted">bypasses universal firewall rules</string>
-    <string name="firewall_status_block_unmetered">blocked on unmetered (wifi) networks</string>
+    <string name="firewall_status_block_unmetered">blocked on unmetered (Wi-Fi) networks</string>
     <string name="firewall_status_block_metered">blocked on metered (mobile) networks</string>
     <string name="firewall_status_blocked">blocked</string>
     <string name="firewall_status_unknown">unknown</string>
@@ -500,7 +500,7 @@
 
     <string name="dns_card_connected_status_failure">Off</string>
 
-    <string name="dns_card_latency_active">Latency: %1$sms</string>
+    <string name="dns_card_latency_active">Latency: %1$s ms</string>
     <string name="dns_card_latency_inactive">Turn on DNS mode.</string>
 
     <string name="apps_card_ips_count">%1$s IP and port rules</string>
@@ -607,24 +607,24 @@
     <string name="about_app_update_check">Check for app updates</string>
     <string name="about_app_contributors">Authors</string>
     <string name="about_dialog_positive_button">Let\'s Go</string>
-    <string name="about_mail_to">hello@celzero.com</string>
-    <string name="about_mail_to_string">mailto:</string>
-    <string name="about_mail_subject">[Rethink]:</string>
-    <string name="about_mail_bugreport_subject">[Rethink]: Bug report</string>
+    <string name="about_mail_to" translatable="false">hello@celzero.com</string>
+    <string name="about_mail_to_string" translatable="false">mailto:</string>
+    <string name="about_mail_subject" translatable="false">[Rethink]:</string>
+    <string name="about_mail_bugreport_subject" translatable="false">[Rethink]: Bug report</string>
     <string name="about_mail_bugreport_text">Send this e-mail to: hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title">Select e-mail provider</string>
-    <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
-    <string name="about_docs_link">https://docs.rethinkdns.com/</string>
-    <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
-    <string name="about_github_link">https://github.com/celzero/rethink-app</string>
-    <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
-    <string name="about_website_link">https://www.rethinkdns.com/</string>
-    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_telegram_link" translatable="false">https://telegram.me/rethinkdns</string>
+    <string name="about_docs_link" translatable="false">https://docs.rethinkdns.com/</string>
+    <string name="about_faq_link" translatable="false">https://www.rethinkdns.com/faq</string>
+    <string name="about_github_link" translatable="false">https://github.com/celzero/rethink-app</string>
+    <string name="about_twitter_handle" translatable="false">https://twitter.com/rethinkdns</string>
+    <string name="about_website_link" translatable="false">https://www.rethinkdns.com/</string>
+    <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="about_version">v%1$s</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Suggest features</string>
 
-    <string name="app_info_error">Could not launch App info.</string>
+    <string name="app_info_error">Could not launch app info.</string>
     <string name="vpn_profile_error">Could not launch VPN profile.</string>
     <string name="log_file_not_available">No crash report found</string>
     <string name="error_loading_log_file">Could not load log file</string>
@@ -632,7 +632,7 @@
     <string name="collecting_logs_progress_text">Capturing…</string>
 
     <string name="contributors_dialog_title">Authors</string>
-    <string name="contributors_list"><![CDATA[The <i>Rethink Open Source Project</i> owes its existence to these volunteers who devote countless hours on its development.<br/>
+    <string name="contributors_list"><![CDATA[The <i>Rethink Project</i> owes its existence to these volunteers devoting countless hours to its development.<br/>
                                               <br/>🛡️ Android app <br/>
                                               <a href="https://github.com/BayLee4">BayLee4</a><br/>
                                               <a href="https://github.com/Ch4t4r">Ch4t4r</a><br/>
@@ -757,7 +757,7 @@
     <string name="dns_btm_resolved_doh">resolved %1$s by %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">resolved %1$s</string>
 
-    <string name="dns_btm_latency_ms">%1$sms</string>
+    <string name="dns_btm_latency_ms">%1$s ms</string>
 
     <string name="dns_btm_record_type">Query type: %1$s</string>
 
@@ -798,7 +798,7 @@
     <string name="univ_accessibility_dialog_negative">Deny</string>
 
     <!-- DNS adapters -->
-    <string name="dns_connected_rethink_plus">Connected. %1$s blocklists in use</string>
+    <string name="dns_connected_rethink_plus">Connected. %1$s blocklists in use.</string>
     <string name="dns_connected_no_count">Connected</string>
     <string name="dns_connected">Connected</string>
     <string name="dns_delete_positive">Delete</string>
@@ -815,7 +815,7 @@
     <string name="dns_proxy_dialog_message">App name: %1$s\n\nIP address: %2$s\n\nPort number: %3$s</string>
     <string name="dns_proxy_dialog_message_no_app">IP address: %1$s\n\nPort number: %2$s</string>
 
-    <string name="dns_query_latency">%1$sms</string>
+    <string name="dns_query_latency">%1$s ms</string>
 
 
     <string name="dns_proxy_dialog_header_dns">Add DNS Proxy</string>
@@ -917,7 +917,7 @@
     <!-- Other DNS list -->
     <string name="other_dns_list_tab1">DoH</string>
     <string name="other_dns_list_tab2">DNSCrypt</string>
-    <string name="other_dns_list_tab3">DNS Proxy</string>
+    <string name="other_dns_list_tab3">DNS proxy</string>
 
     <!-- Home screen bottom sheet -->
     <string name="hs_btm_sheet_lock_down">Cannot change modes with VPN in <i>lockdown</i>. Tap to <u>edit VPN settings</u>.</string>
@@ -931,7 +931,7 @@
     <string name="firewall_rule_lockdown">Lockdown (app)</string>
     <string name="firewall_rule_block_app_new_install">New app</string>
     <string name="firewall_rule_block_app_exception">Error</string>
-    <string name="firewall_rule_block_ip">IP / Port</string>
+    <string name="firewall_rule_block_ip">IP / port</string>
     <string name="firewall_rule_bypass_apprule_ip">Bypassed IP (app)</string>
     <string name="firewall_rule_bypass_universal_ip">Bypassed IP</string>
     <string name="firewall_rule_device_lock">Device locked</string>
@@ -981,7 +981,7 @@
 
     <!-- Notification dialog activity -->
     <string name="notif_dialog_pause_dialog_title">App paused!</string>
-    <string name="notif_dialog_pause_dialog_message">App paused, resume to continue</string>
+    <string name="notif_dialog_pause_dialog_message">App paused. Resume to continue.</string>
     <string name="notif_dialog_pause_dialog_positive">Resume</string>
     <string name="notif_dialog_pause_dialog_negative">Discard</string>
     <string name="notif_dialog_pause_dialog_neutral">Show</string>
@@ -1038,7 +1038,7 @@
     <string name="cd_dialog_desc">Custom URL(domain) or wild card to either allow or block. e.g, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Enter %1$s</string>
     <string name="cd_dialog_error_invalid_domain">Invalid URL(domain).</string>
-    <string name="cd_dialog_error_invalid_tld">Invalid Top level domain.</string>
+    <string name="cd_dialog_error_invalid_tld">Invalid top-level domain.</string>
     <string name="cd_dialog_error_invalid_wildcard">Invalid wildcard.</string>
 
     <string name="cd_whitelist_initial">W</string>
@@ -1207,7 +1207,7 @@
     <string name="dc_rethink_dns">Rethink DNS</string>
     <string name="dc_doh">DNS over HTTPS</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
-    <string name="dc_dns_proxy">DNS Proxy</string>
+    <string name="dc_dns_proxy">DNS proxy</string>
 
     <!-- local blocklist bottom sheet -->
     <string name="lbbs_enable">On</string>
@@ -1223,7 +1223,7 @@
     <!-- backup / restore bottom sheet -->
     <string name="brbs_title">Backup and restoration</string>
     <string name="brbs_backup_title">Backup</string>
-    <string name="brbs_backup_desc">Backup app settings, network and DNS logs</string>
+    <string name="brbs_backup_desc">Back up app settings, network and DNS logs</string>
     <string name="brbs_restore_title">Restore</string>
     <string name="brbs_restore_desc">Restore from a backup file</string>
 
@@ -1242,12 +1242,12 @@
     <string name="brbs_backup_dialog_failure_positive">Retry Backup</string>
     <string name="brbs_backup_dialog_failure_negative">Dismiss</string>
 
-    <string name="brbs_restore_dialog_failure_title">Restoration failed</string>
+    <string name="brbs_restore_dialog_failure_title">Restoring failed</string>
     <string name="brbs_restore_dialog_failure_message">Could not restore. Try again?</string>
-    <string name="brbs_restore_dialog_failure_positive">Retry Restoration</string>
+    <string name="brbs_restore_dialog_failure_positive">Retry Restoring</string>
     <string name="brbs_restore_dialog_failure_negative">Dismiss</string>
 
-    <string name="brbs_restore_complete_toast">Restore completed. Restarting app…</string>
+    <string name="brbs_restore_complete_toast">Restored. Restarting app…</string>
     <string name="brbs_backup_complete_toast">Backup completed</string>
     <string name="brbs_restore_no_uri_toast">Could not restore the Rethink app database and settings. Try again.</string>
 
