@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">RethinkDNS</string>
+    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_rethink">Rethink</string>
+    <string name="title_about">À propos</string>
+    <string name="title_settings">Paramètres</string>
+    <string name="txt_home">Acceuil</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+</resources>
