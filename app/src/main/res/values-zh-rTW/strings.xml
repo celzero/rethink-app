@@ -110,7 +110,6 @@
     <string name="search_universal_ips"><font size="12">搜尋 IP</font></string>
     <string name="search_firewall_network_log"><font size="12">搜尋應用、 IP 、網域</font></string>
     <string name="search_dns_logs"><font size="12">搜尋網域或 IP</font></string>
-    <string name="search_custom_domains"><font size="12">搜尋網域</font></string>
     <string name="search_rethinkplus_file_tag"><font size="12">搜尋攔截清單</font></string>
     <string name="app_mode_dns_low_battery">DNS （省電）</string>
     <string name="app_mode_dns">DNS</string>
