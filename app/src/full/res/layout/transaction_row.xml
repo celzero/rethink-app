@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    app:cardElevation="@dimen/activity_horizontal_margin">
+
+    <LinearLayout
+        android:id="@+id/query_screen_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/query_log_indicator"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:layout_marginStart="5dp"
+            android:layout_weight="0"
+            android:background="?attr/accentBad"
+            android:visibility="invisible"
+            tools:text="" />
+
+        <TextView
+            android:id="@+id/flag"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_weight="0"
+            android:alpha="0.75"
+            android:ellipsize="none"
+            android:gravity="center"
+            android:minWidth="40dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="30sp"
+            tools:text="" />
+
+        <ImageView
+            android:id="@+id/fav_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_weight="0"
+            android:alpha="0.75"
+            android:contentDescription="@string/fav_icon"
+            android:minWidth="40dp"
+            android:padding="10dp"
+            android:src="@android:color/transparent"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp">
+
+            <TextView
+                android:id="@+id/fqdn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginEnd="5dp"
+                android:ellipsize="start"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:textSize="@dimen/large_font_text_view"
+                tools:text="longlongongexaasdsadsdsdasdasdsmple.com" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/latency_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:singleLine="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:textSize="@dimen/default_font_text_view"
+                tools:text="10(ms)" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/response_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:singleLine="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:textSize="@dimen/default_font_text_view"
+                tools:text="17:54:11" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bs_conn_top_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingBottom="40dp">
+
+    <TextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="?attr/border" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/orbot_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/bs_orbot_app"
+            android:padding="5dp"
+            android:src="@drawable/orbot_enabled" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/bs_orbot_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="5dp"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/settings_orbot_header"
+            android:textAlignment="center"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/heading_font_text_view" />
+
+        <ImageView
+            android:id="@+id/orbot_info_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="end"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/bs_orbot_app"
+            android:contentDescription="@string/orbot_explanation"
+            android:src="@drawable/brave_mode_info" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/orbot_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:gravity="center_horizontal"
+        android:padding="5dp"
+        android:text="@string/orbot_none_desc"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view" />
+
+    <RadioGroup
+        android:id="@+id/bs_orbot_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:gravity="center">
+
+        <RelativeLayout
+            android:id="@+id/bs_orbot_http_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_orbot_radio_http"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layoutDirection="ltr"
+                android:padding="5dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toStartOf="@id/bs_orbot_radio_http"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_http"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.75"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_http_desc"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/bs__socks5_orbot_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_orbot_radio_socks5"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layoutDirection="ltr"
+                android:padding="5dp"
+                android:text="" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toStartOf="@id/bs_orbot_radio_socks5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_socks5"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.75"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_socks5_desc"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/bs_orbot_both_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_orbot_radio_both"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layoutDirection="ltr"
+                android:padding="5dp"
+                android:text="" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toStartOf="@id/bs_orbot_radio_both"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_both"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:alpha="0.75"
+                    android:gravity="center_vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_both_desc"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/bs_orbot_none_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/bs_orbot_radio_none"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layoutDirection="ltr"
+                android:padding="5dp"
+                android:text="" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toStartOf="@id/bs_orbot_radio_none"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_none"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:alpha="0.75"
+                    android:gravity="center_vertical"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:text="@string/orbot_none_desc"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </RadioGroup>
+
+</LinearLayout>

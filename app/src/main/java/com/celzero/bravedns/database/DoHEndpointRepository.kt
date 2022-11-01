@@ -22,32 +22,32 @@ import androidx.room.Transaction
 class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
 
     @Transaction
-    suspend fun update(doHEndpoint: DoHEndpoint) {
+    fun update(doHEndpoint: DoHEndpoint) {
         doHEndpointDAO.removeConnectionStatus()
         doHEndpointDAO.update(doHEndpoint)
     }
 
-    suspend fun insertAsync(doHEndpoint: DoHEndpoint) {
+    fun insertAsync(doHEndpoint: DoHEndpoint) {
         doHEndpointDAO.insert(doHEndpoint)
     }
 
-    suspend fun deleteOlderData(date: Long) {
+    fun deleteOlderData(date: Long) {
         doHEndpointDAO.deleteOlderData(date)
     }
 
-    suspend fun deleteDoHEndpoint(id: Int) {
+    fun deleteDoHEndpoint(id: Int) {
         doHEndpointDAO.deleteDoHEndpoint(id)
     }
 
-    suspend fun removeConnectionStatus() {
+    fun removeConnectionStatus() {
         doHEndpointDAO.removeConnectionStatus()
     }
 
-    suspend fun getConnectedDoH(): DoHEndpoint? {
+    fun getConnectedDoH(): DoHEndpoint? {
         return doHEndpointDAO.getConnectedDoH()
     }
 
-    suspend fun getCount(): Int {
+    fun getCount(): Int {
         return doHEndpointDAO.getCount()
     }
 }

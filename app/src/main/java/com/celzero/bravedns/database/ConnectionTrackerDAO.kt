@@ -40,29 +40,38 @@ interface ConnectionTrackerDAO {
     fun getConnectionTrackerLiveData(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc")
+        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc"
+    )
     fun getConnectionTrackerByName(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query("select * from ConnectionTracker where isBlocked = 1 order by timeStamp desc")
     fun getConnectionBlockedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and isBlocked = 1 order by timeStamp desc")
+        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and isBlocked = 1 order by timeStamp desc"
+    )
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc")
+        "select ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc"
+    )
     fun getLogsForApp(uid: Int): List<AppConnections>?
 
     @Query(
-        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc")
-    fun getBlockedConnectionsFiltered(query: String,
-                                      filter: Set<String>): PagingSource<Int, ConnectionTracker>
+        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc"
+    )
+    fun getBlockedConnectionsFiltered(
+        query: String,
+        filter: Set<String>
+    ): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by timeStamp desc")
-    fun getConnectionsFiltered(query: String,
-                               filter: List<String>): PagingSource<Int, ConnectionTracker>
+        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by timeStamp desc"
+    )
+    fun getConnectionsFiltered(
+        query: String,
+        filter: List<String>
+    ): PagingSource<Int, ConnectionTracker>
 
     @Query("delete from ConnectionTracker where timeStamp < :date")
     fun deleteOlderData(date: Long)
@@ -71,17 +80,22 @@ interface ConnectionTrackerDAO {
     fun clearAllData()
 
     @Query(
-        "delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)")
+        "delete from ConnectionTracker where id < ((select max(id) from ConnectionTracker) - :count)"
+    )
     fun deleteOlderDataCount(count: Int)
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query)  order by timeStamp desc")
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query)  order by timeStamp desc"
+    )
     fun getAllowedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by timeStamp desc")
-    fun getAllowedConnectionsFiltered(query: String,
-                                      filter: Set<String>): PagingSource<Int, ConnectionTracker>
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by timeStamp desc"
+    )
+    fun getAllowedConnectionsFiltered(
+        query: String,
+        filter: Set<String>
+    ): PagingSource<Int, ConnectionTracker>
 
     @RawQuery
     fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int

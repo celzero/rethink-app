@@ -16,15 +16,15 @@
 package com.celzero.bravedns.database
 
 class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
-    suspend fun update(customDomain: CustomDomain) {
+    fun update(customDomain: CustomDomain) {
         customDomainDAO.update(customDomain)
     }
 
-    suspend fun insert(customDomain: CustomDomain) {
+    fun insert(customDomain: CustomDomain) {
         customDomainDAO.insert(customDomain)
     }
 
-    suspend fun delete(customDomain: CustomDomain) {
+    fun delete(customDomain: CustomDomain) {
         customDomainDAO.delete(customDomain)
     }
 

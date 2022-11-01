@@ -37,10 +37,6 @@ public abstract class Prober {
             0, 1   // QCLASS = IN (Internet)
     };
 
-    public interface Callback {
-        void onCompleted(boolean succeeded);
-    }
-
     /**
      * Called to execute the probe on a new thread.
      *
@@ -48,4 +44,8 @@ public abstract class Prober {
      * @param callback How to report the probe results
      */
     public abstract void probe(String url, Callback callback);
+
+    public interface Callback {
+        void onCompleted(boolean succeeded);
+    }
 }

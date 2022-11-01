@@ -16,6 +16,7 @@
 package com.celzero.bravedns.util
 
 // https://android.googlesource.com/platform/system/core/+/4489ee0a190ad488df8ed9be545986a46c86148e/libcutils/include/private/android_filesystem_config.h
+
 enum class AndroidUidConfig(val uid: Int) {
     ANDROID(0),//Modified as ANDROID instead of ROOT
     DAEMON(1),
@@ -166,7 +167,6 @@ enum class AndroidUidConfig(val uid: Int) {
     USER_OFFSET(100000),
     OTHER(Constants.INVALID_UID);
 
-
     companion object {
         private val map = values().associateBy(AndroidUidConfig::uid)
 
@@ -178,9 +178,6 @@ enum class AndroidUidConfig(val uid: Int) {
             return (uid >= APP_START.uid && uid <= APP_END.uid)
         }
 
-        fun isValidUid(uid: Int): Boolean {
-            return (uid > 0 && uid < USER_OFFSET.uid)
-        }
     }
 
 }

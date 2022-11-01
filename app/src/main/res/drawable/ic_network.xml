@@ -3,19 +3,19 @@
     android:height="24dp"
     android:viewportWidth="32"
     android:viewportHeight="32">
-  <path
-      android:fillColor="?attr/svgStrokeColor"
-      android:pathData="M30,30L22,30L22,22h8ZM24,28h4L28,24L24,24Z"/>
-  <path
-      android:fillColor="?attr/svgStrokeColor"
-      android:pathData="M20,27H8A6,6 0,0 1,8 15h2v2H8a4,4 0,0 0,0 8H20Z"/>
-  <path
-      android:fillColor="?attr/svgStrokeColor"
-      android:pathData="M20,20L12,20L12,12h8ZM14,18h4L18,14L14,14Z"/>
-  <path
-      android:fillColor="?attr/svgStrokeColor"
-      android:pathData="M24,17H22V15h2a4,4 0,0 0,0 -8H12V5H24a6,6 0,0 1,0 12Z"/>
-  <path
-      android:fillColor="?attr/svgStrokeColor"
-      android:pathData="M10,10H2V2h8ZM4,8H8V4H4Z"/>
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="M30,30L22,30L22,22h8ZM24,28h4L28,24L24,24Z" />
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="M20,27H8A6,6 0,0 1,8 15h2v2H8a4,4 0,0 0,0 8H20Z" />
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="M20,20L12,20L12,12h8ZM14,18h4L18,14L14,14Z" />
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="M24,17H22V15h2a4,4 0,0 0,0 -8H12V5H24a6,6 0,0 1,0 12Z" />
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="M10,10H2V2h8ZM4,8H8V4H4Z" />
 </vector>

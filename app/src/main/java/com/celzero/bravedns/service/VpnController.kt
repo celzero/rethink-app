@@ -40,8 +40,7 @@ object VpnController : KoinComponent {
     private var connectionState: BraveVPNService.State? = null
     private val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
-    var controllerScope: CoroutineScope? = null
-        private set
+    private var controllerScope: CoroutineScope? = null
 
     private var vpnStartElapsedTime: Long = SystemClock.elapsedRealtime()
 
@@ -132,17 +131,6 @@ object VpnController : KoinComponent {
         onConnectionStateChanged(state().connectionState)
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
 
-    }
-
-    fun onStartComplete(context: Context, succeeded: Boolean) {
-        if (!succeeded) {
-            // VPN setup only fails if VPN permission has been revoked.  If this happens, clear the
-            // user intent state and reset to the default state.
-            stop(context)
-        } else {
-            // no op
-        }
-        Log.i(LOG_TAG_VPN, "onStartComplete - VpnController")
     }
 
     fun stop(context: Context) {

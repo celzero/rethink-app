@@ -21,14 +21,19 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Constants
 
 @Entity(primaryKeys = ["name", "url", "uid"], tableName = "RethinkDnsEndpoint")
-class RethinkDnsEndpoint {
-    var name: String = ""
-    var url: String = ""
-    var uid: Int = Constants.MISSING_UID
-    var desc: String = ""
-    var isActive: Boolean = true
-    var isCustom: Boolean = true
-    var latency: Int = 0
+class RethinkDnsEndpoint// Room auto-increments id when its set to zero.
+// A non-zero id overrides and sets caller-specified id instead.
+    (
+    var name: String,
+    var url: String,
+    var uid: Int,
+    var desc: String,
+    var isActive: Boolean,
+    var isCustom: Boolean,
+    var latency: Int,
+    blocklistCount: Int?,
+    modifiedDataTime: Long
+) {
     var blocklistCount: Int = 0
     var modifiedDataTime: Long = Constants.INIT_TIME_MS
 
@@ -53,20 +58,10 @@ class RethinkDnsEndpoint {
         const val RETHINK_PLUS: String = "RDNS Plus"
     }
 
-    constructor(name: String, url: String, uid: Int, desc: String, isActive: Boolean,
-                isCustom: Boolean, latency: Int, blocklistCount: Int?, modifiedDataTime: Long) {
-        // Room auto-increments id when its set to zero.
-        // A non-zero id overrides and sets caller-specified id instead.
-        this.name = name
-        this.url = url
-        this.uid = uid
-        this.desc = desc
-        this.isActive = isActive
-        this.isCustom = isCustom
+    init {
         this.blocklistCount = blocklistCount ?: 0
         if (modifiedDataTime != Constants.INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
-        this.latency = latency
     }
 
     fun isEditable(context: Context): Boolean {

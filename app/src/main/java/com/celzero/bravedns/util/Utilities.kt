@@ -18,8 +18,6 @@ package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Activity
-import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
@@ -45,19 +43,20 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.PauseActivity
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_HEADLESS
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -89,12 +88,6 @@ import java.util.Calendar.DAY_OF_YEAR
 class Utilities {
 
     companion object {
-
-        fun getPermissionDetails(context: Context, packageName: String): PackageInfo {
-            return context.packageManager.getPackageInfo(packageName,
-                                                         PackageManager.GET_PERMISSIONS)
-        }
-
         // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
         fun getETldPlus1(fqdn: String): String? {
             return try {
@@ -123,46 +116,60 @@ class Utilities {
             }
         }
 
-        fun isAccessibilityServiceEnabled(context: Context,
-                                          service: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabled(
+            context: Context,
+            service: Class<out AccessibilityService?>
+        ): Boolean {
             val am = context.getSystemService<AccessibilityManager>() ?: return false
             val enabledServices = am.getEnabledAccessibilityServiceList(
-                AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+                AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+            )
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (DEBUG) Log.i(LOG_TAG_VPN,
-                                 "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
+                if (DEBUG) Log.i(
+                    LOG_TAG_VPN,
+                    "Accessibility enabled check for: ${enabledServiceInfo.packageName}"
+                )
                 if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
                     return true
                 }
             }
-            if (DEBUG) Log.e(LOG_TAG_VPN,
-                             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}")
+            if (DEBUG) Log.e(
+                LOG_TAG_VPN,
+                "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}"
+            )
             return false
         }
 
-        fun isAccessibilityServiceEnabledViaSettingsSecure(context: Context,
-                                                           accessibilityService: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabledViaSettingsSecure(
+            context: Context,
+            accessibilityService: Class<out AccessibilityService?>
+        ): Boolean {
             try {
                 val expectedComponentName = ComponentName(context, accessibilityService)
                 val enabledServicesSetting: String = Settings.Secure.getString(
                     context.contentResolver,
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+                ) ?: return false
                 val colonSplitter = SimpleStringSplitter(':')
                 colonSplitter.setString(enabledServicesSetting)
                 while (colonSplitter.hasNext()) {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (expectedComponentName == enabledService) {
-                        if (DEBUG) Log.i(LOG_TAG_VPN,
-                                         "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}")
+                        if (DEBUG) Log.i(
+                            LOG_TAG_VPN,
+                            "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}"
+                        )
                         return true
                     }
                 }
             } catch (e: Settings.SettingNotFoundException) {
-                Log.e(LOG_TAG_VPN,
-                      "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
-                      e)
+                Log.e(
+                    LOG_TAG_VPN,
+                    "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
+                    e
+                )
             }
             if (DEBUG) Log.d(LOG_TAG_VPN, "Accessibility enabled check failed")
             return isAccessibilityServiceEnabled(context, accessibilityService)
@@ -233,9 +240,11 @@ class Utilities {
             } else if (isYesterday(Date(timestamp))) {
                 "Yesterday"
             } else {
-                val d = DateUtils.getRelativeTimeSpanString(timestamp, now,
-                                                            DateUtils.MINUTE_IN_MILLIS,
-                                                            DateUtils.FORMAT_ABBREV_RELATIVE)
+                val d = DateUtils.getRelativeTimeSpanString(
+                    timestamp, now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE
+                )
                 d.toString()
             }
         }
@@ -247,7 +256,9 @@ class Utilities {
             val c2 = Calendar.getInstance()
             c2.time = day
             if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(DAY_OF_YEAR) == c2.get(
-                    DAY_OF_YEAR)) {
+                    DAY_OF_YEAR
+                )
+            ) {
                 return true
             }
 
@@ -314,8 +325,10 @@ class Utilities {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                showToastUiCentered(context, context.getString(R.string.vpn_profile_error),
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    context, context.getString(R.string.vpn_profile_error),
+                    Toast.LENGTH_SHORT
+                )
                 Log.w(LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
             }
         }
@@ -339,7 +352,17 @@ class Utilities {
             var metadata: PackageInfo? = null
 
             try {
-                metadata = pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
+                metadata = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    pm.getPackageInfo(
+                        pi, PackageManager.PackageInfoFlags.of(
+                            PackageManager.GET_META_DATA.toLong()
+                        )
+                    )
+                } else {
+                    pm.getPackageInfo(
+                        pi, PackageManager.GET_META_DATA
+                    )
+                }
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
             }
@@ -403,8 +426,10 @@ class Utilities {
         // This function is not supported from version 12 onwards.
         fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
             return try {
-                val alwaysOn = Settings.Secure.getString(context.contentResolver,
-                                                         "always_on_vpn_app")
+                val alwaysOn = Settings.Secure.getString(
+                    context.contentResolver,
+                    "always_on_vpn_app"
+                )
                 !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
             } catch (e: Exception) {
                 Log.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
@@ -421,18 +446,16 @@ class Utilities {
                 context.packageManager.getApplicationIcon(packageName)
             } catch (e: PackageManager.NameNotFoundException) {
                 // Not adding exception details in logs.
-                Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: $packageName" + e.message)
+                Log.e(
+                    LOG_TAG_FIREWALL,
+                    "Application Icon not available for package: $packageName" + e.message
+                )
                 getDefaultIcon(context)
             }
         }
 
         private fun isValidAppName(appName: String?, packageName: String): Boolean {
             return !isNonApp(packageName) && Constants.UNKNOWN_APP != appName
-        }
-
-        fun isValidAppName(appName: String?): Boolean {
-            return (!appName.isNullOrEmpty() && appName != Constants.UNKNOWN_APP)
         }
 
         fun getDefaultIcon(context: Context): Drawable? {
@@ -481,28 +504,44 @@ class Utilities {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         }
 
-        fun isAtleastS(): Boolean {
+        private fun isAtleastS(): Boolean {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         }
 
         fun isFdroidFlavour(): Boolean {
-            return BuildConfig.FLAVOR == FLAVOR_FDROID
+            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_FDROID
         }
 
         fun isWebsiteFlavour(): Boolean {
-            return BuildConfig.FLAVOR == FLAVOR_WEBSITE
+            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_WEBSITE
         }
 
         fun isPlayStoreFlavour(): Boolean {
-            return BuildConfig.FLAVOR == FLAVOR_PLAY
+            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_PLAY
+        }
+
+        fun isHeadlessFlavour(): Boolean {
+            return BuildConfig.FLAVOR_releaseType == FLAVOR_HEADLESS
         }
 
         fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
             return try {
-                context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getApplicationInfo(
+                        packageName,
+                        PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+                    )
+                } else {
+                    context.packageManager.getApplicationInfo(
+                        packageName,
+                        PackageManager.GET_META_DATA
+                    )
+                }
             } catch (e: PackageManager.NameNotFoundException) {
-                Log.w(LOG_TAG_FIREWALL,
-                      "ApplicationInfo is not available for package name: $packageName")
+                Log.w(
+                    LOG_TAG_FIREWALL,
+                    "ApplicationInfo is not available for package name: $packageName"
+                )
                 null
             }
         }
@@ -513,8 +552,13 @@ class Utilities {
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.about_mail_to)))
                 putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
             }
-            context.startActivity(Intent.createChooser(intent, context.getString(
-                R.string.about_mail_bugreport_share_title)))
+            context.startActivity(
+                Intent.createChooser(
+                    intent, context.getString(
+                        R.string.about_mail_bugreport_share_title
+                    )
+                )
+            )
         }
 
         fun deleteRecursive(fileOrDirectory: File) {
@@ -529,16 +573,20 @@ class Utilities {
                 } else {
                     fileOrDirectory.delete()
                 }
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
+                if (DEBUG) Log.d(
+                    LOG_TAG_DOWNLOAD,
+                    "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted"
+                )
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
             }
         }
 
         fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
-            return localBlocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                  timestamp) + File.separator + which
+            return localBlocklistDownloadBasePath(
+                ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                timestamp
+            ) + File.separator + which
         }
 
         fun oldLocalBlocklistDownloadDir(ctx: Context, timestamp: Long): String {
@@ -553,17 +601,20 @@ class Utilities {
         }
 
         fun localBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+            return ctx.filesDir.canonicalPath + File.separator + which + File.separator +
+                    timestamp + File.separator
         }
 
         fun localBlocklistCanonicalPath(ctx: Context, which: String): String {
             return ctx.filesDir.canonicalPath + File.separator + which
         }
 
-        fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
-                val localBlocklist = localBlocklistDownloadPath(ctx, which,
-                                                                timestamp) ?: return null
+                val localBlocklist = localBlocklistDownloadPath(
+                    ctx, which,
+                    timestamp
+                )
 
                 return File(localBlocklist)
             } catch (e: IOException) {
@@ -573,10 +624,14 @@ class Utilities {
         }
 
         fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
-            val remoteDir = remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                timestamp) ?: return false
-            val remoteFile = blocklistFile(remoteDir.absolutePath,
-                                           Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+            val remoteDir = remoteBlocklistFile(
+                ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                timestamp
+            ) ?: return false
+            val remoteFile = blocklistFile(
+                remoteDir.absolutePath,
+                Constants.ONDEVICE_BLOCKLIST_FILE_TAG
+            ) ?: return false
             if (remoteFile.exists()) {
                 return true
             }
@@ -608,13 +663,6 @@ class Utilities {
             }
         }
 
-        fun openPauseActivityAndFinish(act: Activity) {
-            val intent = Intent()
-            intent.setClass(act, PauseActivity::class.java)
-            act.startActivity(intent)
-            act.finish()
-        }
-
         fun isNonApp(p: String): Boolean {
             return p.contains(NO_PACKAGE)
         }
@@ -626,9 +674,11 @@ class Utilities {
                 context.startActivity(intent)
             } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
                 Log.w(LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
-                showToastUiCentered(context,
-                                    context.getString(R.string.ctbs_app_info_not_available_toast),
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 
@@ -676,28 +726,36 @@ class Utilities {
                 R.attr.chipBgColorPositive
             }
             val typedValue = TypedValue()
-            val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
-                                                               intArrayOf(attributeFetch))
+            val a: TypedArray = context.obtainStyledAttributes(
+                typedValue.data,
+                intArrayOf(attributeFetch)
+            )
             val color = a.getColor(0, 0)
             a.recycle()
             return color
         }
 
         // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
-        fun getActivityPendingIntent(context: Context, intent: Intent, flag: Int,
-                                     mutable: Boolean): PendingIntent {
+        fun getActivityPendingIntent(
+            context: Context, intent: Intent, flag: Int,
+            mutable: Boolean
+        ): PendingIntent {
             return if (isAtleastS()) {
-                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                val sFlag =
+                    if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
                 PendingIntent.getActivity(context, 0, intent, sFlag)
             } else {
                 PendingIntent.getActivity(context, 0, intent, flag)
             }
         }
 
-        fun getBroadcastPendingIntent(context: Context, requestCode: Int, intent: Intent, flag: Int,
-                                      mutable: Boolean): PendingIntent {
+        fun getBroadcastPendingIntent(
+            context: Context, requestCode: Int, intent: Intent, flag: Int,
+            mutable: Boolean
+        ): PendingIntent {
             return if (isAtleastS()) {
-                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                val sFlag =
+                    if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
                 PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
             } else {
                 PendingIntent.getBroadcast(context, requestCode, intent, flag)
@@ -728,7 +786,8 @@ class Utilities {
             }
 
             val linkProperties: LinkProperties = getLinkProperties(
-                context) ?: return PrivateDnsMode.NONE
+                context
+            ) ?: return PrivateDnsMode.NONE
             if (linkProperties.privateDnsServerName != null) {
                 return PrivateDnsMode.STRICT
             }
@@ -745,7 +804,8 @@ class Utilities {
 
         private fun getLinkProperties(context: Context): LinkProperties? {
             val connectivityManager = context.getSystemService(
-                Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                Context.CONNECTIVITY_SERVICE
+            ) as ConnectivityManager
             val activeNetwork = connectivityManager.activeNetwork ?: return null
             return connectivityManager.getLinkProperties(activeNetwork)
         }

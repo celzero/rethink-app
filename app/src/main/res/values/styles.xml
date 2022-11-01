@@ -321,14 +321,6 @@
         <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
     </style>
 
-    <style name="ThinnerChip" parent="Widget.MaterialComponents.Chip.Filter">
-        <item name="chipCornerRadius">12dp</item>
-        <item name="chipMinHeight">24dp</item>
-        <item name="android:textSize">11sp</item>
-        <item name="chipMinTouchTargetSize">30dp</item>
-        <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
-    </style>
-
     <style name="ThinnerChip.Large" parent="Widget.MaterialComponents.Chip.Filter">
         <item name="chipCornerRadius">18dp</item>
         <item name="chipMinHeight">32dp</item>
@@ -344,13 +336,6 @@
         <item name="chipMinTouchTargetSize">30dp</item>
         <item name="chipIconSize">15dp</item>
         <item name="chipBackgroundColor">?attr/homeScreenBtnBackground</item>
-    </style>
-
-    <style name="ThinnerChip.Entry" parent="Widget.MaterialComponents.Chip.Entry">
-        <item name="chipCornerRadius">12dp</item>
-        <item name="chipMinHeight">24dp</item>
-        <item name="android:textSize">11sp</item>
-        <item name="chipMinTouchTargetSize">30dp</item>
     </style>
 
     <style name="ShapeAppearance.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">

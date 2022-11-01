@@ -22,15 +22,20 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "DoHEndpoint")
-class DoHEndpoint {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
-    var dohName: String = ""
-    var dohURL: String = ""
-    var dohExplanation: String? = null
-    var isSelected: Boolean = true
-    var isCustom: Boolean = true
+class DoHEndpoint// Room auto-increments id when its set to zero.
+// A non-zero id overrides and sets caller-specified id instead.
+    (
+    @PrimaryKey(autoGenerate = true) var id: Int,
+    var dohName: String,
+    var dohURL: String,
+    dohExplanation: String,
+    var isSelected: Boolean,
+    var isCustom: Boolean,
+    modifiedDataTime: Long,
+    var latency: Int
+) {
+    var dohExplanation: String? = dohExplanation
     var modifiedDataTime: Long = INIT_TIME_MS
-    var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is DoHEndpoint) return false
@@ -47,19 +52,9 @@ class DoHEndpoint {
     }
 
 
-    constructor(id: Int, dohName: String, dohURL: String, dohExplanation: String,
-                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        // Room auto-increments id when its set to zero.
-        // A non-zero id overrides and sets caller-specified id instead.
-        this.id = id
-        this.dohName = dohName
-        this.dohURL = dohURL
-        this.dohExplanation = dohExplanation
-        this.isSelected = isSelected
-        this.isCustom = isCustom
+    init {
         if (modifiedDataTime != INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
-        this.latency = latency
     }
 
     fun isDeletable(): Boolean {

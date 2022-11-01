@@ -21,7 +21,7 @@ import android.util.Log
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import java.io.File
@@ -64,8 +64,10 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
 
     private fun updateImage(subUrl: String, url: String, retry: Boolean) {
         val futureTarget: FutureTarget<File> = GlideApp.with(
-            context.applicationContext).downloadOnly().diskCacheStrategy(
-            DiskCacheStrategy.AUTOMATIC).load(subUrl).submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
+            context.applicationContext
+        ).downloadOnly().diskCacheStrategy(
+            DiskCacheStrategy.AUTOMATIC
+        ).load(subUrl).submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
             futureTarget.get()
             if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - success() -$subUrl, $url")
@@ -76,8 +78,10 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - onLoadFailed() -$subUrl")
                 updateImage(url, "", false)
             }
-            Log.e(LOG_TAG_DNS_LOG,
-                  "Glide - Got ExecutionException waiting for background downloadOnly")
+            Log.e(
+                LOG_TAG_DNS_LOG,
+                "Glide - Got ExecutionException waiting for background downloadOnly"
+            )
         } finally {
             GlideApp.with(context.applicationContext).clear(futureTarget)
         }

@@ -17,37 +17,28 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.room.Transaction
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
 
 
 class RethinkRemoteFileTagRepository(private val rethinkRemoteFileTagDao: RethinkRemoteFileTagDao) {
 
     @Transaction
-    suspend fun update(fileTag: RethinkRemoteFileTag) {
+    fun update(fileTag: RethinkRemoteFileTag) {
         rethinkRemoteFileTagDao.update(fileTag)
     }
 
-    suspend fun insertAsync(fileTag: RethinkRemoteFileTag) {
-        rethinkRemoteFileTagDao.insert(fileTag)
-    }
-
-    suspend fun insertWithReplace(fileTag: RethinkRemoteFileTag) {
-        rethinkRemoteFileTagDao.insertReplace(fileTag)
-    }
-
-    suspend fun insertAll(fileTags: List<RethinkRemoteFileTag>): LongArray {
+    fun insertAll(fileTags: List<RethinkRemoteFileTag>): LongArray {
         return rethinkRemoteFileTagDao.insertAll(fileTags)
     }
 
-    suspend fun updateSelectedTags(list: Set<Int>, isSelected: Int) {
+    fun updateSelectedTags(list: Set<Int>, isSelected: Int) {
         rethinkRemoteFileTagDao.updateSelectedTags(list, isSelected)
     }
 
-    suspend fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping> {
+    fun getSimpleViewTags(): List<SimpleViewMapping> {
         return rethinkRemoteFileTagDao.getSimpleViewTags()
     }
 
-    suspend fun clearSelectedTags() {
+    fun clearSelectedTags() {
         rethinkRemoteFileTagDao.clearSelectedTags()
     }
 

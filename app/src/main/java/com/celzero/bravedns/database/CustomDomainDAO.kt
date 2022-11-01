@@ -41,12 +41,14 @@ interface CustomDomainDAO {
 
     @Transaction
     @Query(
-        "select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc")
+        "select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc"
+    )
     fun getWhitelistedDomains(query: String, stat: Int): PagingSource<Int, CustomDomain>
 
     @Transaction
     @Query(
-        "select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc")
+        "select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc"
+    )
     fun getBlockedDomains(query: String, stat: Int): PagingSource<Int, CustomDomain>
 
     @RawQuery

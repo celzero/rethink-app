@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/acd_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/acd_flag"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:ellipsize="none"
+        android:gravity="center"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="26sp" />
+
+    <LinearLayout
+        android:id="@+id/acd_top_layout_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/acd_status_button"
+        android:layout_toEndOf="@id/acd_flag"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/acd_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/drawable_purple_gradient"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:textAppearance="@android:style/TextAppearance.Material.Subhead"
+            android:textSize="@dimen/default_font_text_view"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/acd_ip_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="5dp"
+                android:ellipsize="start"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/acd_domain_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="5dp"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:textSize="@dimen/default_font_text_view" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/acd_status_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:alpha="0.5"
+        android:padding="5dp"
+        android:src="@drawable/ic_arrow_down_small" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/acd_top_layout_ll"
+        android:layout_marginTop="5dp"
+        android:background="?attr/divider" />
+</RelativeLayout>

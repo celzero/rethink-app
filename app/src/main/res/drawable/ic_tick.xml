@@ -3,10 +3,10 @@
     android:height="16dp"
     android:viewportWidth="32"
     android:viewportHeight="32">
-  <path
-      android:fillColor="?attr/accentGood"
-      android:pathData="m14,21.414 l-5,-5.001 1.413,-1.413 3.587,3.586 7.585,-7.586 1.415,1.415z"/>
-  <path
-      android:fillColor="?attr/accentGood"
-      android:pathData="m16,2a14,14 0,1 0,14 14,14 14,0 0,0 -14,-14zM16,28a12,12 0,1 1,12 -12,12 12,0 0,1 -12,12z"/>
+    <path
+        android:fillColor="?attr/accentGood"
+        android:pathData="m14,21.414 l-5,-5.001 1.413,-1.413 3.587,3.586 7.585,-7.586 1.415,1.415z" />
+    <path
+        android:fillColor="?attr/accentGood"
+        android:pathData="m16,2a14,14 0,1 0,14 14,14 14,0 0,0 -14,-14zM16,28a12,12 0,1 1,12 -12,12 12,0 0,1 -12,12z" />
 </vector>

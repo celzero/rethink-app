@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:paddingBottom="40dp">
+
+    <TextView
+        android:layout_width="60dp"
+        android:layout_height="3dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="?attr/border" />
+
+    <!--<androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fs_sort_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="10dp"
+        android:text="@string/fapps_filter_firewall_status"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/ffa_firewall_chip_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="2dp"
+        android:visibility="visible"
+        app:selectionRequired="true"
+        app:singleSelection="true" />-->
+
+    <!-- <View
+         android:layout_width="match_parent"
+         android:layout_height="1dp"
+         android:background="?attr/border" />-->
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fs_filter_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="10dp"
+        android:text="@string/fapps_filter_filter_heading"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/ffa_parent_chip_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="2dp"
+        app:selectionRequired="true"
+        app:singleSelection="true" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="10dp"
+        android:text="@string/fapps_filter_categories_heading"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/ffa_chip_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="5dp"
+        android:padding="2dp"
+        android:visibility="visible"
+        app:singleSelection="false" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:weightSum="1">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/fs_clear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="0.3"
+            android:background="@drawable/rectangle_border_background"
+            android:maxHeight="40dp"
+            android:minHeight="40dp"
+            android:padding="5dp"
+            android:text="@string/fapps_filter_clear_btn"
+            android:textColor="?attr/primaryTextColor" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/fs_apply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/rounded_corners_button_accent"
+            android:maxHeight="40dp"
+            android:minHeight="40dp"
+            android:padding="5dp"
+            android:text="@string/fapps_filter_apply_btn"
+            android:textColor="?attr/chipTextColor" />
+    </LinearLayout>
+
+</LinearLayout>

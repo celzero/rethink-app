@@ -3,10 +3,10 @@
     android:height="48dp"
     android:viewportWidth="36"
     android:viewportHeight="36">
-  <path
-      android:fillColor="?attr/accentGood"
-      android:pathData="m28,30h-22v-22h13.22l2,-2h-15.22a2,2 0,0 0,-2 2v22a2,2 0,0 0,2 2h22a2,2 0,0 0,2 -2v-15l-2,2z"/>
-  <path
-      android:fillColor="?attr/accentGood"
-      android:pathData="m33.53,5.84 l-3.37,-3.37a1.61,1.61 0,0 0,-2.28 0l-13.71,13.79 -1.11,4.81a1.61,1.61 0,0 0,1.57 1.93,1.69 1.69,0 0,0 0.37,0l4.85,-1.07 13.68,-13.81a1.61,1.61 0,0 0,0 -2.28zM18.81,20.08 L15.15,20.89 16,17.26 26.32,6.87 29.14,9.69zM30.27,8.56 L27.45,5.74 29,4.16 31.84,7z"/>
+    <path
+        android:fillColor="?attr/accentGood"
+        android:pathData="m28,30h-22v-22h13.22l2,-2h-15.22a2,2 0,0 0,-2 2v22a2,2 0,0 0,2 2h22a2,2 0,0 0,2 -2v-15l-2,2z" />
+    <path
+        android:fillColor="?attr/accentGood"
+        android:pathData="m33.53,5.84 l-3.37,-3.37a1.61,1.61 0,0 0,-2.28 0l-13.71,13.79 -1.11,4.81a1.61,1.61 0,0 0,1.57 1.93,1.69 1.69,0 0,0 0.37,0l4.85,-1.07 13.68,-13.81a1.61,1.61 0,0 0,0 -2.28zM18.81,20.08 L15.15,20.89 16,17.26 26.32,6.87 29.14,9.69zM30.27,8.56 L27.45,5.74 29,4.16 31.84,7z" />
 </vector>

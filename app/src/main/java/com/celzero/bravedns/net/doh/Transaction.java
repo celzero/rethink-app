@@ -27,6 +27,24 @@ import dnsx.Dnsx;
  */
 public class Transaction implements Serializable {
 
+    public final long queryTime;
+    public final String name;
+    public final short type;
+    public long responseTime;
+    public Status status;
+    public byte[] response;
+    public Calendar responseCalendar;
+    public String serverIp;
+    public String blocklist;
+    public String relayIp;
+    public QueryType queryType;
+
+    public Transaction(DnsPacket query, long timestamp) {
+        this.name = query.getQueryName();
+        this.type = query.getQueryType();
+        this.queryTime = timestamp;
+    }
+
     public enum Status {
         COMPLETE,
         SEND_FAIL,
@@ -39,9 +57,9 @@ public class Transaction implements Serializable {
     }
 
     public enum QueryType {
-        DOH(Dnsx.DOH), DNS_CRYPT(Dnsx.DNSCrypt), DNS_PROXY(Dnsx.DNS53);
+        DOH(), DNS_CRYPT(), DNS_PROXY();
 
-        QueryType(String type) {
+        QueryType() {
         }
 
         public static QueryType getType(String type) {
@@ -69,22 +87,4 @@ public class Transaction implements Serializable {
             return this == DNS_PROXY;
         }
     }
-
-    public Transaction(DnsPacket query, long timestamp) {
-        this.name = query.getQueryName();
-        this.type = query.getQueryType();
-        this.queryTime = timestamp;
-    }
-
-    public final long queryTime;
-    public final String name;
-    public final short type;
-    public long responseTime;
-    public Status status;
-    public byte[] response;
-    public Calendar responseCalendar;
-    public String serverIp;
-    public String blocklist;
-    public String relayIp;
-    public QueryType queryType;
 }

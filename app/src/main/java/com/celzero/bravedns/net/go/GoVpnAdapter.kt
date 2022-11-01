@@ -21,6 +21,7 @@ import android.content.res.Resources
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.dnscryptRelaysToRemove
@@ -28,7 +29,6 @@ import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEFAULT_DOH_URL
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
@@ -59,8 +59,10 @@ import java.io.IOException
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
  * custom logic for Intra.
  * */
-class GoVpnAdapter(private val context: Context, private val externalScope: CoroutineScope,
-                   private var tunFd: ParcelFileDescriptor?) : KoinComponent {
+class GoVpnAdapter(
+    private val context: Context, private val externalScope: CoroutineScope,
+    private var tunFd: ParcelFileDescriptor?
+) : KoinComponent {
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -87,15 +89,19 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             val dohURL: String = getDohUrl()
 
             val transport: Transport = makeDohTransport(dohURL, tunnelOptions.listener)
-            Log.i(LOG_TAG_VPN,
-                  "Connect tunnel with url " + dohURL + ", dnsMode: " + tunnelOptions.tunDnsMode + ", blockMode: " + tunnelOptions.tunFirewallMode + ", proxyMode: " + tunnelOptions.tunProxyMode + ", fake dns: " + tunnelOptions.fakeDns)
+            Log.i(
+                LOG_TAG_VPN,
+                "Connect tunnel with url " + dohURL + ", dnsMode: " + tunnelOptions.tunDnsMode + ", blockMode: " + tunnelOptions.tunFirewallMode + ", proxyMode: " + tunnelOptions.tunProxyMode + ", fake dns: " + tunnelOptions.fakeDns
+            )
 
             if (tunFd == null) return
 
             setPreferredEngine(tunnelOptions)
-            tunnel = Tun2socks.connectIntraTunnel(tunFd!!.fd.toLong(), tunnelOptions.fakeDns,
-                                                  transport, tunnelOptions.blocker,
-                                                  tunnelOptions.listener)
+            tunnel = Tun2socks.connectIntraTunnel(
+                tunFd!!.fd.toLong(), tunnelOptions.fakeDns,
+                transport, tunnelOptions.blocker,
+                tunnelOptions.listener
+            )
 
             setBraveDnsBlocklistMode(tunnelOptions.tunDnsMode, dohURL)
             setTunnelMode(tunnelOptions)
@@ -107,8 +113,10 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     }
 
     private fun setPreferredEngine(tunnelOptions: TunnelOptions) {
-        Log.i(LOG_TAG_VPN,
-              "Preferred engine name:${tunnelOptions.preferredEngine.name},id: ${tunnelOptions.preferredEngine.getPreferredEngine()}")
+        Log.i(
+            LOG_TAG_VPN,
+            "Preferred engine name:${tunnelOptions.preferredEngine.name},id: ${tunnelOptions.preferredEngine.getPreferredEngine()}"
+        )
         Tun2socks.preferredEngine(tunnelOptions.preferredEngine.getPreferredEngine())
     }
 
@@ -123,11 +131,15 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         }
 
         if (tunnelOptions.tunProxyMode.isTunProxyOrbot()) {
-            tunnel?.setTunMode(tunnelOptions.tunDnsMode.mode, tunnelOptions.tunFirewallMode.mode,
-                               Settings.ProxyModeSOCKS5, tunnelOptions.ptMode.id)
+            tunnel?.setTunMode(
+                tunnelOptions.tunDnsMode.mode, tunnelOptions.tunFirewallMode.mode,
+                Settings.ProxyModeSOCKS5, tunnelOptions.ptMode.id
+            )
         } else {
-            tunnel?.setTunMode(tunnelOptions.tunDnsMode.mode, tunnelOptions.tunFirewallMode.mode,
-                               tunnelOptions.tunProxyMode.mode, tunnelOptions.ptMode.id)
+            tunnel?.setTunMode(
+                tunnelOptions.tunDnsMode.mode, tunnelOptions.tunFirewallMode.mode,
+                tunnelOptions.tunProxyMode.mode, tunnelOptions.ptMode.id
+            )
         }
         stopDnscryptIfNeeded()
         setDnsProxyIfNeeded(tunnelOptions)
@@ -158,10 +170,14 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         }
 
         try {
-            val remoteDir = remoteBlocklistFile(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                persistentState.remoteBlocklistTimestamp) ?: return
-            val remoteFile = blocklistFile(remoteDir.absolutePath,
-                                           ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
+            val remoteDir = remoteBlocklistFile(
+                context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                persistentState.remoteBlocklistTimestamp
+            ) ?: return
+            val remoteFile = blocklistFile(
+                remoteDir.absolutePath,
+                ONDEVICE_BLOCKLIST_FILE_TAG
+            ) ?: return
             if (remoteFile.exists()) {
                 tunnel?.braveDNS = Dnsx.newBraveDNSRemote(remoteFile.absolutePath)
                 Log.i(LOG_TAG_VPN, "remote-bravedns enabled")
@@ -193,8 +209,10 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             val serversIndex: String = appConfig.getDnscryptServersToRemove()
             try {
                 if (tunnel?.dnsCryptProxy == null) {
-                    val response: String? = tunnel?.startDNSCryptProxy(servers, routes,
-                                                                       tunnelOptions.listener)
+                    val response: String? = tunnel?.startDNSCryptProxy(
+                        servers, routes,
+                        tunnelOptions.listener
+                    )
                     Log.i(LOG_TAG_VPN, "startDNSCryptProxy: $servers,$routes, Response: $response")
                 } else {
                     val serversToRemove: String? = tunnel?.dnsCryptProxy?.liveServers()?.let {
@@ -235,8 +253,10 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
                 return
             }
 
-            if (DEBUG) Log.d(LOG_TAG_VPN,
-                             "setDNSProxy mode set: " + dnsProxy.host + ", " + dnsProxy.port)
+            if (DEBUG) Log.d(
+                LOG_TAG_VPN,
+                "setDNSProxy mode set: " + dnsProxy.host + ", " + dnsProxy.port
+            )
             tunnel?.startDNSProxy(dnsProxy.host, dnsProxy.port.toString(), tunnelOptions.listener)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: could not connect to dnsproxy: ${e.message}", e)
@@ -267,11 +287,15 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
     private fun setProxyMode(userName: String?, password: String?, ipAddress: String?, port: Int) {
         try {
             tunnel?.startProxy(userName, password, ipAddress, port.toString())
-            Log.i(LOG_TAG_VPN,
-                  "Proxy mode set: $userName$ipAddress$port with tunnel proxyoptions: ${tunnel?.proxyOptions}")
+            Log.i(
+                LOG_TAG_VPN,
+                "Proxy mode set: $userName$ipAddress$port with tunnel proxyoptions: ${tunnel?.proxyOptions}"
+            )
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "connect-tunnel: could not start proxy $userName@$ipAddress:$port",
-                  e)
+            Log.e(
+                LOG_TAG_VPN, "connect-tunnel: could not start proxy $userName@$ipAddress:$port",
+                e
+            )
         }
     }
 
@@ -285,21 +309,27 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             try {
                 val liveServers: String? = tunnel?.dnsCryptProxy?.refresh()
                 appConfig.updateDnscryptLiveServers(liveServers)
-                Log.i(LOG_TAG_VPN,
-                      "Refresh LiveServers: $liveServers, tunnelOptions: $tunnelOptions")
+                Log.i(
+                    LOG_TAG_VPN,
+                    "Refresh LiveServers: $liveServers, tunnelOptions: $tunnelOptions"
+                )
                 if (liveServers.isNullOrEmpty()) {
                     tunnel?.stopDNSCryptProxy()
                     handleDnscryptFailure()
                 } else {
-                    tunnel?.setTunMode(Settings.DNSModeCryptPort,
-                                       tunnelOptions.tunFirewallMode.mode,
-                                       tunnelOptions.tunProxyMode.mode, tunnelOptions.ptMode.id)
+                    tunnel?.setTunMode(
+                        Settings.DNSModeCryptPort,
+                        tunnelOptions.tunFirewallMode.mode,
+                        tunnelOptions.tunProxyMode.mode, tunnelOptions.ptMode.id
+                    )
                     setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
                 }
             } catch (e: Exception) {
                 handleDnscryptFailure()
-                Log.e(LOG_TAG_VPN, "connect-tunnel: could not start dnscrypt-proxy: ${e.message}",
-                      e)
+                Log.e(
+                    LOG_TAG_VPN, "connect-tunnel: could not start dnscrypt-proxy: ${e.message}",
+                    e
+                )
             }
         }
     }
@@ -318,15 +348,19 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
     private fun showDnscryptConnectionFailureToast() {
         ui {
-            showToastUiCentered(context, context.getString(R.string.dns_crypt_connection_failure),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                context, context.getString(R.string.dns_crypt_connection_failure),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 
     private fun showDnsProxyConnectionFailureToast() {
         ui {
-            showToastUiCentered(context, context.getString(R.string.dns_proxy_connection_failure),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                context, context.getString(R.string.dns_proxy_connection_failure),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 
@@ -455,8 +489,10 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             if (tunnel?.braveDNS?.onDeviceBlock() == true) {
                 tunnel?.braveDNS?.stamp = persistentState.localBlocklistStamp
             } else {
-                Log.w(LOG_TAG_VPN,
-                      "bravedns mode is not local but trying to set local stamp, this should not happen")
+                Log.w(
+                    LOG_TAG_VPN,
+                    "bravedns mode is not local but trying to set local stamp, this should not happen"
+                )
             }
         } catch (e: java.lang.Exception) {
             Log.e(LOG_TAG_VPN, "could not set set local-bravedns stamp: ${e.message}", e)
@@ -469,8 +505,10 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
     companion object {
 
-        suspend fun establish(context: Context, scope: CoroutineScope,
-                              tunFd: ParcelFileDescriptor?): GoVpnAdapter? {
+        fun establish(
+            context: Context, scope: CoroutineScope,
+            tunFd: ParcelFileDescriptor?
+        ): GoVpnAdapter? {
             if (tunFd == null) return null
             return GoVpnAdapter(context, scope, tunFd)
         }

@@ -36,59 +36,65 @@ import java.util.List;
 
 public class DnsPacket {
 
-    private final byte[] data;
-
     private static final short TYPE_A = 1;
     private static final short TYPE_AAAA = 28;
-
-    private static class DnsQuestion {
-
-        String name;
-        short qtype;
-        short qclass;
-    }
-
-    public static class DnsRecord {
-
-        String name;
-        short rtype;
-        short rclass;
-        int ttl;
-        byte[] data;
-
-        private boolean isAorAAAA() {
-            return this.rtype == TYPE_A || this.rtype == TYPE_AAAA;
-        }
-
-        public InetAddress getIp() {
-            if (!isAorAAAA()) return null;
-
-            try {
-                return InetAddress.getByAddress(this.data);
-            } catch (IllegalArgumentException | UnknownHostException e) {
-                Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}", e);
-            }
-            return null;
-        }
-
-        public int getTtl() {
-            return this.ttl;
-        }
-    }
-
     private final short id;
     private final boolean qr;
-    private final byte opcode;
-    private final boolean aa;
-    private final boolean tc;
-    private final boolean rd;
-    private final boolean ra;
     private final byte z;
-    private final byte rcode;
     private final DnsQuestion[] question;
     private final DnsRecord[] answer;
     private final DnsRecord[] authority;
-    private final DnsRecord[] additional;
+
+    public DnsPacket(byte[] data) throws ProtocolException {
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+        try {
+            id = buffer.getShort();
+            // First flag byte: QR, Opcode (4 bits), AA, RD, RA
+            byte flags1 = buffer.get();
+            final int QR_BIT = 7;
+            final int OPCODE_SIZE = 4;
+            final int OPCODE_START = 3;
+            final int AA_BIT = 2;
+            final int TC_BIT = 1;
+            final int RD_BIT = 0;
+            qr = getBit(flags1, QR_BIT);
+            byte opcode = getBits(flags1, OPCODE_START, OPCODE_SIZE);
+            boolean aa = getBit(flags1, AA_BIT);
+            boolean tc = getBit(flags1, TC_BIT);
+            boolean rd = getBit(flags1, RD_BIT);
+
+            // Second flag byte: RA, 0, 0, 0, Rcode
+            final int RA_BIT = 7;
+            final int ZEROS_START = 4;
+            final int ZEROS_SIZE = 3;
+            final int RCODE_START = 0;
+            final int RCODE_SIZE = 4;
+            byte flags2 = buffer.get();
+            boolean ra = getBit(flags2, RA_BIT);
+            z = getBits(flags2, ZEROS_START, ZEROS_SIZE);
+            byte rcode = getBits(flags2, RCODE_START, RCODE_SIZE);
+
+            short numQuestions = buffer.getShort();
+            short numAnswers = buffer.getShort();
+            short numAuthorities = buffer.getShort();
+            short numAdditional = buffer.getShort();
+
+            question = new DnsQuestion[numQuestions];
+            for (short i = 0; i < numQuestions; ++i) {
+                question[i] = new DnsQuestion();
+                question[i].name = readName(buffer);
+                question[i].qtype = buffer.getShort();
+                question[i].qclass = buffer.getShort();
+            }
+            answer = readRecords(buffer, numAnswers);
+            authority = readRecords(buffer, numAuthorities);
+            DnsRecord[] additional = readRecords(buffer, numAdditional);
+        } catch (BufferUnderflowException e) {
+            ProtocolException p = new ProtocolException("Packet too short");
+            p.initCause(e);
+            throw p;
+        }
+    }
 
     private static String readName(ByteBuffer buffer) throws BufferUnderflowException,
             ProtocolException {
@@ -154,58 +160,6 @@ public class DnsPacket {
         return (byte) ((src >>> start) & mask);
     }
 
-    public DnsPacket(byte[] data) throws ProtocolException {
-        this.data = data;
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        try {
-            id = buffer.getShort();
-            // First flag byte: QR, Opcode (4 bits), AA, RD, RA
-            byte flags1 = buffer.get();
-            final int QR_BIT = 7;
-            final int OPCODE_SIZE = 4;
-            final int OPCODE_START = 3;
-            final int AA_BIT = 2;
-            final int TC_BIT = 1;
-            final int RD_BIT = 0;
-            qr = getBit(flags1, QR_BIT);
-            opcode = getBits(flags1, OPCODE_START, OPCODE_SIZE);
-            aa = getBit(flags1, AA_BIT);
-            tc = getBit(flags1, TC_BIT);
-            rd = getBit(flags1, RD_BIT);
-
-            // Second flag byte: RA, 0, 0, 0, Rcode
-            final int RA_BIT = 7;
-            final int ZEROS_START = 4;
-            final int ZEROS_SIZE = 3;
-            final int RCODE_START = 0;
-            final int RCODE_SIZE = 4;
-            byte flags2 = buffer.get();
-            ra = getBit(flags2, RA_BIT);
-            z = getBits(flags2, ZEROS_START, ZEROS_SIZE);
-            rcode = getBits(flags2, RCODE_START, RCODE_SIZE);
-
-            short numQuestions = buffer.getShort();
-            short numAnswers = buffer.getShort();
-            short numAuthorities = buffer.getShort();
-            short numAdditional = buffer.getShort();
-
-            question = new DnsQuestion[numQuestions];
-            for (short i = 0; i < numQuestions; ++i) {
-                question[i] = new DnsQuestion();
-                question[i].name = readName(buffer);
-                question[i].qtype = buffer.getShort();
-                question[i].qclass = buffer.getShort();
-            }
-            answer = readRecords(buffer, numAnswers);
-            authority = readRecords(buffer, numAuthorities);
-            additional = readRecords(buffer, numAdditional);
-        } catch (BufferUnderflowException e) {
-            ProtocolException p = new ProtocolException("Packet too short");
-            p.initCause(e);
-            throw p;
-        }
-    }
-
     public DnsRecord[] getAnswer() {
         return this.answer;
     }
@@ -247,5 +201,40 @@ public class DnsPacket {
             }
         }
         return addresses;
+    }
+
+    private static class DnsQuestion {
+
+        String name;
+        short qtype;
+        short qclass;
+    }
+
+    public static class DnsRecord {
+
+        String name;
+        short rtype;
+        short rclass;
+        int ttl;
+        byte[] data;
+
+        private boolean isAorAAAA() {
+            return this.rtype == TYPE_A || this.rtype == TYPE_AAAA;
+        }
+
+        public InetAddress getIp() {
+            if (!isAorAAAA()) return null;
+
+            try {
+                return InetAddress.getByAddress(this.data);
+            } catch (IllegalArgumentException | UnknownHostException e) {
+                Log.e(LOG_TAG_DNS_LOG, "Failure converting string to InetAddresses: ${e.message}", e);
+            }
+            return null;
+        }
+
+        public int getTtl() {
+            return this.ttl;
+        }
     }
 }

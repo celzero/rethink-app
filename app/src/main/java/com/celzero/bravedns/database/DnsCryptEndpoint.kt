@@ -20,15 +20,20 @@ import androidx.room.PrimaryKey
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "DNSCryptEndpoint")
-class DnsCryptEndpoint {
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
-    var dnsCryptName: String = ""
-    var dnsCryptURL: String = ""
-    var dnsCryptExplanation: String? = null
-    var isSelected: Boolean = true
-    var isCustom: Boolean = true
+class DnsCryptEndpoint// Room auto-increments id when its set to zero.
+// A non-zero id overrides and sets caller-specified id instead.
+    (
+    @PrimaryKey(autoGenerate = true) var id: Int,
+    var dnsCryptName: String,
+    var dnsCryptURL: String,
+    dnsCryptExplanation: String,
+    var isSelected: Boolean,
+    var isCustom: Boolean,
+    modifiedDataTime: Long,
+    var latency: Int
+) {
+    var dnsCryptExplanation: String? = dnsCryptExplanation
     var modifiedDataTime: Long = INIT_TIME_MS
-    var latency: Int = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsCryptEndpoint) return false
@@ -41,19 +46,9 @@ class DnsCryptEndpoint {
     }
 
 
-    constructor(id: Int, dnsCryptName: String, dnsCryptURL: String, dnsCryptExplanation: String,
-                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
-        // Room auto-increments id when its set to zero.
-        // A non-zero id overrides and sets caller-specified id instead.
-        this.id = id
-        this.dnsCryptName = dnsCryptName
-        this.dnsCryptURL = dnsCryptURL
-        this.dnsCryptExplanation = dnsCryptExplanation
-        this.isSelected = isSelected
-        this.isCustom = isCustom
+    init {
         if (modifiedDataTime <= INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
-        this.latency = latency
     }
 
     fun isDeletable(): Boolean {

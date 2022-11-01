@@ -20,40 +20,28 @@ import androidx.lifecycle.LiveData
 
 class CustomIpRepository(private val customIpDao: CustomIpDao) {
 
-    suspend fun update(customIp: CustomIp) {
+    fun update(customIp: CustomIp) {
         customIpDao.update(customIp)
     }
 
-    suspend fun clearFirewallRules(uid: Int) {
-        customIpDao.clearIpRuleByUid(uid)
-    }
-
-    suspend fun insert(customIp: CustomIp) {
+    fun insert(customIp: CustomIp) {
         customIpDao.insert(customIp)
     }
 
-    suspend fun getIpRules(): List<CustomIp> {
+    fun getIpRules(): List<CustomIp> {
         return customIpDao.getCustomIpRules()
     }
 
-    suspend fun getCustomIpDetail(uid: Int, ipAddress: String, port: Int): CustomIp? {
+    fun getCustomIpDetail(uid: Int, ipAddress: String, port: Int): CustomIp? {
         return customIpDao.getCustomIpDetail(uid, ipAddress, port)
     }
 
-    suspend fun deleteIPRulesForUID(uid: Int, ipAddress: String, port: Int) {
+    fun deleteIPRulesForUID(uid: Int, ipAddress: String, port: Int) {
         customIpDao.deleteIPRulesForUID(uid, ipAddress, port)
     }
 
-    suspend fun deleteIpRule(customIp: CustomIp) {
-        customIpDao.delete(customIp)
-    }
-
-    suspend fun deleteAllIPRulesUniversal() {
+    fun deleteAllIPRulesUniversal() {
         customIpDao.deleteAllIPRulesUniversal()
-    }
-
-    suspend fun getBlockedConnectionsCount(): Int {
-        return customIpDao.getBlockedConnectionsCount()
     }
 
     fun getCustomIpsLiveData(): LiveData<Int> {

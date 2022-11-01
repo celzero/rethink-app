@@ -3,7 +3,7 @@
     android:height="48dp"
     android:viewportWidth="16"
     android:viewportHeight="16">
-  <path
-      android:pathData="M8,0c-4.4,0 -8,3.6 -8,8s3.6,8 8,8 8,-3.6 8,-8 -3.6,-8 -8,-8zM13,9h-4v4h-2v-4h-4v-2h4v-4h2v4h4v2z"
-      android:fillColor="?attr/svgStrokeColor"/>
+    <path
+        android:fillColor="?attr/svgStrokeColor"
+        android:pathData="M8,0c-4.4,0 -8,3.6 -8,8s3.6,8 8,8 8,-3.6 8,-8 -3.6,-8 -8,-8zM13,9h-4v4h-2v-4h-4v-2h4v-4h2v4h4v2z" />
 </vector>

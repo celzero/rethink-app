@@ -3,18 +3,18 @@
     android:height="24dp"
     android:viewportWidth="22"
     android:viewportHeight="22">
-  <path
-      android:pathData="M6,5h12l3,5l-8.5,9.5a0.7,0.7 0,0 1,-1 0l-8.5,-9.5l3,-5"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M10,12l-2,-2.2l0.6,-1"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
-      android:strokeLineCap="round"/>
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M6,5h12l3,5l-8.5,9.5a0.7,0.7 0,0 1,-1 0l-8.5,-9.5l3,-5"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/svgStrokeColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M10,12l-2,-2.2l0.6,-1"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/svgStrokeColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>

@@ -30,16 +30,7 @@
     <string name="slide_1_title">Free and Open Source</string>
     <string name="slide_1_desc">RethinkDNS is an open source software backed by Mozilla Builders MVP program.</string>
 
-    <string-array name="doh_endpoint_names">
-        <item>Cloudflare</item>
-        <item>Cloudflare Family</item>
-        <item>Cloudflare Security</item>
-        <item>RethinkDNS Basic (default)</item>
-        <item>Custom</item>
-        <item>RethinkDNS Plus</item>
-    </string-array>
-
-    <string name="rethink_plus">RethinkDNS Plus</string>
+  <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
 
     <string-array name="firewall_rules">
@@ -272,8 +263,7 @@
     <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
     <string name="search_dns_logs"><font size="12">Search domain names or IPs</font></string>
     <string name="search_universal_ips"><font size="12">Search IPs</font></string>
-    <string name="search_custom_domains"><font size="12">Search domain names</font></string>
-    <string name="search_rethinkplus_file_tag"><font size="12">Search blocklists</font></string>
+  <string name="search_rethinkplus_file_tag"><font size="12">Search blocklists</font></string>
 
     <string name="app_mode_dns_low_battery">DNS (battery saver)</string>
     <string name="app_mode_dns">DNS</string>
@@ -1012,45 +1002,8 @@
     <string name="build__flavor_fdroid">fdroid</string>
 
     <!-- custom domain -->
-    <string name="cd_dialog_header">Custom domain(s)</string>
-    <string name="cd_toast_deleted">Domain removed from custom list</string>
-    <string name="cd_toast_added">Domain added successfully</string>
-    <string name="cd_remove_dialog_title">Delete domain?</string>
-    <string name="cd_remove_dialog_message">Delete the domain from saved configuration.</string>
-    <string name="cd_remove_dialog_positive">Delete</string>
-    <string name="cd_remove_dialog_negative">Cancel</string>
 
-    <string name="cd_add_dialog_show_btn">show</string>
-
-    <string name="cd_sample_unicode_valid">✅</string>
-    <string name="cd_sample_unicode_invalid">❌</string>
-
-    <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s \n</string>
-    <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s \n</string>
-    <string name="cd_add_dialog_sample_3">%1$s https://%2$s \n</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
-
-    <string name="cd_filter_all">All</string>
-    <string name="cd_filter_allowed">Allowed</string>
-    <string name="cd_filter_blocked">Blocked</string>
-
-    <string name="cd_dialog_title">Add domain</string>
-    <string name="cd_dialog_desc">Custom URL(domain) or wild card to either allow or block. eg, *.test.com, test.com/test</string>
-    <string name="cd_dialog_edittext_hint">Enter %1$s</string>
-    <string name="cd_dialog_error_invalid_domain">Invalid URL(domain).</string>
-    <string name="cd_dialog_error_invalid_tld">Invalid Top level domain.</string>
-    <string name="cd_dialog_error_invalid_wildcard">Invalid wildcard.</string>
-
-    <string name="cd_whitelist_initial">W</string>
-    <string name="cd_whitelist_txt">Whitelist</string>
-
-    <string name="cd_blocked_initial">B</string>
-    <string name="cd_blocked_txt">Blocked</string>
-
-    <string name="cd_no_rule_initial">N</string>
-    <string name="cd_no_rule_txt">No Rule</string>
-
-    <!-- custom IP -->
+  <!-- custom IP -->
     <string name="ci_dialog_title">Add IP / Port Rule</string>
     <string name="ci_dialog_desc">Allow (bypass) or block IP address, IP subnet (range), Port. Example: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
     <string name="ci_dialog_edittext_hint">IP address, subnet or port</string>

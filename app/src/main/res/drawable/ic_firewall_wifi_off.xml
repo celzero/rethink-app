@@ -3,39 +3,39 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="M2,7.9265C3.2401,7.1303 4.5813,6.4779 6,5.9927M22,7.9265C19.1151,6.0742 15.683,5 12,5C11.6645,5 11.3311,5.0089 11,5.0265"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentBad"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M5.1716,11.7046C6.6317,10.86 8.2627,10.2779 10,10.0229M18.8284,11.7046C17.9699,11.2079 17.0522,10.8021 16.0886,10.5001"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentBad"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M9.0736,15.2544C9.9889,14.9309 10.9739,14.7549 12,14.7549C13.0261,14.7549 14.0111,14.9309 14.9265,15.2544"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentBad"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M11.9181,19.1465L11.902,19.1304"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentBad"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M2,2L22,22"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/accentBad"
-      android:strokeLineCap="round"/>
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M2,7.9265C3.2401,7.1303 4.5813,6.4779 6,5.9927M22,7.9265C19.1151,6.0742 15.683,5 12,5C11.6645,5 11.3311,5.0089 11,5.0265"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentBad"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M5.1716,11.7046C6.6317,10.86 8.2627,10.2779 10,10.0229M18.8284,11.7046C17.9699,11.2079 17.0522,10.8021 16.0886,10.5001"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentBad"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M9.0736,15.2544C9.9889,14.9309 10.9739,14.7549 12,14.7549C13.0261,14.7549 14.0111,14.9309 14.9265,15.2544"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentBad"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M11.9181,19.1465L11.902,19.1304"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentBad"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M2,2L22,22"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/accentBad"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>

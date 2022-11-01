@@ -49,7 +49,8 @@ interface ProxyEndpointDAO {
     fun clearOrbotData()
 
     @Query(
-        "delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port")
+        "delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port"
+    )
     fun deleteDNSProxyEndpoint(proxyIP: String, port: Int)
 
     @Query("update ProxyEndpoint set isSelected = 0 where isSelected = 1")

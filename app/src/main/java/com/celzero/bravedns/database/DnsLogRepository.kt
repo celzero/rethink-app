@@ -19,23 +19,23 @@ import com.celzero.bravedns.util.Constants
 
 class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
 
-    suspend fun insert(dnsLog: DnsLog) {
+    fun insert(dnsLog: DnsLog) {
         dnsLogDAO.insert(dnsLog)
     }
 
-    suspend fun insertBatch(dnsLogs: List<DnsLog>) {
+    fun insertBatch(dnsLogs: List<DnsLog>) {
         dnsLogDAO.insertBatch(dnsLogs)
     }
 
-    suspend fun deleteOlderData(date: Long) {
+    fun deleteOlderData(date: Long) {
         dnsLogDAO.deleteOlderData(date)
     }
 
-    suspend fun deleteConnectionTrackerCount() {
+    fun deleteConnectionTrackerCount() {
         dnsLogDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
     }
 
-    suspend fun clearAllData() {
+    fun clearAllData() {
         dnsLogDAO.clearAllData()
     }
 

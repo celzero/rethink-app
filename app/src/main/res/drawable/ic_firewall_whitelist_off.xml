@@ -4,25 +4,25 @@
     android:alpha="0.5"
     android:viewportWidth="26"
     android:viewportHeight="26">
-  <path
-      android:pathData="M20,12H9"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M16,7L21,12L16,17"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
-      android:strokeLineCap="round"/>
-  <path
-      android:pathData="M3,3L3,21"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="?attr/svgFillColor"
-      android:strokeColor="?attr/svgStrokeColor"
-      android:strokeLineCap="round"/>
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M20,12H9"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/svgStrokeColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M16,7L21,12L16,17"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/svgStrokeColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="?attr/svgFillColor"
+        android:pathData="M3,3L3,21"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/svgStrokeColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>

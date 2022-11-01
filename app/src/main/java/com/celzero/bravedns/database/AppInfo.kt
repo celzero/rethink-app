@@ -22,7 +22,8 @@ import androidx.room.PrimaryKey
 class AppInfo {
     // packageInfo is infact a packageName which is wrongly named.
     // Renaming involves migration.
-    @PrimaryKey var packageInfo: String = ""
+    @PrimaryKey
+    var packageInfo: String = ""
     var appName: String = ""
     var uid: Int = 0
     var isSystemApp: Boolean = false

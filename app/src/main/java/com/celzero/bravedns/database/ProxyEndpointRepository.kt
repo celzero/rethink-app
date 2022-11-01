@@ -19,39 +19,35 @@ package com.celzero.bravedns.database
 
 class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 
-    suspend fun insert(proxyEndpoint: ProxyEndpoint) {
+    fun insert(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointDAO.insert(proxyEndpoint)
     }
 
-    suspend fun deleteOlderData(date: Long) {
+    fun deleteOlderData(date: Long) {
         proxyEndpointDAO.deleteOlderData(date)
     }
 
-    suspend fun deleteDNSProxyEndpoint(proxyIP: String, port: Int) {
-        proxyEndpointDAO.deleteDNSProxyEndpoint(proxyIP, port)
-    }
-
-    suspend fun removeConnectionStatus() {
+    fun removeConnectionStatus() {
         proxyEndpointDAO.removeConnectionStatus()
     }
 
-    suspend fun getCount(): Int {
+    fun getCount(): Int {
         return proxyEndpointDAO.getCount()
     }
 
-    suspend fun getConnectedProxy(): ProxyEndpoint? {
+    fun getConnectedProxy(): ProxyEndpoint? {
         return proxyEndpointDAO.getConnectedProxy()
     }
 
-    suspend fun getConnectedOrbotProxy(): ProxyEndpoint {
+    fun getConnectedOrbotProxy(): ProxyEndpoint {
         return proxyEndpointDAO.getConnectedOrbotProxy()
     }
 
-    suspend fun clearAllData() {
+    fun clearAllData() {
         proxyEndpointDAO.clearAllData()
     }
 
-    suspend fun clearOrbotData() {
+    fun clearOrbotData() {
         proxyEndpointDAO.clearOrbotData()
     }
 
