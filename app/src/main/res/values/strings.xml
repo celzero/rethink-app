@@ -1221,7 +1221,7 @@
     <string name="lbbs_heading">Configure 185+ blocklists</string>
 
     <!-- backup / restore bottom sheet -->
-    <string name="brbs_title">Backup and restoration</string>
+    <string name="brbs_title">Backups and restoring</string>
     <string name="brbs_backup_title">Backup</string>
     <string name="brbs_backup_desc">App settings, network and DNS logs</string>
     <string name="brbs_restore_title">Restore</string>
