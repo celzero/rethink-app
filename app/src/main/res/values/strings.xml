@@ -173,7 +173,7 @@
     <string name="custom_url_error_invalid_url">Invalid URL</string>
 
     <string name="conn_track_clear_logs_title">Clear network logs</string>
-    <string name="conn_track_clear_logs_message">Delete network logs (but not firewall rules) for good!?</string>
+    <string name="conn_track_clear_logs_message">Delete network logs for good!?</string>
 
     <string name="dns_query_clear_logs_title">Clear DNS logs</string>
     <string name="dns_query_clear_logs_message">Delete your DNS logs for good!?</string>
