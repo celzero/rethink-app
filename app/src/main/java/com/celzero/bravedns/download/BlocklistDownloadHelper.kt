@@ -81,9 +81,10 @@ class BlocklistDownloadHelper {
             if (!dir.exists()) return
 
             dir.listFiles()?.forEach {
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Delete blocklist list residue for $which, dir: ${it.name}")
                 // delete all the dir other than current timestamp dir
                 if (it.name != timestamp.toString()) {
-                    deleteRecursive(dir)
+                    deleteRecursive(it)
                 }
             }
         }
