@@ -176,4 +176,62 @@
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="about_version">v%1$s</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
+    <string name="download_update_dialog_failure_title">Noe gikk galt.</string>
+    <string name="settings_vpn_heading">VPN</string>
+    <string name="univ_ip_delete_dialog_positive">Slett alle</string>
+    <string name="univ_ip_delete_toast_success">Slettet alle IP-regler.</string>
+    <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
+    <string name="whats_new_version_name">🌎🕊 Verdens studentdag (15 okt) 🕊🌎</string>
+    <string name="univ_delete_firewall_dialog_title">Slett alle IP-regler\?</string>
+    <string name="error_loading_log_file">Kunne ikke laste inn loggfil</string>
+    <string name="cd_custom_doh_dialog_title">Egendefinert tjener-nettadresse</string>
+    <string name="cd_dns_crypt_name_default">DNSCrypt</string>
+    <string name="univ_ip_delete_dialog_negative">Avbryt</string>
+    <string name="dns_proxy_remove_dialog_message">Slett DNS-mellomtjeneren fra lagret oppsett.</string>
+    <string name="about_sponsor_link_text">Sponsor</string>
+    <string name="settings_orbot_header">Orbot\t❯</string>
+    <string name="about_dialog_neutral_button">Foreslå funksjoner</string>
+    <string name="univ_ip_delete_individual_positive">Slett</string>
+    <string name="dns_proxy_remove_success">DNS-mellomtjener slettet.</string>
+    <string name="search_custom_domains"><font size="12">Søk etter domenenavn</font></string>
+    <string name="cd_custom_doh_url_name_default">DoH</string>
+    <string name="configure_dns_connection_name">Tilkoblet til %1$s</string>
+    <string name="cd_dns_proxy_error_text_3">Ugyldig port</string>
+    <string name="ct_filter_parent_allowed">Tillatt</string>
+    <string name="univ_view_blocked_ip">IP og port-regler</string>
+    <string name="search_universal_ips"><font size="12">Søk etter IP-er</font></string>
+    <string name="cd_dns_crypt_dialog_name">Navn</string>
+    <string name="ctbs_proceed_positive_text">Fortsett</string>
+    <string name="hs_download_positive_default">OK</string>
+    <string name="local_blocklist_download">Last ned svartelister</string>
+    <string name="cd_dns_crypt_dialog_desc">Beskrivelse (valgfritt)</string>
+    <string name="ct_delete_logs_positive_btn">Slett loggføring</string>
+    <string name="blocklist_update_check_not_required">Svartelistene er allerede siste versjon.</string>
+    <string name="ctbs_dialog_negative_btn">Gå tilbake</string>
+    <string name="univ_ip_delete_individual_toast">%1$s slettet.</string>
+    <string name="contributors_dialog_title">Utviklere</string>
+    <string name="configure_dns_connected_dns_proxy_status">DNS-mellomtjener</string>
+    <string name="search_firewall_all_apps"><font size="12">Søk etter programmer</font></string>
+    <string name="search_dns_logs"><font size="12">Søk etter domenenavn eller IP-er</font></string>
+    <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
+    <string name="blocklist_update_check_failure">Noe gikk galt. Prøv igjen senere.</string>
+    <string name="cd_custom_dns_proxy_title">Egendefinert DNS-mellomtjener</string>
+    <string name="settings_all_networks_dialog_positive_btn">Skru på uansett</string>
+    <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
+    <string name="settings_socks5_disabled_error">Tilkoblet til Orbot. Skru det av for å fortsette.</string>
+    <string name="dns_proxy_remove_dialog_title">Slett DNS-mellomtjener\?</string>
+    <string name="search_rethinkplus_file_tag"><font size="12">Søk etter svartelister</font></string>
+    <string name="orbot_stop_dialog_negative">Stopp Orbot</string>
+    <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_email">E-post</string>
+    <string name="cd_custom_dns_proxy_name_default">Mellomtjener</string>
+    <string name="cd_dns_proxy_error_text_1">Ugyldig IP-adresse</string>
+    <string name="ct_delete_logs_negative_btn">Avbryt</string>
+    <string name="cd_doh_dialog_heading">Legg til DNS over HTTPS</string>
+    <string name="ct_ip_details">%1$s (%2$s)</string>
+    <string name="ct_filter_parent_all">Alle</string>
+    <string name="ct_filter_parent_blocked">Blokkert</string>
+    <string name="univ_ip_delete_individual_negative">Avbryt</string>
+    <string name="dns_log_dialog_positive">Slett loggføring</string>
+    <string name="dns_log_dialog_negative">Avbryt</string>
 </resources>
