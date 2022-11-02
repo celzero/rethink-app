@@ -4,7 +4,7 @@
     <string name="app_name_rethink">Rethink</string>
     <string name="title_about">About</string>
     <string name="title_settings">Settings</string>
-    <string name="pause_title_desc">taking a nap…</string>
+    <string name="pause_title_desc">Taking a nap…</string>
     <string name="settings_title_desc">Your DNS and firewall</string>
     <string name="about_title_desc">Blocking threats</string>
 
@@ -64,7 +64,7 @@
     </string>
 
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">
-    Tap to change protection setting.
+    Tap to change protection.
   </string>
 
     <string name="dns_mode_notification_title">
@@ -79,7 +79,7 @@
         Protected. Connected to DNS and firewall.
     </string>
 
-    <string name="pause_mode_notification_title">Paused. Firewalling of blocked apps will continue.</string>
+    <string name="pause_mode_notification_title">Paused. Blocked apps remain firewalled.</string>
 
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the device is offline.">
     Waiting
@@ -135,7 +135,7 @@
     </string>
 
     <string name="universal_firewall_explanation">
-        Apply firewall rules on all apps based on device events, for example, firewall when the device is locked or when a particular app is not in use.
+        Apply firewall rules on all apps based on device events, e.g. firewall when the device is locked or when a particular app is not in use.
     </string>
 
     <string name="notification_action_resume_vpn">Resume</string>
@@ -148,7 +148,7 @@
     <string name="firewall_rules">Network rules</string>
 
     <string name="firewall_mode_info_title">Firewall</string>
-    <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
+    <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP.</string>
 
     <string name="apps_info_title">Apps</string>
 
@@ -217,7 +217,7 @@
 
     <string name="univ_firewall_dialog_title">Delete IP Rule?</string>
     <string name="univ_firewall_dialog_message">Continue deleting this rule (allowing any app to connect to this IP)?</string>
-    <string name="univ_firewall_no_ip_message">No IPs found. Tap on entries in the \"Network Log\" screen to block individual IP addresses.</string>
+    <string name="univ_firewall_no_ip_message">No IPs found. Tap on entries in the \"Network Log\" screen to block individual IPs.</string>
 
     <string name="doh_custom_url_remove_dialog_title">Delete DoH endpoint?</string>
     <string name="doh_custom_url_remove_dialog_message">Delete the DNS-over-HTTPS endpoint from saved configuration.</string>
@@ -283,14 +283,14 @@
 
     <string name="settings_vpn_heading">VPN</string>
 
-    <string name="info_dialog_copy_toast_msg">IP address copied.</string>
+    <string name="info_dialog_copy_toast_msg">IP copied.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copied</string>
     <string name="info_dialog_rethink_toast_msg">Copied as RDNS+ DNS-over-HTTPS URL</string>
 
     <string name="settings_enable_logs_desc">Log DNS and firewall info to the device.</string>
     <string name="settings_enable_logs">Logging</string>
 
-    <string name="app_mode_choose">Choose mode</string>
+    <string name="app_mode_choose">Mode</string>
 
     <string name="whats_dialog_title">What\'s new in v053k</string>
     <string name="whats_new_version_name">🌎&#128330; World Student\'s Day (15 Oct) &#128330;🌎</string>
@@ -319,24 +319,24 @@
     <string name="settings_allow_bypass_desc">Allow apps to bypass Rethink firewall on-demand. Audio/video chat apps may require this.</string>
     <string name="settings_lock_down_mode_desc">Cannot bypass, or set up proxies when the VPN is in lockdown. <u>Go to VPN settings</u>.</string>
 
-    <string name="settings_proxy_header">proxy</string>
-    <string name="settings_socks5_heading">Set up SOCKS5 proxy</string>
+    <string name="settings_proxy_header">Proxy</string>
+    <string name="settings_socks5_heading">SOCKS5 proxy</string>
     <string name="settings_socks5_desc">Forward connections to SOCKS5 endpoint.</string>
-    <string name="settings_https_heading">Set up HTTP(S) proxy</string>
+    <string name="settings_https_heading">HTTP(S) proxy</string>
     <string name="settings_https_desc">May be ignored by apps, as those using a HTTP(S) proxy bypass both firewall and DNS rules.</string>
 
     <string name="orbot">Orbot</string>
     <string name="orbot_socks5">TCP-only proxy</string>
     <string name="orbot_socks5_desc">Forwards all TCP connections to Orbot.</string>
-    <string name="orbot_http">HTTP(S) Proxy</string>
-    <string name="orbot_http_desc">Recommends that apps use Orbot\'s HTTP(S) proxy.</string>
+    <string name="orbot_http">HTTP(S) proxy</string>
+    <string name="orbot_http_desc">Recommends apps use Orbot\'s HTTP(S) proxy.</string>
     <string name="orbot_both">TCP and HTTP(S) proxy</string>
     <string name="orbot_both_desc">All of the above.</string>
     <string name="orbot_none">None (default)</string>
     <string name="orbot_none_desc">None of the above.</string>
 
     <string name="orbot_bs_status_1">Forwarding %1$s connections to Orbot.</string>
-    <string name="orbot_bs_status_2">HTTP(S) Proxy set. (Apps may ignore it.)</string>
+    <string name="orbot_bs_status_2">HTTP(S) proxy set. (Apps may ignore it.)</string>
     <string name="orbot_bs_status_3">Forwarding %1$s to Orbot. HTTP(S) proxy also set.</string>
     <string name="orbot_bs_status_4">One-click Tor-as-a-proxy (Orbot) setup.</string>
 
@@ -349,7 +349,7 @@
     <string name="orbot_stop_dialog_title">Action Required</string>
     <string name="orbot_stop_dialog_message_combo">%1$s\n\n%2$s</string>
     <string name="orbot_stop_dialog_message">Rethink has stopped forwarding connections to Orbot, but Orbot may be running in the background.</string>
-    <string name="orbot_stop_dialog_dns_message">Rethink is set up to forward DNS queries to Orbot. Change as required.</string>
+    <string name="orbot_stop_dialog_dns_message">Rethink now forwards DNS queries to Orbot. Change as required.</string>
     <string name="orbot_stop_dialog_negative">Stop Orbot</string>
     <string name="orbot_stop_dialog_neutral">Change DNS</string>
     <string name="orbot_stop_dialog_positive">Dismiss</string>
@@ -358,8 +358,8 @@
     <string name="orbot_explanation">
             Orbot is proxy app that lets other apps to use the Internet more &lt;u>securely&lt;/u>.
             \nOrbot uses &lt;u>Tor&lt;/u> to encrypt your Internet traffic, to &lt;u>bypass censorship&lt;/u> and defend against &lt;u>network surveillance&lt;/u>, for more freedom and privacy.
-            \n&lt;u>TCP Proxy&lt;/u>: Rethink forwards only TCP connections of all apps that are not excluded to Orbot.
-        \n&lt;u>HTTP(S) Proxy&lt;/u>: Rethink &lt;i>sets&lt;/i> a HTTP(S) proxy, but does not require apps to use it. Usually, browsers like Chrome and Firefox do use it. Apps using a HTTP(S) proxy will bypass both Firewall and DNS rules.
+            \n&lt;u>TCP proxy&lt;/u>: Rethink forwards only TCP connections of all apps that are not excluded to Orbot.
+        \n&lt;u>HTTP(S) proxy&lt;/u>: Rethink &lt;i>sets&lt;/i> a HTTP(S) proxy, but does not require apps to use it. Usually, browsers like Chrome and Firefox do use it. Apps using a HTTP(S) proxy will bypass both Firewall and DNS rules.
     </string>
 
 
@@ -388,7 +388,7 @@
 
     <string name="settings_orbot_notification_action">Open Orbot</string>
 
-    <string name="settings_general_header">general</string>
+    <string name="settings_general_header">General</string>
 
     <string name="settings_autostart_bootup_heading">Auto-start (experimental)</string>
     <string name="settings_autostart_bootup_desc">Start up Rethink with the device if it was running when it was shut off or restarted.</string>
@@ -426,7 +426,7 @@
     <string name="settings_dns_proxy_dialog_header">Set SOCKS5 (TCP) proxy</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostname</string>
-    <string name="settings_dns_proxy_dialog_port_number">Port number</string>
+    <string name="settings_dns_proxy_dialog_port_number">Port</string>
     <string name="settings_dns_proxy_dialog_username">Username</string>
     <string name="settings_dns_proxy_dialog_password">Password</string>
     <string name="settings_dns_proxy_dialog_positive_btn">set</string>
@@ -439,7 +439,7 @@
     <string name="settings_socks_forwarding_desc_no_app">Forwarding to %1$s:%2$s…</string>
     <string name="settings_socks_forwarding_default_desc">Forward connections to SOCKS5 endpoint.</string>
 
-    <string name="settings_socks5_dialog_hint_ip">IP address</string>
+    <string name="settings_socks5_dialog_hint_ip">IP</string>
     <string name="settings_socks5_dialog_hint_port">Port</string>
     <string name="settings_socks5_dialog_hint_username">Username (optional)</string>
     <string name="settings_socks5_dialog_hint_password">Password (optional)</string>
@@ -525,7 +525,7 @@
 
     <string name="hsf_whats_new_chip_text">Changes</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
-    <string name="hsf_blocklist_chip_text">%1$s blocklists configured</string>
+    <string name="hsf_blocklist_chip_text">%1$s blocklist(s) configured</string>
     <string name="hsf_blocklist_chip_text_no_blocklist">Rethink is in use</string>
     <string name="hsf_blocklist_chip_text_no_data">Turn on Rethink Plus</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
@@ -550,29 +550,29 @@
 
     <!-- DNS configure screen -->
 
-    <string name="dc_block_heading">rules</string>
-    <string name="dc_other_dns_heading">type</string>
-    <string name="dc_other_settings_heading">advanced</string>
+    <string name="dc_block_heading">Rules</string>
+    <string name="dc_other_dns_heading">DNS Type</string>
+    <string name="dc_other_settings_heading">Advanced</string>
 
-    <string name="dc_custom_dns_radio">Other DNS</string>
+    <string name="dc_custom_dns_radio">Other</string>
     <string name="dc_rethink_dns_radio">Rethink</string>
 
     <string name="dc_entries">%1$s entries 🔗</string>
 
     <string name="dc_local_block_heading">On-device blocklists</string>
-    <string name="dc_local_block_desc_1">Choose from 185+ blocklists. Click here to download or configure blocklists.</string>
+    <string name="dc_local_block_desc_1">Choose from 185+ blocklists.\nClick here to download or set them up.</string>
 
     <string name="dc_custom_block_heading">Allow or deny individual domains</string>
     <string name="dc_custom_block_desc">Coming soon</string>
 
-    <string name="dc_dns_website_heading">Show website icon in DNS logs (experimental)</string>
-    <string name="dc_dns_website_desc">Fetches website icons from <i>duckduckgo.com</i>. Consumes up to 350 MB of storage space.</string>
+    <string name="dc_dns_website_heading">Icons in DNS logs (experimental)</string>
+    <string name="dc_dns_website_desc">Use around 350 MB for website icons (from <i>duckduckgo.com</i>).</string>
 
     <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
     <string name="dc_dns_leaks_desc">Capture all packets on port 53 and forwards them to a user-set DNS endpoint.</string>
 
     <string name="dc_check_update_heading">Confirm before implementing blocklists</string>
-    <string name="dc_check_update_desc">Check for blocklist updates every <i>three</i> days</string>
+    <string name="dc_check_update_desc">Update blocklist every <i>3</i> days.</string>
 
     <!-- About fragment -->
     <string name="about_bravedns_explantion">Rethink lets you monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
@@ -580,28 +580,28 @@
     <string name="about_bravedns_toreport_text">help and feedback</string>
     <string name="about_bug_report_desc">e-mail crash logs</string>
     <string name="about_join_telegram">Telegram</string>
-    <string name="about_bug_report">Bug report</string>
+    <string name="about_bug_report">Bugs</string>
     <string name="about_bug_report_dialog_positive_btn">Send e-mail</string>
     <string name="about_bug_report_dialog_negative_btn">Cancel</string>
-    <string name="about_bug_no_log_dialog_title">Bug report</string>
-    <string name="about_bug_no_log_dialog_message">Could not fetch crash logs.\nReport your bug manually?</string>
+    <string name="about_bug_no_log_dialog_title">Report Bug</string>
+    <string name="about_bug_no_log_dialog_message">Could not fetch crash logs.\nReport a bug manually?</string>
     <string name="about_bug_no_log_dialog_positive_btn">Send e-mail</string>
     <string name="about_bug_no_log_dialog_negative_btn">Cancel</string>
-    <string name="about_web">links</string>
-    <string name="about_website">Visit rethinkdns.com</string>
-    <string name="about_github">Contribute on GitHub</string>
-    <string name="about_faq">View FAQs</string>
-    <string name="about_docs">Read docs</string>
-    <string name="about_connect">contact</string>
-    <string name="about_sponsor">sponsor</string>
+    <string name="about_web">Links</string>
+    <string name="about_website">Website</string>
+    <string name="about_github">Source code</string>
+    <string name="about_faq">FAQ</string>
+    <string name="about_docs">Documentation</string>
+    <string name="about_connect">Contact</string>
+    <string name="about_sponsor">Sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
-    <string name="about_app">app</string>
+    <string name="about_app">App</string>
     <string name="about_email">E-mail</string>
-    <string name="about_settings">system</string>
+    <string name="about_settings">System</string>
     <string name="about_settings_app_info">App info</string>
     <string name="about_settings_vpn_profile">VPN profile</string>
     <string name="about_settings_notification">Notification settings</string>
-    <string name="about_whats_new">What\'s new in %1$s</string>
+    <string name="about_whats_new">Changes in %1$s</string>
     <string name="about_twitter">Twitter</string>
     <string name="about_mozilla">Rethink is part of the Mozilla Builders MVP program.</string>
     <string name="about_app_update_check">Check for app updates</string>
@@ -689,7 +689,7 @@
     <string name="cd_custom_dns_proxy_default_app">Nobody</string>
     <string name="cd_dns_proxy_mode_internal">Internal</string>
     <string name="cd_dns_proxy_mode_external">External</string>
-    <string name="cd_dns_proxy_error_text_1">Invalid IP address</string>
+    <string name="cd_dns_proxy_error_text_1">Invalid IP</string>
     <string name="cd_dns_proxy_error_text_2">Port range should be from 1024–65535</string>
     <string name="cd_dns_proxy_error_text_3">Invalid port</string>
     <string name="cd_dns_crypt_dialog_title">Add DNSCrypt resolver or -relay</string>
@@ -812,8 +812,8 @@
 
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
-    <string name="dns_proxy_dialog_message">App name: %1$s\n\nIP address: %2$s\n\nPort number: %3$s</string>
-    <string name="dns_proxy_dialog_message_no_app">IP address: %1$s\n\nPort number: %2$s</string>
+    <string name="dns_proxy_dialog_message">App name: %1$s\n\nIP: %2$s\n\nPort: %3$s</string>
+    <string name="dns_proxy_dialog_message_no_app">IP: %1$s\n\nPort: %2$s</string>
 
     <string name="dns_query_latency">%1$s ms</string>
 
@@ -821,8 +821,8 @@
     <string name="dns_proxy_dialog_header_dns">Add DNS Proxy</string>
     <string name="dns_proxy_name">Proxy Name</string>
     <string name="dns_proxy_app">App</string>
-    <string name="dns_proxy_ip_address">IP Address</string>
-    <string name="dns_proxy_port">Port Number</string>
+    <string name="dns_proxy_ip_address">IP</string>
+    <string name="dns_proxy_port">Port</string>
     <string name="dns_proxy_negative_btn">Cancel</string>
     <string name="dns_proxy_positive_btn">add</string>
 
@@ -904,9 +904,9 @@
     <string name="settings_local_blocklist_version">Version: v%1$s</string>
 
     <string name="accessibility_notification_title">Action Required</string>
-    <string name="accessibility_notification_content">Rethink accessibility service stopped or crashed. No longer blocking backgrounded apps. Tap to turn it on again.</string>
+    <string name="accessibility_notification_content">Rethink\'s accessibility service stopped or crashed. No longer blocking backgrounded apps. Tap to turn it on again.</string>
 
-    <string name="accessibility_failure_toast">Rethink accessibility service stopped or crashed. No longer blocking backgrounded apps.</string>
+    <string name="accessibility_failure_toast">Rethink\'s accessibility service stopped or crashed. No longer blocking backgrounded apps.</string>
 
     <string name="coming_soon_toast">coming soon</string>
 
@@ -948,24 +948,24 @@
     <string name="firewall_rule_no_rule_desc">No firewall rules matched this connection.</string>
     <string name="firewall_rule_block_app_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i>.<br/><br/> Go to the <i>All Apps</i> tab to change this.]]></string>
     <string name="firewall_rule_new_app_desc"><![CDATA[This app made connection for the <i>first</i> time.<br/><br/> Go to <i>Universal</i> tab to change this.]]></string>
-    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Unmetered</i> network.<br/><br/> Go to the <i>All Apps</i> tab to change this.]]></string>
-    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> network.<br/><br/> Go to the <i>All Apps</i> tab to change this.]]></string>
+    <string name="firewall_rule_block_app_unmetered_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>unmetered</i> network.<br/><br/> Go to the <i>All Apps</i> tab to change this.]]></string>
+    <string name="firewall_rule_block_app_mobile_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i> when trying to connect on <i>metered</i> network.<br/><br/> Go to the <i>All Apps</i> tab to change this.]]></string>
     <string name="firewall_rule_block_app_univ_mobile_desc"><![CDATA[A user-set universal firewall rule blocked this <i>app</i> when trying to connect on <i>Metered</i> (Mobile) network.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
     <string name="firewall_rule_lockdown_desc"><![CDATA[A user-set firewall rule blocked this <i>app</i> connecting to other than <i>bypassed IPs</i>.<br/><br/> Go to the <i>All Apps</i> tab to change this.]]></string>
     <string name="firewall_rule_block_ip_univ_desc"><![CDATA[A user-set firewall rule blocked the <i>destination IP / Port</i>.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
-    <string name="firewall_rule_block_ip_desc"><![CDATA[A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> Go to the <i>App-specific Firewall</i> screen to change this.]]></string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc"><![CDATA[This connection was allowed because the <i>destination IP</i> is set to bypass all app-specific rules.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
-    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[This connection was allowed because the <i>destination IP</i> is set to bypass all universal firewall rules.<br/><br/> To change go to <i>IP Rules<i> in <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_ip_desc"><![CDATA[A user-set firewall rule blocked the <i>destination IP</i>.<br/><br/> Go to the <i>App-specific firewall</i> screen to change this.]]></string>
+    <string name="firewall_rule_bypass_app_rules_ip_desc"><![CDATA[This connection was allowed because the <i>destination IP</i> is set to bypass all app-specific rules.<br/><br/> Go to <i>App-specific Firewall</i> screen to change this.]]></string>
+    <string name="firewall_rule_bypass_universal_ip_desc"><![CDATA[This connection was allowed because the <i>destination IP</i> is set to bypass all universal firewall rules.<br/><br/> Go to <i>IP rules<i> in the <i>Universal</i> tab to change this.]]></string>
     <string name="firewall_rule_device_lock_desc"><![CDATA[This connection was firewalled because <i>device was locked</i> at the time.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
-    <string name="firewall_rule_foreground_desc"><![CDATA[This connection was firewalled because the <i>source app</i> was <i>not in the foreground</i>.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
-    <string name="firewall_rule_unknown_desc"><![CDATA[This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> To change this behaviour go to <i>Universal</i> tab.]]></string>
-    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_foreground_desc"><![CDATA[This connection was firewalled because the <i>source app</i> was <i>not in the foreground</i>.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
+    <string name="firewall_rule_unknown_desc"><![CDATA[This connection was firewalled because the <i>source app</i> could not be determined.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
+    <string name="firewall_rule_block_udp_ntp_desc"><![CDATA[A user-set firewall rule blocked this <i>UDP</i> connection.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
     <string name="firewall_rule_block_dns_bypass_desc"><![CDATA[This connection was blocked because the <i>source app</i> bypassed user-preferred DNS.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc"><![CDATA[This connection was allowed because the <i>source app</i> is set to <i>bypass universal</i> firewall rules.<br/><br/> Go to the <i>App-specific Firewall</i> screen to change this.]]></string>
     <string name="firewall_rule_exempt_dns_proxied_desc"><![CDATA[This DNS connection was proxied and forwarded to user-preferred DNS endpoint.<br/><br/> Turn off <i>Prevent DNS leaks</i> from DNS <i>Configure</i> screen to change this.]]></string>
     <string name="firewall_rule_exempt_orbot_setup_desc"><![CDATA[This connection was allowed because <i>one-click Tor-as-a-proxy</i> setup via Orbot was in progress.]]></string>
-    <string name="firewall_rule_block_http_desc"><![CDATA[This connection was blocked because it likely used <i>insecure HTTP</i>.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
-    <string name="firewall_rule_global_lockdown_desc"><![CDATA[This connection was blocked because universal lockdown is set.<br/><br/> To change go to <i>Universal</i> tab.]]></string>
+    <string name="firewall_rule_block_http_desc"><![CDATA[This connection was blocked because it likely used <i>insecure HTTP</i>.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
+    <string name="firewall_rule_global_lockdown_desc"><![CDATA[This connection was blocked because universal lockdown is set.<br/><br/> Go to the <i>Universal</i> tab to change this.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title">Attention</string>
@@ -994,7 +994,7 @@
     <string name="notif_channel_download">Download Alerts</string>
 
     <string name="notif_channel_desc_vpn_notification">Inform when Rethink is up and running in the background</string>
-    <string name="notif_channel_desc_vpn_failure">Inform when Rethink is stopped by Android or by another VPN app</string>
+    <string name="notif_channel_desc_vpn_failure">Inform when Rethink is stopped by Android or another VPN app</string>
     <string name="notif_channel_desc_firewall_alerts">Alert for firewall errors and anomalies</string>
     <string name="notif_channel_desc_proxy_failure">Alert for proxy errors and anomalies</string>
     <string name="notif_channed_desc_download">Alert for blocklist-download progress</string>
@@ -1052,15 +1052,15 @@
 
     <!-- custom IP -->
     <string name="ci_dialog_title">Add IP / Port Rule</string>
-    <string name="ci_dialog_desc">Allow (bypass) or block IP address, IP subnet (range), Port. Example: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
-    <string name="ci_dialog_edittext_hint">IP address, subnet or port</string>
-    <string name="ci_dialog_error_invalid_ip">Invalid IP address, subnet or port.</string>
+    <string name="ci_dialog_desc">Allow (bypass) or block IPs, -subnet (range), port.\nE.g: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
+    <string name="ci_dialog_edittext_hint">IP, -subnet or port</string>
+    <string name="ci_dialog_error_invalid_ip">Invalid IP, -subnet or port.</string>
 
     <string name="ci_dialog_added_success">IP added to the list</string>
 
     <string name="ci_header">IP and Port Rules</string>
 
-    <string name="ci_no_rules_text">No universal IP block or bypass rules found.</string>
+    <string name="ci_no_rules_text">Could not find any universal IP block or bypass rules.</string>
 
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">Bypass Universal</string>
@@ -1094,8 +1094,8 @@
     <string name="ada_lockdown_title">Lockdown app</string>
     <string name="ada_lockdown_desc">When enabled, the app can connect only to IPs in <i>bypass app rules</i>; connections to any other IP will be blocked.</string>
 
-    <string name="ada_ip_connection_count">Connected to %1$s IP address(es)</string>
-    <string name="ada_ip_connection_count_zero">0 IP address</string>
+    <string name="ada_ip_connection_count">Connected to %1$s IP(s)</string>
+    <string name="ada_ip_connection_count_zero">0 IPs</string>
     <string name="ada_ip_no_connection">No network logs for this app.</string>
 
     <string name="ada_app_status_allow">is allowed</string>
@@ -1144,7 +1144,7 @@
     <string name="bsdl_domain_rule_block">block</string>
 
     <!-- app config -->
-    <string name="network_dns">System DNS</string>
+    <string name="network_dns">System</string>
 
     <!-- custom download -->
     <string name="notif_download_content_title">On-Device Blocklist Download</string>
