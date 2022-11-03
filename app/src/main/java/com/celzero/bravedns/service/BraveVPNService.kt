@@ -513,6 +513,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         val isUdp = protocol == Protocol.UDP.protocolType
         if (!isUdp) return false
 
+        // fall through dns requests, other rules might catch appropriate
+        // https://github.com/celzero/rethink-app/issues/492#issuecomment-1299090538
+        if (isDns(port)) return false
+
         val isNtpFromSystemApp = KnownPorts.isNtp(port) && FirewallManager.isUidSystemApp(uid)
         if (isNtpFromSystemApp) return false
 
@@ -536,7 +540,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 ip == fakeDnsIpv4
             }
         }
-
     }
 
     private fun isDns(port: Int): Boolean {
@@ -864,7 +867,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
             if (appConfig.isDnsProxyActive()) {
                 // For DNS proxy mode, if any app is set then exclude the application from the list
-                val dnsProxyEndpoint = appConfig.getConnectedProxyDetails()
+                val dnsProxyEndpoint = appConfig.getConnectedDnsProxyDetails()
                 val appName = dnsProxyEndpoint?.proxyAppName ?: getString(
                     R.string.settings_app_list_default_app)
                 Log.i(LOG_TAG_VPN, "DNS Proxy mode is set with the app name as $appName")
@@ -1321,24 +1324,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             val opts = appConfig.newTunnelOptions(this, this, getFakeDns(),
                                                   appConfig.getInternetProtocol(),
                                                   appConfig.getProtocolTranslationMode())
-            val previousTunnelProxyInfo = vpnAdapter?.getProxyTransport()
-            if (previousTunnelProxyInfo == null) {
-                updateTun(opts)
-            } else {
-                // no need to update if the proxy set in tunnel is same
-                if (isProxyInfoSame(previousTunnelProxyInfo)) return@io
-
-                updateTun(opts)
-            }
+            updateTun(opts)
         }
     }
 
-    private fun isProxyInfoSame(prev: HostName): Boolean {
-        return prev.host == appConfig.getSystemDns().ipAddress && prev.port == appConfig.getSystemDns().port
-    }
-
     private suspend fun updateDnsProxy(opts: AppConfig.TunnelOptions) {
-        val dnsProxyEndpoint = appConfig.getConnectedProxyDetails()
+        val dnsProxyEndpoint = appConfig.getConnectedDnsProxyDetails()
         if (dnsProxyEndpoint?.isInternal(this) == true) {
             restartVpn(opts)
         } else {

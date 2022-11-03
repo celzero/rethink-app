@@ -33,7 +33,6 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
-import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
@@ -531,7 +530,7 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     // -- DNS Manager --
-    suspend fun getConnectedProxyDetails(): DnsProxyEndpoint? {
+    suspend fun getConnectedDnsProxyDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
@@ -735,7 +734,7 @@ class AppConfig internal constructor(private val context: Context,
             dnsIp = dnsServers[0].hostAddress
         }
 
-        dnsIp?.let { setSystemDns(it, KnownPorts.DNS_PORT) }
+        dnsIp?.let { setSystemDns(it, DNS_PORT) }
     }
 
     fun getSystemDns(): SystemDns {
