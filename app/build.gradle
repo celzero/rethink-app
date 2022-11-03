@@ -42,6 +42,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
     buildTypes {
         release {
             // modified as part of #352, now webview is removed from app, flipping back
@@ -55,6 +61,7 @@ android {
             initWith buildTypes.debug
         }
         compileOptions {
+            coreLibraryDesugaringEnabled true
             sourceCompatibility JavaVersion.VERSION_11
             targetCompatibility JavaVersion.VERSION_11
         }
@@ -84,6 +91,9 @@ dependencies {
     def paging_version = "3.1.1"
 
     implementation "com.google.guava:guava:31.1-android"
+
+    // https://developer.android.com/studio/write/java8-support
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.5.1'
