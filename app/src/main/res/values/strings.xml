@@ -10,7 +10,7 @@
 
     <string name="txt_home">Home</string>
 
-    <string name="admin_receiver_status_enabled">Ready to set DNS based content blocker.</string>
+    <string name="admin_receiver_status_enabled">Ready to set DNS-based content blocker.</string>
     <string name="admin_receiver_status_disabled">Content blocker turned off.</string>
 
     <string name="accessibility_service_description">
@@ -51,12 +51,12 @@
         <item>Lockdown</item>
     </string-array>
 
-    <string name="allow">allow</string>
-    <string name="block">block</string>
-    <string name="bypass_universal">bypass universal</string>
-    <string name="exclude">exclude</string>
-    <string name="lockdown">lockdown</string>
-    <string name="untracked">untracked</string>
+    <string name="allow">Allow</string>
+    <string name="block">Block</string>
+    <string name="bypass_universal">Bypass universal</string>
+    <string name="exclude">Exclude</string>
+    <string name="lockdown">Lockdown</string>
+    <string name="untracked">Untracked</string>
 
     <string name="warning_title" description="Status indicator text shown in a warning notification.">
     Warning: Rethink turned off.
@@ -118,7 +118,7 @@
 
     <string name="status_protected_with_proxy">Protected with proxy</string>
 
-    <string name="status_strict" description="Similar to dns_on, but the protection is provided by the operating system, not by Rethink. It is not color-highlighted.">
+    <string name="status_strict" description="Similar to dns_on, but the protection is provided by Android, not by Rethink. It is not color-highlighted.">
     Private DNS on
     </string>
 
@@ -134,7 +134,7 @@
     </string>
 
     <string name="universal_firewall_explanation">
-        Apply firewall rules on all apps based on device events, e.g. firewall when the device is locked or when a particular app is not in use.
+        Apply firewall rules for all apps based on device events, e.g. when the device is locked or when a particular app is not in use.
     </string>
 
     <string name="notification_action_resume_vpn">Resume</string>
@@ -161,7 +161,7 @@
     <string name="alert_permission_accessibility">Permission — Accessibility</string>
     <string name="alert_permission_accessibility_regrant">Action Required</string>
     <string name="alert_firewall_accessibility_explanation">The accessibility service distinguishes between apps in active use (foreground) and not (background).</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">The Rethink accessibility service has stopped or crashed. <i><b>Goto Settings and force-stop</b></i> Rethink and start it again to use <i>Block any app not in use</i>.\n\nRethink uses the accessibility service to track which apps are in use (foreground) and not (background).</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">The Rethink accessibility service stopped or crashed. <i><b>Open the settings and force-stop</b></i> Rethink and start it again to use <i>Block any app not in use</i>.\n\nRethink uses the accessibility service to track which apps are in use (foreground) and not (background).</string>
     <string name="alert_firewall_accessibility_exception">Could not open the accessibility settings. Try again later.</string>
 
     <string name="brave_dns_connect_mode_change_firewall">Select Mode.</string>
@@ -180,10 +180,10 @@
     <string name="bsct_app_info">App Info</string>
     <string name="bsct_block_app">Block, bypass &lt;u>this IP&lt;/u> for &lt;u>this app&lt;/u></string>
     <string name="bsct_block">Block, bypass, exclude, lockdown &lt;u>this app&lt;/u></string>
-    <string name="bsct_conn_block_desc">blocked %1$s by %2$s</string>
-    <string name="bsct_conn_block_desc_device">blocked %1$s on device</string>
-    <string name="bsct_conn_desc_allowed">allowed on %1$s %2$s</string>
-    <string name="bsct_conn_desc_blocked">blocked on %1$s %2$s</string>
+    <string name="bsct_conn_block_desc">Blocked %1$s by %2$s</string>
+    <string name="bsct_conn_block_desc_device">Blocked %1$s on device</string>
+    <string name="bsct_conn_desc_allowed">Allowed on %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked">Blocked on %1$s %2$s</string>
     <string name="bsct_conn_rule_explanation">
         &lt;u>#1&lt;/u>: Blocks an app from connecting to the Internet.
         \n &lt;u>#2&lt;/u>: Blocks any app from connecting to a particular IP.
@@ -199,7 +199,7 @@
     <string name="always_on_dialog">Turn off \"Always-on VPN\" in the Android settings to start Rethink.</string>
     <string name="always_on_dialog_positive_btn">Open Settings</string>
     <string name="always_on_dialog_negative_btn">Cancel</string>
-
+    
     <string name="always_on_dialog_stop_heading">Always-on VPN</string>
     <string name="always_on_dialog_stop_message">Stop Rethink even though it uses always-on VPN in Android?</string>
     <string name="always_on_dialog_lockdown_stop_message">Stop Rethink when the VPN is in <i>lockdown</i> (disconnecting you from the Internet)?</string>
@@ -211,7 +211,7 @@
 
     <string name="firewall_act_network_monitor_tab">Network Logs</string>
 
-    <string name="dns_act_configure_tab">Configure</string>
+    <string name="dns_act_configure_tab">Set up</string>
     <string name="dns_act_log">Logs</string>
 
     <string name="univ_firewall_dialog_title">Delete IP Rule?</string>
@@ -219,7 +219,7 @@
     <string name="univ_firewall_no_ip_message">No IPs found. Tap on entries in the \"Network Log\" screen to block individual IPs.</string>
 
     <string name="doh_custom_url_remove_dialog_title">Delete DoH endpoint?</string>
-    <string name="doh_custom_url_remove_dialog_message">Delete the DNS-over-HTTPS endpoint from saved configuration.</string>
+    <string name="doh_custom_url_remove_dialog_message">Delete the DNS-over-HTTPS endpoint from your setup.</string>
     <string name="doh_custom_url_remove_success">Endpoint deleted.</string>
 
     <string name="dns_crypt_custom_url_remove_dialog_title">Delete DNSCrypt resolver?</string>
@@ -264,8 +264,8 @@
     <string name="download_update_dialog_message_success">Blocklist downloaded.</string>
     <string name="download_update_dialog_failure_title">Something went wrong</string>
     <string name="download_update_dialog_failure_message">Either the Rethink servers are down or a connection could not be established. Try again later.</string>
-    <string name="download_update_dialog_trylater_title">Can\'t update right now</string>
-    <string name="download_update_dialog_trylater_message">The update cannot be executed right now. Try again later.</string>
+    <string name="download_update_dialog_trylater_title">Install failed</string>
+    <string name="download_update_dialog_trylater_message">Could not install the new version. Try again later.</string>
 
     <string name="search_firewall_network_log"><font size="12">Search apps, IPs, domains</font></string>
     <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
@@ -284,7 +284,7 @@
 
     <string name="info_dialog_copy_toast_msg">IP copied.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copied</string>
-    <string name="info_dialog_rethink_toast_msg">Copied as Rethink DNS+ DNS-over-HTTPS URL</string>
+    <string name="info_dialog_rethink_toast_msg">Copied as URL to Rethink DNS+ DNS-over-HTTPS</string>
 
     <string name="settings_enable_logs_desc">Log DNS and firewall info to the device.</string>
     <string name="settings_enable_logs">Logging</string>
@@ -315,8 +315,8 @@
     <string name="settings_ptrans_desc">Translate outbound IPv6 traffic to IPv4 on the device. Use if connected to an IPv4-only network.</string>
 
     <string name="settings_allow_bypass_heading">Bypass</string>
-    <string name="settings_allow_bypass_desc">Allow apps to bypass Rethink firewall on-demand. Audio/video chat apps may require this.</string>
-    <string name="settings_lock_down_mode_desc">Cannot bypass, or set up proxies when the VPN is in lockdown. <u>Go to VPN settings</u>.</string>
+    <string name="settings_allow_bypass_desc">Allow apps to bypass the Rethink firewall on-demand. Audio/video chat apps may require this.</string>
+    <string name="settings_lock_down_mode_desc">Cannot bypass or set up proxies when the VPN is in lockdown. <u>Go to VPN settings</u>.</string>
 
     <string name="settings_proxy_header">Proxy</string>
     <string name="settings_socks5_heading">SOCKS5 proxy</string>
@@ -355,9 +355,9 @@
 
     <string name="orbot_title">Orbot and Proxies</string>
     <string name="orbot_explanation">
-            Orbot is proxy app that lets other apps to use the Internet more &lt;u>securely&lt;/u>.
-            \nOrbot uses &lt;u>Tor&lt;/u> to encrypt your Internet traffic, to &lt;u>bypass censorship&lt;/u> and defend against &lt;u>network surveillance&lt;/u>, for more freedom and privacy.
-            \n&lt;u>TCP proxy&lt;/u>: Rethink forwards only TCP connections of all apps that are not excluded to Orbot.
+            Orbot is proxy app letting apps use the Internet more &lt;u>securely&lt;/u>.
+            \nOrbot uses &lt;u>Tor&lt;/u> to encrypt your Internet traffic, to &lt;u>bypass censorship&lt;/u> and defend against &lt;u>network surveillance&lt;/u>.
+            \n&lt;u>TCP proxy&lt;/u>: Rethink forwards only TCP connections of all apps (that are not excluded) to Orbot.
         \n&lt;u>HTTP(S) proxy&lt;/u>: Rethink &lt;i>sets&lt;/i> a HTTP(S) proxy, but does not require apps to use it. Usually, browsers like Chrome and Firefox do use it. Apps using a HTTP(S) proxy will bypass both Firewall and DNS rules.
     </string>
 
@@ -383,7 +383,7 @@
     <string name="settings_https_disabled_error">Connected to Orbot. Turn it off to continue.</string>
 
     <string name="settings_orbot_notification_heading">Action Required</string>
-    <string name="settings_orbot_notification_content">Could not start Tor-as-a-Proxy. Open the Orbot app to start it manually.</string>
+    <string name="settings_orbot_notification_content">Could not start Tor as a proxy. Open the Orbot app to start it manually.</string>
 
     <string name="settings_orbot_notification_action">Open Orbot</string>
 
@@ -403,13 +403,13 @@
     <string name="settings_check_update_desc">Looks for new versions of the app once a week.</string>
 
     <string name="settings_custom_downloader_heading">Use in-app downloader</string>
-    <string name="settings_custom_downloader_desc">Otherwise uses Android\'s built-in <i>Download Manager</i>.</string>
+    <string name="settings_custom_downloader_desc">(Otherwise uses Android\'s built-in <i>Download Manager</i>.)</string>
 
     <string name="settings_import_export_heading">Backups and restoring</string>
-    <string name="settings_import_export_desc">Manually back up or restore the app data and settings.</string>
+    <string name="settings_import_export_desc">Manually back up or restore the Rethink app data and settings.</string>
 
     <string name="settings_theme_heading">Appearance</string>
-    <string name="settings_theme_desc">Dark/light themes</string>
+    <string name="settings_theme_desc">Dark/light</string>
 
     <string name="settings_http_proxy_desc">Forwarding to %1$s:%2$s…</string>
     <string name="settings_http_proxy_dialog_title">Custom Server URL</string>
@@ -428,8 +428,8 @@
     <string name="settings_dns_proxy_dialog_port_number">Port</string>
     <string name="settings_dns_proxy_dialog_username">Username</string>
     <string name="settings_dns_proxy_dialog_password">Password</string>
-    <string name="settings_dns_proxy_dialog_positive_btn">set</string>
-    <string name="settings_dns_proxy_dialog_negative_btn">cancel</string>
+    <string name="settings_dns_proxy_dialog_positive_btn">Set</string>
+    <string name="settings_dns_proxy_dialog_negative_btn">Cancel</string>
     <string name="settings_dns_proxy_dialog_app_desc">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
 
     <string name="settings_app_list_default_app">Nobody</string>
@@ -472,19 +472,19 @@
 
     <string name="settings_selected_theme" translatable="false">%1$s</string>
 
-    <string name="settings_protocol_translation_dns_inactive">Switch to <b>DNS</b>, or <b>DNS and firewall</b> to turn on this setting</string>
+    <string name="settings_protocol_translation_dns_inactive">Switch to <b>DNS</b>, or <b>DNS and firewall</b> to turn this on.</string>
 
     <!-- FirewallAppFragment -->
     <string name="apps_icon_content_desc">App Icon</string>
 
     <string name="firewall_status_allow">allowed</string>
-    <string name="firewall_status_excluded">excluded from DNS and firewall</string>
-    <string name="firewall_status_lockdown">lockdown</string>
-    <string name="firewall_status_whitelisted">bypasses universal firewall rules</string>
-    <string name="firewall_status_block_unmetered">blocked on unmetered (Wi-Fi) networks</string>
-    <string name="firewall_status_block_metered">blocked on metered (mobile) networks</string>
-    <string name="firewall_status_blocked">blocked</string>
-    <string name="firewall_status_unknown">unknown</string>
+    <string name="firewall_status_excluded">Excluded from DNS and firewall</string>
+    <string name="firewall_status_lockdown">Lockdown</string>
+    <string name="firewall_status_whitelisted">Bypasses universal firewall rules</string>
+    <string name="firewall_status_block_unmetered">Blocked on unmetered (Wi-Fi) networks</string>
+    <string name="firewall_status_block_metered">Blocked on metered (mobile) networks</string>
+    <string name="firewall_status_blocked">Blocked</string>
+    <string name="firewall_status_unknown">Unknown</string>
 
     <!--Connection tracker bottom sheet -->
     <string name="ct_bs_app_info_error">App info not found</string>
@@ -495,7 +495,7 @@
 
     <string name="firewall_card_text_active">%1$s blocked\n%2$s bypassed\n%3$s excluded\n%4$s lockdown</string>
     <string name="firewall_card_text_inactive">Tap to turn on firewall.</string>
-    <string name="firewall_card_configure_btn">block apps</string>
+    <string name="firewall_card_configure_btn">Block apps</string>
 
     <string name="dns_card_connected_status_failure">Off</string>
 
@@ -504,8 +504,8 @@
 
     <string name="apps_card_ips_count">%1$s IP and port rules</string>
 
-    <string name="hsf_start_btn_state">start</string>
-    <string name="hsf_stop_btn_state">stop</string>
+    <string name="hsf_start_btn_state">Start</string>
+    <string name="hsf_stop_btn_state">Stop</string>
 
     <string name="hsf_uptime">(active since %1$s; protos: %2$s)</string>
     <string name="hsf_downtime">(inactive since %1$s)</string>
@@ -515,7 +515,7 @@
     <string name="hsf_vpn_dialog_positive">Continue</string>
     <string name="hsf_vpn_dialog_negative">Cancel</string>
 
-    <string name="hsf_vpn_prepare_failure">Either you have not granted VPN permission, or another app is using always-on VPN.</string>
+    <string name="hsf_vpn_prepare_failure">Either you have not granted VPN permission, or another app is using <b>Always-on VPN</b>.</string>
 
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_start_dialog_message">You can browse network activity, block websites, IPs, and badly behaving apps.</string>
@@ -562,22 +562,22 @@
     <string name="dc_local_block_desc_1">Choose from 185+ blocklists.\nClick here to download or set them up.</string>
 
     <string name="dc_custom_block_heading">Allow or deny individual domains</string>
-    <string name="dc_custom_block_desc">Coming soon</string>
+    <string name="dc_custom_block_desc">Coming soon.</string>
 
     <string name="dc_dns_website_heading">Icons in DNS logs (experimental)</string>
     <string name="dc_dns_website_desc">Use around 350 MB for website icons (from <i>duckduckgo.com</i>).</string>
 
     <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
-    <string name="dc_dns_leaks_desc">Capture all packets on port 53 and forwards them to a user-set DNS endpoint.</string>
+    <string name="dc_dns_leaks_desc">Captures all packets on port 53 and forwards them to a user-set DNS endpoint.</string>
 
     <string name="dc_check_update_heading">Confirm before implementing blocklists</string>
     <string name="dc_check_update_desc">Update blocklist every <i>3</i> days.</string>
 
     <!-- About fragment -->
-    <string name="about_bravedns_explantion">Rethink lets you monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
-    <string name="about_bravedns_whoarewe">Rethink is libre software, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
-    <string name="about_bravedns_toreport_text">help and feedback</string>
-    <string name="about_bug_report_desc">e-mail crash logs</string>
+    <string name="about_bravedns_explantion">Rethink lets you monitor app activity, circumvent Internet censorship, and firewall apps.</string>
+    <string name="about_bravedns_whoarewe">It is libre software, led by ex-engineers from IBM, Amazon, and Scientific Games.</string>
+    <string name="about_bravedns_toreport_text">Help and feedback</string>
+    <string name="about_bug_report_desc">E-mail crash logs</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report">Bugs</string>
     <string name="about_bug_report_dialog_positive_btn">Send e-mail</string>
@@ -625,13 +625,13 @@
 
     <string name="app_info_error">Could not launch app info.</string>
     <string name="vpn_profile_error">Could not launch VPN profile.</string>
-    <string name="log_file_not_available">No crash report found</string>
+    <string name="log_file_not_available">Could not find any crash reports</string>
     <string name="error_loading_log_file">Could not load log file</string>
 
     <string name="collecting_logs_progress_text">Capturing…</string>
 
     <string name="contributors_dialog_title">Authors</string>
-    <string name="contributors_list"><![CDATA[The <i>Rethink Project</i> owes its existence to these volunteers devoting countless hours to its development.<br/>
+    <string name="contributors_list"><![CDATA[The <i>Rethink Project</i> owes its existence to volunteers devoting countless hours to its development.<br/>
                                               <br/>🛡️ Android app <br/>
                                               <a href="https://github.com/BayLee4">BayLee4</a><br/>
                                               <a href="https://github.com/Ch4t4r">Ch4t4r</a><br/>
@@ -677,7 +677,7 @@
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
-    <string name="cd_dns_crypt_title">resolvers</string>
+    <string name="cd_dns_crypt_title">Resolvers</string>
     <string name="cd_custom_doh_dialog_title">Custom Server URL</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
@@ -689,7 +689,7 @@
     <string name="cd_dns_proxy_mode_internal">Internal</string>
     <string name="cd_dns_proxy_mode_external">External</string>
     <string name="cd_dns_proxy_error_text_1">Invalid IP</string>
-    <string name="cd_dns_proxy_error_text_2">Port range should be from 1024–65535</string>
+    <string name="cd_dns_proxy_error_text_2">Select a port from 1024–65535</string>
     <string name="cd_dns_proxy_error_text_3">Invalid port</string>
     <string name="cd_dns_crypt_dialog_title">Add DNSCrypt resolver or -relay</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
@@ -702,8 +702,8 @@
     <string name="cd_dns_crypt_dialog_name">Name</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
     <string name="cd_dns_crypt_dialog_desc">Description (optional)</string>
-    <string name="cd_dialog_positive_btn">add</string>
-    <string name="cd_dialog_negative_btn">cancel</string>
+    <string name="cd_dialog_positive_btn">Add</string>
+    <string name="cd_dialog_negative_btn">Cancel</string>
     <string name="cd_dns_crypt_error_text_1">Stamp cannot be empty</string>
 
     <string name="cd_doh_dialog_heading">Add DNS over HTTPS Resolver</string>
@@ -726,11 +726,11 @@
     <string name="ct_filter_parent_blocked">Blocked</string>
 
     <!-- Connection tracker bottom sheet fragment string -->
-    <string name="ctbs_app_info_not_available_toast">App settings page not found</string>
+    <string name="ctbs_app_info_not_available_toast">Could not find app settings page</string>
     <string name="ctbs_app_other_apps">%1$s and %2$s other app(s)</string>
-    <string name="ctbs_block_other_apps">Rules applied for %1$s will also be applicable for %2$s other apps</string>
+    <string name="ctbs_block_other_apps">Rules applied for %1$s also apply to %2$s other apps</string>
     <string name="ctbs_proceed_positive_text">Continue</string>
-    <string name="ctbs_dialog_negative_btn">Go Back</string>
+    <string name="ctbs_dialog_negative_btn">Back</string>
     <!-- DNS Log fragment -->
 
     <string name="dns_log_dialog_positive">Delete logs</string>
@@ -768,7 +768,7 @@
     <string name="hs_download_negative_default">Remind me later</string>
 
     <!-- Universal Firewall-->
-    <string name="univ_firewall_rule_1">Block all apps when device is locked</string>
+    <string name="univ_firewall_rule_1">Block all apps when the device is locked</string>
     <string name="univ_firewall_rule_2">Block any app not in use</string>
     <string name="univ_firewall_rule_3">Block when source app is unknown</string>
     <string name="univ_firewall_rule_4">Block UDP except DNS and NTP</string>
@@ -861,24 +861,24 @@
     <string name="fapps_metered_positive">Apply</string>
     <string name="fapps_metered_negative">Cancel</string>
 
-    <string name="fapps_lockdown_hint">VPN in lockdown. The firewall will not honour metered / unmetered rules.</string>
-    <string name="fapps_all_network_hint"><u>Use all networks</u> is on. The firewall will not honour metered / unmetered rules.</string>
+    <string name="fapps_lockdown_hint">VPN in lockdown. The firewall will ignore metered / unmetered rules.</string>
+    <string name="fapps_all_network_hint"><u>Use all networks</u> is on. The firewall will ignore metered / unmetered rules.</string>
 
     <string name="fapps_firewall_filter_hint">Apply unmetered / metered rules for listed apps</string>
 
-    <string name="fapps_firewall_filter_desc"><![CDATA[Showing <u>%1$s</u> %2$s apps]]></string>
+    <string name="fapps_firewall_filter_desc"><![CDATA[Showing <u>%1$s</u> %2$s apps.]]></string>
     <string name="fapps_firewall_filter_desc_category"><![CDATA[Showing <u>%1$s</u> %2$s apps in categories: %3$s]]></string>
 
     <!-- Unicode -->
-    <string name="unicode_warning_sign">\u26a0</string>
-    <string name="unicode_x_sign">\u274c</string>
-    <string name="unicode_question_sign">\u2754</string>
-    <string name="fav_icon">fav_icon</string>
+    <string name="unicode_warning_sign" translatable="false">\u26a0</string>
+    <string name="unicode_x_sign" translatable="false">\u274c</string>
+    <string name="unicode_question_sign" translatable="false">\u2754</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
 
     <!-- BraveVPN service rules failure -->
     <string name="rules_load_failure_heading">Note</string>
-    <string name="rules_load_failure_desc">No firewall rules found</string>
-    <string name="rules_load_failure_reload">reload</string>
+    <string name="rules_load_failure_desc">Could not find any firewall rules</string>
+    <string name="rules_load_failure_reload">Reload</string>
 
     <string name="network_log_app_name_unknown">Unknown</string>
     <string name="network_log_app_name_unnamed">Unnamed (%1$s)</string>
@@ -888,9 +888,9 @@
     <string name="dns_proxy_connection_failure_lockdown">Excluding %1$s for %2$s in lockdown can cause Internet connectivity issues.</string>
     <string name="dns_proxy_toast_parameter">DNS Proxy</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 Proxy</string>
-    <string name="orbot_toast_parameter">Tor-as-a-proxy</string>
+    <string name="orbot_toast_parameter">Tor as a proxy</string>
 
-    <string name="system_dns_connection_failure">Cannot determine current DNS server</string>
+    <string name="system_dns_connection_failure">Cannot find out what DNS server you are connected to</string>
 
     <string name="copy_clipboard_label">URL</string>
 
@@ -903,15 +903,15 @@
     <string name="settings_local_blocklist_version">Version: v%1$s</string>
 
     <string name="accessibility_notification_title">Action Required</string>
-    <string name="accessibility_notification_content">Rethink\'s accessibility service stopped or crashed. No longer blocking backgrounded apps. Tap to turn it on again.</string>
+    <string name="accessibility_notification_content">Tap to start Rethink\'s accessibility service again so backgrounded apps can be blocked.</string>
 
     <string name="accessibility_failure_toast">Rethink\'s accessibility service stopped or crashed. No longer blocking backgrounded apps.</string>
 
-    <string name="coming_soon_toast">Coming soon</string>
+    <string name="coming_soon_toast">Coming soon.</string>
 
     <!-- Pause Activity -->
-    <string name="pause_text">paused</string>
-    <string name="pause_desc">Note: %1$s blocked apps will continue to be firewalled.</string>
+    <string name="pause_text">Paused</string>
+    <string name="pause_desc">Note: %1$s blocked apps will remain firewalled.</string>
 
     <!-- Other DNS list -->
     <string name="other_dns_list_tab1">DoH</string>
@@ -935,7 +935,7 @@
     <string name="firewall_rule_bypass_universal_ip">Bypassed IP</string>
     <string name="firewall_rule_device_lock">Device locked</string>
     <string name="firewall_rule_foreground">App not in use</string>
-    <string name="firewall_rule_unknown">Source unknown</string>
+    <string name="firewall_rule_unknown">Unknown source app</string>
     <string name="firewall_rule_block_udp_ntp">UDP blocked</string>
     <string name="firewall_rule_block_dns_bypass">DNS bypassed</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Bypassed app</string>
@@ -980,7 +980,7 @@
 
     <!-- Notification dialog activity -->
     <string name="notif_dialog_pause_dialog_title">App paused!</string>
-    <string name="notif_dialog_pause_dialog_message">App paused. Resume to continue.</string>
+    <string name="notif_dialog_pause_dialog_message">Resume to get full protection.</string>
     <string name="notif_dialog_pause_dialog_positive">Resume</string>
     <string name="notif_dialog_pause_dialog_negative">Discard</string>
     <string name="notif_dialog_pause_dialog_neutral">Show</string>
@@ -1015,7 +1015,7 @@
     <string name="cd_toast_deleted">Domain removed from custom list</string>
     <string name="cd_toast_added">Domain added</string>
     <string name="cd_remove_dialog_title">Delete domain?</string>
-    <string name="cd_remove_dialog_message">Delete the domain from saved configuration.</string>
+    <string name="cd_remove_dialog_message">Delete the domain from your setup.</string>
     <string name="cd_remove_dialog_positive">Delete</string>
     <string name="cd_remove_dialog_negative">Cancel</string>
 
@@ -1047,7 +1047,7 @@
     <string name="cd_blocked_txt">Blocked</string>
 
     <string name="cd_no_rule_initial">N</string>
-    <string name="cd_no_rule_txt">No Rule</string>
+    <string name="cd_no_rule_txt">No rule</string>
 
     <!-- custom IP -->
     <string name="ci_dialog_title">Add IP / Port Rule</string>
@@ -1085,13 +1085,13 @@
 
     <string name="ada_ip_rules_status_bypass_app_rules">Bypass app rules</string>
     <string name="ada_ip_rules_status_blocked">Blocked</string>
-    <string name="ada_ip_rules_status_allowed">No Rule</string>
+    <string name="ada_ip_rules_status_allowed">No rule</string>
 
     <string name="ada_firewall_status"><![CDATA[This app <b><i>%1$s</i></b>.]]></string>
     <string name="ada_uid"><![CDATA[App ID: <i>%1$s</i><br/>Category: <i>%2$s</i><br/>Installed at: <i>%3$s</i><br/>Updated at: <i>%4$s</i>]]></string>
 
     <string name="ada_lockdown_title">Lock down app</string>
-    <string name="ada_lockdown_desc">Connect only to IPs in <i>bypass app rules</i>; connections to any other IP will be blocked.</string>
+    <string name="ada_lockdown_desc">Connect only to IPs in <i>Bypass app rules</i>; connections to any other IP will be blocked.</string>
 
     <string name="ada_ip_connection_count">Connected to %1$s IP(s)</string>
     <string name="ada_ip_connection_count_zero">0 IPs</string>
@@ -1176,8 +1176,8 @@
     <string name="rt_chip_check_update">Look for new blocklists</string>
     <string name="rt_re_download">Redownload blocklists</string>
 
-    <string name="rt_list_simple_btn_txt">simple</string>
-    <string name="rt_list_adv_btn_txt">advanced</string>
+    <string name="rt_list_simple_btn_txt">Simple</string>
+    <string name="rt_list_adv_btn_txt">Advanced</string>
 
     <string name="rt_cancel_btn">Cancel</string>
     <string name="rt_apply_btn">Apply</string>
@@ -1214,9 +1214,9 @@
     <string name="lbbs_configure">Configure</string>
     <string name="lbbs_copy">Copy as Rethink DNS+ URL</string>
     <string name="lbbs_search">Search domains in blocklists</string>
-    <string name="lbbs_update_check">Check for update</string>
+    <string name="lbbs_update_check">Look for blocklist changes</string>
     <string name="lbbs_redownload">Redownload blocklists</string>
-    <string name="lbbs_download">Update blocklists</string>
+    <string name="lbbs_download">Tap to get new blocklists</string>
     <string name="lbbs_heading">Configure 185+ blocklists</string>
 
     <!-- backup / restore bottom sheet -->
