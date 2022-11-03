@@ -167,7 +167,7 @@
     <string name="brave_dns_connect_mode_change_firewall">Select Mode.</string>
     <string name="brave_dns_connect_mode_change_dns">Select Mode.</string>
 
-    <string name="default_dns_name">RDNS (default)</string>
+    <string name="default_dns_name">Rethink DNS (default)</string>
 
     <string name="custom_url_error_invalid_url">Invalid URL</string>
 
@@ -284,7 +284,7 @@
 
     <string name="info_dialog_copy_toast_msg">IP copied.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copied</string>
-    <string name="info_dialog_rethink_toast_msg">Copied as RDNS+ DNS-over-HTTPS URL</string>
+    <string name="info_dialog_rethink_toast_msg">Copied as Rethink DNS+ DNS-over-HTTPS URL</string>
 
     <string name="settings_enable_logs_desc">Log DNS and firewall info to the device.</string>
     <string name="settings_enable_logs">Logging</string>
@@ -1212,7 +1212,7 @@
     <string name="lbbs_enable">On</string>
     <string name="lbbs_enabled">Off</string>
     <string name="lbbs_configure">Configure</string>
-    <string name="lbbs_copy">Copy as RDNS+ URL</string>
+    <string name="lbbs_copy">Copy as Rethink DNS+ URL</string>
     <string name="lbbs_search">Search domains in blocklists</string>
     <string name="lbbs_update_check">Check for update</string>
     <string name="lbbs_redownload">Redownload blocklists</string>
