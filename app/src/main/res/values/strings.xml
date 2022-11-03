@@ -15,7 +15,6 @@
 
     <string name="accessibility_service_description">
         Rethink uses the accessibility service to detect and firewall background apps.
-        Rethink does not collect or sell your info.
     </string>
 
     <string name="accessibility_service_label">Rethink</string>
@@ -27,8 +26,8 @@
     <string name="slide_2_title">Welcome</string>
     <string name="slide_2_desc">Rethink lets you monitor your network activity, bypass Internet censorship, and firewall apps.</string>
 
-    <string name="slide_1_title">Free and Open Source</string>
-    <string name="slide_1_desc">Rethink is open source software backed by the Mozilla Builders MVP program.</string>
+    <string name="slide_1_title">Libre</string>
+    <string name="slide_1_desc">Rethink is software you can use, study, change and share.</string>
 
     <string-array name="doh_endpoint_names">
         <item>Cloudflare</item>
@@ -40,14 +39,14 @@
     </string-array>
 
     <string name="rethink_plus">Rethink Plus</string>
-    <string name="rdns_plus">RDNS Plus</string>
+    <string name="rdns_plus">RDNS+</string>
 
     <string-array name="firewall_rules">
         <item>Allow</item>
         <item>Block</item>
         <item>Block (unmetered)</item>
         <item>Block (metered)</item>
-        <item>Bypass Universal</item>
+        <item>Bypass universal</item>
         <item>Exclude</item>
         <item>Lockdown</item>
     </string-array>
@@ -309,11 +308,11 @@
     <string name="connection_http3">HTTP/3</string>
 
     <!-- Settings Fragment strings -->
-    <string name="settings_ip_network_heading">Choose IP version</string>
-    <string name="settings_ip_network_desc">Choose between Internet protocol versions.</string>
+    <string name="settings_ip_network_heading">IP version</string>
+    <string name="settings_ip_network_desc">Choose an Internet protocol version.</string>
 
     <string name="settings_ptrans_heading">Force IPv4 egress</string>
-    <string name="settings_ptrans_desc">Translate outbound IPv6 traffic to IPv4 on-device. Use if connected to an IPv4-only network.</string>
+    <string name="settings_ptrans_desc">Translate outbound IPv6 traffic to IPv4 on the device. Use if connected to an IPv4-only network.</string>
 
     <string name="settings_allow_bypass_heading">Bypass</string>
     <string name="settings_allow_bypass_desc">Allow apps to bypass Rethink firewall on-demand. Audio/video chat apps may require this.</string>
@@ -460,20 +459,20 @@
 
     <string name="settings_selected_ip_desc">%1$s</string>
 
-    <string name="settings_notification_heading">Choose notification action</string>
-    <string name="settings_notification_desc">Available buttons: %1$s</string>
-    <string name="settings_notification_desc1"><b>Pause</b>, <b>Stop</b> (default)</string>
-    <string name="settings_notification_desc2"><b>DNS</b>, <b>DNS and Firewall</b></string>
+    <string name="settings_notification_heading">Buttons in notification</string>
+    <string name="settings_notification_desc">%1$s</string>
+    <string name="settings_notification_desc1"><b>Pause</b> and <b>Stop</b> (default)</string>
+    <string name="settings_notification_desc2"><b>DNS</b> and <b>DNS and Firewall</b></string>
     <string name="settings_notification_desc3">None</string>
 
-    <string name="settings_notification_dialog_title">Notification</string>
-    <string name="settings_notification_dialog_option_1">\n<b>Pause</b>, <b>Stop</b> (default)\nTwo buttons, to quickly pause and stop Rethink.</string>
-    <string name="settings_notification_dialog_option_2">\n<b>DNS</b>, <b>DNS and Firewall</b>\nTwo buttons to quickly switch between the battery-saving DNS and the regular DNS and firewall.</string>
+    <string name="settings_notification_dialog_title">Buttons in notification</string>
+    <string name="settings_notification_dialog_option_1">\n<b>Pause</b> and <b>Stop</b> (default)\nTo quickly pause and stop Rethink.</string>
+    <string name="settings_notification_dialog_option_2">\n<b>DNS</b> and <b>DNS and Firewall</b>\nTo switch between the battery-saving DNS, and the regular DNS and firewall.</string>
     <string name="settings_notification_dialog_option_3">\nNone\nNo buttons.\n</string>
 
     <string name="settings_selected_theme" translatable="false">%1$s</string>
 
-    <string name="settings_protocol_translation_dns_inactive">Switch to DNS, or DNS and firewall to turn on this setting</string>
+    <string name="settings_protocol_translation_dns_inactive">Switch to <b>DNS</b>, or <b>DNS and firewall</b> to turn on this setting</string>
 
     <!-- FirewallAppFragment -->
     <string name="apps_icon_content_desc">App Icon</string>
@@ -576,7 +575,7 @@
 
     <!-- About fragment -->
     <string name="about_bravedns_explantion">Rethink lets you monitor app activity, circumvent Internet censorship, and firewall apps on your Android device.</string>
-    <string name="about_bravedns_whoarewe">Rethink is a free and open-source project, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
+    <string name="about_bravedns_whoarewe">Rethink is libre software, led by ex-engineers from Amazon, IBM, and Scientific Games.</string>
     <string name="about_bravedns_toreport_text">help and feedback</string>
     <string name="about_bug_report_desc">e-mail crash logs</string>
     <string name="about_join_telegram">Telegram</string>
@@ -603,8 +602,8 @@
     <string name="about_settings_notification">Notification settings</string>
     <string name="about_whats_new">Changes in %1$s</string>
     <string name="about_twitter">Twitter</string>
-    <string name="about_mozilla">Rethink is part of the Mozilla Builders MVP program.</string>
-    <string name="about_app_update_check">Check for app updates</string>
+    <string name="about_mozilla">Backed by <i>Mozilla Builders MVP</i>.</string>
+    <string name="about_app_update_check">Look for new versions of the app</string>
     <string name="about_app_contributors">Authors</string>
     <string name="about_dialog_positive_button">OK</string>
     <string name="about_mail_to" translatable="false">hello@celzero.com</string>
@@ -707,9 +706,9 @@
     <string name="cd_dialog_negative_btn">cancel</string>
     <string name="cd_dns_crypt_error_text_1">Stamp cannot be empty</string>
 
-    <string name="cd_doh_dialog_heading">Add DNS over HTTPS</string>
-    <string name="cd_doh_dialog_resolver_name">Resolver Name</string>
-    <string name="cd_doh_dialog_resolver_url">Resolver URL</string>
+    <string name="cd_doh_dialog_heading">Add DNS over HTTPS Resolver</string>
+    <string name="cd_doh_dialog_resolver_name">Name</string>
+    <string name="cd_doh_dialog_resolver_url">URL</string>
 
     <string name="cd_dnscrypt_relay_heading">Relays</string>
     <string name="cd_dnscrypt_relay_dismiss_btn">Dismiss</string>
@@ -819,7 +818,7 @@
 
 
     <string name="dns_proxy_dialog_header_dns">Add DNS Proxy</string>
-    <string name="dns_proxy_name">Proxy Name</string>
+    <string name="dns_proxy_name">Name</string>
     <string name="dns_proxy_app">App</string>
     <string name="dns_proxy_ip_address">IP</string>
     <string name="dns_proxy_port">Port</string>
@@ -908,7 +907,7 @@
 
     <string name="accessibility_failure_toast">Rethink\'s accessibility service stopped or crashed. No longer blocking backgrounded apps.</string>
 
-    <string name="coming_soon_toast">coming soon</string>
+    <string name="coming_soon_toast">Coming soon</string>
 
     <!-- Pause Activity -->
     <string name="pause_text">paused</string>
@@ -1063,16 +1062,16 @@
     <string name="ci_no_rules_text">Could not find any universal IP block or bypass rules.</string>
 
     <string name="ci_bypass_universal_initial">BU</string>
-    <string name="ci_bypass_universal_txt">Bypass Universal</string>
-    <string name="ci_bypass_universal_desc">- Bypasses universal</string>
+    <string name="ci_bypass_universal_txt">Bypass universal</string>
+    <string name="ci_bypass_universal_desc">— Bypasses universal</string>
 
     <string name="ci_blocked_initial">B</string>
     <string name="ci_blocked_txt">Blocked</string>
-    <string name="ci_blocked_desc">- Blocked</string>
+    <string name="ci_blocked_desc">— Blocked</string>
 
     <string name="ci_no_rule_initial">N</string>
-    <string name="ci_no_rule_txt">No Rule</string>
-    <string name="ci_no_rule_desc">- No Rule</string>
+    <string name="ci_no_rule_txt">No rule</string>
+    <string name="ci_no_rule_desc">— No rule</string>
 
     <string name='ci_no_rule'>no rule</string>
     <string name='ci_block'>block</string>
@@ -1081,7 +1080,7 @@
 
     <!-- app info -->
     <string name="ada_noapp_dialog_title">No App Info</string>
-    <string name="ada_noapp_dialog_message">Could not find app info about the specified app.</string>
+    <string name="ada_noapp_dialog_message">Could not find info about the specified app.</string>
     <string name="ada_noapp_dialog_positive">OK</string>
 
     <string name="ada_ip_rules_status_bypass_app_rules">Bypass app rules</string>
@@ -1091,8 +1090,8 @@
     <string name="ada_firewall_status"><![CDATA[This app <b><i>%1$s</i></b>.]]></string>
     <string name="ada_uid"><![CDATA[App ID: <i>%1$s</i><br/>Category: <i>%2$s</i><br/>Installed at: <i>%3$s</i><br/>Updated at: <i>%4$s</i>]]></string>
 
-    <string name="ada_lockdown_title">Lockdown app</string>
-    <string name="ada_lockdown_desc">When enabled, the app can connect only to IPs in <i>bypass app rules</i>; connections to any other IP will be blocked.</string>
+    <string name="ada_lockdown_title">Lock down app</string>
+    <string name="ada_lockdown_desc">Connect only to IPs in <i>bypass app rules</i>; connections to any other IP will be blocked.</string>
 
     <string name="ada_ip_connection_count">Connected to %1$s IP(s)</string>
     <string name="ada_ip_connection_count_zero">0 IPs</string>
@@ -1112,11 +1111,11 @@
 
     <string name="ada_ip_rules_title">IP rules for this app</string>
 
-    <string name="ada_network_log_title">network log for this app</string>
+    <string name="ada_network_log_title">Network log for this app</string>
 
     <string name="ada_app_metered">Metered</string>
     <string name="ada_app_unmetered">Unmetered</string>
-    <string name="ada_app_whitelist">Bypass Universal</string>
+    <string name="ada_app_whitelist">Bypass universal</string>
     <string name="ada_app_exclude">Exclude</string>
 
     <string name="ada_app_dns_settings">DNS Settings</string>
@@ -1147,8 +1146,8 @@
     <string name="network_dns">System</string>
 
     <!-- custom download -->
-    <string name="notif_download_content_title">On-Device Blocklist Download</string>
-    <string name="notif_download_content_text">Download in progress…</string>
+    <string name="notif_download_content_title">Download Blocklist to Device</string>
+    <string name="notif_download_content_text">Downloading…</string>
     <string name="notif_download_failure_content">Download failed. Try again.</string>
     <string name="notif_download_success_content">Downloaded.</string>
 
@@ -1162,7 +1161,7 @@
     <string name="rt_rethink_dns">Rethink</string>
 
     <string name="rt_dialog_title">Save Changes</string>
-    <string name="rt_dialog_message">Apply newly configured blocklists?</string>
+    <string name="rt_dialog_message">Apply newly configure blocklists?</string>
     <string name="rt_dialog_positive">Apply</string>
     <string name="rt_dialog_negative">Cancel</string>
     <string name="rt_dialog_neutral">Continue</string>
@@ -1173,9 +1172,9 @@
     <string name="rt_download">Download blocklists</string>
     <string name="rt_cancel_download">Cancel</string>
 
-    <string name="rt_chip_update_available">Update available</string>
-    <string name="rt_chip_check_update">Check for update</string>
-    <string name="rt_re_download">Re-download blocklists</string>
+    <string name="rt_chip_update_available">Look for new blocklists</string>
+    <string name="rt_chip_check_update">Look for new blocklists</string>
+    <string name="rt_re_download">Redownload blocklists</string>
 
     <string name="rt_list_simple_btn_txt">simple</string>
     <string name="rt_list_adv_btn_txt">advanced</string>
@@ -1183,7 +1182,7 @@
     <string name="rt_cancel_btn">Cancel</string>
     <string name="rt_apply_btn">Apply</string>
 
-    <string name="rt_download_desc">Download blocklists (around 60 MB) to use this feature.</string>
+    <string name="rt_download_desc">Download blocklists (around 60 MB) to use this.</string>
 
     <string name="rethink_dns_txt">Rethink %1$s</string>
 
@@ -1228,12 +1227,12 @@
     <string name="brbs_restore_desc">From a backup file</string>
 
     <string name="brbs_backup_dialog_title">Take backup</string>
-    <string name="brbs_backup_dialog_message">Backs up app settings, network and DNS logs to a file. This will restart the VPN.</string>
+    <string name="brbs_backup_dialog_message">Backs up app settings, network- and DNS logs to a file, and restart the VPN.</string>
     <string name="brbs_backup_dialog_positive">Backup</string>
     <string name="brbs_backup_dialog_negative">Cancel</string>
 
     <string name="brbs_restore_dialog_title">Restore backup</string>
-    <string name="brbs_restore_dialog_message">Restore app settings, network and DNS logs from a backup file. This will restart the app.</string>
+    <string name="brbs_restore_dialog_message">Restore app settings, network- and DNS logs from a backup file, and restart the app.</string>
     <string name="brbs_restore_dialog_positive">Restore</string>
     <string name="brbs_restore_dialog_negative">Cancel</string>
 
