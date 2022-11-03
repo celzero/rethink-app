@@ -42,39 +42,39 @@ interface AppInfoDAO {
     fun getAllAppDetails(): List<AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search) and firewallStatus in (:firewall) order by lower(appName)")
+        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageInfo like :search) and firewallStatus in (:firewall) order by lower(appName)")
     fun getSystemApps(search: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search) and appCategory in (:filter) and firewallStatus in (:firewall)  order by lower(appName)")
+        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageInfo like :search) and appCategory in (:filter) and firewallStatus in (:firewall)  order by lower(appName)")
     fun getSystemApps(search: String, filter: Set<String>,
                       firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search) and firewallStatus in (:firewall) order by lower(appName)")
+        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageInfo like :search) and firewallStatus in (:firewall) order by lower(appName)")
     fun getInstalledApps(search: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search) and appCategory in (:filter) and firewallStatus in (:firewall) order by lower(appName)")
+        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageInfo like :search) and appCategory in (:filter) and firewallStatus in (:firewall) order by lower(appName)")
     fun getInstalledApps(search: String, filter: Set<String>,
                          firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search) and firewallStatus in (:firewall) order by lower(appName)")
+        "select * from AppInfo where (appName like :search or uid like :search or packageInfo like :search) and firewallStatus in (:firewall) order by lower(appName)")
     fun getAppInfos(search: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search) and appCategory in (:filter)  and firewallStatus in (:firewall)  order by lower(appName)")
+        "select * from AppInfo where (appName like :search or uid like :search or packageInfo like :search) and appCategory in (:filter)  and firewallStatus in (:firewall)  order by lower(appName)")
     fun getAppInfos(search: String, filter: Set<String>,
                     firewall: Set<Int>): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search) and appCategory in (:cat) and isSystemApp in (:appType) and firewallStatus in (:firewall) ")
+        "select * from AppInfo where (appName like :search or uid like :search or packageInfo like :search) and appCategory in (:cat) and isSystemApp in (:appType) and firewallStatus in (:firewall) ")
     fun getFilteredApps(search: String, cat: Set<String>, firewall: Set<Int>,
                         appType: Set<Int>): List<AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search) and isSystemApp in (:appType) and firewallStatus in (:firewall) ")
+        "select * from AppInfo where (appName like :search or uid like :search or packageInfo like :search) and isSystemApp in (:appType) and firewallStatus in (:firewall) ")
     fun getFilteredApps(search: String, firewall: Set<Int>, appType: Set<Int>): List<AppInfo>
 
     @RawQuery
