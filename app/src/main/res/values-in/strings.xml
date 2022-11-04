@@ -1,3 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="next">Selanjutnya</string>
+    <string name="always_on_dialog">\"VPN Selalu-Menyala\" telah dinyalakan di perangkat ini. Untuk menjalankan Rethink, silakan masuk ke Pengaturan dan matikan \"VPN Selalu-Menyala\".</string>
+    <string name="private_dns_toast">DNS pribadi telah diatur.</string>
+    <string name="always_on_dialog_neutral">Pengaturan</string>
+    <string name="blocklist_update_check_failure">Terjadi kesalahan. Coba beberapa saat lagi.</string>
+    <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
+    <string name="configure_dns_connection_name">Terhubung dengan %1$s</string>
+    <string name="info_dialog_copy_toast_msg">Alamat IP telah dikopi.</string>
+    <string name="app_mode_wireguard">VPN</string>
+    <string name="settings_enable_logs_desc">Simpan riwayat DNS dan Firewall di perangkat lokal.</string>
+    <string name="orbot">Orbot</string>
+    <string name="settings_orbot_heading">Atur Orbot</string>
+    <string name="always_on_dialog_positive">Berhenti</string>
+    <string name="search_firewall_all_apps"><font size="12">Cari app</font></string>
+    <string name="settings_vpn_heading">vpn</string>
+    <string name="orbot_stop_dialog_negative">Hentikan Orbot</string>
+    <string name="settings_orbot_header">Orbot\t❯</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns privat telah aktif</string>
+    <string name="always_on_dialog_negative_btn">Batal</string>
+    <string name="orbot_status_arg_3">DNS dan TCP</string>
+    <string name="orbot_bs_status_trying_connect">Mengatur Orbot…</string>
+    <string name="orbot_stop_dialog_neutral">Ubah DNS</string>
+    <string name="skip">Lewati</string>
+    <string name="finish">Selesai</string>
+    <string name="app_mode_dns">DNS</string>
+    <string name="orbot_stop_dialog_message">RethinkDNS telah berhenti mengalihkan koneksi ke Orbot, tapi mungkin Orbot masih berjalan di belakang.</string>
+    <string name="settings_orbot_install_desc">Sentuh di sini untuk menginstal Orbot</string>
+    <string name="app_name_rethink">Rethink</string>
+    <string name="dns_act_log">Riwayat</string>
+    <string name="download_update_dialog_trylater_title">Tidak dapat memperbaharui saat ini</string>
+    <string name="settings_ip_network_heading">Pilih versi IP</string>
+    <string name="orbot_install_dialog_title">Instal Orbot\?</string>
+    <string name="app_mode_firewall">Firewall</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="always_on_dialog_heading">Matikan VPN Selalu-Menyala</string>
+    <string name="configure_dns_connected_doh_status">DNS atas HTTPS (DoH)</string>
+    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
+    <string name="settings_orbot_desc">Orbot dalam mode tanpa-vpn dengan HTTPS/SOCKS5.</string>
+    <string name="always_on_dialog_stop_heading">VPN Selalu-Menyala</string>
+    <string name="univ_firewall_dialog_title">Hapus aturan IP\?</string>
+    <string name="connection_http3">HTTP3</string>
+    <string name="app_name_small_case">rethink</string>
+    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="rdns_plus">RDNS Plus</string>
+    <string name="always_on_dialog_positive_btn">Masuk ke Pengaturan</string>
+    <string name="always_on_dialog_negative">Batal</string>
+    <string name="settings_enable_logs">Aktifkan pencatatan di perangkat.</string>
+    <string name="app_mode_choose">Pilih mode</string>
+    <string name="orbot_both_desc">Semua di atas.</string>
+    <string name="download_update_dialog_message_ok">Anda sedang menggunakan versi terbaru.</string>
+    <string name="info_dialog_url_copy_toast_msg">URL telah dikopi</string>
+    <string name="orbot_status_arg_2">TCP</string>
+    <string name="orbot_install_activity_error">Terjadi kesalahan. Coba beberapa saat lagi.</string>
+    <string name="slide_2_title">Selamat datang</string>
+    <string name="download_update_dialog_trylater_message">Pembaharuan tidak dapat dilakukan saat ini, silakan coba beberapa saat lagi.</string>
+    <string name="orbot_app_issue">Tidak dapat menjalankan Orbot. Apakah app tersebut telah terinstal\?</string>
+    <string name="app_mode_dns_low_battery">DNS (penghemat baterai)</string>
+    <string name="firewall_act_network_monitor_tab">Riwayat jaringan</string>
+    <string name="orbot_stop_dialog_message_combo">%1$s
+\n
+\n%2$s</string>
+    <string name="orbot_install_dialog_positive">Instal</string>
+    <string name="settings_socks5_disabled_error">Sedang terhubung ke Orbot. Matikan untuk melanjutkan.</string>
+    <string name="download_update_dialog_failure_title">Terjadi kesalahan!</string>
+    <string name="always_on_dialog_stop_message">Rethink diatur sebagai VPN Selalu-Menyala. Apakah Anda yakin untuk menghentikan Rethink\?</string>
+    <string name="univ_firewall_dialog_message">Jika aturan ini dihapus, IP ini dapat terhubung app manapun. Apakah Anda ingin melanjutkan\?</string>
+    <string name="download_update_dialog_message">App versi terbaru tersedia untuk diunduh dari laman. Apakah Anda ingin melanjutkan\?</string>
+    <string name="search_universal_ips"><font size="12">Cari IP</font></string>
+    <string name="whats_dialog_title">Yang baru di v053k</string>
+    <string name="settings_ip_network_desc">Pilih versi Protokol Jaringan</string>
+    <string name="orbot_stop_dialog_dns_message">RethinkDNS diatur untuk mengalihkan permintaan DNS ke Orbot. Ubahlah sesuai kebutuhan.</string>
+    <string name="orbot_bs_status_1">Mengalihkan koneksi %1$s ke Orbot.</string>
+    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_install_dialog_neutral">laman</string>
+</resources>
