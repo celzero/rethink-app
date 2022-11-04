@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="title_settings">تنظیمات</string>
+    <string name="txt_home">خانه</string>
+    <string name="always_on_dialog_neutral">تنظیمات</string>
+</resources>
