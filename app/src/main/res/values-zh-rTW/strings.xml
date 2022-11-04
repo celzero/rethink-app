@@ -206,7 +206,7 @@
     <string name="always_on_dialog_stop_heading">永久連線的 VPN</string>
     <string name="univ_firewall_dialog_message">刪除此條規則將允許任何應用連線至此 IP 位址。您是否想要繼續？</string>
     <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
-    <string name="doh_custom_url_remove_dialog_message">于已儲存的配置中刪除此 DNS over HTTPS 端點。</string>
+    <string name="doh_custom_url_remove_dialog_message">於已儲存的配置中刪除此 DNS over HTTPS 端點。</string>
     <string name="dns_crypt_url_remove_dialog_message">于已儲存的配置中刪除此 DNSCrypt 解析服務。</string>
     <string name="show_logs_disabled_network_message">連線日誌已被禁用。若您想要重新啓用，請至<i>設定</i>並打開<i>啓用本地日誌</i>。</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
