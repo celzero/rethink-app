@@ -3,4 +3,7 @@
     <string name="title_settings">تنظیمات</string>
     <string name="txt_home">خانه</string>
     <string name="always_on_dialog_neutral">تنظیمات</string>
+    <string name="title_about">درباره</string>
+    <string name="next">بعدی</string>
+    <string name="firewall_rules">قوانین شبکه</string>
 </resources>
