@@ -74,4 +74,39 @@
     <string name="orbot_bs_status_1">Mengalihkan koneksi %1$s ke Orbot.</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_install_dialog_neutral">laman</string>
+    <string name="hybrid_mode_notification_title">Terlindungi! Terhubung dengan DNS+ Firewall.</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">Gagal</string>
+    <string name="conn_track_clear_logs_title">Hapus semua catatan jaringan\?</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">Menunggu</string>
+    <string name="status_protected_with_private_dns">terlindungi dns pribadi</string>
+    <string name="dns_query_clear_logs_title">Hapus semua catatan DNS\?</string>
+    <string name="exclude">Kecualikan</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">Terlindungi</string>
+    <string name="status_protected_with_socks5_private_dns">terlindungi socks5 &amp; dns pribadi</string>
+    <string name="wireguard_mode_info_explanation_new">Segera tersedia.</string>
+    <string name="status_protected_with_tor">terlindungi tor</string>
+    <string name="brave_dns_connect_mode_change_firewall">Pilih Mode.</string>
+    <string name="settings_title_desc">DNS dan Firewall yang sangat mudah disesuaikan</string>
+    <string name="status_protected_with_tor_private_dns">terlindungi tor &amp; dns pribadi</string>
+    <string name="block">Blok</string>
+    <string name="title_settings">Pengaturan</string>
+    <string name="status_dns_error">dns mengalami kesalahan</string>
+    <string name="title_about">Tentang</string>
+    <string name="about_title_desc">Mendeteksi dan menangkal ancaman-ancaman keamanan jaringan</string>
+    <string name="admin_receiver_status_enabled">Siap mengatur penangkal berbasis dns.</string>
+    <string name="allow">Ijinkan</string>
+    <string name="dns_mode_notification_title">Terlindungi! Terhubung dengan Fast and Secure DNS.</string>
+    <string name="firewall_mode_notification_title">Terlindungi! Terhubung dengan Firewall.</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Peringatan: RethinkDNS telah tidak aktif</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Sentuh untuk merubah pengaturan keamanan</string>
+    <string name="status_no_internet">tidak ada jaringan</string>
+    <string name="dns_mode_info_explanation_new">Mengawasi, penangkal, dan mengenkripsi permohonan-permohonan DNS.</string>
+    <string name="brave_dns_connect_mode_change_dns">Pilih Mode.</string>
+    <string name="txt_home">Halaman muka</string>
+    <string name="admin_receiver_status_disabled">Penangkal isi tidak lagi berpengaruh.</string>
+    <string name="status_dns_server_down">peladen dns tidak berfungsi</string>
+    <string name="status_app_error">App mengalami kesalahan</string>
+    <string name="dns_firewall_mode_info_explanation_new">Semua di atas + lewati sensor jaringan</string>
+    <string name="alert_permission_accessibility_regrant">Perlu tindakan</string>
+    <string name="conn_track_clear_logs_message">Hanya menghapus catatan-catatan jaringan, tidak dengan aturan-aturan firewall. Tindakan ini tidak dapat dibatalkan. Apakah Anda ingin melanjutkan\?</string>
 </resources>
