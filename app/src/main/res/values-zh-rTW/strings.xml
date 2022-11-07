@@ -94,7 +94,7 @@
     <string name="refresh_complete">應用列表已重新同步完畢。</string>
     <string name="blocklist_update_check_failure">似乎有什麼出錯了。請稍後重試！</string>
     <string name="show_logs_disabled_dns_message">DNS 請求日誌已被禁用。若您想要重新啓用，請至<i>設定</i>並打開<i>啓用本地日誌</i>。</string>
-    <string name="configure_dns_crypt">DNSCrypt: %1$s 伺服器</string>
+    <string name="configure_dns_crypt">DNSCrypt: %1$s 解析服務</string>
     <string name="http_proxy_dialog_heading">設定 HTTP(S) 代理</string>
     <string name="http_proxy_dialog_desc">HTTP(S) 代理設定僅爲對應用程式的一個提醒，它們可選擇是否使用代理；但如 Chrome 及 Firefox 等的瀏覽器則會使用代理。使用 HTTP(S) 代理的應用會同時繞過防火牆及 DNS 規則。</string>
     <string name="download_update_dialog_title">更新可用！</string>
@@ -200,7 +200,7 @@
 \n <u>#4</u>：阻止任意未使用的應用連線（通用攔截規則）。
 \n <u>#5</u>：阻止未知應用的連線（通用攔截規則）。
 \n <u>#6</u>：攔截除 DNS 外的所有 UDP 流量（通用攔截規則）。
-\n <u>#7</u>：攔截被繞過 DNS 的流量（通用攔截規則）。</string>
+\n <u>#7</u>：攔截繞過 DNS 的流量（通用攔截規則）。</string>
     <string name="always_on_dialog">「永久連線的 VPN 」已在此裝置上啓用。爲啓動 Rethink ，請移步系統設定並禁用「永久連線的 VPN 」。</string>
     <string name="private_dns_toast">已設定私人 DNS 。</string>
     <string name="always_on_dialog_stop_heading">永久連線的 VPN</string>
@@ -729,7 +729,7 @@
     <string name="univ_firewall_rule_2">攔截任何未使用的應用</string>
     <string name="univ_firewall_rule_3">攔截未知應用</string>
     <string name="univ_firewall_rule_4">攔截除 DNS 與 NTP 外的所有 UDP 流量</string>
-    <string name="univ_firewall_rule_5">攔截被繞過 DNS 的流量</string>
+    <string name="univ_firewall_rule_5">攔截繞過 DNS 的流量</string>
     <string name="univ_firewall_rule_6">默認攔截所有新安裝的應用</string>
     <string name="univ_firewall_rule_7">於 IPv6 攔截 IPv4 （實驗性）</string>
     <string name="univ_firewall_rule_8">攔截埠 80 （不安全 HTTP ）的流量</string>

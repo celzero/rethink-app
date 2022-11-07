@@ -638,7 +638,7 @@
     <string name="firewall_mode_info_explanation_new">راقب نشاط الشبكة وجدار الحماية أي تطبيق أو عنوان IP.</string>
     <string name="always_on_dialog_heading">تعطيل Always-on VPN</string>
     <string name="dns_proxy_remove_dialog_message">احذف وكيل DNS من التكوين المحفوظ.</string>
-    <string name="http_proxy_dialog_desc">تعد إعدادات الوكيل HTTP (S) مجرد تلميح للتطبيقات ولكنها قد تستخدمها أو لا تستخدمها ؛ ومع ذلك ، فإن متصفحات مثل Chrome و Firefox تستخدم هذه. ستتجاوز التطبيقات التي تستخدم وكيل HTTP (S) قواعد جدار الحماية ونظام أسماء النطاقات.</string>
+    <string name="http_proxy_dialog_desc">تعد إعدادات بروكسي HTTP(S) مجرد تلميح للتطبيقات، ولكنها قد تستخدمها أو لا؛ ومع ذلك تستخدمها متصفحات الويب مثل Chrome و Firefox. ستتجاوز التطبيقات التي تستخدم بروكسي HTTP(S) قواعد جدار الحماية و قواعد نظام DNS.</string>
     <string name="info_dialog_copy_toast_msg">تم نسخ عنوان IP.</string>
     <string name="orbot_socks5">وكيل TCP فقط</string>
     <string name="orbot_http_desc">يوصي بأن تستخدم التطبيقات وكيل HTTP الخاص بـ Orbot.</string>
