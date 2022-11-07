@@ -585,4 +585,46 @@
 \n <u>#7</u>: Blokkerer tilkoblinger når DNS omgås (universell brannmur).</string>
     <string name="dc_dns_website_desc">Henter nettsideikon fra <i>duckduckgo.com</i>. Bruker ca. 350 MB plass.</string>
     <string name="contributors_list">&lt;i&gt;Rethink-prosjektet&lt;/i&gt; finnes fordi bidragsytere har brukt utallige timer på utviklingen av det.&lt;br/&gt; &lt;br/&gt;🛡️ Android-programmet &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Nettverksmotoren &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Utlederen &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Gemenskapsmodder &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="radio_sky_btn">⛅ Sky</string>
+    <string name="download_update_dialog_message_success">Svarteliste nedlastet.</string>
+    <string name="about_bravedns_toreport_text">Hjelp og tilbakemeldinger</string>
+    <string name="download_update_dialog_message">Last ned ny versjon av programmet fra nettsiden\?</string>
+    <string name="firewall_card_configure_btn">Blokker programmer</string>
+    <string name="collecting_logs_progress_text">Loggfører …</string>
+    <string name="hsf_whats_new_chip_text">Nyheter</string>
+    <string name="orbot_socks5">Kun-TCP-mellomtjener</string>
+    <string name="dc_local_block_desc_1">Velg mellom 185+ svartelister. Klikk her for å laste ned eller sette opp svartelister.</string>
+    <string name="firewall_rule_block_unmetered">Ikke kvotebasert (Wi-Fi)</string>
+    <string name="new_app_notification_content">Rethink blokkerte et nylig installert program, %1$s,</string>
+    <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
+    <string name="alert_firewall_accessibility_exception">Klarte ikke å åpne tilgjengelighetsinnstillingene. Prøv igjen senere.</string>
+    <string name="refresh_complete">Programliste resynkronisert.</string>
+    <string name="network_dns">System-DNS</string>
+    <string name="alert_permission_accessibility">Tilgang</string>
+    <string name="about_bug_report_desc">Send krasjlogg på e-post</string>
+    <string name="new_app_bulk_notification_content">Rethink blokkerte %1$s nye programmer. Trykk for å vise eller endre.</string>
+    <string name="hsf_start_dialog_negative">Forkast</string>
+    <string name="ctbs_app_other_apps">%1$s og %2$s program(mer) til</string>
+    <string name="configure_dns_crypt">DNSCrypt: %1$s utledere</string>
+    <string name="download_update_dialog_message_ok">Du har allerede nyeste versjon.</string>
+    <string name="firewall_rule_block_app_desc">En brukervalgt brannmursregel blokkerte dette <i>programmet</i>.<br/><br/> Endre dette fra <i>Alle programmer</i>-fanen.</string>
+    <string name="brbs_backup_dialog_failure_negative">Forkast</string>
+    <string name="orbot_bs_status_3">Videresender %1$s til Orbot. HTTP-mellomtjener også satt.</string>
+    <string name="dc_other_dns_heading">Type</string>
+    <string name="dc_check_update_desc">Se etter endringer i svartelister hver <i>tredje</i> dag</string>
+    <string name="cd_dns_crypt_resolver_heading">Utleder</string>
+    <string name="dc_block_heading">Regler</string>
+    <string name="hsf_blocklist_chip_text">%1$s svartelister satt opp</string>
+    <string name="firewall_rule_block_metered">Kvotebasert (mobilnett)</string>
+    <string name="cd_custom_doh_url_name">DoH %1$s</string>
+    <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
+    <string name="hsf_downtime">(inaktiv siden %1$s)</string>
+    <string name="dc_other_settings_heading">Avansert</string>
+    <string name="dc_local_block_heading">Svartelister på enheten</string>
+    <string name="univ_firewall_rule_1">Blokker alle programmer når enheten er låst</string>
+    <string name="dns_crypt_relay_error_toast">Ingen utleder valgt</string>
+    <string name="hs_download_positive_play_store">Fullfør installasjon</string>
+    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s svarteliste(r)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
+    <string name="dc_check_update_heading">Spør om oppdatering av svartelister</string>
+    <string name="new_app_notification_title">Handling kreves</string>
 </resources>
