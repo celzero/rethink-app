@@ -819,4 +819,5 @@
     <string name="rt_edit_dialog_positive">Redaguoti</string>
     <string name="rt_chip_update_available">Galimas atnaujinimas</string>
     <string name="brbs_restore_no_uri_toast">Atkūrimas nepavyko; bandykite dar kartą</string>
+    <string name="radio_max_btn">🪂 Max</string>
 </resources>
