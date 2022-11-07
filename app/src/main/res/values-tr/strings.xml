@@ -377,7 +377,7 @@
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="brbs_restore_dialog_title">Yedeği geri yükle</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
-    <string name="dns_proxy_positive_btn">add</string>
+    <string name="dns_proxy_positive_btn">ekle</string>
     <string name="unicode_x_sign">❌</string>
     <string name="default_dns_name">RDNS Varsayılan</string>
     <string name="dns_query_clear_logs_title">Tüm DNS kayıtları silinsin mi\?</string>
@@ -625,7 +625,7 @@
     <string name="dc_doh">HTTPS üzerinden Dns</string>
     <string name="brbs_restore_dialog_negative">İptal</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
-    <string name="cd_dialog_positive_btn">add</string>
+    <string name="cd_dialog_positive_btn">ekle</string>
     <string name="dns_proxy_toast_parameter">DNS Proxy</string>
     <string name="always_on_dialog_negative_btn">İptal</string>
     <string name="dns_mode_info_explanation_new">DNS isteklerini izleyin, engelleyin ve şifreleyin.</string>
@@ -876,4 +876,12 @@
     <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Değişiklikleri Kaydet</string>
     <string name="rt_dialog_positive">Uygula</string>
+    <string name="cd_sample_unicode_invalid">❌</string>
+    <string name="dc_dns_proxy">DNS Vekil</string>
+    <string name="build__flavor_fdroid">fdroid</string>
+    <string name="ci_delete">sil</string>
+    <string name="ci_bypass_universal_initial">BE</string>
+    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
+    <string name="other_dns_list_tab3">Dns Vekil</string>
+    <string name="cd_sample_unicode_valid">✅</string>
 </resources>
