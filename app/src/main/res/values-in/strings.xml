@@ -256,7 +256,6 @@
     <string name="hs_download_positive_website">Kunjungi laman</string>
     <string name="rt_dialog_neutral">Lanjut</string>
     <string name="cd_remove_dialog_message">Menghapus domain dari konfigurasi tersimpan.</string>
-    <string name="settings_dns_proxy_dialog_app"></string>
     <string name="dns_filter_parent_all">Semua</string>
     <string name="rt_cancel_btn">Batal</string>
     <string name="settings_dns_proxy_dialog_negative_btn">batal</string>
