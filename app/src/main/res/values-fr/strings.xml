@@ -8,4 +8,94 @@
     <string name="txt_home">Acceuil</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="pause_title_desc">faire une sieste…</string>
+    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="notification_action_resume_vpn">REPRENDRE</string>
+    <string name="slide_1_title">Source libre et ouverte</string>
+    <string name="slide_1_desc">RethinkDNS est un logiciel open source soutenu par le programme Mozilla Builders MVP.</string>
+    <string name="rdns_plus">RDNS Plus</string>
+    <string name="block">bloquer</string>
+    <string name="lockdown">verrouillage</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Appuyer pour changer le paramétrage de protection</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Attention : RethinkDNS a été désactivé</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">en erreur</string>
+    <string name="pause_mode_notification_title">En pause ! Les applications bloquées continueront à utiliser un pare-feu.</string>
+    <string name="firewall_mode_notification_title">Protégé ! Connecté au Pare-feu.</string>
+    <string name="hybrid_mode_notification_title">Protégé ! Connecté au DNS + Pare-feu.</string>
+    <string name="status_app_error">erreur de l\'application</string>
+    <string name="status_no_internet">pas d\'internet</string>
+    <string name="status_protected_with_tor">protégé avec tor</string>
+    <string name="status_protected_with_tor_private_dns">protégé avec tor &amp; un dns privé</string>
+    <string name="status_protected_with_proxy_private_dns">protégé avec un proxy &amp; un dns privé</string>
+    <string name="status_protected_with_http_private_dns">protégé avec proxy http &amp; dns privé</string>
+    <string name="status_protected_with_socks5_private_dns">protégé avec socks5 &amp; un dns privé</string>
+    <string name="dns_explanation_dns_connected">Connecté avec RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected">Connecté au Parfeu</string>
+    <string name="universal_firewall_explanation">Appliquer des règles de pare-feu à toutes les applications en fonction des événements survenant sur l\'appareil, par exemple, appliquer un pare-feu lorsque l\'appareil est verrouillé ou lorsqu\'une application particulière n\'est pas utilisée.</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="firewall_mode_info_title">Parefeu</string>
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS utilise un service d\'accessibilité pour savoir quelles sont les applications en cours d\'utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan).
+\n
+\nRethinkDNS ne collecte aucune information et ne vous espionne en aucune façon.</string>
+    <string name="dns_firewall_mode_info_explanation_new">Tout ce qui précède + contourner la censure de l\'Internet.</string>
+    <string name="dns_mode_info_explanation_new">Surveillez, bloquez et chiffrez les requêtes DNS.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Le service d\'accessibilité de RethinkDNS s\'est arrêté ou s\'est écrasé. <i><b>Aller à Paramètres et Forcer l\'arrêt</b></i> RethinkDNS \u0020et le redémarrer pour utiliser <i>Bloquer toutes fonctionnalités application non utilisée.</i>
+\n
+\nRethinkDNS utilise un service d\'accessibilité pour savoir quelles sont les applications en cours d\'utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan).</string>
+    <string name="bsct_conn_block_desc_device">bloqué %1$s sur le périphérique</string>
+    <string name="bsct_block_app">Bloquer, contourner <u>cette IP</u> pour <u>cette application</u>.</string>
+    <string name="always_on_dialog">L\'option \"VPN Permanant\" est activée sur cet appareil. Pour lancer Rethink, allez dans l\'application Paramètres et désactivez \"VPN Permanant\".</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u> : Bloque la connexion d\'une app à Internet.
+\n <u>#2</u> : Bloque toutes appli de se connecter à une IP particulière.
+\n <u>#3</u> : Bloque toutes les connexions lorsque l\'appareil est verrouillé (pare-feu universel).
+\n <u>#4</u> : Bloque toutes appli non utilisée (Pare-feu universel).
+\n <u>#5</u> : Bloque les connexions lorsque l\'app source est inconnue (Pare-feu universel).
+\n <u>#6</u> : Bloque tout le trafic UDP sauf le DNS (Pare-feu universel).
+\n <u>#7</u> : Bloque les connexions lorsque le DNS est contourné (Pare-feu universel).</string>
+    <string name="status_protected_with_private_dns">protégé avec un dns privé</string>
+    <string name="allow">autoriser</string>
+    <string name="bsct_block">Bloquer, contourner, exclure, verrouiller <u>cette application</u>.</string>
+    <string name="firewall_rules">Règles du Réseau</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns privé est actif</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">pas de protection</string>
+    <string name="bypass_universal">contournement universel</string>
+    <string name="status_dns_server_down">serveur DNS hors service</string>
+    <string name="alert_permission_accessibility">Autorisation - Accessibilité</string>
+    <string name="brave_dns_connect_mode_change_firewall">Choisissez le mode de fonctionnement.</string>
+    <string name="custom_url_error_invalid_url">URL invalide</string>
+    <string name="bsct_conn_desc_blocked">bloqué sur %1$s %2$s</string>
+    <string name="always_on_dialog_heading">Désactiver le VPN permanent</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Connecté à RethinkDNS et au Parefeu</string>
+    <string name="alert_firewall_accessibility_exception">Échec de l\'ouverture des paramètres d\'accessibilité. Réessayez plus tard !</string>
+    <string name="bsct_conn_block_desc">bloqué %1$s par%2$s</string>
+    <string name="always_on_dialog_positive_btn">Allez dans les paramètres</string>
+    <string name="always_on_dialog_stop_heading">VPN Permanent</string>
+    <string name="exclude">exclure</string>
+    <string name="dns_mode_info_title">DNS</string>
+    <string name="wireguard_mode_info_explanation_new">Prochainement.</string>
+    <string name="dns_query_clear_logs_title">Effacer tous les journaux DNS \?</string>
+    <string name="private_dns_toast">Dns Privé a été réglé.</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">protégé</string>
+    <string name="status_protected_with_proxy">protégé avec proxy</string>
+    <string name="apps_info_title">Applis</string>
+    <string name="brave_dns_connect_mode_change_dns">Choisissez le mode de fonctionnement.</string>
+    <string name="conn_track_clear_logs_message">Cette opération supprime uniquement les journaux du réseau mais pas les règles du pare-feu. Cette opération n\'est pas réversible. Voulez-vous continuer \?</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">en attente</string>
+    <string name="status_protected_with_http">protégé avec proxy http</string>
+    <string name="notification_action_stop_vpn">STOP</string>
+    <string name="default_dns_name">RDNS par défaut</string>
+    <string name="conn_track_clear_logs_title">Effacer tous les journaux du réseau \?</string>
+    <string name="notification_action_pause_vpn">PAUSE</string>
+    <string name="untracked">sans traces</string>
+    <string name="bsct_app_info">Info d\'App</string>
+    <string name="bsct_conn_desc_allowed">autorisé sur %1$s%2$s</string>
+    <string name="firewall_mode_info_explanation_new">Surveillez l\'activité du réseau et mettez en place un pare-feu pour toute application ou adresse IP.</string>
+    <string name="alert_permission_accessibility_regrant">Action Nécessaire</string>
+    <string name="status_dns_error">erreur du dns</string>
+    <string name="hybrid_mode_info_title">DNS + Parefeu</string>
+    <string name="always_on_dialog_negative_btn">Annuler</string>
+    <string name="dns_mode_notification_title">Protégé ! Connecté à un DNS rapide et sécurisé.</string>
+    <string name="status_protected_with_socks5">protégé avec proxy socks</string>
+    <string name="dns_query_clear_logs_message">Cette opération supprime les journaux DNS sur le périphérique. Cette opération n\'est pas réversible. Voulez-vous continuer \?</string>
+    <string name="notification_action_dns_firewall_mode">DNS + Parefeu</string>
+    <string name="always_on_dialog_stop_message">VPN Permanent est activé pour Rethink. Êtes-vous sûr de vouloir arrêter Rethink quand même \?</string>
 </resources>
