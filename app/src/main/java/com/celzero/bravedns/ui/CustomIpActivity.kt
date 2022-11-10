@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -42,7 +43,11 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import inet.ipaddr.HostName
 import inet.ipaddr.HostNameException
+import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -162,20 +167,27 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
         }
 
         dBind.daciAddBtn.setOnClickListener {
-            val input = dBind.daciIpEditText.text.toString()
+            ui {
+                val input = dBind.daciIpEditText.text.toString()
+                val ipString = Utilities.removeLeadingAndTrailingDots(input)
+                var hostName: HostName? = null
+                var ip: IPAddress? = null
 
-            val ipString = Utilities.removeLeadingAndTrailingDots(input)
+                // chances of creating NetworkOnMainThread exception, handling with io operation
+                ioCtx {
+                    hostName = getHostName(ipString)
+                    ip = hostName?.address
+                }
 
-            val hostName = getHostName(ipString)
-            val ip = hostName?.address
-            if (ip == null || ipString.isEmpty()) {
-                dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
-                dBind.daciFailureTextView.visibility = View.VISIBLE
-                return@setOnClickListener
+                if (ip == null || ipString.isEmpty()) {
+                    dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
+                    dBind.daciFailureTextView.visibility = View.VISIBLE
+                    return@ui
+                }
+
+                dBind.daciIpEditText.text.clear()
+                insertCustomIp(hostName)
             }
-
-            dBind.daciIpEditText.text.clear()
-            insertCustomIp(hostName)
 
         }
 
@@ -185,7 +197,7 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
         dialog.show()
     }
 
-    private fun getHostName(ip: String): HostName? {
+    private suspend fun getHostName(ip: String): HostName? {
         return try {
             val host = HostName(ip)
             host.validate()
@@ -196,7 +208,9 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
         }
     }
 
-    private fun insertCustomIp(ip: HostName) {
+    private fun insertCustomIp(ip: HostName?) {
+        if (ip == null) return
+
         IpRulesManager.addIpRule(IpRulesManager.UID_EVERYBODY, ip,
                                  IpRulesManager.IpRuleStatus.BLOCK)
         Utilities.showToastUiCentered(this, getString(R.string.ci_dialog_added_success),
@@ -219,6 +233,20 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
 
         builder.setCancelable(true)
         builder.create().show()
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            f()
+        }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                f()
+            }
+        }
     }
 
 }
