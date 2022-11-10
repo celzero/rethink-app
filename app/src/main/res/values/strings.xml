@@ -10,9 +10,6 @@
 
     <string name="txt_home">Home</string>
 
-    <string name="admin_receiver_status_enabled">Ready to set dns based content blocker.</string>
-    <string name="admin_receiver_status_disabled">Content blocker no longer in effect.</string>
-
     <string name="accessibility_service_description">
         RethinkDNS uses accessibility service to detect and firewall background applications.
         RethinkDNS does not collect or sell any information.
@@ -151,7 +148,6 @@
     <string name="firewall_mode_info_explanation_new">Monitor network activity and firewall any app or IP address.</string>
 
     <string name="apps_info_title">Apps</string>
-    <string name="sponsor_title">Sponsor</string>
 
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
 
@@ -295,16 +291,17 @@
 
     <string name="whats_dialog_title">What\'s new in v053k</string>
     <string name="whats_new_version_name">🌎&#128330; World Student\'s Day (15 Oct) &#128330;🌎</string>
-    <string name="whats_new_version_update"><b>Maximum effort</b>\n\n
-        1. Introducing a more private Rethink resolver, <i>Max</i>.\n
-        2. Mark IPv6 as experimental; switch to IPv4 by default.\n
-        3. <i>New feature</i>: Backup and restore app settings.\n
-        4. <i>New feature</i>: App lockdown mode.\n
-        5. <i>New feature</i>: Universal lockdown mode.\n
-        6. <i>New feature</i>: Apply firewall rules on port numbers.\n
-        7. <i>New feature</i>: Apply app firewall rules in batches.\n
-        8. Minor UI refresh.\n
-        9. Other memory and crash fixes.
+    <string name="whats_new_version_update"><![CDATA[<b>Maximum effort</b><br/><br/>
+        1. Introducing a more private Rethink resolver, <i>Max</i>.<br/>
+        2. Mark IPv6 as experimental; switch to IPv4 by default.<br/>
+        3. <i>New feature</i>: Backup and restore app settings.<br/>
+        4. <i>New feature</i>: App lockdown mode.<br/>
+        5. <i>New feature</i>: Universal lockdown mode.<br/>
+        6. <i>New feature</i>: Apply firewall rules on port numbers.<br/>
+        7. <i>New feature</i>: Apply app firewall rules in batches.<br/>
+        8. Minor UI refresh.<br/>
+        9. Other memory and crash fixes.<br/><br/>
+        <a href="https://hosted.weblate.org/projects/rethink-dns-firewall/app/">Help translate this app</a>]]>
     </string>
 
     <string name="connection_http3">HTTP3</string>
@@ -397,7 +394,7 @@
     <string name="settings_network_all_networks">Use all available networks (experimental)</string>
     <string name="settings_network_all_networks_desc">When enabled, RethinkDNS uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
     <string name="settings_all_networks_dialog_title">Attention!</string>
-    <string name="settings_all_networks_dialog_message">When enabled, app firewall rules for metered (ex: WiFi) and non-metered (ex: Mobile) will not be honoured.\n\nDo you want to continue?</string>
+    <string name="settings_all_networks_dialog_message">When enabled, app firewall rules for metered (ex: Mobile) and non-metered (ex: WiFi) will not be honoured.\n\nDo you want to continue?</string>
     <string name="settings_all_networks_dialog_positive_btn">Enable anyway</string>
     <string name="settings_all_networks_dialog_negative_btn">Cancel</string>
 
@@ -500,7 +497,6 @@
 
     <string name="firewall_card_text_active">%1$s blocked\n%2$s bypassed\n%3$s excluded\n%4$s lockdown</string>
     <string name="firewall_card_text_inactive">Enable firewall mode.</string>
-    <string name="firewall_card_configure_btn">block apps</string>
 
     <string name="dns_card_connected_status_failure">Disabled</string>
 
@@ -532,8 +528,8 @@
     <string name="hsf_whats_new_chip_text">What\'s new</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
     <string name="hsf_blocklist_chip_text">%1$s blocklists configured</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS in-use</string>
-    <string name="hsf_blocklist_chip_text_no_data">Enable RethinkDNS+</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in-use</string>
+    <string name="hsf_blocklist_chip_text_no_data">Enable RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
     <string name="hsf_network_logs_chip_text">Network logs</string>
 
@@ -612,6 +608,7 @@
     <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
     <string name="about_app_update_check">Check for app updates</string>
     <string name="about_app_contributors">Authors</string>
+    <string name="about_app_translate">Translate</string>
     <string name="about_dialog_positive_button">Let\'s Go</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_to_string">mailto:</string>
@@ -626,6 +623,7 @@
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_version">v%1$s</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Suggest features</string>
@@ -633,6 +631,8 @@
     <string name="app_info_error">Could not launch App info.</string>
     <string name="vpn_profile_error">Could not launch VPN profile.</string>
     <string name="notification_screen_error">Could not launch App Notification screen.</string>
+    <string name="intent_launch_error">Count not launch %1$s</string>
+    <string name="no_browser_error">Cannot open webpage from browser.</string>
     <string name="log_file_not_available">No crash report found</string>
     <string name="error_loading_log_file">Error loading log file</string>
 
@@ -656,6 +656,7 @@
                                               <a href="https://github.com/fortuna">fortuna</a><br/>
                                               <a href="https://github.com/ignoramous">ignoramous</a><br/>
                                               <a href="https://github.com/PeterDaveHello">PeterDaveHello</a><br/>
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a><br/>
                                               <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
                                               <br/>📚 Resolver <br/>
                                               <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a><br/>
@@ -683,6 +684,8 @@
                                               <a href="https://t.me/Billi_ance">Billi_ance</a><br/>
                                               <a href="https://t.me/kaliangel">kaliangel</a><br/>
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
+                                              <br/>📌 IP geo-location database <br/>
+                                              <a href="https://db-ip.com">db-ip.com</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_crypt_title">resolvers</string>
@@ -940,6 +943,7 @@
     <string name="firewall_rule_block_app_new_install">New App</string>
     <string name="firewall_rule_block_app_exception">Error</string>
     <string name="firewall_rule_block_ip">IP / Port (App)</string>
+    <string name="firewall_rule_block_univ_ip">IP / Port (Universal)</string>
     <string name="firewall_rule_bypass_apprule_ip">Bypassed IP (App)</string>
     <string name="firewall_rule_bypass_universal_ip">Bypassed IP</string>
     <string name="firewall_rule_device_lock">Device Locked</string>
