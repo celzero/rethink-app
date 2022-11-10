@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -48,18 +49,15 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
@@ -503,13 +501,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
 
     private fun initiateDownload() {
-        val url = Constants.RETHINK_APP_DOWNLOAD_LINK
-        val uri = Uri.parse(url)
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = uri
-        intent.addCategory(Intent.CATEGORY_BROWSABLE)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        try {
+            val url = Constants.RETHINK_APP_DOWNLOAD_LINK
+            val uri = Uri.parse(url)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = uri
+            intent.addCategory(Intent.CATEGORY_BROWSABLE)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
+            Log.w(LoggerConstants.LOG_TAG_VPN,
+                  "Failure opening rethink download link: ${e.message}", e)
+        }
     }
 
     override fun onStop() {
@@ -534,21 +538,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
                 R.id.navigation_settings -> {
                     settingsFragment = SettingsFragment()
-                    supportFragmentManager.popBackStackImmediate()
                     supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
                                                                       settingsFragment,
-                                                                      settingsFragment.javaClass.simpleName).setReorderingAllowed(
-                        true).addToBackStack(null).commit()
+                                                                      settingsFragment.javaClass.simpleName).commit()
                     return@setOnItemSelectedListener true
                 }
 
                 R.id.navigation_about -> {
                     aboutFragment = AboutFragment()
-                    supportFragmentManager.popBackStackImmediate()
                     supportFragmentManager.beginTransaction().replace(R.id.fragment_container,
                                                                       aboutFragment,
-                                                                      aboutFragment.javaClass.simpleName).setReorderingAllowed(
-                        true).addToBackStack(null).commit()
+                                                                      aboutFragment.javaClass.simpleName).commit()
                     return@setOnItemSelectedListener true
                 }
             }
