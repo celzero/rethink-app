@@ -813,7 +813,15 @@
     <string name="firewall_mode_info_title">防火牆</string>
     <string name="universal_firewall_explanation">根據裝置事件應用防火牆規則，例如喺在裝置鎖定時或者某個 app 唔係用緊時進行攔截。</string>
     <string name="always_on_dialog">呢部電話嘅「永久連線 VPN」已經開着咗。要開 Rethink 嘅話，請去系統設定禁用咗「永久連線 VPN」先。</string>
-    <string name="alert_firewall_accessibility_exception">開唔到無障礙設定。等陣再試！</string>
+    <string name="alert_firewall_accessibility_exception">打開唔到無障礙設定。請等陣再試過！</string>
     <string name="bsct_conn_block_desc">由 %2$s 攔截咗 %1$s</string>
-    <string name="bsct_block_app">針對<u>呢個 app</u> 攔截或繞行<u>呢個IP</u></string>
+    <string name="bsct_block_app">針對<u>呢個 app</u> 攔截、放行<u>呢個 IP</u></string>
+    <string name="bsct_block">針對<u>呢個 app</u> 攔截、放行、排除或者閉關</string>
+    <string name="bsct_conn_block_desc_device">本地攔截 %1$s</string>
+    <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
+    <string name="bsct_conn_desc_blocked">%2$s 攔截 %1$s</string>
+    <string name="blocklist_update_check_failure">似乎有啲咩出咗錯。請等陣再試過！</string>
+    <string name="download_update_dialog_failure_message">可能我哋嘅伺服器死咗，或者個網有啲事，請等陣再試過。</string>
+    <string name="download_update_dialog_trylater_message">而家更新唔到，請等陣再試過。</string>
+    <string name="orbot_install_activity_error">似乎出咗啲問題，請等陣再試過</string>
 </resources>
