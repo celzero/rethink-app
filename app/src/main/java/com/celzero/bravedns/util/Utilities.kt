@@ -224,12 +224,12 @@ class Utilities {
             return convertLongToTime(now, TIME_FORMAT_1)
         }
 
-        fun formatToRelativeTime(timestamp: Long): String {
+        fun formatToRelativeTime(context: Context, timestamp: Long): String {
             val now = System.currentTimeMillis()
             return if (DateUtils.isToday(timestamp)) {
-                "Today"
+                context.getString(R.string.relative_time_today)
             } else if (isYesterday(Date(timestamp))) {
-                "Yesterday"
+                context.getString(R.string.relative_time_yesterday)
             } else {
                 val d = DateUtils.getRelativeTimeSpanString(timestamp, now,
                                                             DateUtils.MINUTE_IN_MILLIS,

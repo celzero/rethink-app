@@ -306,6 +306,9 @@
 
     <string name="connection_http3">HTTP3</string>
 
+    <string name="relative_time_today">Today</string>
+    <string name="relative_time_yesterday">Yesterday</string>
+
     <!-- Settings Fragment strings -->
     <string name="settings_ip_network_heading">Choose IP version</string>
     <string name="settings_ip_network_desc">Choose between Internet Protocol versions.</string>
