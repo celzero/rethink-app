@@ -12,7 +12,7 @@
     <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 嘅無障礙服務停咗或者 hang 咗。如果您要繼續用<i>攔截未使用應用</i>呢個功能，<i><b>請去系統設定度強制停止並再次啓動</b></i> RethinkDNS。
 \n
 \nRethinkDNS 用咗無障礙服務嚟追蹤你用緊嘅 app（前景）同唔係用緊嘅 app（背景）。</string>
-    <string name="status_protected_with_http_private_dns">畀 HTTP 代理同私人 DNS 保護住</string>
+    <string name="status_protected_with_http_private_dns">被 HTTP 代理同私人 DNS 保護住</string>
     <string name="notification_action_dns_firewall_mode">DNS + 防火牆</string>
     <string name="settings_socks5_dialog_hint_ip">IP 地址</string>
     <string name="settings_socks5_dialog_hint_port">埠</string>
@@ -43,10 +43,10 @@
     <string name="settings_socks5_dialog_hint_password">密碼（可選）</string>
     <string name="settings_socks_forwarding_default_desc">轉發緊連線去 SOCKS5 端點。</string>
     <string name="settings_dns_proxy_dialog_header">設定 SOCKS5 (TCP) 代理</string>
-    <string name="status_protected_with_tor">畀 Tor 保護住</string>
-    <string name="status_protected_with_private_dns">畀私人 DNS 保護住</string>
-    <string name="status_protected_with_tor_private_dns">畀 Tor 同私人 DNS 保護住</string>
-    <string name="status_protected_with_proxy_private_dns">畀代理同私人 DNS 保護住</string>
+    <string name="status_protected_with_tor">被 Tor 保護住</string>
+    <string name="status_protected_with_private_dns">被私人 DNS 保護住</string>
+    <string name="status_protected_with_tor_private_dns">被 Tor 同私人 DNS 保護住</string>
+    <string name="status_protected_with_proxy_private_dns">被代理同私人 DNS 保護住</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某個 app 上網。
 \n <u>#2</u>：阻止任何想連去某個特定 IP 嘅 app。
 \n <u>#3</u>：喺裝置鎖定時阻止所有連線（通用攔截規則）。
@@ -139,10 +139,10 @@
     <string name="status_dns_error">DNS 錯誤</string>
     <string name="status_dns_server_down">DNS 伺服器離線</string>
     <string name="status_no_internet">冇網絡連線</string>
-    <string name="status_protected_with_socks5_private_dns">畀 SOCKS5 同私人 DNS 保護住</string>
-    <string name="status_protected_with_socks5">畀 SOCKS5 代理保護住</string>
-    <string name="status_protected_with_http">畀 HTTP 代理保護住</string>
-    <string name="status_protected_with_proxy">畀代理保護住</string>
+    <string name="status_protected_with_socks5_private_dns">被 SOCKS5 同私人 DNS 保護住</string>
+    <string name="status_protected_with_socks5">被 SOCKS5 代理保護住</string>
+    <string name="status_protected_with_http">被 HTTP 代理保護住</string>
+    <string name="status_protected_with_proxy">被代理保護住</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">私人 DNS 開着咗</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">未保護</string>
     <string name="dns_explanation_dns_connected">連線咗去 RethinkDNS</string>
@@ -152,7 +152,7 @@
     <string name="notification_action_pause_vpn">暫停</string>
     <string name="notification_action_stop_vpn">停止</string>
     <string name="notification_action_dns_mode">DNS</string>
-    <string name="apps_info_title">Apps</string>
+    <string name="apps_info_title">應用程式</string>
     <string name="hybrid_mode_info_title">DNS + 防火牆</string>
     <string name="dns_mode_info_explanation_new">監測、攔截同加密 DNS 請求。</string>
     <string name="dns_firewall_mode_info_explanation_new">上面所有功能加埋繞過互聯網審查。</string>
@@ -167,7 +167,7 @@
     <string name="conn_track_clear_logs_title">係咪要丟哂所有網絡日誌？</string>
     <string name="conn_track_clear_logs_message">咁做只會丟咗網絡日誌，唔會影響防火牆規則。呢個動作冇得返轉頭㗎。請問您係咪想繼續？</string>
     <string name="dns_query_clear_logs_title">係咪要丟哂所有 DNS 日誌？</string>
-    <string name="dns_query_clear_logs_message">咁做會丟咗裝置上面所有既 DNS 日誌。呢個動作冇得返轉頭㗎。請問您係咪想繼續？</string>
+    <string name="dns_query_clear_logs_message">咁做會丟咗裝置上面所有嘅 DNS 日誌。呢個動作冇得返轉頭㗎。請問您係咪想繼續？</string>
     <string name="bsct_app_info">應用程式資訊</string>
     <string name="private_dns_toast">私人 DNS 已經設定好。</string>
     <string name="always_on_dialog_heading">禁用永久連線 VPN</string>
@@ -295,7 +295,7 @@
     <string name="settings_http_proxy_toast_success">HTTP 代理設定咗</string>
     <string name="settings_http_proxy_hostname">網域</string>
     <string name="settings_http_proxy_port">埠</string>
-    <string name="settings_dns_proxy_dialog_app">App</string>
+    <string name="settings_dns_proxy_dialog_app">應用程式</string>
     <string name="settings_dns_proxy_dialog_hostname">網域</string>
     <string name="settings_dns_proxy_dialog_port_number">埠</string>
     <string name="settings_dns_proxy_dialog_username">帳號</string>
@@ -533,7 +533,7 @@
     <string name="dns_query_latency">%1$sms</string>
     <string name="dns_proxy_dialog_header_dns">加 DNS 代理</string>
     <string name="dns_proxy_name">代理名</string>
-    <string name="dns_proxy_app">App</string>
+    <string name="dns_proxy_app">應用程式</string>
     <string name="dns_proxy_ip_address">IP 地址</string>
     <string name="dns_proxy_port">埠</string>
     <string name="dns_proxy_negative_btn">取消</string>
@@ -781,7 +781,7 @@
     <string name="brbs_restore_complete_toast">恢復完，重啓緊 app……</string>
     <string name="cd_remove_dialog_message">喺儲存咗嘅配置入面刪除呢個網域。</string>
     <string name="pause_title_desc">瞌陣先…</string>
-    <string name="admin_receiver_status_enabled">而家可以設定基於 DNS 嘅內容攔截器.</string>
+    <string name="admin_receiver_status_enabled">而家可以設定基於 DNS 嘅內容攔截器。</string>
     <string name="accessibility_service_description">唔該比 RethinkDNS 用無障礙服務，嚟偵測同攔截背景應用程式。RethinkDNS 並唔會偷同埋賣您嘅任何資訊。</string>
     <string name="slide_2_desc">RethinkDNS 係而家喺 Android 裝置度最易用嘅監測網絡活動、繞過互聯網審查同攔截應用程式嘅防火牆軟件。</string>
     <string name="slide_1_desc">RethinkDNS 係一款受到 Mozilla Builders MVP 計劃資助同支持嘅開放原始碼軟件。</string>
@@ -808,7 +808,9 @@
     <string name="cd_filter_allowed">放行</string>
     <string name="cd_filter_blocked">攔截</string>
     <string name="skip">跳過</string>
-    <string name="allow">允許</string>
-    <string name="block">阻擋</string>
+    <string name="allow">放行</string>
+    <string name="block">攔截</string>
     <string name="firewall_mode_info_title">防火牆</string>
+    <string name="universal_firewall_explanation">根據裝置事件應用防火牆規則，例如喺在裝置鎖定時或者某個 app 唔係用緊時進行攔截。</string>
+    <string name="always_on_dialog">呢部電話嘅「永久連線 VPN」已經開着咗。要開 Rethink 嘅話，請去系統設定禁用咗「永久連線 VPN」先。</string>
 </resources>
