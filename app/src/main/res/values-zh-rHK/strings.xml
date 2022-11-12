@@ -807,4 +807,8 @@
     <string name="notif_dialog_pause_dialog_message">應用程式已被暫停，要繼續請恢復先</string>
     <string name="cd_filter_allowed">放行</string>
     <string name="cd_filter_blocked">攔截</string>
+    <string name="skip">跳過</string>
+    <string name="allow">允許</string>
+    <string name="block">阻擋</string>
+    <string name="firewall_mode_info_title">防火牆</string>
 </resources>
