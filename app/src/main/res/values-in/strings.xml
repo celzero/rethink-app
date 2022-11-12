@@ -106,7 +106,7 @@
     <string name="admin_receiver_status_disabled">Pemblokir konten tidak lagi berpengaruh.</string>
     <string name="status_dns_server_down">peladen dns tidak berfungsi</string>
     <string name="status_app_error">kesalahan app</string>
-    <string name="dns_firewall_mode_info_explanation_new">Semua di atas + lewati sensor jaringan.</string>
+    <string name="dns_firewall_mode_info_explanation_new">Semua di atas + pintasi sensor jaringan.</string>
     <string name="alert_permission_accessibility_regrant">Perlu Tindakan</string>
     <string name="conn_track_clear_logs_message">Hanya menghapus riwayat catatan jaringan, tidak dengan aturan-aturan firewall. Tindakan ini tidak dapat dibatalkan. Apakah Anda ingin melanjutkan\?</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">tidak terlindungi</string>
@@ -282,7 +282,7 @@
     <string name="orbot_none">Tidak ada (bawaan)</string>
     <string name="settings_theme_desc">Tema gelap/terang</string>
     <string name="ct_filter_parent_blocked">Terblokir</string>
-    <string name="dns_crypt_relay_remove_success">Pengoper DNSCrypt telah dihapus.</string>
+    <string name="dns_crypt_relay_remove_success">Pengoper DNSCrypt telah terhapus.</string>
     <string name="cd_dns_proxy_error_text_1">Alamat IP tidak valid</string>
     <string name="cd_dns_crypt_relay_heading">Pengoper</string>
     <string name="dns_filter_parent_allowed">Diijinkan</string>
@@ -607,4 +607,106 @@
     <string name="bsct_conn_block_desc">%1$s telah terblokir %2$s</string>
     <string name="info_dialog_rethink_toast_msg">Terkopi sebagai URL RDNS+ DNS-over-HTTPS</string>
     <string name="configure_dns_connected_dns_proxy_status">Proksi DNS</string>
+    <string name="dns_query_latency">%1$s mili-detik</string>
+    <string name="settings_orbot_disabled_error">Matikan proksi HTTP(S) dan/atau SOCKS5 untuk melanjutkan dengan pengaturan Tor-sebagai-proksi.</string>
+    <string name="dns_btm_latency_ms">%1$s mili-detik</string>
+    <string name="orbot_install_dialog_message">Orbot menyediakan fitur-fitur dan fungsi Tor kepada Android.</string>
+    <string name="ada_uid">ID app: <i>%1$s</i><br/>Kategori: <i>%2$s</i><br/>Diinstal pada: <i>%3$s</i><br/>Diperbarui pada: <i>%4$s</i></string>
+    <string name="notif_channel_desc_vpn_notification">Informasikan ketika RethinkDNS sedang aktif dan bekerja di latar belakang</string>
+    <string name="settings_orbot_notification_content">Gagal menjalankan Tor-sebagai-Proksi. Buka app Orbot untuk menjalankannya secara manual.</string>
+    <string name="ada_noapp_dialog_message">Informasi app ini tidak ditemukan.</string>
+    <string name="ci_no_rules_text">Aturan-aturan blokir ataupun pintasan universal tidak ditemukan.</string>
+    <string name="bsac_title_desc">Aturan-aturan yang diterapkan hanya pada app ini.</string>
+    <string name="dns_crypt_relay_error_toast">Tidak ada resolver yang dipilih</string>
+    <string name="dns_select_toast">Minimal satu resolver harus terpilih.</string>
+    <string name="bsac_bypass_app_rules">Pintaskan aturan-aturan app</string>
+    <string name="ada_app_status_whitelist">akan memintas aturan-aturan universal firewall</string>
+    <string name="settings_http_proxy_error_text3">Nama host tidak terisi</string>
+    <string name="ct_delete_logs_positive_btn">Hapus catatan-catatan</string>
+    <string name="notif_dialog_pause_dialog_negative">Singkirkan</string>
+    <string name="ada_app_status_block_wifi">apakah jaringan-jaringan yang tak dihitung (wifi) telah diblokir</string>
+    <string name="notif_dialog_pause_dialog_title">App terjeda!</string>
+    <string name="hsf_pause_lockdown_failure">Tidak dapat menjeda: RethinkDNS dalam mode dikunci</string>
+    <string name="about_dialog_positive_button">Mari Mulai</string>
+    <string name="fapps_metered_unblock_dialog_title">Ijinkan yang dihitung</string>
+    <string name="fapps_all_network_hint"><u>Gunakan semua jaringan</u> telah aktif. Firewall tidak akan mematuhi aturan-aturan Dihitung / Tak Dihitung.</string>
+    <string name="settings_notification_desc1">Jeda/ Hentikan (bawaan)</string>
+    <string name="dns_btm_resolved_crypt">ter-resolve <u>secara anonim</u> %1$s oleh %2$s</string>
+    <string name="cd_doh_dialog_heading">Menambah DNS atas HTTPS</string>
+    <string name="settings_all_networks_dialog_positive_btn">Tetap aktifkan</string>
+    <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
+    <string name="dns_crypt_url_remove_dialog_message">Menghapus resolver DNSCrypt dari konfigurasi tersimpan.</string>
+    <string name="lockdown">kunci</string>
+    <string name="univ_firewall_rule_9">Blokir jaringan yang dihitung (selular)</string>
+    <string name="hsf_pause_vpn_failure">Tidak dapat menjeda: RethinkDNS tidak aktif</string>
+    <string name="pause_mode_notification_title">Dijeda! App-app terblokir akan tetap ter-firewall.</string>
+    <string name="dns_btm_record_type">Jenis permintaan: %1$s</string>
+    <string name="dns_crypt_url_remove_success">Resolver DNSCrypt telah terhapus.</string>
+    <string name="firewall_status_lockdown">kunci</string>
+    <string name="fapps_metered_block_dialog_title">Blokir yang dihitung</string>
+    <string name="ada_app_status_block_md">apakah jaringan-jaringan yang dihitung (selular) telah diblokir</string>
+    <string name="cd_dns_crypt_dialog_heading">Menambah Resolver atau Relay DNSCrypt</string>
+    <string name="dns_logs_blocked_queries">Ermintaan terblokir: %1$s</string>
+    <string name="ada_network_log_title">catatan jaringan dari app ini</string>
+    <string name="cd_doh_dialog_resolver_name">Nama Resolver</string>
+    <string name="rt_chip_update_available">Pembaharuan tersedia</string>
+    <string name="ada_app_unmetered">Tak dihitung</string>
+    <string name="firewall_rule_block_unmetered">Tak dihitung (WiFi)</string>
+    <string name="firewall_status_block_metered">jaringan-jaringan yang dihitung (selular) telah diblokir</string>
+    <string name="firewall_rule_bypass_apprule_ip">IP terpintaskan (App)</string>
+    <string name="brbs_backup_dialog_title">Buat cadangan</string>
+    <string name="cd_dns_crypt_title">resolver-resolver</string>
+    <string name="firewall_rule_univ_block_metered">Dihitung (Universal)</string>
+    <string name="fapps_unmetered_block_dialog_title">Blokir yang tak dihitung</string>
+    <string name="ada_app_status_lockdown">dalam mode terkunci</string>
+    <string name="ci_bypass_universal_desc">- Memintas universal</string>
+    <string name="ada_lockdown_title">Kunci app</string>
+    <string name="firewall_rule_block_metered">Dihitung (Selular)</string>
+    <string name="settings_notification_dialog_option_1">"
+\nJeda / Hentikan (bawaan):
+\nMenampilkan dua tombol, untuk menjeda atau menghentikan RethinkDNS dengan cepat."</string>
+    <string name="ct_btm_sheet_error">Tidak dapat membuka lembar bawah</string>
+    <string name="hsf_proxy_chip_removed_toast">Proksi dihapus</string>
+    <string name="firewall_rule_global_lockdown">Kunci</string>
+    <string name="cd_dns_crypt_dialog_title">Menambah Resolver atau Relay DNSCrypt</string>
+    <string name="ada_firewall_status">App ini <b><i>%1$s</i></b>.</string>
+    <string name="fapps_lockdown_hint">Vpn dalam mode terkunci. Firewall akan mematuhi aturan-aturan Dihitung / Tak Dihitung.</string>
+    <string name="dns_crypt_connection_failure">Gagal terkoneksi dengan peladen DNSCrypt.</string>
+    <string name="configure_dns_crypt">DNSCrypt: %1$s pe-resolver</string>
+    <string name="fapps_firewall_filter_lockdown">Kunci</string>
+    <string name="ada_app_metered">Dihitung</string>
+    <string name="settings_custom_downloader_heading">Gunakan pengunduh bawaan app</string>
+    <string name="bsdl_blocked_desc">%1$s telah terblokir %2$s</string>
+    <string name="notification_action_stop_vpn">HENTIKAN</string>
+    <string name="firewall_status_block_unmetered">jaringan-jaringan yang tak dihitung (wifi) telah diblokir</string>
+    <string name="pause_text">terjeda</string>
+    <string name="error_loading_log_file">Gagal memuat fail catatan</string>
+    <string name="dns_btm_resolved_doh">%1$s telah ter-resolve %2$s</string>
+    <string name="ada_ip_rules_status_bypass_app_rules">Pintaskan aturan-aturan app</string>
+    <string name="cd_doh_dialog_resolver_url">URL Resolver</string>
+    <string name="dns_log_dialog_positive">Hapus catatan-catatan</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">Hapus resolver DNSCrypt\?</string>
+    <string name="fapps_unmetered_unblock_dialog_title">Ijinkan yang tak dihitung</string>
+    <string name="notification_action_pause_vpn">JEDA</string>
+    <string name="orbot_stop_dialog_title">Dibutuhkan intervensi manual</string>
+    <string name="dc_doh">Dns atas HTTPS</string>
+    <string name="settings_all_networks_dialog_message">Jika diaktifkan, aturan-aturan firewall dihitung (Selular) dan tak-dihitung (WiFi) tidak akan dipatuhi.
+\n
+\nApakah Anda ingin melanjutkan\?</string>
+    <string name="brbs_backup_desc">Cadangkan pengaturan-pengaturan app, jaringan dan catatan-catatan dns</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Sebuah aturan firewall universal pengguna memblokir <i>app</i>\tini ketika mencoba terkoneksi dengan jaringan <i>Dihitung</i> (Selular).<br/><br/> Masuklah ke tab <i>Semua App</i> untuk mengubahnya.</string>
+    <string name="hsf_exclude_error">Pengecualian tidak dimungkinkan dalam mode penguncian VPN</string>
+    <string name="firewall_rule_block_app_mobile_desc">Sebuah aturan firewall pengguna memblokir <i>app</i>\tini ketika mencoba terkoneksi dengan jaringan <i>Dihitung</i>.<br/><br/> Masuklah ke tab <i>Semua App</i> untuk mengubahnya.</string>
+    <string name="slide_1_desc">RethinkDNS adalah peranti lunak dengan sumber terbuka yang didukung program MVP Mozilla Builders.</string>
+    <string name="bsct_block">Blokir, pintaskan, kecualikan, kunci <u>app ini</u></string>
+    <string name="fapps_info_dialog_message">Memblokir koneksi app-app ke jaringan. Membatasi akses ke jaringan membantu mencegah pemakaian data yang tanpa dasar, sekaligus menghemat baterai.
+\n
+\nAturan-aturan firewall Dihitung (Selular) / Tak Dihitung (WiFi) tidak akan dipatuhi jika:
+\n
+\n1. VPN dalam mode terkunci (misal, <i>Blokir koneksi-koneksi tanpa VPN</i> sedang aktif).
+\n
+\n2. Pengaturan <i>Gunakan semua jaringan yang tersedia</i> sedang aktif.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Sebuah aturan firewall pengguna memblokir <i>app</i>\tini ketika mencoba terkoneksi dengan jaringan <i>Tak Dihitung</i>.<br/><br/> Masuklah ke tab <i>Semua App</i> untuk mengubahnya.</string>
+    <string name="bsac_whitelist_toast">Pintaskan aturan-aturan app untuk IP %1$s ini</string>
+    <string name="pause_title_desc">sedang rehat…</string>
 </resources>
