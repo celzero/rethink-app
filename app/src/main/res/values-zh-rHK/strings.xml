@@ -820,7 +820,7 @@
     <string name="bsct_conn_block_desc_device">本地攔截 %1$s</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
     <string name="bsct_conn_desc_blocked">%2$s 攔截 %1$s</string>
-    <string name="blocklist_update_check_failure">似乎有啲咩出咗錯。請等陣再試過！</string>
+    <string name="blocklist_update_check_failure">出咗啲問題。等陣再試！</string>
     <string name="download_update_dialog_failure_message">可能我哋嘅伺服器死咗，或者個網有啲事，請等陣再試過。</string>
     <string name="download_update_dialog_trylater_message">而家更新唔到，請等陣再試過。</string>
     <string name="orbot_install_activity_error">似乎出咗啲問題，請等陣再試過</string>
