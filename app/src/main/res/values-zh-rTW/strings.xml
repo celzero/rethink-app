@@ -569,7 +569,7 @@
     <string name="hsf_uptime">（自%1$s啓動；協定：%2$s）</string>
     <string name="hsf_downtime">（自%1$s起停用）</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
-    <string name="hsf_vpn_dialog_message">RethinkDNS 需要設定本地 VPN 的的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。
+    <string name="hsf_vpn_dialog_message">RethinkDNS 需要設定本地 VPN 的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。
 \n
 \nRethinkDNS 並不會收集任何資料，且不會以任何方式監視您。</string>
     <string name="hsf_vpn_dialog_positive">繼續</string>
