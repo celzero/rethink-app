@@ -95,7 +95,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private fun openBottomSheet(ct: ConnectionTracker) {
             if (context !is FragmentActivity) {
-                Log.wtf(LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
+                Log.wtf(LOG_TAG_UI, "Error opening the connection tracker bottomsheet")
                 return
             }
 

@@ -733,8 +733,6 @@
 
     <string name="ct_ip_details">%1$s (%2$s)</string>
 
-    <string name="ct_btm_sheet_error">Can not open bottom sheet</string>
-
     <string name="ct_filter_parent_all">All</string>
     <string name="ct_filter_parent_allowed">Allowed</string>
     <string name="ct_filter_parent_blocked">Blocked</string>

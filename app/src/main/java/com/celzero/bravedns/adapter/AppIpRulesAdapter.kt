@@ -78,7 +78,7 @@ class AppIpRulesAdapter(private val context: Context, val uid: Int) :
         private fun openBottomSheet(ipAddress: String, port: Int,
                                     ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int) {
             if (context !is AppCompatActivity) {
-                Log.wtf(LoggerConstants.LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
+                Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottomsheet")
                 return
             }
 
