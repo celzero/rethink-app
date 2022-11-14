@@ -159,7 +159,7 @@
     <string name="settings_autostart_bootup_heading">裝置啓動時自啓（實驗性）</string>
     <string name="settings_autostart_bootup_desc">若在關機前 RethinkDNS 在運行，在開機時則自動啓動。</string>
     <string name="settings_network_all_networks_desc">啓用時， RethinkDNS 將使用所有可用的網路來連線至互聯網。若未啓用，則將使用 Android 認爲<i>活躍</i>的網路。</string>
-    <string name="settings_all_networks_dialog_message">啓用時，應用防火牆規則將不會考慮網路爲非計費（如 WiFi ）或計費（如行動數據）。
+    <string name="settings_all_networks_dialog_message">啓用時，應用防火牆規則將不會考慮網路爲計費（如行動數據）或非計費（如 WiFi ）。
 \n
 \n您是否想要繼續？</string>
     <string name="allow">放行</string>
