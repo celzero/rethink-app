@@ -709,4 +709,39 @@
     <string name="firewall_rule_block_app_unmetered_desc">Sebuah aturan firewall pengguna memblokir <i>app</i>\tini ketika mencoba terkoneksi dengan jaringan <i>Tak Dihitung</i>.<br/><br/> Masuklah ke tab <i>Semua App</i> untuk mengubahnya.</string>
     <string name="bsac_whitelist_toast">Pintaskan aturan-aturan app untuk IP %1$s ini</string>
     <string name="pause_title_desc">sedang rehat…</string>
+    <string name="whats_new_version_update"><b>Usaha maximal</b>
+\n
+\n 1. Memperkenalkan resolver Rethink yang lebih privat, <i>Max</i>.
+\n 2. Menadai IPv6 sebagai eksperimental; beralih ke IPv4 sebagai default.
+\n 3. <i>Fitur baru</i>: Mencadangkan dan memulihkan pengaturan-pengaturan app.
+\n 4. <i>Fitur baru</i>: Mode penguncian app.
+\n 5. <i>Fitur baru</i>: Mode penguncian universal.
+\n 6. <i>Fitur baru</i>: Menerapkan aturan-aturan firewall pada nomor-nomor port.
+\n 7. <i>Fitur baru</i>: Menerapkan aturan-aturan firewall secara berkelompok.
+\n 8. Penyegaran minor UI.
+\n 9. Perbaikan-perbaikan memori dan crash lain. </string>
+    <string name="brbs_restore_dialog_failure_positive">Ulangi Pemulihan</string>
+    <string name="brbs_restore_complete_toast">Pemulihan selesai, memulai ulang app…</string>
+    <string name="settings_import_export_heading">Pencadangan &amp; Pemulihan</string>
+    <string name="brbs_restore_dialog_message">Memulihkan pengaturan-pengaturan, catatan-catatan jaringan dan dns dari fail cadangan. Ini akan memulai ulang app ybs.</string>
+    <string name="brbs_restore_desc">Memulihkan dari fail cadangan</string>
+    <string name="brbs_backup_dialog_message">Mencadangkan pengaturan-pengaturan, catatan-catatan jaringan dan dns ke sebuah fail. Ini akan memulai ulang VPN.</string>
+    <string name="download_update_dialog_message_ok_title">Telah terkini!</string>
+    <string name="brbs_restore_no_uri_toast">Pemulihan gagal, coba lagi</string>
+    <string name="brbs_restore_dialog_failure_message">Tidak dapat memulihkan. Coba lagi\?</string>
+    <string name="brbs_restore_title">Pemulihan</string>
+    <string name="notif_channel_proxy_failure">Peringatan-peringatan Proksi</string>
+    <string name="brbs_title">Pencadangan &amp; pemulihan</string>
+    <string name="firewall_card_text_active">%1$s diblokir
+\n%2$s dipintaskan
+\n%3$s dikecualikan
+\n%4$s dikunci</string>
+    <string name="firewall_rule_bypass_universal_ip">IP terpintaskan</string>
+    <string name="local_blocklist_redownload">Telah terkini!</string>
+    <string name="contributors_dialog_title">Para pencipta</string>
+    <string name="settings_import_export_desc">Mencadangkan atau memulihkan data dan pengaturan-pengaturan app secara manual.</string>
+    <string name="cd_whitelist_txt">Daftar putih</string>
+    <string name="brbs_restore_dialog_positive">Pulihkan</string>
+    <string name="brbs_restore_dialog_title">Pemulihkan cadangan</string>
+    <string name="brbs_restore_dialog_failure_title">Pemulihan gagal</string>
 </resources>
