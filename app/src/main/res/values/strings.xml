@@ -597,6 +597,7 @@
     <string name="about_github">Contribute on GitHub</string>
     <string name="about_faq">View FAQs</string>
     <string name="about_docs">Read docs</string>
+    <string name="about_privacy_policy">Privacy policy</string>
     <string name="about_connect">contact</string>
     <string name="about_sponsor">sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
@@ -627,6 +628,7 @@
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
     <string name="about_version">v%1$s</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Suggest features</string>

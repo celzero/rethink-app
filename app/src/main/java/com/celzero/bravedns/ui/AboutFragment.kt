@@ -96,6 +96,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutTwitter.setOnClickListener(this)
         b.aboutGithub.setOnClickListener(this)
         b.aboutBlog.setOnClickListener(this)
+        b.aboutPrivacyPolicy.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
@@ -192,6 +193,9 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutAppTranslate -> {
                 openActionViewIntent(getString(R.string.about_translate_link).toUri())
+            }
+            b.aboutPrivacyPolicy -> {
+                openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
             }
         }
     }
