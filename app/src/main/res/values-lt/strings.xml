@@ -135,7 +135,7 @@
     <string name="settings_general_header">bendrieji</string>
     <string name="settings_network_all_networks">Naudoti visus turimus tinklus (eksperimentinis)</string>
     <string name="settings_all_networks_dialog_title">Dėmesio!</string>
-    <string name="settings_all_networks_dialog_message">Kai įjungta, programėlės ugniasienės taisyklės, skirtos matuojamiems (pvz., Wi-Fi) ir nematuojamiems (pvz., mobiliesiems) tinklams, nebus paisomos.
+    <string name="settings_all_networks_dialog_message">Kai įjungta, programėlės ugniasienės taisyklės, skirtos matuojamiems (pvz., mobiliesiems) ir nematuojamiems (pvz., WiFi) tinklams, nebus paisomos.
 \n
 \nAr norite tęsti\?</string>
     <string name="settings_all_networks_dialog_positive_btn">Vis tiek įjungti</string>
