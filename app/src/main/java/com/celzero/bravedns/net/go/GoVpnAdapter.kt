@@ -79,7 +79,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
         try {
             if (DEBUG) {
-                Tun2socks.enableDebugLog()
+                //Tun2socks.enableDebugLog()
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
@@ -98,7 +98,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
                                                   tunnelOptions.listener)
 
             setTunnelMode(tunnelOptions)
-            setBraveDnsBlocklistMode(tunnelOptions.tunDnsMode, dohURL)
+            setBraveDnsBlocklistMode(dohURL)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
             tunnel?.disconnect()
@@ -134,7 +134,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
     }
 
-    private fun setBraveDnsBlocklistMode(tunDnsMode: AppConfig.TunDnsMode, dohUrl: String) {
+    private fun setBraveDnsBlocklistMode(dohUrl: String) {
         if (DEBUG) Log.d(LOG_TAG_VPN, "init bravedns mode")
         // remove braveDns object from the tunnel, set if either local or remote is set
         tunnel?.braveDNS = null
@@ -142,7 +142,11 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         io {
             if (persistentState.blocklistEnabled) {
                 setBraveDNSLocalMode()
-            } else if (tunDnsMode.isRethinkRemote()) {
+            }
+            // earlier, remote blocklist was enabled based on the tunDnsMode in tunnelOptions.
+            // case: can configure the blocklist from website and it as a new DOH entry in ui
+            // which will also
+            else if (appConfig.isRethinkDnsConnected()) {
                 setBraveDNSRemoteMode(dohUrl)
             } else {
                 // no-op
@@ -427,7 +431,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
             setTunnelMode(tunnelOptions)
             // Set brave dns to tunnel - Local/Remote
-            setBraveDnsBlocklistMode(tunnelOptions.tunDnsMode, dohURL)
+            setBraveDnsBlocklistMode(dohURL)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
             tunnel?.disconnect()
