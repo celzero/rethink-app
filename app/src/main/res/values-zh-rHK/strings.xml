@@ -22,7 +22,7 @@
 \nRethinkDNS 並唔會收集任何資料，同埋唔會以任何方式監視您。</string>
     <string name="dc_dns_website_heading">喺 DNS 日誌入面展示網站圖示（實驗性）</string>
     <string name="dc_check_update_desc">每<i>三</i>日檢查有冇攔截清單更新</string>
-    <string name="dc_other_settings_heading">類型</string>
+    <string name="dc_other_settings_heading">進階</string>
     <string name="about_bravedns_toreport_text">幫助同反饋</string>
     <string name="about_bug_no_log_dialog_message">拎唔到崩潰日誌。請問您係咪要手動報告漏洞？</string>
     <string name="about_version">v%1$s</string>
@@ -163,7 +163,7 @@
 \n
 \nRethinkDNS 並唔會收集任何資料，同埋唔會以任何方式監視您。</string>
     <string name="default_dns_name">RDNS 默認</string>
-    <string name="custom_url_error_invalid_url">無效嘅 URL</string>
+    <string name="custom_url_error_invalid_url">冇效嘅 URL</string>
     <string name="conn_track_clear_logs_title">係咪要丟哂所有網絡日誌？</string>
     <string name="conn_track_clear_logs_message">咁做只會丟咗網絡日誌，唔會影響防火牆規則。呢個動作冇得返轉頭㗎。請問您係咪想繼續？</string>
     <string name="dns_query_clear_logs_title">係咪要丟哂所有 DNS 日誌？</string>
@@ -289,7 +289,7 @@
     <string name="settings_http_proxy_desc">轉發緊去 %1$s:%2$s</string>
     <string name="settings_http_proxy_dialog_title">自訂伺服器 URL</string>
     <string name="settings_http_proxy_error_text1">埠範圍喺 1024 到 65535 之間</string>
-    <string name="settings_http_proxy_error_text2">無效埠</string>
+    <string name="settings_http_proxy_error_text2">冇效嘅埠</string>
     <string name="settings_http_proxy_error_text3">網域係空</string>
     <string name="settings_http_proxy_error_text4">伺服器連線失敗。請再嚟過。</string>
     <string name="settings_http_proxy_toast_success">HTTP 代理設定咗</string>
@@ -699,8 +699,8 @@
     <string name="bsac_bypass_app_rules">繞行應用規則</string>
     <string name="bsac_go_pass_app_rules">移除繞行</string>
     <string name="bsac_delete">刪除</string>
-    <string name="bsac_block_toast">針對呢個 IP %1$s 嘅繞行應用規則</string>
-    <string name="bsac_unblock_toast">移除咗針對呢個 IP %1$s 嘅繞行</string>
+    <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
+    <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
     <string name="bsac_delete_toast">刪除咗 %1$s</string>
     <string name="bsdl_domain_heading">網域規則</string>
     <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
@@ -770,11 +770,11 @@
     <string name="brbs_restore_dialog_positive">恢復</string>
     <string name="brbs_restore_dialog_negative">取消</string>
     <string name="brbs_backup_dialog_failure_title">備份失敗</string>
-    <string name="brbs_backup_dialog_failure_message">而家備份唔到。要不要試多次？</string>
+    <string name="brbs_backup_dialog_failure_message">而家備份唔到。要唔要試多次？</string>
     <string name="brbs_backup_dialog_failure_positive">重新備份</string>
     <string name="brbs_backup_dialog_failure_negative">忽略</string>
     <string name="brbs_restore_dialog_failure_title">恢復失敗</string>
-    <string name="brbs_restore_dialog_failure_message">而家恢復唔到。要不要試多次？</string>
+    <string name="brbs_restore_dialog_failure_message">而家恢復唔到。要唔要試多次？</string>
     <string name="brbs_backup_complete_toast">備份完</string>
     <string name="brbs_restore_dialog_failure_positive">重新恢復</string>
     <string name="brbs_restore_dialog_failure_negative">忽略</string>
@@ -791,7 +791,7 @@
     <string name="untracked">未追蹤</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">㩒一下呢度改防護設定</string>
     <string name="brave_dns_connect_mode_change_firewall">揀模式。</string>
-    <string name="firewall_mode_info_explanation_new">監測網路活動同攔截任何應用程式或者 IP 地址。</string>
+    <string name="firewall_mode_info_explanation_new">監測網絡活動同攔截任何應用程式或者 IP 地址。</string>
     <string name="brave_dns_connect_mode_change_dns">揀模式。</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS 用緊<i>閉關</i>模式行緊 VPN。停咗佢會令到而家嘅使用者上唔到網。您係咪仲要繼續？</string>
     <string name="always_on_dialog_stop_message">永久連線 VPN 已對 Rethink 啓用。您係咪仲想停止 Rethink？</string>
@@ -820,8 +820,58 @@
     <string name="bsct_conn_block_desc_device">本地攔截 %1$s</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
     <string name="bsct_conn_desc_blocked">%2$s 攔截 %1$s</string>
-    <string name="blocklist_update_check_failure">出咗啲問題。等陣再試！</string>
+    <string name="blocklist_update_check_failure">似乎出咗啲問題。請等陣再試過！</string>
     <string name="download_update_dialog_failure_message">可能我哋嘅伺服器死咗，或者個網有啲事，請等陣再試過。</string>
     <string name="download_update_dialog_trylater_message">而家更新唔到，請等陣再試過。</string>
     <string name="orbot_install_activity_error">似乎出咗啲問題，請等陣再試過</string>
+    <string name="firewall_status_allow">放行咗</string>
+    <string name="firewall_status_excluded">排除咗喺 DNS 同防火牆之外</string>
+    <string name="firewall_status_lockdown">閉關咗</string>
+    <string name="firewall_status_whitelisted">繞過咗全局防火牆規則</string>
+    <string name="firewall_status_block_unmetered">阻止咗連接唔收費嘅網絡（WiFi）</string>
+    <string name="firewall_status_block_metered">阻止咗連接收費嘅網絡（流動數據）</string>
+    <string name="firewall_status_blocked">攔截咗</string>
+    <string name="firewall_card_status_inactive">禁用咗</string>
+    <string name="dns_card_connected_status_failure">禁用咗</string>
+    <string name="dns_btm_sheet_chip_allowed">放行咗</string>
+    <string name="dns_btm_sheet_chip_blocked">攔截咗</string>
+    <string name="dns_btm_sheet_chip_no_answer">冇回應</string>
+    <string name="dns_filter_parent_allowed">放行咗</string>
+    <string name="dns_filter_parent_blocked">攔截咗</string>
+    <string name="fapps_firewall_filter_allowed">放行咗</string>
+    <string name="fapps_firewall_filter_blocked">攔截咗</string>
+    <string name="fapps_firewall_filter_bypass_universal">繞行咗</string>
+    <string name="fapps_firewall_filter_excluded">排除咗</string>
+    <string name="fapps_firewall_filter_lockdown">閉關咗</string>
+    <string name="firewall_rule_block_app_desc">一條用戶定義嘅防火牆規則攔截咗呢個 <i>App</i>。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_new_app_desc">呢個 App <i>第一次</i>嘗試連線。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_block_app_unmetered_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>唔收費嘅網絡</i>嘅時候將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_block_app_mobile_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>嘅時候將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用</i>選項卡。</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>（流動數據）時將佢攔截咗。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_lockdown_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>已繞行 IP</i> 以外嘅地址時時將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_block_ip_univ_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP / 埠</i>。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
+    <string name="firewall_rule_block_ip_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP</i>。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_bypass_app_rules_ip_desc">呢個連線因為呢個<i>目標 IP</i> 設定咗做繞過所有分應用規則而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_bypass_universal_ip_desc">呢個連線因為呢個<i>目標 IP</i> 設定咗做繞過所有全局規則而被放行。<br/><br/>若需更改，請去<i>全局</i>選項卡。</string>
+    <string name="cd_dialog_desc">比一個自訂嘅 URL（網域）或者通配符嚟放行或者攔截，例如 *.test.com 或者 test.com/test</string>
+    <string name="cd_whitelist_initial">放</string>
+    <string name="cd_whitelist_txt">放行</string>
+    <string name="cd_blocked_initial">攔</string>
+    <string name="cd_blocked_txt">攔截</string>
+    <string name="ci_bypass_universal_txt">無條件放行</string>
+    <string name="ci_bypass_universal_desc">- 無條件放行</string>
+    <string name="ci_blocked_initial">攔</string>
+    <string name="ci_blocked_txt">攔截</string>
+    <string name="ci_blocked_desc">- 攔截</string>
+    <string name="ci_block">攔截</string>
+    <string name="ci_bypass_universal">無條件放行</string>
+    <string name="ada_ip_rules_status_blocked">攔截咗</string>
+    <string name="ada_app_status_allow">放行咗</string>
+    <string name="ada_app_status_block">攔截咗</string>
+    <string name="ada_app_status_block_wifi">已經喺唔收費嘅網絡（WiFi）攔截咗</string>
+    <string name="ada_app_status_block_md">已經喺收費嘅網絡（流動數據）攔截咗</string>
+    <string name="ada_app_whitelist">無條件放行</string>
+    <string name="bsac_block">攔截</string>
+    <string name="notif_download_failure_content">下載失敗。請再試過。</string>
+    <string name="brbs_restore_no_uri_toast">恢復失敗；請再試過</string>
 </resources>
