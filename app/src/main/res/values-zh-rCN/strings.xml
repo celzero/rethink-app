@@ -369,7 +369,7 @@
 \n%2$s</string>
     <string name="orbot_stop_dialog_message">RethinkDNS 已停止向 Orbot 转发连接，但 Orbot 可能仍于后台运行。</string>
     <string name="orbot_install_dialog_positive">安装</string>
-    <string name="settings_all_networks_dialog_message">启用时，应用防火墙规则将不会考虑网络为非收费（如 WiFi ）或收费（如移动数据）。
+    <string name="settings_all_networks_dialog_message">启用时，应用防火墙规则将不会考虑网络为收费（如移动数据）或非收费（如 WiFi ）。
 \n
 \n您是否想要继续？</string>
     <string name="settings_theme_dialog_themes_2">亮色</string>

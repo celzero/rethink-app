@@ -109,7 +109,7 @@
     <string name="fapps_filter_parent_all">Tudo</string>
     <string name="fapps_info_dialog_positive_btn">Ok</string>
     <string name="fapps_unmetered_positive">Aplicar</string>
-    <string name="fapps_metered_block_dialog_title">Bloquear em redes medidas</string>
+    <string name="fapps_metered_block_dialog_title">Bloqueie em redes com franquia de dados</string>
     <string name="fapps_unmetered_negative">Cancelar</string>
     <string name="network_log_app_name_unknown">Desconhecido</string>
     <string name="cd_dns_proxy_error_text_1">Endereço IP inválido</string>
@@ -117,33 +117,33 @@
     <string name="rules_load_failure_desc">Nenhuma regra de firewall encontrada</string>
     <string name="rules_load_failure_reload">recarregar</string>
     <string name="firewall_rule_block_app_new_install">Novo app</string>
-    <string name="fapps_unmetered_unblock_dialog_title">Permitir em redes ilimitadas</string>
+    <string name="fapps_unmetered_unblock_dialog_title">Permitir em redes de banda larga</string>
     <string name="firewall_rule_block_app_exception">Erro</string>
     <string name="firewall_rule_block_ip">IP / Porta</string>
     <string name="firewall_rule_exempt_app_bypass_univ">App contornado</string>
     <string name="firewall_rule_block_http">HTTP inseguro</string>
-    <string name="fapps_unmetered_block_dialog_title">Bloquear em redes ilimitadas</string>
-    <string name="fapps_unmetered_block_dialog_message">Bloquear conexões em redes ilimitadas (WiFi) para apps <i>listados</i>\?</string>
+    <string name="fapps_unmetered_block_dialog_title">Bloquear em redes de banda larga</string>
+    <string name="fapps_unmetered_block_dialog_message">Bloquear conexões em redes de banda larga (WiFi) para apps <i>listados</i>\?</string>
     <string name="firewall_rule_exempt_orbot_setup">Configuração do Orbot</string>
-    <string name="fapps_unmetered_unblock_dialog_message">Permitir conexões em rede ilimitadas (WiFi) para apps <i>listados</i>\?</string>
-    <string name="fapps_firewall_filter_hint">Aplicar regras medidas / ilimitadas em apps listados</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Permitir conexões em rede de banda larga (WiFi) para apps <i>listados</i>\?</string>
+    <string name="fapps_firewall_filter_hint">Aplicar regras em franquia de dados / banda larga para apps listados</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS com proxy</string>
     <string name="firewall_rule_no_rule_desc">Nenhuma regra do firewall correspondeu a esta conexão.</string>
     <string name="firewall_rule_block_dns_bypass">DNS contornado</string>
     <string name="firewall_rule_global_lockdown">Restrito</string>
-    <string name="firewall_rule_block_app_mobile_desc">Uma regra do firewall definida pelo usuário bloqueou este app <i/> ao tentar conectar-se com a rede <i>medida</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra do firewall universal definida pelo usuário bloqueou este app <i/> ao tentar conectar-se com a rede <i>medida</i> (Móvel).<br/><br/> Para mudar, acesse <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i> ao tentar conectar-se a rede com <i>Franquia de dados</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra universal do firewall definida pelo usuário bloqueou este <i>app</i> ao tentar conectar-se a rede com <i>Franquia de dados</i> (Móvel).<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_app_rules_ip_desc">Esta conexão foi permitida porque o <i>IP de destino</i> está configurado para contornar todas as regras específicas do app.<br/><br/> Para alterar, acesse <i>Firewall específico do app</i>.</string>
     <string name="firewall_rule_device_lock_desc">Esta conexão foi bloqueada porque o dispositivo <i>estava bloqueado</i> naquele momento.<br/><br/> Para mudar este comportamento, acesse <i>Universal</i>.</string>
     <string name="firewall_rule_block_udp_ntp_desc">Uma regra do firewall definida pelo usuário bloqueou esta conexão <i>UDP</i>.<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta conexão foi permitida porque o <i>app de origem</i> está configurado para <i>contornar as regras universais do firewall</i>.<br/><br/> Para alterar, acesse <i>Firewall específico do app</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta conexão foi permitida porque o <i>app de origem</i> está configurado para <i>contornar as regras universais</i> do firewall.<br/><br/> Para alterar, acesse <i>Firewall específico do app</i>.</string>
     <string name="firewall_rule_block_http_desc">Esta conexão foi bloqueada porque provavelmente usava <i>HTTP inseguro</i>.<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
     <string name="new_app_notification_action_toast_allow">Conexão da rede permitida para este app</string>
     <string name="notif_channel_firewall_alerts">Alertas do firewall</string>
     <string name="notif_channel_vpn_failure">VPN inativa</string>
     <string name="notif_channel_proxy_failure">Alertas de proxy</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
-    <string name="dns_proxy_connection_failure_lockdown">Ao excluir %1$s para %2$s no modo restrito você pode causar problemas de conectividade à internet.</string>
+    <string name="dns_proxy_connection_failure_lockdown">Ao excluir %1$s para %2$s no modo restrito você pode causar problemas de conectividade com a internet.</string>
     <string name="orbot_toast_parameter">Tor-como-proxy</string>
     <string name="update_complete_snack_message">Nova versão baixada.</string>
     <string name="update_complete_action_snack">RESTART</string>
@@ -162,16 +162,16 @@
     <string name="cd_remove_dialog_positive">Apagar</string>
     <string name="cd_remove_dialog_negative">Cancelar</string>
     <string name="cd_sample_unicode_invalid">❌</string>
-    <string name="ci_bypass_universal_desc">- Liberação universal</string>
+    <string name="ci_bypass_universal_desc">- Autorização universal</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_blocked_desc">-Bloqueado</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Regras de liberação do app</string>
+    <string name="ada_ip_rules_status_bypass_app_rules">Regras de autorização do app</string>
     <string name="ci_no_rule_initial">N</string>
-    <string name="ada_app_status_block_wifi">está bloqueado em redes ilimitadas (wifi)</string>
-    <string name="ada_lockdown_desc">Quando ativado, o app pode conectar-se apenas a IPs definidos em <i>Regras de liberação do app</i>; as conexões a qualquer outro IP serão bloqueadas.</string>
+    <string name="ada_app_status_block_wifi">está bloqueado em redes de banda larga (wifi)</string>
+    <string name="ada_lockdown_desc">Quando ativado, o app pode conectar-se apenas a IPs definidos em <i>Regras de autorização do app</i>; conexões a qualquer outro IP serão bloqueadas.</string>
     <string name="ada_app_status_allow">está permitido</string>
     <string name="ada_ip_no_connection">Nenhum registro da rede para este app.</string>
-    <string name="ada_app_status_block_md">está bloqueado em redes medidas (móveis)</string>
+    <string name="ada_app_status_block_md">está bloqueado em redes com franquia de dados (móvel)</string>
     <string name="ada_app_status_whitelist">contornará as regras universais do firewall</string>
     <string name="bsdl_domain_desc">Toque abaixo para permitir ou bloquear a consulta de DNS</string>
     <string name="bsdl_domain_rule_block">bloquear</string>
@@ -233,7 +233,7 @@
     <string name="status_protected_with_http_private_dns">protegido pelo proxy de http e dns privado</string>
     <string name="status_protected_with_socks5">protegido pelo proxy de socks</string>
     <string name="status_protected_with_proxy">protegido pelo proxy</string>
-    <string name="universal_firewall_explanation">Aplique as regras de firewall para todos os apps com a base em eventos do dispositivo, p.ex., firewall quando o dispositivo estiver bloqueado ou quando um determinado app não estiver em uso.</string>
+    <string name="universal_firewall_explanation">Aplique as regras de firewall para todos os apps baseado em eventos no dispositivo, p.ex., usar firewall quando o dispositivo estiver bloqueado ou quando um determinado app não estiver em uso.</string>
     <string name="settings_allow_bypass_desc">Permitir que os apps solicitantes contornem o firewall do RethinkDNS sob demanda. Alguns apps de áudio/vídeo conferência como Zoom e WhatsApp podem exigir um contorno sob demanda para funcionar corretamente.</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="status_protected_with_http">protegido pelo proxy de http</string>
@@ -286,7 +286,7 @@
     <string name="slide_1_title">Gratuito e de software livre</string>
     <string name="slide_1_desc">RethinkDNS é um software livre apoiado pelo programa MVP do Mozilla Builders.</string>
     <string name="allow">permitir</string>
-    <string name="bypass_universal">Liberação ilimitada</string>
+    <string name="bypass_universal">Autorização universal</string>
     <string name="exclude">excluir</string>
     <string name="untracked">não rastreado</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: RethinkDNS foi desativado</string>
@@ -441,7 +441,7 @@
     <string name="settings_orbot_notification_content">Falha ao iniciar Tor-como-Proxy. Abra Orbot app para iniciá-lo manualmente.</string>
     <string name="settings_orbot_notification_action">Abrir Orbot</string>
     <string name="settings_all_networks_dialog_title">Atenção!</string>
-    <string name="settings_all_networks_dialog_message">Quando ativado, as regras de firewall do app para redes medidas (ex: WiFi) e não medidas (ex: Móvel) não serão honradas.
+    <string name="settings_all_networks_dialog_message">Quando ativado, as regras de firewall do app para redes com franquia de dados (ex: Móvel) e banda larga (ex: WiFi) não serão honradas.
 \n
 \nVocê quer continuar\?</string>
     <string name="settings_all_networks_dialog_positive_btn">Ativar de qualquer modo</string>
@@ -497,7 +497,7 @@
     <string name="firewall_status_allow">permitido</string>
     <string name="firewall_status_lockdown">restrito</string>
     <string name="firewall_status_whitelisted">contorna regras universais do firewall</string>
-    <string name="firewall_status_block_metered">bloqueado em redes limitadas (móveis)</string>
+    <string name="firewall_status_block_metered">bloqueado em redes com franquia de dados (móvel)</string>
     <string name="firewall_status_blocked">bloqueado</string>
     <string name="firewall_status_unknown">desconhecido</string>
     <string name="firewall_card_status_inactive">Desativado</string>
@@ -520,7 +520,7 @@
     <string name="hsf_vpn_dialog_positive">Continuar</string>
     <string name="hsf_vpn_prepare_failure">Ou a permissão da VPN está ausente, ou outro app está no modo de VPN Sempre Ligada.</string>
     <string name="hsf_start_dialog_header">Iniciar %1$s</string>
-    <string name="firewall_status_block_unmetered">bloqueado em redes ilimitadas (wifi)</string>
+    <string name="firewall_status_block_unmetered">bloqueado em redes de banda larga (wifi)</string>
     <string name="hsf_start_dialog_positive">Começar</string>
     <string name="hsf_start_dialog_negative">Descartar</string>
     <string name="hsf_blocklist_chip_text">%1$s listas de bloqueio configuradas</string>
@@ -528,7 +528,7 @@
     <string name="hsf_blocklist_chip_text_no_data">Ativar RethinkDNS+</string>
     <string name="hsf_dns_logs_chip_text">Registros de DNS</string>
     <string name="hsf_network_logs_chip_text">Registros da rede</string>
-    <string name="hsf_exclude_error">Não é possível excluir no modo restrito de VPN</string>
+    <string name="hsf_exclude_error">Não é possível excluir em modo restrito da VPN</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausar: RethinkDNS não está ativo</string>
     <string name="hsf_pause_lockdown_failure">Não é possível pausar: RethinkDNS no modo restrito</string>
     <string name="dns_logs_lifetime_queries">Consultas desde começou: %1$s</string>
@@ -616,7 +616,7 @@
     <string name="univ_firewall_rule_6">Bloqueie apps recém instalados por padrão</string>
     <string name="univ_firewall_rule_7">Bloqueie IPv4 em IPv6 (experimental)</string>
     <string name="univ_firewall_rule_8">Bloqueie tráfego na porta 80 (HTTP inseguro)</string>
-    <string name="univ_firewall_rule_9">Bloqueie na rede limitada (móvel)</string>
+    <string name="univ_firewall_rule_9">Bloqueie na rede com franquia de dados (móvel)</string>
     <string name="univ_view_blocked_ip">regras de ip e porta</string>
     <string name="univ_view_blocked_ip_desc">Modifique regras de IP/Portas bloqueadas ou contornadas.</string>
     <string name="univ_ip_delete_individual_positive">Apagar</string>
@@ -658,9 +658,9 @@
     <string name="fapps_firewall_filter_bypass_universal">Contornado</string>
     <string name="fapps_firewall_filter_lockdown">Restrito</string>
     <string name="fapps_info_dialog_title">Detalhes</string>
-    <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede medidas (móvel) para apps <i>listados</i>\?</string>
-    <string name="fapps_metered_unblock_dialog_title">Permitir em redes medidas</string>
-    <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes medidas (móvel) para apps <i>listados</i>\?</string>
+    <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede com franquia de dados (móvel) para apps <i>listados</i>\?</string>
+    <string name="fapps_metered_unblock_dialog_title">Permitir em redes com franquia de dados</string>
+    <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes com franquia de dados (móvel) para apps <i>listados</i>\?</string>
     <string name="fapps_metered_positive">Aplicar</string>
     <string name="fapps_metered_negative">Cancelar</string>
     <string name="fapps_firewall_filter_desc">Mostrando <u>%1$s</u> %2$s apps</string>
@@ -675,13 +675,13 @@
     <string name="dns_proxy_connection_failure">Erro ao conectar a servidor proxy de DNS.</string>
     <string name="fapps_info_dialog_message">Impeça que os apps se conectem à internet. Ao limitar acesso à internet você consegue evitar o uso indevido de dados, além de economizar a bateria.
 \n
-\nAs regras de firewall para redes medidas (móvel) / ilimitadas (WiFi) não serão respeitadas quando:
+\nAs regras de firewall para redes com franquia de dados (móvel) / banda larga (WiFi) não serão respeitadas quando:
 \n
 \n1. A VPN está no modo restrito (ou seja, <i>Bloqueio de conexões sem VPN</i> está ativado).
 \n
 \n2. A configuração <i>Usar todas as redes disponíveis</i> está ativada.</string>
-    <string name="fapps_lockdown_hint">VPN está em modo restrito. O firewall não respeitará as regras de redes medidas / ilimitadas.</string>
-    <string name="fapps_all_network_hint"><u>Usar todas as redes</u> está ativado. O firewall não respeitará as regras de redes medidas / ilimitadas.</string>
+    <string name="fapps_lockdown_hint">VPN está em modo restrito. O firewall não respeitará as regras de redes com franquia de dados / banda larga.</string>
+    <string name="fapps_all_network_hint"><u>Usar todas as redes</u> está ativado. O firewall não respeitará as regras de redes com franquia de dados / banda larga.</string>
     <string name="dns_proxy_toast_parameter">Proxy de DNS</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio em uso</string>
     <string name="settings_local_blocklist_dialog_positive">Baixar</string>
@@ -699,9 +699,9 @@
     <string name="hs_btm_sheet_lock_down">Não é possível alterar entre modos quando a VPN está em modo <i>restrito</i>. Toque para <u>editar configurações da VPN</u>.</string>
     <string name="firewall_rule_no_rule">Sem regras</string>
     <string name="firewall_rule_block_app">App bloqueado</string>
-    <string name="firewall_rule_block_unmetered">Ilimitado (WiFi)</string>
-    <string name="firewall_rule_block_metered">Medido (Celular)</string>
-    <string name="firewall_rule_univ_block_metered">Medido (Universal)</string>
+    <string name="firewall_rule_block_unmetered">Banda larga (WiFi)</string>
+    <string name="firewall_rule_block_metered">Franquia de dados (Móvel)</string>
+    <string name="firewall_rule_univ_block_metered">Franquia de dados (Universal)</string>
     <string name="firewall_rule_lockdown">Restrito (App)</string>
     <string name="firewall_rule_bypass_apprule_ip">IP contornado (App)</string>
     <string name="firewall_rule_bypass_universal_ip">IP contornado</string>
@@ -709,19 +709,19 @@
     <string name="firewall_rule_foreground">App não está em uso</string>
     <string name="firewall_rule_unknown">Fonte desconhecida</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_block_app_desc">Uma regra do firewall definida pelo usuário bloqueou este app <i/> .<br/><br/> Para alterar, acesse <i>. Todos os apps</i>.</string>
+    <string name="firewall_rule_block_app_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i>.<br/><br/> Para alterar, acesse <i>. Todos os apps</i>.</string>
     <string name="firewall_rule_new_app_desc">Este app fez a conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Uma regra do firewall definida pelo usuário bloqueou este app <i/> ao tentar conectar-se com a rede <i>ilimitada</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
-    <string name="firewall_rule_lockdown_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i> enquanto conectava a outros IPs além dos <i>contornados</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i> ao tentar conectar-se com a rede de <i>Banda larga</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
+    <string name="firewall_rule_lockdown_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i> enquanto conectava a outros <i>IPs além dos contornados</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
     <string name="firewall_rule_block_ip_univ_desc">Uma regra do firewall definida pelo usuário bloqueou o <i>IP / Porta de destino</i>.<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
     <string name="firewall_rule_block_ip_desc">Uma regra do firewall definida pelo usuário bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, acesse <i>Firewall específico do app</i>.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">Esta conexão foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para contornar todas as regras do firewall universal.&lt;br/&gt;&gt;br/&gt; Para alterar, acesse &lt;i&gt;Regras de IP&lt;i&gt; em &lt;i&gt;Universal&lt;/i&gt;.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc">Esta conexão foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para contornar todas as regras universais do firewall.&lt;br/&gt;&lt;br/&gt; Para alterar, acesse &lt;i&gt;Regras de IP&lt;i&gt; em &lt;i&gt;Universal&lt;/i&gt;.</string>
     <string name="firewall_rule_foreground_desc">Esta conexão foi protegida por firewall porque o app de origem <i>não estava em primeiro plano</i>.<br/><br/> Para alterar esse comportamento, acesse <i>Universal</i>.</string>
     <string name="firewall_rule_unknown_desc">Esta conexão foi protegida por firewall porque o <i>app de origem</i> não podia ser determinado.<br/><br/> Para alterar esse comportamento, acesse <i>Universal</i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Esta conexão foi bloqueada porque o <i>app de origem</i> contornou o DNS escolhido por usuário.<br/><br/> Para alterar esse comportamento, acesse <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">Esta conexão de DNS usou proxy e foi encaminhada ao endpoint do DNS escolhido pelo usuário.<br/><br/> Para alterar, desative <i>Impedir vazamentos do DNS</i> acessando a tela de <i>Configuração</i> do DNS.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta conexão foi permitida porque a configuração de <i>Tor-como-proxy em um clique</i> via Orbot estava em andamento.</string>
-    <string name="firewall_rule_global_lockdown_desc">Esta conexão foi bloqueada porque restrição universal está definida.<br/><br/> Para alterar acesse <i>Universal</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">Esta conexão foi bloqueada porque foi definida uma restrição universal.<br/><br/> Para alterar acesse <i>Universal</i>.</string>
     <string name="new_app_bulk_notification_title">Atenção</string>
     <string name="new_app_bulk_notification_content">RethinkDNS bloqueou %1$s novos apps. Toque para ver ou modificar.</string>
     <string name="new_app_notification_title">Ação requerida</string>
@@ -776,13 +776,13 @@
     <string name="ci_header">Regras de IP e portas</string>
     <string name="ci_no_rules_text">Nenhuma regra universal de bloqueio ou contorno de IP encontrada.</string>
     <string name="ci_bypass_universal_initial">BU</string>
-    <string name="ci_bypass_universal_txt">Liberação universal</string>
+    <string name="ci_bypass_universal_txt">Autorização universal</string>
     <string name="ci_blocked_txt">Bloqueado</string>
     <string name="ci_no_rule_txt">Nenhuma regra</string>
     <string name="ci_no_rule_desc">- Nenhuma regra</string>
     <string name="ci_no_rule">nenhuma regra</string>
     <string name="ci_block">bloquear</string>
-    <string name="ci_bypass_universal">liberação universal</string>
+    <string name="ci_bypass_universal">autorização universal</string>
     <string name="ci_delete">apagar</string>
     <string name="ada_noapp_dialog_title">Detalhes do app não encontrados</string>
     <string name="ada_noapp_dialog_message">Detalhes do app para o aplicativo especificado não foram encontrados.</string>
@@ -802,21 +802,21 @@
     <string name="ada_ip_block_no_rules">Não há regras de IP para este app.</string>
     <string name="ada_ip_rules_title">regras de ip para este app</string>
     <string name="ada_network_log_title">registro da rede para este app</string>
-    <string name="ada_app_metered">Medido</string>
-    <string name="ada_app_unmetered">Ilimitado</string>
-    <string name="ada_app_whitelist">Liberação universal</string>
+    <string name="ada_app_metered">Franquia de dados</string>
+    <string name="ada_app_unmetered">Banda larga</string>
+    <string name="ada_app_whitelist">Autorização universal</string>
     <string name="ada_app_exclude">Excluir</string>
     <string name="ada_app_dns_settings">Configurações de DNS</string>
     <string name="bsac_title_desc">As regras se aplicam apenas a este app.</string>
     <string name="bsac_unblock">Desbloquear</string>
     <string name="bsac_block">Bloquear</string>
-    <string name="bsac_bypass_app_rules">Regras de liberação do app</string>
-    <string name="bsac_go_pass_app_rules">Remover liberação</string>
+    <string name="bsac_bypass_app_rules">Regras de autorização do app</string>
+    <string name="bsac_go_pass_app_rules">Remover autorização</string>
     <string name="bsac_delete">Apagar</string>
     <string name="bsac_block_toast">Bloqueando %1$s para este app</string>
     <string name="bsac_unblock_toast">Desbloqueado %1$s para este app</string>
     <string name="bsac_whitelist_toast">Contornando as regras do app para este IP %1$s</string>
-    <string name="bsac_whitelist_remove_toast">Removida a liberação para este IP %1$s</string>
+    <string name="bsac_whitelist_remove_toast">Foi removida a autorização para este IP %1$s</string>
     <string name="bsac_delete_toast">%1$s apagada</string>
     <string name="bsdl_blocked_desc">bloqueado %1$s por %2$s</string>
     <string name="bsdl_domain_rule_norule">nenhuma regra</string>
