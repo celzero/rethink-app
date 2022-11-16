@@ -33,6 +33,8 @@ import java.io.IOException
 
 class BlocklistDownloadHelper {
 
+    data class BlocklistUpdateServerResponse(val version: Int, val update: Boolean, val timestamp: Long)
+
     companion object {
         fun isDownloadComplete(context: Context, timestamp: Long): Boolean {
             var result = false
@@ -47,8 +49,8 @@ class BlocklistDownloadHelper {
                     0
                 }
                 result = Constants.ONDEVICE_BLOCKLISTS.count() == total
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${e.message}", e)
+            } catch (ignored: Exception) {
+                Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${ignored.message}", ignored)
             }
 
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
@@ -107,7 +109,7 @@ class BlocklistDownloadHelper {
             return Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH + File.separator + timestamp + File.separator
         }
 
-        suspend fun getDownloadableTimestamp(timestamp: Long, vcode: Int, retryCount: Int): Long {
+        suspend fun checkBlocklistUpdate(timestamp: Long, vcode: Int, retryCount: Int): BlocklistUpdateServerResponse? {
             try {
                 val retrofit = RetrofitManager.getBlocklistBaseBuilder(
                     getDnsTypeOnRetryCount(retryCount)).addConverterFactory(
@@ -123,10 +125,10 @@ class BlocklistDownloadHelper {
                 } else {
                     retryIfRequired(timestamp, vcode, retryCount)
                 }
-            } catch (e: Exception) {
+            } catch (ignored: Exception) {
                 retryIfRequired(timestamp, vcode, retryCount)
             }
-            return INIT_TIME_MS
+            return null
         }
 
         private suspend fun retryIfRequired(timestamp: Long, vcode: Int, retryCount: Int) {
@@ -134,7 +136,7 @@ class BlocklistDownloadHelper {
                 return
             }
 
-            getDownloadableTimestamp(timestamp, vcode, retryCount + 1)
+            checkBlocklistUpdate(timestamp, vcode, retryCount + 1)
         }
 
         private fun getDnsTypeOnRetryCount(
@@ -147,24 +149,30 @@ class BlocklistDownloadHelper {
             }
         }
 
-        private fun processCheckDownloadResponse(response: JSONObject?): Long {
-            if (response == null) return INIT_TIME_MS
+        private fun processCheckDownloadResponse(response: JSONObject?): BlocklistUpdateServerResponse? {
+            if (response == null) return null
 
             try {
                 val version = response.optInt(Constants.JSON_VERSION, 0)
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
                                  "client onResponse for refresh blocklist files:  $version")
-                if (version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
-                    return INIT_TIME_MS
-                }
 
                 val shouldUpdate = response.optBoolean(Constants.JSON_UPDATE, false)
                 val timestamp = response.optLong(Constants.JSON_LATEST, INIT_TIME_MS)
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "onResponse:  update? $shouldUpdate")
-                return timestamp
+                Log.i(LOG_TAG_DOWNLOAD, "response for blocklist update check: version: $version, update? $shouldUpdate, timestamp: $timestamp")
+
+                return BlocklistUpdateServerResponse(version, shouldUpdate, timestamp)
             } catch (e: JSONException) {
                 throw IOException()
             }
+        }
+
+        fun getDownloadableTimestamp(response: BlocklistUpdateServerResponse): Long {
+            if (response.version != Constants.UPDATE_CHECK_RESPONSE_VERSION) {
+                return INIT_TIME_MS
+            }
+
+            return response.timestamp
         }
     }
 

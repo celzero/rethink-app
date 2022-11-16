@@ -25,6 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
+import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.checkBlocklistUpdate
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.getDownloadableTimestamp
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
@@ -58,8 +59,14 @@ class AppDownloadManager(private val context: Context,
     val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     // various download status used as part of Work manager.
-    enum class DownloadManagerStatus(val id: Long) {
-        NOT_STARTED(-4L), FAILURE(-3L), NOT_REQUIRED(-2L), IN_PROGRESS(-1L), SUCCESS(0L);
+    enum class DownloadManagerStatus(val id: Int) {
+        NOT_AVAILABLE(-5),
+        NOT_STARTED(-4),
+        FAILURE(-3),
+        NOT_REQUIRED(-2),
+        IN_PROGRESS(-1),
+        STARTED (0),
+        SUCCESS(1);
     }
 
     enum class DownloadType(val id: Int) {
@@ -77,8 +84,25 @@ class AppDownloadManager(private val context: Context,
     suspend fun isDownloadRequired(type: DownloadType) {
         downloadRequired.postValue(DownloadManagerStatus.IN_PROGRESS)
         val ts = getCurrentBlocklistTimestamp(type)
-        val updatableTs = getDownloadableTimestamp(ts, persistentState.appVersion, retryCount = 0)
-        Log.d(LOG_TAG_DNS, "Updatable TS: $updatableTs, current: $ts, ${type.name}")
+        val response = checkBlocklistUpdate(ts, persistentState.appVersion, retryCount = 0)
+        // if received response for update is null
+        if (response == null) {
+            Log.w(LOG_TAG_DNS, "Response for blocklist update is null")
+            downloadRequired.postValue(DownloadManagerStatus.FAILURE)
+            return
+        }
+
+        // new case: timestamp value is greater than current & update is set to false
+        // in this case, we need to prompt user stating that the update for blocklist
+        // is available but not suitable for the current version of the app
+        if (!response.update && ts < response.timestamp) {
+            downloadRequired.postValue(DownloadManagerStatus.NOT_AVAILABLE)
+            return
+        }
+
+        val updatableTs = getDownloadableTimestamp(response)
+        Log.i(LOG_TAG_DNS,
+              "Updatable ts: $updatableTs, current ts: $ts, blocklist type: ${type.name}")
 
         if (updatableTs == INIT_TIME_MS) {
             downloadRequired.postValue(DownloadManagerStatus.FAILURE)
@@ -133,18 +157,24 @@ class AppDownloadManager(private val context: Context,
      * Responsible for downloading the local blocklist files.
      * For local blocklist, we need filetag.json, basicconfig.json, rd.txt and td.txt
      */
-    suspend fun downloadLocalBlocklist(currentTs: Long, isRedownload: Boolean): Boolean {
+    suspend fun downloadLocalBlocklist(currentTs: Long, isRedownload: Boolean): DownloadManagerStatus {
         // local blocklist available only in fdroid and website version
         if (!Utilities.isWebsiteFlavour() && !Utilities.isFdroidFlavour()) {
-            return false
+            return DownloadManagerStatus.FAILURE
         }
 
-        val updatableTs = getDownloadableTimestamp(currentTs, persistentState.appVersion,
-                                                   retryCount = 0)
+        val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
+        // if received response for update is null
+        if (response == null) {
+            Log.w(LOG_TAG_DNS, "Response for blocklist update is null")
+            return DownloadManagerStatus.FAILURE
+        }
+
+        val updatableTs = getDownloadableTimestamp(response)
 
         // no need to proceed if the current and received timestamp is same
         if (updatableTs <= currentTs && !isRedownload) {
-            return false
+            return DownloadManagerStatus.NOT_REQUIRED
         } else {
             // no-op
         }
@@ -156,10 +186,10 @@ class AppDownloadManager(private val context: Context,
         return initiateAndroidDownloadManager(updatableTs)
     }
 
-    private fun initiateAndroidDownloadManager(timestamp: Long): Boolean {
+    private fun initiateAndroidDownloadManager(timestamp: Long): DownloadManagerStatus {
 
         if (WorkScheduler.isWorkScheduled(context, DOWNLOAD_TAG) || WorkScheduler.isWorkScheduled(
-                context, FILE_TAG)) return false
+                context, FILE_TAG)) return DownloadManagerStatus.FAILURE
 
         purge(context, timestamp, DownloadType.LOCAL)
         val downloadIds = LongArray(ONDEVICE_BLOCKLISTS.count())
@@ -169,21 +199,30 @@ class AppDownloadManager(private val context: Context,
             downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())
         }
         initiateDownloadStatusCheck(downloadIds, timestamp)
-        return true
+        return DownloadManagerStatus.STARTED
     }
 
-    private fun initiateCustomDownloadManager(timestamp: Long): Boolean {
+    private fun initiateCustomDownloadManager(timestamp: Long): DownloadManagerStatus {
         if (WorkScheduler.isWorkScheduled(context,
                                           LocalBlocklistCoordinator.CUSTOM_DOWNLOAD) || WorkScheduler.isWorkRunning(
-                context, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)) return false
+                context, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)) return DownloadManagerStatus.FAILURE
 
         startLocalBlocklistCoordinator(timestamp)
-        return true
+        return DownloadManagerStatus.STARTED
     }
 
     suspend fun downloadRemoteBlocklist(currentTs: Long, isRedownload: Boolean): Boolean {
-        val updatableTs = getDownloadableTimestamp(currentTs, persistentState.appVersion,
-                                                   retryCount = 0)
+
+        val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
+        // if received response for update is null
+        if (response == null) {
+            Log.w(LOG_TAG_DNS, "Response for blocklist update is null")
+            downloadRequired.postValue(DownloadManagerStatus.FAILURE)
+            return false
+        }
+
+        val updatableTs = getDownloadableTimestamp(response)
+
         if (updatableTs <= currentTs && !isRedownload) {
             return false
         } else {

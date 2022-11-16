@@ -55,13 +55,26 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                 return Result.failure()
             }
 
-            return when (downloadRemoteBlocklist(timestamp)) {
+            val downloadStatus = downloadRemoteBlocklist(timestamp)
+            // reset updatable time stamp
+            if (downloadStatus) {
+                // update the download related persistence status on download success
+                updatePersistenceOnCopySuccess(timestamp)
+            } else {
+                // reset the remote blocklist timestamp, so that user will be prompt to
+                // download again.
+                persistentState.remoteBlocklistTimestamp = Constants.INIT_TIME_MS
+            }
+
+            BlocklistDownloadHelper.deleteBlocklistResidue(context,
+                                                           Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                           timestamp)
+
+            return when (downloadStatus) {
                 false -> {
                     Result.failure()
                 }
                 true -> {
-                    // update the download related persistence status on download success
-                    updatePersistenceOnCopySuccess(timestamp)
                     Result.success()
                 }
             }
@@ -80,19 +93,14 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             GsonConverterFactory.create()).build()
         val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
         val response = retrofitInterface.downloadRemoteBlocklistFile(
-            Constants.FILETAG_TEMP_DOWNLOAD_URL)
+            Constants.FILETAG_TEMP_DOWNLOAD_URL, persistentState.appVersion, "")
 
         Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
               "Response received on remote blocklist request: ${response?.isSuccessful}")
 
         return if (response?.isSuccessful == true) {
-            saveRemoteFile(response.body(), timestamp)
-            // reset updatable time stamp
-            persistentState.newestRemoteBlocklistTimestamp = Constants.INIT_TIME_MS
-            BlocklistDownloadHelper.deleteBlocklistResidue(context,
-                                                           Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                           timestamp)
-            true
+            val isDownloadSuccess = saveRemoteFile(response.body(), timestamp)
+            isDownloadSuccess
         } else {
             Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
                   "Remote blocklist download failure, call? ${response?.body()}, response: $response ")
@@ -107,14 +115,12 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             filetag.writeText(jsonObject.toString())
 
             // write the file tag json file into database
-            RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.REMOTE,
+            return RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.REMOTE,
                                              timestamp)
-            return true
         } catch (e: IOException) {
             Log.w(LoggerConstants.LOG_TAG_DOWNLOAD,
                   "could not create filetag.json at version $timestamp", e)
         }
-        persistentState.remoteBlocklistTimestamp = Constants.INIT_TIME_MS
         return false
     }
 

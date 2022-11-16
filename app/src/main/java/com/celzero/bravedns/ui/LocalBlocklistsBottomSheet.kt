@@ -108,16 +108,15 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.lbbsDownloadLl.visibility = View.VISIBLE
+        b.lbbsVersion.text = getString(R.string.settings_local_blocklist_version,
+                                       Utilities.convertLongToTime(
+                                           persistentState.localBlocklistTimestamp,
+                                           Constants.TIME_FORMAT_2))
 
         if (persistentState.newestRemoteBlocklistTimestamp == INIT_TIME_MS) {
             showCheckUpdateUi()
             return
         }
-
-        b.lbbsVersion.text = getString(R.string.settings_local_blocklist_version,
-                                       Utilities.convertLongToTime(
-                                           persistentState.localBlocklistTimestamp,
-                                           Constants.TIME_FORMAT_2))
 
         if (persistentState.newestLocalBlocklistTimestamp > persistentState.localBlocklistTimestamp) {
             showUpdateUi()
@@ -128,49 +127,11 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initializeObservers() {
-        observeWorkManager()
-
         appDownloadManager.downloadRequired.observe(viewLifecycleOwner) {
             Log.i(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == null) return@observe
 
-            when (it) {
-                AppDownloadManager.DownloadManagerStatus.NOT_STARTED -> {
-                    // no-op
-                }
-                AppDownloadManager.DownloadManagerStatus.FAILURE -> {
-                    ui {
-                        b.lbbsCheckDownload.isEnabled = true
-                        Utilities.showToastUiCentered(requireContext(), getString(
-                            R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
-                    }
-                    appDownloadManager.downloadRequired.postValue(
-                        AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
-                }
-                AppDownloadManager.DownloadManagerStatus.IN_PROGRESS -> {
-                    ui {
-                        showCheckDownloadProgressUi()
-                    }
-                }
-                AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED -> {
-                    ui {
-                        showRedownloadUi()
-                        b.lbbsCheckDownload.isEnabled = true
-                        Utilities.showToastUiCentered(requireContext(), getString(
-                            R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
-                    }
-                    appDownloadManager.downloadRequired.postValue(
-                        AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
-                }
-                AppDownloadManager.DownloadManagerStatus.SUCCESS -> {
-                    ui {
-                        showUpdateUi()
-                        b.lbbsCheckDownload.isEnabled = true
-                    }
-                    appDownloadManager.downloadRequired.postValue(
-                        AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
-                }
-            }
+            handleDownloadStatus(it)
         }
     }
 
@@ -270,17 +231,68 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun downloadLocalBlocklist(isRedownload: Boolean) {
         ui {
-            var isDownloadInitated = false
+            var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
             b.lbbsDownload.isEnabled = false
             b.lbbsRedownload.isEnabled = false
             val currentTs = persistentState.localBlocklistTimestamp
             ioCtx {
-                isDownloadInitated = appDownloadManager.downloadLocalBlocklist(currentTs,
-                                                                               isRedownload)
+                status = appDownloadManager.downloadLocalBlocklist(currentTs, isRedownload)
             }
 
-            if (!isDownloadInitated) {
+            handleDownloadStatus(status)
+        }
+    }
+
+    private fun handleDownloadStatus(status: AppDownloadManager.DownloadManagerStatus) {
+        when (status) {
+            AppDownloadManager.DownloadManagerStatus.IN_PROGRESS -> {
+                ui {
+                    showCheckDownloadProgressUi()
+                }
+            }
+            AppDownloadManager.DownloadManagerStatus.STARTED -> {
+                // the job of download status stops after initiating the work manager observer
+                ui {
+                    observeWorkManager()
+                    showCheckDownloadProgressUi()
+                }
+            }
+            AppDownloadManager.DownloadManagerStatus.NOT_STARTED -> {
+                // no-op
+            }
+            AppDownloadManager.DownloadManagerStatus.SUCCESS -> {
+                ui {
+                    showUpdateUi()
+                    b.lbbsCheckDownload.isEnabled = true
+                }
+                appDownloadManager.downloadRequired.postValue(
+                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
+            }
+            AppDownloadManager.DownloadManagerStatus.FAILURE -> {
+                ui {
+                    b.lbbsCheckDownload.isEnabled = true
+                    Utilities.showToastUiCentered(requireContext(), getString(
+                        R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
+                }
+                appDownloadManager.downloadRequired.postValue(
+                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
                 onDownloadFail()
+            }
+            AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED -> {
+                ui {
+                    showRedownloadUi()
+                    b.lbbsCheckDownload.isEnabled = true
+                    Utilities.showToastUiCentered(requireContext(), getString(
+                        R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
+                }
+                appDownloadManager.downloadRequired.postValue(
+                    AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
+            }
+            AppDownloadManager.DownloadManagerStatus.NOT_AVAILABLE -> {
+                // TODO: prompt user for app update
+                Utilities.showToastUiCentered(requireContext(),
+                                              "Download latest version to update the blocklists",
+                                              Toast.LENGTH_SHORT)
             }
         }
     }

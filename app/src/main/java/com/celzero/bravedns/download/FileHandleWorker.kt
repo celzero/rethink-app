@@ -17,6 +17,7 @@ package com.celzero.bravedns.download
 
 import android.content.Context
 import android.util.Log
+import androidx.work.CoroutineWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -50,11 +51,11 @@ import java.io.File
  */
 
 class FileHandleWorker(val context: Context, workerParameters: WorkerParameters) :
-        Worker(context, workerParameters), KoinComponent {
+        CoroutineWorker(context, workerParameters), KoinComponent {
 
     val persistentState by inject<PersistentState>()
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         try {
             val timestamp = inputData.getLong("blocklistDownloadInitiatedTime", Long.MIN_VALUE)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "blocklistDownloadInitiatedTime - $timestamp")
@@ -81,7 +82,7 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return Result.failure()
     }
 
-    private fun copyFiles(context: Context, timestamp: Long): Boolean {
+    private suspend fun copyFiles(context: Context, timestamp: Long): Boolean {
         try {
             if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp)) {
                 return false
@@ -130,6 +131,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
 
+            val result = updateTagsToDb(timestamp)
+
             updatePersistenceOnCopySuccess(timestamp)
             deleteOldFiles(context, timestamp, AppDownloadManager.DownloadType.LOCAL)
             return true
@@ -140,15 +143,16 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return false
     }
 
+    private suspend fun updateTagsToDb(timestamp: Long): Boolean {
+        return RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
+                                                         timestamp)
+    }
+
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         ui {
             persistentState.localBlocklistTimestamp = timestamp
             persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
             persistentState.blocklistEnabled = true
-            io {
-                RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
-                                                 timestamp)
-            }
         }
     }
 

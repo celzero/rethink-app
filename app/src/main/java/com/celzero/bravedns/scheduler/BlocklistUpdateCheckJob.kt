@@ -45,10 +45,11 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
     }
 
     private suspend fun isDownloadRequired(timestamp: Long, type: AppDownloadManager.DownloadType) {
-        val updatableTs = BlocklistDownloadHelper.getDownloadableTimestamp(timestamp,
-                                                                           persistentState.appVersion,
-                                                                           retryCount = 0)
-        if (updatableTs > timestamp) {
+        val response = BlocklistDownloadHelper.checkBlocklistUpdate(timestamp, persistentState.appVersion,
+                                                                    retryCount = 0) ?: return
+
+        val updatableTs = BlocklistDownloadHelper.getDownloadableTimestamp(response)
+        if (response.update && updatableTs > timestamp) {
             setUpdatableTimestamp(updatableTs, type)
         } else {
             // no-op

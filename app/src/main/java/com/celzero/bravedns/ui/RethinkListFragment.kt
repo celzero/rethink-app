@@ -387,34 +387,37 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                 AppDownloadManager.DownloadManagerStatus.IN_PROGRESS -> {
                     // no-op
                 }
+                AppDownloadManager.DownloadManagerStatus.NOT_AVAILABLE -> {
+                    // TODO: prompt user for app update
+                    Utilities.showToastUiCentered(requireContext(),
+                                                  "Download latest version to update the blocklists",
+                                                  Toast.LENGTH_SHORT)
+                    hideProgress()
+                }
                 AppDownloadManager.DownloadManagerStatus.NOT_REQUIRED -> {
-                    ui {
-                        hideProgress()
-                        showRedownloadUi()
-                        Utilities.showToastUiCentered(requireContext(), getString(
-                            R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
-                    }
+                    hideProgress()
+                    showRedownloadUi()
+                    Utilities.showToastUiCentered(requireContext(), getString(
+                        R.string.blocklist_update_check_not_required), Toast.LENGTH_SHORT)
                     appDownloadManager.downloadRequired.postValue(
                         AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
                 }
                 AppDownloadManager.DownloadManagerStatus.FAILURE -> {
-                    ui {
-                        hideProgress()
-                        Utilities.showToastUiCentered(requireContext(), getString(
-                            R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
-                    }
+                    hideProgress()
+                    Utilities.showToastUiCentered(requireContext(), getString(
+                                                R.string.blocklist_update_check_failure), Toast.LENGTH_SHORT)
                     appDownloadManager.downloadRequired.postValue(
                         AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
                 }
                 AppDownloadManager.DownloadManagerStatus.SUCCESS -> {
-                    ui {
-                        hideProgress()
-                        showNewUpdateUi()
-                    }
+                    hideProgress()
+                    showNewUpdateUi()
                     appDownloadManager.downloadRequired.postValue(
                         AppDownloadManager.DownloadManagerStatus.NOT_STARTED)
                 }
-
+                AppDownloadManager.DownloadManagerStatus.STARTED -> {
+                    // no-op
+                }
             }
         }
     }
