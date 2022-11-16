@@ -345,7 +345,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun openEditConfiguration(stamp: String) {
-        val intent = Intent(context, ConfigureRethinkBasicActivity::class.java)
+        val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
         intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,
                         RethinkBlocklistFragment.RethinkBlocklistType.REMOTE)
         intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME,
