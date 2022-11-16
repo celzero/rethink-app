@@ -15,10 +15,12 @@
  */
 package com.celzero.bravedns.database
 
+import android.util.Log
 import androidx.room.Entity
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
+import com.celzero.bravedns.util.LoggerConstants
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 
@@ -69,19 +71,31 @@ class CustomIp {
         }
     }
 
+    // chances of null pointer exception while converting the string object to
+    // HostName().address
+    // ref: https://seancfoley.github.io/IPAddress/
     fun setCustomIpAddress(ipAddress: String) {
         var ip = ipAddress
-        if (HostName(ipAddress).address.isIPv4) {
-            if (ipAddress.count { it == '.' } < 3) {
-                ip = getPaddedIp(ip)
+        try {
+            if (HostName(ipAddress).address.isIPv4) {
+                if (ipAddress.count { it == '.' } < 3) {
+                    ip = getPaddedIp(ip)
+                }
             }
+            this.ipAddress = HostName(ip).address.toNormalizedString()
+        } catch (ignored: NullPointerException) {
+            Log.e(LoggerConstants.LOG_TAG_VPN, "Invalid IP address added", ignored)
+            this.ipAddress = ""
         }
-
-        this.ipAddress = HostName(ip).address.toNormalizedString()
     }
 
     fun setCustomIpAddress(hostName: HostName) {
-        this.ipAddress = hostName.address.toNormalizedString()
+        try {
+            this.ipAddress = hostName.address.toNormalizedString()
+        } catch (ignored: NullPointerException) {
+            Log.e(LoggerConstants.LOG_TAG_VPN, "Invalid IP address added", ignored)
+            this.ipAddress = ""
+        }
     }
 
     private fun getPaddedIp(ip: String): String {
