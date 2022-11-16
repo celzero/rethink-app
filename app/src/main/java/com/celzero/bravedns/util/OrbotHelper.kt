@@ -318,6 +318,10 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
     }
 
     private fun enableOrbotDns() {
+        // removing this feature as part of https://github.com/celzero/rethink-app/issues/665
+        // fixme: consider enabling auto dns switch to Orbot dns
+        return
+
         if (dnsPort == null) return
 
         // no need to set dns if Android's private-dns is enabled
