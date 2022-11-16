@@ -460,6 +460,10 @@ class OrbotHelper(private val context: Context, private val persistentState: Per
         try {
             val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.fromParts("package", ORBOT_PACKAGE_NAME, null)
+            // fix for AndroidRuntimeException: calling startActivity() from outside of an
+            // activity context requires the FLAG_ACTIVITY_NEW_TASK flag
+            // ref: https://stackoverflow.com/questions/3918517/calling-startactivity-from-outside-of-an-activity-context
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Log.w(LOG_TAG_VPN, "Failure calling app info: ${e.message}", e)
