@@ -43,7 +43,6 @@ class RetrofitManager {
             okhttpClientBuilder.readTimeout(20, TimeUnit.MINUTES)
             okhttpClientBuilder.writeTimeout(20, TimeUnit.MINUTES)
             okhttpClientBuilder.retryOnConnectionFailure(true)
-            okhttpClientBuilder.addInterceptor(NetworkConnectionInterceptor())
             // If unset, the system-wide default DNS will be used.
             customDns(dnsType)?.let { okhttpClientBuilder.dns(it) }
             return okhttpClientBuilder.build()
