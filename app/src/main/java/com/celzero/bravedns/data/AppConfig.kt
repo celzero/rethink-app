@@ -192,10 +192,6 @@ class AppConfig internal constructor(private val context: Context,
             return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
         }
 
-        fun isRethinkRemote(): Boolean {
-            return mode == DOH_IP.mode || mode == DOH_PORT.mode
-        }
-
         fun isSystemDns(): Boolean {
             return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
         }

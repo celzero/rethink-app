@@ -58,13 +58,13 @@ class RemoteFileTagUtil : KoinComponent {
             }
             val file = File(dir.absolutePath + Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
 
-            if (file.exists()) {
+            return if (file.exists()) {
                 // no need to move the file from asset if the file is already available
-                return null
+                file
+            } else {
+                file.createNewFile()
+                file
             }
-
-            file.createNewFile()
-            return file
         }
     }
 }

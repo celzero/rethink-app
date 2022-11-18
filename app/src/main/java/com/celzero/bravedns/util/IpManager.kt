@@ -2,16 +2,11 @@ package com.celzero.bravedns.util
 
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlin.math.absoluteValue
 
 class IpManager {
 
     companion object {
-
-        fun isIpV6(ip: String): Boolean {
-            val ipAddress = getIpAddress(ip)
-            return ipAddress?.isIPv6 == true
-        }
-
         fun isIpV6(ip: IPAddress): Boolean {
             return ip.isIPv6
         }

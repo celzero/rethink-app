@@ -70,7 +70,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         }
 
         TabLayoutMediator(b.dnsDetailActTabLayout,
-                          b.dnsDetailActViewpager) { tab, position -> // Styling each tab here
+                          b.dnsDetailActViewpager) { tab, position ->
             tab.text = when (position) {
                 Tabs.LOGS.screen -> getString(R.string.dns_act_log)
                 Tabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)

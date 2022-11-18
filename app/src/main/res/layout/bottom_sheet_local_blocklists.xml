@@ -256,7 +256,7 @@
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="@string/lbbs_heading"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"

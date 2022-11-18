@@ -42,7 +42,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
            R.string.firewall_rule_bypass_app_rules_ip_desc, FirewallActions.allow),
     RULE2C("Rule #2C", R.string.firewall_rule_bypass_universal_ip,
            R.string.firewall_rule_bypass_universal_ip_desc, FirewallActions.allow),
-    RULE2D("Rule #2D", R.string.firewall_rule_block_ip, R.string.firewall_rule_block_ip_univ_desc,
+    RULE2D("Rule #2D", R.string.firewall_rule_block_univ_ip, R.string.firewall_rule_block_ip_univ_desc,
            FirewallActions.stall),
     RULE3("Rule #3", R.string.firewall_rule_device_lock, R.string.firewall_rule_device_lock_desc,
           FirewallActions.stall),

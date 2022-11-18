@@ -59,6 +59,9 @@ class Constants {
         // TODO: have two different response versions for blocklist update and app update
         const val UPDATE_CHECK_RESPONSE_VERSION = 1
 
+        // the version value for rethink stamp generation
+        const val RETHINK_STAMP_VERSION = 1
+
         // meta data for on-device blocklist
         data class OnDeviceBlocklistsMetadata(val url: String, val filename: String)
 
@@ -136,7 +139,7 @@ class Constants {
         const val MISSING_UID = -2000
 
         // label for rethinkdns plus doh endpoint
-        const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
+        const val RETHINK_DNS_PLUS = "RDNS Plus"
 
         // constants used as part of intent to load the viewpager's screen
         const val VIEW_PAGER_SCREEN_TO_LOAD = "view_pager_screen"
