@@ -1147,10 +1147,14 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     }
 
     private fun unobserveAppInfos() {
-        FirewallManager.getApplistObserver().removeObserver(appInfoObserver)
+        // fix for issue #648 (UninitializedPropertyAccessException)
+        if (this::appInfoObserver.isInitialized) {
+            FirewallManager.getApplistObserver().removeObserver(appInfoObserver)
+        }
     }
 
     private fun unobserveOrbotStartStatus() {
+        // fix for issue #648 (UninitializedPropertyAccessException)
         if (this::orbotStartStatusObserver.isInitialized) {
             persistentState.orbotConnectionStatus.removeObserver(orbotStartStatusObserver)
         }
