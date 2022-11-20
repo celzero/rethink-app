@@ -24,7 +24,7 @@ jobs:
         run: |
           (
             printenv COMMITS | jq -r "$TEMPLATE"
-            printf '📅 @RethinkDNS_Channel'
+            printf '@RethinkDNS_Channel'
           ) | \
           jq -R --slurp '{
             text: .,
