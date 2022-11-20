@@ -44,7 +44,7 @@ jobs:
 
       - name: Build and send apks to telegram
         run: |
-          for TASK in assembleWebsiteDebug; do
+          for TASK in assembleWebsiteNightly; do
             ./gradlew $TASK
             apk_path="$(find . -type f -iname *.apk)"
             echo $apk_path

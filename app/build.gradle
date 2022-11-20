@@ -66,6 +66,11 @@ android {
             matchingFallbacks = ['debug']
             initWith buildTypes.debug
         }
+        nightly {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
     flavorDimensions "releaseChannel", "releaseType"
     productFlavors {
