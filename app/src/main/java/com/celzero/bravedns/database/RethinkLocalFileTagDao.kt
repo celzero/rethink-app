@@ -41,7 +41,7 @@ interface RethinkLocalFileTagDao {
     fun insertAll(fileTags: List<RethinkLocalFileTag>): LongArray
 
     @Query("Update RethinkLocalFileTag set isSelected = :isSelected where value in (:list) ")
-    fun updateSelectedTags(list: Set<Int>, isSelected: Int)
+    fun updateTags(list: Set<Int>, isSelected: Int)
 
     @Query("Update RethinkLocalFileTag set isSelected = :isSelected where value = :value")
     fun updateSelectedTag(value: Int, isSelected: Int)
@@ -49,7 +49,7 @@ interface RethinkLocalFileTagDao {
     @Query("select * from RethinkLocalFileTag")
     fun getAllTags(): List<FileTag>
 
-    @Query("select * from RethinkLocalFileTag where entries > 0 order by `group`")
+    @Query("select * from RethinkLocalFileTag order by `group`")
     fun getLocalFileTags(): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
@@ -78,6 +78,12 @@ interface RethinkLocalFileTagDao {
 
     @Query("Update RethinkLocalFileTag set isSelected = 0")
     fun clearSelectedTags()
+
+    @Query("select * from RethinkLocalFileTag")
+    fun fileTags(): List<RethinkLocalFileTag>
+
+    @Query("select value from RethinkLocalFileTag where isSelected = 1")
+    fun getSelectedTags(): List<Int>
 
     @RawQuery
     fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
