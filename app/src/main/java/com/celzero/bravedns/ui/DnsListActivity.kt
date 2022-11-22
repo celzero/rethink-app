@@ -38,7 +38,9 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
-        DOH(0), DNSCRYPT(1), DNSPROXY(2);
+        DOH(0),
+        DNSCRYPT(1),
+        DNSPROXY(2);
 
         companion object {
             fun getCount(): Int {
@@ -55,33 +57,37 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     }
 
     private fun init() {
-        b.otherDnsActViewpager.adapter = object : FragmentStateAdapter(this) {
-            override fun createFragment(position: Int): Fragment {
-                return when (position) {
-                    0 -> DohListFragment.newInstance()
-                    1 -> DnsCryptListFragment.newInstance()
-                    else -> DnsProxyListFragment.newInstance()
+        b.otherDnsActViewpager.adapter =
+            object : FragmentStateAdapter(this) {
+                override fun createFragment(position: Int): Fragment {
+                    return when (position) {
+                        0 -> DohListFragment.newInstance()
+                        1 -> DnsCryptListFragment.newInstance()
+                        else -> DnsProxyListFragment.newInstance()
+                    }
+                }
+
+                override fun getItemCount(): Int {
+                    return dnsTabsCount
                 }
             }
 
-            override fun getItemCount(): Int {
-                return dnsTabsCount
+        TabLayoutMediator(b.otherDnsActTabLayout, b.otherDnsActViewpager) { tab, position
+                -> // Styling each tab here
+                tab.text =
+                    when (position) {
+                        0 -> getString(R.string.other_dns_list_tab1)
+                        1 -> getString(R.string.other_dns_list_tab2)
+                        else -> getString(R.string.other_dns_list_tab3)
+                    }
             }
-        }
-
-        TabLayoutMediator(b.otherDnsActTabLayout,
-                          b.otherDnsActViewpager) { tab, position -> // Styling each tab here
-            tab.text = when (position) {
-                0 -> getString(R.string.other_dns_list_tab1)
-                1 -> getString(R.string.other_dns_list_tab2)
-                else -> getString(R.string.other_dns_list_tab3)
-            }
-        }.attach()
+            .attach()
 
         b.otherDnsActViewpager.setCurrentItem(fragmentIndex, true)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 }

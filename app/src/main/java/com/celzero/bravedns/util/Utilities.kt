@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.util
 
-
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
@@ -84,7 +83,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
 
-
 class Utilities {
 
     companion object {
@@ -96,7 +94,8 @@ class Utilities {
                 try {
                     name.topPrivateDomain().toString()
                 } catch (e: IllegalStateException) {
-                    // The name doesn't end in a recognized TLD.  This can happen for randomly generated
+                    // The name doesn't end in a recognized TLD.  This can happen for randomly
+                    // generated
                     // names, or when new TLDs are introduced.
                     val parts: List<String> = name.parts()
                     val size = parts.count()
@@ -117,46 +116,67 @@ class Utilities {
             }
         }
 
-        fun isAccessibilityServiceEnabled(context: Context,
-                                          service: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabled(
+            context: Context,
+            service: Class<out AccessibilityService?>
+        ): Boolean {
             val am = context.getSystemService<AccessibilityManager>() ?: return false
-            val enabledServices = am.getEnabledAccessibilityServiceList(
-                AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+            val enabledServices =
+                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
             for (enabledService in enabledServices) {
                 val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-                if (DEBUG) Log.i(LOG_TAG_VPN,
-                                 "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
-                if (enabledServiceInfo.packageName == context.packageName && enabledServiceInfo.name == service.name) {
+                if (DEBUG)
+                    Log.i(
+                        LOG_TAG_VPN,
+                        "Accessibility enabled check for: ${enabledServiceInfo.packageName}"
+                    )
+                if (
+                    enabledServiceInfo.packageName == context.packageName &&
+                        enabledServiceInfo.name == service.name
+                ) {
                     return true
                 }
             }
-            if (DEBUG) Log.e(LOG_TAG_VPN,
-                             "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}")
+            if (DEBUG)
+                Log.e(
+                    LOG_TAG_VPN,
+                    "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}"
+                )
             return false
         }
 
-        fun isAccessibilityServiceEnabledViaSettingsSecure(context: Context,
-                                                           accessibilityService: Class<out AccessibilityService?>): Boolean {
+        fun isAccessibilityServiceEnabledViaSettingsSecure(
+            context: Context,
+            accessibilityService: Class<out AccessibilityService?>
+        ): Boolean {
             try {
                 val expectedComponentName = ComponentName(context, accessibilityService)
-                val enabledServicesSetting: String = Settings.Secure.getString(
-                    context.contentResolver,
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
+                val enabledServicesSetting: String =
+                    Settings.Secure.getString(
+                        context.contentResolver,
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+                    )
+                        ?: return false
                 val colonSplitter = SimpleStringSplitter(':')
                 colonSplitter.setString(enabledServicesSetting)
                 while (colonSplitter.hasNext()) {
                     val componentNameString = colonSplitter.next()
                     val enabledService = ComponentName.unflattenFromString(componentNameString)
                     if (expectedComponentName == enabledService) {
-                        if (DEBUG) Log.i(LOG_TAG_VPN,
-                                         "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}")
+                        if (DEBUG)
+                            Log.i(
+                                LOG_TAG_VPN,
+                                "SettingsSecure accessibility enabled for: ${expectedComponentName.packageName}"
+                            )
                         return true
                     }
                 }
             } catch (e: Settings.SettingNotFoundException) {
-                Log.e(LOG_TAG_VPN,
-                      "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
-                      e)
+                Log.e(
+                    LOG_TAG_VPN,
+                    "isAccessibilityServiceEnabled Exception on isAccessibilityServiceEnabledViaSettingsSecure() ${e.message}",
+                    e
+                )
             }
             if (DEBUG) Log.d(LOG_TAG_VPN, "Accessibility enabled check failed")
             return isAccessibilityServiceEnabled(context, accessibilityService)
@@ -191,9 +211,12 @@ class Utilities {
                 return ""
             }
             // Flag emoji consist of two "regional indicator symbol letters", which are
-            // Unicode characters that correspond to the English alphabet and are arranged in the same
-            // order.  Therefore, to convert from a country code to a flag, we simply need to apply an
-            // offset to each character, shifting it from the normal A-Z range into the region indicator
+            // Unicode characters that correspond to the English alphabet and are arranged in the
+            // same
+            // order.  Therefore, to convert from a country code to a flag, we simply need to apply
+            // an
+            // offset to each character, shifting it from the normal A-Z range into the region
+            // indicator
             // symbol letter range.
             val alphaBase = 'A'.code // Start of alphabetic country code characters.
             val flagBase = 0x1F1E6 // Start of regional indicator symbol letters.
@@ -231,9 +254,13 @@ class Utilities {
             } else if (isYesterday(Date(timestamp))) {
                 context.getString(R.string.relative_time_yesterday)
             } else {
-                val d = DateUtils.getRelativeTimeSpanString(timestamp, now,
-                                                            DateUtils.MINUTE_IN_MILLIS,
-                                                            DateUtils.FORMAT_ABBREV_RELATIVE)
+                val d =
+                    DateUtils.getRelativeTimeSpanString(
+                        timestamp,
+                        now,
+                        DateUtils.MINUTE_IN_MILLIS,
+                        DateUtils.FORMAT_ABBREV_RELATIVE
+                    )
                 d.toString()
             }
         }
@@ -244,8 +271,10 @@ class Utilities {
             c1.add(DAY_OF_YEAR, -1)
             val c2 = Calendar.getInstance()
             c2.time = day
-            if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(DAY_OF_YEAR) == c2.get(
-                    DAY_OF_YEAR)) {
+            if (
+                c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
+                    c1.get(DAY_OF_YEAR) == c2.get(DAY_OF_YEAR)
+            ) {
                 return true
             }
 
@@ -299,21 +328,26 @@ class Utilities {
         }
 
         private fun isDarkSystemTheme(context: Context): Boolean {
-            return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+            return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+                Configuration.UI_MODE_NIGHT_YES
         }
 
         fun openVpnProfile(context: Context) {
             try {
-                val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Intent(ACTION_VPN_SETTINGS)
-                } else {
-                    Intent(ACTION_VPN_SETTINGS_INTENT)
-                }
+                val intent =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Intent(ACTION_VPN_SETTINGS)
+                    } else {
+                        Intent(ACTION_VPN_SETTINGS_INTENT)
+                    }
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                showToastUiCentered(context, context.getString(R.string.vpn_profile_error),
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.vpn_profile_error),
+                    Toast.LENGTH_SHORT
+                )
                 Log.w(LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
             }
         }
@@ -401,8 +435,8 @@ class Utilities {
         // This function is not supported from version 12 onwards.
         fun isOtherVpnHasAlwaysOn(context: Context): Boolean {
             return try {
-                val alwaysOn = Settings.Secure.getString(context.contentResolver,
-                                                         "always_on_vpn_app")
+                val alwaysOn =
+                    Settings.Secure.getString(context.contentResolver, "always_on_vpn_app")
                 !TextUtils.isEmpty(alwaysOn) && context.packageName != alwaysOn
             } catch (e: Exception) {
                 Log.e(LOG_TAG_VPN, "Failure while retrieving Settings.Secure value ${e.message}", e)
@@ -419,8 +453,10 @@ class Utilities {
                 context.packageManager.getApplicationIcon(packageName)
             } catch (e: PackageManager.NameNotFoundException) {
                 // Not adding exception details in logs.
-                Log.e(LOG_TAG_FIREWALL,
-                      "Application Icon not available for package: $packageName" + e.message)
+                Log.e(
+                    LOG_TAG_FIREWALL,
+                    "Application Icon not available for package: $packageName" + e.message
+                )
                 getDefaultIcon(context)
             }
         }
@@ -503,44 +539,54 @@ class Utilities {
             return try {
                 context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             } catch (e: PackageManager.NameNotFoundException) {
-                Log.w(LOG_TAG_FIREWALL,
-                      "ApplicationInfo is not available for package name: $packageName")
+                Log.w(
+                    LOG_TAG_FIREWALL,
+                    "ApplicationInfo is not available for package name: $packageName"
+                )
                 null
             }
         }
 
         fun sendEmailIntent(context: Context) {
-            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse(context.getString(R.string.about_mail_to_string))
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.about_mail_to)))
-                putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
-            }
-            context.startActivity(Intent.createChooser(intent, context.getString(
-                R.string.about_mail_bugreport_share_title)))
+            val intent =
+                Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse(context.getString(R.string.about_mail_to_string))
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.about_mail_to)))
+                    putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.about_mail_subject))
+                }
+            context.startActivity(
+                Intent.createChooser(
+                    intent,
+                    context.getString(R.string.about_mail_bugreport_share_title)
+                )
+            )
         }
 
         fun deleteRecursive(fileOrDirectory: File) {
             try {
                 if (fileOrDirectory.isDirectory) {
-                    fileOrDirectory.listFiles()?.forEach { child ->
-                        deleteRecursive(child)
+                    fileOrDirectory.listFiles()?.forEach { child -> deleteRecursive(child) }
+                }
+                val isDeleted: Boolean =
+                    if (isAtleastO()) {
+                        fileOrDirectory.deleteRecursively()
+                    } else {
+                        fileOrDirectory.delete()
                     }
-                }
-                val isDeleted: Boolean = if (isAtleastO()) {
-                    fileOrDirectory.deleteRecursively()
-                } else {
-                    fileOrDirectory.delete()
-                }
-                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                 "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted")
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_DOWNLOAD,
+                        "deleteRecursive File : ${fileOrDirectory.path}, $isDeleted"
+                    )
             } catch (e: Exception) {
                 Log.w(LOG_TAG_DOWNLOAD, "File delete exception: ${e.message}", e)
             }
         }
 
         fun localBlocklistFileDownloadPath(ctx: Context, which: String, timestamp: Long): String {
-            return blocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                             timestamp) + File.separator + which
+            return blocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp) +
+                File.separator +
+                which
         }
 
         fun oldLocalBlocklistDownloadDir(ctx: Context, timestamp: Long): String {
@@ -548,9 +594,10 @@ class Utilities {
         }
 
         fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
-            val a = Constants.ONDEVICE_BLOCKLISTS.all {
-                localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
-            }
+            val a =
+                Constants.ONDEVICE_BLOCKLISTS.all {
+                    localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
+                }
             return a
         }
 
@@ -579,10 +626,12 @@ class Utilities {
         }
 
         fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
-            val remoteDir = remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                timestamp) ?: return false
-            val remoteFile = blocklistFile(remoteDir.absolutePath,
-                                           Constants.ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+            val remoteDir =
+                remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+                    ?: return false
+            val remoteFile =
+                blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
+                    ?: return false
             if (remoteFile.exists()) {
                 return true
             }
@@ -628,9 +677,11 @@ class Utilities {
                 context.startActivity(intent)
             } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
                 Log.w(LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
-                showToastUiCentered(context,
-                                    context.getString(R.string.ctbs_app_info_not_available_toast),
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 
@@ -652,54 +703,66 @@ class Utilities {
         }
 
         fun fetchToggleBtnColors(context: Context, attr: Int): Int {
-            val attributeFetch = if (attr == R.color.firewallNoRuleToggleBtnTxt) {
-                R.attr.firewallNoRuleToggleBtnTxt
-            } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
-                R.attr.firewallNoRuleToggleBtnBg
-            } else if (attr == R.color.firewallBlockToggleBtnTxt) {
-                R.attr.firewallBlockToggleBtnTxt
-            } else if (attr == R.color.firewallBlockToggleBtnBg) {
-                R.attr.firewallBlockToggleBtnBg
-            } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
-                R.attr.firewallWhiteListToggleBtnTxt
-            } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
-                R.attr.firewallWhiteListToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnBg) {
-                R.attr.firewallExcludeToggleBtnBg
-            } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
-                R.attr.firewallExcludeToggleBtnTxt
-            } else if (attr == R.color.defaultToggleBtnBg) {
-                R.attr.defaultToggleBtnBg
-            } else if (attr == R.color.defaultToggleBtnTxt) {
-                R.attr.defaultToggleBtnTxt
-            } else if (attr == R.color.accentGood) {
-                R.attr.accentGood
-            } else {
-                R.attr.chipBgColorPositive
-            }
+            val attributeFetch =
+                if (attr == R.color.firewallNoRuleToggleBtnTxt) {
+                    R.attr.firewallNoRuleToggleBtnTxt
+                } else if (attr == R.color.firewallNoRuleToggleBtnBg) {
+                    R.attr.firewallNoRuleToggleBtnBg
+                } else if (attr == R.color.firewallBlockToggleBtnTxt) {
+                    R.attr.firewallBlockToggleBtnTxt
+                } else if (attr == R.color.firewallBlockToggleBtnBg) {
+                    R.attr.firewallBlockToggleBtnBg
+                } else if (attr == R.color.firewallWhiteListToggleBtnTxt) {
+                    R.attr.firewallWhiteListToggleBtnTxt
+                } else if (attr == R.color.firewallWhiteListToggleBtnBg) {
+                    R.attr.firewallWhiteListToggleBtnBg
+                } else if (attr == R.color.firewallExcludeToggleBtnBg) {
+                    R.attr.firewallExcludeToggleBtnBg
+                } else if (attr == R.color.firewallExcludeToggleBtnTxt) {
+                    R.attr.firewallExcludeToggleBtnTxt
+                } else if (attr == R.color.defaultToggleBtnBg) {
+                    R.attr.defaultToggleBtnBg
+                } else if (attr == R.color.defaultToggleBtnTxt) {
+                    R.attr.defaultToggleBtnTxt
+                } else if (attr == R.color.accentGood) {
+                    R.attr.accentGood
+                } else {
+                    R.attr.chipBgColorPositive
+                }
             val typedValue = TypedValue()
-            val a: TypedArray = context.obtainStyledAttributes(typedValue.data,
-                                                               intArrayOf(attributeFetch))
+            val a: TypedArray =
+                context.obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
             val color = a.getColor(0, 0)
             a.recycle()
             return color
         }
 
         // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
-        fun getActivityPendingIntent(context: Context, intent: Intent, flag: Int,
-                                     mutable: Boolean): PendingIntent {
+        fun getActivityPendingIntent(
+            context: Context,
+            intent: Intent,
+            flag: Int,
+            mutable: Boolean
+        ): PendingIntent {
             return if (isAtleastS()) {
-                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                val sFlag =
+                    if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
                 PendingIntent.getActivity(context, 0, intent, sFlag)
             } else {
                 PendingIntent.getActivity(context, 0, intent, flag)
             }
         }
 
-        fun getBroadcastPendingIntent(context: Context, requestCode: Int, intent: Intent, flag: Int,
-                                      mutable: Boolean): PendingIntent {
+        fun getBroadcastPendingIntent(
+            context: Context,
+            requestCode: Int,
+            intent: Intent,
+            flag: Int,
+            mutable: Boolean
+        ): PendingIntent {
             return if (isAtleastS()) {
-                val sFlag = if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
+                val sFlag =
+                    if (mutable) PendingIntent.FLAG_MUTABLE else PendingIntent.FLAG_IMMUTABLE
                 PendingIntent.getBroadcast(context, requestCode, intent, sFlag)
             } else {
                 PendingIntent.getBroadcast(context, requestCode, intent, flag)
@@ -717,8 +780,9 @@ class Utilities {
         }
 
         enum class PrivateDnsMode {
-            NONE,  // The setting is "Off" or "Opportunistic", and the DNS connection is not using TLS.
-            UPGRADED,  // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
+            NONE, // The setting is "Off" or "Opportunistic", and the DNS connection is not using
+                  // TLS.
+            UPGRADED, // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
             STRICT // The setting is "Strict".
         }
 
@@ -729,8 +793,8 @@ class Utilities {
                 return PrivateDnsMode.NONE
             }
 
-            val linkProperties: LinkProperties = getLinkProperties(
-                context) ?: return PrivateDnsMode.NONE
+            val linkProperties: LinkProperties =
+                getLinkProperties(context) ?: return PrivateDnsMode.NONE
             if (linkProperties.privateDnsServerName != null) {
                 return PrivateDnsMode.STRICT
             }
@@ -746,8 +810,8 @@ class Utilities {
         }
 
         private fun getLinkProperties(context: Context): LinkProperties? {
-            val connectivityManager = context.getSystemService(
-                Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork = connectivityManager.activeNetwork ?: return null
             return connectivityManager.getLinkProperties(activeNetwork)
         }

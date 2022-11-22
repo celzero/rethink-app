@@ -30,11 +30,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 
-class NetLogTracker internal constructor(private val context: Context,
-                                         private val connectionTrackerRepository: ConnectionTrackerRepository,
-                                         private val dnsLogRepository: DnsLogRepository,
-                                         private val persistentState: PersistentState) :
-        KoinComponent {
+class NetLogTracker
+internal constructor(
+    private val context: Context,
+    private val connectionTrackerRepository: ConnectionTrackerRepository,
+    private val dnsLogRepository: DnsLogRepository,
+    private val persistentState: PersistentState
+) : KoinComponent {
 
     private val dnsLatencyTracker by inject<QueryTracker>()
 
@@ -73,7 +75,6 @@ class NetLogTracker internal constructor(private val context: Context,
             val connTracker = ipTracker?.makeConnectionTracker(info) ?: return@launch
             ipNetLogBatcher?.add(connTracker)
         }
-
     }
 
     // now, this method is doing multiple things which should be removed.
@@ -93,11 +94,8 @@ class NetLogTracker internal constructor(private val context: Context,
         if (!persistentState.logsEnabled) return
 
         dnsLogTracker?.updateDnsRequestCount(dnsLog)
-        scope?.launch {
-            dnsNetLogBatcher?.add(dnsLog)
-        }
+        scope?.launch { dnsNetLogBatcher?.add(dnsLog) }
         // TODO: This method should be part of BraveVPNService
         dnsLogTracker?.updateVpnConnectionState(transaction)
     }
-
 }

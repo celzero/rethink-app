@@ -29,17 +29,13 @@ import org.koin.dsl.module
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-private val RootModule = module {
-    single<ContentResolver> { androidContext().contentResolver }
-}
+private val RootModule = module { single<ContentResolver> { androidContext().contentResolver } }
 private val updaterModule = module {
     single { NonStoreAppUpdater(Constants.RETHINK_APP_UPDATE_CHECK, get()) }
     single<AppUpdater> { get<NonStoreAppUpdater>() }
 }
 
-private val orbotHelperModule = module {
-    single { OrbotHelper(androidContext(), get(), get()) }
-}
+private val orbotHelperModule = module { single { OrbotHelper(androidContext(), get(), get()) } }
 
 private val appDownloadManagerModule = module {
     single { AppDownloadManager(androidContext(), get()) }

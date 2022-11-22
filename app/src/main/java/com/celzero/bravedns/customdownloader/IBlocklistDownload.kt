@@ -28,17 +28,25 @@ interface IBlocklistDownload {
     @GET("/{fileName}")
     @Streaming
     suspend fun downloadLocalBlocklistFile(
-            @Path("fileName") fileName: String,  @Query("vcode") vcode: Int, @Query("compressed") compressed: String): Response<ResponseBody?>?
+        @Path("fileName") fileName: String,
+        @Query("vcode") vcode: Int,
+        @Query("compressed") compressed: String
+    ): Response<ResponseBody?>?
 
     @GET("/{fileName}")
     @Streaming
     suspend fun downloadRemoteBlocklistFile(
-            @Path("fileName") fileName: String,  @Query("vcode") vcode: Int, @Query("compressed") compressed: String): Response<JsonObject?>?
+        @Path("fileName") fileName: String,
+        @Query("vcode") vcode: Int,
+        @Query("compressed") compressed: String
+    ): Response<JsonObject?>?
 
     @GET("/{update}/{blocklist}")
     @Streaming
-    suspend fun downloadAvailabilityCheck(@Path("update") update: String,
-                                          @Path("blocklist") blocklist: String,
-                                          @Query("tstamp") tStamp: Long,
-                                          @Query("vcode") vcode: Int): Response<JsonObject?>?
+    suspend fun downloadAvailabilityCheck(
+        @Path("update") update: String,
+        @Path("blocklist") blocklist: String,
+        @Query("tstamp") tStamp: Long,
+        @Query("vcode") vcode: Int
+    ): Response<JsonObject?>?
 }

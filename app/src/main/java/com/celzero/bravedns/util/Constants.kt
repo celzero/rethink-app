@@ -18,7 +18,6 @@ package com.celzero.bravedns.util
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-
 class Constants {
 
     companion object {
@@ -47,13 +46,15 @@ class Constants {
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2 = "blocklists"
 
         // url to check to check the if there is update available for on-device blocklist
-        const val ONDEVICE_IPDB_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/geoip?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
+        const val ONDEVICE_IPDB_UPDATE_CHECK_URL =
+            "$DOWNLOAD_BASE_URL/update/geoip?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
 
         // url parameter, part of update check for on-device blocklist
         const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE = "vcode="
 
         // url to check if there is app-update is available (this is for website version only)
-        const val RETHINK_APP_UPDATE_CHECK = "$DOWNLOAD_BASE_URL/update/app?$ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE"
+        const val RETHINK_APP_UPDATE_CHECK =
+            "$DOWNLOAD_BASE_URL/update/app?$ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE"
 
         // The version tag value(response) for the update check (both on-device and app update)
         // TODO: have two different response versions for blocklist update and app update
@@ -65,7 +66,8 @@ class Constants {
         // meta data for on-device blocklist
         data class OnDeviceBlocklistsMetadata(val url: String, val filename: String)
 
-        // folder name to store the local blocklist download files (eg../files/local_blocklist/<timestamp>)
+        // folder name to store the local blocklist download files
+        // (eg../files/local_blocklist/<timestamp>)
         const val LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME = "local_blocklist"
 
         const val REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME = "remote_blocklist"
@@ -74,27 +76,39 @@ class Constants {
         // search param
         const val URL_SEARCHPARAM_COMPRESS_BLOB = "?compressed"
 
-        val ONDEVICE_BLOCKLISTS = listOf(OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/blocklists",
-                                                                    ONDEVICE_BLOCKLIST_FILE_TAG),
-                                         OnDeviceBlocklistsMetadata(
-                                             "$DOWNLOAD_BASE_URL/basicconfig",
-                                             ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
-                                         OnDeviceBlocklistsMetadata(
-                                             "$DOWNLOAD_BASE_URL/rank$URL_SEARCHPARAM_COMPRESS_BLOB",
-                                             ONDEVICE_BLOCKLIST_FILE_RD),
-                                         OnDeviceBlocklistsMetadata(
-                                             "$DOWNLOAD_BASE_URL/trie$URL_SEARCHPARAM_COMPRESS_BLOB",
-                                             ONDEVICE_BLOCKLIST_FILE_TD))
+        val ONDEVICE_BLOCKLISTS =
+            listOf(
+                OnDeviceBlocklistsMetadata(
+                    "$DOWNLOAD_BASE_URL/blocklists",
+                    ONDEVICE_BLOCKLIST_FILE_TAG
+                ),
+                OnDeviceBlocklistsMetadata(
+                    "$DOWNLOAD_BASE_URL/basicconfig",
+                    ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
+                ),
+                OnDeviceBlocklistsMetadata(
+                    "$DOWNLOAD_BASE_URL/rank$URL_SEARCHPARAM_COMPRESS_BLOB",
+                    ONDEVICE_BLOCKLIST_FILE_RD
+                ),
+                OnDeviceBlocklistsMetadata(
+                    "$DOWNLOAD_BASE_URL/trie$URL_SEARCHPARAM_COMPRESS_BLOB",
+                    ONDEVICE_BLOCKLIST_FILE_TD
+                )
+            )
 
-        val ONDEVICE_IPDB = listOf(
-            OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v4", ONDEVICE_GEOIP_IPV4),
-            OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v6", ONDEVICE_GEOIP_IPV6))
+        val ONDEVICE_IPDB =
+            listOf(
+                OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v4", ONDEVICE_GEOIP_IPV4),
+                OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v6", ONDEVICE_GEOIP_IPV6)
+            )
 
-        val ONDEVICE_BLOCKLISTS_TEMP = listOf(
-            OnDeviceBlocklistsMetadata("blocklists", ONDEVICE_BLOCKLIST_FILE_TAG),
-            OnDeviceBlocklistsMetadata("basicconfig", ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
-            OnDeviceBlocklistsMetadata("rank", ONDEVICE_BLOCKLIST_FILE_RD),
-            OnDeviceBlocklistsMetadata("trie", ONDEVICE_BLOCKLIST_FILE_TD))
+        val ONDEVICE_BLOCKLISTS_TEMP =
+            listOf(
+                OnDeviceBlocklistsMetadata("blocklists", ONDEVICE_BLOCKLIST_FILE_TAG),
+                OnDeviceBlocklistsMetadata("basicconfig", ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
+                OnDeviceBlocklistsMetadata("rank", ONDEVICE_BLOCKLIST_FILE_RD),
+                OnDeviceBlocklistsMetadata("trie", ONDEVICE_BLOCKLIST_FILE_TD)
+            )
 
         const val FILETAG_TEMP_DOWNLOAD_URL = "blocklists"
 
@@ -176,10 +190,13 @@ class Constants {
         const val NOTIF_ACTION_NEW_APP_DENY = "NEW_APP_DENY" // deny network access for new apps
 
         // various notification intent extra name/values used part of notification's pending-intent
-        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME = "ACCESSIBILITY" // accessibility failure name
-        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE = "ACCESSIBILITY_FAILURE" // accessibility failure value
+        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME =
+            "ACCESSIBILITY" // accessibility failure name
+        const val NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE =
+            "ACCESSIBILITY_FAILURE" // accessibility failure value
         const val NOTIF_INTENT_EXTRA_NEW_APP_NAME = "NEW_APP" // new app install name
-        const val NOTIF_INTENT_EXTRA_NEW_APP_VALUE = "NEW_APP_INSTALL_NOTIFY" // new app install value
+        const val NOTIF_INTENT_EXTRA_NEW_APP_VALUE =
+            "NEW_APP_INSTALL_NOTIFY" // new app install value
 
         // new app install intent extra name for uid. see RefreshDatabase#makeNewAppVpnIntent()
         const val NOTIF_INTENT_EXTRA_APP_UID = "NEW_APP_UID"
@@ -190,7 +207,8 @@ class Constants {
         // The minimum interval before checking if the internal accessibility service
         // (used to block apps-not-in-use) is indeed running.
         // Ref: {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabled} and
-        // {@link com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabledViaSettingsSecure}
+        // {@link
+        // com.celzero.bravedns.util.Utilities#isAccessibilityServiceEnabledViaSettingsSecure}
         val ACCESSIBILITY_SERVICE_HEARTBEAT_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(5)
 
         // minimum interval before checking if there is a change in active network

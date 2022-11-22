@@ -25,17 +25,14 @@ import com.celzero.bravedns.data.FileTag
 @Dao
 interface RethinkRemoteFileTagDao {
 
-    @Update
-    fun update(fileTag: RethinkRemoteFileTag)
+    @Update fun update(fileTag: RethinkRemoteFileTag)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(fileTag: RethinkRemoteFileTag)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(fileTag: RethinkRemoteFileTag)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertReplace(fileTag: RethinkRemoteFileTag)
 
-    @Delete
-    fun delete(fileTag: RethinkRemoteFileTag)
+    @Delete fun delete(fileTag: RethinkRemoteFileTag)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(fileTag: List<RethinkRemoteFileTag>): LongArray
@@ -44,28 +41,43 @@ interface RethinkRemoteFileTagDao {
     fun getRemoteFileTags(): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`")
-    fun getRemoteFileTags(query: String, selected: Set<Int>, group: Set<String>,
-                          subg: Set<String>): PagingSource<Int, RethinkRemoteFileTag>
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+    )
+    fun getRemoteFileTags(
+        query: String,
+        selected: Set<Int>,
+        group: Set<String>,
+        subg: Set<String>
+    ): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and (vname like :query or `group` like :query or subg like :query) order by `group`")
-    fun getRemoteFileTagsGroup(query: String, selected: Set<Int>,
-                               group: Set<String>): PagingSource<Int, RethinkRemoteFileTag>
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+    )
+    fun getRemoteFileTagsGroup(
+        query: String,
+        selected: Set<Int>,
+        group: Set<String>
+    ): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`")
-    fun getRemoteFileTagsSubg(query: String, selected: Set<Int>,
-                              subg: Set<String>): PagingSource<Int, RethinkRemoteFileTag>
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+    )
+    fun getRemoteFileTagsSubg(
+        query: String,
+        selected: Set<Int>,
+        subg: Set<String>
+    ): PagingSource<Int, RethinkRemoteFileTag>
 
-    @Query("select * from RethinkRemoteFileTag order by `group`")
-    fun getAllTags(): List<FileTag>
+    @Query("select * from RethinkRemoteFileTag order by `group`") fun getAllTags(): List<FileTag>
 
     @Transaction
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and (vname like :input or `group` like :input or subg like :input) order by `group`")
-    fun getRemoteFileTagsWithFilter(input: String,
-                                    selected: Set<Int>): PagingSource<Int, RethinkRemoteFileTag>
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and (vname like :input or `group` like :input or subg like :input) order by `group`"
+    )
+    fun getRemoteFileTagsWithFilter(
+        input: String,
+        selected: Set<Int>
+    ): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query("Update RethinkRemoteFileTag set isSelected = :isSelected where value in (:list) ")
     fun updateTags(list: Set<Int>, isSelected: Int)
@@ -74,18 +86,16 @@ interface RethinkRemoteFileTagDao {
     fun updateSelectedTag(value: Int, isSelected: Int)
 
     @Query(
-        "select value, simpleTagId from RethinkRemoteFileTag where entries > 0 order by simpleTagId")
+        "select value, simpleTagId from RethinkRemoteFileTag where entries > 0 order by simpleTagId"
+    )
     fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping>
 
-    @Query("select * from RethinkRemoteFileTag")
-    fun fileTags(): List<RethinkRemoteFileTag>
+    @Query("select * from RethinkRemoteFileTag") fun fileTags(): List<RethinkRemoteFileTag>
 
-    @Query("Update RethinkRemoteFileTag set isSelected = 0")
-    fun clearSelectedTags()
+    @Query("Update RethinkRemoteFileTag set isSelected = 0") fun clearSelectedTags()
 
     @Query("select value from RethinkRemoteFileTag where isSelected = 1")
     fun getSelectedTags(): List<Int>
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

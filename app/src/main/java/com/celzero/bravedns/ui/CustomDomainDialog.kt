@@ -43,8 +43,11 @@ import com.google.android.material.chip.Chip
 import java.net.MalformedURLException
 import java.util.regex.Pattern
 
-class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainViewModel,
-                         themeId: Int) : Dialog(activity, themeId), SearchView.OnQueryTextListener {
+class CustomDomainDialog(
+    val activity: Activity,
+    val viewModel: CustomDomainViewModel,
+    themeId: Int
+) : Dialog(activity, themeId), SearchView.OnQueryTextListener {
 
     private lateinit var b: DialogCustomDomainBinding
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -58,8 +61,10 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         b = DialogCustomDomainBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                          WindowManager.LayoutParams.MATCH_PARENT)
+        window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT
+        )
 
         b.cdfSearchView.setOnQueryTextListener(this)
         setupRecyclerView()
@@ -79,24 +84,17 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     }
 
     private fun setupClickListeners() {
-        b.cdfAddDomain.setOnClickListener {
-            showAddDomainDialog()
-        }
+        b.cdfAddDomain.setOnClickListener { showAddDomainDialog() }
 
-        b.cdfSearchFilterIcon.setOnClickListener {
-            toggleChipsUi()
-        }
+        b.cdfSearchFilterIcon.setOnClickListener { toggleChipsUi() }
 
-        b.cdfSearchView.setOnClickListener {
-            showChipsUi()
-        }
+        b.cdfSearchView.setOnClickListener { showChipsUi() }
     }
 
     /**
      * Shows dialog to add custom domain. Provides user option to user to add DOMAIN, TLD and
-     * WILDCARD. If entered option and text-input is valid, then the dns requests will be
-     * filtered based on it. User can either select the entered domain to be added in
-     * whitelist or blocklist.
+     * WILDCARD. If entered option and text-input is valid, then the dns requests will be filtered
+     * based on it. User can either select the entered domain to be added in whitelist or blocklist.
      */
     private fun showAddDomainDialog() {
         val dialog = Dialog(activity)
@@ -108,8 +106,8 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         val types = DomainRulesManager.DomainType.getAllDomainTypes()
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
 
-        val aa: ArrayAdapter<*> = ArrayAdapter<Any?>(activity, android.R.layout.simple_spinner_item,
-                                                     types)
+        val aa: ArrayAdapter<*> =
+            ArrayAdapter<Any?>(activity, android.R.layout.simple_spinner_item, types)
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         dBind.dacdSpinner.adapter = aa
 
@@ -123,25 +121,36 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
         dialog.window?.attributes = lp
 
         dBind.dacdUrlTitle.text = activity.getString(R.string.cd_dialog_title)
-        dBind.dacdDomainEditText.hint = activity.resources.getString(
-            R.string.cd_dialog_edittext_hint, types[0])
-        dBind.dacdTextInputLayout.hint = activity.resources.getString(
-            R.string.cd_dialog_edittext_hint, types[0])
+        dBind.dacdDomainEditText.hint =
+            activity.resources.getString(R.string.cd_dialog_edittext_hint, types[0])
+        dBind.dacdTextInputLayout.hint =
+            activity.resources.getString(R.string.cd_dialog_edittext_hint, types[0])
 
-        dBind.dacdSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // no-op
-            }
+        dBind.dacdSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // no-op
+                }
 
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int,
-                                        id: Long) {
-                selectedType = DomainRulesManager.DomainType.getType(position)
-                dBind.dacdDomainEditText.hint = activity.resources.getString(
-                    R.string.cd_dialog_edittext_hint, types[position])
-                dBind.dacdTextInputLayout.hint = activity.resources.getString(
-                    R.string.cd_dialog_edittext_hint, types[position])
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    selectedType = DomainRulesManager.DomainType.getType(position)
+                    dBind.dacdDomainEditText.hint =
+                        activity.resources.getString(
+                            R.string.cd_dialog_edittext_hint,
+                            types[position]
+                        )
+                    dBind.dacdTextInputLayout.hint =
+                        activity.resources.getString(
+                            R.string.cd_dialog_edittext_hint,
+                            types[position]
+                        )
+                }
             }
-        }
 
         dBind.dacdAddBtn.setOnClickListener {
             dBind.dacdFailureText.visibility = View.GONE
@@ -157,8 +166,8 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
                 DomainRulesManager.DomainType.TLD -> {
                     val tld = removeLeadingAndTrailingDots(input)
                     if (!isValidTld(tld)) {
-                        dBind.dacdFailureText.text = activity.resources.getString(
-                            R.string.cd_dialog_error_invalid_tld)
+                        dBind.dacdFailureText.text =
+                            activity.resources.getString(R.string.cd_dialog_error_invalid_tld)
                         dBind.dacdFailureText.visibility = View.VISIBLE
                         return@setOnClickListener
                     }
@@ -167,19 +176,18 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
                 }
                 DomainRulesManager.DomainType.WILDCARD -> {
                     if (!isWildCardEntry(input)) {
-                        dBind.dacdFailureText.text = activity.resources.getString(
-                            R.string.cd_dialog_error_invalid_wildcard)
+                        dBind.dacdFailureText.text =
+                            activity.resources.getString(R.string.cd_dialog_error_invalid_wildcard)
                         dBind.dacdFailureText.visibility = View.VISIBLE
                         return@setOnClickListener
-
                     }
 
                     constructWildcardSamples(input)
                 }
                 DomainRulesManager.DomainType.DOMAIN -> {
                     if (!isValidDomain(input)) {
-                        dBind.dacdFailureText.text = activity.resources.getString(
-                            R.string.cd_dialog_error_invalid_domain)
+                        dBind.dacdFailureText.text =
+                            activity.resources.getString(R.string.cd_dialog_error_invalid_domain)
                         dBind.dacdFailureText.visibility = View.VISIBLE
                         return@setOnClickListener
                     }
@@ -194,9 +202,7 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
             dBind.dacdAddBtn.visibility = View.VISIBLE
         }
 
-        dBind.dacdCancelBtn.setOnClickListener {
-            dialog.dismiss()
-        }
+        dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
@@ -211,10 +217,10 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun constructTldSamples(input: String): String {
         val validUnicode = activity.getString(R.string.cd_sample_unicode_valid)
         val invalidUnicode = activity.getString(R.string.cd_sample_unicode_invalid)
-        var sample = activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode, "abc.xyz",
-                                        input)
-        sample += activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.xyz",
-                                     "pqr")
+        var sample =
+            activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode, "abc.xyz", input)
+        sample +=
+            activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.xyz", "pqr")
         sample += activity.getString(R.string.cd_add_dialog_sample_3, invalidUnicode, "xyz.$input")
         sample += activity.getString(R.string.cd_add_dialog_sample_4, validUnicode, "xyz.pqr")
         return sample
@@ -223,10 +229,10 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun constructWildcardSamples(input: String): String {
         val validUnicode = activity.getString(R.string.cd_sample_unicode_valid)
         val invalidUnicode = activity.getString(R.string.cd_sample_unicode_invalid)
-        var sample = activity.getString(R.string.cd_add_dialog_sample_1, validUnicode, "abc.",
-                                        input)
-        sample += activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.",
-                                     "$input.pqr")
+        var sample =
+            activity.getString(R.string.cd_add_dialog_sample_1, validUnicode, "abc.", input)
+        sample +=
+            activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.", "$input.pqr")
         sample += activity.getString(R.string.cd_add_dialog_sample_3, invalidUnicode, "xyz")
         sample += activity.getString(R.string.cd_add_dialog_sample_4, validUnicode, "xyz")
         return sample
@@ -235,10 +241,10 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun constructDomainSamples(input: String): String {
         val validUnicode = activity.getString(R.string.cd_sample_unicode_valid)
         val invalidUnicode = activity.getString(R.string.cd_sample_unicode_invalid)
-        var sample = activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode, "abc.",
-                                        input)
-        sample += activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.",
-                                     "$input.pqr")
+        var sample =
+            activity.getString(R.string.cd_add_dialog_sample_1, invalidUnicode, "abc.", input)
+        sample +=
+            activity.getString(R.string.cd_add_dialog_sample_2, validUnicode, "abc.", "$input.pqr")
         sample += activity.getString(R.string.cd_add_dialog_sample_3, invalidUnicode, "xyz")
         sample += activity.getString(R.string.cd_add_dialog_sample_4, validUnicode, "xyz")
         return sample
@@ -261,21 +267,26 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun isWildCardEntry(url: String): Boolean {
         // ref: https://stackoverflow.com/a/50448970
         /*val regEx = Pattern.compile(
-            "(?i)^(?:\\\\S+(?::\\\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|"
-                    //DOMAIN
-                    + "(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+|\\*)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))\\.?)(?::\\d{2,5})?(?:[/?#]\\S*)?$")*/
+        "(?i)^(?:\\\\S+(?::\\\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|"
+                //DOMAIN
+                + "(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+|\\*)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))\\.?)(?::\\d{2,5})?(?:[/?#]\\S*)?$")*/
 
-        // ref: https://stackoverflow.com/questions/51500161/regex-to-validate-wildcard-domains-with-special-conditions
-        val pattern = Pattern.compile(
-            "(?=^[*]|.*[*]\$)(?:\\*(?:\\.|-)?)?(?:(?!-)[\\w-]+(?:(?<!-)\\.)?)+([a-z])+(?:(?:-|\\.)?\\*)?\$")
+        // ref:
+        // https://stackoverflow.com/questions/51500161/regex-to-validate-wildcard-domains-with-special-conditions
+        val pattern =
+            Pattern.compile(
+                "(?=^[*]|.*[*]\$)(?:\\*(?:\\.|-)?)?(?:(?!-)[\\w-]+(?:(?<!-)\\.)?)+([a-z])+(?:(?:-|\\.)?\\*)?\$"
+            )
         return pattern.matcher(url).find()
     }
 
     private fun insertDomain(domain: String, type: DomainRulesManager.DomainType) {
         DomainRulesManager.block(domain, type = type)
-        Utilities.showToastUiCentered(activity,
-                                      activity.resources.getString(R.string.cd_toast_added),
-                                      Toast.LENGTH_SHORT)
+        Utilities.showToastUiCentered(
+            activity,
+            activity.resources.getString(R.string.cd_toast_added),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun toggleChipsUi() {
@@ -309,12 +320,24 @@ class CustomDomainDialog(val activity: Activity, val viewModel: CustomDomainView
     private fun remakeParentFilterChipsUi() {
         b.cdfFilterChipGroup.removeAllViews()
 
-        val all = makeParentChip(DomainRulesManager.DomainStatus.NONE.id,
-                                 activity.getString(R.string.cd_filter_all), true)
-        val allowed = makeParentChip(DomainRulesManager.DomainStatus.WHITELIST.id,
-                                     activity.getString(R.string.cd_filter_allowed), false)
-        val blocked = makeParentChip(DomainRulesManager.DomainStatus.BLOCK.id,
-                                     activity.getString(R.string.cd_filter_blocked), false)
+        val all =
+            makeParentChip(
+                DomainRulesManager.DomainStatus.NONE.id,
+                activity.getString(R.string.cd_filter_all),
+                true
+            )
+        val allowed =
+            makeParentChip(
+                DomainRulesManager.DomainStatus.WHITELIST.id,
+                activity.getString(R.string.cd_filter_allowed),
+                false
+            )
+        val blocked =
+            makeParentChip(
+                DomainRulesManager.DomainStatus.BLOCK.id,
+                activity.getString(R.string.cd_filter_blocked),
+                false
+            )
 
         b.cdfFilterChipGroup.addView(all)
         b.cdfFilterChipGroup.addView(allowed)

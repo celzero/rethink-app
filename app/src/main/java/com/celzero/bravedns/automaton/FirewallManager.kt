@@ -56,9 +56,11 @@ object FirewallManager : KoinComponent {
     private const val CACHE_BUILDER_MAX_SIZE = 20000L
     private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
 
-    val ipDomainLookup: Cache<String, DnsCacheRecord> = CacheBuilder.newBuilder().maximumSize(
-        CACHE_BUILDER_MAX_SIZE).expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_HRS,
-                                                 TimeUnit.HOURS).build()
+    val ipDomainLookup: Cache<String, DnsCacheRecord> =
+        CacheBuilder.newBuilder()
+            .maximumSize(CACHE_BUILDER_MAX_SIZE)
+            .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_HRS, TimeUnit.HOURS)
+            .build()
 
     // Below are the firewall rule set
     // app-status | connection-status |  Rule
@@ -67,7 +69,12 @@ object FirewallManager : KoinComponent {
     // blocked    |    mobile         |  mobile-data-block
     // blocked    |    both           |  block
     enum class FirewallStatus(val id: Int) {
-        ALLOW(0), BLOCK(1), BYPASS_UNIVERSAL(2), EXCLUDE(3), LOCKDOWN(4), UNTRACKED(5);
+        ALLOW(0),
+        BLOCK(1),
+        BYPASS_UNIVERSAL(2),
+        EXCLUDE(3),
+        LOCKDOWN(4),
+        UNTRACKED(5);
 
         fun getLabelId(): Int {
             return when (this) {
@@ -178,7 +185,9 @@ object FirewallManager : KoinComponent {
     }
 
     enum class ConnectionStatus(val id: Int) {
-        BOTH(0), WIFI(1), MOBILE_DATA(2);
+        BOTH(0),
+        WIFI(1),
+        MOBILE_DATA(2);
 
         fun mobileData(): Boolean {
             return this == MOBILE_DATA
@@ -219,7 +228,6 @@ object FirewallManager : KoinComponent {
                 }
             }
         }
-
     }
 
     // Firewall app category constants
@@ -236,8 +244,9 @@ object FirewallManager : KoinComponent {
             }
 
             fun isAnySystemCategory(context: Context, name: String): Boolean {
-                return context.getString(SYSTEM_COMPONENT.nameResId) == name || context.getString(
-                    SYSTEM_APP.nameResId) == name || context.getString(NON_APP.nameResId) == name
+                return context.getString(SYSTEM_COMPONENT.nameResId) == name ||
+                    context.getString(SYSTEM_APP.nameResId) == name ||
+                    context.getString(NON_APP.nameResId) == name
             }
 
             fun isNonApp(context: Context, name: String): Boolean {
@@ -287,10 +296,10 @@ object FirewallManager : KoinComponent {
     fun deletePackagesFromCache(packagesToDelete: Set<AppInfoTuple>) {
         lock.write {
             packagesToDelete.forEach { tuple ->
-                appInfos.get(
-                    tuple.uid).filter { tuple.packageName == it.packageInfo }.forEach { ai ->
-                    appInfos.remove(tuple.uid, ai)
-                }
+                appInfos
+                    .get(tuple.uid)
+                    .filter { tuple.packageName == it.packageInfo }
+                    .forEach { ai -> appInfos.remove(tuple.uid, ai) }
             }
         }
         io {
@@ -344,7 +353,10 @@ object FirewallManager : KoinComponent {
     }
 
     fun getExcludedApps(): MutableSet<String> {
-        return getAppInfosLocked().filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }.map { it.packageInfo }.toMutableSet()
+        return getAppInfosLocked()
+            .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
+            .map { it.packageInfo }
+            .toMutableSet()
     }
 
     fun getPackageNameByAppName(appName: String): String? {
@@ -382,15 +394,19 @@ object FirewallManager : KoinComponent {
     }
 
     fun getCategoriesForSystemApps(): List<String> {
-        return getAppInfosLocked().filter {
-            it.isSystemApp
-        }.map { it.appCategory }.distinct().sorted()
+        return getAppInfosLocked()
+            .filter { it.isSystemApp }
+            .map { it.appCategory }
+            .distinct()
+            .sorted()
     }
 
     fun getCategoriesForInstalledApps(): List<String> {
-        return getAppInfosLocked().filter {
-            !it.isSystemApp
-        }.map { it.appCategory }.distinct().sorted()
+        return getAppInfosLocked()
+            .filter { !it.isSystemApp }
+            .map { it.appCategory }
+            .distinct()
+            .sorted()
     }
 
     fun getAllCategories(): List<String> {
@@ -400,13 +416,14 @@ object FirewallManager : KoinComponent {
     suspend fun loadAppFirewallRules() {
         if (isFirewallRulesLoaded) return
 
-        withContext(Dispatchers.IO) {
-            reloadAppList()
-        }
+        withContext(Dispatchers.IO) { reloadAppList() }
     }
 
-    private fun invalidateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
-                                         connectionStatus: ConnectionStatus) {
+    private fun invalidateFirewallStatus(
+        uid: Int,
+        firewallStatus: FirewallStatus,
+        connectionStatus: ConnectionStatus
+    ) {
         lock.write {
             appInfos.get(uid).forEach {
                 it.firewallStatus = firewallStatus.id
@@ -419,9 +436,7 @@ object FirewallManager : KoinComponent {
     suspend fun persistAppInfo(appInfo: AppInfo) {
         appInfoRepository.insert(appInfo)
 
-        lock.write {
-            appInfos.put(appInfo.uid, appInfo)
-        }
+        lock.write { appInfos.put(appInfo.uid, appInfo) }
         informObservers()
     }
 
@@ -435,17 +450,17 @@ object FirewallManager : KoinComponent {
 
         lock.write {
             appInfos.clear()
-            apps.forEach {
-                appInfos.put(it.uid, it)
-            }
+            apps.forEach { appInfos.put(it.uid, it) }
             isFirewallRulesLoaded = true
         }
         informObservers()
     }
 
     fun untrackForegroundApps() {
-        Log.i(LOG_TAG_FIREWALL,
-              "launcher in the foreground, clear foreground uids: $foregroundUids")
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "launcher in the foreground, clear foreground uids: $foregroundUids"
+        )
         foregroundUids.clear()
     }
 
@@ -473,23 +488,34 @@ object FirewallManager : KoinComponent {
         // should be blocked.
         val locked = keyguardManager?.isKeyguardLocked == false
         val isForeground = foregroundUids.contains(uid)
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground")
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_FIREWALL,
+                "is app $uid foreground? ${locked && isForeground}, isLocked? $locked, is available in foreground list? $isForeground"
+            )
         return locked && isForeground
     }
 
     fun updateFirewalledApps(uid: Int, firewallStatus: FirewallStatus) {
         io {
             invalidateFirewallStatus(uid, firewallStatus, ConnectionStatus.BOTH)
-            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id,
-                                                        ConnectionStatus.BOTH.id)
+            appInfoRepository.updateFirewallStatusByUid(
+                uid,
+                firewallStatus.id,
+                ConnectionStatus.BOTH.id
+            )
         }
     }
 
-    fun updateFirewallStatus(uid: Int, firewallStatus: FirewallStatus,
-                             connectionStatus: ConnectionStatus) {
-        Log.i(LOG_TAG_FIREWALL,
-              "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}")
+    fun updateFirewallStatus(
+        uid: Int,
+        firewallStatus: FirewallStatus,
+        connectionStatus: ConnectionStatus
+    ) {
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}"
+        )
         io {
             invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
             appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
@@ -510,14 +536,10 @@ object FirewallManager : KoinComponent {
 
     private fun informObservers() {
         val v = getAppInfosLocked()
-        v.let {
-            appInfosLiveData.postValue(v)
-        }
+        v.let { appInfosLiveData.postValue(v) }
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            f()
-        }
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

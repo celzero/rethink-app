@@ -18,6 +18,15 @@ package com.celzero.bravedns.data
 import java.io.Serializable
 
 // data class to handle filetags for both local and remote blocklist (filetga.json)
-data class FileTag(val value: Int, val uname: String, val vname: String, val group: String,
-                   var subg: String, val url: String, val show: Int, val entries: Int,
-                   var simpleTagId: Int, var isSelected: Boolean = false) : Serializable
+data class FileTag(
+    val value: Int,
+    val uname: String,
+    val vname: String,
+    val group: String,
+    var subg: String,
+    val url: String,
+    val show: Int,
+    val entries: Int,
+    var simpleTagId: Int,
+    var isSelected: Boolean = false
+) : Serializable

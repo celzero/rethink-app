@@ -40,9 +40,16 @@ class DnsCryptEndpoint {
         return this.id.hashCode()
     }
 
-
-    constructor(id: Int, dnsCryptName: String, dnsCryptURL: String, dnsCryptExplanation: String,
-                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
+    constructor(
+        id: Int,
+        dnsCryptName: String,
+        dnsCryptURL: String,
+        dnsCryptExplanation: String,
+        isSelected: Boolean,
+        isCustom: Boolean,
+        modifiedDataTime: Long,
+        latency: Int
+    ) {
         // Room auto-increments id when its set to zero.
         // A non-zero id overrides and sets caller-specified id instead.
         this.id = id

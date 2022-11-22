@@ -1,4 +1,4 @@
-    /*
+/*
  * Copyright 2022 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,15 +30,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RethinkSimpleViewPacksAdapter(val context: Context,
-                                    var fileTags: List<RethinkBlocklistManager.SimpleViewPacksTag>,
-                                    val selectedTags: List<Int>,
-                                    val type: RethinkBlocklistFragment.RethinkBlocklistType) :
-        RecyclerView.Adapter<RethinkSimpleViewPacksAdapter.RethinkSimpleViewHolder>() {
+class RethinkSimpleViewPacksAdapter(
+    val context: Context,
+    var fileTags: List<RethinkBlocklistManager.SimpleViewPacksTag>,
+    val selectedTags: List<Int>,
+    val type: RethinkBlocklistFragment.RethinkBlocklistType
+) : RecyclerView.Adapter<RethinkSimpleViewPacksAdapter.RethinkSimpleViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RethinkSimpleViewHolder {
-        val itemBinding = ListItemRethinkBlocklistSimpleBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+        val itemBinding =
+            ListItemRethinkBlocklistSimpleBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         return RethinkSimpleViewHolder(itemBinding)
     }
 
@@ -52,7 +56,7 @@ class RethinkSimpleViewPacksAdapter(val context: Context,
     }
 
     inner class RethinkSimpleViewHolder(private val b: ListItemRethinkBlocklistSimpleBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(position: Int) {
             displayMetaData(position)
@@ -60,13 +64,9 @@ class RethinkSimpleViewPacksAdapter(val context: Context,
         }
 
         private fun setupClickListener(position: Int) {
-            b.crpCheckBox.setOnClickListener {
-                toggleCheckbox(b.crpCheckBox.isChecked, position)
-            }
+            b.crpCheckBox.setOnClickListener { toggleCheckbox(b.crpCheckBox.isChecked, position) }
 
-            b.crpCard.setOnClickListener {
-                toggleCheckbox(!b.crpCheckBox.isChecked, position)
-            }
+            b.crpCard.setOnClickListener { toggleCheckbox(!b.crpCheckBox.isChecked, position) }
         }
 
         private fun setCardBackground(card: CardView, isSelected: Boolean) {
@@ -84,21 +84,28 @@ class RethinkSimpleViewPacksAdapter(val context: Context,
         }
 
         private fun setFileTag(tagIds: MutableList<Int>?, selected: Int) {
-            Log.d("TEST","TEST Update blocklist tag: $tagIds, $selected")
             if (tagIds == null || tagIds.isEmpty()) return
 
             io {
                 if (type.isRemote()) {
                     RethinkBlocklistManager.updateFiletagsRemote(tagIds.toSet(), selected)
                     val selectedTags = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                    val stamp = RethinkBlocklistManager.getStamp(context, selectedTags,
-                                                                 RethinkBlocklistFragment.RethinkBlocklistType.REMOTE)
+                    val stamp =
+                        RethinkBlocklistManager.getStamp(
+                            context,
+                            selectedTags,
+                            RethinkBlocklistFragment.RethinkBlocklistType.REMOTE
+                        )
                     RethinkBlocklistFragment.modifiedStamp = stamp
                 } else {
                     RethinkBlocklistManager.updateFiletagsLocal(tagIds.toSet(), selected)
                     val selectedTags = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                    val stamp = RethinkBlocklistManager.getStamp(context, selectedTags,
-                                                                 RethinkBlocklistFragment.RethinkBlocklistType.LOCAL)
+                    val stamp =
+                        RethinkBlocklistManager.getStamp(
+                            context,
+                            selectedTags,
+                            RethinkBlocklistFragment.RethinkBlocklistType.LOCAL
+                        )
                     RethinkBlocklistFragment.modifiedStamp = stamp
                 }
             }
@@ -119,16 +126,14 @@ class RethinkSimpleViewPacksAdapter(val context: Context,
             }
 
             b.crpLabelTv.text = simpleView.name.replaceFirstChar(Char::titlecase)
-            b.crpDescGroupTv.text = simpleView.desc.replaceFirstChar(
-                Char::titlecase) + " blocklists"
+            b.crpDescGroupTv.text =
+                simpleView.desc.replaceFirstChar(Char::titlecase) + " blocklists"
             b.crpCheckBox.isChecked = false
 
             // enable the check box if the stamp contains all the values
             if (selectedTags.isEmpty() || simpleView.tags.isEmpty()) return
 
             if (selectedTags.containsAll(simpleView.tags)) {
-                Log.d("TEST",
-                      "TEST Selected tag contains all values: ${simpleView.name}, ${simpleView.tags}")
                 b.crpCheckBox.isChecked = true
                 setCardBackground(b.crpCard, true)
             }
@@ -145,11 +150,7 @@ class RethinkSimpleViewPacksAdapter(val context: Context,
         }
 
         private fun io(f: suspend () -> Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
-                f()
-            }
+            CoroutineScope(Dispatchers.IO).launch { f() }
         }
-
     }
-
 }

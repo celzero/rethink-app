@@ -51,8 +51,9 @@ object PauseTimer {
                     val c = addCountdown(-COUNT_DOWN_INTERVAL)
 
                     // Check vpn lockdown state every 30 secs
-                    if (TimeUnit.MILLISECONDS.toSeconds(
-                            c) % LOCKDOWN_STATUS_CHECK_TIME_IN_SEC == 0L) {
+                    if (
+                        TimeUnit.MILLISECONDS.toSeconds(c) % LOCKDOWN_STATUS_CHECK_TIME_IN_SEC == 0L
+                    ) {
                         resumeAppIfVpnLockdown()
                     }
                 }
@@ -70,7 +71,6 @@ object PauseTimer {
         if (!VpnController.isVpnLockdown()) return
 
         VpnController.resumeApp()
-
     }
 
     private fun setCountdown(c: Long): Long {

@@ -60,7 +60,9 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     enum class DnsLogFilter(val id: Int) {
-        ALL(0), ALLOWED(1), BLOCKED(2)
+        ALL(0),
+        ALLOWED(1),
+        BLOCKED(2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,21 +88,20 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private fun observeDnsStats() {
         persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
             val lifeTimeConversion = formatDecimal(it)
-            b.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
-                                               lifeTimeConversion)
+            b.totalQueriesTxt.text =
+                getString(R.string.dns_logs_lifetime_queries, lifeTimeConversion)
         }
 
         persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner) {
             val blocked = formatDecimal(it)
             b.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
         }
-
     }
 
     private fun formatDecimal(i: Long?): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            CompactDecimalFormat.getInstance(Locale.US,
-                                             CompactDecimalFormat.CompactStyle.SHORT).format(i)
+            CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT)
+                .format(i)
         } else {
             i.toString()
         }
@@ -114,13 +115,9 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
             b.queryListSearch.onActionViewExpanded()
         }
 
-        b.queryListFilterIcon.setOnClickListener {
-            toggleChipsUi()
-        }
+        b.queryListFilterIcon.setOnClickListener { toggleChipsUi() }
 
-        b.queryListDeleteIcon.setOnClickListener {
-            showDnsLogsDeleteDialog()
-        }
+        b.queryListDeleteIcon.setOnClickListener { showDnsLogsDeleteDialog() }
     }
 
     private fun displayPerDnsUi() {
@@ -138,42 +135,47 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         }
         b.recyclerQuery.adapter = recyclerAdapter
 
-        val scrollListener = object : RecyclerView.OnScrollListener() {
+        val scrollListener =
+            object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-                if (recyclerView.getChildAt(0).tag == null) return
+                    if (recyclerView.getChildAt(0).tag == null) return
 
-                val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag: Long = recyclerView.getChildAt(0).tag as Long
 
-                if (dy > 0) {
-                    b.queryListRecyclerScrollHeader.text = formatToRelativeTime(requireContext(), tag)
-                    b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
-                } else {
-                    b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    if (dy > 0) {
+                        b.queryListRecyclerScrollHeader.text =
+                            formatToRelativeTime(requireContext(), tag)
+                        b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
+                    } else {
+                        b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    }
+                }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    }
                 }
             }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    b.queryListRecyclerScrollHeader.visibility = View.GONE
-                }
-            }
-        }
         b.recyclerQuery.addOnScrollListener(scrollListener)
-
     }
 
     private fun remakeFilterChipsUi() {
         b.filterChipGroup.removeAllViews()
 
         val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.dns_filter_parent_all), true)
-        val allowed = makeChip(DnsLogFilter.ALLOWED.id,
-                               getString(R.string.dns_filter_parent_allowed), false)
-        val blocked = makeChip(ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
-                               getString(R.string.dns_filter_parent_blocked), false)
+        val allowed =
+            makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.dns_filter_parent_allowed), false)
+        val blocked =
+            makeChip(
+                ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
+                getString(R.string.dns_filter_parent_blocked),
+                false
+            )
 
         b.filterChipGroup.addView(all)
         b.filterChipGroup.addView(allowed)
@@ -256,8 +258,6 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            f()
-        }
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

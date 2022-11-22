@@ -27,7 +27,7 @@ class KnownPorts {
         // represents the unknown port in the port map. see class KnownPorts
         const val PORT_VAL_UNKNOWN = "unknown"
 
-        //get protocol desc based on port number
+        // get protocol desc based on port number
         private var portMap: HashMap<Int, String> = initPortMap()
 
         fun resolvePort(port: Int): String {
@@ -43,7 +43,8 @@ class KnownPorts {
         }
 
         // init hash map with reserved ports (1-1024) and protocol identifiers
-        // based on: http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+        // based on:
+        // http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
         private fun initPortMap(): HashMap<Int, String> {
             portMap = HashMap()
             portMap[1] = "tcpmux"

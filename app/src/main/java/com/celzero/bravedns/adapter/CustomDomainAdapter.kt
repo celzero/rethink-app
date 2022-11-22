@@ -35,28 +35,35 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 
 class CustomDomainAdapter(val context: Context) :
-        PagingDataAdapter<CustomDomain, CustomDomainAdapter.CustomDomainViewHolder>(DIFF_CALLBACK) {
+    PagingDataAdapter<CustomDomain, CustomDomainAdapter.CustomDomainViewHolder>(DIFF_CALLBACK) {
 
     companion object {
 
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CustomDomain>() {
-            override fun areItemsTheSame(oldConnection: CustomDomain,
-                                         newConnection: CustomDomain): Boolean {
-                return (oldConnection.domain == newConnection.domain && oldConnection.status == newConnection.status)
-            }
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<CustomDomain>() {
+                override fun areItemsTheSame(
+                    oldConnection: CustomDomain,
+                    newConnection: CustomDomain
+                ): Boolean {
+                    return (oldConnection.domain == newConnection.domain &&
+                        oldConnection.status == newConnection.status)
+                }
 
-            override fun areContentsTheSame(oldConnection: CustomDomain,
-                                            newConnection: CustomDomain): Boolean {
-                return (oldConnection.domain == newConnection.domain && oldConnection.status != newConnection.status)
+                override fun areContentsTheSame(
+                    oldConnection: CustomDomain,
+                    newConnection: CustomDomain
+                ): Boolean {
+                    return (oldConnection.domain == newConnection.domain &&
+                        oldConnection.status != newConnection.status)
+                }
             }
-        }
     }
 
     data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomDomainViewHolder {
-        val itemBinding = ListItemCustomDomainBinding.inflate(LayoutInflater.from(parent.context),
-                                                              parent, false)
+        val itemBinding =
+            ListItemCustomDomainBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CustomDomainViewHolder(itemBinding)
     }
 
@@ -66,7 +73,7 @@ class CustomDomainAdapter(val context: Context) :
     }
 
     inner class CustomDomainViewHolder(private val b: ListItemCustomDomainBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customDomain: CustomDomain
         fun update(cd: CustomDomain) {
@@ -82,10 +89,7 @@ class CustomDomainAdapter(val context: Context) :
 
             b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
 
-            b.customDomainExpandIcon.setOnClickListener {
-                toggleActionsUi()
-            }
-
+            b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
         }
 
         private fun updateToggleGroup(id: Int) {
@@ -112,28 +116,29 @@ class CustomDomainAdapter(val context: Context) :
             }
         }
 
-        private val domainRulesGroupListener = MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
-            val b: MaterialButton = b.customDomainToggleGroup.findViewById(checkedId)
-            if (isChecked) {
-                val statusId = findSelectedRuleByTag(getTag(b.tag))
-                // delete button
-                if (statusId == null) {
-                    showDialogForDelete(customDomain)
+        private val domainRulesGroupListener =
+            MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
+                val b: MaterialButton = b.customDomainToggleGroup.findViewById(checkedId)
+                if (isChecked) {
+                    val statusId = findSelectedRuleByTag(getTag(b.tag))
+                    // delete button
+                    if (statusId == null) {
+                        showDialogForDelete(customDomain)
+                        return@OnButtonCheckedListener
+                    }
+
+                    val t = toggleBtnUi(statusId)
+                    // update toggle button
+                    selectToggleBtnUi(b, t)
+                    // update status in desc and status flag (N/B/W)
+                    updateStatusUi(statusId)
+                    // change status based on selected btn
+                    changeDomainStatus(statusId)
                     return@OnButtonCheckedListener
                 }
 
-                val t = toggleBtnUi(statusId)
-                // update toggle button
-                selectToggleBtnUi(b, t)
-                // update status in desc and status flag (N/B/W)
-                updateStatusUi(statusId)
-                // change status based on selected btn
-                changeDomainStatus(statusId)
-                return@OnButtonCheckedListener
+                unselectToggleBtnUi(b)
             }
-
-            unselectToggleBtnUi(b)
-        }
 
         private fun changeDomainStatus(id: DomainRulesManager.DomainStatus) {
             when (id) {
@@ -152,17 +157,22 @@ class CustomDomainAdapter(val context: Context) :
         private fun toggleBtnUi(id: DomainRulesManager.DomainStatus): ToggleBtnUi {
             return when (id) {
                 DomainRulesManager.DomainStatus.NONE -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
-                                fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg))
+                    ToggleBtnUi(
+                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
+                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
+                    )
                 }
                 DomainRulesManager.DomainStatus.BLOCK -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt),
-                                fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnBg))
+                    ToggleBtnUi(
+                        fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt),
+                        fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnBg)
+                    )
                 }
                 DomainRulesManager.DomainStatus.WHITELIST -> {
                     ToggleBtnUi(
                         fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt),
-                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnBg))
+                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnBg)
+                    )
                 }
             }
         }
@@ -174,8 +184,8 @@ class CustomDomainAdapter(val context: Context) :
 
         private fun unselectToggleBtnUi(b: MaterialButton) {
             b.setTextColor(fetchToggleBtnColors(context, R.color.defaultToggleBtnTxt))
-            b.backgroundTintList = ColorStateList.valueOf(
-                fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
+            b.backgroundTintList =
+                ColorStateList.valueOf(fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
         }
 
         // each button in the toggle group is associated with tag value.
@@ -246,15 +256,18 @@ class CustomDomainAdapter(val context: Context) :
             builder.setTitle(R.string.cd_remove_dialog_title)
             builder.setMessage(R.string.cd_remove_dialog_message)
             builder.setCancelable(true)
-            builder.setPositiveButton(
-                context.getString(R.string.cd_remove_dialog_positive)) { _, _ ->
+            builder.setPositiveButton(context.getString(R.string.cd_remove_dialog_positive)) { _, _
+                ->
                 DomainRulesManager.deleteDomain(customDomain)
-                Utilities.showToastUiCentered(context, context.getString(R.string.cd_toast_deleted),
-                                              Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.cd_toast_deleted),
+                    Toast.LENGTH_SHORT
+                )
             }
 
-            builder.setNegativeButton(
-                context.getString(R.string.cd_remove_dialog_negative)) { _, _ ->
+            builder.setNegativeButton(context.getString(R.string.cd_remove_dialog_negative)) { _, _
+                ->
                 // no-op
             }
             builder.create().show()

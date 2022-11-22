@@ -63,19 +63,22 @@ class NotificationHandlerDialog : AppCompatActivity() {
             return
         }
 
-        val t = if (isAccessibilityIntent(intent)) {
-            TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
-        } else if (isNewAppInstalledIntent(intent)) {
-            TrampolineType.NEW_APP_INSTAL_DIALOG
-        } else {
-            TrampolineType.NONE
-        }
+        val t =
+            if (isAccessibilityIntent(intent)) {
+                TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG
+            } else if (isNewAppInstalledIntent(intent)) {
+                TrampolineType.NEW_APP_INSTAL_DIALOG
+            } else {
+                TrampolineType.NONE
+            }
         trampoline(t)
     }
 
     private fun trampoline(trampolineType: TrampolineType) {
-        Log.i(LoggerConstants.LOG_TAG_VPN,
-              "act on notification, notification type: $trampolineType")
+        Log.i(
+            LoggerConstants.LOG_TAG_VPN,
+            "act on notification, notification type: $trampolineType"
+        )
         when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()
@@ -112,12 +115,14 @@ class NotificationHandlerDialog : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.alert_permission_accessibility_regrant)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
-        builder.setPositiveButton(
-            getString(R.string.univ_accessibility_crash_dialog_positive)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) {
+            _,
+            _ ->
             openRethinkAppInfo(this)
         }
-        builder.setNegativeButton(
-            getString(R.string.univ_accessibility_crash_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) {
+            _,
+            _ ->
             finish()
         }
         builder.setCancelable(false)
@@ -145,9 +150,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
             trampoline(trampolineType)
         }
 
-        builder.setNegativeButton(R.string.notif_dialog_pause_dialog_negative) { _, _ ->
-            finish()
-        }
+        builder.setNegativeButton(R.string.notif_dialog_pause_dialog_negative) { _, _ -> finish() }
 
         builder.setNeutralButton(R.string.notif_dialog_pause_dialog_neutral) { _, _ ->
             Utilities.openPauseActivityAndFinish(this)
@@ -171,5 +174,4 @@ class NotificationHandlerDialog : AppCompatActivity() {
         val what = intent.extras?.getString(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME)
         return Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE == what
     }
-
 }

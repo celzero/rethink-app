@@ -30,15 +30,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RethinkSimpleViewAdapter(val context: Context,
-                               var fileTags: List<RethinkBlocklistManager.SimpleViewTag>,
-                               val selectedTags: List<Int>,
-                               val type: RethinkBlocklistFragment.RethinkBlocklistType) :
-        RecyclerView.Adapter<RethinkSimpleViewAdapter.RethinkSimpleViewHolder>() {
+class RethinkSimpleViewAdapter(
+    val context: Context,
+    var fileTags: List<RethinkBlocklistManager.SimpleViewTag>,
+    val selectedTags: List<Int>,
+    val type: RethinkBlocklistFragment.RethinkBlocklistType
+) : RecyclerView.Adapter<RethinkSimpleViewAdapter.RethinkSimpleViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RethinkSimpleViewHolder {
-        val itemBinding = ListItemRethinkBlocklistSimpleBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+        val itemBinding =
+            ListItemRethinkBlocklistSimpleBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         return RethinkSimpleViewHolder(itemBinding)
     }
 
@@ -51,7 +56,7 @@ class RethinkSimpleViewAdapter(val context: Context,
     }
 
     inner class RethinkSimpleViewHolder(private val b: ListItemRethinkBlocklistSimpleBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(position: Int) {
             displayMetaData(position)
@@ -59,13 +64,9 @@ class RethinkSimpleViewAdapter(val context: Context,
         }
 
         private fun setupClickListener(position: Int) {
-            b.crpCheckBox.setOnClickListener {
-                toggleCheckbox(b.crpCheckBox.isChecked, position)
-            }
+            b.crpCheckBox.setOnClickListener { toggleCheckbox(b.crpCheckBox.isChecked, position) }
 
-            b.crpCard.setOnClickListener {
-                toggleCheckbox(!b.crpCheckBox.isChecked, position)
-            }
+            b.crpCard.setOnClickListener { toggleCheckbox(!b.crpCheckBox.isChecked, position) }
         }
 
         private fun setCardBackground(card: CardView, isSelected: Boolean) {
@@ -75,7 +76,6 @@ class RethinkSimpleViewAdapter(val context: Context,
                 card.setCardBackgroundColor(Utilities.fetchColor(context, R.attr.background))
             }
         }
-
 
         private fun toggleCheckbox(isSelected: Boolean, position: Int) {
             b.crpCheckBox.isChecked = isSelected
@@ -123,11 +123,7 @@ class RethinkSimpleViewAdapter(val context: Context,
         }
 
         private fun io(f: suspend () -> Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
-                f()
-            }
+            CoroutineScope(Dispatchers.IO).launch { f() }
         }
-
     }
-
 }

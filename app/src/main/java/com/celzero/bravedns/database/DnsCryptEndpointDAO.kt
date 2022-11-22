@@ -20,18 +20,14 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
-
 @Dao
 interface DnsCryptEndpointDAO {
 
-    @Update
-    fun update(dnsCryptEndpoint: DnsCryptEndpoint)
+    @Update fun update(dnsCryptEndpoint: DnsCryptEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(dnsCryptEndpoint: DnsCryptEndpoint)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(dnsCryptEndpoint: DnsCryptEndpoint)
 
-    @Delete
-    fun delete(dnsCryptEndpoint: DnsCryptEndpoint)
+    @Delete fun delete(dnsCryptEndpoint: DnsCryptEndpoint)
 
     @Transaction
     @Query("select * from DNSCryptEndpoint order by isSelected desc")
@@ -39,14 +35,14 @@ interface DnsCryptEndpointDAO {
 
     @Transaction
     @Query(
-        "select * from DNSCryptEndpoint where dnsCryptURL like :query or dnsCryptName like :query order by isSelected desc")
+        "select * from DNSCryptEndpoint where dnsCryptURL like :query or dnsCryptName like :query order by isSelected desc"
+    )
     fun getDNSCryptEndpointLiveDataByName(query: String): PagingSource<Int, DnsCryptEndpoint>
 
     @Query("delete from DNSCryptEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)
 
-    @Query("delete from DNSCryptEndpoint")
-    fun clearAllData()
+    @Query("delete from DNSCryptEndpoint") fun clearAllData()
 
     @Query("delete from DNSCryptEndpoint where id = :id and isCustom = 1")
     fun deleteDNSCryptEndpoint(id: Int)
@@ -64,17 +60,13 @@ interface DnsCryptEndpointDAO {
     @Query("select count(*) from DNSCryptEndpoint where isSelected = 1")
     fun getConnectedCountLiveData(): LiveData<Int>
 
-    @Query("select count(*) from DNSCryptEndpoint")
-    fun getCount(): Int
+    @Query("select count(*) from DNSCryptEndpoint") fun getCount(): Int
 
     @Transaction
     @Query("update DNSCryptEndpoint set isSelected = 1 where id = :liveServerID")
     fun updateConnectionStatus(liveServerID: Int)
 
-    @Transaction
-    @Query("update DNSCryptEndpoint set isSelected=0")
-    fun updateFailingConnections()
+    @Transaction @Query("update DNSCryptEndpoint set isSelected=0") fun updateFailingConnections()
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

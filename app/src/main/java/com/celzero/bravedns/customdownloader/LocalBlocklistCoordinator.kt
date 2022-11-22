@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
 class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
-        CoroutineWorker(context, workerParams), KoinComponent {
+    CoroutineWorker(context, workerParams), KoinComponent {
 
     val persistentState by inject<PersistentState>()
     val appConfig by inject<AppConfig>()
@@ -61,7 +61,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     // download request status
     enum class DownloadStatus {
-        FAILED, RUNNING, SUCCESSFUL
+        FAILED,
+        RUNNING,
+        SUCCESSFUL
     }
 
     private lateinit var builder: NotificationCompat.Builder
@@ -101,12 +103,18 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 }
             }
         } catch (ex: CancellationException) {
-            Log.e(LOG_TAG_DOWNLOAD,
-                  "Local blocklist download, received cancellation exception: ${ex.message}", ex)
+            Log.e(
+                LOG_TAG_DOWNLOAD,
+                "Local blocklist download, received cancellation exception: ${ex.message}",
+                ex
+            )
             notifyDownloadCancelled(context)
         } catch (ex: Exception) {
-            Log.e(LOG_TAG_DOWNLOAD,
-                  "Local blocklist download, received cancellation exception: ${ex.message}", ex)
+            Log.e(
+                LOG_TAG_DOWNLOAD,
+                "Local blocklist download, received cancellation exception: ${ex.message}",
+                ex
+            )
             notifyDownloadFailure(context)
         } finally {
             clear()
@@ -188,8 +196,8 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun makeTempDownloadDir(timestamp: Long): File? {
         try {
-            val file = File(
-                tempDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp))
+            val file =
+                File(tempDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp))
             if (!file.exists()) {
                 file.mkdirs()
             }
@@ -200,16 +208,20 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         return null
     }
 
-    private suspend fun startFileDownload(context: Context, url: String,
-                                          fileName: String): Boolean {
+    private suspend fun startFileDownload(
+        context: Context,
+        url: String,
+        fileName: String
+    ): Boolean {
         // enable the OkHttp's logging only in debug mode for testing
         if (DEBUG) OkHttpDebugLogging.enableHttp2()
         if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
 
         // create okhttp client with base url
-        val retrofit = getBlocklistBaseBuilder(
-            RetrofitManager.Companion.OkHttpDnsType.DEFAULT).build().create(
-            IBlocklistDownload::class.java)
+        val retrofit =
+            getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
+                .build()
+                .create(IBlocklistDownload::class.java)
         val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
 
         return if (response?.isSuccessful == true) {
@@ -279,34 +291,44 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         try {
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Local block list validation: ${dir.absolutePath}")
 
-            total = if (dir.isDirectory) {
-                dir.list()?.count()
-            } else {
-                0
-            }
+            total =
+                if (dir.isDirectory) {
+                    dir.list()?.count()
+                } else {
+                    0
+                }
             result = Constants.ONDEVICE_BLOCKLISTS.count() == total
         } catch (e: Exception) {
             Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${e.message}", e)
         }
 
-        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                         "Valid on-device blocklist in folder (${dir.name}) download? $result, files: $total, dir? ${dir.isDirectory}")
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_DOWNLOAD,
+                "Valid on-device blocklist in folder (${dir.name}) download? $result, files: $total, dir? ${dir.isDirectory}"
+            )
         return result
     }
 
     // move the files from temp location to actual location (folder name with timestamp)
     private fun moveLocalBlocklistFiles(context: Context, timestamp: Long): Boolean {
         try {
-            val from = File(
-                tempDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp))
+            val from =
+                File(tempDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp))
 
             if (!from.isDirectory) {
                 if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Invalid from: ${from.name} dir")
                 return false
             }
 
-            val to = File(
-                blocklistDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp))
+            val to =
+                File(
+                    blocklistDownloadBasePath(
+                        context,
+                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                        timestamp
+                    )
+                )
             if (!to.exists()) {
                 to.mkdir()
             }
@@ -315,8 +337,8 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 val dest = File(to.absolutePath + File.separator + it.name)
                 val result = it.copyTo(dest, true)
                 if (!result.isFile) {
-                    if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                     "Copy failed from ${it.path} to ${dest.path}")
+                    if (DEBUG)
+                        Log.d(LOG_TAG_DOWNLOAD, "Copy failed from ${it.path} to ${dest.path}")
                     return false
                 }
             }
@@ -331,26 +353,31 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun isLocalBlocklistDownloadValid(context: Context, timestamp: Long): Boolean {
         try {
-            val path: String = blocklistDownloadBasePath(context,
-                                                         LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                         timestamp)
-            val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
-                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
-                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                                                 path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                             "AppDownloadManager isDownloadValid? ${braveDNS != null}")
+            val path: String =
+                blocklistDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+            val braveDNS =
+                Dnsx.newBraveDNSLocal(
+                    path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
+                    path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
+                    path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                    path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG
+                )
+            if (DEBUG)
+                Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid? ${braveDNS != null}")
             return braveDNS != null
         } catch (e: Exception) {
             Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception: ${e.message}", e)
         }
         return false
-
     }
 
     private suspend fun updateTagsToDb(timestamp: Long): Boolean {
         // write the file tag json file into database
-        return RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL, timestamp)
+        return RethinkBlocklistManager.readJson(
+            context,
+            AppDownloadManager.DownloadType.LOCAL,
+            timestamp
+        )
     }
 
     private fun getBuilder(context: Context): NotificationCompat.Builder {
@@ -369,14 +396,17 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             val contentText = context.getString(R.string.notif_download_content_text)
             val contentTitle = context.getString(R.string.notif_download_content_title)
 
-            builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(
-                contentTitle).setContentIntent(getPendingIntent(context)).setContentText(
-                contentText)
+            builder
+                .setSmallIcon(R.drawable.dns_icon)
+                .setContentTitle(contentTitle)
+                .setContentIntent(getPendingIntent(context))
+                .setContentText(contentText)
             builder.setProgress(100, 0, false)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
 
-            // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+            // Secret notifications are not shown on the lock screen.  No need for this app to show
+            // there.
             // Only available in API >= 21
             builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
 
@@ -392,27 +422,31 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun getNotificationManager(context: Context): NotificationManager {
         return context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
-
     }
 
     private fun getPendingIntent(context: Context): PendingIntent {
-        return Utilities.getActivityPendingIntent(context,
-                                                  Intent(context, HomeScreenActivity::class.java),
-                                                  PendingIntent.FLAG_UPDATE_CURRENT,
-                                                  mutable = false)
+        return Utilities.getActivityPendingIntent(
+            context,
+            Intent(context, HomeScreenActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT,
+            mutable = false
+        )
     }
 
     private fun showNotification(context: Context) {
-        getNotificationManager(context).notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID,
-                                               getBuilder(context).build())
+        getNotificationManager(context)
+            .notify(
+                DOWNLOAD_NOTIFICATION_TAG,
+                DOWNLOAD_NOTIFICATION_ID,
+                getBuilder(context).build()
+            )
     }
 
     private fun updateProgress(context: Context, progress: Int) {
-        Log.d("TEST","TEST Notify: $progress")
         val builder = getBuilder(context)
         builder.setProgress(100, progress, false)
-        getNotificationManager(context).notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID,
-                                               builder.build())
+        getNotificationManager(context)
+            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun notifyDownloadFailure(context: Context) {
@@ -420,12 +454,15 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         val contentText = context.getString(R.string.notif_download_failure_content)
         val contentTitle = context.getString(R.string.notif_download_content_title)
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            getPendingIntent(context)).setContentText(contentText)
+        builder
+            .setSmallIcon(R.drawable.dns_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(getPendingIntent(context))
+            .setContentText(contentText)
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        getNotificationManager(context).notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID,
-                                               builder.build())
+        getNotificationManager(context)
+            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun notifyDownloadSuccess(context: Context) {
@@ -433,12 +470,15 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         val contentText = context.getString(R.string.notif_download_success_content)
         val contentTitle = context.getString(R.string.notif_download_content_title)
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            getPendingIntent(context)).setContentText(contentText)
+        builder
+            .setSmallIcon(R.drawable.dns_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(getPendingIntent(context))
+            .setContentText(contentText)
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        getNotificationManager(context).notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID,
-                                               builder.build())
+        getNotificationManager(context)
+            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun notifyDownloadCancelled(context: Context) {
@@ -446,19 +486,24 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         val contentText = context.getString(R.string.notif_download_cancel_content)
         val contentTitle = context.getString(R.string.notif_download_content_title)
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            getPendingIntent(context)).setContentText(contentText)
+        builder
+            .setSmallIcon(R.drawable.dns_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(getPendingIntent(context))
+            .setContentText(contentText)
         builder.setProgress(0, 0, false)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        getNotificationManager(context).notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID,
-                                               builder.build())
+        getNotificationManager(context)
+            .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }
 
     private fun clear() {
         downloadStatuses.clear()
-        BlocklistDownloadHelper.deleteBlocklistResidue(context,
-                                                       LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                       persistentState.localBlocklistTimestamp)
+        BlocklistDownloadHelper.deleteBlocklistResidue(
+            context,
+            LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+            persistentState.localBlocklistTimestamp
+        )
     }
 
     private suspend fun updatePersistenceOnCopySuccess(timestamp: Long) {
@@ -469,5 +514,4 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         // recreate bravedns object ()
         appConfig.recreateBraveDnsObj()
     }
-
 }

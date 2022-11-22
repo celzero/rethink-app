@@ -20,45 +20,19 @@ import org.koin.dsl.module
 
 object ViewModelModule {
     private val viewModelModule = module {
-        viewModel {
-            ConnectionTrackerViewModel(get())
-        }
-        viewModel {
-            DnsCryptEndpointViewModel(get())
-        }
-        viewModel {
-            DnsCryptRelayEndpointViewModel(get())
-        }
-        viewModel {
-            DnsLogViewModel(get())
-        }
-        viewModel {
-            DnsProxyEndpointViewModel(get())
-        }
-        viewModel {
-            DoHEndpointViewModel(get())
-        }
-        viewModel {
-            AppInfoViewModel(get())
-        }
-        viewModel {
-            CustomDomainViewModel(get())
-        }
-        viewModel {
-            CustomIpViewModel(get())
-        }
-        viewModel {
-            RethinkEndpointViewModel(get())
-        }
-        viewModel {
-            AppCustomIpViewModel(get())
-        }
-        viewModel {
-            RethinkRemoteFileTagViewModel(get())
-        }
-        viewModel {
-            RethinkLocalFileTagViewModel(get())
-        }
+        viewModel { ConnectionTrackerViewModel(get()) }
+        viewModel { DnsCryptEndpointViewModel(get()) }
+        viewModel { DnsCryptRelayEndpointViewModel(get()) }
+        viewModel { DnsLogViewModel(get()) }
+        viewModel { DnsProxyEndpointViewModel(get()) }
+        viewModel { DoHEndpointViewModel(get()) }
+        viewModel { AppInfoViewModel(get()) }
+        viewModel { CustomDomainViewModel(get()) }
+        viewModel { CustomIpViewModel(get()) }
+        viewModel { RethinkEndpointViewModel(get()) }
+        viewModel { AppCustomIpViewModel(get()) }
+        viewModel { RethinkRemoteFileTagViewModel(get()) }
+        viewModel { RethinkLocalFileTagViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)

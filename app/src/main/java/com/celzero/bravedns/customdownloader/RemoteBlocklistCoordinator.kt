@@ -38,7 +38,7 @@ import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
 class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
-        CoroutineWorker(context, workerParams), KoinComponent {
+    CoroutineWorker(context, workerParams), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
 
@@ -61,9 +61,11 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             if (downloadStatus) {
                 // update the download related persistence status on download success
                 updatePersistenceOnCopySuccess(timestamp)
-                BlocklistDownloadHelper.deleteBlocklistResidue(context,
-                                                               Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                               timestamp)
+                BlocklistDownloadHelper.deleteBlocklistResidue(
+                    context,
+                    Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                    timestamp
+                )
             } else {
                 // reset the remote blocklist timestamp, a copy of remote blocklist is already
                 // available in asset folder (go back to that version)
@@ -79,8 +81,11 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                 }
             }
         } catch (ex: CancellationException) {
-            Log.e(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "Local blocklist download, received cancellation exception: ${ex.message}", ex)
+            Log.e(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "Local blocklist download, received cancellation exception: ${ex.message}",
+                ex
+            )
         }
         return Result.failure()
     }
@@ -88,22 +93,31 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
     private suspend fun downloadRemoteBlocklist(timestamp: Long): Boolean {
         Log.d(LoggerConstants.LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
 
-        val retrofit = RetrofitManager.getBlocklistBaseBuilder(
-            RetrofitManager.Companion.OkHttpDnsType.DEFAULT).addConverterFactory(
-            GsonConverterFactory.create()).build()
+        val retrofit =
+            RetrofitManager.getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
         val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
-        val response = retrofitInterface.downloadRemoteBlocklistFile(
-            Constants.FILETAG_TEMP_DOWNLOAD_URL, persistentState.appVersion, "")
+        val response =
+            retrofitInterface.downloadRemoteBlocklistFile(
+                Constants.FILETAG_TEMP_DOWNLOAD_URL,
+                persistentState.appVersion,
+                ""
+            )
 
-        Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-              "Response received on remote blocklist request: ${response?.isSuccessful}")
+        Log.i(
+            LoggerConstants.LOG_TAG_DOWNLOAD,
+            "Response received on remote blocklist request: ${response?.isSuccessful}"
+        )
 
         return if (response?.isSuccessful == true) {
             val isDownloadSuccess = saveRemoteFile(response.body(), timestamp)
             isDownloadSuccess
         } else {
-            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "Remote blocklist download failure, call? ${response?.body()}, response: $response ")
+            Log.i(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "Remote blocklist download failure, call? ${response?.body()}, response: $response "
+            )
             false
         }
     }
@@ -115,20 +129,30 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             filetag.writeText(jsonObject.toString())
 
             // write the file tag json file into database
-            return RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.REMOTE,
-                                             timestamp)
+            return RethinkBlocklistManager.readJson(
+                context,
+                AppDownloadManager.DownloadType.REMOTE,
+                timestamp
+            )
         } catch (e: IOException) {
-            Log.w(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "could not create filetag.json at version $timestamp", e)
+            Log.w(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "could not create filetag.json at version $timestamp",
+                e
+            )
         }
         return false
     }
 
     private fun makeFile(timestamp: Long): File? {
         try {
-            val dir = Utilities.remoteBlocklistFile(context,
-                                                    Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                    timestamp) ?: return null
+            val dir =
+                Utilities.remoteBlocklistFile(
+                    context,
+                    Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                    timestamp
+                )
+                    ?: return null
 
             if (!dir.exists()) {
                 dir.mkdirs()
@@ -139,8 +163,11 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             }
             return filePath
         } catch (e: IOException) {
-            Log.e(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "Could not create remote blocklist folder/file: $timestamp" + e.message, e)
+            Log.e(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "Could not create remote blocklist folder/file: $timestamp" + e.message,
+                e
+            )
         }
         return null
     }
@@ -149,5 +176,4 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
         persistentState.remoteBlocklistTimestamp = timestamp
         persistentState.newestRemoteBlocklistTimestamp = Constants.INIT_TIME_MS
     }
-
 }

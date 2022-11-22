@@ -51,7 +51,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
     private val appConfig by inject<AppConfig>()
 
-    //DNS Proxy UI Elements
+    // DNS Proxy UI Elements
     private lateinit var dnsProxyRecyclerAdapter: DnsProxyEndpointAdapter
     private var dnsProxyLayoutManager: RecyclerView.LayoutManager? = null
     private val dnsProxyViewModel: DnsProxyEndpointViewModel by viewModel()
@@ -70,8 +70,8 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         dnsProxyLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsProxyConnections.layoutManager = dnsProxyLayoutManager
 
-        dnsProxyRecyclerAdapter = DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner,
-                                                          get())
+        dnsProxyRecyclerAdapter =
+            DnsProxyEndpointAdapter(requireContext(), viewLifecycleOwner, get())
         dnsProxyViewModel.dnsProxyEndpointList.observe(viewLifecycleOwner) {
             dnsProxyRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
@@ -79,9 +79,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     }
 
     private fun initClickListeners() {
-        b.dohFabAddServerIcon.setOnClickListener {
-            showAddDnsProxyDialog()
-        }
+        b.dohFabAddServerIcon.setOnClickListener { showAddDnsProxyDialog() }
     }
 
     private fun showAddDnsProxyDialog() {
@@ -119,20 +117,24 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             uiCtx {
                 proxyNameEditText.setText(
                     getString(R.string.cd_custom_dns_proxy_name, nextIndex.toString()),
-                    TextView.BufferType.EDITABLE)
+                    TextView.BufferType.EDITABLE
+                )
             }
         }
 
-        proxyNameEditText.setText(getString(R.string.cd_custom_dns_proxy_name_default),
-                                  TextView.BufferType.EDITABLE)
-        ipAddressEditText.setText(getString(R.string.cd_custom_dns_proxy_default_ip),
-                                  TextView.BufferType.EDITABLE)
+        proxyNameEditText.setText(
+            getString(R.string.cd_custom_dns_proxy_name_default),
+            TextView.BufferType.EDITABLE
+        )
+        ipAddressEditText.setText(
+            getString(R.string.cd_custom_dns_proxy_default_ip),
+            TextView.BufferType.EDITABLE
+        )
         val appNames: MutableList<String> = ArrayList()
         appNames.add(getString(R.string.cd_custom_dns_proxy_default_app))
         appNames.addAll(FirewallManager.getAllAppNames())
-        val proxySpinnerAdapter = ArrayAdapter(requireContext(),
-                                               android.R.layout.simple_spinner_dropdown_item,
-                                               appNames)
+        val proxySpinnerAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames)
         appNameSpinner.adapter = proxySpinnerAdapter
         llSpinnerHeader.visibility = View.VISIBLE
         llIPHeader.visibility = View.VISIBLE
@@ -145,14 +147,16 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             val mode = getString(R.string.cd_dns_proxy_mode_external)
             val ip = ipAddressEditText.text.toString()
 
-
             val appName = appNames[appNameSpinner.selectedItemPosition]
-            val appPackageName = if (appName.isBlank() || appName == getString(
-                    R.string.cd_custom_dns_proxy_default_app)) {
-                appNames[0]
-            } else {
-                FirewallManager.getPackageNameByAppName(appName)
-            }
+            val appPackageName =
+                if (
+                    appName.isBlank() ||
+                        appName == getString(R.string.cd_custom_dns_proxy_default_app)
+                ) {
+                    appNames[0]
+                } else {
+                    FirewallManager.getPackageNameByAppName(appName)
+                }
 
             if (IPAddressString(ip).isIPAddress) {
                 isIpValid = true
@@ -163,11 +167,12 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
             try {
                 port = portEditText.text.toString().toInt()
-                isPortValid = if (Utilities.isLanIpv4(ip)) {
-                    Utilities.isValidLocalPort(port)
-                } else {
-                    true
-                }
+                isPortValid =
+                    if (Utilities.isLanIpv4(ip)) {
+                        Utilities.isValidLocalPort(port)
+                    } else {
+                        true
+                    }
                 if (!isPortValid) {
                     errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
                 }
@@ -178,57 +183,64 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             }
 
             if (isPortValid && isIpValid) {
-                //Do the DNS Proxy setting there
-                if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
-                                                                   "new value inserted into DNSProxy")
+                // Do the DNS Proxy setting there
+                if (HomeScreenActivity.GlobalVariable.DEBUG)
+                    Log.d(LoggerConstants.LOG_TAG_UI, "new value inserted into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appPackageName, ip, port)
                 dialog.dismiss()
             } else {
-                Log.i(LoggerConstants.LOG_TAG_UI,
-                      "cannot insert invalid dns-proxy IPs: $name, $appName")
+                Log.i(
+                    LoggerConstants.LOG_TAG_UI,
+                    "cannot insert invalid dns-proxy IPs: $name, $appName"
+                )
             }
-
         }
 
-        cancelURLBtn.setOnClickListener {
-            dialog.dismiss()
-        }
+        cancelURLBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
-
-    private fun insertDNSProxyEndpointDB(mode: String, name: String, appName: String?, ip: String,
-                                         port: Int) {
+    private fun insertDNSProxyEndpointDB(
+        mode: String,
+        name: String,
+        appName: String?,
+        ip: String,
+        port: Int
+    ) {
         if (appName == null) return
 
         io {
             var proxyName = name
             if (proxyName.isBlank()) {
-                proxyName = if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
-                    appName
-                } else ip
+                proxyName =
+                    if (mode == getString(R.string.cd_dns_proxy_mode_internal)) {
+                        appName
+                    } else ip
             }
-            val dnsProxyEndpoint = DnsProxyEndpoint(id = 0, proxyName, mode, appName, ip, port,
-                                                    isSelected = false, isCustom = true,
-                                                    modifiedDataTime = 0L, latency = 0)
+            val dnsProxyEndpoint =
+                DnsProxyEndpoint(
+                    id = 0,
+                    proxyName,
+                    mode,
+                    appName,
+                    ip,
+                    port,
+                    isSelected = false,
+                    isCustom = true,
+                    modifiedDataTime = 0L,
+                    latency = 0
+                )
             appConfig.insertDnsproxyEndpoint(dnsProxyEndpoint)
-            if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_UI,
-                                                               "Insert into DNSProxy database- $appName, $port")
+            if (HomeScreenActivity.GlobalVariable.DEBUG)
+                Log.d(LoggerConstants.LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
         }
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
+        withContext(Dispatchers.Main) { f() }
     }
-
 }

@@ -51,8 +51,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
-                         SearchView.OnQueryTextListener {
+class CustomIpActivity :
+    AppCompatActivity(R.layout.activity_custom_ip), SearchView.OnQueryTextListener {
 
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val b by viewBinding(ActivityCustomIpBinding::bind)
@@ -72,9 +72,9 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
-
 
     private fun observeCustomRules() {
         viewModel.customIpSize.observe(this) {
@@ -121,26 +121,19 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
         b.cipRecycler.layoutManager = layoutManager
         val adapter = CustomIpAdapter(this)
 
-        viewModel.customIpDetails.observe(this) {
-            adapter.submitData(this.lifecycle, it)
-        }
+        viewModel.customIpDetails.observe(this) { adapter.submitData(this.lifecycle, it) }
         b.cipRecycler.adapter = adapter
     }
 
     private fun setupClickListeners() {
-        b.customDialogAddFab.setOnClickListener {
-            showAddIpDialog()
-        }
+        b.customDialogAddFab.setOnClickListener { showAddIpDialog() }
 
-        b.cipSearchDeleteIcon.setOnClickListener {
-            showIpRulesDeleteDialog()
-        }
+        b.cipSearchDeleteIcon.setOnClickListener { showIpRulesDeleteDialog() }
     }
 
     /**
-     * Shows dialog to add custom IP. Provides user option to user to add ips.
-     * validates the entered input, if valid then will add it to the custom ip
-     * database table.
+     * Shows dialog to add custom IP. Provides user option to user to add ips. validates the entered
+     * input, if valid then will add it to the custom ip database table.
      */
     private fun showAddIpDialog() {
         val dialog = Dialog(this)
@@ -188,12 +181,9 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
                 dBind.daciIpEditText.text.clear()
                 insertCustomIp(hostName)
             }
-
         }
 
-        dBind.daciCancelBtn.setOnClickListener {
-            dialog.dismiss()
-        }
+        dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
@@ -211,10 +201,16 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
     private fun insertCustomIp(ip: HostName?) {
         if (ip == null) return
 
-        IpRulesManager.addIpRule(IpRulesManager.UID_EVERYBODY, ip,
-                                 IpRulesManager.IpRuleStatus.BLOCK)
-        Utilities.showToastUiCentered(this, getString(R.string.ci_dialog_added_success),
-                                      Toast.LENGTH_SHORT)
+        IpRulesManager.addIpRule(
+            IpRulesManager.UID_EVERYBODY,
+            ip,
+            IpRulesManager.IpRuleStatus.BLOCK
+        )
+        Utilities.showToastUiCentered(
+            this,
+            getString(R.string.ci_dialog_added_success),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private fun showIpRulesDeleteDialog() {
@@ -223,8 +219,11 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
             IpRulesManager.clearAllIpRules()
-            Utilities.showToastUiCentered(this, getString(R.string.univ_ip_delete_toast_success),
-                                          Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(
+                this,
+                getString(R.string.univ_ip_delete_toast_success),
+                Toast.LENGTH_SHORT
+            )
         }
 
         builder.setNegativeButton(getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->
@@ -236,17 +235,10 @@ class CustomIpActivity : AppCompatActivity(R.layout.activity_custom_ip),
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
+        withContext(Dispatchers.IO) { f() }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.Main) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
-
 }

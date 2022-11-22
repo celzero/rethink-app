@@ -27,21 +27,21 @@ import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit
 
 /**
- * The download watcher  - Worker initiated from AppDownloadManager class.
- * The worker will be listening for the status of the download for the download ID's
- * stored in shared preference.
- * Once the download is completed, the Worker will send a Result.success().
- * Else, the Result.retry() will be triggered to check again.
+ * The download watcher - Worker initiated from AppDownloadManager class. The worker will be
+ * listening for the status of the download for the download ID's stored in shared preference. Once
+ * the download is completed, the Worker will send a Result.success(). Else, the Result.retry() will
+ * be triggered to check again.
  */
 class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) :
-        Worker(context, workerParameters), KoinComponent {
+    Worker(context, workerParameters), KoinComponent {
 
     companion object {
         // Maximum time out for the DownloadManager to wait for download of local blocklist.
         // The time out value is set as 40 minutes.
         val ONDEVICE_BLOCKLIST_DOWNLOAD_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(40)
 
-        // various download status used as part of Work manager. see DownloadWatcher#checkForDownload()
+        // various download status used as part of Work manager. see
+        // DownloadWatcher#checkForDownload()
         const val DOWNLOAD_FAILURE = -1
         const val DOWNLOAD_SUCCESS = 1
         const val DOWNLOAD_RETRY = 0
@@ -84,8 +84,8 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
             val downloadID = downloadIdsIterator.next()
             val query = DownloadManager.Query()
             query.setFilterById(downloadID)
-            val downloadManager = context.getSystemService(
-                Context.DOWNLOAD_SERVICE) as DownloadManager
+            val downloadManager =
+                context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val cursor = downloadManager.query(query)
             if (cursor == null) {
                 Log.i(LOG_TAG_DOWNLOAD, "status is $downloadID cursor null")
@@ -101,10 +101,13 @@ class DownloadWatcher(val context: Context, workerParameters: WorkerParameters) 
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         downloadIdsIterator.remove()
                     } else if (status == DownloadManager.STATUS_FAILED) {
-                        val reason = cursor.getInt(
-                            cursor.getColumnIndex(DownloadManager.COLUMN_REASON))
-                        if (DEBUG) Log.d(LOG_TAG_DOWNLOAD,
-                                         "download status failure for $downloadID, $reason")
+                        val reason =
+                            cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_REASON))
+                        if (DEBUG)
+                            Log.d(
+                                LOG_TAG_DOWNLOAD,
+                                "download status failure for $downloadID, $reason"
+                            )
                         return DOWNLOAD_FAILURE
                     }
                 } else {

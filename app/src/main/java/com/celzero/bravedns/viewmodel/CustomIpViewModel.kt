@@ -34,22 +34,26 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
         filteredList.value = ""
     }
 
-    val customIpDetails = Transformations.switchMap(filteredList) { input ->
-        if (input.isNullOrBlank()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                customIpDao.getUnivBlockedConnectionsLiveData()
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                customIpDao.getUnivBlockedConnectionsByIP("%$input%")
-            }.liveData.cachedIn(viewModelScope)
+    val customIpDetails =
+        Transformations.switchMap(filteredList) { input ->
+            if (input.isNullOrBlank()) {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        customIpDao.getUnivBlockedConnectionsLiveData()
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        customIpDao.getUnivBlockedConnectionsByIP("%$input%")
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
         }
-    }
 
     val customIpSize = customIpDao.getCustomIpsLiveData()
 
     fun setFilter(filter: String) {
         filteredList.value = filter
     }
-
 }

@@ -35,28 +35,41 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RethinkLocalAdvancedViewAdapter(val context: Context) :
-        PagingDataAdapter<RethinkLocalFileTag, RethinkLocalAdvancedViewAdapter.RethinkLocalFileTagViewHolder>(
-            DIFF_CALLBACK) {
+    PagingDataAdapter<
+        RethinkLocalFileTag, RethinkLocalAdvancedViewAdapter.RethinkLocalFileTagViewHolder
+    >(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<RethinkLocalFileTag>() {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<RethinkLocalFileTag>() {
 
-            override fun areItemsTheSame(oldConnection: RethinkLocalFileTag,
-                                         newConnection: RethinkLocalFileTag): Boolean {
-                return oldConnection == newConnection
-            }
+                override fun areItemsTheSame(
+                    oldConnection: RethinkLocalFileTag,
+                    newConnection: RethinkLocalFileTag
+                ): Boolean {
+                    return oldConnection == newConnection
+                }
 
-            override fun areContentsTheSame(oldConnection: RethinkLocalFileTag,
-                                            newConnection: RethinkLocalFileTag): Boolean {
-                return (oldConnection.value == newConnection.value && oldConnection.isSelected == newConnection.isSelected)
+                override fun areContentsTheSame(
+                    oldConnection: RethinkLocalFileTag,
+                    newConnection: RethinkLocalFileTag
+                ): Boolean {
+                    return (oldConnection.value == newConnection.value &&
+                        oldConnection.isSelected == newConnection.isSelected)
+                }
             }
-        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): RethinkLocalFileTagViewHolder {
-        val itemBinding = ListItemRethinkBlocklistAdvBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RethinkLocalFileTagViewHolder {
+        val itemBinding =
+            ListItemRethinkBlocklistAdvBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         return RethinkLocalFileTagViewHolder(itemBinding)
     }
 
@@ -66,21 +79,16 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
         holder.update(filetag, position)
     }
 
-
     inner class RethinkLocalFileTagViewHolder(private val b: ListItemRethinkBlocklistAdvBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(filetag: RethinkLocalFileTag, position: Int) {
             displayHeaderIfNeeded(filetag, position)
             displayMetaData(filetag)
 
-            b.crpCheckBox.setOnClickListener {
-                toggleCheckbox(b.crpCheckBox.isChecked, filetag)
-            }
+            b.crpCheckBox.setOnClickListener { toggleCheckbox(b.crpCheckBox.isChecked, filetag) }
 
-            b.crpCard.setOnClickListener {
-                toggleCheckbox(!b.crpCheckBox.isChecked, filetag)
-            }
+            b.crpCard.setOnClickListener { toggleCheckbox(!b.crpCheckBox.isChecked, filetag) }
 
             b.crpDescEntriesTv.setOnClickListener {
                 val intent = Intent(Intent.ACTION_VIEW, filetag.url[0].toUri())
@@ -96,8 +104,8 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
                 b.crpDescGroupTv.text = filetag.subg
             }
 
-            b.crpDescEntriesTv.text = context.getString(R.string.dc_entries,
-                                                        filetag.entries.toString())
+            b.crpDescEntriesTv.text =
+                context.getString(R.string.dc_entries, filetag.entries.toString())
             b.crpCheckBox.isChecked = filetag.isSelected
             setCardBackground(filetag.isSelected)
         }
@@ -134,8 +142,12 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagLocal(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                val stamp = RethinkBlocklistManager.getStamp(context, list,
-                                                             RethinkBlocklistFragment.RethinkBlocklistType.LOCAL)
+                val stamp =
+                    RethinkBlocklistManager.getStamp(
+                        context,
+                        list,
+                        RethinkBlocklistFragment.RethinkBlocklistType.LOCAL
+                    )
                 RethinkBlocklistFragment.modifiedStamp = stamp
             }
         }
@@ -151,10 +163,7 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
         }
 
         private fun io(f: suspend () -> Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
-                f()
-            }
+            CoroutineScope(Dispatchers.IO).launch { f() }
         }
-
     }
 }

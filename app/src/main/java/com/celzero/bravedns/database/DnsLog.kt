@@ -71,11 +71,14 @@ class DnsLog {
     }
 
     fun groundedQuery(): Boolean {
-        return (this.status != Transaction.Status.COMPLETE.toString() || this.response == Constants.NXDOMAIN || this.isBlocked)
+        return (this.status != Transaction.Status.COMPLETE.toString() ||
+            this.response == Constants.NXDOMAIN ||
+            this.isBlocked)
     }
 
     fun unansweredQuery(): Boolean {
-        return (this.status != Transaction.Status.COMPLETE.toString() || this.response == Constants.NXDOMAIN)
+        return (this.status != Transaction.Status.COMPLETE.toString() ||
+            this.response == Constants.NXDOMAIN)
     }
 
     fun isAnonymized(): Boolean {
@@ -93,5 +96,4 @@ class DnsLog {
     fun getBlocklists(): List<String> {
         return this.blockLists.split(",")
     }
-
 }

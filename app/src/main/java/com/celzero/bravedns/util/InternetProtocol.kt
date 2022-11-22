@@ -18,8 +18,9 @@ package com.celzero.bravedns.util
 import settings.Settings
 
 enum class InternetProtocol(val id: Int) {
-
-    IPv4(0), IPv6(1), IPv46(2);
+    IPv4(0),
+    IPv6(1),
+    IPv46(2);
 
     fun isIPv6(): Boolean {
         return this == IPv6
@@ -48,5 +49,4 @@ enum class InternetProtocol(val id: Int) {
             IPv46 -> Settings.Ns46
         }
     }
-
 }

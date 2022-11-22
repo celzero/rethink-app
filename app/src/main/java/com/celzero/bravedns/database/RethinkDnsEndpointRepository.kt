@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 
 import androidx.room.Transaction
 
-
 class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) {
 
     @Transaction

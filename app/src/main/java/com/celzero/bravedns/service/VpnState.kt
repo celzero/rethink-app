@@ -31,5 +31,4 @@ class VpnState(requested: Boolean, on: Boolean, connectionState: BraveVPNService
         this.on = on
         this.connectionState = connectionState
     }
-
 }

@@ -17,7 +17,7 @@ package com.celzero.bravedns.util
 
 // https://android.googlesource.com/platform/system/core/+/4489ee0a190ad488df8ed9be545986a46c86148e/libcutils/include/private/android_filesystem_config.h
 enum class AndroidUidConfig(val uid: Int) {
-    ANDROID(0),//Modified as ANDROID instead of ROOT
+    ANDROID(0), // Modified as ANDROID instead of ROOT
     DAEMON(1),
     BIN(2),
     SYSTEM(1000),
@@ -101,15 +101,11 @@ enum class AndroidUidConfig(val uid: Int) {
     EXT_DATA_RW(1078),
     EXT_OBB_RW(1079),
     CONTEXT_HUB(1080),
-
     SHELL(2000),
     CACHE(2001),
     DIAG(2002),
-
     OEM_RESERVED_START(2900),
     OEM_RESERVED_END(2999),
-
-
     NET_BT_ADMIN(3001),
     NET_BT(3002),
     INET(3003),
@@ -120,52 +116,36 @@ enum class AndroidUidConfig(val uid: Int) {
     READPROC(3009),
     WAKELOCK(3010),
     UHID(3011),
-
     OEM_RESERVED_2_START(5000),
     OEM_RESERVED_2_END(5999),
-
     SYSTEM_RESERVED_START(6000),
     SYSTEM_RESERVED_END(6499),
-
     ODM_RESERVED_START(6500),
     ODM_RESERVED_END(6999),
-
     PRODUCT_RESERVED_START(7000),
     PRODUCT_RESERVED_END(7499),
-
     SYSTEM_EXT_RESERVED_START(7500),
     SYSTEM_EXT_RESERVED_END(7999),
-
     EVERYBODY(9997),
     MISC(9998),
     NOBODY(9999),
-
     APP(10000),
     APP_START(10000),
     APP_END(19999),
-
     CACHE_GID_START(20000),
     CACHE_GID_END(29999),
-
     EXT_GID_START(30000),
     EXT_GID_END(39999),
-
     EXT_CACHE_GID_START(40000),
     EXT_CACHE_GID_END(49999),
-
     SHARED_GID_START(50000),
     SHARED_GID_END(59999),
-
-
     OVERFLOWUID(65534),
-
     ISOLATED_START(90000),
     ISOLATED_END(99999),
-
     USER(100000),
     USER_OFFSET(100000),
     OTHER(Constants.INVALID_UID);
-
 
     companion object {
         private val map = values().associateBy(AndroidUidConfig::uid)
@@ -182,5 +162,4 @@ enum class AndroidUidConfig(val uid: Int) {
             return (uid > 0 && uid < USER_OFFSET.uid)
         }
     }
-
 }

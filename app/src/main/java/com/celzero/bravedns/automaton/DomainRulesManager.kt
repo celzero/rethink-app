@@ -46,11 +46,13 @@ object DomainRulesManager : KoinComponent {
     var tlds: HashMap<String, CustomDomain> = HashMap()
 
     // stores all the previous response sent
-    private val domainLookupCache: Cache<String, DomainStatus> = CacheBuilder.newBuilder().maximumSize(
-        CACHE_MAX_SIZE).build()
+    private val domainLookupCache: Cache<String, DomainStatus> =
+        CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
 
     enum class DomainStatus(val id: Int) {
-        NONE(0), BLOCK(1), WHITELIST(2);
+        NONE(0),
+        BLOCK(1),
+        WHITELIST(2);
 
         companion object {
             fun getStatus(statusId: Int): DomainStatus {
@@ -65,7 +67,9 @@ object DomainRulesManager : KoinComponent {
     }
 
     enum class DomainType(val id: Int) {
-        DOMAIN(0), WILDCARD(1), TLD(2);
+        DOMAIN(0),
+        WILDCARD(1),
+        TLD(2);
 
         companion object {
             fun getAllDomainTypes(): Array<String> {
@@ -88,19 +92,13 @@ object DomainRulesManager : KoinComponent {
     private fun updateCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                lock.write {
-                    domains[cd.domain] = cd
-                }
+                lock.write { domains[cd.domain] = cd }
             }
             DomainType.TLD -> {
-                lock.write {
-                    tlds[cd.domain] = cd
-                }
+                lock.write { tlds[cd.domain] = cd }
             }
             DomainType.WILDCARD -> {
-                lock.write {
-                    wildcards[cd.domain] = cd
-                }
+                lock.write { wildcards[cd.domain] = cd }
             }
         }
         domainLookupCache.invalidateAll()
@@ -113,9 +111,7 @@ object DomainRulesManager : KoinComponent {
             return
         }
 
-        cd.forEach {
-            updateCache(it)
-        }
+        cd.forEach { updateCache(it) }
     }
 
     data class Test(val type: String, val domain: DomainStatus)
@@ -179,9 +175,11 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun matchesTld(recvDomain: String): DomainStatus {
-        // ref: https://guava.dev/releases/snapshot-jre/api/docs/com/google/common/net/InternetDomainName.html
+        // ref:
+        // https://guava.dev/releases/snapshot-jre/api/docs/com/google/common/net/InternetDomainName.html
         try {
-            // Returns the public suffix portion of the domain name, or null if no public suffix is present
+            // Returns the public suffix portion of the domain name, or null if no public suffix is
+            // present
             val recvDomainTld = InternetDomainName.from(recvDomain).publicSuffix()
             val domain = recvDomainTld?.let { tlds.getValue(it.toString()) }
             return domain?.let { it -> DomainStatus.getStatus(it.status) } ?: DomainStatus.NONE
@@ -198,7 +196,10 @@ object DomainRulesManager : KoinComponent {
     }
 
     fun matchesDomain(recvDomain: String): DomainStatus {
-        val d = domains.getOrElse(recvDomain) { return DomainStatus.NONE }
+        val d =
+            domains.getOrElse(recvDomain) {
+                return DomainStatus.NONE
+            }
         return DomainStatus.getStatus(d.status)
     }
 
@@ -264,33 +265,36 @@ object DomainRulesManager : KoinComponent {
     private fun removeFromCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                lock.write {
-                    domains.remove(cd.domain)
-                }
+                lock.write { domains.remove(cd.domain) }
             }
             DomainType.TLD -> {
-                lock.write {
-                    tlds.remove(cd.domain)
-                }
+                lock.write { tlds.remove(cd.domain) }
             }
             DomainType.WILDCARD -> {
-                lock.write {
-                    wildcards.remove(cd.domain)
-                }
+                lock.write { wildcards.remove(cd.domain) }
             }
         }
         domainLookupCache.invalidateAll()
     }
 
-    private fun constructObject(domain: String, ips: String = "", type: DomainType,
-                                status: Int): CustomDomain {
-        return CustomDomain(domain, ips, type.id, status, Calendar.getInstance().timeInMillis,
-                            Constants.INIT_TIME_MS, CustomDomain.getCurrentVersion())
+    private fun constructObject(
+        domain: String,
+        ips: String = "",
+        type: DomainType,
+        status: Int
+    ): CustomDomain {
+        return CustomDomain(
+            domain,
+            ips,
+            type.id,
+            status,
+            Calendar.getInstance().timeInMillis,
+            Constants.INIT_TIME_MS,
+            CustomDomain.getCurrentVersion()
+        )
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            f()
-        }
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

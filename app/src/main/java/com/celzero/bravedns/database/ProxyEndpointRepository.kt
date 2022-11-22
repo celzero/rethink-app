@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 
-
 class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 
     suspend fun insert(proxyEndpoint: ProxyEndpoint) {
@@ -60,5 +59,4 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
     suspend fun clearOrbotData() {
         proxyEndpointDAO.clearOrbotData()
     }
-
 }

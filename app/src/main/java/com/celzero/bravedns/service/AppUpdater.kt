@@ -18,8 +18,11 @@ package com.celzero.bravedns.service
 import android.app.Activity
 
 interface AppUpdater {
-    fun checkForAppUpdate(isInteractive: UserPresent, activity: Activity,
-                          listener: InstallStateListener)
+    fun checkForAppUpdate(
+        isInteractive: UserPresent,
+        activity: Activity,
+        listener: InstallStateListener
+    )
 
     fun completeUpdate()
     fun unregisterListener(listener: InstallStateListener)
@@ -34,14 +37,23 @@ interface AppUpdater {
 
     data class InstallState(val status: InstallStatus)
     enum class InstallStatus {
-        CANCELED, DOWNLOADED, DOWNLOADING, FAILED, INSTALLED, INSTALLING, PENDING, UNKNOWN
+        CANCELED,
+        DOWNLOADED,
+        DOWNLOADING,
+        FAILED,
+        INSTALLED,
+        INSTALLING,
+        PENDING,
+        UNKNOWN
     }
 
     enum class InstallSource {
-        STORE, OTHER
+        STORE,
+        OTHER
     }
 
     enum class UserPresent {
-        INTERACTIVE, NONINTERACTIVE
+        INTERACTIVE,
+        NONINTERACTIVE
     }
 }

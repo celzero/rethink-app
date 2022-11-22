@@ -89,9 +89,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun reloadRules() {
-        io {
-            FirewallManager.loadAppFirewallRules()
-        }
+        io { FirewallManager.loadAppFirewallRules() }
     }
 
     private fun stopVpn(context: Context) {
@@ -100,16 +98,20 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
 
     private fun pauseApp(context: Context) {
         if (!VpnController.hasTunnel()) {
-            Utilities.showToastUiCentered(context,
-                                          context.getString(R.string.hsf_pause_vpn_failure),
-                                          Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.hsf_pause_vpn_failure),
+                Toast.LENGTH_SHORT
+            )
             return
         }
 
         if (VpnController.isVpnLockdown()) {
-            Utilities.showToastUiCentered(context,
-                                          context.getString(R.string.hsf_pause_lockdown_failure),
-                                          Toast.LENGTH_SHORT)
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.hsf_pause_lockdown_failure),
+                Toast.LENGTH_SHORT
+            )
             return
         }
 
@@ -121,32 +123,30 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun dnsMode() {
-        io {
-            appConfig.changeBraveMode(AppConfig.BraveMode.DNS.mode)
-        }
+        io { appConfig.changeBraveMode(AppConfig.BraveMode.DNS.mode) }
     }
 
     private fun dnsFirewallMode() {
-        io {
-            appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode)
-        }
+        io { appConfig.changeBraveMode(AppConfig.BraveMode.DNS_FIREWALL.mode) }
     }
 
-    private fun modifyAppFirewallSettings(context: Context, uid: Int,
-                                          firewallStatus: FirewallManager.FirewallStatus) {
-        val text = if (firewallStatus == FirewallManager.FirewallStatus.BLOCK) {
-            context.getString(R.string.new_app_notification_action_toast_deny)
-        } else {
-            context.getString(R.string.new_app_notification_action_toast_allow)
-        }
+    private fun modifyAppFirewallSettings(
+        context: Context,
+        uid: Int,
+        firewallStatus: FirewallManager.FirewallStatus
+    ) {
+        val text =
+            if (firewallStatus == FirewallManager.FirewallStatus.BLOCK) {
+                context.getString(R.string.new_app_notification_action_toast_deny)
+            } else {
+                context.getString(R.string.new_app_notification_action_toast_allow)
+            }
 
         Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
         FirewallManager.updateFirewalledApps(uid, firewallStatus)
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            f()
-        }
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

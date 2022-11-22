@@ -20,21 +20,17 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
-
 @Dao
 interface DnsProxyEndpointDAO {
 
-    @Update
-    fun update(dnsProxyEndpoint: DnsProxyEndpoint)
+    @Update fun update(dnsProxyEndpoint: DnsProxyEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(dnsProxyEndpoint: DnsProxyEndpoint)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(dnsProxyEndpoint: DnsProxyEndpoint)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertWithReplace(dnsProxyEndpoint: DnsProxyEndpoint)
 
-    @Delete
-    fun delete(dnsProxyEndpoint: DnsProxyEndpoint)
+    @Delete fun delete(dnsProxyEndpoint: DnsProxyEndpoint)
 
     @Query("select * from DNSProxyEndpoint order by isSelected desc")
     fun getDnsProxyEndpointLiveData(): PagingSource<Int, DnsProxyEndpoint>
@@ -45,8 +41,7 @@ interface DnsProxyEndpointDAO {
     @Query("delete from DNSProxyEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)
 
-    @Query("delete from DNSProxyEndpoint")
-    fun clearAllData()
+    @Query("delete from DNSProxyEndpoint") fun clearAllData()
 
     @Query("delete from DNSProxyEndpoint where id = :id and isSelected = 0")
     fun deleteDnsProxyEndpoint(id: Int)
@@ -54,8 +49,7 @@ interface DnsProxyEndpointDAO {
     @Query("update DNSProxyEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
-    @Query("select count(*) from DNSProxyEndpoint")
-    fun getCount(): Int
+    @Query("select count(*) from DNSProxyEndpoint") fun getCount(): Int
 
     @Query("select * from DNSProxyEndpoint where isSelected = 1")
     fun getConnectedProxy(): DnsProxyEndpoint?
@@ -63,7 +57,5 @@ interface DnsProxyEndpointDAO {
     @Query("select * from DNSProxyEndpoint where proxyName = 'Orbot' and isCustom = 0 LIMIT 1")
     fun getOrbotDnsEndpoint(): DnsProxyEndpoint?
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
-
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

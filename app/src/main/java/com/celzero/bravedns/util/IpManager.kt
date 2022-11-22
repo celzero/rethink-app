@@ -2,7 +2,6 @@ package com.celzero.bravedns.util
 
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlin.math.absoluteValue
 
 class IpManager {
 
@@ -61,7 +60,6 @@ class IpManager {
             return false
         }
 
-
         // for teredo tunneling
         private fun isIpTeredo(ips: IPAddress): Boolean {
             return ips.toIPv6().isTeredo
@@ -85,6 +83,5 @@ class IpManager {
         fun getIpAddress(ip: String): IPAddress? {
             return IPAddressString(ip).address
         }
-
     }
 }

@@ -46,9 +46,19 @@ class RethinkRemoteFileTag {
         return this.value.hashCode()
     }
 
-    constructor(value: Int, uname: String, vname: String, group: String, subg: String,
-                pack: List<String>?, url: List<String>, show: Int, entries: Int, simpleTagId: Int,
-                isSelected: Boolean = false) {
+    constructor(
+        value: Int,
+        uname: String,
+        vname: String,
+        group: String,
+        subg: String,
+        pack: List<String>?,
+        url: List<String>,
+        show: Int,
+        entries: Int,
+        simpleTagId: Int,
+        isSelected: Boolean = false
+    ) {
         this.value = value
         this.uname = uname
         this.vname = vname

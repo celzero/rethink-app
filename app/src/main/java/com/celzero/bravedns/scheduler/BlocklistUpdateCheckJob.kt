@@ -28,7 +28,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerParameters) :
-        CoroutineWorker(context, workerParameters), KoinComponent {
+    CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
 
@@ -36,17 +36,26 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
         Log.i(LOG_TAG_SCHEDULER, "starting blocklist update check job")
 
         if (!Utilities.isPlayStoreFlavour()) {
-            isDownloadRequired(persistentState.localBlocklistTimestamp,
-                               AppDownloadManager.DownloadType.LOCAL)
+            isDownloadRequired(
+                persistentState.localBlocklistTimestamp,
+                AppDownloadManager.DownloadType.LOCAL
+            )
         }
-        isDownloadRequired(persistentState.remoteBlocklistTimestamp,
-                           AppDownloadManager.DownloadType.REMOTE)
+        isDownloadRequired(
+            persistentState.remoteBlocklistTimestamp,
+            AppDownloadManager.DownloadType.REMOTE
+        )
         return Result.success()
     }
 
     private suspend fun isDownloadRequired(timestamp: Long, type: AppDownloadManager.DownloadType) {
-        val response = BlocklistDownloadHelper.checkBlocklistUpdate(timestamp, persistentState.appVersion,
-                                                                    retryCount = 0) ?: return
+        val response =
+            BlocklistDownloadHelper.checkBlocklistUpdate(
+                timestamp,
+                persistentState.appVersion,
+                retryCount = 0
+            )
+                ?: return
 
         val updatableTs = BlocklistDownloadHelper.getDownloadableTimestamp(response)
         if (response.update && updatableTs > timestamp) {

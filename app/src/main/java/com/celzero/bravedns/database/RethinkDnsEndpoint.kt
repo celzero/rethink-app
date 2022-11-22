@@ -53,8 +53,17 @@ class RethinkDnsEndpoint {
         const val RETHINK_PLUS: String = "RDNS Plus"
     }
 
-    constructor(name: String, url: String, uid: Int, desc: String, isActive: Boolean,
-                isCustom: Boolean, latency: Int, blocklistCount: Int?, modifiedDataTime: Long) {
+    constructor(
+        name: String,
+        url: String,
+        uid: Int,
+        desc: String,
+        isActive: Boolean,
+        isCustom: Boolean,
+        latency: Int,
+        blocklistCount: Int?,
+        modifiedDataTime: Long
+    ) {
         // Room auto-increments id when its set to zero.
         // A non-zero id overrides and sets caller-specified id instead.
         this.name = name

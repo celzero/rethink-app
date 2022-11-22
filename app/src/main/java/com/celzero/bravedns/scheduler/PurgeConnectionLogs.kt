@@ -27,7 +27,7 @@ import org.koin.core.component.inject
 import java.util.*
 
 class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParameters) :
-        CoroutineWorker(context, workerParameters), KoinComponent {
+    CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val refreshDatabase by inject<RefreshDatabase>()
 
@@ -36,20 +36,18 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
     }
 
     override suspend fun doWork(): Result {
-        if (HomeScreenActivity.GlobalVariable.DEBUG) Log.d(LoggerConstants.LOG_TAG_SCHEDULER,
-                                                           "starting purge-database job")
+        if (HomeScreenActivity.GlobalVariable.DEBUG)
+            Log.d(LoggerConstants.LOG_TAG_SCHEDULER, "starting purge-database job")
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, NUMBER_OF_DAYS_TO_PURGE)
         val date = calendar.time.time
 
         /**
-         * purge logs older than 7 days (on version v053l, subject to change in later versions
-         * based on user configuration)
-         * come up with user configuration to delete the user logs.(both
+         * purge logs older than 7 days (on version v053l, subject to change in later versions based
+         * on user configuration) come up with user configuration to delete the user logs.(both
          * ConnectionTracker and DNSLogs.
          */
         refreshDatabase.purgeConnectionLogs(date)
         return Result.success()
     }
-
 }

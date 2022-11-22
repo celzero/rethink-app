@@ -43,13 +43,15 @@ import kotlinx.coroutines.Job
 import java.util.concurrent.TimeUnit
 
 /**
- * Generic class responsible for downloading the block list for both remote and local.
- * As of now, the download manager will download the local blocklist and initiate thw workers
- * to listen for the download complete and for copying the files from external to canonical path.
- * TODO remote blocklist - implementation pending.
+ * Generic class responsible for downloading the block list for both remote and local. As of now,
+ * the download manager will download the local blocklist and initiate thw workers to listen for the
+ * download complete and for copying the files from external to canonical path. TODO remote
+ * blocklist - implementation pending.
  */
-class AppDownloadManager(private val context: Context,
-                         private val persistentState: PersistentState) {
+class AppDownloadManager(
+    private val context: Context,
+    private val persistentState: PersistentState
+) {
 
     private lateinit var downloadManager: DownloadManager
 
@@ -65,12 +67,13 @@ class AppDownloadManager(private val context: Context,
         FAILURE(-3),
         NOT_REQUIRED(-2),
         IN_PROGRESS(-1),
-        STARTED (0),
-        SUCCESS(1);
+        STARTED(0),
+        SUCCESS(1)
     }
 
     enum class DownloadType(val id: Int) {
-        LOCAL(0), REMOTE(1);
+        LOCAL(0),
+        REMOTE(1);
 
         fun isLocal(): Boolean {
             return this == LOCAL
@@ -101,8 +104,10 @@ class AppDownloadManager(private val context: Context,
         }
 
         val updatableTs = getDownloadableTimestamp(response)
-        Log.i(LOG_TAG_DNS,
-              "Updatable ts: $updatableTs, current ts: $ts, blocklist type: ${type.name}")
+        Log.i(
+            LOG_TAG_DNS,
+            "Updatable ts: $updatableTs, current ts: $ts, blocklist type: ${type.name}"
+        )
 
         if (updatableTs == INIT_TIME_MS) {
             downloadRequired.postValue(DownloadManagerStatus.FAILURE)
@@ -124,8 +129,8 @@ class AppDownloadManager(private val context: Context,
 
     private fun cancelLocalBlocklistDownload() {
         if (persistentState.useCustomDownloadManager) {
-            WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(
-                LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
+            WorkManager.getInstance(context.applicationContext)
+                .cancelAllWorkByTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
         } else {
             WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(DOWNLOAD_TAG)
             WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(FILE_TAG)
@@ -133,8 +138,8 @@ class AppDownloadManager(private val context: Context,
     }
 
     private fun cancelRemoteBlocklistDownload() {
-        WorkManager.getInstance(context.applicationContext).cancelAllWorkByTag(
-            RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
+        WorkManager.getInstance(context.applicationContext)
+            .cancelAllWorkByTag(RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
     }
 
     private fun setUpdatableTimestamp(timestamp: Long, type: DownloadType) {
@@ -154,10 +159,13 @@ class AppDownloadManager(private val context: Context,
     }
 
     /**
-     * Responsible for downloading the local blocklist files.
-     * For local blocklist, we need filetag.json, basicconfig.json, rd.txt and td.txt
+     * Responsible for downloading the local blocklist files. For local blocklist, we need
+     * filetag.json, basicconfig.json, rd.txt and td.txt
      */
-    suspend fun downloadLocalBlocklist(currentTs: Long, isRedownload: Boolean): DownloadManagerStatus {
+    suspend fun downloadLocalBlocklist(
+        currentTs: Long,
+        isRedownload: Boolean
+    ): DownloadManagerStatus {
         // local blocklist available only in fdroid and website version
         if (!Utilities.isWebsiteFlavour() && !Utilities.isFdroidFlavour()) {
             return DownloadManagerStatus.FAILURE
@@ -188,8 +196,11 @@ class AppDownloadManager(private val context: Context,
 
     private fun initiateAndroidDownloadManager(timestamp: Long): DownloadManagerStatus {
 
-        if (WorkScheduler.isWorkScheduled(context, DOWNLOAD_TAG) || WorkScheduler.isWorkScheduled(
-                context, FILE_TAG)) return DownloadManagerStatus.FAILURE
+        if (
+            WorkScheduler.isWorkScheduled(context, DOWNLOAD_TAG) ||
+                WorkScheduler.isWorkScheduled(context, FILE_TAG)
+        )
+            return DownloadManagerStatus.FAILURE
 
         purge(context, timestamp, DownloadType.LOCAL)
         val downloadIds = LongArray(ONDEVICE_BLOCKLISTS.count())
@@ -203,9 +214,11 @@ class AppDownloadManager(private val context: Context,
     }
 
     private fun initiateCustomDownloadManager(timestamp: Long): DownloadManagerStatus {
-        if (WorkScheduler.isWorkScheduled(context,
-                                          LocalBlocklistCoordinator.CUSTOM_DOWNLOAD) || WorkScheduler.isWorkRunning(
-                context, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)) return DownloadManagerStatus.FAILURE
+        if (
+            WorkScheduler.isWorkScheduled(context, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD) ||
+                WorkScheduler.isWorkRunning(context, LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
+        )
+            return DownloadManagerStatus.FAILURE
 
         startLocalBlocklistCoordinator(timestamp)
         return DownloadManagerStatus.STARTED
@@ -233,9 +246,17 @@ class AppDownloadManager(private val context: Context,
     }
 
     private fun initiateRemoteBlocklistDownload(timestamp: Long): Boolean {
-        if (WorkScheduler.isWorkScheduled(context,
-                                          RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER) || WorkScheduler.isWorkRunning(
-                context, RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)) return false
+        if (
+            WorkScheduler.isWorkScheduled(
+                context,
+                RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER
+            ) ||
+                WorkScheduler.isWorkRunning(
+                    context,
+                    RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER
+                )
+        )
+            return false
 
         startRemoteBlocklistCoordinator(timestamp)
         return true
@@ -245,11 +266,16 @@ class AppDownloadManager(private val context: Context,
         val data = Data.Builder()
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
         data.putLong("blocklistTimestamp", timestamp)
-        val downloadWatcher = OneTimeWorkRequestBuilder<RemoteBlocklistCoordinator>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(
-            RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER).build()
+        val downloadWatcher =
+            OneTimeWorkRequestBuilder<RemoteBlocklistCoordinator>()
+                .setInputData(data.build())
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .addTag(RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
+                .build()
 
         WorkManager.getInstance(context).beginWith(downloadWatcher).enqueue()
     }
@@ -258,36 +284,51 @@ class AppDownloadManager(private val context: Context,
         val data = Data.Builder()
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
         data.putLong("blocklistTimestamp", timestamp)
-        val downloadWatcher = OneTimeWorkRequestBuilder<LocalBlocklistCoordinator>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(
-            LocalBlocklistCoordinator.CUSTOM_DOWNLOAD).build()
+        val downloadWatcher =
+            OneTimeWorkRequestBuilder<LocalBlocklistCoordinator>()
+                .setInputData(data.build())
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .addTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
+                .build()
 
         WorkManager.getInstance(context).beginWith(downloadWatcher).enqueue()
     }
-
 
     private fun initiateDownloadStatusCheck(downloadIds: LongArray, timestamp: Long) {
         val data = Data.Builder()
         data.putLong("workerStartTime", SystemClock.elapsedRealtime())
         data.putLongArray("downloadIds", downloadIds)
 
-        val downloadWatcher = OneTimeWorkRequestBuilder<DownloadWatcher>().setInputData(
-            data.build()).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                             OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                             TimeUnit.MILLISECONDS).addTag(
-            DOWNLOAD_TAG).setInitialDelay(10, TimeUnit.SECONDS).build()
+        val downloadWatcher =
+            OneTimeWorkRequestBuilder<DownloadWatcher>()
+                .setInputData(data.build())
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .addTag(DOWNLOAD_TAG)
+                .setInitialDelay(10, TimeUnit.SECONDS)
+                .build()
 
         val timestampWorkerData = workDataOf("blocklistDownloadInitiatedTime" to timestamp)
 
-        val fileHandler = OneTimeWorkRequestBuilder<FileHandleWorker>().setInputData(
-            timestampWorkerData).setBackoffCriteria(BackoffPolicy.LINEAR,
-                                                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                                    TimeUnit.MILLISECONDS).addTag(FILE_TAG).build()
+        val fileHandler =
+            OneTimeWorkRequestBuilder<FileHandleWorker>()
+                .setInputData(timestampWorkerData)
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .addTag(FILE_TAG)
+                .build()
 
         WorkManager.getInstance(context).beginWith(downloadWatcher).then(fileHandler).enqueue()
-
     }
 
     /**
@@ -305,9 +346,11 @@ class AppDownloadManager(private val context: Context,
         request.apply {
             setTitle(fileName)
             setDescription(fileName)
-            request.setDestinationInExternalFilesDir(context,
-                                                     BlocklistDownloadHelper.getExternalFilePath(
-                                                         timestamp), fileName)
+            request.setDestinationInExternalFilesDir(
+                context,
+                BlocklistDownloadHelper.getExternalFilePath(timestamp),
+                fileName
+            )
             val downloadId = downloadManager.enqueue(this)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename: $fileName, downloadID: $downloadId")
             return downloadId

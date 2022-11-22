@@ -47,7 +47,7 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
 
     private val appConfig by inject<AppConfig>()
 
-    //Doh UI elements
+    // Doh UI elements
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var dohRecyclerAdapter: DohEndpointAdapter? = null
     private val viewModel: DoHEndpointViewModel by viewModel()
@@ -74,15 +74,13 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
     }
 
     private fun initClickListeners() {
-        b.dohFabAddServerIcon.setOnClickListener {
-            showAddCustomDohDialog()
-        }
+        b.dohFabAddServerIcon.setOnClickListener { showAddCustomDohDialog() }
     }
 
     /**
-     * Shows dialog for custom DNS endpoint configuration
-     * If entered DNS end point is valid, then the DNS queries are forwarded to that end point
-     * else, it will revert back to default end point
+     * Shows dialog for custom DNS endpoint configuration If entered DNS end point is valid, then
+     * the DNS queries are forwarded to that end point else, it will revert back to default end
+     * point
      */
     private fun showAddCustomDohDialog() {
         val dialog = Dialog(requireContext())
@@ -112,13 +110,17 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         io {
             val nextIndex = appConfig.getDohCount().plus(1)
             uiCtx {
-                customName.setText(getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
-                                   TextView.BufferType.EDITABLE)
+                customName.setText(
+                    getString(R.string.cd_custom_doh_url_name, nextIndex.toString()),
+                    TextView.BufferType.EDITABLE
+                )
             }
         }
 
-        customName.setText(getString(R.string.cd_custom_doh_url_name_default),
-                           TextView.BufferType.EDITABLE)
+        customName.setText(
+            getString(R.string.cd_custom_doh_url_name_default),
+            TextView.BufferType.EDITABLE
+        )
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()
@@ -135,9 +137,7 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
             }
         }
 
-        cancelURLBtn.setOnClickListener {
-            dialog.dismiss()
-        }
+        cancelURLBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
@@ -147,9 +147,17 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
             if (name.isBlank()) {
                 dohName = url
             }
-            val doHEndpoint = DoHEndpoint(id = 0, dohName, url, dohExplanation = "",
-                                          isSelected = false, isCustom = true, modifiedDataTime = 0,
-                                          latency = 0)
+            val doHEndpoint =
+                DoHEndpoint(
+                    id = 0,
+                    dohName,
+                    url,
+                    dohExplanation = "",
+                    isSelected = false,
+                    isCustom = true,
+                    modifiedDataTime = 0,
+                    latency = 0
+                )
             appConfig.insertDohEndpoint(doHEndpoint)
         }
     }
@@ -159,25 +167,21 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
     private fun checkUrl(url: String): Boolean {
         return try {
             val parsed = URL(url)
-            parsed.protocol == "https" && parsed.host.isNotEmpty() && parsed.path.isNotEmpty() && parsed.query == null && parsed.ref == null
+            parsed.protocol == "https" &&
+                parsed.host.isNotEmpty() &&
+                parsed.path.isNotEmpty() &&
+                parsed.query == null &&
+                parsed.ref == null
         } catch (e: MalformedURLException) {
             false
         }
     }
 
-
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
+        withContext(Dispatchers.Main) { f() }
     }
-
 }
