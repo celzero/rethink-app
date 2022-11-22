@@ -15,18 +15,25 @@
  */
 package com.celzero.bravedns.ui
 
+import android.Manifest
 import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -46,6 +53,7 @@ import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
@@ -64,10 +72,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
 
+    private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         setupClickListeners()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        registerForActivityResult()
     }
 
     private fun initView() {
@@ -312,10 +327,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             if (b) {
                 showAllNetworksDialog()
-                return@setOnCheckedChangeListener
+            } else {
+                persistentState.useMultipleNetworks = b
             }
-
-            persistentState.useMultipleNetworks = b
         }
 
         b.settingsActivityAllowBypassRl.setOnClickListener {
@@ -432,11 +446,16 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityImportExportRl.setOnClickListener {
             invokeImportExport()
         }
+
+        b.settingsActivityAppNotificationSwitch.setOnClickListener {
+            b.settingsActivityAppNotificationSwitch.isChecked = !b.settingsActivityAppNotificationSwitch.isChecked
+            invokeNotificationPermission()
+        }
     }
 
     private fun invokeImportExport() {
         val bottomSheetFragment = BackupRestoreBottomSheetFragment()
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun handleOrbotUiEvent() {
@@ -463,7 +482,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
 
         val bottomSheetFragment = OrbotBottomSheetFragment()
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -575,6 +594,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         super.onResume()
         refreshOrbotUi()
         handleLockdownModeIfNeeded()
+        // app notification permission android 13
+        showEnableNotificationSettingIfNeeded()
         handleProxyUi()
     }
 
@@ -870,6 +891,83 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    private fun registerForActivityResult() {
+        if (!isAtleastT()) return
+
+        // Sets up permissions request launcher.
+        notificationPermissionResult = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                Log.i(LOG_TAG_VPN, "User allowed notification permission for the app")
+                b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
+                b.settingsActivityAppNotificationSwitch.isChecked = true
+            } else {
+                Log.w(LOG_TAG_VPN, "User rejected notification permission for the app")
+                persistentState.shouldRequestNotificationPermission = false
+                b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
+                b.settingsActivityAppNotificationSwitch.isChecked = false
+                invokeAndroidNotificationSetting()
+            }
+        }
+    }
+
+    private fun invokeNotificationPermission() {
+        if (!isAtleastT()) {
+            // notification permission is needed for version 13 or above
+            return
+        }
+
+        if (isNotificationPermissionGranted()) {
+            // notification already granted
+            invokeAndroidNotificationSetting()
+            return
+        }
+
+        notificationPermissionResult.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    private fun invokeAndroidNotificationSetting() {
+        val packageName = requireContext().packageName
+        try {
+            val intent = Intent()
+            if (Utilities.isAtleastO()) {
+                intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            } else {
+                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                intent.addCategory(Intent.CATEGORY_DEFAULT)
+                intent.data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showToastUiCentered(requireContext(), getString(R.string.notification_screen_error),
+                                Toast.LENGTH_SHORT)
+            Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+        }
+    }
+
+    private fun showEnableNotificationSettingIfNeeded() {
+        if (!isAtleastT()) {
+            // notification permission is only needed for version 13 or above
+            b.settingsActivityAppNotificationRl.visibility = View.GONE
+            return
+        }
+
+        if (isNotificationPermissionGranted()) {
+            // notification permission is granted to the app, enable switch
+            b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
+            b.settingsActivityAppNotificationSwitch.isChecked = true
+        } else {
+            b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
+            b.settingsActivityAppNotificationSwitch.isChecked = false
+        }
+    }
+
+    private fun isNotificationPermissionGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(requireContext(),
+                                                 Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     }
 
 

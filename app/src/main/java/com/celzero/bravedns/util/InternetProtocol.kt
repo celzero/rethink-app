@@ -43,7 +43,7 @@ enum class InternetProtocol(val id: Int) {
     // preferred network engine id (go-module)
     fun getPreferredEngine(): Long {
         return when (this) {
-            IPv4 -> Settings.Lwip4
+            IPv4 -> Settings.Ns4
             IPv6 -> Settings.Ns6
             IPv46 -> Settings.Ns46
         }

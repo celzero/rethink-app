@@ -38,11 +38,13 @@ class Constants {
         val ONDEVICE_GEOIP_IPV4 = File.separator + "dbip.v4"
         val ONDEVICE_GEOIP_IPV6 = File.separator + "dbip.v6"
 
+        // url to check to check the if there is update available for on-device blocklist
         // url parameter used in configure blocklist webview
         private const val RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER = "tstamp="
 
-        // url to check to check the if there is update available for on-device blocklist
-        const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/blocklists?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
+        // query part
+        const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_1 = "update"
+        const val ONDEVICE_BLOCKLIST_UPDATE_CHECK_QUERYPART_2 = "blocklists"
 
         // url to check to check the if there is update available for on-device blocklist
         const val ONDEVICE_IPDB_UPDATE_CHECK_URL = "$DOWNLOAD_BASE_URL/update/geoip?$RETHINK_BLOCKLIST_CONFIGURE_URL_PARAMETER"
@@ -53,12 +55,12 @@ class Constants {
         // url to check if there is app-update is available (this is for website version only)
         const val RETHINK_APP_UPDATE_CHECK = "$DOWNLOAD_BASE_URL/update/app?$ONDEVICE_BLOCKLIST_UPDATE_CHECK_PARAMETER_VCODE"
 
-        // url to launch the blocklist (remote/on-device) configure screen
-        const val RETHINK_BLOCKLIST_CONFIGURE_URL = "https://rethinkdns.com/configure?v=app"
-
         // The version tag value(response) for the update check (both on-device and app update)
         // TODO: have two different response versions for blocklist update and app update
         const val UPDATE_CHECK_RESPONSE_VERSION = 1
+
+        // the version value for rethink stamp generation
+        const val RETHINK_STAMP_VERSION = 1
 
         // meta data for on-device blocklist
         data class OnDeviceBlocklistsMetadata(val url: String, val filename: String)
@@ -105,9 +107,6 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // base-url stamp for configure blocklist
-        const val RETHINK_BLOCKLIST_CONFIGURE_BASE_URL = "rethinkdns.com/configure"
-
         // default filetag.json for remote blocklist (stored in assets folder) (v053i)
         const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1657632597183
 
@@ -132,9 +131,6 @@ class Constants {
         // app type unknown
         const val UNKNOWN_APP = "Unknown"
 
-        // Number of network log entries to store in the database.
-        const val TOTAL_LOG_ENTRIES_THRESHOLD = 10000
-
         // invalid application uid
         const val INVALID_UID = -1
 
@@ -143,20 +139,10 @@ class Constants {
         const val MISSING_UID = -2000
 
         // label for rethinkdns plus doh endpoint
-        const val RETHINK_DNS_PLUS = "RethinkDNS Plus"
+        const val RETHINK_DNS_PLUS = "RDNS Plus"
 
         // constants used as part of intent to load the viewpager's screen
         const val VIEW_PAGER_SCREEN_TO_LOAD = "view_pager_screen"
-
-        // name-value to pass as part of intent
-        // determines whether launched from local/remote
-        const val BLOCKLIST_LOCATION_INTENT_EXTRA = "location"
-
-        // stamp name-value for blocklist configure screen
-        const val BLOCKLIST_STAMP_INTENT_EXTRA = "stamp"
-
-        // url name-value for blocklist configure screen
-        const val BLOCKLIST_URL_INTENT_EXTRA = "url"
 
         // default custom http proxy port number
         const val HTTP_PROXY_PORT = "8118"
@@ -210,10 +196,6 @@ class Constants {
         // minimum interval before checking if there is a change in active network
         // (metered/unmetered)
         val ACTIVE_NETWORK_CHECK_THRESHOLD_MS = TimeUnit.SECONDS.toMillis(60)
-
-        // View model - filter string
-        const val FILTER_IS_SYSTEM = "isSystem"
-        const val FILTER_CATEGORY = "category:"
 
         // IPv4 uses 0.0.0.0 as an unspecified address
         const val UNSPECIFIED_IP_IPV4 = "0.0.0.0"

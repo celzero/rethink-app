@@ -18,13 +18,13 @@ package com.celzero.bravedns.glide
 import android.content.Context
 import android.os.Process
 import android.util.Log
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
 import java.io.File
+
 
 /**
  * FavIconDownloader - Downloads the favicon of the DNS requests and store in the
@@ -61,11 +61,12 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         return "${FAV_ICON_URL}${url}.ico"
     }
 
-
+    // ref: https://github.com/bumptech/glide/issues/2972
+    // https://github.com/bumptech/glide/issues/509
     private fun updateImage(subUrl: String, url: String, retry: Boolean) {
         val futureTarget: FutureTarget<File> = GlideApp.with(
-            context.applicationContext).downloadOnly().diskCacheStrategy(
-            DiskCacheStrategy.AUTOMATIC).load(subUrl).submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
+            context.applicationContext).downloadOnly().load(subUrl).submit(SIZE_ORIGINAL,
+                                                                           SIZE_ORIGINAL)
         try {
             futureTarget.get()
             if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - success() -$subUrl, $url")

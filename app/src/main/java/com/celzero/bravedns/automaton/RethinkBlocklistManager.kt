@@ -125,9 +125,9 @@ object RethinkBlocklistManager : KoinComponent {
     private suspend fun readLocalJson(context: Context, timestamp: Long) {
         try {
             val dbFileTagLocal: MutableList<RethinkLocalFileTag> = mutableListOf()
-            val dir = Utilities.localBlocklistDownloadBasePath(context,
-                                                               LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                               timestamp)
+            val dir = Utilities.blocklistDownloadBasePath(context,
+                                                          LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                          timestamp)
 
             val file = Utilities.blocklistFile(dir, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
 
@@ -156,9 +156,9 @@ object RethinkBlocklistManager : KoinComponent {
         try {
             val dbFileTagRemote: MutableList<RethinkRemoteFileTag> = mutableListOf()
 
-            val dir = Utilities.remoteBlocklistDownloadBasePath(context,
-                                                                REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                timestamp)
+            val dir = Utilities.blocklistDownloadBasePath(context,
+                                                          REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                          timestamp)
 
             val file = Utilities.blocklistFile(dir, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
 

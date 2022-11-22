@@ -10,9 +10,6 @@
 
     <string name="txt_home">Home</string>
 
-    <string name="admin_receiver_status_enabled">Ready to set dns based content blocker.</string>
-    <string name="admin_receiver_status_disabled">Content blocker no longer in effect.</string>
-
     <string name="accessibility_service_description">
         RethinkDNS uses accessibility service to detect and firewall background applications.
         RethinkDNS does not collect or sell any information.
@@ -269,7 +266,7 @@
     <string name="download_update_dialog_trylater_message">The update cannot be executed right now, please try again later.</string>
 
     <string name="search_firewall_network_log"><font size="12">Search apps, IPs, domains</font></string>
-    <string name="search_firewall_all_apps"><font size="12">Search apps</font></string>
+    <string name="search_firewall_all_apps"><font size="12">Search apps by uid, name</font></string>
     <string name="search_dns_logs"><font size="12">Search domain names or IPs</font></string>
     <string name="search_universal_ips"><font size="12">Search IPs</font></string>
     <string name="search_custom_domains"><font size="12">Search domain names</font></string>
@@ -294,19 +291,23 @@
 
     <string name="whats_dialog_title">What\'s new in v053k</string>
     <string name="whats_new_version_name">🌎&#128330; World Student\'s Day (15 Oct) &#128330;🌎</string>
-    <string name="whats_new_version_update"><b>Maximum effort</b>\n\n
-        1. Introducing a more private Rethink resolver, <i>Max</i>.\n
-        2. Mark IPv6 as experimental; switch to IPv4 by default.\n
-        3. <i>New feature</i>: Backup and restore app settings.\n
-        4. <i>New feature</i>: App lockdown mode.\n
-        5. <i>New feature</i>: Universal lockdown mode.\n
-        6. <i>New feature</i>: Apply firewall rules on port numbers.\n
-        7. <i>New feature</i>: Apply app firewall rules in batches.\n
-        8. Minor UI refresh.\n
-        9. Other memory and crash fixes.
+    <string name="whats_new_version_update"><![CDATA[<b>Maximum effort</b><br/><br/>
+        1. Introducing a more private Rethink resolver, <i>Max</i>.<br/>
+        2. Mark IPv6 as experimental; switch to IPv4 by default.<br/>
+        3. <i>New feature</i>: Backup and restore app settings.<br/>
+        4. <i>New feature</i>: App lockdown mode.<br/>
+        5. <i>New feature</i>: Universal lockdown mode.<br/>
+        6. <i>New feature</i>: Apply firewall rules on port numbers.<br/>
+        7. <i>New feature</i>: Apply app firewall rules in batches.<br/>
+        8. Minor UI refresh.<br/>
+        9. Other memory and crash fixes.<br/><br/>
+        <a href="https://hosted.weblate.org/projects/rethink-dns-firewall/app/">Help translate this app</a>]]>
     </string>
 
     <string name="connection_http3">HTTP3</string>
+
+    <string name="relative_time_today">Today</string>
+    <string name="relative_time_yesterday">Yesterday</string>
 
     <!-- Settings Fragment strings -->
     <string name="settings_ip_network_heading">Choose IP version</string>
@@ -409,6 +410,9 @@
     <string name="settings_import_export_heading">Backup &amp; Restore</string>
     <string name="settings_import_export_desc">Manually back up or restore the app data and settings.</string>
 
+    <string name="settings_app_notification_a13_heading">App Notification</string>
+    <string name="settings_app_notification_a13_desc">Enable notification permission for the app</string>
+
     <string name="settings_theme_heading">Appearance</string>
     <string name="settings_theme_desc">Dark/light theme</string>
 
@@ -496,7 +500,6 @@
 
     <string name="firewall_card_text_active">%1$s blocked\n%2$s bypassed\n%3$s excluded\n%4$s lockdown</string>
     <string name="firewall_card_text_inactive">Enable firewall mode.</string>
-    <string name="firewall_card_configure_btn">block apps</string>
 
     <string name="dns_card_connected_status_failure">Disabled</string>
 
@@ -518,6 +521,8 @@
 
     <string name="hsf_vpn_prepare_failure">Either VPN permission missing, or another app is in Always-on VPN mode.</string>
 
+    <string name="hsf_notification_permission_failure">Enable notification permission from Settings screen</string>
+
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_start_dialog_message">You are one step away from safe and secure Android: Instantly see network activity, block websites, IPs, and badly behaving apps.</string>
     <string name="hsf_start_dialog_positive">Start</string>
@@ -526,8 +531,8 @@
     <string name="hsf_whats_new_chip_text">What\'s new</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
     <string name="hsf_blocklist_chip_text">%1$s blocklists configured</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS in-use</string>
-    <string name="hsf_blocklist_chip_text_no_data">Enable RethinkDNS+</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in-use</string>
+    <string name="hsf_blocklist_chip_text_no_data">Enable RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
     <string name="hsf_network_logs_chip_text">Network logs</string>
 
@@ -592,6 +597,7 @@
     <string name="about_github">Contribute on GitHub</string>
     <string name="about_faq">View FAQs</string>
     <string name="about_docs">Read docs</string>
+    <string name="about_privacy_policy">Privacy policy</string>
     <string name="about_connect">contact</string>
     <string name="about_sponsor">sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
@@ -606,6 +612,7 @@
     <string name="about_mozilla">RethinkDNS is part of Mozilla Builders MVP program.</string>
     <string name="about_app_update_check">Check for app updates</string>
     <string name="about_app_contributors">Authors</string>
+    <string name="about_app_translate">Translate</string>
     <string name="about_dialog_positive_button">Let\'s Go</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_to_string">mailto:</string>
@@ -620,12 +627,17 @@
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
     <string name="about_version">v%1$s</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button">Suggest features</string>
 
     <string name="app_info_error">Could not launch App info.</string>
     <string name="vpn_profile_error">Could not launch VPN profile.</string>
+    <string name="notification_screen_error">Could not launch App Notification screen.</string>
+    <string name="intent_launch_error">Count not launch %1$s</string>
+    <string name="no_browser_error">Cannot open webpage from browser.</string>
     <string name="log_file_not_available">No crash report found</string>
     <string name="error_loading_log_file">Error loading log file</string>
 
@@ -649,6 +661,7 @@
                                               <a href="https://github.com/fortuna">fortuna</a><br/>
                                               <a href="https://github.com/ignoramous">ignoramous</a><br/>
                                               <a href="https://github.com/PeterDaveHello">PeterDaveHello</a><br/>
+                                              <a href="https://github.com/santhosh-ponnusamy">santhosh-ponnusamy</a><br/>
                                               <a href="https://github.com/SeanBurford">SeanBurford</a><br/>
                                               <br/>📚 Resolver <br/>
                                               <a href="https://github.com/ahmed-tasaly">ahmed-tasaly</a><br/>
@@ -676,6 +689,8 @@
                                               <a href="https://t.me/Billi_ance">Billi_ance</a><br/>
                                               <a href="https://t.me/kaliangel">kaliangel</a><br/>
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
+                                              <br/>📌 IP geo-location database <br/>
+                                              <a href="https://db-ip.com">db-ip.com</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_crypt_title">resolvers</string>
@@ -720,11 +735,11 @@
 
     <string name="ct_ip_details">%1$s (%2$s)</string>
 
-    <string name="ct_btm_sheet_error">Can not open bottom sheet</string>
-
     <string name="ct_filter_parent_all">All</string>
     <string name="ct_filter_parent_allowed">Allowed</string>
     <string name="ct_filter_parent_blocked">Blocked</string>
+
+    <string name="ct_ip_port">%1$s:%2$s</string>
 
     <!-- Connection tracker bottom sheet fragment string -->
     <string name="ctbs_app_info_not_available_toast">App settings page not found</string>
@@ -816,7 +831,6 @@
     <string name="dns_proxy_dialog_message_no_app">IP address: %1$s\n\nPort number: %2$s</string>
 
     <string name="dns_query_latency">%1$sms</string>
-
 
     <string name="dns_proxy_dialog_header_dns">Add DNS Proxy</string>
     <string name="dns_proxy_name">Proxy Name</string>
@@ -931,7 +945,8 @@
     <string name="firewall_rule_lockdown">Lockdown (App)</string>
     <string name="firewall_rule_block_app_new_install">New App</string>
     <string name="firewall_rule_block_app_exception">Error</string>
-    <string name="firewall_rule_block_ip">IP / Port</string>
+    <string name="firewall_rule_block_ip">IP / Port (App)</string>
+    <string name="firewall_rule_block_univ_ip">IP / Port (Universal)</string>
     <string name="firewall_rule_bypass_apprule_ip">Bypassed IP (App)</string>
     <string name="firewall_rule_bypass_universal_ip">Bypassed IP</string>
     <string name="firewall_rule_device_lock">Device Locked</string>
@@ -1091,9 +1106,6 @@
     <string name="ada_firewall_status"><![CDATA[This app <b><i>%1$s</i></b>.]]></string>
     <string name="ada_uid"><![CDATA[App ID: <i>%1$s</i><br/>Category: <i>%2$s</i><br/>Installed at: <i>%3$s</i><br/>Updated at: <i>%4$s</i>]]></string>
 
-    <string name="ada_lockdown_title">Lockdown app</string>
-    <string name="ada_lockdown_desc">When enabled, the app can connect only to IPs in <i>bypass app rules</i>; connections to any other IP will be blocked.</string>
-
     <string name="ada_ip_connection_count">Connected to %1$s IP address(es)</string>
     <string name="ada_ip_connection_count_zero">0 IP address</string>
     <string name="ada_ip_no_connection">No network logs for this app.</string>
@@ -1110,6 +1122,8 @@
     <string name="ada_ip_block_count">%1$s IP rule(s)</string>
     <string name="ada_ip_block_no_rules">No IP rules for this app.</string>
 
+    <string name="ada_firewall_title">firewall rules for this app</string>
+
     <string name="ada_ip_rules_title">ip rules for this app</string>
 
     <string name="ada_network_log_title">network log for this app</string>
@@ -1118,6 +1132,7 @@
     <string name="ada_app_unmetered">Unmetered</string>
     <string name="ada_app_whitelist">Bypass Universal</string>
     <string name="ada_app_exclude">Exclude</string>
+    <string name="ada_app_lockdown">Lockdown</string>
 
     <string name="ada_app_dns_settings">DNS Settings</string>
 
@@ -1150,6 +1165,7 @@
     <string name="notif_download_content_title">On-Device Blocklist download</string>
     <string name="notif_download_content_text">Download in progress…</string>
     <string name="notif_download_failure_content">Download failed. Try again.</string>
+    <string name="notif_download_cancel_content">Download cancelled.</string>
     <string name="notif_download_success_content">Download successful.</string>
 
     <!-- rethink blocklist heading -->
@@ -1180,6 +1196,9 @@
     <string name="rt_list_simple_btn_txt">simple</string>
     <string name="rt_list_adv_btn_txt">advanced</string>
 
+    <string name="rt_filter_parent_all">All</string>
+    <string name="rt_filter_parent_selected">Selected</string>
+
     <string name="rt_cancel_btn">Cancel</string>
     <string name="rt_apply_btn">Apply</string>
 
@@ -1190,13 +1209,18 @@
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
 
+    <string name="rt_filter_hint">Showing <u>all</u> blocklists</string>
+    <string name="rt_filter_desc"><![CDATA[Showing <u>%1$s</u> blocklists]]></string>
+    <string name="rt_filter_desc_groups"><![CDATA[Showing <u>%1$s</u> blocklists in group: %2$s ]]></string>
+    <string name="rt_filter_desc_subgroups"><![CDATA[Showing <u>%1$s</u> blocklists in group: %2$s and subgroup: %3$s]]></string>
+
     <string name="rethink_sky_desc">280+ locations; higher uptime; stub resolver running on cloudflare.com</string>
     <string name="rethink_max_desc">50+ locations; more private; recursive resolver running on fly.io</string>
 
     <!-- rethink bottomsheet filter -->
 
     <string name="bsrf_group_heading">Group</string>
-    <string name="bsrf_sub_group_heading">Sub Group</string>
+    <string name="bsrf_sub_group_heading">Subgroup</string>
     <string name="bsrf_apply_filter">Apply</string>
     <string name="bsrf_clear_filter">Clear</string>
 

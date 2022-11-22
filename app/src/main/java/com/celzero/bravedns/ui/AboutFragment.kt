@@ -96,6 +96,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutTwitter.setOnClickListener(this)
         b.aboutGithub.setOnClickListener(this)
         b.aboutBlog.setOnClickListener(this)
+        b.aboutPrivacyPolicy.setOnClickListener(this)
         b.aboutMail.setOnClickListener(this)
         b.aboutTelegram.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
@@ -108,6 +109,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutCrashLog.setOnClickListener(this)
         b.aboutAppVersion.setOnClickListener(this)
         b.aboutAppContributors.setOnClickListener(this)
+        b.aboutAppTranslate.setOnClickListener(this)
 
         try {
             val version = getVersionName()
@@ -137,22 +139,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     override fun onClick(view: View?) {
         when (view) {
             b.aboutTelegram -> {
-                val intent = Intent(Intent.ACTION_VIEW,
-                                    getString(R.string.about_telegram_link).toUri())
-                startActivity(intent)
+                openActionViewIntent(getString(R.string.about_telegram_link).toUri())
             }
             b.aboutBlog -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_docs_link).toUri())
-                startActivity(intent)
+                openActionViewIntent(getString(R.string.about_docs_link).toUri())
             }
             b.aboutFaq -> {
-                val intent = Intent(Intent.ACTION_VIEW, getString(R.string.about_faq_link).toUri())
-                startActivity(intent)
+                openActionViewIntent(getString(R.string.about_faq_link).toUri())
             }
             b.aboutGithub -> {
-                val intent = Intent(Intent.ACTION_VIEW,
-                                    getString(R.string.about_github_link).toUri())
-                startActivity(intent)
+                openActionViewIntent(getString(R.string.about_github_link).toUri())
             }
             b.aboutCrashLog -> {
                 if (isAtleastR()) {
@@ -165,23 +161,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 sendEmailIntent(requireContext())
             }
             b.aboutTwitter -> {
-                val intent = Intent(Intent.ACTION_VIEW,
-                                    getString(R.string.about_twitter_handle).toUri())
-                startActivity(intent)
+                openActionViewIntent(getString(R.string.about_twitter_handle).toUri())
             }
             b.aboutWebsite -> {
-                val intent = Intent(Intent.ACTION_VIEW,
-                                    getString(R.string.about_website_link).toUri())
-                startActivity(intent)
+                openActionViewIntent(getString(R.string.about_website_link).toUri())
             }
             b.aboutSponsor -> {
-                val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-                startActivity(intent)
+                openActionViewIntent(RETHINKDNS_SPONSOR_LINK.toUri())
             }
             b.mozillaImg -> {
-                val intent = Intent(Intent.ACTION_VIEW,
-                                    getString(R.string.about_mozilla_alumni_link).toUri())
-                startActivity(intent)
+                openActionViewIntent(getString(R.string.about_mozilla_alumni_link).toUri())
             }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
@@ -202,6 +191,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutAppContributors -> {
                 showContributors()
             }
+            b.aboutAppTranslate -> {
+                openActionViewIntent(getString(R.string.about_translate_link).toUri())
+            }
+            b.aboutPrivacyPolicy -> {
+                openActionViewIntent(getString(R.string.about_privacy_policy_link).toUri())
+            }
         }
     }
 
@@ -219,6 +214,17 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         }
         builder.create().show()
 
+    }
+
+    private fun openActionViewIntent(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showToastUiCentered(requireContext(), getString(R.string.intent_launch_error, intent.data),
+                                Toast.LENGTH_SHORT)
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+        }
     }
 
     private fun openAppInfo() {
@@ -249,7 +255,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(requireContext(), getString(R.string.vpn_profile_error),
+            showToastUiCentered(requireContext(), getString(R.string.notification_screen_error),
                                 Toast.LENGTH_SHORT)
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
@@ -258,6 +264,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun showNewFeaturesDialog() {
         val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null,
                                                     false)
+        binding.desc.movementMethod = LinkMovementMethod.getInstance()
+        binding.desc.text = Utilities.updateHtmlEncodedText(getString(R.string.whats_new_version_update))
         AlertDialog.Builder(requireContext()).setView(binding.root).setTitle(
             getString(R.string.whats_dialog_title)).setPositiveButton(
             getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
@@ -319,7 +327,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         heading.setCompoundDrawablesWithIntrinsicBounds(
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_authors), null, null, null)
 
-        descText.movementMethod = LinkMovementMethod.getInstance();
+        descText.movementMethod = LinkMovementMethod.getInstance()
         descText.text = Utilities.updateHtmlEncodedText(getString(R.string.contributors_list))
 
         okBtn.setOnClickListener {

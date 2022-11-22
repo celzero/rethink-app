@@ -32,10 +32,12 @@ class WorkScheduler(val context: Context) {
         const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OnDemandCollectAppExitInfoJob"
         const val APP_EXIT_INFO_JOB_TAG = "ScheduledCollectAppExitInfoJob"
         const val REFRESH_APPS_JOB_TAG = "ScheduledRefreshAppsJob"
+        const val PURGE_CONNECTION_LOGS_JOB_TAG = "ScheduledPurgeConnectionLogsJob"
         const val BLOCKLIST_UPDATE_CHECK_JOB_TAG = "ScheduledBlocklistUpdateCheckJob"
 
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
         const val REFRESH_TIME_INTERVAL_HOURS: Long = 3
+        const val PURGE_LOGS_TIME_INTERVAL_DAYS: Long = 7
         const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 3
 
         fun isWorkRunning(context: Context, tag: String): Boolean {
@@ -119,6 +121,19 @@ class WorkScheduler(val context: Context) {
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(REFRESH_APPS_JOB_TAG,
                                                                    ExistingPeriodicWorkPolicy.KEEP,
                                                                    refreshAppsJob)
+    }
+
+    fun schedulePurgeConnectionsLog() {
+        if (isWorkScheduled(context, PURGE_CONNECTION_LOGS_JOB_TAG)) return
+
+        val purgeLogs = PeriodicWorkRequest.Builder(PurgeConnectionLogs::class.java,
+                                                    PURGE_LOGS_TIME_INTERVAL_DAYS,
+                                                    TimeUnit.DAYS).addTag(
+            PURGE_CONNECTION_LOGS_JOB_TAG).build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(PURGE_CONNECTION_LOGS_JOB_TAG,
+                                                                   ExistingPeriodicWorkPolicy.KEEP,
+                                                                   purgeLogs)
     }
 
     // Schedule AppExitInfo on demand

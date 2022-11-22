@@ -63,6 +63,7 @@
                         style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:elevation="10dp"
                         android:gravity="center_vertical"
@@ -93,10 +94,10 @@
                     style="@style/TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
+                    android:layout_marginStart="25dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginEnd="40dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginEnd="25dp"
+                    android:layout_marginBottom="30dp"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
                     android:drawableStart="@drawable/ic_heart"
@@ -347,6 +348,22 @@
                 android:text="@string/about_app_contributors"
                 android:textSize="@dimen/large_font_text_view" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_app_translate"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_translate"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_app_translate"
+                android:textSize="@dimen/large_font_text_view" />
+
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <LinearLayout
@@ -434,6 +451,22 @@
                 android:lineSpacingExtra="5dp"
                 android:padding="5dp"
                 android:text="@string/about_docs"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/about_privacy_policy"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_privacy_policy"
+                android:drawablePadding="20dp"
+                android:gravity="start|center_vertical"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/about_privacy_policy"
                 android:textSize="@dimen/large_font_text_view" />
 
         </LinearLayout>

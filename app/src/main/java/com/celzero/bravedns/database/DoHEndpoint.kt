@@ -66,8 +66,4 @@ class DoHEndpoint {
         return isCustom && !isSelected
     }
 
-    fun isRethinkDnsPlus(): Boolean {
-        return Constants.RETHINK_DNS_PLUS == this.dohName
-    }
-
 }

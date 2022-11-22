@@ -79,7 +79,7 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
 
         try {
             if (DEBUG) {
-                Tun2socks.enableDebugLog()
+                //Tun2socks.enableDebugLog()
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
@@ -97,8 +97,8 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
                                                   transport, tunnelOptions.blocker,
                                                   tunnelOptions.listener)
 
-            setBraveDnsBlocklistMode(tunnelOptions.tunDnsMode, dohURL)
             setTunnelMode(tunnelOptions)
+            setBraveDnsBlocklistMode(dohURL)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
             tunnel?.disconnect()
@@ -134,16 +134,19 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
     }
 
-    private fun setBraveDnsBlocklistMode(tunDnsMode: AppConfig.TunDnsMode, dohUrl: String) {
+    private fun setBraveDnsBlocklistMode(dohUrl: String) {
         if (DEBUG) Log.d(LOG_TAG_VPN, "init bravedns mode")
+        // remove braveDns object from the tunnel, set if either local or remote is set
         tunnel?.braveDNS = null
 
-        // No need to set the brave mode for DNS Proxy (implementation pending in underlying Go library).
-        // TODO: remove the check once the implementation completed in underlying Go library
         io {
             if (persistentState.blocklistEnabled) {
                 setBraveDNSLocalMode()
-            } else if (tunDnsMode.isRethinkRemote()) {
+            }
+            // earlier, remote blocklist was enabled based on the tunDnsMode in tunnelOptions.
+            // case: can configure the blocklist from website and it as a new DOH entry in ui
+            // which will also
+            else if (appConfig.isRethinkDnsConnected()) {
                 setBraveDNSRemoteMode(dohUrl)
             } else {
                 // no-op
@@ -228,10 +231,25 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         if (!tunnelOptions.tunDnsMode.isDnsProxy() || !tunnelOptions.tunDnsMode.isSystemDns()) return
 
         try {
-            val dnsProxy = getConnectedProxy()
+            val dnsProxy = getConnectedDnsProxy()
 
             if (dnsProxy == null) {
                 handleDnsProxyFailure()
+                return
+            }
+
+            // get the dns proxy associated with tunnel
+            val transport = tunnel?.dnsProxy
+
+            val tunDnsProxy = if (transport != null) {
+                HostName(transport.addr)
+            } else {
+                null
+            }
+
+            // no need to update if the proxy set in tunnel is same
+            if (isDnsProxyInfoSame(tunDnsProxy)) {
+                Log.d(LOG_TAG_VPN, "previous dns proxy info is same as current, no need to set")
                 return
             }
 
@@ -244,14 +262,20 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         }
     }
 
-    private suspend fun getConnectedProxy(): HostName? {
+    private fun isDnsProxyInfoSame(tunDnsProxy: HostName?): Boolean {
+        if (tunDnsProxy == null) return false
+
+        return tunDnsProxy.host == appConfig.getSystemDns().ipAddress && tunDnsProxy.port == appConfig.getSystemDns().port
+    }
+
+    private suspend fun getConnectedDnsProxy(): HostName? {
         if (appConfig.isSystemDns()) {
             val systemDns = appConfig.getSystemDns()
             return HostName(IPAddressString(systemDns.ipAddress).address, systemDns.port)
         }
 
         if (appConfig.isDnsProxyActive()) {
-            val dnsProxy: DnsProxyEndpoint = appConfig.getConnectedProxyDetails() ?: return null
+            val dnsProxy: DnsProxyEndpoint = appConfig.getConnectedDnsProxyDetails() ?: return null
 
             val proxyIp = IPAddressString(dnsProxy.proxyIP).address
             return HostName(proxyIp, dnsProxy.proxyPort)
@@ -350,11 +374,6 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         return (tunnel != null)
     }
 
-    fun getProxyTransport(): HostName? {
-        val transport = tunnel?.dnsProxy ?: return null
-        return HostName(transport.addr)
-    }
-
     fun close() {
         if (tunnel != null) {
             tunnel?.disconnect()
@@ -410,9 +429,9 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
             tunnel?.dns = dohTransport
             Log.i(LOG_TAG_VPN, "update tun with doh: $dohURL, opts: $tunnelOptions")
 
-            // Set brave dns to tunnel - Local/Remote
-            setBraveDnsBlocklistMode(tunnelOptions.tunDnsMode, dohURL)
             setTunnelMode(tunnelOptions)
+            // Set brave dns to tunnel - Local/Remote
+            setBraveDnsBlocklistMode(dohURL)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
             tunnel?.disconnect()
@@ -437,11 +456,18 @@ class GoVpnAdapter(private val context: Context, private val externalScope: Coro
         try {
             val stamp: String = persistentState.localBlocklistStamp
             Log.i(LOG_TAG_VPN, "local-bravedns stamp: $stamp")
+            // no need to set braveDNS to tunnel when stamp is empty
             if (stamp.isEmpty()) {
                 return
             }
 
-            tunnel?.braveDNS = makeLocalBraveDns()
+            val braveDNS = makeLocalBraveDns()
+            if (braveDNS == null) {
+                Log.e(LOG_TAG_VPN, "Issue creating local bravedns object")
+            } else {
+                if (DEBUG) Log.d(LOG_TAG_VPN, "BraveDns object is set")
+            }
+            tunnel?.braveDNS = braveDNS
             tunnel?.braveDNS?.stamp = stamp
         } catch (ex: Exception) {
             Log.e(LOG_TAG_VPN, "could not set local-bravedns: ${ex.message}", ex)

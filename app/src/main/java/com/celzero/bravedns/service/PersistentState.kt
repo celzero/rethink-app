@@ -121,9 +121,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user set preference whether firewall should block all connections when device is locked
     var blockWhenDeviceLocked by booleanPref("screen_state").withDefault<Boolean>(false)
 
-    var oldNumberRequests by intPref("number_request").withDefault<Int>(0)
-    var oldBlockedRequests by intPref("blocked_request").withDefault<Int>(0)
-
     // total dns requests the app has served since installation (or post clear data)
     var numberOfRequests by longPref("dns_number_request").withDefault<Long>(0)
 
@@ -156,9 +153,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // user selected proxy provider, as of now two providers (custom, orbot)
     var proxyProvider by stringPref("proxy_proxyprovider").withDefault<String>(
         AppConfig.ProxyProvider.NONE.name)
-
-    // total dnscrypt server currently connected to
-    private var _dnsCryptRelayCount by intPref("dnscrypt_relay").withDefault<Int>(0)
 
     // the last collected app exit info's timestamp
     var lastAppExitInfoTimestamp by longPref("prev_trace_timestamp").withDefault<Long>(INIT_TIME_MS)
@@ -220,6 +214,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // universal firewall settings to lockdown all apps
     var universalLockdown by booleanPref("universal_lockdown").withDefault<Boolean>(false)
 
+    // notification permission request (Android 13 ana above)
+    var shouldRequestNotificationPermission by booleanPref(
+        "notification_permission_request").withDefault<Boolean>(true)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
@@ -230,14 +228,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     fun setMedianLatency(median: Long) {
         this.median.postValue(median)
-    }
-
-    fun setDnsCryptRelayCount(count: Int) {
-        _dnsCryptRelayCount = count
-    }
-
-    fun getDnsCryptRelayCount(): Int {
-        return _dnsCryptRelayCount
     }
 
     fun setVpnEnabled(isOn: Boolean) {

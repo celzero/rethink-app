@@ -96,17 +96,11 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
             Log.i(LOG_TAG_DNS,
                   "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}")
             if (endpoint.isSelected) {
-                val count = appConfig.getRemoteBlocklistCount()
-                b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDnsPlus() && count > 0) {
-                    context.getString(R.string.dns_connected_rethink_plus, count.toString())
-                } else {
-                    context.getString(R.string.dns_connected)
-                }
+                b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
             }
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
-
         }
 
         private fun showIcon(endpoint: DoHEndpoint) {
@@ -122,7 +116,6 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
         private fun updateConnection(endpoint: DoHEndpoint) {
             if (DEBUG) Log.d(LOG_TAG_DNS,
                              "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
-
             io {
                 endpoint.isSelected = true
                 appConfig.handleDoHChanges(endpoint)

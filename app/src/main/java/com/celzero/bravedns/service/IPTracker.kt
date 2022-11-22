@@ -86,8 +86,8 @@ class IPTracker internal constructor(
     }
 
     private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {
-        val inetAddress = HostName(ip)?.toInetAddress()
-        val ipAddress = IPAddressString(ip)?.address ?: return inetAddress
+        val inetAddress = HostName(ip).toInetAddress()
+        val ipAddress = IPAddressString(ip).address ?: return inetAddress
 
         // no need to check if IP is not of type IPv6
         if (!IpManager.isIpV6(ipAddress)) return inetAddress

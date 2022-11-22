@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -41,7 +42,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.AppUpdater
@@ -49,22 +49,19 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
-import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.snackbar.Snackbar
@@ -80,8 +77,6 @@ import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
-
-    private val refreshDatabase by inject<RefreshDatabase>()
 
     private lateinit var settingsFragment: SettingsFragment
     private lateinit var homeScreenFragment: HomeScreenFragment
@@ -126,8 +121,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         // handle intent receiver for backup/restore
         handleIntent()
-
-        refreshDatabase.deleteOlderDataFromNetworkLogs()
 
         initUpdateCheck()
 
@@ -260,12 +253,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val removeLocal = "local_blocklist_update_check"
         val removeRemote = "remote_blocklist_update_check"
         val killApp = "kill_app_on_firewall"
+        val dnsCryptRelay = "dnscrypt_relay"
 
         val sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val editor = sharedPref.edit()
         editor.remove(removeLocal)
         editor.remove(removeRemote)
         editor.remove(killApp)
+        editor.remove(dnsCryptRelay)
         editor.apply()
     }
 
@@ -305,8 +300,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     // move the files of local blocklist to specific folder (../files/local_blocklist/<timestamp>)
     private fun changeDefaultLocalBlocklistLocation() {
-        val baseDir = localBlocklistDownloadBasePath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                     persistentState.localBlocklistTimestamp)
+        val baseDir = blocklistDownloadBasePath(this, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                persistentState.localBlocklistTimestamp)
         File(baseDir).mkdirs()
         Constants.ONDEVICE_BLOCKLISTS.forEach {
             val currentFile = File(oldLocalBlocklistDownloadDir(this,
@@ -506,13 +501,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
 
     private fun initiateDownload() {
-        val url = Constants.RETHINK_APP_DOWNLOAD_LINK
-        val uri = Uri.parse(url)
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = uri
-        intent.addCategory(Intent.CATEGORY_BROWSABLE)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        try {
+            val url = Constants.RETHINK_APP_DOWNLOAD_LINK
+            val uri = Uri.parse(url)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = uri
+            intent.addCategory(Intent.CATEGORY_BROWSABLE)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
+            Log.w(LoggerConstants.LOG_TAG_VPN,
+                  "Failure opening rethink download link: ${e.message}", e)
+        }
     }
 
     override fun onStop() {
@@ -562,11 +563,4 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
         }
     }
-
-    private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            f()
-        }
-    }
-
 }

@@ -124,7 +124,7 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
                 val tag: Long = recyclerView.getChildAt(0).tag as Long
 
                 if (dy > 0) {
-                    b.connectionListScrollHeader.text = Utilities.formatToRelativeTime(tag)
+                    b.connectionListScrollHeader.text = Utilities.formatToRelativeTime(requireContext(), tag)
                     b.connectionListScrollHeader.visibility = View.VISIBLE
                 } else {
                     b.connectionListScrollHeader.visibility = View.GONE

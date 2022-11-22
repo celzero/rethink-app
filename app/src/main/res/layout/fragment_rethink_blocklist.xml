@@ -53,7 +53,8 @@
             android:layout_height="match_parent"
             android:layout_above="@id/lb_apply_container"
             android:layout_below="@id/lb_list_toggle_group"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="visible">
 
             <ProgressBar
                 android:id="@+id/lb_simple_progress"
@@ -87,34 +88,66 @@
                 app:cardCornerRadius="16dp">
 
                 <LinearLayout
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="start"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
+                    android:orientation="vertical">
 
-                    <androidx.appcompat.widget.SearchView
-                        android:id="@+id/lb_adv_search_sv"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_weight="0.90"
-                        android:focusable="false"
-                        android:fontFamily="sans-serif"
-                        android:isScrollContainer="true"
-                        app:iconifiedByDefault="false"
-                        app:queryHint="@string/search_rethinkplus_file_tag" />
+                        android:gravity="start"
+                        android:orientation="horizontal"
+                        android:weightSum="1">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/lb_adv_search_filter_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.1"
-                        android:padding="5dp"
-                        android:src="@drawable/ic_filter" />
+                        <androidx.appcompat.widget.SearchView
+                            android:id="@+id/lb_adv_search_sv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_weight="0.90"
+                            android:focusable="false"
+                            android:fontFamily="sans-serif"
+                            android:isScrollContainer="true"
+                            app:iconifiedByDefault="false"
+                            app:queryHint="@string/search_rethinkplus_file_tag" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/lb_adv_search_filter_icon"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.1"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_filter" />
+                    </LinearLayout>
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/filter_chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="2dp"
+                        android:visibility="visible"
+                        app:selectionRequired="true"
+                        app:singleSelection="true" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/lb_advanced_filter_label_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:fontFamily="sans-serif"
+                android:padding="5dp"
+                android:text="@string/rt_filter_hint"
+                android:textAlignment="textStart"
+                android:textSize="@dimen/default_font_text_view" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lb_advanced_recycler"
@@ -169,7 +202,10 @@
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:layout_gravity="bottom|center"
-            android:layout_margin="50dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="20dp"
             android:src="@drawable/illustrations_download" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -209,8 +245,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toEndOf="@id/lb_download_progress"
-                android:maxHeight="40dp"
-                android:minHeight="40dp"
+                android:padding="10dp"
                 android:text="@string/rt_download"
                 android:textColor="?attr/chipTextColor" />
         </RelativeLayout>

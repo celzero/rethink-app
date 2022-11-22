@@ -19,7 +19,6 @@ package com.celzero.bravedns.util
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
@@ -89,11 +88,6 @@ import java.util.Calendar.DAY_OF_YEAR
 class Utilities {
 
     companion object {
-
-        fun getPermissionDetails(context: Context, packageName: String): PackageInfo {
-            return context.packageManager.getPackageInfo(packageName,
-                                                         PackageManager.GET_PERMISSIONS)
-        }
 
         // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
         fun getETldPlus1(fqdn: String): String? {
@@ -209,10 +203,14 @@ class Utilities {
             return String(Character.toChars(firstHalf)) + String(Character.toChars(secondHalf))
         }
 
-        fun makeAddressPair(countryCode: String?, ipAddress: String): String {
-            return if (countryCode == null) {
+        fun makeAddressPair(countryCode: String?, ipAddress: String?): String {
+            return if (ipAddress == null) {
+                ""
+            } else if (countryCode == null) {
                 ipAddress
-            } else String.format("%s (%s)", countryCode, ipAddress)
+            } else {
+                String.format("%s (%s)", countryCode, ipAddress)
+            }
         }
 
         fun convertLongToTime(time: Long, template: String): String {
@@ -226,12 +224,12 @@ class Utilities {
             return convertLongToTime(now, TIME_FORMAT_1)
         }
 
-        fun formatToRelativeTime(timestamp: Long): String {
+        fun formatToRelativeTime(context: Context, timestamp: Long): String {
             val now = System.currentTimeMillis()
             return if (DateUtils.isToday(timestamp)) {
-                "Today"
+                context.getString(R.string.relative_time_today)
             } else if (isYesterday(Date(timestamp))) {
-                "Yesterday"
+                context.getString(R.string.relative_time_yesterday)
             } else {
                 val d = DateUtils.getRelativeTimeSpanString(timestamp, now,
                                                             DateUtils.MINUTE_IN_MILLIS,
@@ -431,10 +429,6 @@ class Utilities {
             return !isNonApp(packageName) && Constants.UNKNOWN_APP != appName
         }
 
-        fun isValidAppName(appName: String?): Boolean {
-            return (!appName.isNullOrEmpty() && appName != Constants.UNKNOWN_APP)
-        }
-
         fun getDefaultIcon(context: Context): Drawable? {
             return AppCompatResources.getDrawable(context, R.drawable.default_app_icon)
         }
@@ -469,6 +463,10 @@ class Utilities {
             return null
         }
 
+        fun isAtleastN(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+        }
+
         fun isAtleastO(): Boolean {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         }
@@ -483,6 +481,10 @@ class Utilities {
 
         fun isAtleastS(): Boolean {
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        }
+
+        fun isAtleastT(): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
         }
 
         fun isFdroidFlavour(): Boolean {
@@ -536,9 +538,9 @@ class Utilities {
             }
         }
 
-        fun localBlocklistDownloadPath(ctx: Context, which: String, timestamp: Long): String {
-            return localBlocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                  timestamp) + File.separator + which
+        fun localBlocklistFileDownloadPath(ctx: Context, which: String, timestamp: Long): String {
+            return blocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                             timestamp) + File.separator + which
         }
 
         fun oldLocalBlocklistDownloadDir(ctx: Context, timestamp: Long): String {
@@ -552,22 +554,26 @@ class Utilities {
             return a
         }
 
-        fun localBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
+        fun tempDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
+            // instead of creating folder for actual timestamp, create for its negative value
+            return blocklistCanonicalPath(ctx, which) + File.separator + (-1 * timestamp)
         }
 
-        fun localBlocklistCanonicalPath(ctx: Context, which: String): String {
+        fun blocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
+            return blocklistCanonicalPath(ctx, which) + File.separator + timestamp
+        }
+
+        fun blocklistCanonicalPath(ctx: Context, which: String): String {
             return ctx.filesDir.canonicalPath + File.separator + which
         }
 
-        fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
+        private fun localBlocklistFile(ctx: Context, which: String, timestamp: Long): File? {
             return try {
-                val localBlocklist = localBlocklistDownloadPath(ctx, which,
-                                                                timestamp) ?: return null
+                val localBlocklist = localBlocklistFileDownloadPath(ctx, which, timestamp)
 
                 return File(localBlocklist)
             } catch (e: IOException) {
-                Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
+                Log.e(LOG_TAG_VPN, "Could not fetch local blocklist: " + e.message, e)
                 null
             }
         }
@@ -588,15 +594,11 @@ class Utilities {
             if (ctx == null) return null
 
             return try {
-                File(remoteBlocklistDownloadBasePath(ctx, which, timestamp))
+                File(blocklistDownloadBasePath(ctx, which, timestamp))
             } catch (e: IOException) {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
-        }
-
-        fun remoteBlocklistDownloadBasePath(ctx: Context, which: String, timestamp: Long): String {
-            return ctx.filesDir.canonicalPath + File.separator + which + File.separator + timestamp
         }
 
         fun blocklistFile(dirPath: String, fileName: String): File? {
@@ -748,6 +750,10 @@ class Utilities {
                 Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork = connectivityManager.activeNetwork ?: return null
             return connectivityManager.getLinkProperties(activeNetwork)
+        }
+
+        fun removeBeginningTrailingCommas(value: String): String {
+            return value.removePrefix(",").dropLastWhile { it == ',' }
         }
     }
 }

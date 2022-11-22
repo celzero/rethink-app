@@ -157,8 +157,8 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                 GlideApp.with(context.applicationContext).load(url).onlyRetrieveFromCache(
-                    true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(SIZE_ORIGINAL,
-                                                                                  SIZE_ORIGINAL).error(
+                    true).diskCacheStrategy(DiskCacheStrategy.DATA).override(SIZE_ORIGINAL,
+                                                                             SIZE_ORIGINAL).error(
                     GlideApp.with(context.applicationContext).load(
                         subDomainURL).onlyRetrieveFromCache(true)).transition(
                     withCrossFade(factory)).into(object : CustomViewTarget<ImageView, Drawable>(

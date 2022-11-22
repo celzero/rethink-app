@@ -1,70 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/acd_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:animateLayoutChanges="true"
-    android:orientation="horizontal">
+    android:minHeight="50dp"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/acd_flag"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
-        android:ellipsize="none"
-        android:gravity="center"
-        android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textSize="26sp" />
-
-    <LinearLayout
-        android:id="@+id/acd_top_layout_ll"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@id/acd_status_button"
-        android:layout_toEndOf="@id/acd_flag"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:animateLayoutChanges="true">
+
+        <TextView
+            android:id="@+id/acd_flag"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="none"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="26sp" />
 
         <TextView
             android:id="@+id/acd_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/acd_flag"
             android:background="@drawable/drawable_purple_gradient"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
-            android:padding="10dp"
+            android:layout_marginStart="5dp"
+            android:maxWidth="40dp"
+            android:minWidth="40dp"
+            android:padding="5dp"
             android:singleLine="true"
             android:textAppearance="@android:style/TextAppearance.Material.Subhead"
             android:textSize="@dimen/default_font_text_view"
             android:textStyle="bold" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/acd_top_layout_ll"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.8"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/acd_status_button"
+            android:layout_toEndOf="@id/acd_count"
+            android:baselineAligned="false"
+            android:gravity="center"
             android:orientation="vertical"
-            android:weightSum="1">
+            android:padding="5dp">
 
             <TextView
                 android:id="@+id/acd_ip_address"
+                style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:ellipsize="start"
-                android:fontFamily="sans-serif-light"
-                android:layout_gravity="center_vertical"
-                android:gravity="center_vertical"
-                android:padding="5dp"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:padding="2dp"
                 android:textAppearance="@android:style/TextAppearance.Material.Body1"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
@@ -74,34 +75,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                android:padding="5dp"
+                android:padding="2dp"
                 android:textSize="@dimen/default_font_text_view" />
+
 
         </LinearLayout>
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/acd_status_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:alpha="0.5"
+            android:padding="5dp"
+            android:src="@drawable/ic_arrow_down_small" />
 
-    </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/acd_status_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
-        android:alpha="0.5"
-        android:padding="5dp"
-        android:src="@drawable/ic_arrow_down_small" />
+    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
-        android:layout_below="@id/acd_top_layout_ll"
-        android:layout_height="0.5dp"
+        android:layout_height="0.75dp"
+        android:layout_marginTop="3dp"
         android:background="?attr/divider" />
-</RelativeLayout>
+</LinearLayout>

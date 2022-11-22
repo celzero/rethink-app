@@ -459,7 +459,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
 
     private fun openFilterBottomSheet() {
         val bottomSheetFragment = FirewallAppFilterBottomSheet()
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun addAnimation() {

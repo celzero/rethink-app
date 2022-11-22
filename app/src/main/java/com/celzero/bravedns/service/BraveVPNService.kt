@@ -63,6 +63,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIB
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isMissingOrInvalidUid
@@ -321,7 +322,9 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
                     // case: if the global lockdown is enabled, don't allow the bypassed ips
-                    // unless the app is set to bypass universal
+                    // unless the app is set to bypass universal or lockdown
+                    // honor app rules over universal rules: here app is in lockdown state and the
+                    // ips should be allowed.
                     if (canAllowConnection(appStatus)) {
                         return FirewallRuleset.RULE2B
                     }
@@ -411,7 +414,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     }
 
     private fun canAllowConnection(appStatus: FirewallManager.FirewallStatus): Boolean {
-        return !(universalLockdown() && appStatus.bypassUniversal())
+        return !(universalLockdown() && (appStatus.bypassUniversal() || appStatus.lockdown()))
     }
 
     private fun universalLockdown(): Boolean {
@@ -510,6 +513,10 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         val isUdp = protocol == Protocol.UDP.protocolType
         if (!isUdp) return false
 
+        // fall through dns requests, other rules might catch appropriate
+        // https://github.com/celzero/rethink-app/issues/492#issuecomment-1299090538
+        if (isDns(port)) return false
+
         val isNtpFromSystemApp = KnownPorts.isNtp(port) && FirewallManager.isUidSystemApp(uid)
         if (isNtpFromSystemApp) return false
 
@@ -533,7 +540,6 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
                 ip == fakeDnsIpv4
             }
         }
-
     }
 
     private fun isDns(port: Int): Boolean {
@@ -861,7 +867,7 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
 
             if (appConfig.isDnsProxyActive()) {
                 // For DNS proxy mode, if any app is set then exclude the application from the list
-                val dnsProxyEndpoint = appConfig.getConnectedProxyDetails()
+                val dnsProxyEndpoint = appConfig.getConnectedDnsProxyDetails()
                 val appName = dnsProxyEndpoint?.proxyAppName ?: getString(
                     R.string.settings_app_list_default_app)
                 Log.i(LOG_TAG_VPN, "DNS Proxy mode is set with the app name as $appName")
@@ -1141,11 +1147,17 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
     }
 
     private fun unobserveAppInfos() {
-        FirewallManager.getApplistObserver().removeObserver(appInfoObserver)
+        // fix for issue #648 (UninitializedPropertyAccessException)
+        if (this::appInfoObserver.isInitialized) {
+            FirewallManager.getApplistObserver().removeObserver(appInfoObserver)
+        }
     }
 
     private fun unobserveOrbotStartStatus() {
-        persistentState.orbotConnectionStatus.removeObserver(orbotStartStatusObserver)
+        // fix for issue #648 (UninitializedPropertyAccessException)
+        if (this::orbotStartStatusObserver.isInitialized) {
+            persistentState.orbotConnectionStatus.removeObserver(orbotStartStatusObserver)
+        }
     }
 
     private fun registerAccessibilityServiceState() {
@@ -1316,24 +1328,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
             val opts = appConfig.newTunnelOptions(this, this, getFakeDns(),
                                                   appConfig.getInternetProtocol(),
                                                   appConfig.getProtocolTranslationMode())
-            val previousTunnelProxyInfo = vpnAdapter?.getProxyTransport()
-            if (previousTunnelProxyInfo == null) {
-                updateTun(opts)
-            } else {
-                // no need to update if the proxy set in tunnel is same
-                if (isProxyInfoSame(previousTunnelProxyInfo)) return@io
-
-                updateTun(opts)
-            }
+            updateTun(opts)
         }
     }
 
-    private fun isProxyInfoSame(prev: HostName): Boolean {
-        return prev.host == appConfig.getSystemDns().ipAddress && prev.port == appConfig.getSystemDns().port
-    }
-
     private suspend fun updateDnsProxy(opts: AppConfig.TunnelOptions) {
-        val dnsProxyEndpoint = appConfig.getConnectedProxyDetails()
+        val dnsProxyEndpoint = appConfig.getConnectedDnsProxyDetails()
         if (dnsProxyEndpoint?.isInternal(this) == true) {
             restartVpn(opts)
         } else {
@@ -1558,7 +1558,12 @@ class BraveVPNService : VpnService(), ConnectionMonitor.NetworkListener, Blocker
         vpnScope.cancel("VpnService onDestroy")
 
         Log.w(LOG_TAG_VPN, "Destroying VPN service")
-        stopForeground(true)
+
+        if (isAtleastN()) {
+            stopForeground(STOP_FOREGROUND_DETACH)
+        } else {
+            stopForeground(true)
+        }
     }
 
     private fun startPauseTimer() {

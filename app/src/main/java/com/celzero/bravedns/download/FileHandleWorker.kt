@@ -17,6 +17,7 @@ package com.celzero.bravedns.download
 
 import android.content.Context
 import android.util.Log
+import androidx.work.CoroutineWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -30,7 +31,7 @@ import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FO
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
-import com.celzero.bravedns.util.Utilities.Companion.localBlocklistDownloadPath
+import com.celzero.bravedns.util.Utilities.Companion.localBlocklistFileDownloadPath
 import dnsx.Dnsx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,11 +51,11 @@ import java.io.File
  */
 
 class FileHandleWorker(val context: Context, workerParameters: WorkerParameters) :
-        Worker(context, workerParameters), KoinComponent {
+        CoroutineWorker(context, workerParameters), KoinComponent {
 
     val persistentState by inject<PersistentState>()
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         try {
             val timestamp = inputData.getLong("blocklistDownloadInitiatedTime", Long.MIN_VALUE)
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "blocklistDownloadInitiatedTime - $timestamp")
@@ -81,9 +82,9 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return Result.failure()
     }
 
-    private fun copyFiles(context: Context, timestamp: Long): Boolean {
+    private suspend fun copyFiles(context: Context, timestamp: Long): Boolean {
         try {
-            if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp.toString())) {
+            if (!BlocklistDownloadHelper.isDownloadComplete(context, timestamp)) {
                 return false
             }
 
@@ -108,8 +109,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
             // during the next download downloadLocalBlocklist
             for (i in children.indices) {
                 val from = dir.absolutePath + File.separator + children[i]
-                val to = localBlocklistDownloadPath(context, children[i], timestamp)
-                if (to == null) {
+                val to = localBlocklistFileDownloadPath(context, children[i], timestamp)
+                if (to.isEmpty()) {
                     Log.w(LOG_TAG_DOWNLOAD, "Copy failed from $from, to: $to")
                     return false
                 }
@@ -130,6 +131,8 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                 return false
             }
 
+            val result = updateTagsToDb(timestamp)
+
             updatePersistenceOnCopySuccess(timestamp)
             deleteOldFiles(context, timestamp, AppDownloadManager.DownloadType.LOCAL)
             return true
@@ -140,15 +143,16 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
         return false
     }
 
+    private suspend fun updateTagsToDb(timestamp: Long): Boolean {
+        return RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
+                                                         timestamp)
+    }
+
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
         ui {
             persistentState.localBlocklistTimestamp = timestamp
             persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
             persistentState.blocklistEnabled = true
-            io {
-                RethinkBlocklistManager.readJson(context, AppDownloadManager.DownloadType.LOCAL,
-                                                 timestamp)
-            }
         }
     }
 
@@ -162,9 +166,9 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
      */
     private fun isDownloadValid(timestamp: Long): Boolean {
         try {
-            val path: String = Utilities.localBlocklistDownloadBasePath(context,
-                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                        timestamp)
+            val path: String = Utilities.blocklistDownloadBasePath(context,
+                                                                   LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                                   timestamp)
             val braveDNS = Dnsx.newBraveDNSLocal(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
                                                  path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,

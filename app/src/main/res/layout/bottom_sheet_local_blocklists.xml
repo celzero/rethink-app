@@ -75,7 +75,9 @@
         android:id="@+id/lbbs_configure"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
         android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
@@ -101,7 +103,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lbbs_configure">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
@@ -211,12 +216,12 @@
 
     </LinearLayout>
 
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/lbbs_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
@@ -251,7 +256,7 @@
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="@string/lbbs_heading"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"

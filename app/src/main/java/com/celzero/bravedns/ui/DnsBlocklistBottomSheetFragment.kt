@@ -452,8 +452,8 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                              "Glide - TransactionViewHolder updateImage() -$url, $subDomainUrl")
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             GlideApp.with(requireContext().applicationContext).load(url).onlyRetrieveFromCache(
-                true).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).override(Target.SIZE_ORIGINAL,
-                                                                              Target.SIZE_ORIGINAL).error(
+                true).diskCacheStrategy(DiskCacheStrategy.DATA).override(Target.SIZE_ORIGINAL,
+                                                                         Target.SIZE_ORIGINAL).error(
                 GlideApp.with(requireContext().applicationContext).load(
                     subDomainUrl).onlyRetrieveFromCache(true)).transition(
                 DrawableTransitionOptions.withCrossFade(factory)).into(object :

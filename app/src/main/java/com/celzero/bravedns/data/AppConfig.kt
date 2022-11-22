@@ -20,7 +20,6 @@ import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
@@ -34,7 +33,6 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
-import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
@@ -43,8 +41,6 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import protect.Blocker
 import settings.Settings
 import java.net.InetAddress
@@ -80,10 +76,9 @@ class AppConfig internal constructor(private val context: Context,
         if (!persistentState.blocklistEnabled) return
 
         try {
-            // FIXME: canonical path may go missing but is unhandled
-            val path: String = Utilities.localBlocklistDownloadBasePath(context,
-                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                        persistentState.localBlocklistTimestamp)
+            val path: String = Utilities.blocklistDownloadBasePath(context,
+                                                                   LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                                   persistentState.localBlocklistTimestamp)
             braveDns = Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
                                              path + ONDEVICE_BLOCKLIST_FILE_RD,
                                              path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
@@ -93,8 +88,7 @@ class AppConfig internal constructor(private val context: Context,
             // if there is a failure creating bravedns
             persistentState.blocklistEnabled = false
             Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
-            // Set local blocklist enabled to false and reset the timestamp
-            // or corrupted. Reset local blocklist timestamp to make sure
+            // Set local blocklist enabled to false and reset the timestamp to make sure
             // user is prompted to download blocklists again on the next try
             persistentState.localBlocklistTimestamp = INIT_TIME_MS
         }
@@ -106,6 +100,10 @@ class AppConfig internal constructor(private val context: Context,
         }
 
         return braveDns
+    }
+
+    fun recreateBraveDnsObj() {
+        createBraveDnsObjectIfNeeded()
     }
 
     data class TunnelOptions(val tunDnsMode: TunDnsMode, val tunFirewallMode: TunFirewallMode,
@@ -192,10 +190,6 @@ class AppConfig internal constructor(private val context: Context,
 
         fun isDnsProxy(): Boolean {
             return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
-        }
-
-        fun isRethinkRemote(): Boolean {
-            return mode == DOH_IP.mode || mode == DOH_PORT.mode
         }
 
         fun isSystemDns(): Boolean {
@@ -446,11 +440,9 @@ class AppConfig internal constructor(private val context: Context,
             }
             DnsType.DNSCRYPT -> {
                 val count = getDNSCryptServerCount()
-                val relayCount = dnsCryptRelayEndpointRepository.getConnectedRelays()
                 val text = context.getString(R.string.configure_dns_crypt, count.toString())
                 connectedDns.postValue(text)
                 persistentState.connectedDnsName = text
-                persistentState.setDnsCryptRelayCount(relayCount.count())
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
@@ -534,7 +526,7 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     // -- DNS Manager --
-    suspend fun getConnectedProxyDetails(): DnsProxyEndpoint? {
+    suspend fun getConnectedDnsProxyDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
@@ -738,7 +730,7 @@ class AppConfig internal constructor(private val context: Context,
             dnsIp = dnsServers[0].hostAddress
         }
 
-        dnsIp?.let { setSystemDns(it, KnownPorts.DNS_PORT) }
+        dnsIp?.let { setSystemDns(it, DNS_PORT) }
     }
 
     fun getSystemDns(): SystemDns {
@@ -1004,9 +996,5 @@ class AppConfig internal constructor(private val context: Context,
         proxyEndpointRepository.insert(proxyEndpoint)
     }
 
-    val connectedProxy: LiveData<ProxyEndpoint> = liveData {
-        withContext(Dispatchers.IO) {
-            proxyEndpointRepository.getConnectedProxy()?.let { emit(it) }
-        }
-    }
+    val connectedProxy: LiveData<ProxyEndpoint?> = proxyEndpointRepository.getConnectedProxyLiveData()
 }

@@ -221,9 +221,9 @@ object IpRulesManager : KoinComponent {
         }
 
         if (appIpRules.contains(ip)) {
-            val customIp = appIpRules[ip] ?: return IpRuleStatus.NONE
+            val customIp = appIpRules[ip]
 
-            if (customIp.uid == uid) {
+            if (customIp?.uid == uid) {
                 val status = IpRuleStatus.getStatus(customIp.status)
                 ipRulesLookupCache.put(ip, IpCache(customIp.uid, status))
                 return status

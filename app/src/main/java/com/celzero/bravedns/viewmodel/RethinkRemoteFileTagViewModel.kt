@@ -41,24 +41,25 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
     val remoteFileTags = Transformations.switchMap(list, ({ input: String ->
         if (blocklistFilter != null) {
             val query = blocklistFilter?.query ?: "%%"
+            val selected = getSelectedFilter()
             val groups = blocklistFilter?.groups ?: mutableSetOf()
             val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
             if (groups.isNotEmpty() && subg.isNotEmpty()) {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTags(query, groups, subg)
+                    rethinkRemoteDao.getRemoteFileTags(query, selected, groups, subg)
                 }.liveData.cachedIn(viewModelScope)
             } else if (groups.isNotEmpty()) {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTagsGroup(query, groups)
+                    rethinkRemoteDao.getRemoteFileTagsGroup(query, selected, groups)
                 }.liveData.cachedIn(viewModelScope)
             } else if (subg.isNotEmpty()) {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTagsSubg(query, subg)
+                    rethinkRemoteDao.getRemoteFileTagsSubg(query, selected, subg)
                 }.liveData.cachedIn(viewModelScope)
             } else {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTagsWithFilter(query)
+                    rethinkRemoteDao.getRemoteFileTagsWithFilter(query, selected)
                 }.liveData.cachedIn(viewModelScope)
             }
         } else if (input.isBlank()) {
@@ -67,10 +68,17 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
             }.liveData.cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                rethinkRemoteDao.getRemoteFileTagsWithFilter("%$input%")
+                rethinkRemoteDao.getRemoteFileTagsWithFilter("%$input%", getSelectedFilter())
             }.liveData.cachedIn(viewModelScope)
         }
     }))
+
+    private fun getSelectedFilter(): MutableSet<Int> {
+        if (blocklistFilter?.filterSelected == RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED) {
+            return mutableSetOf(1)
+        }
+        return mutableSetOf(0, 1)
+    }
 
     suspend fun allFileTags(): List<FileTag> {
         return rethinkRemoteDao.getAllTags()

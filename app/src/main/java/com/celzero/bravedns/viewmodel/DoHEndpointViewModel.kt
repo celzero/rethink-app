@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -24,31 +22,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.DoHEndpointDAO
-import com.celzero.bravedns.util.Constants.Companion.FILTER_IS_SYSTEM
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DoHEndpointViewModel(private val doHEndpointDAO: DoHEndpointDAO) : ViewModel() {
-
-    private var filteredList: MutableLiveData<String> = MutableLiveData()
-
-    init {
-        filteredList.value = ""
-    }
-
-    val dohEndpointList = Transformations.switchMap(filteredList, ({ input: String ->
-        if (input.isBlank()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                doHEndpointDAO.getDoHEndpointLiveData()
-            }.liveData.cachedIn(viewModelScope)
-        } else if (input == FILTER_IS_SYSTEM) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                doHEndpointDAO.getDoHEndpointLiveData()
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                doHEndpointDAO.getDoHEndpointLiveDataByName("%$input%")
-            }.liveData.cachedIn(viewModelScope)
-        }
-    }))
+    val dohEndpointList = Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+        doHEndpointDAO.getDoHEndpointLiveData()
+    }.liveData.cachedIn(viewModelScope)
 
 }

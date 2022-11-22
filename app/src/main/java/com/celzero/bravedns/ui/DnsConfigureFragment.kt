@@ -24,7 +24,6 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -113,7 +112,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun initObservers() {
         observeBraveMode()
-        observeWorkManager()
         observeDnscryptStatus()
         observeAppState()
     }
@@ -217,21 +215,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
         }
     }
 
-    private fun observeWorkManager() {
-        val workManager = WorkManager.getInstance(requireContext().applicationContext)
-
-        // handle the check for blocklist switch based on the work manager's status
-        workManager.getWorkInfosByTagLiveData(BLOCKLIST_UPDATE_CHECK_JOB_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
-                  "WorkManager state: ${workInfo.state} for $BLOCKLIST_UPDATE_CHECK_JOB_TAG")
-            // disable the switch only when the work is in a CANCELLED state.
-            // enable the switch for all the other states (ENQUEUED, RUNNING, SUCCEEDED, FAILED, BLOCKED)
-            b.dcCheckUpdateSwitch.isChecked = WorkInfo.State.CANCELLED != workInfo.state
-        }
-    }
-
     private fun observeBraveMode() {
         appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
             if (it == null) return@observe
@@ -282,8 +265,8 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
         }
 
         b.dcCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+            persistentState.periodicallyCheckBlocklistUpdate = enabled
             if (enabled) {
-                persistentState.periodicallyCheckBlocklistUpdate = true
                 get<WorkScheduler>().scheduleBlocklistUpdateCheckJob()
             } else {
                 Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
@@ -339,7 +322,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     private fun openLocalBlocklist() {
         val bottomSheetFragment = LocalBlocklistsBottomSheet()
         bottomSheetFragment.setDismissListener(this)
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun invokeRethinkActivity(type: ConfigureRethinkBasicActivity.FragmentLoader) {
