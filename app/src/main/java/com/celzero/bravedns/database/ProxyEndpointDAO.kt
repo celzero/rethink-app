@@ -21,18 +21,14 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
-
 @Dao
 interface ProxyEndpointDAO {
 
-    @Update
-    fun update(proxyEndpoint: ProxyEndpoint)
+    @Update fun update(proxyEndpoint: ProxyEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(proxyEndpoint: ProxyEndpoint)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(proxyEndpoint: ProxyEndpoint)
 
-    @Delete
-    fun delete(proxyEndpoint: ProxyEndpoint)
+    @Delete fun delete(proxyEndpoint: ProxyEndpoint)
 
     @Query("select * from ProxyEndpoint where proxyMode = 1 order by isSelected desc")
     fun getDNSProxyEndpointLiveData(): PagingSource<Int, ProxyEndpoint>
@@ -43,21 +39,19 @@ interface ProxyEndpointDAO {
     @Query("delete from ProxyEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)
 
-    @Query("delete from ProxyEndpoint")
-    fun clearAllData()
+    @Query("delete from ProxyEndpoint") fun clearAllData()
 
-    @Query("delete from ProxyEndpoint where proxyName = 'ORBOT'")
-    fun clearOrbotData()
+    @Query("delete from ProxyEndpoint where proxyName = 'ORBOT'") fun clearOrbotData()
 
     @Query(
-        "delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port")
+        "delete from ProxyEndpoint where proxyIP like :proxyIP or proxyAppName like :proxyIP and proxyPort = :port"
+    )
     fun deleteDNSProxyEndpoint(proxyIP: String, port: Int)
 
     @Query("update ProxyEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
-    @Query("select count(*) from ProxyEndpoint")
-    fun getCount(): Int
+    @Query("select count(*) from ProxyEndpoint") fun getCount(): Int
 
     @Query("select * from ProxyEndpoint where isSelected = 1")
     fun getConnectedProxy(): ProxyEndpoint?
@@ -68,6 +62,5 @@ interface ProxyEndpointDAO {
     @Query("select * from ProxyEndpoint where isSelected = 1 and proxyName = 'ORBOT'")
     fun getConnectedOrbotProxy(): ProxyEndpoint
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

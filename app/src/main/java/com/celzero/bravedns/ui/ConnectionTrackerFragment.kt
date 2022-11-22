@@ -42,11 +42,9 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-/**
- * Captures network logs and stores in ConnectionTracker, a room database.
- */
-class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker),
-                                  SearchView.OnQueryTextListener {
+/** Captures network logs and stores in ConnectionTracker, a room database. */
+class ConnectionTrackerFragment :
+    Fragment(R.layout.activity_connection_tracker), SearchView.OnQueryTextListener {
     private val b by viewBinding(ActivityConnectionTrackerBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -63,7 +61,9 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     }
 
     enum class TopLevelFilter(val id: Int) {
-        ALL(0), ALLOWED(1), BLOCKED(2)
+        ALL(0),
+        ALLOWED(1),
+        BLOCKED(2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -101,43 +101,41 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
             b.connectionSearch.onActionViewExpanded()
         }
 
-        b.connectionFilterIcon.setOnClickListener {
-            toggleParentChipsUi()
-        }
+        b.connectionFilterIcon.setOnClickListener { toggleParentChipsUi() }
 
-        b.connectionDeleteIcon.setOnClickListener {
-            showDeleteDialog()
-        }
+        b.connectionDeleteIcon.setOnClickListener { showDeleteDialog() }
 
         remakeParentFilterChipsUi()
         remakeChildFilterChipsUi(FirewallRuleset.getBlockedRules())
     }
 
     private fun setupRecyclerScrollListener() {
-        val scrollListener = object : RecyclerView.OnScrollListener() {
+        val scrollListener =
+            object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-                if (recyclerView.getChildAt(0).tag == null) return
+                    if (recyclerView.getChildAt(0).tag == null) return
 
-                val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag: Long = recyclerView.getChildAt(0).tag as Long
 
-                if (dy > 0) {
-                    b.connectionListScrollHeader.text = Utilities.formatToRelativeTime(requireContext(), tag)
-                    b.connectionListScrollHeader.visibility = View.VISIBLE
-                } else {
-                    b.connectionListScrollHeader.visibility = View.GONE
+                    if (dy > 0) {
+                        b.connectionListScrollHeader.text =
+                            Utilities.formatToRelativeTime(requireContext(), tag)
+                        b.connectionListScrollHeader.visibility = View.VISIBLE
+                    } else {
+                        b.connectionListScrollHeader.visibility = View.GONE
+                    }
+                }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        b.connectionListScrollHeader.visibility = View.GONE
+                    }
                 }
             }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    b.connectionListScrollHeader.visibility = View.GONE
-                }
-            }
-        }
         b.recyclerConnection.addOnScrollListener(scrollListener)
     }
 
@@ -168,12 +166,20 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private fun remakeParentFilterChipsUi() {
         b.filterChipParentGroup.removeAllViews()
 
-        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all),
-                                 true)
-        val allowed = makeParentChip(TopLevelFilter.ALLOWED.id,
-                                     getString(R.string.ct_filter_parent_allowed), false)
-        val blocked = makeParentChip(TopLevelFilter.BLOCKED.id,
-                                     getString(R.string.ct_filter_parent_blocked), false)
+        val all =
+            makeParentChip(TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all), true)
+        val allowed =
+            makeParentChip(
+                TopLevelFilter.ALLOWED.id,
+                getString(R.string.ct_filter_parent_allowed),
+                false
+            )
+        val blocked =
+            makeParentChip(
+                TopLevelFilter.BLOCKED.id,
+                getString(R.string.ct_filter_parent_blocked),
+                false
+            )
 
         b.filterChipParentGroup.addView(all)
         b.filterChipParentGroup.addView(allowed)
@@ -200,8 +206,8 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
     private fun makeChildChip(id: String, titleResId: Int): Chip {
         val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
         chip.text = getString(titleResId)
-        chip.chipIcon = ContextCompat.getDrawable(requireContext(),
-                                                  FirewallRuleset.getRulesIcon(id))
+        chip.chipIcon =
+            ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(id))
         chip.isCheckedIconVisible = false
         chip.tag = id
 
@@ -253,13 +259,10 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
         builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
-            io {
-                connectionTrackerRepository.clearAllData()
-            }
+            io { connectionTrackerRepository.clearAllData() }
         }
 
-        builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ ->
-        }
+        builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ -> }
         builder.create().show()
     }
 
@@ -306,13 +309,8 @@ class ConnectionTrackerFragment : Fragment(R.layout.activity_connection_tracker)
         b.filterChipParentGroup.visibility = View.GONE
     }
 
-
     // fixme: move this to viewmodel scope
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

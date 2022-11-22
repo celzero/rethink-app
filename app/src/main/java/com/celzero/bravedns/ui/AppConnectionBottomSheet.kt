@@ -42,13 +42,14 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetAppConnectionsBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
-    private val b get() = _binding!!
+    private val b
+        get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
 
-    override fun getTheme(): Int = getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                              persistentState.theme)
+    override fun getTheme(): Int =
+        getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     interface OnBottomSheetDialogFragmentDismiss {
         fun notifyDataset(position: Int)
@@ -69,7 +70,8 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     fun dismissListener(aca: AppConnectionAdapter?, pos: Int) {
@@ -77,8 +79,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         position = pos
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetAppConnectionsBinding.inflate(inflater, container, false)
         dismissListener = adapter
         return b.root
@@ -153,23 +158,43 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private fun initializeClickListeners() {
         b.bsacBlock.setOnClickListener {
-            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.BLOCK,
-                      getString(R.string.bsac_block_toast, ipAddress))
+            applyRule(
+                uid,
+                ipAddress,
+                port,
+                IpRulesManager.IpRuleStatus.BLOCK,
+                getString(R.string.bsac_block_toast, ipAddress)
+            )
         }
 
         b.bsacUnblock.setOnClickListener {
-            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.NONE,
-                      getString(R.string.bsac_unblock_toast, ipAddress))
+            applyRule(
+                uid,
+                ipAddress,
+                port,
+                IpRulesManager.IpRuleStatus.NONE,
+                getString(R.string.bsac_unblock_toast, ipAddress)
+            )
         }
 
         b.bsacBypassAppRules.setOnClickListener {
-            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
-                      getString(R.string.bsac_whitelist_toast, ipAddress))
+            applyRule(
+                uid,
+                ipAddress,
+                port,
+                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
+                getString(R.string.bsac_whitelist_toast, ipAddress)
+            )
         }
 
         b.bsacGopassAppRules.setOnClickListener {
-            applyRule(uid, ipAddress, port, IpRulesManager.IpRuleStatus.NONE,
-                      getString(R.string.bsac_whitelist_remove_toast, ipAddress))
+            applyRule(
+                uid,
+                ipAddress,
+                port,
+                IpRulesManager.IpRuleStatus.NONE,
+                getString(R.string.bsac_whitelist_remove_toast, ipAddress)
+            )
         }
 
         b.bsacDelete.setOnClickListener {
@@ -178,28 +203,25 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun applyRule(uid: Int, ipAddress: String, port: Int,
-                          status: IpRulesManager.IpRuleStatus, toastMsg: String) {
-        io {
-            IpRulesManager.addIpRule(uid, ipAddress, port, status)
-        }
+    private fun applyRule(
+        uid: Int,
+        ipAddress: String,
+        port: Int,
+        status: IpRulesManager.IpRuleStatus,
+        toastMsg: String
+    ) {
+        io { IpRulesManager.addIpRule(uid, ipAddress, port, status) }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()
     }
 
     private fun deleteRule(uid: Int, ipAddress: String, port: Int, toastMsg: String) {
-        io {
-            IpRulesManager.removeFirewallRules(uid, ipAddress, port)
-        }
+        io { IpRulesManager.removeFirewallRules(uid, ipAddress, port) }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

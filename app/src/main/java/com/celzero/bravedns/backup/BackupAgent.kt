@@ -39,9 +39,10 @@ import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-// ref: https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
+// ref:
+// https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
 class BackupAgent(val context: Context, workerParams: WorkerParameters) :
-        Worker(context, workerParams), KoinComponent {
+    Worker(context, workerParams), KoinComponent {
 
     var filesToZip: MutableList<File> = ArrayList()
 
@@ -51,12 +52,14 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     override fun doWork(): Result {
         val backupFileUri = Uri.parse(inputData.getString(DATA_BUILDER_BACKUP_URI))
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                         "begin backup process with file uri: $backupFileUri")
+        if (DEBUG)
+            Log.d(LOG_TAG_BACKUP_RESTORE, "begin backup process with file uri: $backupFileUri")
         val isBackupSucceed = startBackupProcess(backupFileUri)
 
-        Log.i(LOG_TAG_BACKUP_RESTORE,
-              "completed backup process, is backup successful? $isBackupSucceed")
+        Log.i(
+            LOG_TAG_BACKUP_RESTORE,
+            "completed backup process, is backup successful? $isBackupSucceed"
+        )
         if (isBackupSucceed) {
             // start vpn on backup success
             startVpn(context)
@@ -72,34 +75,47 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
             val prefsBackupFile = File(tempDir, SHARED_PREFS_BACKUP_FILE_NAME)
 
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                             "backup process, temp file dir: ${tempDir.path}, prefs backup file: ${prefsBackupFile.path}")
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "backup process, temp file dir: ${tempDir.path}, prefs backup file: ${prefsBackupFile.path}"
+                )
             successFull = saveSharedPreferencesToFile(context, prefsBackupFile)
 
             if (successFull) {
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                                 "shared pref backup is added to the temp dir")
+                if (DEBUG)
+                    Log.d(LOG_TAG_BACKUP_RESTORE, "shared pref backup is added to the temp dir")
                 filesToZip.add(prefsBackupFile)
             } else {
-                Log.w(LOG_TAG_BACKUP_RESTORE,
-                      "failed to add shared pref to temp backup dir, return failure")
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "failed to add shared pref to temp backup dir, return failure"
+                )
                 return false
             }
 
             successFull = saveDatabasesToFile(tempDir.path)
 
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                             "completed db backup to temp dir, isSuccessful? $successFull")
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "completed db backup to temp dir, isSuccessful? $successFull"
+                )
             if (!successFull) {
-                Log.w(LOG_TAG_BACKUP_RESTORE,
-                      "failed to add database backup to temp dir (${tempDir.path}), return failure")
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "failed to add database backup to temp dir (${tempDir.path}), return failure"
+                )
                 return false
             }
 
             return zipAndCopyToDestination(tempDir, backupFileUri)
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BACKUP_RESTORE, "exception during backup process, reason? ${e.message}",
-                  e)
+            Log.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "exception during backup process, reason? ${e.message}",
+                e
+            )
             return false
         } finally {
             for (file in filesToZip) {
@@ -111,28 +127,34 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     private fun zipAndCopyToDestination(tempDir: File, destUri: Uri): Boolean {
         val bZipSucceeded: Boolean = zip(filesToZip, tempDir.path)
 
-        Log.i(LOG_TAG_BACKUP_RESTORE,
-              "backup zip completed, is success? $bZipSucceeded, proceed to copy $destUri")
+        Log.i(
+            LOG_TAG_BACKUP_RESTORE,
+            "backup zip completed, is success? $bZipSucceeded, proceed to copy $destUri"
+        )
 
         if (bZipSucceeded) {
             val tempZipFile = File(tempDir, TEMP_ZIP_FILE_NAME)
             val zipFileUri: Uri = Uri.fromFile(tempZipFile)
-            val inputStream: InputStream = context.contentResolver.openInputStream(
-                zipFileUri) ?: return false
-            val outputStream: OutputStream = context.contentResolver.openOutputStream(
-                destUri) ?: return false
+            val inputStream: InputStream =
+                context.contentResolver.openInputStream(zipFileUri) ?: return false
+            val outputStream: OutputStream =
+                context.contentResolver.openOutputStream(destUri) ?: return false
 
             // we are passing the streams instead of actual files because we do not have
             // write access to the destination dir.
             val copySucceeded: Boolean = copyWithStream(inputStream, outputStream)
             return if (copySucceeded) {
-                Log.i(LOG_TAG_BACKUP_RESTORE,
-                      "Copy completed, delete the temp dir ${tempZipFile.path}")
+                Log.i(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "Copy completed, delete the temp dir ${tempZipFile.path}"
+                )
                 deleteResidue(tempZipFile)
                 true
             } else {
-                Log.w(LOG_TAG_BACKUP_RESTORE,
-                      "copy failed to destination dir, path: ${zipFileUri.path}")
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "copy failed to destination dir, path: ${zipFileUri.path}"
+                )
                 false
             }
         } else {
@@ -145,10 +167,11 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         val files = getRethinkDatabase(context)?.listFiles() ?: return false
 
         for (f in files) {
-            val databaseFile = backUpDatabaseFile(f.absolutePath,
-                                                  constructDbFileName(path, f.name)) ?: return false
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                             "file ${databaseFile.name} added to backup dir")
+            val databaseFile =
+                backUpDatabaseFile(f.absolutePath, constructDbFileName(path, f.name))
+                    ?: return false
+            if (DEBUG)
+                Log.d(LOG_TAG_BACKUP_RESTORE, "file ${databaseFile.name} added to backup dir")
             filesToZip.add(databaseFile)
         }
 
@@ -162,8 +185,8 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     private fun saveSharedPreferencesToFile(context: Context, prefFile: File): Boolean {
         var output: ObjectOutputStream? = null
 
-        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE,
-                         "begin shared pref copy, file path:${prefFile.path}")
+        if (DEBUG)
+            Log.d(LOG_TAG_BACKUP_RESTORE, "begin shared pref copy, file path:${prefFile.path}")
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
         try {
@@ -188,8 +211,10 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
 
     private fun backUpDatabaseFile(backupFilePath: String?, destFilePath: String?): File? {
         if (backupFilePath == null || destFilePath == null) {
-            Log.w(LOG_TAG_BACKUP_RESTORE,
-                  "invalid backup info during db backup, file: $backupFilePath, destination: $destFilePath")
+            Log.w(
+                LOG_TAG_BACKUP_RESTORE,
+                "invalid backup info during db backup, file: $backupFilePath, destination: $destFilePath"
+            )
             return null
         }
         val isCopySuccess = Utilities.copy(backupFilePath, destFilePath)
@@ -227,5 +252,4 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             false
         }
     }
-
 }

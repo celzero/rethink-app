@@ -113,18 +113,21 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         try {
             val version = getVersionName()
-            b.aboutAppVersion.text = getString(R.string.about_version_install_source, version,
-                                               getDownloadSource())
-            b.aboutWhatsNew.text = getString(R.string.about_whats_new,
-                                             getString(R.string.about_version, version))
+            b.aboutAppVersion.text =
+                getString(R.string.about_version_install_source, version, getDownloadSource())
+            b.aboutWhatsNew.text =
+                getString(R.string.about_whats_new, getString(R.string.about_version, version))
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
     }
 
     private fun getVersionName(): String {
-        val pInfo: PackageInfo? = Utilities.getPackageMetadata(requireContext().packageManager,
-                                                               requireContext().packageName)
+        val pInfo: PackageInfo? =
+            Utilities.getPackageMetadata(
+                requireContext().packageManager,
+                requireContext().packageName
+            )
         return pInfo?.versionName ?: ""
     }
 
@@ -174,7 +177,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
-                    AppUpdater.UserPresent.INTERACTIVE)
+                    AppUpdater.UserPresent.INTERACTIVE
+                )
             }
             b.aboutWhatsNew -> {
                 showNewFeaturesDialog()
@@ -204,16 +208,16 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.about_bug_no_log_dialog_title)
         builder.setMessage(R.string.about_bug_no_log_dialog_message)
-        builder.setPositiveButton(
-            getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _
+            ->
             sendEmailIntent(requireContext())
         }
-        builder.setNegativeButton(
-            getString(R.string.about_bug_no_log_dialog_negative_btn)) { dialog, _ ->
+        builder.setNegativeButton(getString(R.string.about_bug_no_log_dialog_negative_btn)) {
+            dialog,
+            _ ->
             dialog.dismiss()
         }
         builder.create().show()
-
     }
 
     private fun openActionViewIntent(uri: Uri) {
@@ -221,8 +225,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         try {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(requireContext(), getString(R.string.intent_launch_error, intent.data),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.intent_launch_error, intent.data),
+                Toast.LENGTH_SHORT
+            )
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
@@ -235,8 +242,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(requireContext(), getString(R.string.app_info_error),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.app_info_error),
+                Toast.LENGTH_SHORT
+            )
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
@@ -255,25 +265,37 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(requireContext(), getString(R.string.notification_screen_error),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.notification_screen_error),
+                Toast.LENGTH_SHORT
+            )
             Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
     private fun showNewFeaturesDialog() {
-        val binding = DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null,
-                                                    false)
+        val binding =
+            DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
-        binding.desc.text = Utilities.updateHtmlEncodedText(getString(R.string.whats_new_version_update))
-        AlertDialog.Builder(requireContext()).setView(binding.root).setTitle(
-            getString(R.string.whats_dialog_title)).setPositiveButton(
-            getString(R.string.about_dialog_positive_button)) { dialogInterface, _ ->
-            dialogInterface.dismiss()
-        }.setNeutralButton(
-            getString(R.string.about_dialog_neutral_button)) { _: DialogInterface, _: Int ->
-            sendEmailIntent(requireContext())
-        }.setCancelable(true).create().show()
+        binding.desc.text =
+            Utilities.updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+        AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .setTitle(getString(R.string.whats_dialog_title))
+            .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
+                dialogInterface,
+                _ ->
+                dialogInterface.dismiss()
+            }
+            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) {
+                _: DialogInterface,
+                _: Int ->
+                sendEmailIntent(requireContext())
+            }
+            .setCancelable(true)
+            .create()
+            .show()
     }
 
     // ref: https://developer.android.com/guide/components/intents-filters
@@ -291,13 +313,17 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         emailIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         emailIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         startActivity(
-            Intent.createChooser(emailIntent, getString(R.string.about_mail_bugreport_share_title)))
+            Intent.createChooser(emailIntent, getString(R.string.about_mail_bugreport_share_title))
+        )
     }
 
     private fun getFileUri(file: File): Uri? {
         if (isFileAvailable(file)) {
-            return FileProvider.getUriForFile(requireContext().applicationContext,
-                                              FILE_PROVIDER_NAME, file)
+            return FileProvider.getUriForFile(
+                requireContext().applicationContext,
+                FILE_PROVIDER_NAME,
+                file
+            )
         }
         return null
     }
@@ -325,34 +351,40 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
         heading.text = getString(R.string.contributors_dialog_title)
         heading.setCompoundDrawablesWithIntrinsicBounds(
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_authors), null, null, null)
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_authors),
+            null,
+            null,
+            null
+        )
 
         descText.movementMethod = LinkMovementMethod.getInstance()
         descText.text = Utilities.updateHtmlEncodedText(getString(R.string.contributors_list))
 
-        okBtn.setOnClickListener {
-            dialog.dismiss()
-        }
+        okBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
     private fun promptCrashLogAction() {
-        val binding = DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null,
-                                                    false)
-        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext()).setView(
-            binding.root)
+        val binding =
+            DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null, false)
+        val builder: AlertDialog.Builder =
+            AlertDialog.Builder(requireContext()).setView(binding.root)
         builder.setTitle(getString(R.string.about_bug_report))
 
         val zipPath = getZipFilePath(requireContext())
-        val zipFile = try {
-            ZipFile(zipPath)
-        } catch (ignored: Exception) {  // FileNotFound, ZipException
-            null
-        }
+        val zipFile =
+            try {
+                ZipFile(zipPath)
+            } catch (ignored: Exception) { // FileNotFound, ZipException
+                null
+            }
 
         if (zipFile == null || zipFile.size() <= 0) {
-            showToastUiCentered(requireContext(), getString(R.string.log_file_not_available),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.log_file_not_available),
+                Toast.LENGTH_SHORT
+            )
             return
         }
 
@@ -395,12 +427,13 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val width = (resources.displayMetrics.widthPixels * 0.75).toInt()
         val height = (resources.displayMetrics.heightPixels * 0.75).toInt()
 
-        builder.setPositiveButton(
-            getString(R.string.about_bug_report_dialog_positive_btn)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.about_bug_report_dialog_positive_btn)) { _, _
+            ->
             emailBugReport()
         }
-        builder.setNegativeButton(
-            getString(R.string.about_bug_report_dialog_negative_btn)) { dialog, _ ->
+        builder.setNegativeButton(getString(R.string.about_bug_report_dialog_negative_btn)) {
+            dialog,
+            _ ->
             dialog.dismiss()
         }
 
@@ -410,22 +443,28 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun handleShowAppExitInfo() {
-        if (WorkScheduler.isWorkRunning(requireContext(),
-                                        WorkScheduler.APP_EXIT_INFO_JOB_TAG)) return
+        if (WorkScheduler.isWorkRunning(requireContext(), WorkScheduler.APP_EXIT_INFO_JOB_TAG))
+            return
 
         workScheduler.scheduleOneTimeWorkForAppExitInfo()
         showBugReportProgressUi()
 
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
         workManager.getWorkInfosByTagLiveData(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+            viewLifecycleOwner
+        ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
-                  "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}")
+            Log.i(
+                LoggerConstants.LOG_TAG_SCHEDULER,
+                "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}"
+            )
             if (WorkInfo.State.SUCCEEDED == workInfo.state) {
                 onAppExitInfoSuccess()
                 workManager.pruneWork()
-            } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+            } else if (
+                WorkInfo.State.CANCELLED == workInfo.state ||
+                    WorkInfo.State.FAILED == workInfo.state
+            ) {
                 onAppExitInfoFailure()
                 workManager.pruneWork()
                 workManager.cancelAllWorkByTag(WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG)
@@ -436,8 +475,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun onAppExitInfoFailure() {
-        showToastUiCentered(requireContext(), getString(R.string.log_file_not_available),
-                            Toast.LENGTH_SHORT)
+        showToastUiCentered(
+            requireContext(),
+            getString(R.string.log_file_not_available),
+            Toast.LENGTH_SHORT
+        )
         hideBugReportProgressUi()
     }
 
@@ -453,8 +495,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
 
     private fun onAppExitInfoSuccess() {
         // refrain from calling promptCrashLogAction multiple times
-        if (SystemClock.elapsedRealtime() - lastAppExitInfoDialogInvokeTime < TimeUnit.SECONDS.toMillis(
-                1L)) {
+        if (
+            SystemClock.elapsedRealtime() - lastAppExitInfoDialogInvokeTime <
+                TimeUnit.SECONDS.toMillis(1L)
+        ) {
             return
         }
 
@@ -464,16 +508,10 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
+        withContext(Dispatchers.Main) { f() }
     }
 }

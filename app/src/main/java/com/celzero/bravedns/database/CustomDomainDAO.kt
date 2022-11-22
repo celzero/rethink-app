@@ -22,14 +22,11 @@ import androidx.sqlite.db.SupportSQLiteQuery
 @Dao
 interface CustomDomainDAO {
 
-    @Update
-    fun update(customDomain: CustomDomain)
+    @Update fun update(customDomain: CustomDomain)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(customDomain: CustomDomain)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(customDomain: CustomDomain)
 
-    @Delete
-    fun delete(customDomain: CustomDomain)
+    @Delete fun delete(customDomain: CustomDomain)
 
     @Transaction
     @Query("select * from CustomDomain order by createdTs desc")
@@ -41,15 +38,15 @@ interface CustomDomainDAO {
 
     @Transaction
     @Query(
-        "select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc")
+        "select * from CustomDomain where domain like :query and status == :stat  order by createdTs desc"
+    )
     fun getWhitelistedDomains(query: String, stat: Int): PagingSource<Int, CustomDomain>
 
     @Transaction
     @Query(
-        "select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc")
+        "select * from CustomDomain where domain like :query and  status == :stat  order by createdTs desc"
+    )
     fun getBlockedDomains(query: String, stat: Int): PagingSource<Int, CustomDomain>
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
-
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

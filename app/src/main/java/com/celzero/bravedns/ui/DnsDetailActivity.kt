@@ -37,7 +37,8 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
-        LOGS(0), CONFIGURE(1);
+        LOGS(0),
+        CONFIGURE(1);
 
         companion object {
             fun getCount(): Int {
@@ -55,35 +56,36 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
 
     private fun init() {
 
-        b.dnsDetailActViewpager.adapter = object : FragmentStateAdapter(this) {
-            override fun createFragment(position: Int): Fragment {
-                return when (position) {
-                    Tabs.LOGS.screen -> DnsLogFragment.newInstance()
-                    Tabs.CONFIGURE.screen -> DnsConfigureFragment.newInstance()
-                    else -> DnsConfigureFragment.newInstance()
+        b.dnsDetailActViewpager.adapter =
+            object : FragmentStateAdapter(this) {
+                override fun createFragment(position: Int): Fragment {
+                    return when (position) {
+                        Tabs.LOGS.screen -> DnsLogFragment.newInstance()
+                        Tabs.CONFIGURE.screen -> DnsConfigureFragment.newInstance()
+                        else -> DnsConfigureFragment.newInstance()
+                    }
+                }
+
+                override fun getItemCount(): Int {
+                    return Tabs.getCount()
                 }
             }
 
-            override fun getItemCount(): Int {
-                return Tabs.getCount()
+        TabLayoutMediator(b.dnsDetailActTabLayout, b.dnsDetailActViewpager) { tab, position ->
+                tab.text =
+                    when (position) {
+                        Tabs.LOGS.screen -> getString(R.string.dns_act_log)
+                        Tabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
+                        else -> getString(R.string.dns_act_configure_tab)
+                    }
             }
-        }
-
-        TabLayoutMediator(b.dnsDetailActTabLayout,
-                          b.dnsDetailActViewpager) { tab, position ->
-            tab.text = when (position) {
-                Tabs.LOGS.screen -> getString(R.string.dns_act_log)
-                Tabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
-                else -> getString(R.string.dns_act_configure_tab)
-            }
-        }.attach()
+            .attach()
 
         b.dnsDetailActViewpager.setCurrentItem(fragmentIndex, true)
-
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
-
 }

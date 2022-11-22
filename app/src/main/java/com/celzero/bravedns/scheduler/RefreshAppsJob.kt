@@ -26,7 +26,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class RefreshAppsJob(val context: Context, workerParameters: WorkerParameters) :
-        CoroutineWorker(context, workerParameters), KoinComponent {
+    CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val refreshDatabase by inject<RefreshDatabase>()
 

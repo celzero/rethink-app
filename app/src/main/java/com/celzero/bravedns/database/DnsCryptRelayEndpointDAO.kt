@@ -19,18 +19,15 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
-
 @Dao
 interface DnsCryptRelayEndpointDAO {
 
-    @Update
-    fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
+    @Update fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
 
-    @Delete
-    fun delete(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
+    @Delete fun delete(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
 
     @Transaction
     @Query("select * from DNSCryptRelayEndpoint order by isSelected desc")
@@ -38,15 +35,16 @@ interface DnsCryptRelayEndpointDAO {
 
     @Transaction
     @Query(
-        "select * from DNSCryptRelayEndpoint where dnsCryptRelayURL like :query or dnsCryptRelayName like :query order by isSelected desc")
+        "select * from DNSCryptRelayEndpoint where dnsCryptRelayURL like :query or dnsCryptRelayName like :query order by isSelected desc"
+    )
     fun getDnsCryptRelayEndpointLiveDataByName(
-            query: String): PagingSource<Int, DnsCryptRelayEndpoint>
+        query: String
+    ): PagingSource<Int, DnsCryptRelayEndpoint>
 
     @Query("delete from DNSCryptRelayEndpoint where modifiedDataTime < :date")
     fun deleteOlderData(date: Long)
 
-    @Query("delete from DNSCryptRelayEndpoint")
-    fun clearAllData()
+    @Query("delete from DNSCryptRelayEndpoint") fun clearAllData()
 
     @Query("delete from DNSCryptRelayEndpoint where id = :id and isCustom = 1")
     fun deleteDnsCryptRelayEndpoint(id: Int)
@@ -58,10 +56,7 @@ interface DnsCryptRelayEndpointDAO {
     @Query("select * from DNSCryptRelayEndpoint where isSelected = 1")
     fun getConnectedRelays(): List<DnsCryptRelayEndpoint>
 
-    @Transaction
-    @Query("select count(*) from DNSCryptRelayEndpoint")
-    fun getCount(): Int
+    @Transaction @Query("select count(*) from DNSCryptRelayEndpoint") fun getCount(): Int
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

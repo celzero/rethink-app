@@ -19,7 +19,10 @@ import com.celzero.bravedns.R
 
 // Application themes enum
 enum class Themes(val id: Int) {
-    SYSTEM_DEFAULT(0), LIGHT(1), DARK(2), TRUE_BLACK(3);
+    SYSTEM_DEFAULT(0),
+    LIGHT(1),
+    DARK(2),
+    TRUE_BLACK(3);
 
     companion object {
         fun getThemeCount(): Int {

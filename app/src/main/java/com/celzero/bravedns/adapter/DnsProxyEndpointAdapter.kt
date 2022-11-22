@@ -38,29 +38,39 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: LifecycleOwner,
-                              private val appConfig: AppConfig) :
-        PagingDataAdapter<DnsProxyEndpoint, DnsProxyEndpointAdapter.DnsProxyEndpointViewHolder>(
-            DIFF_CALLBACK) {
-
+class DnsProxyEndpointAdapter(
+    private val context: Context,
+    val lifecycleOwner: LifecycleOwner,
+    private val appConfig: AppConfig
+) :
+    PagingDataAdapter<DnsProxyEndpoint, DnsProxyEndpointAdapter.DnsProxyEndpointViewHolder>(
+        DIFF_CALLBACK
+    ) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DnsProxyEndpoint>() {
-            override fun areItemsTheSame(oldConnection: DnsProxyEndpoint,
-                                         newConnection: DnsProxyEndpoint): Boolean {
-                return (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
-            }
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<DnsProxyEndpoint>() {
+                override fun areItemsTheSame(
+                    oldConnection: DnsProxyEndpoint,
+                    newConnection: DnsProxyEndpoint
+                ): Boolean {
+                    return (oldConnection.id == newConnection.id &&
+                        oldConnection.isSelected == newConnection.isSelected)
+                }
 
-            override fun areContentsTheSame(oldConnection: DnsProxyEndpoint,
-                                            newConnection: DnsProxyEndpoint): Boolean {
-                return (oldConnection.id == newConnection.id && oldConnection.isSelected != newConnection.isSelected)
+                override fun areContentsTheSame(
+                    oldConnection: DnsProxyEndpoint,
+                    newConnection: DnsProxyEndpoint
+                ): Boolean {
+                    return (oldConnection.id == newConnection.id &&
+                        oldConnection.isSelected != newConnection.isSelected)
+                }
             }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DnsProxyEndpointViewHolder {
-        val itemBinding = DnsProxyListItemBinding.inflate(LayoutInflater.from(parent.context),
-                                                          parent, false)
+        val itemBinding =
+            DnsProxyListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return DnsProxyEndpointViewHolder(itemBinding)
     }
 
@@ -69,9 +79,8 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
         holder.update(dnsProxyEndpoint)
     }
 
-
     inner class DnsProxyEndpointViewHolder(private val b: DnsProxyListItemBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(endpoint: DnsProxyEndpoint) {
             displayDetails(endpoint)
@@ -79,29 +88,17 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
         }
 
         private fun setupClickListeners(endpoint: DnsProxyEndpoint) {
-            b.root.setOnClickListener {
-                updateDnsProxyDetails(endpoint)
-            }
+            b.root.setOnClickListener { updateDnsProxyDetails(endpoint) }
 
-            b.dnsProxyListActionImage.setOnClickListener {
-                promptUser(endpoint)
-            }
+            b.dnsProxyListActionImage.setOnClickListener { promptUser(endpoint) }
 
-            b.dnsProxyListCheckImage.setOnClickListener {
-                updateDnsProxyDetails(endpoint)
-            }
+            b.dnsProxyListCheckImage.setOnClickListener { updateDnsProxyDetails(endpoint) }
 
-            b.root.setOnClickListener {
-                updateDnsProxyDetails(endpoint)
-            }
+            b.root.setOnClickListener { updateDnsProxyDetails(endpoint) }
 
-            b.dnsProxyListActionImage.setOnClickListener {
-                promptUser(endpoint)
-            }
+            b.dnsProxyListActionImage.setOnClickListener { promptUser(endpoint) }
 
-            b.dnsProxyListCheckImage.setOnClickListener {
-                updateDnsProxyDetails(endpoint)
-            }
+            b.dnsProxyListCheckImage.setOnClickListener { updateDnsProxyDetails(endpoint) }
         }
 
         private fun displayDetails(endpoint: DnsProxyEndpoint) {
@@ -112,10 +109,12 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
 
             if (endpoint.isDeletable()) {
                 b.dnsProxyListActionImage.setImageDrawable(
-                    AppCompatResources.getDrawable(context, R.drawable.ic_fab_uninstall))
+                    AppCompatResources.getDrawable(context, R.drawable.ic_fab_uninstall)
+                )
             } else {
                 b.dnsProxyListActionImage.setImageDrawable(
-                    AppCompatResources.getDrawable(context, R.drawable.ic_info))
+                    AppCompatResources.getDrawable(context, R.drawable.ic_info)
+                )
             }
         }
     }
@@ -123,8 +122,12 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
     private fun promptUser(endpoint: DnsProxyEndpoint) {
         if (endpoint.isDeletable()) showDeleteDialog(endpoint)
         else {
-            showDetailsDialog(endpoint.proxyName, endpoint.getPackageName(), endpoint.proxyIP,
-                              endpoint.proxyPort.toString())
+            showDetailsDialog(
+                endpoint.proxyName,
+                endpoint.getPackageName(),
+                endpoint.proxyIP,
+                endpoint.proxyPort.toString()
+            )
         }
     }
 
@@ -138,20 +141,29 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message, app, ip, port))
         } else {
             builder.setMessage(
-                context.getString(R.string.dns_proxy_dialog_message_no_app, ip, port))
+                context.getString(R.string.dns_proxy_dialog_message_no_app, ip, port)
+            )
         }
         builder.setCancelable(true)
-        builder.setPositiveButton(
-            context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
+        builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
+            dialogInterface,
+            _ ->
             dialogInterface.dismiss()
         }
-        builder.setNeutralButton(
-            context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
+        builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
+            _: DialogInterface,
+            _: Int ->
             if (ip != null) {
-                Utilities.clipboardCopy(context, ip,
-                                        context.getString(R.string.copy_clipboard_label))
-                Utilities.showToastUiCentered(context, context.getString(
-                    R.string.info_dialog_copy_toast_msg), Toast.LENGTH_SHORT)
+                Utilities.clipboardCopy(
+                    context,
+                    ip,
+                    context.getString(R.string.copy_clipboard_label)
+                )
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.info_dialog_copy_toast_msg),
+                    Toast.LENGTH_SHORT
+                )
             } else {
                 // no op: Copy functionality is for the Ip of the endpoint, no operation needed
                 // when the ip is not available for endpoint.
@@ -170,8 +182,7 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
             deleteProxyEndpoint(dnsProxyEndpoint.id)
         }
 
-        builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
-        }
+        builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ -> }
         builder.create().show()
     }
 
@@ -186,24 +197,17 @@ class DnsProxyEndpointAdapter(private val context: Context, val lifecycleOwner: 
         io {
             appConfig.deleteDnsProxyEndpoint(id)
             uiCtx {
-                Toast.makeText(context, R.string.dns_proxy_remove_success,
-                               Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
+        withContext(Dispatchers.Main) { f() }
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
-
 }

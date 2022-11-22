@@ -28,12 +28,16 @@ class RetrofitManager {
 
     companion object {
         enum class OkHttpDnsType {
-            DEFAULT, CLOUDFLARE, GOOGLE, SYSTEM_DNS;
+            DEFAULT,
+            CLOUDFLARE,
+            GOOGLE,
+            SYSTEM_DNS
         }
 
         fun getBlocklistBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
-            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(
-                okHttpClient(dnsType))
+            return Retrofit.Builder()
+                .baseUrl(Constants.DOWNLOAD_BASE_URL)
+                .client(okHttpClient(dnsType))
         }
 
         fun okHttpClient(dnsType: OkHttpDnsType): OkHttpClient {
@@ -52,25 +56,40 @@ class RetrofitManager {
         private fun customDns(dnsType: OkHttpDnsType): Dns? {
             when (dnsType) {
                 OkHttpDnsType.DEFAULT -> {
-                    return DnsOverHttps.Builder().client(OkHttpClient()).url(
-                        "https://dns.quad9.net/dns-query".toHttpUrl()).bootstrapDnsHosts(
-                        InetAddress.getByName("9.9.9.9"), InetAddress.getByName("149.112.112.112"),
-                        InetAddress.getByName("2620:fe::9"),
-                        InetAddress.getByName("2620:fe::fe")).build()
+                    return DnsOverHttps.Builder()
+                        .client(OkHttpClient())
+                        .url("https://dns.quad9.net/dns-query".toHttpUrl())
+                        .bootstrapDnsHosts(
+                            InetAddress.getByName("9.9.9.9"),
+                            InetAddress.getByName("149.112.112.112"),
+                            InetAddress.getByName("2620:fe::9"),
+                            InetAddress.getByName("2620:fe::fe")
+                        )
+                        .build()
                 }
                 OkHttpDnsType.CLOUDFLARE -> {
-                    return DnsOverHttps.Builder().client(OkHttpClient()).url(
-                        "https://cloudflare-dns.com/dns-query".toHttpUrl()).bootstrapDnsHosts(
-                        InetAddress.getByName("1.1.1.1"), InetAddress.getByName("1.0.0.1"),
-                        InetAddress.getByName("2606:4700:4700::1111"),
-                        InetAddress.getByName("2606:4700:4700::1001")).build()
+                    return DnsOverHttps.Builder()
+                        .client(OkHttpClient())
+                        .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
+                        .bootstrapDnsHosts(
+                            InetAddress.getByName("1.1.1.1"),
+                            InetAddress.getByName("1.0.0.1"),
+                            InetAddress.getByName("2606:4700:4700::1111"),
+                            InetAddress.getByName("2606:4700:4700::1001")
+                        )
+                        .build()
                 }
                 OkHttpDnsType.GOOGLE -> {
-                    return DnsOverHttps.Builder().client(OkHttpClient()).url(
-                        "https://dns.google/dns-query".toHttpUrl()).bootstrapDnsHosts(
-                        InetAddress.getByName("8.8.8.8"), InetAddress.getByName("8.8.4.4"),
-                        InetAddress.getByName("2001:4860:4860:0:0:0:0:8888"),
-                        InetAddress.getByName("2001:4860:4860:0:0:0:0:8844")).build()
+                    return DnsOverHttps.Builder()
+                        .client(OkHttpClient())
+                        .url("https://dns.google/dns-query".toHttpUrl())
+                        .bootstrapDnsHosts(
+                            InetAddress.getByName("8.8.8.8"),
+                            InetAddress.getByName("8.8.4.4"),
+                            InetAddress.getByName("2001:4860:4860:0:0:0:0:8888"),
+                            InetAddress.getByName("2001:4860:4860:0:0:0:0:8844")
+                        )
+                        .build()
                 }
                 OkHttpDnsType.SYSTEM_DNS -> {
                     return null
@@ -78,5 +97,4 @@ class RetrofitManager {
             }
         }
     }
-
 }

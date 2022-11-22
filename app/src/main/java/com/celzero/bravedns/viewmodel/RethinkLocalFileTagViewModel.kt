@@ -29,7 +29,7 @@ import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFileTagDao) :
-        ViewModel() {
+    ViewModel() {
 
     private var list: MutableLiveData<String> = MutableLiveData()
     private var blocklistFilter: RethinkBlocklistFragment.Filters? = null
@@ -38,43 +38,63 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
         list.value = ""
     }
 
-    val localFiletags = Transformations.switchMap(list, ({ input: String ->
-        if (blocklistFilter != null) {
-            val query = blocklistFilter?.query ?: "%%"
-            val selected = getSelectedFilter()
-            val groups = blocklistFilter?.groups ?: mutableSetOf()
-            val subg = blocklistFilter?.subGroups ?: mutableSetOf()
+    val localFiletags =
+        Transformations.switchMap(
+            list,
+            ({ input: String ->
+                if (blocklistFilter != null) {
+                    val query = blocklistFilter?.query ?: "%%"
+                    val selected = getSelectedFilter()
+                    val groups = blocklistFilter?.groups ?: mutableSetOf()
+                    val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
-            if (groups.isNotEmpty() && subg.isNotEmpty()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTags(query, selected, groups, subg)
-                }.liveData.cachedIn(viewModelScope)
-            } else if (groups.isNotEmpty()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTagsGroup(query, selected, groups)
-                }.liveData.cachedIn(viewModelScope)
-            } else if (subg.isNotEmpty()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTagsSubg(query, selected, subg)
-                }.liveData.cachedIn(viewModelScope)
-            } else {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkLocalDao.getLocalFileTagsWithFilter(query, selected)
-                }.liveData.cachedIn(viewModelScope)
-            }
-        } else if (input.isBlank()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                rethinkLocalDao.getLocalFileTags()
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                rethinkLocalDao.getLocalFileTagsWithFilter("%$input%", getSelectedFilter())
-            }.liveData.cachedIn(viewModelScope)
-        }
-    }))
+                    if (groups.isNotEmpty() && subg.isNotEmpty()) {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkLocalDao.getLocalFileTags(query, selected, groups, subg)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    } else if (groups.isNotEmpty()) {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkLocalDao.getLocalFileTagsGroup(query, selected, groups)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    } else if (subg.isNotEmpty()) {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkLocalDao.getLocalFileTagsSubg(query, selected, subg)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    } else {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkLocalDao.getLocalFileTagsWithFilter(query, selected)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    }
+                } else if (input.isBlank()) {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { rethinkLocalDao.getLocalFileTags() }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                } else {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                            rethinkLocalDao.getLocalFileTagsWithFilter(
+                                "%$input%",
+                                getSelectedFilter()
+                            )
+                        }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                }
+            })
+        )
 
     private fun getSelectedFilter(): MutableSet<Int> {
-        if (blocklistFilter?.filterSelected == RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED) {
+        if (
+            blocklistFilter?.filterSelected ==
+                RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED
+        ) {
             return mutableSetOf(1)
         }
         return mutableSetOf(0, 1)
@@ -92,6 +112,4 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
         this.blocklistFilter = filter
         list.value = filter.query
     }
-
-
 }

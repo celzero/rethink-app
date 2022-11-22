@@ -102,9 +102,7 @@ object VpnController : KoinComponent {
     }
 
     fun onConnectionStateChanged(state: BraveVPNService.State?) {
-        controllerScope?.launch {
-            states?.send(state)
-        }
+        controllerScope?.launch { states?.send(state) }
     }
 
     private fun updateState(state: BraveVPNService.State?) {
@@ -131,7 +129,6 @@ object VpnController : KoinComponent {
 
         onConnectionStateChanged(state().connectionState)
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
-
     }
 
     fun onStartComplete(context: Context, succeeded: Boolean) {
@@ -168,7 +165,8 @@ object VpnController : KoinComponent {
     }
 
     fun hasStarted(): Boolean {
-        return connectionState == BraveVPNService.State.WORKING || connectionState == BraveVPNService.State.FAILING
+        return connectionState == BraveVPNService.State.WORKING ||
+            connectionState == BraveVPNService.State.FAILING
     }
 
     fun isAppPaused(): Boolean {
@@ -224,5 +222,4 @@ object VpnController : KoinComponent {
         }
         return protoString
     }
-
 }

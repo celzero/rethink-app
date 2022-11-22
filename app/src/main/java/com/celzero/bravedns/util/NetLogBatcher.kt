@@ -55,20 +55,14 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
 
     fun begin(scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
-            golooper(scope) {
-                sig()
-            }
-            golooper(scope) {
-                consume()
-            }
+            golooper(scope) { sig() }
+            golooper(scope) { consume() }
             monitorCancellation()
         }
     }
 
     private suspend fun golooper(s: CoroutineScope, f: suspend () -> Unit): Deferred<Unit> {
-        return s.async(s.coroutineContext + looper + n2, CoroutineStart.DEFAULT) {
-            f()
-        }
+        return s.async(s.coroutineContext + looper + n2, CoroutineStart.DEFAULT) { f() }
     }
 
     // stackoverflow.com/a/68905423
@@ -98,15 +92,16 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
         buffers.send(b)
     }
 
-    suspend fun add(payload: T) = withContext(looper + n1) {
-        batches.add(payload)
-        // if the batch size is met, dispatch it to the consumer
-        if (batches.size >= batchSize) {
-            txswap()
-        } else if (batches.size == 1) {
-            signal.send(lsn) // start tracking 'lsn'
+    suspend fun add(payload: T) =
+        withContext(looper + n1) {
+            batches.add(payload)
+            // if the batch size is met, dispatch it to the consumer
+            if (batches.size >= batchSize) {
+                txswap()
+            } else if (batches.size == 1) {
+                signal.send(lsn) // start tracking 'lsn'
+            }
         }
-    }
 
     private suspend fun sig() {
         // consume all signals
@@ -118,14 +113,17 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
                 if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue for buffer")
                 continue
             } else {
-                if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER,
-                                 "signal sleep for $waitms for buffer")
+                if (DEBUG)
+                    Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal sleep for $waitms for buffer")
             }
 
             // wait for 'batch' to dispatch
             delay(waitms)
-            if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER,
-                             "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})")
+            if (DEBUG)
+                Log.d(
+                    LoggerConstants.LOG_BATCH_LOGGER,
+                    "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})"
+                )
 
             // 'l' is the current buffer, that is, 'l == i',
             // and 'batch' hasn't dispatched it,

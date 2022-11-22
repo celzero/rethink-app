@@ -40,7 +40,8 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
-        UNIVERSAL(0), LOGS(1);
+        UNIVERSAL(0),
+        LOGS(1);
 
         companion object {
             fun getCount(): Int {
@@ -57,33 +58,37 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun init() {
 
-        b.firewallActViewpager.adapter = object : FragmentStateAdapter(this) {
-            override fun createFragment(position: Int): Fragment {
-                return when (position) {
-                    Tabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
-                    Tabs.LOGS.screen -> ConnectionTrackerFragment.newInstance()
-                    else -> UniversalFirewallFragment.newInstance()
+        b.firewallActViewpager.adapter =
+            object : FragmentStateAdapter(this) {
+                override fun createFragment(position: Int): Fragment {
+                    return when (position) {
+                        Tabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
+                        Tabs.LOGS.screen -> ConnectionTrackerFragment.newInstance()
+                        else -> UniversalFirewallFragment.newInstance()
+                    }
+                }
+
+                override fun getItemCount(): Int {
+                    return Tabs.getCount()
                 }
             }
 
-            override fun getItemCount(): Int {
-                return Tabs.getCount()
+        TabLayoutMediator(b.firewallActTabLayout, b.firewallActViewpager) { tab, position
+                -> // Styling each tab here
+                tab.text =
+                    when (position) {
+                        Tabs.UNIVERSAL.screen -> getString(R.string.firewall_act_universal_tab)
+                        Tabs.LOGS.screen -> getString(R.string.firewall_act_network_monitor_tab)
+                        else -> getString(R.string.firewall_act_universal_tab)
+                    }
             }
-        }
-
-        TabLayoutMediator(b.firewallActTabLayout,
-                          b.firewallActViewpager) { tab, position -> // Styling each tab here
-            tab.text = when (position) {
-                Tabs.UNIVERSAL.screen -> getString(R.string.firewall_act_universal_tab)
-                Tabs.LOGS.screen -> getString(R.string.firewall_act_network_monitor_tab)
-                else -> getString(R.string.firewall_act_universal_tab)
-            }
-        }.attach()
+            .attach()
 
         b.firewallActViewpager.setCurrentItem(fragmentIndex, true)
 
@@ -97,5 +102,4 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
             }
         }
     }
-
 }

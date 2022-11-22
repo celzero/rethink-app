@@ -75,9 +75,8 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.regex.Pattern
 
-
-class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
-                                 SearchView.OnQueryTextListener {
+class RethinkBlocklistFragment :
+    Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentRethinkBlocklistBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -99,7 +98,8 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     private val localFileTagViewModel: RethinkLocalFileTagViewModel by viewModel()
 
     enum class BlocklistSelectionFilter(val id: Int) {
-        ALL(0), SELECTED(1)
+        ALL(0),
+        SELECTED(1)
     }
 
     class Filters {
@@ -110,7 +110,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     enum class BlocklistView(val tag: String) {
-        SIMPLE("0"), PACKS("1"), ADVANCED("2");
+        SIMPLE("0"),
+        PACKS("1"),
+        ADVANCED("2");
 
         companion object {
             fun getTag(tag: String): BlocklistView {
@@ -126,7 +128,8 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     enum class RethinkBlocklistType {
-        LOCAL, REMOTE;
+        LOCAL,
+        REMOTE;
 
         companion object {
             fun getType(id: Int): RethinkBlocklistType {
@@ -150,11 +153,17 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         var modifiedStamp: String = ""
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val bundle = this.arguments
-        type = getType(bundle?.getInt(RETHINK_BLOCKLIST_TYPE,
-                                      RethinkBlocklistType.REMOTE.ordinal) ?: RethinkBlocklistType.REMOTE.ordinal)
+        type =
+            getType(
+                bundle?.getInt(RETHINK_BLOCKLIST_TYPE, RethinkBlocklistType.REMOTE.ordinal)
+                    ?: RethinkBlocklistType.REMOTE.ordinal
+            )
         remoteName = bundle?.getString(RETHINK_BLOCKLIST_NAME, "") ?: ""
         remoteUrl = bundle?.getString(RETHINK_BLOCKLIST_URL, "") ?: ""
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -201,18 +210,30 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
     private fun updateFilteredTxtUi(filter: Filters) {
         if (filter.groups.isEmpty()) {
-            b.lbAdvancedFilterLabelTv.text = Utilities.updateHtmlEncodedText(
-                getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase()))
+            b.lbAdvancedFilterLabelTv.text =
+                Utilities.updateHtmlEncodedText(
+                    getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase())
+                )
         } else {
             if (filter.subGroups.isEmpty()) {
-                b.lbAdvancedFilterLabelTv.text = Utilities.updateHtmlEncodedText(
-                    getString(R.string.rt_filter_desc_groups,
-                              filter.filterSelected.name.lowercase(), filter.groups))
+                b.lbAdvancedFilterLabelTv.text =
+                    Utilities.updateHtmlEncodedText(
+                        getString(
+                            R.string.rt_filter_desc_groups,
+                            filter.filterSelected.name.lowercase(),
+                            filter.groups
+                        )
+                    )
             } else {
-                b.lbAdvancedFilterLabelTv.text = Utilities.updateHtmlEncodedText(
-                    getString(R.string.rt_filter_desc_subgroups,
-                              filter.filterSelected.name.lowercase(), filter.groups,
-                              filter.subGroups))
+                b.lbAdvancedFilterLabelTv.text =
+                    Utilities.updateHtmlEncodedText(
+                        getString(
+                            R.string.rt_filter_desc_subgroups,
+                            filter.filterSelected.name.lowercase(),
+                            filter.groups,
+                            filter.subGroups
+                        )
+                    )
             }
         }
     }
@@ -220,12 +241,13 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     private fun hasBlocklist() {
         go {
             uiCtx {
-                val blocklistsExist = withContext(Dispatchers.IO) {
-                    hasBlocklists()
-                }
+                val blocklistsExist = withContext(Dispatchers.IO) { hasBlocklists() }
                 if (blocklistsExist) {
-                    RethinkBlocklistManager.createBraveDns(requireContext(),
-                                                           currentBlocklistTimeStamp(), type)
+                    RethinkBlocklistManager.createBraveDns(
+                        requireContext(),
+                        currentBlocklistTimeStamp(),
+                        type
+                    )
                     setListAdapter()
                     showConfigureUi()
                     hideDownloadUi()
@@ -310,9 +332,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
         b.lbListToggleGroup.addOnButtonCheckedListener(listViewToggleListener)
 
-        b.lbAdvSearchFilterIcon.setOnClickListener {
-            openFilterBottomSheet()
-        }
+        b.lbAdvSearchFilterIcon.setOnClickListener { openFilterBottomSheet() }
 
         b.lbAdvSearchSv.setOnQueryTextListener(this)
 
@@ -339,8 +359,11 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             if (type.isLocal()) {
                 var status = AppDownloadManager.DownloadManagerStatus.NOT_STARTED
                 ioCtx {
-                    status = appDownloadManager.downloadLocalBlocklist(
-                        persistentState.localBlocklistTimestamp, isRedownload = false)
+                    status =
+                        appDownloadManager.downloadLocalBlocklist(
+                            persistentState.localBlocklistTimestamp,
+                            isRedownload = false
+                        )
                 }
                 handleDownloadStatus(status)
             } else { // remote blocklist
@@ -348,7 +371,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
                 // check RethinkListFragment.kt
                 ioCtx {
                     appDownloadManager.downloadRemoteBlocklist(
-                        persistentState.remoteBlocklistTimestamp, isRedownload = false)
+                        persistentState.remoteBlocklistTimestamp,
+                        isRedownload = false
+                    )
                 }
             }
         }
@@ -380,9 +405,11 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             }
             AppDownloadManager.DownloadManagerStatus.NOT_AVAILABLE -> {
                 // TODO: Prompt for app update
-                showToastUiCentered(requireContext(),
-                                    "Download latest version to update the blocklists",
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    requireContext(),
+                    "Download latest version to update the blocklists",
+                    Toast.LENGTH_SHORT
+                )
             }
         }
     }
@@ -416,21 +443,26 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun setStamp(stamp: String?) {
-        Log.i(LoggerConstants.LOG_TAG_VPN,
-              "Rethink dns, set stamp for blocklist type: ${type.name} with $stamp")
+        Log.i(
+            LoggerConstants.LOG_TAG_VPN,
+            "Rethink dns, set stamp for blocklist type: ${type.name} with $stamp"
+        )
         if (stamp == null) return
 
         io {
-            val blocklistCount = RethinkBlocklistManager.getTagsFromStamp(requireContext(), stamp,
-                                                                          type).size
+            val blocklistCount =
+                RethinkBlocklistManager.getTagsFromStamp(requireContext(), stamp, type).size
             if (type.isLocal()) {
                 persistentState.localBlocklistStamp = stamp
                 persistentState.numberOfLocalBlocklists = blocklistCount
                 persistentState.blocklistEnabled = true
             } else {
                 // set stamp for remote blocklist
-                appConfig.updateRethinkEndpoint(Constants.RETHINK_DNS_PLUS, getRemoteUrl(stamp),
-                                                blocklistCount)
+                appConfig.updateRethinkEndpoint(
+                    Constants.RETHINK_DNS_PLUS,
+                    getRemoteUrl(stamp),
+                    blocklistCount
+                )
                 appConfig.enableRethinkDnsPlus()
             }
         }
@@ -444,16 +476,17 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
     }
 
-    private val listViewToggleListener = MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
-        val mb: MaterialButton = b.lbListToggleGroup.findViewById(checkedId)
-        if (isChecked) {
-            selectToggleBtnUi(mb)
-            showList(mb.tag.toString())
-            return@OnButtonCheckedListener
-        }
+    private val listViewToggleListener =
+        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
+            val mb: MaterialButton = b.lbListToggleGroup.findViewById(checkedId)
+            if (isChecked) {
+                selectToggleBtnUi(mb)
+                showList(mb.tag.toString())
+                return@OnButtonCheckedListener
+            }
 
-        unselectToggleBtnUi(mb)
-    }
+            unselectToggleBtnUi(mb)
+        }
 
     private fun showList(id: String) {
         // change the check based on the tag
@@ -479,13 +512,15 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun selectToggleBtnUi(b: MaterialButton) {
-        b.backgroundTintList = ColorStateList.valueOf(
-            fetchToggleBtnColors(requireContext(), R.color.accentGood))
+        b.backgroundTintList =
+            ColorStateList.valueOf(fetchToggleBtnColors(requireContext(), R.color.accentGood))
     }
 
     private fun unselectToggleBtnUi(b: MaterialButton) {
-        b.backgroundTintList = ColorStateList.valueOf(
-            fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg))
+        b.backgroundTintList =
+            ColorStateList.valueOf(
+                fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg)
+            )
     }
 
     private fun setListAdapter() {
@@ -502,7 +537,6 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     private fun processSelectedFileTags(stamp: String) {
         val list = RethinkBlocklistManager.getTagsFromStamp(requireContext(), stamp, type)
 
-        Log.d("TEST", "TEST: selectTagsForStamp: $list")
         updateSelectedFileTags(list.toMutableSet())
     }
 
@@ -511,28 +545,32 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             // clear the residues if the selected tags are empty
             if (selectedTags.isEmpty()) {
                 if (type.isLocal()) {
-                    Log.d("TEST", "TEST Clearing local blocklist")
                     RethinkBlocklistManager.clearTagsSelectionLocal()
                 } else {
-                    Log.d("TEST", "TEST Clearing Remote blocklist")
                     RethinkBlocklistManager.clearTagsSelectionRemote()
                 }
                 return@io
             }
 
             if (type.isLocal()) {
-                Log.d("TEST", "TEST: updateSelectedFileTags for local: $selectedTags")
                 RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
                 val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                val stamp = RethinkBlocklistManager.getStamp(requireContext(), list,
-                                                             RethinkBlocklistType.LOCAL)
+                val stamp =
+                    RethinkBlocklistManager.getStamp(
+                        requireContext(),
+                        list,
+                        RethinkBlocklistType.LOCAL
+                    )
                 modifiedStamp = stamp
             } else {
-                Log.d("TEST", "TEST: updateSelectedFileTags for remote: $selectedTags")
                 RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
                 val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                val stamp = RethinkBlocklistManager.getStamp(requireContext(), list,
-                                                             RethinkBlocklistType.LOCAL)
+                val stamp =
+                    RethinkBlocklistManager.getStamp(
+                        requireContext(),
+                        list,
+                        RethinkBlocklistType.LOCAL
+                    )
                 modifiedStamp = stamp
             }
         }
@@ -563,17 +601,14 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     }
 
     private fun isRethinkStampSearch(t: String): Boolean {
-        Log.d("TEST", "TEST: isSearchStringStamp: $t")
         // do not proceed if rethinkdns.com is not available
         if (!t.contains(Constants.RETHINKDNS_DOMAIN)) return false
 
         val split = t.split("/")
-        Log.d("TEST", "TEST: split: $split")
 
         // split: https://max.rethinkdns.com/1:IAAgAA== [https:, , max.rethinkdns.com, 1:IAAgAA==]
         split.forEach {
             if (it.contains("$RETHINK_STAMP_VERSION:") && isBase64(it)) {
-                Log.d("TEST", "TEST selectTagsForStamp: $it")
                 selectTagsForStamp(it)
                 showToastUiCentered(requireContext(), "Blocklists restored", Toast.LENGTH_SHORT)
                 return true
@@ -586,8 +621,10 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     // ref: netflix/msl/util/Base64
     private fun isBase64(stamp: String): Boolean {
         val whitespaceRegex = "\\s"
-        val pattern = Pattern.compile(
-            "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$")
+        val pattern =
+            Pattern.compile(
+                "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"
+            )
 
         val versionSplit = stamp.split(":").getOrNull(1) ?: return false
 
@@ -595,12 +632,10 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
 
         val result = versionSplit.replace(whitespaceRegex, "")
         val match = pattern.matcher(result).matches()
-        Log.d("TEST", "TEST isBase64 result: $result, match: $match")
         return match
     }
 
     private fun selectTagsForStamp(stamp: String) {
-        Log.d("TEST", "TEST: Stamp: $stamp, time: ${currentBlocklistTimeStamp()}")
         processSelectedFileTags(stamp)
     }
 
@@ -632,9 +667,9 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             val selectedTags = getSelectedTags()
             uiCtx {
                 // set recycler for simple view adapter
-                simpleListAdapter = RethinkSimpleViewAdapter(requireContext(), tags, selectedTags,
-                                                             type)
-                //getSimpleViewFileTags
+                simpleListAdapter =
+                    RethinkSimpleViewAdapter(requireContext(), tags, selectedTags, type)
+                // getSimpleViewFileTags
                 val layoutManager = LinearLayoutManager(requireContext())
                 b.lbSimpleRecycler.layoutManager = layoutManager
                 b.lbSimpleRecycler.adapter = simpleListAdapter
@@ -656,8 +691,8 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             val tags = RethinkBlocklistManager.getSimpleViewPacksTags(type)
             val selectedTags = getSelectedTags()
             uiCtx {
-                simplePacksListAdapter = RethinkSimpleViewPacksAdapter(requireContext(), tags,
-                                                                       selectedTags, type)
+                simplePacksListAdapter =
+                    RethinkSimpleViewPacksAdapter(requireContext(), tags, selectedTags, type)
                 val layoutManager = LinearLayoutManager(requireContext())
                 b.lbSimpleRecyclerPacks.layoutManager = layoutManager
                 b.lbSimpleRecyclerPacks.adapter = simplePacksListAdapter
@@ -669,10 +704,18 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     private fun remakeFilterChipsUi() {
         b.filterChipGroup.removeAllViews()
 
-        val all = makeChip(BlocklistSelectionFilter.ALL.id,
-                           getString(R.string.rt_filter_parent_all), true)
-        val selected = makeChip(BlocklistSelectionFilter.SELECTED.id,
-                                getString(R.string.rt_filter_parent_selected), false)
+        val all =
+            makeChip(
+                BlocklistSelectionFilter.ALL.id,
+                getString(R.string.rt_filter_parent_all),
+                true
+            )
+        val selected =
+            makeChip(
+                BlocklistSelectionFilter.SELECTED.id,
+                getString(R.string.rt_filter_parent_selected),
+                false
+            )
 
         b.filterChipGroup.addView(all)
         b.filterChipGroup.addView(selected)
@@ -710,9 +753,7 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
     private fun openFilterBottomSheet() {
         io {
             val bottomSheetFragment = RethinkPlusFilterBottomSheetFragment(this, getAllList())
-            uiCtx {
-                bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag)
-            }
+            uiCtx { bottomSheetFragment.show(childFragmentManager, bottomSheetFragment.tag) }
         }
     }
 
@@ -737,7 +778,8 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         b.lbAdvancedRecycler.adapter = advanceRemoteListAdapter
 
         // implement sticky headers
-        // ref: https://stackoverflow.com/questions/32949971/how-can-i-make-sticky-headers-in-recyclerview-without-external-lib
+        // ref:
+        // https://stackoverflow.com/questions/32949971/how-can-i-make-sticky-headers-in-recyclerview-without-external-lib
         /*b.lbAdvancedRecycler.addItemDecoration(HeaderItemDecoration(b.lbAdvancedRecycler) { itemPosition ->
             itemPosition >= 0 && itemPosition < advanceRemoteListAdapter!!.itemCount
         })*/
@@ -760,17 +802,25 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
 
         // observer for custom download manager worker
-        workManager.getWorkInfosByTagLiveData(CUSTOM_DOWNLOAD).observe(
-            viewLifecycleOwner) { workInfoList ->
+        workManager.getWorkInfosByTagLiveData(CUSTOM_DOWNLOAD).observe(viewLifecycleOwner) {
+            workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD")
-            if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
+            Log.i(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD"
+            )
+            if (
+                WorkInfo.State.ENQUEUED == workInfo.state ||
+                    WorkInfo.State.RUNNING == workInfo.state
+            ) {
                 onDownloadStart()
             } else if (WorkInfo.State.SUCCEEDED == workInfo.state) {
                 onDownloadSuccess()
                 workManager.pruneWork()
-            } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+            } else if (
+                WorkInfo.State.CANCELLED == workInfo.state ||
+                    WorkInfo.State.FAILED == workInfo.state
+            ) {
                 onDownloadFail()
                 workManager.pruneWork()
                 workManager.cancelAllWorkByTag(CUSTOM_DOWNLOAD)
@@ -780,14 +830,22 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         }
 
         // observer for Androids default download manager
-        workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+        workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(viewLifecycleOwner) {
+            workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                  "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG")
-            if (WorkInfo.State.ENQUEUED == workInfo.state || WorkInfo.State.RUNNING == workInfo.state) {
+            Log.i(
+                LoggerConstants.LOG_TAG_DOWNLOAD,
+                "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG"
+            )
+            if (
+                WorkInfo.State.ENQUEUED == workInfo.state ||
+                    WorkInfo.State.RUNNING == workInfo.state
+            ) {
                 onDownloadStart()
-            } else if (WorkInfo.State.CANCELLED == workInfo.state || WorkInfo.State.FAILED == workInfo.state) {
+            } else if (
+                WorkInfo.State.CANCELLED == workInfo.state ||
+                    WorkInfo.State.FAILED == workInfo.state
+            ) {
                 onDownloadFail()
                 workManager.pruneWork()
                 workManager.cancelAllWorkByTag(DOWNLOAD_TAG)
@@ -797,24 +855,34 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
             }
         }
 
-        workManager.getWorkInfosByTagLiveData(FILE_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
+        workManager.getWorkInfosByTagLiveData(FILE_TAG).observe(viewLifecycleOwner) { workInfoList
+            ->
             if (workInfoList != null && workInfoList.isNotEmpty()) {
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                    Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager completed - $FILE_TAG")
+                    Log.i(
+                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        "AppDownloadManager Work Manager completed - $FILE_TAG"
+                    )
                     onDownloadSuccess()
                     workManager.pruneWork()
-                } else if (workInfo != null && (workInfo.state == WorkInfo.State.CANCELLED || workInfo.state == WorkInfo.State.FAILED)) {
+                } else if (
+                    workInfo != null &&
+                        (workInfo.state == WorkInfo.State.CANCELLED ||
+                            workInfo.state == WorkInfo.State.FAILED)
+                ) {
                     onDownloadFail()
                     workManager.pruneWork()
                     workManager.cancelAllWorkByTag(FILE_TAG)
-                    Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager failed - $FILE_TAG")
+                    Log.i(
+                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        "AppDownloadManager Work Manager failed - $FILE_TAG"
+                    )
                 } else {
-                    Log.i(LoggerConstants.LOG_TAG_DOWNLOAD,
-                          "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}")
+                    Log.i(
+                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}"
+                    )
                 }
             }
         }
@@ -845,45 +913,33 @@ class RethinkBlocklistFragment : Fragment(R.layout.fragment_rethink_blocklist),
         b.lbDownloadProgressRemote.visibility = View.GONE
         b.lbDownloadBtn.text = getString(R.string.rt_download)
         hideDownloadUi()
-        //showConfigureUi()
+        // showConfigureUi()
         hasBlocklist()
         b.lbListToggleGroup.check(R.id.lb_simple_toggle_btn)
-        showToastUiCentered(requireContext(),
-                            getString(R.string.download_update_dialog_message_success),
-                            Toast.LENGTH_SHORT)
+        showToastUiCentered(
+            requireContext(),
+            getString(R.string.download_update_dialog_message_success),
+            Toast.LENGTH_SHORT
+        )
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
+        withContext(Dispatchers.Main) { f() }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
+        withContext(Dispatchers.IO) { f() }
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            f()
-        }
+        lifecycleScope.launch { f() }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.Main) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
 }

@@ -25,13 +25,11 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 
 /**
- * The CustomIp table will contain the firewall rules
- * based on IP address, port and protocol.
+ * The CustomIp table will contain the firewall rules based on IP address, port and protocol.
  *
  * The rules will be added to the database with the combination of uid, ipaddress, port, protocol.
  * Special case: when the uid is assigned as FirewallRules#EVERYBODY_UID then the rules with
  * combination of ipaddress, port, protocol will be applied for all the available apps.
- *
  */
 @Entity(primaryKeys = ["uid", "ipAddress", "port", "protocol"], tableName = "CustomIp")
 class CustomIp {

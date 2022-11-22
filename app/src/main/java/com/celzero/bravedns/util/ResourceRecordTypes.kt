@@ -19,7 +19,6 @@ package com.celzero.bravedns.util
 // From https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
 // additional ref: https://www.netmeister.org/blog/dns-rrs.html
 enum class ResourceRecordTypes(val value: Int, val desc: String) {
-
     A(1, "IPv4"),
     NS(2, "Authoritative Name Server"),
     CNAME(5, "Canonical Name"),
@@ -101,5 +100,4 @@ enum class ResourceRecordTypes(val value: Int, val desc: String) {
             return map[value.hashCode()] ?: UNKNOWN
         }
     }
-
 }

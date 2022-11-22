@@ -36,65 +36,78 @@ class HttpRequestHelper {
 
     companion object {
 
-        // FIXME - #319 Come up with a logic where onResponse should call for an interface and proceed
+        // FIXME - #319 Come up with a logic where onResponse should call for an interface and
+        // proceed
         // with the result returned from server.
         private fun serverCheckForUpdate(url: String, persistentState: PersistentState) {
             val client = OkHttpClient()
             val request = Request.Builder().url(url).build()
 
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.i(LOG_TAG_DOWNLOAD,
-                          "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}")
-                }
+            client
+                .newCall(request)
+                .enqueue(
+                    object : Callback {
+                        override fun onFailure(call: Call, e: IOException) {
+                            Log.i(
+                                LOG_TAG_DOWNLOAD,
+                                "onFailure -  ${call.isCanceled()}, ${call.isExecuted()}"
+                            )
+                        }
 
-                override fun onResponse(call: Call, response: Response) {
-                    val stringResponse = response.body?.string()
-                    if (stringResponse.isNullOrEmpty()) return
+                        override fun onResponse(call: Call, response: Response) {
+                            val stringResponse = response.body?.string()
+                            if (stringResponse.isNullOrEmpty()) return
 
-                    val json = JSONObject(stringResponse)
-                    val version = json.optInt(JSON_VERSION)
-                    val shouldUpdate = json.getBoolean(JSON_UPDATE)
-                    persistentState.lastAppUpdateCheck = System.currentTimeMillis()
-                    Log.i(LOG_TAG_DOWNLOAD,
-                          "Server response for the new version download is true, version number-  $shouldUpdate")
-                    if (version == UPDATE_CHECK_RESPONSE_VERSION) {
-                        if (shouldUpdate) {
-                            // TODO handle - #319
-                        } else {
-                            // TODO handle - #319
+                            val json = JSONObject(stringResponse)
+                            val version = json.optInt(JSON_VERSION)
+                            val shouldUpdate = json.getBoolean(JSON_UPDATE)
+                            persistentState.lastAppUpdateCheck = System.currentTimeMillis()
+                            Log.i(
+                                LOG_TAG_DOWNLOAD,
+                                "Server response for the new version download is true, version number-  $shouldUpdate"
+                            )
+                            if (version == UPDATE_CHECK_RESPONSE_VERSION) {
+                                if (shouldUpdate) {
+                                    // TODO handle - #319
+                                } else {
+                                    // TODO handle - #319
+                                }
+                            }
+                            response.body!!.close()
+                            client.connectionPool.evictAll()
                         }
                     }
-                    response.body!!.close()
-                    client.connectionPool.evictAll()
-                }
-            })
+                )
         }
 
         fun downloadBlockListFiles(context: Context): DownloadManager {
-            val downloadManager = context.getSystemService(
-                AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
+            val downloadManager =
+                context.getSystemService(AppCompatActivity.DOWNLOAD_SERVICE) as DownloadManager
             val uri: Uri = Uri.parse("")
             val request = DownloadManager.Request(uri)
-            request.setDestinationInExternalFilesDir(context,
-                                                     Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH,
-                                                     Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
-            Log.i(LOG_TAG_DOWNLOAD,
-                  "Path - ${context.filesDir.canonicalPath}${Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH}${Constants.ONDEVICE_BLOCKLIST_FILE_TAG}")
+            request.setDestinationInExternalFilesDir(
+                context,
+                Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH,
+                Constants.ONDEVICE_BLOCKLIST_FILE_TAG
+            )
+            Log.i(
+                LOG_TAG_DOWNLOAD,
+                "Path - ${context.filesDir.canonicalPath}${Constants.ONDEVICE_BLOCKLIST_DOWNLOAD_PATH}${Constants.ONDEVICE_BLOCKLIST_FILE_TAG}"
+            )
             downloadManager.enqueue(request)
             return downloadManager
         }
 
         fun checkStatus(cursor: Cursor): String {
-            //column for status
+            // column for status
             val columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
             val status = cursor.getInt(columnIndex)
-            //column for reason code if the download failed or paused
+            // column for reason code if the download failed or paused
             val columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON)
             val reason = cursor.getInt(columnReason)
-            //get the download filename
-            //val filenameIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME)
-            //val filename = cursor.getString(filenameIndex)
+            // get the download filename
+            // val filenameIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME)
+            // val filename = cursor.getString(filenameIndex)
             var statusText = ""
             var reasonText = ""
             when (status) {
@@ -102,23 +115,32 @@ class HttpRequestHelper {
                     statusText = "STATUS_FAILED"
                     when (reason) {
                         DownloadManager.ERROR_CANNOT_RESUME -> reasonText = "ERROR_CANNOT_RESUME"
-                        DownloadManager.ERROR_DEVICE_NOT_FOUND -> reasonText = "ERROR_DEVICE_NOT_FOUND"
-                        DownloadManager.ERROR_FILE_ALREADY_EXISTS -> reasonText = "ERROR_FILE_ALREADY_EXISTS"
+                        DownloadManager.ERROR_DEVICE_NOT_FOUND ->
+                            reasonText = "ERROR_DEVICE_NOT_FOUND"
+                        DownloadManager.ERROR_FILE_ALREADY_EXISTS ->
+                            reasonText = "ERROR_FILE_ALREADY_EXISTS"
                         DownloadManager.ERROR_FILE_ERROR -> reasonText = "ERROR_FILE_ERROR"
-                        DownloadManager.ERROR_HTTP_DATA_ERROR -> reasonText = "ERROR_HTTP_DATA_ERROR"
-                        DownloadManager.ERROR_INSUFFICIENT_SPACE -> reasonText = "ERROR_INSUFFICIENT_SPACE"
-                        DownloadManager.ERROR_TOO_MANY_REDIRECTS -> reasonText = "ERROR_TOO_MANY_REDIRECTS"
-                        DownloadManager.ERROR_UNHANDLED_HTTP_CODE -> reasonText = "ERROR_UNHANDLED_HTTP_CODE"
+                        DownloadManager.ERROR_HTTP_DATA_ERROR ->
+                            reasonText = "ERROR_HTTP_DATA_ERROR"
+                        DownloadManager.ERROR_INSUFFICIENT_SPACE ->
+                            reasonText = "ERROR_INSUFFICIENT_SPACE"
+                        DownloadManager.ERROR_TOO_MANY_REDIRECTS ->
+                            reasonText = "ERROR_TOO_MANY_REDIRECTS"
+                        DownloadManager.ERROR_UNHANDLED_HTTP_CODE ->
+                            reasonText = "ERROR_UNHANDLED_HTTP_CODE"
                         DownloadManager.ERROR_UNKNOWN -> reasonText = "ERROR_UNKNOWN"
                     }
                 }
                 DownloadManager.STATUS_PAUSED -> {
                     statusText = "STATUS_PAUSED"
                     when (reason) {
-                        DownloadManager.PAUSED_QUEUED_FOR_WIFI -> reasonText = "PAUSED_QUEUED_FOR_WIFI"
+                        DownloadManager.PAUSED_QUEUED_FOR_WIFI ->
+                            reasonText = "PAUSED_QUEUED_FOR_WIFI"
                         DownloadManager.PAUSED_UNKNOWN -> reasonText = "PAUSED_UNKNOWN"
-                        DownloadManager.PAUSED_WAITING_FOR_NETWORK -> reasonText = "PAUSED_WAITING_FOR_NETWORK"
-                        DownloadManager.PAUSED_WAITING_TO_RETRY -> reasonText = "PAUSED_WAITING_TO_RETRY"
+                        DownloadManager.PAUSED_WAITING_FOR_NETWORK ->
+                            reasonText = "PAUSED_WAITING_FOR_NETWORK"
+                        DownloadManager.PAUSED_WAITING_TO_RETRY ->
+                            reasonText = "PAUSED_WAITING_TO_RETRY"
                     }
                 }
                 DownloadManager.STATUS_PENDING -> statusText = "STATUS_PENDING"
@@ -130,6 +152,5 @@ class HttpRequestHelper {
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "Reason: $reasonText")
             return statusText
         }
-
     }
 }

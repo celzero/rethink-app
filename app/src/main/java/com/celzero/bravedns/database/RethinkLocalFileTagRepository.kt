@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.room.Transaction
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 
-
 class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkLocalFileTagDao) {
 
     @Transaction

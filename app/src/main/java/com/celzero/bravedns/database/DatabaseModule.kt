@@ -21,9 +21,7 @@ import org.koin.dsl.module
 object DatabaseModule {
     private val databaseModule = module {
         single { AppDatabase.buildDatabase(androidContext()) }
-        single {
-            RefreshDatabase(androidContext(), get(), get(), get())
-        }
+        single { RefreshDatabase(androidContext(), get(), get(), get()) }
     }
     private val daoModule = module {
         single { get<AppDatabase>().appInfoDAO() }

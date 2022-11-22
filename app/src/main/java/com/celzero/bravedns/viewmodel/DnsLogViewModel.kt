@@ -31,9 +31,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    val dnsLogsList = Transformations.switchMap(filteredList) { input ->
-        fetchDnsLogs(input)
-    }
+    val dnsLogsList = Transformations.switchMap(filteredList) { input -> fetchDnsLogs(input) }
 
     private fun fetchDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return when (filterType) {
@@ -51,20 +49,26 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 
     private fun getAllDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
-            dnsLogDAO.getDnsLogsByName("%$filter%")
-        }.liveData.cachedIn(viewModelScope)
+                dnsLogDAO.getDnsLogsByName("%$filter%")
+            }
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     private fun getAllowedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
-            dnsLogDAO.getAllowedDnsLogsByName("%$filter%")
-        }.liveData.cachedIn(viewModelScope)
+                dnsLogDAO.getAllowedDnsLogsByName("%$filter%")
+            }
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     private fun getBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
-            dnsLogDAO.getBlockedDnsLogsByName("%$filter%")
-        }.liveData.cachedIn(viewModelScope)
+                dnsLogDAO.getBlockedDnsLogsByName("%$filter%")
+            }
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     fun setFilter(searchString: String, type: DnsLogFragment.DnsLogFilter) {
@@ -73,5 +77,4 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
         if (searchString.isNotBlank()) filteredList.value = searchString
         else filteredList.value = ""
     }
-
 }

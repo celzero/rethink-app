@@ -45,9 +45,18 @@ class DnsProxyEndpoint {
         return this.id.hashCode()
     }
 
-    constructor(id: Int, proxyName: String, proxyType: String, proxyAppName: String,
-                proxyIP: String, proxyPort: Int, isSelected: Boolean, isCustom: Boolean,
-                modifiedDataTime: Long, latency: Int) {
+    constructor(
+        id: Int,
+        proxyName: String,
+        proxyType: String,
+        proxyAppName: String,
+        proxyIP: String,
+        proxyPort: Int,
+        isSelected: Boolean,
+        isCustom: Boolean,
+        modifiedDataTime: Long,
+        latency: Int
+    ) {
         // Room auto-increments id when its set to zero.
         // A non-zero id overrides and sets caller-specified id instead.
         this.id = id
@@ -74,22 +83,35 @@ class DnsProxyEndpoint {
             // for no app.
             if (this.proxyAppName != context.getString(R.string.cd_custom_dns_proxy_default_app)) {
                 val app = FirewallManager.getAppInfoByPackage(this.proxyAppName)?.appName
-                context.getString(R.string.settings_socks_forwarding_desc, this.proxyIP,
-                                  this.proxyPort.toString(), app)
+                context.getString(
+                    R.string.settings_socks_forwarding_desc,
+                    this.proxyIP,
+                    this.proxyPort.toString(),
+                    app
+                )
             } else {
-                context.getString(R.string.settings_socks_forwarding_desc_no_app, this.proxyIP,
-                                  this.proxyPort.toString())
+                context.getString(
+                    R.string.settings_socks_forwarding_desc_no_app,
+                    this.proxyIP,
+                    this.proxyPort.toString()
+                )
             }
         } else {
             if (this.proxyAppName != context.getString(R.string.cd_custom_dns_proxy_default_app)) {
                 val app = FirewallManager.getAppInfoByPackage(this.proxyAppName)?.appName
-                context.getString(R.string.dns_proxy_desc, this.proxyIP, this.proxyPort.toString(),
-                                  app)
+                context.getString(
+                    R.string.dns_proxy_desc,
+                    this.proxyIP,
+                    this.proxyPort.toString(),
+                    app
+                )
             } else {
-                context.getString(R.string.dns_proxy_desc_no_app, this.proxyIP,
-                                  this.proxyPort.toString())
+                context.getString(
+                    R.string.dns_proxy_desc_no_app,
+                    this.proxyIP,
+                    this.proxyPort.toString()
+                )
             }
-
         }
     }
 

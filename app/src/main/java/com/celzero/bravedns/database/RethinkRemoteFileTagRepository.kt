@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.room.Transaction
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 
-
 class RethinkRemoteFileTagRepository(private val rethinkRemoteFileTagDao: RethinkRemoteFileTagDao) {
 
     @Transaction
@@ -58,5 +57,4 @@ class RethinkRemoteFileTagRepository(private val rethinkRemoteFileTagDao: Rethin
     suspend fun getSelectedTags(): List<Int> {
         return rethinkRemoteFileTagDao.getSelectedTags()
     }
-
 }

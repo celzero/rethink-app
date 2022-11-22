@@ -32,5 +32,4 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
     suspend fun clearAllData() {
         dnsLogDAO.clearAllData()
     }
-
 }

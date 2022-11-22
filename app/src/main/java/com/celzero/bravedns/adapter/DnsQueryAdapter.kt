@@ -45,18 +45,19 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.google.gson.Gson
 
 class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
-        PagingDataAdapter<DnsLog, DnsQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
+    PagingDataAdapter<DnsLog, DnsQueryAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         const val TYPE_TRANSACTION: Int = 1
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DnsLog>() {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<DnsLog>() {
 
-            override fun areItemsTheSame(oldConnection: DnsLog,
-                                         newConnection: DnsLog) = oldConnection.id == newConnection.id
+                override fun areItemsTheSame(oldConnection: DnsLog, newConnection: DnsLog) =
+                    oldConnection.id == newConnection.id
 
-            override fun areContentsTheSame(oldConnection: DnsLog,
-                                            newConnection: DnsLog) = oldConnection == newConnection
-        }
+                override fun areContentsTheSame(oldConnection: DnsLog, newConnection: DnsLog) =
+                    oldConnection == newConnection
+            }
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
@@ -71,13 +72,13 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
-        val itemBinding = TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent,
-                                                        false)
+        val itemBinding =
+            TransactionRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TransactionViewHolder(itemBinding)
     }
 
     inner class TransactionViewHolder(private val b: TransactionRowBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
         fun update(dnsLog: DnsLog?) {
             if (dnsLog == null) return
 
@@ -85,9 +86,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             displayLogEntryHint(dnsLog)
             displayIcon(dnsLog)
 
-            b.root.setOnClickListener {
-                openBottomSheet(dnsLog)
-            }
+            b.root.setOnClickListener { openBottomSheet(dnsLog) }
         }
 
         fun setTag(dnsLog: DnsLog?) {
@@ -127,58 +126,71 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             b.responseTime.text = dnsLog.wallTime()
             b.fqdn.text = dnsLog.queryStr
 
-            b.latencyVal.text = context.getString(R.string.dns_query_latency,
-                                                  dnsLog.latency.toString())
+            b.latencyVal.text =
+                context.getString(R.string.dns_query_latency, dnsLog.latency.toString())
         }
 
         private fun openBottomSheet(dnsLog: DnsLog) {
             if (context !is FragmentActivity) {
-                Log.wtf(LoggerConstants.LOG_TAG_UI,
-                        "Can not open bottom sheet. Context is not attached to activity")
+                Log.wtf(
+                    LoggerConstants.LOG_TAG_UI,
+                    "Can not open bottom sheet. Context is not attached to activity"
+                )
                 return
             }
 
             val bottomSheetFragment = DnsBlocklistBottomSheetFragment()
             val bundle = Bundle()
-            bundle.putString(DnsBlocklistBottomSheetFragment.INSTANCE_STATE_DNSLOGS,
-                             Gson().toJson(dnsLog))
+            bundle.putString(
+                DnsBlocklistBottomSheetFragment.INSTANCE_STATE_DNSLOGS,
+                Gson().toJson(dnsLog)
+            )
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
         /**
-         * Loads the fav icons from the cache, the icons are cached by favIconDownloader.
-         * On failure, will check if there is a icon for top level domain is available in cache.
-         * Else, will show the Flag.
+         * Loads the fav icons from the cache, the icons are cached by favIconDownloader. On
+         * failure, will check if there is a icon for top level domain is available in cache. Else,
+         * will show the Flag.
          *
          * This method will be executed only when show fav icon setting is turned on.
          */
         private fun displayFavIcon(url: String, subDomainURL: String) {
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                GlideApp.with(context.applicationContext).load(url).onlyRetrieveFromCache(
-                    true).diskCacheStrategy(DiskCacheStrategy.DATA).override(SIZE_ORIGINAL,
-                                                                             SIZE_ORIGINAL).error(
-                    GlideApp.with(context.applicationContext).load(
-                        subDomainURL).onlyRetrieveFromCache(true)).transition(
-                    withCrossFade(factory)).into(object : CustomViewTarget<ImageView, Drawable>(
-                    b.favIcon) {
-                    override fun onLoadFailed(errorDrawable: Drawable?) {
-                        showFlag()
-                        hideFavIcon()
-                    }
+                GlideApp.with(context.applicationContext)
+                    .load(url)
+                    .onlyRetrieveFromCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                    .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                    .error(
+                        GlideApp.with(context.applicationContext)
+                            .load(subDomainURL)
+                            .onlyRetrieveFromCache(true)
+                    )
+                    .transition(withCrossFade(factory))
+                    .into(
+                        object : CustomViewTarget<ImageView, Drawable>(b.favIcon) {
+                            override fun onLoadFailed(errorDrawable: Drawable?) {
+                                showFlag()
+                                hideFavIcon()
+                            }
 
-                    override fun onResourceReady(resource: Drawable,
-                                                 transition: Transition<in Drawable>?) {
-                        hideFlag()
-                        showFavIcon(resource)
-                    }
+                            override fun onResourceReady(
+                                resource: Drawable,
+                                transition: Transition<in Drawable>?
+                            ) {
+                                hideFlag()
+                                showFavIcon(resource)
+                            }
 
-                    override fun onResourceCleared(placeholder: Drawable?) {
-                        hideFavIcon()
-                        showFlag()
-                    }
-                })
+                            override fun onResourceCleared(placeholder: Drawable?) {
+                                hideFavIcon()
+                                showFlag()
+                            }
+                        }
+                    )
             } catch (e: Exception) {
                 if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 showFlag()

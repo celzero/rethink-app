@@ -26,8 +26,7 @@ import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 @Dao
 interface RethinkDnsEndpointDao {
 
-    @Update
-    fun update(rethinkDnsEndpoint: RethinkDnsEndpoint)
+    @Update fun update(rethinkDnsEndpoint: RethinkDnsEndpoint)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(rethinkDnsEndpoint: RethinkDnsEndpoint)
@@ -36,11 +35,11 @@ interface RethinkDnsEndpointDao {
     fun insertReplace(rethinkDnsEndpoint: RethinkDnsEndpoint)
 
     @Query(
-        "Update RethinkDnsEndpoint set url = :url, blocklistCount = :count where name = :name and uid = $MISSING_UID")
+        "Update RethinkDnsEndpoint set url = :url, blocklistCount = :count where name = :name and uid = $MISSING_UID"
+    )
     fun updateEndpoint(name: String, url: String, count: Int)
 
-    @Delete
-    fun delete(rethinkDnsEndpoint: RethinkDnsEndpoint)
+    @Delete fun delete(rethinkDnsEndpoint: RethinkDnsEndpoint)
 
     @Query("update RethinkDnsEndpoint set isActive = 0 where isActive = 1 and uid = $MISSING_UID")
     fun removeConnectionStatus()
@@ -49,7 +48,8 @@ interface RethinkDnsEndpointDao {
     fun removeAppWiseDns(uid: Int)
 
     @Query(
-        "delete from RethinkDnsEndpoint where name = :name and url =:url and uid = :uid and isCustom = 1 and uid = $MISSING_UID")
+        "delete from RethinkDnsEndpoint where name = :name and url =:url and uid = :uid and isCustom = 1 and uid = $MISSING_UID"
+    )
     fun deleteDoHEndpoint(name: String, url: String, uid: Int)
 
     @Transaction
@@ -65,7 +65,8 @@ interface RethinkDnsEndpointDao {
 
     @Transaction
     @Query(
-        "select * from RethinkDnsEndpoint where name like :query or url like :query and uid = $MISSING_UID order by isActive desc")
+        "select * from RethinkDnsEndpoint where name like :query or url like :query and uid = $MISSING_UID order by isActive desc"
+    )
     fun getRethinkEndpointsByName(query: String): PagingSource<Int, RethinkDnsEndpoint>
 
     @Query("select * from RethinkDnsEndpoint where isActive = 1 and uid = $MISSING_UID LIMIT 1")
@@ -74,8 +75,7 @@ interface RethinkDnsEndpointDao {
     @Query("update RethinkDnsEndpoint set isActive = 1 where uid = $MISSING_UID and name = :conn")
     fun updateConnectionDefault(conn: String = RETHINK_DEFAULT)
 
-    @Query("select count(*) from RethinkDnsEndpoint")
-    fun getCount(): Int
+    @Query("select count(*) from RethinkDnsEndpoint") fun getCount(): Int
 
     @Query("select * from RethinkDnsEndpoint where name = :plus and uid = $MISSING_UID")
     fun getRethinkPlusEndpoint(plus: String = RETHINK_PLUS): RethinkDnsEndpoint
@@ -85,16 +85,13 @@ interface RethinkDnsEndpointDao {
 
     // TODO: remove this method post v054 versions
     @Query(
-        "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = :plus")
+        "update RethinkDnsEndpoint set blocklistCount = :count where uid = $MISSING_UID and name = :plus"
+    )
     fun updatePlusBlocklistCount(count: Int, plus: String = RETHINK_PLUS)
 
-    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'sky', 'max')")
-    fun switchToMax()
+    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'sky', 'max')") fun switchToMax()
 
-    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'max', 'sky')")
-    fun switchToSky()
+    @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'max', 'sky')") fun switchToSky()
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
-
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

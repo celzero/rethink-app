@@ -21,7 +21,6 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 import java.sql.Date
 
-
 class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
@@ -43,6 +42,4 @@ class Converters {
     fun listToString(set: List<String>): String {
         return Gson().toJson(set)
     }
-
-
 }

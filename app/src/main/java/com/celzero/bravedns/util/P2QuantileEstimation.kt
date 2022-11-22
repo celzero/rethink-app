@@ -20,9 +20,7 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
-/**
- * Estimate percentiles without storing actual samples.
- */
+/** Estimate percentiles without storing actual samples. */
 class P2QuantileEstimation(probability: Double) {
 
     // details: https://aakinshin.net/posts/p2-quantile-estimator/
@@ -137,7 +135,10 @@ class P2QuantileEstimation(probability: Double) {
     }
 
     private fun parabolic(i: Int, d: Double): Double {
-        return q[i] + (d / (n[i + 1] - n[i - 1])) * (((n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i])) + ((n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1])))
+        return q[i] +
+            (d / (n[i + 1] - n[i - 1])) *
+                (((n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i])) +
+                    ((n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1])))
     }
 
     private fun linear(i: Int, d: Int): Double {
@@ -155,5 +156,4 @@ class P2QuantileEstimation(probability: Double) {
         val index = ((c - 1) * p).roundToInt()
         return q[index].toLong()
     }
-
 }

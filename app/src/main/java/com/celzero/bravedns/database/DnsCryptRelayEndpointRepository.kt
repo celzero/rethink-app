@@ -19,19 +19,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class DnsCryptRelayEndpointRepository(
-        private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO) {
+    private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO
+) {
 
     suspend fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointDAO.update(dnsCryptRelayEndpoint)
     }
 
-    suspend fun insertAsync(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
-                            coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
-        coroutineScope.launch {
-            dnsCryptRelayEndpointDAO.insert(dnsCryptRelayEndpoint)
-        }
+    suspend fun insertAsync(
+        dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
+        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    ) {
+        coroutineScope.launch { dnsCryptRelayEndpointDAO.insert(dnsCryptRelayEndpoint) }
     }
 
     suspend fun deleteOlderData(date: Long) {
@@ -56,8 +56,6 @@ class DnsCryptRelayEndpointRepository(
 
     suspend fun getServersToAdd(): String {
         val relays = getConnectedRelays()
-        return relays.joinToString(separator = ",") {
-            it.dnsCryptRelayURL
-        }
+        return relays.joinToString(separator = ",") { it.dnsCryptRelayURL }
     }
 }

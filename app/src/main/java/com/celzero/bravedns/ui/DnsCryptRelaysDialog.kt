@@ -24,9 +24,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.databinding.DialogDnscryptRelaysBinding
 
-class DnsCryptRelaysDialog(private var activity: Activity,
-                           internal var adapter: RecyclerView.Adapter<*>, themeID: Int) :
-        Dialog(activity, themeID) {
+class DnsCryptRelaysDialog(
+    private var activity: Activity,
+    internal var adapter: RecyclerView.Adapter<*>,
+    themeID: Int
+) : Dialog(activity, themeID) {
 
     private lateinit var b: DialogDnscryptRelaysBinding
 
@@ -43,16 +45,16 @@ class DnsCryptRelaysDialog(private var activity: Activity,
     }
 
     private fun initView() {
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                          WindowManager.LayoutParams.MATCH_PARENT)
+        window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT
+        )
 
         mLayoutManager = LinearLayoutManager(activity)
 
         b.recyclerViewDialog.layoutManager = mLayoutManager
         b.recyclerViewDialog.adapter = adapter
 
-        b.customDialogOkButton.setOnClickListener {
-            this.dismiss()
-        }
+        b.customDialogOkButton.setOnClickListener { this.dismiss() }
     }
 }

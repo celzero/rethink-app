@@ -38,25 +38,28 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import inet.ipaddr.IPAddressString
 
 class CustomIpAdapter(private val context: Context) :
-        PagingDataAdapter<CustomIp, CustomIpAdapter.CustomIpsViewHolder>(DIFF_CALLBACK) {
+    PagingDataAdapter<CustomIp, CustomIpAdapter.CustomIpsViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CustomIp>() {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<CustomIp>() {
 
-            override fun areItemsTheSame(oldConnection: CustomIp,
-                                         newConnection: CustomIp) = oldConnection.ipAddress == newConnection.ipAddress && oldConnection.status == newConnection.status
+                override fun areItemsTheSame(oldConnection: CustomIp, newConnection: CustomIp) =
+                    oldConnection.ipAddress == newConnection.ipAddress &&
+                        oldConnection.status == newConnection.status
 
-            override fun areContentsTheSame(oldConnection: CustomIp,
-                                            newConnection: CustomIp) = oldConnection.ipAddress == newConnection.ipAddress && oldConnection.status != newConnection.status
-        }
+                override fun areContentsTheSame(oldConnection: CustomIp, newConnection: CustomIp) =
+                    oldConnection.ipAddress == newConnection.ipAddress &&
+                        oldConnection.status != newConnection.status
+            }
     }
 
     // ui component to update/toggle the buttons
     data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomIpsViewHolder {
-        val itemBinding = ListItemCustomIpBinding.inflate(LayoutInflater.from(parent.context),
-                                                          parent, false)
+        val itemBinding =
+            ListItemCustomIpBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CustomIpsViewHolder(itemBinding)
     }
 
@@ -66,7 +69,7 @@ class CustomIpAdapter(private val context: Context) :
     }
 
     inner class CustomIpsViewHolder(private val b: ListItemCustomIpBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customIp: CustomIp
         fun update(ci: CustomIp) {
@@ -86,14 +89,9 @@ class CustomIpAdapter(private val context: Context) :
 
             b.customIpToggleGroup.addOnButtonCheckedListener(ipRulesGroupListener)
 
-            b.customIpExpandIcon.setOnClickListener {
-                toggleActionsUi()
-            }
+            b.customIpExpandIcon.setOnClickListener { toggleActionsUi() }
 
-            b.customIpContainer.setOnClickListener {
-                toggleActionsUi()
-            }
-
+            b.customIpContainer.setOnClickListener { toggleActionsUi() }
         }
 
         private fun updateToggleGroup(id: IpRulesManager.IpRuleStatus) {
@@ -124,29 +122,30 @@ class CustomIpAdapter(private val context: Context) :
             }
         }
 
-        private val ipRulesGroupListener = MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
-            val b: MaterialButton = b.customIpToggleGroup.findViewById(checkedId)
-            if (isChecked) {
-                val statusId = findSelectedIpRule(getTag(b.tag))
-                // delete button
-                if (statusId == null) {
-                    group.clearChecked()
-                    showDialogForDelete(customIp)
+        private val ipRulesGroupListener =
+            MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
+                val b: MaterialButton = b.customIpToggleGroup.findViewById(checkedId)
+                if (isChecked) {
+                    val statusId = findSelectedIpRule(getTag(b.tag))
+                    // delete button
+                    if (statusId == null) {
+                        group.clearChecked()
+                        showDialogForDelete(customIp)
+                        return@OnButtonCheckedListener
+                    }
+
+                    val t = toggleBtnUi(statusId)
+                    // update the toggle button
+                    selectToggleBtnUi(b, t)
+                    // update the status in desc and status flag (N/B/BU)
+                    updateStatusUi(statusId)
+
+                    changeIpStatus(statusId)
                     return@OnButtonCheckedListener
                 }
 
-                val t = toggleBtnUi(statusId)
-                // update the toggle button
-                selectToggleBtnUi(b, t)
-                // update the status in desc and status flag (N/B/BU)
-                updateStatusUi(statusId)
-
-                changeIpStatus(statusId)
-                return@OnButtonCheckedListener
+                unselectToggleBtnUi(b)
             }
-
-            unselectToggleBtnUi(b)
-        }
 
         private fun changeIpStatus(id: IpRulesManager.IpRuleStatus) {
             when (id) {
@@ -168,21 +167,28 @@ class CustomIpAdapter(private val context: Context) :
         private fun toggleBtnUi(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
             return when (id) {
                 IpRulesManager.IpRuleStatus.NONE -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
-                                fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg))
+                    ToggleBtnUi(
+                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
+                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
+                    )
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt),
-                                fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnBg))
+                    ToggleBtnUi(
+                        fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt),
+                        fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnBg)
+                    )
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     ToggleBtnUi(
                         fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt),
-                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnBg))
+                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnBg)
+                    )
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
-                    ToggleBtnUi(fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
-                                fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg))
+                    ToggleBtnUi(
+                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
+                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
+                    )
                 }
             }
         }
@@ -194,8 +200,8 @@ class CustomIpAdapter(private val context: Context) :
 
         private fun unselectToggleBtnUi(btn: MaterialButton) {
             btn.setTextColor(fetchToggleBtnColors(context, R.color.defaultToggleBtnTxt))
-            btn.backgroundTintList = ColorStateList.valueOf(
-                fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
+            btn.backgroundTintList =
+                ColorStateList.valueOf(fetchToggleBtnColors(context, R.color.defaultToggleBtnBg))
         }
 
         // each button in the toggle group is associated with tag value.
@@ -227,8 +233,13 @@ class CustomIpAdapter(private val context: Context) :
         private fun updateFlagIfAvailable(ip: CustomIp) {
             if (ip.wildcard) return
 
-            b.customIpFlag.text = getFlag(
-                getCountryCode(IPAddressString(ip.ipAddress).hostAddress.toInetAddress(), context))
+            b.customIpFlag.text =
+                getFlag(
+                    getCountryCode(
+                        IPAddressString(ip.ipAddress).hostAddress.toInetAddress(),
+                        context
+                    )
+                )
         }
 
         private fun toggleActionsUi() {
@@ -245,8 +256,8 @@ class CustomIpAdapter(private val context: Context) :
         private fun updateStatusUi(status: IpRulesManager.IpRuleStatus) {
             when (status) {
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    b.customIpStatusIcon.text = context.getString(
-                        R.string.ci_bypass_universal_initial)
+                    b.customIpStatusIcon.text =
+                        context.getString(R.string.ci_bypass_universal_initial)
                     b.customIpStatusTv.text = context.getString(R.string.ci_bypass_universal_txt)
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
@@ -281,20 +292,27 @@ class CustomIpAdapter(private val context: Context) :
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(
-                context.getString(R.string.univ_ip_delete_individual_positive)) { _, _ ->
+                context.getString(R.string.univ_ip_delete_individual_positive)
+            ) { _, _ ->
                 IpRulesManager.removeFirewallRules(UID_EVERYBODY, customIp.ipAddress, customIp.port)
-                Toast.makeText(context, context.getString(R.string.univ_ip_delete_individual_toast,
-                                                          customIp.ipAddress),
-                               Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                        context,
+                        context.getString(
+                            R.string.univ_ip_delete_individual_toast,
+                            customIp.ipAddress
+                        ),
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
             }
 
             builder.setNegativeButton(
-                context.getString(R.string.univ_ip_delete_individual_negative)) { _, _ ->
+                context.getString(R.string.univ_ip_delete_individual_negative)
+            ) { _, _ ->
                 updateStatusUi(IpRulesManager.IpRuleStatus.getStatus(customIp.status))
             }
 
             builder.create().show()
         }
     }
-
 }

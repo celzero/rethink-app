@@ -40,8 +40,15 @@ class CustomDomain {
         return this.domain.hashCode()
     }
 
-    constructor(domain: String, ips: String, type: Int, status: Int, createdTs: Long,
-                deletedTs: Long, version: Long) {
+    constructor(
+        domain: String,
+        ips: String,
+        type: Int,
+        status: Int,
+        createdTs: Long,
+        deletedTs: Long,
+        version: Long
+    ) {
         this.domain = domain.dropLastWhile { it == '.' }
         this.ips = ips
         this.status = status

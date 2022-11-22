@@ -17,7 +17,6 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 
-
 class CustomIpRepository(private val customIpDao: CustomIpDao) {
 
     suspend fun update(customIp: CustomIp) {

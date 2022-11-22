@@ -38,7 +38,8 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetRethinkListBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
-    private val b get() = _binding!!
+    private val b
+        get() = _binding!!
     private val persistentState by inject<PersistentState>()
 
     private var layoutManager: RecyclerView.LayoutManager? = null
@@ -47,15 +48,19 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
 
     private var filter: Int = 1
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int =
+        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetRethinkListBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -79,16 +84,15 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initClickListeners() {
-        b.bsrConfigure.setOnClickListener {
-            openRethinkBasicActivity()
-        }
+        b.bsrConfigure.setOnClickListener { openRethinkBasicActivity() }
     }
 
     private fun openRethinkBasicActivity() {
         val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
-        intent.putExtra(ConfigureRethinkBasicActivity.INTENT,
-                        ConfigureRethinkBasicActivity.FragmentLoader.REMOTE.ordinal)
+        intent.putExtra(
+            ConfigureRethinkBasicActivity.INTENT,
+            ConfigureRethinkBasicActivity.FragmentLoader.REMOTE.ordinal
+        )
         startActivity(intent)
     }
-
 }
