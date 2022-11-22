@@ -32,6 +32,11 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
 
     defaultConfig {
         applicationId "com.celzero.bravedns"
@@ -59,11 +64,6 @@ android {
         leakCanary {
             matchingFallbacks = ['debug']
             initWith buildTypes.debug
-        }
-        compileOptions {
-            coreLibraryDesugaringEnabled true
-            sourceCompatibility JavaVersion.VERSION_11
-            targetCompatibility JavaVersion.VERSION_11
         }
     }
     flavorDimensions "releaseChannel"

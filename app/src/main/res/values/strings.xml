@@ -397,7 +397,7 @@
     <string name="settings_network_all_networks">Use all available networks (experimental)</string>
     <string name="settings_network_all_networks_desc">When enabled, RethinkDNS uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
     <string name="settings_all_networks_dialog_title">Attention!</string>
-    <string name="settings_all_networks_dialog_message">When enabled, app firewall rules for metered (ex: Mobile) and non-metered (ex: WiFi) will not be honoured.\n\nDo you want to continue?</string>
+    <string name="settings_all_networks_dialog_message">When enabled, app firewall rules for metered (ex: Mobile) and non-metered (ex: WiFi) will not be honoured. \n\nDo you want to continue?</string>
     <string name="settings_all_networks_dialog_positive_btn">Enable anyway</string>
     <string name="settings_all_networks_dialog_negative_btn">Cancel</string>
 

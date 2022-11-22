@@ -1,2 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="title_settings">تنظیمات</string>
+    <string name="txt_home">خانه</string>
+    <string name="always_on_dialog_neutral">تنظیمات</string>
+    <string name="title_about">درباره</string>
+    <string name="next">بعدی</string>
+    <string name="firewall_rules">قوانین شبکه</string>
+    <string name="orbot_install_dialog_title">Orbot نصب شود؟</string>
+    <string name="pause_mode_notification_title">متوقف شد! برنامه های مسدود شده همچنان فایروال می شوند.</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="orbot_install_dialog_message">Orbot ویژگی ها و عملکرد Tor را به اندروید می آورد.</string>
+    <string name="pause_text">متوقف شده</string>
+    <string name="app_name">RethinkDNS</string>
+    <string name="settings_title_desc">DNS و فایروال بسیار قابل تنظیم</string>
+    <string name="orbot_install_dialog_positive">نصب</string>
+    <string name="admin_receiver_status_enabled">آماده تنظیم مسدود کننده محتوای مبتنی بر DNS.</string>
+    <string name="admin_receiver_status_disabled">مسدودکننده محتوا دیگر فعال نیست.</string>
+    <string name="about_title_desc">شناسایی و مسدود کردن تهدیدات امنیتی شبکه</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">هشدار: RethinkDNS غیرفعال شده است</string>
+    <string name="slide_2_title">خوش آمدید</string>
+    <string name="dns_mode_notification_title">حفاظت شده! متصل به DNS سریع و امن.</string>
+    <string name="firewall_mode_notification_title">حفاظت شده! متصل به فایروال.</string>
+    <string name="status_dns_error">خطای dns</string>
+    <string name="status_app_error">خطای برنامه</string>
+    <string name="other_dns_list_tab2">Dnscrypt</string>
+    <string name="finish">پایان</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">در انتظار</string>
+    <string name="other_dns_list_tab1">DoH</string>
+</resources>
