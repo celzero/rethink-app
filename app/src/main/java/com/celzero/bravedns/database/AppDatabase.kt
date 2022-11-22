@@ -27,7 +27,7 @@ import com.celzero.bravedns.util.Constants
 
 @Database(
     entities = [AppInfo::class, ConnectionTracker::class, CustomIp::class, DoHEndpoint::class, DnsCryptEndpoint::class, DnsProxyEndpoint::class, DnsCryptRelayEndpoint::class, ProxyEndpoint::class, DnsLog::class, CustomDomain::class, RethinkDnsEndpoint::class, RethinkRemoteFileTag::class, RethinkLocalFileTag::class],
-    version = 14, exportSchema = false)
+    version = 15, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -49,7 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
             MIGRATION_4_5).addMigrations(MIGRATION_5_6).addMigrations(MIGRATION_6_7).addMigrations(
             MIGRATION_7_8).addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).addMigrations(
             MIGRATION_10_11).addMigrations(MIGRATION_11_12).addMigrations(
-            MIGRATION_12_13).addMigrations(MIGRATION_13_14).build()
+            MIGRATION_12_13).addMigrations(MIGRATION_13_14).addMigrations(MIGRATION_14_15).build()
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -382,6 +382,15 @@ abstract class AppDatabase : RoomDatabase() {
                 database.execSQL(
                     "Update AppInfo set appCategory = 'System Services' where appCategory = 'Non-App System' and isSystemApp = 1")
                 database.execSQL("Update RethinkDnsEndpoint set url = REPLACE(url, 'basic', 'sky')")
+            }
+        }
+
+        private val MIGRATION_14_15: Migration = object : Migration(14, 15) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE RethinkLocalFileTag add column pack TEXT DEFAULT ''")
+                database.execSQL(
+                    "ALTER TABLE RethinkRemoteFileTag add column pack TEXT DEFAULT ''")
             }
         }
 

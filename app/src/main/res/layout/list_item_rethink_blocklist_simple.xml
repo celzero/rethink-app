@@ -80,7 +80,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/crp_label_tv"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/crp_check_box"
                 android:ellipsize="end"
                 android:padding="5dp"
                 android:alpha="0.75"

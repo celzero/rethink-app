@@ -68,7 +68,7 @@ interface RethinkRemoteFileTagDao {
                                     selected: Set<Int>): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query("Update RethinkRemoteFileTag set isSelected = :isSelected where value in (:list) ")
-    fun updateSelectedTags(list: Set<Int>, isSelected: Int)
+    fun updateTags(list: Set<Int>, isSelected: Int)
 
     @Query("Update RethinkRemoteFileTag set isSelected = :isSelected where value = :value")
     fun updateSelectedTag(value: Int, isSelected: Int)
@@ -77,8 +77,14 @@ interface RethinkRemoteFileTagDao {
         "select value, simpleTagId from RethinkRemoteFileTag where entries > 0 order by simpleTagId")
     fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping>
 
+    @Query("select * from RethinkRemoteFileTag")
+    fun fileTags(): List<RethinkRemoteFileTag>
+
     @Query("Update RethinkRemoteFileTag set isSelected = 0")
     fun clearSelectedTags()
+
+    @Query("select value from RethinkRemoteFileTag where isSelected = 1")
+    fun getSelectedTags(): List<Int>
 
     @RawQuery
     fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int

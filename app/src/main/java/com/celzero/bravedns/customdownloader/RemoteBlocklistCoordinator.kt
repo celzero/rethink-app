@@ -26,6 +26,7 @@ import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
 import com.google.gson.JsonObject
 import org.koin.core.component.KoinComponent
@@ -60,15 +61,14 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             if (downloadStatus) {
                 // update the download related persistence status on download success
                 updatePersistenceOnCopySuccess(timestamp)
+                BlocklistDownloadHelper.deleteBlocklistResidue(context,
+                                                               Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                                               timestamp)
             } else {
-                // reset the remote blocklist timestamp, so that user will be prompt to
-                // download again.
-                persistentState.remoteBlocklistTimestamp = Constants.INIT_TIME_MS
+                // reset the remote blocklist timestamp, a copy of remote blocklist is already
+                // available in asset folder (go back to that version)
+                RemoteFileTagUtil.moveFileToLocalDir(context.applicationContext, persistentState)
             }
-
-            BlocklistDownloadHelper.deleteBlocklistResidue(context,
-                                                           Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                           timestamp)
 
             return when (downloadStatus) {
                 false -> {

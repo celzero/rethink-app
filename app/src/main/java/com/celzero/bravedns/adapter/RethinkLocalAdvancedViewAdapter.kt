@@ -28,7 +28,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
-import com.celzero.bravedns.ui.RethinkBlocklistFragment.Companion.selectedFileTags
+import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +83,7 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
             }
 
             b.crpDescEntriesTv.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW, filetag.url.toUri())
+                val intent = Intent(Intent.ACTION_VIEW, filetag.url[0].toUri())
                 context.startActivity(intent)
             }
         }
@@ -102,7 +102,7 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
             setCardBackground(filetag.isSelected)
         }
 
-        // fixme: remove this method, add it in strings.xml
+        // handle the group name (filetag.json)
         private fun getGroupName(group: String): String {
             return if (group == "parentalcontrol") {
                 context.getString(R.string.rbl_parental_control)
@@ -126,38 +126,18 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
         private fun toggleCheckbox(isSelected: Boolean, filetag: RethinkLocalFileTag) {
             b.crpCheckBox.isChecked = isSelected
             setCardBackground(isSelected)
-
-            if (isSelected) {
-                addBlocklistTag(filetag)
-                return
-            }
-            removeBlocklistTag(filetag)
+            setFileTag(filetag, isSelected)
         }
 
-        private fun addBlocklistTag(filetag: RethinkLocalFileTag) {
+        private fun setFileTag(filetag: RethinkLocalFileTag, selected: Boolean) {
             io {
-                filetag.isSelected = true
-                RethinkBlocklistManager.updateSelectedFiletagLocal(filetag)
+                filetag.isSelected = selected
+                RethinkBlocklistManager.updateFiletagLocal(filetag)
+                val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
+                val stamp = RethinkBlocklistManager.getStamp(context, list,
+                                                             RethinkBlocklistFragment.RethinkBlocklistType.LOCAL)
+                RethinkBlocklistFragment.modifiedStamp = stamp
             }
-            if (selectedFileTags.value == null) {
-                selectedFileTags.postValue(mutableSetOf(filetag.value))
-                return
-            }
-
-            selectedFileTags.value?.add(filetag.value)
-            selectedFileTags.postValue(selectedFileTags.value)
-        }
-
-        private fun removeBlocklistTag(filetag: RethinkLocalFileTag) {
-            io {
-                filetag.isSelected = false
-                RethinkBlocklistManager.updateSelectedFiletagLocal(filetag)
-            }
-
-            if (selectedFileTags.value == null) return
-
-            selectedFileTags.value?.remove(filetag.value)
-            selectedFileTags.postValue(selectedFileTags.value)
         }
 
         private fun displayHeaderIfNeeded(filetag: RethinkLocalFileTag, position: Int) {
