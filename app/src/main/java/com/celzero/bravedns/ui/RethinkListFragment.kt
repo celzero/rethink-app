@@ -80,11 +80,8 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private var uid: Int = Constants.MISSING_UID
 
-    data class ModifiedStamp(val name: String, val stamp: String, val count: Int)
-
     companion object {
         fun newInstance() = RethinkListFragment()
-        var modifiedStamp: MutableLiveData<ModifiedStamp?> = MutableLiveData()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -99,25 +96,12 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         initView()
         initObservers()
         initClickListeners()
-        observeModifiedStamp()
-    }
-
-    private fun observeModifiedStamp() {
-        modifiedStamp.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            if (it.name.isNotEmpty()) {
-                updateRethinkEndpoint(it.name, getUrlForStamp(it.stamp), it.count)
-                return@observe
-            }
-
-            showAddCustomDohDialog(it.stamp, it.count)
-        }
     }
 
     private fun showBlocklistVersionUi() {
         if (getDownloadTimeStamp() == INIT_TIME_MS) {
             b.dohFabAddServerIcon.visibility = View.GONE
+            b.lbVersion.visibility = View.GONE
             return
         }
 
@@ -171,6 +155,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun getDownloadTimeStamp(): Long {
+        Log.d("TEST","TEST: timestamp:: ${persistentState.remoteBlocklistTimestamp}")
         return persistentState.remoteBlocklistTimestamp
     }
 
@@ -202,8 +187,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
 
     private fun initClickListeners() {
         b.dohFabAddServerIcon.setOnClickListener {
-            emptyTempStampInfo()
-
             val intent = Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
             intent.putExtra(RETHINK_BLOCKLIST_TYPE,
                             RethinkBlocklistFragment.RethinkBlocklistType.REMOTE)
@@ -342,7 +325,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         }
 
         dialogBinding.dialogCustomUrlCancelBtn.setOnClickListener {
-            emptyTempStampInfo()
             dialog.dismiss()
         }
         dialog.show()
@@ -456,11 +438,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
                                       Toast.LENGTH_SHORT)
     }
 
-    private fun emptyTempStampInfo() {
-        modifiedStamp.postValue(null)
-        RethinkBlocklistFragment.selectedFileTags.postValue(mutableSetOf())
-    }
-
     private fun insertRethinkEndpoint(name: String, url: String, count: Int) {
         io {
             var dohName: String = name
@@ -473,15 +450,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             appConfig.insertReplaceEndpoint(endpoint)
             endpoint.isActive = true
             appConfig.handleRethinkChanges(endpoint)
-            emptyTempStampInfo()
-        }
-    }
-
-    private fun updateRethinkEndpoint(name: String, url: String, count: Int) {
-        io {
-            appConfig.updateRethinkEndpoint(name, url, count)
-            appConfig.enableRethinkDnsPlus()
-            emptyTempStampInfo()
         }
     }
 

@@ -56,7 +56,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.delay
@@ -100,7 +99,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         initializeClickListeners()
         observeVpnState()
         observeChipStates()
-        observeRethinkPlusConfiguration()
         updateConfigureDnsChip(appConfig.getRemoteBlocklistCount())
     }
 
@@ -140,32 +138,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         b.fhsThemeChip.text = getString(R.string.hsf_chip_appearance,
                                         themeNames[persistentState.theme])
-    }
-
-    private fun observeRethinkPlusConfiguration() {
-        RethinkListFragment.modifiedStamp.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            if (it.name.isNotEmpty()) {
-                io {
-                    val rdnsUrl = appConfig.getRethinkPlusEndpoint().url
-                    val url = getUrlForStamp(rdnsUrl, it.stamp)
-                    appConfig.updateRethinkEndpoint(it.name, url, it.count)
-                    kotlinx.coroutines.delay(1000)
-                    appConfig.enableRethinkDnsPlus()
-                }
-                RethinkListFragment.modifiedStamp.postValue(null)
-                return@observe
-            }
-        }
-    }
-
-    private fun getUrlForStamp(url: String, stamp: String): String {
-        return if (url.contains(MAX_ENDPOINT)) {
-            Constants.RETHINK_BASE_URL_MAX + stamp
-        } else {
-            Constants.RETHINK_BASE_URL_SKY + stamp
-        }
     }
 
     // Icons used in chips are re-used in other screens as well.
@@ -259,7 +231,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
                 // open configuration screen if rethinkplus is already connected.
                 if (plusEndpoint.isActive) {
-                    openEditConfiguration(stamp)
+                    openEditConfiguration(plusEndpoint.url)
                     return@io
                 }
 
@@ -268,7 +240,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     appConfig.enableRethinkDnsPlus()
                 } else {
                     // for new configuration/empty configuration
-                    openEditConfiguration(stamp)
+                    openEditConfiguration(plusEndpoint.url)
                 }
             }
         }
@@ -350,7 +322,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         RethinkBlocklistFragment.RethinkBlocklistType.REMOTE)
         intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME,
                         RethinkDnsEndpoint.RETHINK_PLUS)
-        intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_STAMP, stamp)
+        intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_URL, stamp)
         requireContext().startActivity(intent)
     }
 

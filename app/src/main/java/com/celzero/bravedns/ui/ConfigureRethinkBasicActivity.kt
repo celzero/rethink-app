@@ -36,7 +36,7 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
         const val INTENT = "RethinkDns_Intent"
         const val RETHINK_BLOCKLIST_TYPE = "RethinkBlocklistType"
         const val RETHINK_BLOCKLIST_NAME = "RethinkBlocklistName"
-        const val RETHINK_BLOCKLIST_STAMP = "RethinkBlocklistStamp"
+        const val RETHINK_BLOCKLIST_URL = "RethinkBlocklistUrl"
         const val UID = "UID"
     }
 
@@ -51,14 +51,14 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
         when (intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)) {
             FragmentLoader.REMOTE.ordinal -> {
                 val name = intent.getStringExtra(RETHINK_BLOCKLIST_NAME) ?: ""
-                val stamp = intent.getStringExtra(RETHINK_BLOCKLIST_STAMP) ?: ""
+                val url = intent.getStringExtra(RETHINK_BLOCKLIST_URL) ?: ""
 
                 // load the Rethink remote dns configure screen (default)
                 val rr = RethinkBlocklistFragment.newInstance()
                 var bundle = createBundle(RETHINK_BLOCKLIST_TYPE,
                                           RethinkBlocklistFragment.RethinkBlocklistType.REMOTE.ordinal)
                 bundle = updateBundle(bundle, RETHINK_BLOCKLIST_NAME, name)
-                rr.arguments = updateBundle(bundle, RETHINK_BLOCKLIST_STAMP, stamp)
+                rr.arguments = updateBundle(bundle, RETHINK_BLOCKLIST_URL, url)
                 supportFragmentManager.beginTransaction().replace(R.id.root_container, rr,
                                                                   rr.javaClass.simpleName).commit()
                 return

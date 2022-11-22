@@ -36,7 +36,6 @@ import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -119,28 +118,24 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         // create a temp folder to download, format (timestamp ==> -timestamp)
         val file = makeTempDownloadDir(timestamp) ?: return false
 
-        // skip this step if blocklist is already available
-        if (!Utilities.hasLocalBlocklists(context, timestamp)) {
-            Constants.ONDEVICE_BLOCKLISTS_TEMP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
-                val id = generateCustomDownloadId()
+        Constants.ONDEVICE_BLOCKLISTS_TEMP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
+            val id = generateCustomDownloadId()
 
-                downloadStatuses[id] = DownloadStatus.RUNNING
-                val filePath = file.absolutePath + onDeviceBlocklistsMetadata.filename
+            downloadStatuses[id] = DownloadStatus.RUNNING
+            val filePath = file.absolutePath + onDeviceBlocklistsMetadata.filename
 
-                if (isDownloadCancelled()) return false
+            if (isDownloadCancelled()) return false
 
-                when (startFileDownload(context, onDeviceBlocklistsMetadata.url, filePath)) {
-                    true -> {
-                        downloadStatuses[id] = DownloadStatus.SUCCESSFUL
-                    }
-                    false -> {
-                        downloadStatuses[id] = DownloadStatus.FAILED
-                        return false
-                    }
+            when (startFileDownload(context, onDeviceBlocklistsMetadata.url, filePath)) {
+                true -> {
+                    downloadStatuses[id] = DownloadStatus.SUCCESSFUL
+                }
+                false -> {
+                    downloadStatuses[id] = DownloadStatus.FAILED
+                    return false
                 }
             }
         }
-
         // check if all the files are downloaded, as of now the check if for only number of files
         // downloaded. TODO: Later add checksum matching as well
         if (!isDownloadComplete(file)) {
@@ -261,7 +256,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 if (currentTime > 1000 * timeCount) {
                     download.currentFileSize = current
                     download.progress = progress
-                    updateProgress(context, download.progress)
+                    updateProgress(context, download.currentFileSize.toInt())
                     timeCount++
                 }
                 output.write(data, 0, count)
@@ -408,18 +403,12 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     }
 
     private fun showNotification(context: Context) {
-        val intent = Intent(context, NotificationHandlerDialog::class.java)
-        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME,
-                        Constants.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE)
-
-        val builder = getBuilder(context)
-
-
         getNotificationManager(context).notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID,
-                                               builder.build())
+                                               getBuilder(context).build())
     }
 
     private fun updateProgress(context: Context, progress: Int) {
+        Log.d("TEST","TEST Notify: $progress")
         val builder = getBuilder(context)
         builder.setProgress(100, progress, false)
         getNotificationManager(context).notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID,

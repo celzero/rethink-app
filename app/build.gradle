@@ -42,8 +42,8 @@ android {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 22 // for version name 053k
-        versionName "053k"
+        versionCode 23 // for version name 053l
+        versionName "053l"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -93,6 +93,7 @@ dependencies {
     implementation "com.google.guava:guava:31.1-android"
 
     // https://developer.android.com/studio/write/java8-support
+    // included to fix issues with Android 6 support, issue#563
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
@@ -122,7 +123,7 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.3"
+    implementation "androidx.fragment:fragment-ktx:1.5.4"
     implementation 'com.google.android.material:material:1.7.0'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
