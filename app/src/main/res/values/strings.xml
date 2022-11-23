@@ -634,9 +634,7 @@
 
     <string name="app_info_error">Could not launch app info.</string>
     <string name="vpn_profile_error">Could not launch VPN profile.</string>
-    <string name="log_file_not_available">Could not find any crash reports.</string>
-    <string name="error_loading_log_file">Could not load log file.</string>
-    <string name="notification_screen_error">Could not show the app-notification screen.</string>
+    <string name="notification_screen_error">Could not show app-notification screen.</string>
     <string name="intent_launch_error">Cound not launch %1$s.</string>
     <string name="no_browser_error">Install a web browser to open the website.</string>
     <string name="log_file_not_available">Could not find any crash reports.</string>
