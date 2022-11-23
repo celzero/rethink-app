@@ -358,6 +358,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun openAppDetailActivity(uid: Int) {
+        this.dismiss()
         val intent = Intent(requireContext(), AppInfoActivity::class.java)
         intent.putExtra(AppInfoActivity.UID_INTENT_NAME, uid)
         requireContext().startActivity(intent)

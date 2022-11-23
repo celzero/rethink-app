@@ -38,4 +38,8 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
     suspend fun clearAllData() {
         connectionTrackerDAO.clearAllData()
     }
+
+    suspend fun clearLogsByUid(uid: Int) {
+        connectionTrackerDAO.clearLogsByUid(uid)
+    }
 }

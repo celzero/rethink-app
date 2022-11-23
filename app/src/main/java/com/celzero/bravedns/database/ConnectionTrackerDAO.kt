@@ -57,6 +57,8 @@ interface ConnectionTrackerDAO {
 
     @Query("delete from ConnectionTracker") fun clearAllData()
 
+    @Query("delete from ConnectionTracker where uid = :uid") fun clearLogsByUid(uid: Int)
+
     @Query("DELETE FROM ConnectionTracker WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 
     @Query(
