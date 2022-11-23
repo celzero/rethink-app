@@ -155,7 +155,7 @@ class AppInfoActivity :
 
         appCustomIpViewModel.setUid(appInfo.uid)
         displayIpRulesIfAny(appInfo.uid)
-        displayNetworkLogsIfAny(appInfo.uid)
+        io { displayNetworkLogsIfAny(appInfo.uid) }
     }
 
     private fun updateDnsDetails() {
@@ -316,6 +316,8 @@ class AppInfoActivity :
         b.aadAppDnsRethinkConfigure.setOnClickListener { rethinkListBottomSheet() }
 
         b.aadIpAddIndicator.setOnClickListener { showAddIpDialog() }
+
+        b.aadConnDelete.setOnClickListener { showDeleteConnectionsDialog() }
     }
 
     private fun setAppDns(url: String) {
@@ -453,30 +455,29 @@ class AppInfoActivity :
         b.aadIpBlockRecycler.adapter = recyclerAdapter
     }
 
-    private fun displayNetworkLogsIfAny(uid: Int) {
-        io {
-            connIpList = connectionTrackerRepository.getLogsForApp(uid)
+    private suspend fun displayNetworkLogsIfAny(uid: Int) {
+        connIpList = connectionTrackerRepository.getLogsForApp(uid)
 
-            uiCtx {
-                if (connIpList.isNullOrEmpty()) {
-                    b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
-                    b.aadConnDetailSearchContainer.visibility = View.GONE
-                    b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
-                    b.aadConnDetailRecycler.visibility = View.GONE
-                    toggleFirewallUiState(firewallUiState)
-                    return@uiCtx
-                }
-
-                // asserting as the null check is above
-                b.aadConnDetailDesc.text =
-                    getString(R.string.ada_ip_connection_count, connIpList!!.size.toString())
-                // set listview adapter
-                b.aadConnDetailRecycler.setHasFixedSize(true)
-                val layoutManager = LinearLayoutManager(this)
-                b.aadConnDetailRecycler.layoutManager = layoutManager
-                appConnAdapter = AppConnectionAdapter(this, connIpList!!, uid)
-                b.aadConnDetailRecycler.adapter = appConnAdapter
+        uiCtx {
+            if (connIpList.isNullOrEmpty()) {
+                b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
+                b.aadConnDetailSearchContainer.visibility = View.GONE
+                b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
+                b.aadConnDetailRecycler.visibility = View.GONE
+                toggleFirewallUiState(firewallUiState)
+                b.aadConnDelete.visibility = View.GONE
+                return@uiCtx
             }
+
+            // asserting as the null check is above
+            b.aadConnDetailDesc.text =
+                getString(R.string.ada_ip_connection_count, connIpList!!.size.toString())
+            // set listview adapter
+            b.aadConnDetailRecycler.setHasFixedSize(true)
+            val layoutManager = LinearLayoutManager(this)
+            b.aadConnDetailRecycler.layoutManager = layoutManager
+            appConnAdapter = AppConnectionAdapter(this, connIpList!!, uid)
+            b.aadConnDetailRecycler.adapter = appConnAdapter
         }
     }
 
@@ -485,9 +486,11 @@ class AppInfoActivity :
         if (state) {
             b.aadConnDetailTopLl.visibility = View.VISIBLE
             b.aadConnDetailSearchLl.visibility = View.VISIBLE
+            b.aadConnDelete.visibility = View.VISIBLE
             b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_up)
         } else {
             b.aadConnDetailSearchLl.visibility = View.GONE
+            b.aadConnDelete.visibility = View.GONE
             b.aadConnDetailTopLl.visibility = View.GONE
             b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_down)
         }
@@ -693,6 +696,26 @@ class AppInfoActivity :
 
         dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun showDeleteConnectionsDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.ada_delete_logs_dialog_title)
+        builder.setMessage(R.string.ada_delete_logs_dialog_desc)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.ada_delete_logs_dialog_positive)) { _, _ ->
+            deleteAppLogs()
+        }
+
+        builder.setNegativeButton(getString(R.string.ada_delete_logs_delete_negative)) { _, _ -> }
+        builder.create().show()
+    }
+
+    private fun deleteAppLogs() {
+        io {
+            connectionTrackerRepository.clearLogsByUid(uid)
+            displayNetworkLogsIfAny(uid)
+        }
     }
 
     private fun getHostName(ip: String): HostName? {

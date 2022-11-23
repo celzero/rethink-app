@@ -549,6 +549,17 @@
                     </LinearLayout>
 
                     <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/aad_conn_delete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/aad_conn_detail_indicator"
+                        android:minWidth="24dp"
+                        android:padding="10dp"
+                        android:minHeight="24dp"
+                        android:src="@drawable/ic_delete" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/aad_conn_detail_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
