@@ -16,7 +16,6 @@
 package com.celzero.bravedns.database
 
 import com.celzero.bravedns.data.AppConnections
-import com.celzero.bravedns.util.Constants
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
@@ -32,16 +31,11 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
         return connectionTrackerDAO.getLogsForApp(uid)
     }
 
-    suspend fun deleteConnectionTrackerCount() {
-        connectionTrackerDAO.deleteOlderDataCount(Constants.TOTAL_LOG_ENTRIES_THRESHOLD)
-    }
-
-    suspend fun deleteOlderData(date: Long) {
-        connectionTrackerDAO.deleteOlderData(date)
+    suspend fun purgeLogsByDate(date: Long) {
+        connectionTrackerDAO.purgeLogsByDate(date)
     }
 
     suspend fun clearAllData() {
         connectionTrackerDAO.clearAllData()
     }
-
 }

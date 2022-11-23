@@ -42,6 +42,7 @@ class RethinkDnsApplication : Application() {
         if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Schedule job")
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
         get<WorkScheduler>().scheduleDatabaseRefreshJob()
+        get<WorkScheduler>().schedulePurgeConnectionsLog()
     }
 
     private fun turnOnStrictMode() {
@@ -49,8 +50,20 @@ class RethinkDnsApplication : Application() {
         // Uncomment the code below to enable the StrictModes.
         // To test the apps disk read/writes, network usages.
         StrictMode.setThreadPolicy(
-            StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().permitDiskReads().permitDiskWrites().permitNetwork().build())
+            StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .permitDiskReads()
+                .permitDiskWrites()
+                .permitNetwork()
+                .build()
+        )
         StrictMode.setVmPolicy(
-            StrictMode.VmPolicy.Builder().detectAll().detectLeakedSqlLiteObjects().penaltyLog().build())
+            StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .detectLeakedSqlLiteObjects()
+                .penaltyLog()
+                .build()
+        )
     }
 }

@@ -65,7 +65,8 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     }
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,8 +80,8 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         dnsCryptLayoutManager = LinearLayoutManager(requireContext())
         b.recyclerDnsCryptConnections.layoutManager = dnsCryptLayoutManager
 
-        dnsCryptRecyclerAdapter = DnsCryptEndpointAdapter(requireContext(), viewLifecycleOwner,
-                                                          get())
+        dnsCryptRecyclerAdapter =
+            DnsCryptEndpointAdapter(requireContext(), viewLifecycleOwner, get())
         dnsCryptViewModel.dnsCryptEndpointList.observe(viewLifecycleOwner) {
             dnsCryptRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
@@ -88,25 +89,21 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
     }
 
     private fun initClickListeners() {
-        b.addRelayBtn.setOnClickListener {
-            openDnsCryptRelaysDialog()
-        }
+        b.addRelayBtn.setOnClickListener { openDnsCryptRelaysDialog() }
 
-        b.dohFabAddServerIcon.setOnClickListener {
-            showAddDnsCryptDialog()
-        }
+        b.dohFabAddServerIcon.setOnClickListener { showAddDnsCryptDialog() }
     }
 
     private fun openDnsCryptRelaysDialog() {
-        dnsCryptRelayRecyclerAdapter = DnsCryptRelayEndpointAdapter(requireContext(),
-                                                                    viewLifecycleOwner, get())
+        dnsCryptRelayRecyclerAdapter =
+            DnsCryptRelayEndpointAdapter(requireContext(), viewLifecycleOwner, get())
         dnsCryptRelayViewModel.dnsCryptRelayEndpointList.observe(viewLifecycleOwner) {
             dnsCryptRelayRecyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val customDialog = DnsCryptRelaysDialog(requireActivity(), dnsCryptRelayRecyclerAdapter,
-                                                themeId)
+        val customDialog =
+            DnsCryptRelaysDialog(requireActivity(), dnsCryptRelayRecyclerAdapter, themeId)
         customDialog.show()
     }
 
@@ -147,23 +144,28 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             uiCtx {
                 cryptNameEditText.setText(
                     getString(R.string.cd_dns_crypt_name, dnscryptNextIndex.toString()),
-                    TextView.BufferType.EDITABLE)
+                    TextView.BufferType.EDITABLE
+                )
             }
         }
 
-        cryptNameEditText.setText(getString(R.string.cd_dns_crypt_name_default),
-                                  TextView.BufferType.EDITABLE)
+        cryptNameEditText.setText(
+            getString(R.string.cd_dns_crypt_name_default),
+            TextView.BufferType.EDITABLE
+        )
 
         radioServer.setOnClickListener {
             cryptNameEditText.setText(
                 getString(R.string.cd_dns_crypt_name, dnscryptNextIndex.toString()),
-                TextView.BufferType.EDITABLE)
+                TextView.BufferType.EDITABLE
+            )
         }
 
         radioRelay.setOnClickListener {
             cryptNameEditText.setText(
                 getString(R.string.cd_dns_crypt_relay_name, relayNextIndex.toString()),
-                TextView.BufferType.EDITABLE)
+                TextView.BufferType.EDITABLE
+            )
         }
 
         applyURLBtn.setOnClickListener {
@@ -172,18 +174,19 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             val urlStamp = cryptURLEditText.text.toString()
             val desc = cryptDescEditText.text.toString()
 
-            val mode = if (radioServer.isChecked) {
-                0 // Selected radio button - DNS Crypt
-            } else {
-                1 // Selected radio button - DNS Crypt Relay
-            }
+            val mode =
+                if (radioServer.isChecked) {
+                    0 // Selected radio button - DNS Crypt
+                } else {
+                    1 // Selected radio button - DNS Crypt Relay
+                }
             if (urlStamp.isBlank()) {
                 isValid = false
                 errorText.text = getString(R.string.cd_dns_crypt_error_text_1)
             }
 
             if (isValid) {
-                //Do the DNS Crypt setting there
+                // Do the DNS Crypt setting there
                 if (mode == 0) {
                     insertDNSCryptServer(name, urlStamp, desc)
                 } else if (mode == 1) {
@@ -193,9 +196,7 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             }
         }
 
-        cancelURLBtn.setOnClickListener {
-            dialog.dismiss()
-        }
+        cancelURLBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
@@ -205,9 +206,17 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
             if (serverName.isBlank()) {
                 serverName = urlStamp
             }
-            val dnsCryptRelayEndpoint = DnsCryptRelayEndpoint(id = 0, serverName, urlStamp, desc,
-                                                              isSelected = false, isCustom = true,
-                                                              modifiedDataTime = 0L, latency = 0)
+            val dnsCryptRelayEndpoint =
+                DnsCryptRelayEndpoint(
+                    id = 0,
+                    serverName,
+                    urlStamp,
+                    desc,
+                    isSelected = false,
+                    isCustom = true,
+                    modifiedDataTime = 0L,
+                    latency = 0
+                )
             appConfig.insertDnscryptRelayEndpoint(dnsCryptRelayEndpoint)
         }
     }
@@ -219,25 +228,26 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
                 serverName = urlStamp
             }
 
-            val dnsCryptEndpoint = DnsCryptEndpoint(id = 0, serverName, urlStamp, desc,
-                                                    isSelected = false, isCustom = true,
-                                                    modifiedDataTime = 0L, latency = 0)
+            val dnsCryptEndpoint =
+                DnsCryptEndpoint(
+                    id = 0,
+                    serverName,
+                    urlStamp,
+                    desc,
+                    isSelected = false,
+                    isCustom = true,
+                    modifiedDataTime = 0L,
+                    latency = 0
+                )
             appConfig.insertDnscryptEndpoint(dnsCryptEndpoint)
         }
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) {
-            f()
-        }
+        withContext(Dispatchers.Main) { f() }
     }
-
 }

@@ -39,7 +39,9 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
             return
         }
 
-        if (Intent.ACTION_REBOOT != intent.action && Intent.ACTION_BOOT_COMPLETED != intent.action) {
+        if (
+            Intent.ACTION_REBOOT != intent.action && Intent.ACTION_BOOT_COMPLETED != intent.action
+        ) {
             Log.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
             return
         }
@@ -48,12 +50,13 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
         // but: if always-on is enabled, then back-off, since android
         // is expected to kick-start the vpn up on its own
         if (VpnController.state().activationRequested && !VpnController.isAlwaysOn(context)) {
-            val prepareVpnIntent: Intent? = try {
-                VpnService.prepare(context)
-            } catch (e: NullPointerException) {
-                Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode.")
-                return
-            }
+            val prepareVpnIntent: Intent? =
+                try {
+                    VpnService.prepare(context)
+                } catch (e: NullPointerException) {
+                    Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode.")
+                    return
+                }
 
             if (prepareVpnIntent == null) {
                 VpnController.start(context)

@@ -28,7 +28,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class RethinkEndpointViewModel(private val rethinkDnsEndpointDao: RethinkDnsEndpointDao) :
-        ViewModel() {
+    ViewModel() {
 
     private var list: MutableLiveData<String> = MutableLiveData()
     private var uid: Int = Constants.MISSING_UID
@@ -37,28 +37,36 @@ class RethinkEndpointViewModel(private val rethinkDnsEndpointDao: RethinkDnsEndp
         list.value = ""
     }
 
-    val rethinkEndpointList = Transformations.switchMap(list, ({ input: String ->
-        if (uid == Constants.MISSING_UID) {
-            if (input.isBlank()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkDnsEndpointDao.getRethinkEndpoints()
-                }.liveData.cachedIn(viewModelScope)
-            } else {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkDnsEndpointDao.getRethinkEndpointsByName("%$input%")
-                }.liveData.cachedIn(viewModelScope)
-            }
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                rethinkDnsEndpointDao.getAllRethinkEndpoints()
-            }.liveData.cachedIn(viewModelScope)
-        }
-
-    }))
+    val rethinkEndpointList =
+        Transformations.switchMap(
+            list,
+            ({ input: String ->
+                if (uid == Constants.MISSING_UID) {
+                    if (input.isBlank()) {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkDnsEndpointDao.getRethinkEndpoints()
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    } else {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkDnsEndpointDao.getRethinkEndpointsByName("%$input%")
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    }
+                } else {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                            rethinkDnsEndpointDao.getAllRethinkEndpoints()
+                        }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                }
+            })
+        )
 
     fun setFilter(uid: Int, searchText: String = "") {
         this.uid = uid
         list.value = searchText
     }
-
 }

@@ -17,18 +17,36 @@ package com.celzero.bravedns.customdownloader
 
 import com.google.gson.JsonObject
 import okhttp3.ResponseBody
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.Streaming
 
 interface IBlocklistDownload {
 
     @GET("/{fileName}")
     @Streaming
-    fun downloadLocalBlocklistFile(@Path("fileName") fileName: String): Call<ResponseBody?>?
+    suspend fun downloadLocalBlocklistFile(
+        @Path("fileName") fileName: String,
+        @Query("vcode") vcode: Int,
+        @Query("compressed") compressed: String
+    ): Response<ResponseBody?>?
 
     @GET("/{fileName}")
     @Streaming
-    fun downloadRemoteBlocklistFile(@Path("fileName") fileName: String): Call<JsonObject?>
+    suspend fun downloadRemoteBlocklistFile(
+        @Path("fileName") fileName: String,
+        @Query("vcode") vcode: Int,
+        @Query("compressed") compressed: String
+    ): Response<JsonObject?>?
+
+    @GET("/{update}/{blocklist}")
+    @Streaming
+    suspend fun downloadAvailabilityCheck(
+        @Path("update") update: String,
+        @Path("blocklist") blocklist: String,
+        @Query("tstamp") tStamp: Long,
+        @Query("vcode") vcode: Int
+    ): Response<JsonObject?>?
 }

@@ -33,7 +33,7 @@ import org.koin.core.component.inject
 import java.io.File
 
 class AppExitInfoCollector(val context: Context, workerParameters: WorkerParameters) :
-        Worker(context, workerParameters), KoinComponent {
+    Worker(context, workerParameters), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
 
@@ -62,20 +62,18 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
         val file = File(path)
         run returnTag@{
             appExitInfo.forEach {
-
                 maxTimestamp = maxTimestamp.coerceAtLeast(it.timestamp)
 
                 // Write exit infos past the previously recorded checkpoint
                 if (persistentState.lastAppExitInfoTimestamp >= it.timestamp) return@returnTag
 
                 BugReportZipper.write(it, file)
-
             }
         }
 
         // Store the last exit reason time stamp
-        persistentState.lastAppExitInfoTimestamp = persistentState.lastAppExitInfoTimestamp.coerceAtLeast(
-            maxTimestamp)
+        persistentState.lastAppExitInfoTimestamp =
+            persistentState.lastAppExitInfoTimestamp.coerceAtLeast(maxTimestamp)
 
         BugReportZipper.build(applicationContext, file)
     }

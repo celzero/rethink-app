@@ -27,7 +27,7 @@ import com.celzero.bravedns.database.DnsCryptEndpointDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DnsCryptEndpointViewModel(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) :
-        ViewModel() {
+    ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
 
@@ -35,16 +35,20 @@ class DnsCryptEndpointViewModel(private val dnsCryptEndpointDAO: DnsCryptEndpoin
         filteredList.value = ""
     }
 
-    val dnsCryptEndpointList = Transformations.switchMap(filteredList) { input ->
-        if (input.isBlank()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsCryptEndpointDAO.getDNSCryptEndpointLiveData()
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%")
-            }.liveData.cachedIn(viewModelScope)
+    val dnsCryptEndpointList =
+        Transformations.switchMap(filteredList) { input ->
+            if (input.isBlank()) {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        dnsCryptEndpointDAO.getDNSCryptEndpointLiveData()
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        dnsCryptEndpointDAO.getDNSCryptEndpointLiveDataByName("%$input%")
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
         }
-    }
-
 }

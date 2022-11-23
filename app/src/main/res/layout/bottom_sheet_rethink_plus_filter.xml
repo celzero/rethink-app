@@ -15,11 +15,6 @@
         android:layout_marginBottom="20dp"
         android:background="?attr/border" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/border" />
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/rpf_filter_group_heading"
         android:layout_width="wrap_content"

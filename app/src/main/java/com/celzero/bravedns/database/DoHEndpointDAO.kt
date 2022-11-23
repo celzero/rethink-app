@@ -20,21 +20,16 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 
-
 @Dao
 interface DoHEndpointDAO {
 
-    @Update
-    fun update(doHEndpoint: DoHEndpoint)
+    @Update fun update(doHEndpoint: DoHEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(doHEndpoint: DoHEndpoint)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(doHEndpoint: DoHEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertReplace(doHEndpoint: DoHEndpoint)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertReplace(doHEndpoint: DoHEndpoint)
 
-    @Delete
-    fun delete(doHEndpoint: DoHEndpoint)
+    @Delete fun delete(doHEndpoint: DoHEndpoint)
 
     @Transaction
     @Query("select * from DoHEndpoint order by isSelected desc")
@@ -42,17 +37,15 @@ interface DoHEndpointDAO {
 
     @Transaction
     @Query(
-        "select * from DoHEndpoint where dohURL like :query or dohName like :query order by isSelected desc")
+        "select * from DoHEndpoint where dohURL like :query or dohName like :query order by isSelected desc"
+    )
     fun getDoHEndpointLiveDataByName(query: String): PagingSource<Int, DoHEndpoint>
 
-    @Query("delete from DoHEndpoint where modifiedDataTime < :date")
-    fun deleteOlderData(date: Long)
+    @Query("delete from DoHEndpoint where modifiedDataTime < :date") fun deleteOlderData(date: Long)
 
-    @Query("delete from DoHEndpoint")
-    fun clearAllData()
+    @Query("delete from DoHEndpoint") fun clearAllData()
 
-    @Query("delete from DoHEndpoint where id = :id and isCustom = 1")
-    fun deleteDoHEndpoint(id: Int)
+    @Query("delete from DoHEndpoint where id = :id and isCustom = 1") fun deleteDoHEndpoint(id: Int)
 
     @Query("update DoHEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
@@ -61,10 +54,7 @@ interface DoHEndpointDAO {
     @Query("select * from DoHEndpoint where isSelected = 1")
     fun getConnectedDoH(): DoHEndpoint?
 
-    @Query("select count(*) from DoHEndpoint")
-    fun getCount(): Int
+    @Query("select count(*) from DoHEndpoint") fun getCount(): Int
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
-
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

@@ -29,7 +29,7 @@ import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteFileTagDao) :
-        ViewModel() {
+    ViewModel() {
 
     private var list: MutableLiveData<String> = MutableLiveData()
     private var blocklistFilter: RethinkBlocklistFragment.Filters? = null
@@ -38,39 +38,67 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
         list.value = ""
     }
 
-    val remoteFileTags = Transformations.switchMap(list, ({ input: String ->
-        if (blocklistFilter != null) {
-            val query = blocklistFilter?.query ?: "%%"
-            val groups = blocklistFilter?.groups ?: mutableSetOf()
-            val subg = blocklistFilter?.subGroups ?: mutableSetOf()
+    val remoteFileTags =
+        Transformations.switchMap(
+            list,
+            ({ input: String ->
+                if (blocklistFilter != null) {
+                    val query = blocklistFilter?.query ?: "%%"
+                    val selected = getSelectedFilter()
+                    val groups = blocklistFilter?.groups ?: mutableSetOf()
+                    val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
-            if (groups.isNotEmpty() && subg.isNotEmpty()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTags(query, groups, subg)
-                }.liveData.cachedIn(viewModelScope)
-            } else if (groups.isNotEmpty()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTagsGroup(query, groups)
-                }.liveData.cachedIn(viewModelScope)
-            } else if (subg.isNotEmpty()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTagsSubg(query, subg)
-                }.liveData.cachedIn(viewModelScope)
-            } else {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    rethinkRemoteDao.getRemoteFileTagsWithFilter(query)
-                }.liveData.cachedIn(viewModelScope)
-            }
-        } else if (input.isBlank()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                rethinkRemoteDao.getRemoteFileTags()
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                rethinkRemoteDao.getRemoteFileTagsWithFilter("%$input%")
-            }.liveData.cachedIn(viewModelScope)
+                    if (groups.isNotEmpty() && subg.isNotEmpty()) {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkRemoteDao.getRemoteFileTags(query, selected, groups, subg)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    } else if (groups.isNotEmpty()) {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkRemoteDao.getRemoteFileTagsGroup(query, selected, groups)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    } else if (subg.isNotEmpty()) {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkRemoteDao.getRemoteFileTagsSubg(query, selected, subg)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    } else {
+                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                                rethinkRemoteDao.getRemoteFileTagsWithFilter(query, selected)
+                            }
+                            .liveData
+                            .cachedIn(viewModelScope)
+                    }
+                } else if (input.isBlank()) {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { rethinkRemoteDao.getRemoteFileTags() }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                } else {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                            rethinkRemoteDao.getRemoteFileTagsWithFilter(
+                                "%$input%",
+                                getSelectedFilter()
+                            )
+                        }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                }
+            })
+        )
+
+    private fun getSelectedFilter(): MutableSet<Int> {
+        if (
+            blocklistFilter?.filterSelected ==
+                RethinkBlocklistFragment.BlocklistSelectionFilter.SELECTED
+        ) {
+            return mutableSetOf(1)
         }
-    }))
+        return mutableSetOf(0, 1)
+    }
 
     suspend fun allFileTags(): List<FileTag> {
         return rethinkRemoteDao.getAllTags()
@@ -84,5 +112,4 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
         this.blocklistFilter = filter
         list.value = filter.query
     }
-
 }

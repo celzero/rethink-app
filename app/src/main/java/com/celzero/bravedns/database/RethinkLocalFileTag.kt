@@ -25,9 +25,10 @@ class RethinkLocalFileTag {
     var vname: String = ""
     var group: String = ""
     var subg: String = ""
-    var url: String = ""
+    var url: List<String> = arrayListOf()
     var show: Int = 0
     var entries: Int = 0
+    var pack: List<String>? = arrayListOf()
     var simpleTagId: Int = INVALID_SIMPLE_TAG_ID
     var isSelected: Boolean = false
 
@@ -45,9 +46,19 @@ class RethinkLocalFileTag {
         return this.value.hashCode()
     }
 
-
-    constructor(value: Int, uname: String, vname: String, group: String, subg: String, url: String,
-                show: Int, entries: Int, simpleTagId: Int, isSelected: Boolean = false) {
+    constructor(
+        value: Int,
+        uname: String,
+        vname: String,
+        group: String,
+        subg: String,
+        pack: List<String>?,
+        url: List<String>,
+        show: Int,
+        entries: Int,
+        simpleTagId: Int,
+        isSelected: Boolean = false
+    ) {
         this.value = value
         this.uname = uname
         this.vname = vname
@@ -56,6 +67,7 @@ class RethinkLocalFileTag {
         this.url = url
         this.show = show
         this.entries = entries
+        this.pack = pack
         this.simpleTagId = simpleTagId
         this.isSelected = isSelected
     }

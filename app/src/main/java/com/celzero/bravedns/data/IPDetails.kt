@@ -17,6 +17,15 @@ package com.celzero.bravedns.data
 
 import java.io.Serializable
 
-data class IPDetails(val uid: Int, val sourceIP: String, val sourcePort: Int, val destIP: String,
-                     val destPort: Int, val timestamp: Long, var isBlocked: Boolean,
-                     var blockedByRule: String, val protocol: Int, var query: String) : Serializable
+data class IPDetails(
+    val uid: Int,
+    val sourceIP: String,
+    val sourcePort: Int,
+    val destIP: String,
+    val destPort: Int,
+    val timestamp: Long,
+    var isBlocked: Boolean,
+    var blockedByRule: String,
+    val protocol: Int,
+    var query: String
+) : Serializable

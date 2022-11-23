@@ -20,9 +20,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filter.value = ""
     }
 
-    val appInfo = Transformations.switchMap(filter) { input: String ->
-        getAppInfo(input)
-    }
+    val appInfo = Transformations.switchMap(filter) { input: String -> getAppInfo(input) }
 
     fun setFilter(filters: FirewallAppFragment.Filters) {
         this.category.clear()
@@ -33,7 +31,6 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
         this.search = filters.searchString
         this.filter.value = filters.searchString
-
     }
 
     private fun getAppInfo(searchString: String): LiveData<PagingData<AppInfo>> {
@@ -53,93 +50,124 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun allApps(searchString: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                appInfoDAO.getAppInfos("%$searchString%", firewallFilter.getFilter())
-            }.liveData.cachedIn(viewModelScope)
+                    appInfoDAO.getAppInfos("%$searchString%", firewallFilter.getFilter())
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                appInfoDAO.getAppInfos("%$searchString%", category, firewallFilter.getFilter())
-            }.liveData.cachedIn(viewModelScope)
+                    appInfoDAO.getAppInfos("%$searchString%", category, firewallFilter.getFilter())
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         }
     }
 
     private fun installedApps(search: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                appInfoDAO.getInstalledApps("%$search%", firewallFilter.getFilter())
-            }.liveData.cachedIn(viewModelScope)
+                    appInfoDAO.getInstalledApps("%$search%", firewallFilter.getFilter())
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                appInfoDAO.getInstalledApps("%$search%", category, firewallFilter.getFilter())
-            }.liveData.cachedIn(viewModelScope)
+                    appInfoDAO.getInstalledApps("%$search%", category, firewallFilter.getFilter())
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         }
     }
 
     private fun systemApps(search: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                appInfoDAO.getSystemApps("%$search%", firewallFilter.getFilter())
-            }.liveData.cachedIn(viewModelScope)
+                    appInfoDAO.getSystemApps("%$search%", firewallFilter.getFilter())
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                appInfoDAO.getSystemApps("%$search%", category, firewallFilter.getFilter())
-            }.liveData.cachedIn(viewModelScope)
+                    appInfoDAO.getSystemApps("%$search%", category, firewallFilter.getFilter())
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         }
     }
 
     fun updateUnmeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
 
-        appList.distinctBy { it.uid }.forEach {
-            val appStatus = getAppStateForWifi(blocked, it.firewallStatus, it.metered)
-            FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
-        }
+        appList
+            .distinctBy { it.uid }
+            .forEach {
+                val appStatus = getAppStateForWifi(blocked, it.firewallStatus, it.metered)
+                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
+            }
     }
 
     private fun getAppStateForWifi(blocked: Boolean, firewall: Int, metered: Int): AppState {
         val state: AppState
 
         if (firewall == FirewallManager.FirewallStatus.BLOCK.id) {
-            state = if (blocked) {
-                if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
-                    AppState(FirewallManager.FirewallStatus.BLOCK,
-                             FirewallManager.ConnectionStatus.WIFI)
+            state =
+                if (blocked) {
+                    if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
+                        AppState(
+                            FirewallManager.FirewallStatus.BLOCK,
+                            FirewallManager.ConnectionStatus.WIFI
+                        )
+                    } else {
+                        AppState(
+                            FirewallManager.FirewallStatus.BLOCK,
+                            FirewallManager.ConnectionStatus.BOTH
+                        )
+                    }
                 } else {
-                    AppState(FirewallManager.FirewallStatus.BLOCK,
-                             FirewallManager.ConnectionStatus.BOTH)
+                    if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
+                        AppState(
+                            FirewallManager.FirewallStatus.ALLOW,
+                            FirewallManager.ConnectionStatus.BOTH
+                        )
+                    } else {
+                        AppState(
+                            FirewallManager.FirewallStatus.BLOCK,
+                            FirewallManager.ConnectionStatus.MOBILE_DATA
+                        )
+                    }
                 }
-            } else {
-                if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
-                    AppState(FirewallManager.FirewallStatus.ALLOW,
-                             FirewallManager.ConnectionStatus.BOTH)
-                } else {
-                    AppState(FirewallManager.FirewallStatus.BLOCK,
-                             FirewallManager.ConnectionStatus.MOBILE_DATA)
-                }
-            }
         } else {
-            state = if (blocked) {
-                AppState(FirewallManager.FirewallStatus.BLOCK,
-                         FirewallManager.ConnectionStatus.WIFI)
-            } else {
-                AppState(FirewallManager.FirewallStatus.ALLOW,
-                         FirewallManager.ConnectionStatus.BOTH)
-            }
+            state =
+                if (blocked) {
+                    AppState(
+                        FirewallManager.FirewallStatus.BLOCK,
+                        FirewallManager.ConnectionStatus.WIFI
+                    )
+                } else {
+                    AppState(
+                        FirewallManager.FirewallStatus.ALLOW,
+                        FirewallManager.ConnectionStatus.BOTH
+                    )
+                }
         }
 
         return state
     }
 
-    data class AppState(val fid: FirewallManager.FirewallStatus,
-                        val cid: FirewallManager.ConnectionStatus)
-
+    data class AppState(
+        val fid: FirewallManager.FirewallStatus,
+        val cid: FirewallManager.ConnectionStatus
+    )
 
     fun updateMeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
 
-        appList.distinctBy { it.uid }.forEach {
-            val appStatus = getAppStateForMobileData(blocked, it.firewallStatus, it.metered)
-            FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
-        }
+        appList
+            .distinctBy { it.uid }
+            .forEach {
+                val appStatus = getAppStateForMobileData(blocked, it.firewallStatus, it.metered)
+                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
+            }
     }
 
     private fun getAppStateForMobileData(blocked: Boolean, firewall: Int, metered: Int): AppState {
@@ -166,17 +194,18 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     private fun getFilteredApps(): List<AppInfo> {
-        val appType = when (topLevelFilter) {
-            FirewallAppFragment.TopLevelFilter.ALL -> {
-                setOf(0, 1)
+        val appType =
+            when (topLevelFilter) {
+                FirewallAppFragment.TopLevelFilter.ALL -> {
+                    setOf(0, 1)
+                }
+                FirewallAppFragment.TopLevelFilter.INSTALLED -> {
+                    setOf(0)
+                }
+                FirewallAppFragment.TopLevelFilter.SYSTEM -> {
+                    setOf(1)
+                }
             }
-            FirewallAppFragment.TopLevelFilter.INSTALLED -> {
-                setOf(0)
-            }
-            FirewallAppFragment.TopLevelFilter.SYSTEM -> {
-                setOf(1)
-            }
-        }
         return if (category.isEmpty()) {
             appInfoDAO.getFilteredApps("%$search%", firewallFilter.getFilter(), appType)
         } else {

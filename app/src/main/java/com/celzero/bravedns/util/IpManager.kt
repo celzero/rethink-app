@@ -6,12 +6,6 @@ import inet.ipaddr.IPAddressString
 class IpManager {
 
     companion object {
-
-        fun isIpV6(ip: String): Boolean {
-            val ipAddress = getIpAddress(ip)
-            return ipAddress?.isIPv6 == true
-        }
-
         fun isIpV6(ip: IPAddress): Boolean {
             return ip.isIPv6
         }
@@ -66,7 +60,6 @@ class IpManager {
             return false
         }
 
-
         // for teredo tunneling
         private fun isIpTeredo(ips: IPAddress): Boolean {
             return ips.toIPv6().isTeredo
@@ -90,6 +83,5 @@ class IpManager {
         fun getIpAddress(ip: String): IPAddress? {
             return IPAddressString(ip).address
         }
-
     }
 }

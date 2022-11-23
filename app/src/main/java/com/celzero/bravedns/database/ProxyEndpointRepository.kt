@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
 
 class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 
@@ -43,6 +44,10 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getConnectedProxy()
     }
 
+    fun getConnectedProxyLiveData(): LiveData<ProxyEndpoint?> {
+        return proxyEndpointDAO.getConnectedProxyLiveData()
+    }
+
     suspend fun getConnectedOrbotProxy(): ProxyEndpoint {
         return proxyEndpointDAO.getConnectedOrbotProxy()
     }
@@ -54,5 +59,4 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
     suspend fun clearOrbotData() {
         proxyEndpointDAO.clearOrbotData()
     }
-
 }

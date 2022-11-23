@@ -44,18 +44,23 @@ import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isNonApp
 import com.google.common.collect.Sets
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
 
-class RefreshDatabase internal constructor(private var context: Context,
-                                           private val connTrackerRepository: ConnectionTrackerRepository,
-                                           private val dnsLogRepository: DnsLogRepository,
-                                           private val persistentState: PersistentState) {
-
+class RefreshDatabase
+internal constructor(
+    private var context: Context,
+    private val connTrackerRepository: ConnectionTrackerRepository,
+    private val dnsLogRepository: DnsLogRepository,
+    private val persistentState: PersistentState
+) {
 
     companion object {
         private const val NOTIF_BATCH_NEW_APPS_THRESHOLD = 5
@@ -70,7 +75,8 @@ class RefreshDatabase internal constructor(private var context: Context,
     @GuardedBy("refreshMutex") @Volatile private var isRefreshInProgress: Boolean = false
 
     /**
-     * Need to rewrite the logic for adding the apps in the database and removing it during uninstall.
+     * Need to rewrite the logic for adding the apps in the database and removing it during
+     * uninstall.
      */
     suspend fun refreshAppInfoDatabase() {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info")
@@ -97,23 +103,32 @@ class RefreshDatabase internal constructor(private var context: Context,
                 val trackedApps = FirewallManager.getPackageNames()
 
                 // installedPackages will also include apps which are disabled by the user
-                val installedPackages: List<PackageInfo> = context.packageManager?.getInstalledPackages(
-                    PackageManager.GET_META_DATA) as List<PackageInfo>
+                val installedPackages: List<PackageInfo> =
+                    context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)
+                        as List<PackageInfo>
 
-                val installedApps = installedPackages.map {
-                    FirewallManager.AppInfoTuple(it.applicationInfo.uid, it.packageName)
-                }.toHashSet()
+                val installedApps =
+                    installedPackages
+                        .map {
+                            FirewallManager.AppInfoTuple(it.applicationInfo.uid, it.packageName)
+                        }
+                        .toHashSet()
 
-                // packages which are all available in database but not in installed apps(package manager)
-                val packagesToDelete = Sets.difference(trackedApps, installedApps).filter {
-                    !isNonApp(it.packageName)
-                }.toHashSet()
+                // packages which are all available in database but not in installed apps(package
+                // manager)
+                val packagesToDelete =
+                    Sets.difference(trackedApps, installedApps)
+                        .filter { !isNonApp(it.packageName) }
+                        .toHashSet()
 
                 // packages which are all available in installed apps list but not in database
-                val packagesToAdd = Sets.difference(installedApps, trackedApps).filter {
-                    // Remove this package
-                    it.packageName != context.packageName
-                }.toHashSet()
+                val packagesToAdd =
+                    Sets.difference(installedApps, trackedApps)
+                        .filter {
+                            // Remove this package
+                            it.packageName != context.packageName
+                        }
+                        .toHashSet()
 
                 FirewallManager.deletePackagesFromCache(packagesToDelete)
 
@@ -126,17 +141,15 @@ class RefreshDatabase internal constructor(private var context: Context,
                 Log.e(LOG_TAG_APP_DB, e.message, e)
                 throw e
             } finally {
-                withContext(NonCancellable) {
-                    refreshMutex.write {
-                        isRefreshInProgress = false
-                    }
-                }
+                withContext(NonCancellable) { refreshMutex.write { isRefreshInProgress = false } }
             }
         }
     }
 
-    private suspend fun refreshNonApps(trackedApps: Set<FirewallManager.AppInfoTuple>,
-                                       installedApps: MutableSet<FirewallManager.AppInfoTuple>) {
+    private suspend fun refreshNonApps(
+        trackedApps: Set<FirewallManager.AppInfoTuple>,
+        installedApps: MutableSet<FirewallManager.AppInfoTuple>
+    ) {
         // if a non-app appears installed-apps group, then upsert its db entry
         // and give it a proper identity as retrieved from the package-manager
         val nonApps = trackedApps.filter { isNonApp(it.packageName) }.map { it.uid }.toSet()
@@ -153,7 +166,6 @@ class RefreshDatabase internal constructor(private var context: Context,
         insertApp(appInfo)
     }
 
-
     // TODO: Ideally this should be in FirewallManager
     private suspend fun addMissingPackages(apps: HashSet<FirewallManager.AppInfoTuple>) {
         if (apps.isEmpty()) return
@@ -167,7 +179,6 @@ class RefreshDatabase internal constructor(private var context: Context,
             val appInfo = Utilities.getApplicationInfo(context, it.packageName) ?: return@forEach
 
             insertApp(appInfo)
-
         }
     }
 
@@ -247,13 +258,14 @@ class RefreshDatabase internal constructor(private var context: Context,
         val appDetail = AndroidUidConfig.fromFileSystemUid(uid)
         val appInfo = AppInfo()
 
-        val appName = if (appDetail.uid == Constants.INVALID_UID) {
-            appInfo.isSystemApp = false
-            context.getString(R.string.network_log_app_name_unnamed, uid.toString())
-        } else {
-            appInfo.isSystemApp = true
-            appDetail.name
-        }
+        val appName =
+            if (appDetail.uid == Constants.INVALID_UID) {
+                appInfo.isSystemApp = false
+                context.getString(R.string.network_log_app_name_unnamed, uid.toString())
+            } else {
+                appInfo.isSystemApp = true
+                appDetail.name
+            }
 
         appInfo.appName = appName
         appInfo.packageInfo = "no_package_$uid"
@@ -306,32 +318,32 @@ class RefreshDatabase internal constructor(private var context: Context,
         }
 
         // show notification for particular app (less than NEW_APP_BULK_CHECK_COUNT)
-        apps.forEach {
-            showNewAppNotificationIfNeeded(it)
-        }
+        apps.forEach { showNewAppNotificationIfNeeded(it) }
     }
 
     private fun showNewAppsBulkNotificationIfNeeded(appSize: Int) {
         // no need to notify if the Universal setting is off
         if (!persistentState.blockNewlyInstalledApp) return
 
-        val notificationManager = context.getSystemService(
-            VpnService.NOTIFICATION_SERVICE) as NotificationManager
-        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN,
-                         "Number of new apps: $appSize, show notification")
+        val notificationManager =
+            context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
+        if (DEBUG)
+            Log.d(LoggerConstants.LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
         val intent = Intent(context, NotificationHandlerDialog::class.java)
-        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
-                        Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE)
+        intent.putExtra(
+            Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
+            Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
+        )
 
-        val pendingIntent = getActivityPendingIntent(context, intent, PendingIntent.FLAG_ONE_SHOT,
-                                                     mutable = false)
+        val pendingIntent =
+            getActivityPendingIntent(context, intent, PendingIntent.FLAG_ONE_SHOT, mutable = false)
 
         var builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
-            val description = context.resources.getString(
-                R.string.notif_channel_desc_firewall_alerts)
+            val description =
+                context.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -341,26 +353,36 @@ class RefreshDatabase internal constructor(private var context: Context,
             builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String = context.resources.getString(
-            R.string.new_app_bulk_notification_title)
-        val contentText: String = context.resources.getString(
-            R.string.new_app_bulk_notification_content, appSize.toString())
+        val contentTitle: String =
+            context.resources.getString(R.string.new_app_bulk_notification_title)
+        val contentText: String =
+            context.resources.getString(
+                R.string.new_app_bulk_notification_content,
+                appSize.toString()
+            )
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            pendingIntent).setContentText(contentText)
+        builder
+            .setSmallIcon(R.drawable.dns_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(pendingIntent)
+            .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
 
-        // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+        // Secret notifications are not shown on the lock screen.  No need for this app to show
+        // there.
         // Only available in API >= 21
         builder = builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
 
         // Cancel the notification after clicking.
         builder.setAutoCancel(true)
 
-        notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, randomNotifId.nextInt(100),
-                                   builder.build())
+        notificationManager.notify(
+            NOTIF_CHANNEL_ID_FIREWALL_ALERTS,
+            randomNotifId.nextInt(100),
+            builder.build()
+        )
     }
 
     private fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
@@ -372,30 +394,37 @@ class RefreshDatabase internal constructor(private var context: Context,
         }
 
         val appInfo = Utilities.getApplicationInfo(context, app.packageName)
-        val appName = if (appInfo == null) {
-            app.uid
-        } else {
-            context.packageManager.getApplicationLabel(appInfo).toString()
-        }
+        val appName =
+            if (appInfo == null) {
+                app.uid
+            } else {
+                context.packageManager.getApplicationLabel(appInfo).toString()
+            }
 
-        val notificationManager = context.getSystemService(
-            VpnService.NOTIFICATION_SERVICE) as NotificationManager
-        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN,
-                         "New app installed: $appName, show notification")
+        val notificationManager =
+            context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
+        if (DEBUG)
+            Log.d(LoggerConstants.LOG_TAG_VPN, "New app installed: $appName, show notification")
 
         val intent = Intent(context, NotificationHandlerDialog::class.java)
-        intent.putExtra(Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
-                        Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE)
+        intent.putExtra(
+            Constants.NOTIF_INTENT_EXTRA_NEW_APP_NAME,
+            Constants.NOTIF_INTENT_EXTRA_NEW_APP_VALUE
+        )
 
-        val pendingIntent = getActivityPendingIntent(context, intent,
-                                                     PendingIntent.FLAG_UPDATE_CURRENT,
-                                                     mutable = false)
+        val pendingIntent =
+            getActivityPendingIntent(
+                context,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT,
+                mutable = false
+            )
 
         val builder: NotificationCompat.Builder
         if (isAtleastO()) {
             val name: CharSequence = context.getString(R.string.notif_channel_firewall_alerts)
-            val description = context.resources.getString(
-                R.string.notif_channel_desc_firewall_alerts)
+            val description =
+                context.resources.getString(R.string.notif_channel_desc_firewall_alerts)
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, name, importance)
             channel.description = description
@@ -406,32 +435,50 @@ class RefreshDatabase internal constructor(private var context: Context,
         }
 
         val contentTitle: String = context.resources.getString(R.string.new_app_notification_title)
-        val contentText: String = context.resources.getString(R.string.new_app_notification_content,
-                                                              appName)
+        val contentText: String =
+            context.resources.getString(R.string.new_app_notification_content, appName)
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentTitle(contentTitle).setContentIntent(
-            pendingIntent).setContentText(contentText)
+        builder
+            .setSmallIcon(R.drawable.dns_icon)
+            .setContentTitle(contentTitle)
+            .setContentIntent(pendingIntent)
+            .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
 
-        val openIntent1 = makeNewAppVpnIntent(context, Constants.NOTIF_ACTION_NEW_APP_ALLOW,
-                                              app.uid, PENDING_INTENT_REQUEST_CODE_ALLOW)
+        val openIntent1 =
+            makeNewAppVpnIntent(
+                context,
+                Constants.NOTIF_ACTION_NEW_APP_ALLOW,
+                app.uid,
+                PENDING_INTENT_REQUEST_CODE_ALLOW
+            )
 
-        val openIntent2 = makeNewAppVpnIntent(context, Constants.NOTIF_ACTION_NEW_APP_DENY, app.uid,
-                                              PENDING_INTENT_REQUEST_CODE_DENY)
-        val notificationAction: NotificationCompat.Action = NotificationCompat.Action(0,
-                                                                                      context.resources.getString(
-                                                                                          R.string.new_app_notification_action_allow),
-                                                                                      openIntent1)
-        val notificationAction2: NotificationCompat.Action = NotificationCompat.Action(0,
-                                                                                       context.resources.getString(
-                                                                                           R.string.new_app_notification_action_deny),
-                                                                                       openIntent2)
+        val openIntent2 =
+            makeNewAppVpnIntent(
+                context,
+                Constants.NOTIF_ACTION_NEW_APP_DENY,
+                app.uid,
+                PENDING_INTENT_REQUEST_CODE_DENY
+            )
+        val notificationAction: NotificationCompat.Action =
+            NotificationCompat.Action(
+                0,
+                context.resources.getString(R.string.new_app_notification_action_allow),
+                openIntent1
+            )
+        val notificationAction2: NotificationCompat.Action =
+            NotificationCompat.Action(
+                0,
+                context.resources.getString(R.string.new_app_notification_action_deny),
+                openIntent2
+            )
         builder.addAction(notificationAction)
         builder.addAction(notificationAction2)
 
-        // Secret notifications are not shown on the lock screen.  No need for this app to show there.
+        // Secret notifications are not shown on the lock screen.  No need for this app to show
+        // there.
         // Only available in API >= 21
         builder.setVisibility(NotificationCompat.VISIBILITY_SECRET)
 
@@ -441,15 +488,23 @@ class RefreshDatabase internal constructor(private var context: Context,
         notificationManager.notify(NOTIF_CHANNEL_ID_FIREWALL_ALERTS, app.uid, builder.build())
     }
 
-    private fun makeNewAppVpnIntent(context: Context, intentExtra: String, uid: Int,
-                                    requestCode: Int): PendingIntent? {
+    private fun makeNewAppVpnIntent(
+        context: Context,
+        intentExtra: String,
+        uid: Int,
+        requestCode: Int
+    ): PendingIntent? {
         val intent = Intent(context, NotificationActionReceiver::class.java)
         intent.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
         intent.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, uid)
 
-        return Utilities.getBroadcastPendingIntent(context, (uid or requestCode), intent,
-                                                   PendingIntent.FLAG_UPDATE_CURRENT,
-                                                   mutable = false)
+        return Utilities.getBroadcastPendingIntent(
+            context,
+            (uid or requestCode),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT,
+            mutable = false
+        )
     }
 
     private fun isSystemApp(ai: ApplicationInfo): Boolean {
@@ -483,37 +538,26 @@ class RefreshDatabase internal constructor(private var context: Context,
         }
 
         return context.getString(FirewallManager.CategoryConstants.INSTALLED.nameResId)
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun appInfoCategory(ai: ApplicationInfo): String {
         val cat = ApplicationInfo.getCategoryTitle(context, ai.category)
-        return cat?.toString() ?: context.getString(
-            FirewallManager.CategoryConstants.OTHER.nameResId)
+        return cat?.toString()
+            ?: context.getString(FirewallManager.CategoryConstants.OTHER.nameResId)
     }
 
     private fun replaceUnderscore(s: String): String {
         return s.replace("_", " ")
     }
 
-    fun deleteOlderDataFromNetworkLogs() {
-        CoroutineScope(Dispatchers.IO).launch {
-            /**
-             * Removing the logs delete code based on the days. Instead added a count to keep
-             * in the table.
-             * Come up with some other configuration/logic to delete the user logs.(both
-             * ConnectionTracker and DNSLogs.
-             */
-            dnsLogRepository.deleteConnectionTrackerCount()
-            connTrackerRepository.deleteConnectionTrackerCount()
-        }
+    suspend fun purgeConnectionLogs(date: Long) {
+        // purge logs older than specified date
+        dnsLogRepository.purgeDnsLogsByDate(date)
+        connTrackerRepository.purgeLogsByDate(date)
     }
 
-    /**
-     * Below code to fetch the google play service-application category
-     * Not in use as of now.
-     */
+    /** Below code to fetch the google play service-application category Not in use as of now. */
     private fun fetchCategory(): String {
         return PlayStoreCategory.OTHER.name
         /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -566,9 +610,6 @@ class RefreshDatabase internal constructor(private var context: Context,
     }*/
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) {
-            f()
-        }
+        withContext(Dispatchers.IO) { f() }
     }
-
 }

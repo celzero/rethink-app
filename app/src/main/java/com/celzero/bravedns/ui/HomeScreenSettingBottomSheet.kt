@@ -47,20 +47,25 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val b get() = _binding!!
+    private val b
+        get() = _binding!!
 
     private val appConfig by inject<AppConfig>()
     private val persistentState by inject<PersistentState>()
 
-    override fun getTheme(): Int = getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                              persistentState.theme)
+    override fun getTheme(): Int =
+        getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetHomeScreenBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -69,7 +74,6 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding = null
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -109,15 +113,20 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initializeClickListeners() {
-        b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.bsHomeScreenRadioDns.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean
+            ->
             handleDnsMode(isSelected)
         }
 
-        b.bsHomeScreenRadioFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.bsHomeScreenRadioFirewall.setOnCheckedChangeListener {
+            _: CompoundButton,
+            isSelected: Boolean ->
             handleFirewallMode(isSelected)
         }
 
-        b.bsHomeScreenRadioDnsFirewall.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
+        b.bsHomeScreenRadioDnsFirewall.setOnCheckedChangeListener {
+            _: CompoundButton,
+            isSelected: Boolean ->
             handleDnsFirewallMode(isSelected)
         }
 
@@ -146,8 +155,11 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         }
 
         b.bsHsWireguardRl.setOnClickListener {
-            showToastUiCentered(requireContext(), getString(R.string.coming_soon_toast),
-                                Toast.LENGTH_SHORT)
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.coming_soon_toast),
+                Toast.LENGTH_SHORT
+            )
         }
 
         b.bsHomeScreenVpnLockdownDesc.setOnClickListener {
@@ -202,22 +214,26 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         val protocols = VpnController.protocols()
         val now = System.currentTimeMillis()
         // returns a string describing 'time' as a time relative to 'now'
-        val t = DateUtils.getRelativeTimeSpanString(now - uptimeMs, now, DateUtils.MINUTE_IN_MILLIS,
-                                                    DateUtils.FORMAT_ABBREV_RELATIVE)
+        val t =
+            DateUtils.getRelativeTimeSpanString(
+                now - uptimeMs,
+                now,
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
 
-        b.bsHomeScreenAppUptime.text = if (uptimeMs < INIT_TIME_MS) {
-            b.bsHomeScreenAppUptime.visibility = View.GONE
-            getString(R.string.hsf_downtime, t)
-        } else {
-            b.bsHomeScreenAppUptime.visibility = View.VISIBLE
-            getString(R.string.hsf_uptime, t, protocols)
-        }
+        b.bsHomeScreenAppUptime.text =
+            if (uptimeMs < INIT_TIME_MS) {
+                b.bsHomeScreenAppUptime.visibility = View.GONE
+                getString(R.string.hsf_downtime, t)
+            } else {
+                b.bsHomeScreenAppUptime.visibility = View.VISIBLE
+                getString(R.string.hsf_uptime, t, protocols)
+            }
     }
 
     private fun modifyBraveMode(braveMode: Int) {
-        io {
-            appConfig.changeBraveMode(braveMode)
-        }
+        io { appConfig.changeBraveMode(braveMode) }
     }
 
     private fun getConnectionStatus(): String {
@@ -235,10 +251,6 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

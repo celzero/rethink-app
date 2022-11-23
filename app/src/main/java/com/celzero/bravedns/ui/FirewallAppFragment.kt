@@ -48,8 +48,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
-                            SearchView.OnQueryTextListener {
+class FirewallAppFragment :
+    Fragment(R.layout.fragment_firewall_app_list), SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentFirewallAppListBinding::bind)
 
     private val appInfoViewModel: AppInfoViewModel by viewModel()
@@ -76,7 +76,9 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     enum class TopLevelFilter(val id: Int) {
-        ALL(0), INSTALLED(1), SYSTEM(2);
+        ALL(0),
+        INSTALLED(1),
+        SYSTEM(2);
 
         fun getLabel(context: Context): String {
             return when (this) {
@@ -96,7 +98,12 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     enum class FirewallFilter(val id: Int) {
-        ALL(0), ALLOWED(1), BLOCKED(2), BYPASS_UNIVERSAL(3), EXCLUDED(4), LOCKDOWN(5);
+        ALL(0),
+        ALLOWED(1),
+        BLOCKED(2),
+        BYPASS_UNIVERSAL(3),
+        EXCLUDED(4),
+        LOCKDOWN(5);
 
         fun getFilter(): Set<Int> {
             return when (this) {
@@ -114,8 +121,8 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                 ALL -> context.getString(R.string.fapps_firewall_filter_all)
                 ALLOWED -> context.getString(R.string.fapps_firewall_filter_allowed)
                 BLOCKED -> context.getString(R.string.fapps_firewall_filter_blocked)
-                BYPASS_UNIVERSAL -> context.getString(
-                    R.string.fapps_firewall_filter_bypass_universal)
+                BYPASS_UNIVERSAL ->
+                    context.getString(R.string.fapps_firewall_filter_bypass_universal)
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
                 LOCKDOWN -> context.getString(R.string.fapps_firewall_filter_lockdown)
             }
@@ -190,13 +197,24 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         val filterLabel = filter.topLevelFilter.getLabel(requireContext())
         val firewallLabel = filter.firewallFilter.getLabel(requireContext())
         if (filter.categoryFilters.isEmpty()) {
-            b.firewallAppLabelTv.text = Utilities.updateHtmlEncodedText(
-                getString(R.string.fapps_firewall_filter_desc, firewallLabel.lowercase(),
-                          filterLabel))
+            b.firewallAppLabelTv.text =
+                Utilities.updateHtmlEncodedText(
+                    getString(
+                        R.string.fapps_firewall_filter_desc,
+                        firewallLabel.lowercase(),
+                        filterLabel
+                    )
+                )
         } else {
-            b.firewallAppLabelTv.text = Utilities.updateHtmlEncodedText(
-                getString(R.string.fapps_firewall_filter_desc_category, firewallLabel.lowercase(),
-                          filterLabel, filter.categoryFilters))
+            b.firewallAppLabelTv.text =
+                Utilities.updateHtmlEncodedText(
+                    getString(
+                        R.string.fapps_firewall_filter_desc_category,
+                        firewallLabel.lowercase(),
+                        filterLabel,
+                        filter.categoryFilters
+                    )
+                )
         }
     }
 
@@ -232,9 +250,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     private fun setupClickListener() {
-        b.ffaFilterIcon.setOnClickListener {
-            openFilterBottomSheet()
-        }
+        b.ffaFilterIcon.setOnClickListener { openFilterBottomSheet() }
 
         b.ffaRefreshList.setOnClickListener {
             b.ffaRefreshList.isEnabled = false
@@ -245,9 +261,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
                 if (isAdded) {
                     b.ffaRefreshList.isEnabled = true
                     b.ffaRefreshList.clearAnimation()
-                    Utilities.showToastUiCentered(requireContext(),
-                                                  getString(R.string.refresh_complete),
-                                                  Toast.LENGTH_SHORT)
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.refresh_complete),
+                        Toast.LENGTH_SHORT
+                    )
                 }
             }
         }
@@ -260,9 +278,7 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
             showUpdateMeteredForBulkDialog(getBulkTagMetered())
         }
 
-        b.ffaAppInfoIcon.setOnClickListener {
-            showInfoDialog()
-        }
+        b.ffaAppInfoIcon.setOnClickListener { showInfoDialog() }
     }
 
     private fun showUpdateUnmeteredForBulkDialog(isBlock: Boolean) {
@@ -331,18 +347,42 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     private fun remakeFirewallChipsUi() {
         b.ffaFirewallChipGroup.removeAllViews()
 
-        val none = makeFirewallChip(FirewallFilter.ALL.id,
-                                    getString(R.string.fapps_firewall_filter_all), true)
-        val allowed = makeFirewallChip(FirewallFilter.ALLOWED.id,
-                                       getString(R.string.fapps_firewall_filter_allowed), false)
-        val blocked = makeFirewallChip(FirewallFilter.BLOCKED.id,
-                                       getString(R.string.fapps_firewall_filter_blocked), false)
-        val bypassUniversal = makeFirewallChip(FirewallFilter.BYPASS_UNIVERSAL.id, getString(
-            R.string.fapps_firewall_filter_bypass_universal), false)
-        val excluded = makeFirewallChip(FirewallFilter.EXCLUDED.id,
-                                        getString(R.string.fapps_firewall_filter_excluded), false)
-        val lockdown = makeFirewallChip(FirewallFilter.LOCKDOWN.id,
-                                        getString(R.string.fapps_firewall_filter_lockdown), false)
+        val none =
+            makeFirewallChip(
+                FirewallFilter.ALL.id,
+                getString(R.string.fapps_firewall_filter_all),
+                true
+            )
+        val allowed =
+            makeFirewallChip(
+                FirewallFilter.ALLOWED.id,
+                getString(R.string.fapps_firewall_filter_allowed),
+                false
+            )
+        val blocked =
+            makeFirewallChip(
+                FirewallFilter.BLOCKED.id,
+                getString(R.string.fapps_firewall_filter_blocked),
+                false
+            )
+        val bypassUniversal =
+            makeFirewallChip(
+                FirewallFilter.BYPASS_UNIVERSAL.id,
+                getString(R.string.fapps_firewall_filter_bypass_universal),
+                false
+            )
+        val excluded =
+            makeFirewallChip(
+                FirewallFilter.EXCLUDED.id,
+                getString(R.string.fapps_firewall_filter_excluded),
+                false
+            )
+        val lockdown =
+            makeFirewallChip(
+                FirewallFilter.LOCKDOWN.id,
+                getString(R.string.fapps_firewall_filter_lockdown),
+                false
+            )
 
         b.ffaFirewallChipGroup.addView(none)
         b.ffaFirewallChipGroup.addView(allowed)
@@ -385,8 +425,11 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
     }
 
     private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+        val colorFilter =
+            PorterDuffColorFilter(
+                ContextCompat.getColor(requireContext(), R.color.primaryText),
+                PorterDuff.Mode.SRC_IN
+            )
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
     }
@@ -400,34 +443,26 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
         if (getBulkTagMetered()) {
             b.ffaToggleAllMobileData.tag = 1
             b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_off)
-            io {
-                appInfoViewModel.updateMeteredStatus(true)
-            }
+            io { appInfoViewModel.updateMeteredStatus(true) }
             return
         }
 
         b.ffaToggleAllMobileData.tag = 0
         b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on)
-        io {
-            appInfoViewModel.updateMeteredStatus(false)
-        }
+        io { appInfoViewModel.updateMeteredStatus(false) }
     }
 
     private fun updateUnmeteredBulk() {
         if (getBulkTagUnmetered()) {
             b.ffaToggleAllWifi.tag = 1
             b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_off)
-            io {
-                appInfoViewModel.updateUnmeteredStatus(true)
-            }
+            io { appInfoViewModel.updateUnmeteredStatus(true) }
             return
         }
 
         b.ffaToggleAllWifi.tag = 0
         b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on)
-        io {
-            appInfoViewModel.updateUnmeteredStatus(false)
-        }
+        io { appInfoViewModel.updateUnmeteredStatus(false) }
     }
 
     private fun getBulkTagUnmetered(): Boolean {
@@ -454,39 +489,36 @@ class FirewallAppFragment : Fragment(R.layout.fragment_firewall_app_list),
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.ffaAppList.adapter = recyclerAdapter
-
     }
 
     private fun openFilterBottomSheet() {
         val bottomSheetFragment = FirewallAppFilterBottomSheet()
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun addAnimation() {
-        animation = RotateAnimation(ANIMATION_START_DEGREE, ANIMATION_END_DEGREE,
-                                    Animation.RELATIVE_TO_SELF, ANIMATION_PIVOT_VALUE,
-                                    Animation.RELATIVE_TO_SELF, ANIMATION_PIVOT_VALUE)
+        animation =
+            RotateAnimation(
+                ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE
+            )
         animation.repeatCount = ANIMATION_REPEAT_COUNT
         animation.duration = ANIMATION_DURATION
     }
 
     private fun refreshDatabase() {
-        io {
-            refreshDatabase.refreshAppInfoDatabase()
-        }
+        io { refreshDatabase.refreshAppInfoDatabase() }
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     private fun ui(f: () -> Unit) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            f()
-        }
+        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

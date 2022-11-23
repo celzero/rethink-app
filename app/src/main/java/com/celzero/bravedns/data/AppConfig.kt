@@ -20,7 +20,6 @@ import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
@@ -34,7 +33,6 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
-import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
@@ -43,20 +41,21 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import protect.Blocker
 import settings.Settings
 import java.net.InetAddress
 
-class AppConfig internal constructor(private val context: Context,
-                                     private val rethinkDnsEndpointRepository: RethinkDnsEndpointRepository,
-                                     private val dnsProxyEndpointRepository: DnsProxyEndpointRepository,
-                                     private val doHEndpointRepository: DoHEndpointRepository,
-                                     private val dnsCryptEndpointRepository: DnsCryptEndpointRepository,
-                                     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
-                                     private val proxyEndpointRepository: ProxyEndpointRepository,
-                                     private val persistentState: PersistentState) {
+class AppConfig
+internal constructor(
+    private val context: Context,
+    private val rethinkDnsEndpointRepository: RethinkDnsEndpointRepository,
+    private val dnsProxyEndpointRepository: DnsProxyEndpointRepository,
+    private val doHEndpointRepository: DoHEndpointRepository,
+    private val dnsCryptEndpointRepository: DnsCryptEndpointRepository,
+    private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
+    private val proxyEndpointRepository: ProxyEndpointRepository,
+    private val persistentState: PersistentState
+) {
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
@@ -80,21 +79,25 @@ class AppConfig internal constructor(private val context: Context,
         if (!persistentState.blocklistEnabled) return
 
         try {
-            // FIXME: canonical path may go missing but is unhandled
-            val path: String = Utilities.localBlocklistDownloadBasePath(context,
-                                                                        LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                                                        persistentState.localBlocklistTimestamp)
-            braveDns = Dnsx.newBraveDNSLocal(path + ONDEVICE_BLOCKLIST_FILE_TD,
-                                             path + ONDEVICE_BLOCKLIST_FILE_RD,
-                                             path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                                             path + ONDEVICE_BLOCKLIST_FILE_TAG)
+            val path: String =
+                Utilities.blocklistDownloadBasePath(
+                    context,
+                    LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                    persistentState.localBlocklistTimestamp
+                )
+            braveDns =
+                Dnsx.newBraveDNSLocal(
+                    path + ONDEVICE_BLOCKLIST_FILE_TD,
+                    path + ONDEVICE_BLOCKLIST_FILE_RD,
+                    path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                    path + ONDEVICE_BLOCKLIST_FILE_TAG
+                )
         } catch (e: Exception) {
             // Set local blocklist enabled to false and reset the timestamp
             // if there is a failure creating bravedns
             persistentState.blocklistEnabled = false
             Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
-            // Set local blocklist enabled to false and reset the timestamp
-            // or corrupted. Reset local blocklist timestamp to make sure
+            // Set local blocklist enabled to false and reset the timestamp to make sure
             // user is prompted to download blocklists again on the next try
             persistentState.localBlocklistTimestamp = INIT_TIME_MS
         }
@@ -108,13 +111,25 @@ class AppConfig internal constructor(private val context: Context,
         return braveDns
     }
 
-    data class TunnelOptions(val tunDnsMode: TunDnsMode, val tunFirewallMode: TunFirewallMode,
-                             val tunProxyMode: TunProxyMode, val ptMode: ProtoTranslationMode,
-                             val blocker: Blocker, val listener: Listener, val fakeDns: String,
-                             val preferredEngine: InternetProtocol)
+    fun recreateBraveDnsObj() {
+        createBraveDnsObjectIfNeeded()
+    }
+
+    data class TunnelOptions(
+        val tunDnsMode: TunDnsMode,
+        val tunFirewallMode: TunFirewallMode,
+        val tunProxyMode: TunProxyMode,
+        val ptMode: ProtoTranslationMode,
+        val blocker: Blocker,
+        val listener: Listener,
+        val fakeDns: String,
+        val preferredEngine: InternetProtocol
+    )
 
     enum class BraveMode(val mode: Int) {
-        DNS(0), FIREWALL(1), DNS_FIREWALL(2);
+        DNS(0),
+        FIREWALL(1),
+        DNS_FIREWALL(2);
 
         fun isFirewallActive(): Boolean {
             return isFirewallMode() || isDnsFirewallMode()
@@ -146,7 +161,6 @@ class AppConfig internal constructor(private val context: Context,
                 }
             }
         }
-
     }
 
     enum class TunFirewallMode(val mode: Long) {
@@ -162,7 +176,11 @@ class AppConfig internal constructor(private val context: Context,
 
     enum class DnsType(val type: Int) {
         // fixme: remove the type RETHINK_REMOTE and merge it with type DOH
-        DOH(1), DNSCRYPT(2), DNS_PROXY(3), RETHINK_REMOTE(4), NETWORK_DNS(5);
+        DOH(1),
+        DNSCRYPT(2),
+        DNS_PROXY(3),
+        RETHINK_REMOTE(4),
+        NETWORK_DNS(5);
 
         fun isDnsProxy(): Boolean {
             return this == DNS_PROXY
@@ -192,10 +210,6 @@ class AppConfig internal constructor(private val context: Context,
 
         fun isDnsProxy(): Boolean {
             return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
-        }
-
-        fun isRethinkRemote(): Boolean {
-            return mode == DOH_IP.mode || mode == DOH_PORT.mode
         }
 
         fun isSystemDns(): Boolean {
@@ -228,13 +242,14 @@ class AppConfig internal constructor(private val context: Context,
         fun isTunProxySocks5(): Boolean {
             return mode == SOCKS5.mode
         }
-
     }
 
     // Provider - Custom - SOCKS5, Http proxy setup.
     // ORBOT - One touch Orbot integration.
     enum class ProxyProvider {
-        NONE, CUSTOM, ORBOT;
+        NONE,
+        CUSTOM,
+        ORBOT;
 
         fun isProxyProviderCustom(): Boolean {
             return CUSTOM.name == name
@@ -261,7 +276,10 @@ class AppConfig internal constructor(private val context: Context,
 
     // Supported Proxy types
     enum class ProxyType {
-        NONE, HTTP, SOCKS5, HTTP_SOCKS5;
+        NONE,
+        HTTP,
+        SOCKS5,
+        HTTP_SOCKS5;
 
         fun isProxyTypeHttp(): Boolean {
             return HTTP.name == name
@@ -294,7 +312,7 @@ class AppConfig internal constructor(private val context: Context,
     enum class ProtoTranslationMode(val id: Long) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
-        PTMODEMAYBE46(Settings.PtModeMaybe46);
+        PTMODEMAYBE46(Settings.PtModeMaybe46)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -308,7 +326,6 @@ class AppConfig internal constructor(private val context: Context,
 
         return ProtoTranslationMode.PTMODEAUTO
     }
-
 
     data class SystemDns(var ipAddress: String, var port: Int)
 
@@ -446,11 +463,9 @@ class AppConfig internal constructor(private val context: Context,
             }
             DnsType.DNSCRYPT -> {
                 val count = getDNSCryptServerCount()
-                val relayCount = dnsCryptRelayEndpointRepository.getConnectedRelays()
                 val text = context.getString(R.string.configure_dns_crypt, count.toString())
                 connectedDns.postValue(text)
                 persistentState.connectedDnsName = text
-                persistentState.setDnsCryptRelayCount(relayCount.count())
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
@@ -473,7 +488,11 @@ class AppConfig internal constructor(private val context: Context,
     }
 
     private fun isValidDnsType(dt: DnsType): Boolean {
-        return (dt == DnsType.DOH || dt == DnsType.DNSCRYPT || dt == DnsType.DNS_PROXY || dt == DnsType.RETHINK_REMOTE || dt == DnsType.NETWORK_DNS)
+        return (dt == DnsType.DOH ||
+            dt == DnsType.DNSCRYPT ||
+            dt == DnsType.DNS_PROXY ||
+            dt == DnsType.RETHINK_REMOTE ||
+            dt == DnsType.NETWORK_DNS)
     }
 
     suspend fun switchRethinkDnsToMax() {
@@ -519,22 +538,37 @@ class AppConfig internal constructor(private val context: Context,
         }
 
         // app mode - Firewall & DNS+Firewall
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        return if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+        ) {
             TunFirewallMode.FILTER_ANDROID8_BELOW
         } else {
             TunFirewallMode.FILTER_ANDROID9_ABOVE
         }
     }
 
-    fun newTunnelOptions(blocker: Blocker, listener: Listener, fakeDns: String,
-                         preferredEngine: InternetProtocol,
-                         ptMode: ProtoTranslationMode): TunnelOptions {
-        return TunnelOptions(getDnsMode(), getFirewallMode(), getTunProxyMode(), ptMode, blocker,
-                             listener, fakeDns, preferredEngine)
+    fun newTunnelOptions(
+        blocker: Blocker,
+        listener: Listener,
+        fakeDns: String,
+        preferredEngine: InternetProtocol,
+        ptMode: ProtoTranslationMode
+    ): TunnelOptions {
+        return TunnelOptions(
+            getDnsMode(),
+            getFirewallMode(),
+            getTunProxyMode(),
+            ptMode,
+            blocker,
+            listener,
+            fakeDns,
+            preferredEngine
+        )
     }
 
     // -- DNS Manager --
-    suspend fun getConnectedProxyDetails(): DnsProxyEndpoint? {
+    suspend fun getConnectedDnsProxyDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getConnectedProxy()
     }
 
@@ -738,7 +772,7 @@ class AppConfig internal constructor(private val context: Context,
             dnsIp = dnsServers[0].hostAddress
         }
 
-        dnsIp?.let { setSystemDns(it, KnownPorts.DNS_PORT) }
+        dnsIp?.let { setSystemDns(it, DNS_PORT) }
     }
 
     fun getSystemDns(): SystemDns {
@@ -889,8 +923,10 @@ class AppConfig internal constructor(private val context: Context,
                 setProxy(ProxyType.HTTP, removeProvider)
                 return
             } else {
-                Log.w(LOG_TAG_VPN,
-                      "invalid remove proxy call, type: ${removeType.name}, provider: ${removeProvider.name}")
+                Log.w(
+                    LOG_TAG_VPN,
+                    "invalid remove proxy call, type: ${removeType.name}, provider: ${removeProvider.name}"
+                )
             }
         } else {
             removeAllProxies()
@@ -971,17 +1007,20 @@ class AppConfig internal constructor(private val context: Context,
 
     fun canEnableSocks5Proxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() && (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+        return canEnableProxy() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
     }
 
     fun canEnableHttpProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() && (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+        return canEnableProxy() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
     }
 
     fun canEnableOrbotProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() && (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
+        return canEnableProxy() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
     }
 
     suspend fun getConnectedSocks5Proxy(): ProxyEndpoint? {
@@ -1004,9 +1043,6 @@ class AppConfig internal constructor(private val context: Context,
         proxyEndpointRepository.insert(proxyEndpoint)
     }
 
-    val connectedProxy: LiveData<ProxyEndpoint> = liveData {
-        withContext(Dispatchers.IO) {
-            proxyEndpointRepository.getConnectedProxy()?.let { emit(it) }
-        }
-    }
+    val connectedProxy: LiveData<ProxyEndpoint?> =
+        proxyEndpointRepository.getConnectedProxyLiveData()
 }

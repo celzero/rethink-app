@@ -27,7 +27,7 @@ import com.celzero.bravedns.database.DnsProxyEndpointDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DnsProxyEndpointViewModel(private val dnsProxyEndpointDAO: DnsProxyEndpointDAO) :
-        ViewModel() {
+    ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
 
@@ -35,15 +35,20 @@ class DnsProxyEndpointViewModel(private val dnsProxyEndpointDAO: DnsProxyEndpoin
         filteredList.value = ""
     }
 
-    val dnsProxyEndpointList = Transformations.switchMap(filteredList) { input ->
-        if (input.isBlank()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsProxyEndpointDAO.getDnsProxyEndpointLiveData()
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsProxyEndpointDAO.getDnsProxyEndpointLiveDataByType("%$input%")
-            }.liveData.cachedIn(viewModelScope)
+    val dnsProxyEndpointList =
+        Transformations.switchMap(filteredList) { input ->
+            if (input.isBlank()) {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        dnsProxyEndpointDAO.getDnsProxyEndpointLiveData()
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        dnsProxyEndpointDAO.getDnsProxyEndpointLiveDataByType("%$input%")
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
         }
-    }
 }

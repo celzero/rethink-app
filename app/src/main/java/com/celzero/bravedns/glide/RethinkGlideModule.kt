@@ -17,18 +17,15 @@ package com.celzero.bravedns.glide
 
 import android.content.Context
 import android.util.Log
-import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
-import com.bumptech.glide.Registry
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.bumptech.glide.load.engine.cache.LruResourceCache
 import com.bumptech.glide.module.AppGlideModule
 
 /**
- * Defines the options to use when initializing Glide within an application.
- * As of now, limit for memory cache and disk cache is added.
- * By default, Glide uses LRUCache for both memory and disk.
+ * Defines the options to use when initializing Glide within an application. As of now, limit for
+ * memory cache and disk cache is added. By default, Glide uses LRUCache for both memory and disk.
  * Ref - https://bumptech.github.io/glide/doc/configuration.html
  */
 @GlideModule
@@ -46,9 +43,4 @@ class RethinkGlideModule : AppGlideModule() {
 
         builder.setLogLevel(Log.ERROR)
     }
-
-    override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
-        super.registerComponents(context, glide, registry)
-    }
-
 }

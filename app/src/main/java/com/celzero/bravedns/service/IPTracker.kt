@@ -39,9 +39,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.InetAddress
 
-class IPTracker internal constructor(
-        private val connectionTrackerRepository: ConnectionTrackerRepository,
-        private val context: Context) : KoinComponent {
+class IPTracker
+internal constructor(
+    private val connectionTrackerRepository: ConnectionTrackerRepository,
+    private val context: Context
+) : KoinComponent {
 
     private val persistentState by inject<PersistentState>()
     private val dnsLogTracker by inject<DnsLogTracker>()
@@ -50,10 +52,8 @@ class IPTracker internal constructor(
         if (ipDetails == null) return
         if (!persistentState.logsEnabled) return
 
-        //Modified the call of the insert to database inside the coroutine scope.
-        io {
-            insertToDB(ipDetails)
-        }
+        // Modified the call of the insert to database inside the coroutine scope.
+        io { insertToDB(ipDetails) }
     }
 
     private suspend fun insertToDB(ipDetails: IPDetails) {
@@ -86,8 +86,8 @@ class IPTracker internal constructor(
     }
 
     private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {
-        val inetAddress = HostName(ip)?.toInetAddress()
-        val ipAddress = IPAddressString(ip)?.address ?: return inetAddress
+        val inetAddress = HostName(ip).toInetAddress()
+        val ipAddress = IPAddressString(ip).address ?: return inetAddress
 
         // no need to check if IP is not of type IPv6
         if (!IpManager.isIpV6(ipAddress)) return inetAddress
@@ -108,20 +108,23 @@ class IPTracker internal constructor(
 
         val packageNameList = getPackageInfoForUid(context, uid)
 
-        val appName: String = if (packageNameList != null && packageNameList.isNotEmpty()) {
-            val packageName = packageNameList[0]
-            getValidAppName(uid, packageName)
-        } else { // For UNKNOWN or Non-App.
-            val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
-            Log.i(LOG_TAG_FIREWALL_LOG,
-                  "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}")
+        val appName: String =
+            if (packageNameList != null && packageNameList.isNotEmpty()) {
+                val packageName = packageNameList[0]
+                getValidAppName(uid, packageName)
+            } else { // For UNKNOWN or Non-App.
+                val fileSystemUID = AndroidUidConfig.fromFileSystemUid(uid)
+                Log.i(
+                    LOG_TAG_FIREWALL_LOG,
+                    "App name for the uid: ${uid}, AndroidUid: ${fileSystemUID.uid}, fileName: ${fileSystemUID.name}"
+                )
 
-            if (fileSystemUID.uid == INVALID_UID) {
-                context.getString(R.string.network_log_app_name_unnamed, uid.toString())
-            } else {
-                fileSystemUID.name
+                if (fileSystemUID.uid == INVALID_UID) {
+                    context.getString(R.string.network_log_app_name_unnamed, uid.toString())
+                } else {
+                    fileSystemUID.name
+                }
             }
-        }
         return appName
     }
 
@@ -134,17 +137,16 @@ class IPTracker internal constructor(
         if (appName.isNullOrEmpty()) {
             val appInfo = Utilities.getApplicationInfo(context, packageName) ?: return ""
 
-            Log.i(LOG_TAG_FIREWALL_LOG,
-                  "app, $appName, in PackageManager's list not tracked by FirewallManager")
+            Log.i(
+                LOG_TAG_FIREWALL_LOG,
+                "app, $appName, in PackageManager's list not tracked by FirewallManager"
+            )
             appName = context.packageManager.getApplicationLabel(appInfo).toString()
         }
         return appName
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            f()
-        }
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
-
 }

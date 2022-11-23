@@ -41,10 +41,6 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         super.onRebind(intent)
     }
 
-    override fun onServiceConnected() {
-        super.onServiceConnected()
-    }
-
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         // Commenting out the below code - warning during the build process
         /*
@@ -106,11 +102,13 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
 
     // Handle the received event.
     // Earlier the event handling is taken care in FirewallManager.
-    // Now, the firewall manager usage is modified, so moving this part here. 
+    // Now, the firewall manager usage is modified, so moving this part here.
     private fun handleAccessibilityEvent(event: AccessibilityEvent) {
 
-        // ref: https://developer.android.com/reference/android/accessibilityservice/AccessibilityService.html#lifecycle
-        // see: https://stackoverflow.com/questions/40433449/how-can-i-programmatically-start-and-stop-an-accessibilityservice
+        // ref:
+        // https://developer.android.com/reference/android/accessibilityservice/AccessibilityService.html#lifecycle
+        // see:
+        // https://stackoverflow.com/questions/40433449/how-can-i-programmatically-start-and-stop-an-accessibilityservice
         // no need ot handle the events when the vpn is not running
         if (!VpnController.isOn()) return
 
@@ -120,13 +118,18 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
 
         if (latestTrackedPackage.isNullOrEmpty()) return
 
-        val hasContentChanged = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED || event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        } else {
-            event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        }
-        if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                         "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged")
+        val hasContentChanged =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                event.eventType == AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED ||
+                    event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+            } else {
+                event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+            }
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_FIREWALL,
+                "onAccessibilityEvent: ${event.packageName}, ${event.eventType}, $hasContentChanged"
+            )
 
         if (!hasContentChanged) return
 
@@ -143,13 +146,12 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
             val uid = getEventUid(latestTrackedPackage) ?: return
             FirewallManager.trackForegroundApp(uid)
         }
-
     }
 
     // https://stackoverflow.com/questions/45620584/event-getsource-returns-null-in-accessibility-service-catch-source-for-a-3rd-p
     /**
-     * If the event retrieved package name is null then the check for the package name
-     * is carried out in (getRootInActiveWindow)AccessibilityNodeInfo
+     * If the event retrieved package name is null then the check for the package name is carried
+     * out in (getRootInActiveWindow)AccessibilityNodeInfo
      */
     private fun getEventPackageName(event: AccessibilityEvent): String? {
         return if (event.packageName.isNullOrBlank()) {
@@ -176,9 +178,11 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         val intent = Intent("android.intent.action.MAIN")
         intent.addCategory("android.intent.category.HOME")
         // package manager returns null,
-        val thisPackage = this.packageManager.resolveActivity(intent,
-                                                              PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
+        val thisPackage =
+            this.packageManager
+                .resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                ?.activityInfo
+                ?.packageName
         return thisPackage == packageName
     }
-
 }

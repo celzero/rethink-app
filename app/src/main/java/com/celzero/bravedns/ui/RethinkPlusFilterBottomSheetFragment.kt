@@ -33,30 +33,36 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
-class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragment?,
-                                           private val fileTags: List<FileTag>) :
-        BottomSheetDialogFragment() {
+class RethinkPlusFilterBottomSheetFragment(
+    val activity: RethinkBlocklistFragment?,
+    private val fileTags: List<FileTag>
+) : BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetRethinkPlusFilterBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
-    private val b get() = _binding!!
+    private val b
+        get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
 
     private var filters: RethinkBlocklistFragment.Filters? = null
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int =
+        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetRethinkPlusFilterBinding.inflate(inflater, container, false)
         return b.root
     }
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,20 +79,22 @@ class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragmen
 
     private fun makeChipGroup(ft: List<FileTag>) {
         b.rpfFilterChipGroup.removeAllViews()
-        ft.distinctBy { it.group }.forEach {
-            val checked = filters?.groups?.contains(it.group) == true
-            b.rpfFilterChipGroup.addView(remakeChipGroup(it.group, checked))
-        }
+        ft.distinctBy { it.group }
+            .forEach {
+                val checked = filters?.groups?.contains(it.group) == true
+                b.rpfFilterChipGroup.addView(remakeChipGroup(it.group, checked))
+            }
     }
 
     private fun makeChipSubGroup(ft: List<FileTag>) {
         b.rpfFilterChipSubGroup.removeAllViews()
-        ft.distinctBy { it.subg }.forEach {
-            if (it.subg.isBlank()) return@forEach
+        ft.distinctBy { it.subg }
+            .forEach {
+                if (it.subg.isBlank()) return@forEach
 
-            val checked = filters?.subGroups?.contains(it.subg) == true
-            b.rpfFilterChipSubGroup.addView(remakeChipSubgroup(it.subg, checked))
-        }
+                val checked = filters?.subGroups?.contains(it.subg) == true
+                b.rpfFilterChipSubGroup.addView(remakeChipSubgroup(it.subg, checked))
+            }
     }
 
     private fun initClickListeners() {
@@ -140,8 +148,11 @@ class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragmen
     }
 
     private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+        val colorFilter =
+            PorterDuffColorFilter(
+                ContextCompat.getColor(requireContext(), R.color.primaryText),
+                PorterDuff.Mode.SRC_IN
+            )
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
     }
@@ -155,9 +166,7 @@ class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragmen
 
         // filter sub group ui
         val filteredTag: MutableList<FileTag> = ArrayList()
-        filters!!.groups.forEach { g ->
-            filteredTag.addAll(fileTags.filter { it.group == g })
-        }
+        filters!!.groups.forEach { g -> filteredTag.addAll(fileTags.filter { it.group == g }) }
         makeChipSubGroup(filteredTag)
     }
 
@@ -171,9 +180,7 @@ class RethinkPlusFilterBottomSheetFragment(val activity: RethinkBlocklistFragmen
         val filteredTag: MutableList<FileTag> = ArrayList()
         if (filters!!.groups.isEmpty()) return
 
-        filters!!.groups.forEach { g ->
-            filteredTag.addAll(fileTags.filter { it.group == g })
-        }
+        filters!!.groups.forEach { g -> filteredTag.addAll(fileTags.filter { it.group == g }) }
         makeChipSubGroup(filteredTag)
     }
 

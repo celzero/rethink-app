@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(tableName = "DoHEndpoint")
@@ -46,9 +45,16 @@ class DoHEndpoint {
         return result
     }
 
-
-    constructor(id: Int, dohName: String, dohURL: String, dohExplanation: String,
-                isSelected: Boolean, isCustom: Boolean, modifiedDataTime: Long, latency: Int) {
+    constructor(
+        id: Int,
+        dohName: String,
+        dohURL: String,
+        dohExplanation: String,
+        isSelected: Boolean,
+        isCustom: Boolean,
+        modifiedDataTime: Long,
+        latency: Int
+    ) {
         // Room auto-increments id when its set to zero.
         // A non-zero id overrides and sets caller-specified id instead.
         this.id = id
@@ -65,9 +71,4 @@ class DoHEndpoint {
     fun isDeletable(): Boolean {
         return isCustom && !isSelected
     }
-
-    fun isRethinkDnsPlus(): Boolean {
-        return Constants.RETHINK_DNS_PLUS == this.dohName
-    }
-
 }

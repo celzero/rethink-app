@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.room.Transaction
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 
-
 class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkLocalFileTagDao) {
 
     @Transaction
@@ -39,15 +38,23 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         return rethinkLocalFileTagDao.insertAll(fileTags)
     }
 
-    suspend fun updateSelectedTags(list: Set<Int>, isSelected: Int) {
-        rethinkLocalFileTagDao.updateSelectedTags(list, isSelected)
+    suspend fun updateTags(list: Set<Int>, isSelected: Int) {
+        rethinkLocalFileTagDao.updateTags(list, isSelected)
     }
 
     suspend fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping> {
         return rethinkLocalFileTagDao.getSimpleViewTags()
     }
 
+    suspend fun fileTags(): List<RethinkLocalFileTag> {
+        return rethinkLocalFileTagDao.fileTags()
+    }
+
     suspend fun clearSelectedTags() {
         return rethinkLocalFileTagDao.clearSelectedTags()
+    }
+
+    suspend fun getSelectedTags(): List<Int> {
+        return rethinkLocalFileTagDao.getSelectedTags()
     }
 }

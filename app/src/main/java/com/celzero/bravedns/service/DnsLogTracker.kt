@@ -54,9 +54,12 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRepository,
-                                         private val persistentState: PersistentState,
-                                         private val context: Context) {
+class DnsLogTracker
+internal constructor(
+    private val dnsLogRepository: DnsLogRepository,
+    private val persistentState: PersistentState,
+    private val context: Context
+) {
 
     companion object {
         private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
@@ -99,11 +102,12 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
     }
 
     fun processOnResponse(summary: Summary): Transaction? {
-        val query: DnsPacket = try {
-            DnsPacket(summary.query)
-        } catch (e: Exception) {
-            return null
-        }
+        val query: DnsPacket =
+            try {
+                DnsPacket(summary.query)
+            } catch (e: Exception) {
+                return null
+            }
         val latencyMs = (TimeUnit.SECONDS.toMillis(1L) * summary.latency).toLong()
         val nowMs = SystemClock.elapsedRealtime()
         val queryTimeMs = nowMs - latencyMs
@@ -146,8 +150,8 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         val serverAddress = IpManager.getIpAddress(transaction.serverIp)
 
         if (serverAddress?.toInetAddress()?.hostAddress != null) {
-            val countryCode: String? = getCountryCode(serverAddress.toInetAddress(),
-                                                      context) //TODO: Country code things
+            val countryCode: String? =
+                getCountryCode(serverAddress.toInetAddress(), context) // TODO: Country code things
             dnsLog.resolver = makeAddressPair(countryCode, transaction.serverIp)
         } else {
             dnsLog.resolver = transaction.serverIp
@@ -168,20 +172,27 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
                     val countryCode: String? = getCountryCode(destination, context)
 
                     val inetAddress = convertIpV6ToIpv4IfNeeded(addresses[0])
-                    dnsLog.response = makeAddressPair(getCountryCode(inetAddress, context),
-                                                      addresses[0].hostAddress)
+                    dnsLog.response =
+                        makeAddressPair(
+                            getCountryCode(inetAddress, context),
+                            addresses[0].hostAddress
+                        )
 
-                    dnsLog.responseIps = addresses.joinToString(separator = ",") {
-                        val inetAddress = convertIpV6ToIpv4IfNeeded(it)
-                        makeAddressPair(getCountryCode(inetAddress, context), it.hostAddress)
-                    }
+                    dnsLog.responseIps =
+                        addresses.joinToString(separator = ",") {
+                            val addr = convertIpV6ToIpv4IfNeeded(it)
+                            makeAddressPair(getCountryCode(addr, context), it.hostAddress)
+                        }
 
-                    if (destination.hostAddress.contains(UNSPECIFIED_IP_IPV4)) {
+                    if (destination.hostAddress?.contains(UNSPECIFIED_IP_IPV4) == true) {
                         dnsLog.isBlocked = true
                     }
                     if (destination.isLoopbackAddress) {
                         dnsLog.isBlocked = true
-                    } else if (destination.hostAddress == UNSPECIFIED_IP_IPV6 || destination.hostAddress == LOOPBACK_IPV6) {
+                    } else if (
+                        destination.hostAddress == UNSPECIFIED_IP_IPV6 ||
+                            destination.hostAddress == LOOPBACK_IPV6
+                    ) {
                         dnsLog.isBlocked = true
                     }
 
@@ -190,18 +201,22 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
 
                     packet.answer.forEach { r ->
                         val ip = r.ip ?: return@forEach
-                        // drop trailing period . from the fqdn sent in dns-answer, ie a.com. => a.com
-                        val dnsCacheRecord = FirewallManager.DnsCacheRecord(calculateTtl(r.ttl),
-                                                                            transaction.name.dropLast(
-                                                                                1), flag)
-                        ipDomainLookup.put(ip.hostAddress, dnsCacheRecord)
+                        // drop trailing period . from the fqdn sent in dns-answer, ie a.com. =>
+                        // a.com
+                        val dnsCacheRecord =
+                            FirewallManager.DnsCacheRecord(
+                                calculateTtl(r.ttl),
+                                transaction.name.dropLast(1),
+                                flag
+                            )
+                        ip.hostAddress?.let { ipDomainLookup.put(it, dnsCacheRecord) }
                     }
                 } else {
                     // fixme: for queries with empty AAAA records, we are setting as NXDOMAIN
                     //  which needs a fix. need to check for the response's status
                     dnsLog.response = NXDOMAIN
-                    dnsLog.flag = context.getString(
-                        R.string.unicode_question_sign) // White question mark
+                    dnsLog.flag =
+                        context.getString(R.string.unicode_question_sign) // White question mark
                 }
             } else {
                 dnsLog.response = err
@@ -209,11 +224,12 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
             }
         } else {
             dnsLog.response = transaction.status.name
-            dnsLog.flag = if (transaction.status === Transaction.Status.CANCELED) {
-                context.getString(R.string.unicode_x_sign)// "X" mark
-            } else {
-                context.getString(R.string.unicode_warning_sign) // Warning sign
-            }
+            dnsLog.flag =
+                if (transaction.status === Transaction.Status.CANCELED) {
+                    context.getString(R.string.unicode_x_sign) // "X" mark
+                } else {
+                    context.getString(R.string.unicode_warning_sign) // Warning sign
+                }
         }
 
         fetchFavIcon(dnsLog)
@@ -235,7 +251,8 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
     fun updateVpnConnectionState(transaction: Transaction?) {
         if (transaction == null) return
 
-        // Update the connection state.  If the transaction succeeded, then the connection is working.
+        // Update the connection state.  If the transaction succeeded, then the connection is
+        // working.
         // If the transaction failed, then the connection is not working.
         // If the transaction was canceled, then we don't have any new information about the status
         // of the connection, so we don't send an update.
@@ -262,8 +279,8 @@ class DnsLogTracker internal constructor(private val dnsLogRepository: DnsLogRep
         CoroutineScope(Dispatchers.IO).launch {
             // Post number of requests and blocked count to livedata.
             persistentState.dnsRequestsCountLiveData.postValue(++numRequests)
-            if (dnsLog.isBlocked) persistentState.dnsBlockedCountLiveData.postValue(
-                ++numBlockedRequests)
+            if (dnsLog.isBlocked)
+                persistentState.dnsBlockedCountLiveData.postValue(++numBlockedRequests)
 
             // avoid excessive disk I/O from syncing the counter to disk after every request
             if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {

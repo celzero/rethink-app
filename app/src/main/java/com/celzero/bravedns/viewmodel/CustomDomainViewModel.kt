@@ -36,25 +36,32 @@ class CustomDomainViewModel(private val customDomainDAO: CustomDomainDAO) : View
         filteredList.value = ""
     }
 
-    val customDomainList = Transformations.switchMap(filteredList) { input ->
-        when (status) {
-            DomainRulesManager.DomainStatus.NONE -> {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    customDomainDAO.getAllDomainsLiveData("%$input%")
-                }.liveData.cachedIn(viewModelScope)
-            }
-            DomainRulesManager.DomainStatus.WHITELIST -> {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    customDomainDAO.getWhitelistedDomains("%$input%", status.id)
-                }.liveData.cachedIn(viewModelScope)
-            }
-            DomainRulesManager.DomainStatus.BLOCK -> {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    customDomainDAO.getBlockedDomains("%$input%", status.id)
-                }.liveData.cachedIn(viewModelScope)
+    val customDomainList =
+        Transformations.switchMap(filteredList) { input ->
+            when (status) {
+                DomainRulesManager.DomainStatus.NONE -> {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                            customDomainDAO.getAllDomainsLiveData("%$input%")
+                        }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                }
+                DomainRulesManager.DomainStatus.WHITELIST -> {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                            customDomainDAO.getWhitelistedDomains("%$input%", status.id)
+                        }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                }
+                DomainRulesManager.DomainStatus.BLOCK -> {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                            customDomainDAO.getBlockedDomains("%$input%", status.id)
+                        }
+                        .liveData
+                        .cachedIn(viewModelScope)
+                }
             }
         }
-    }
 
     fun setFilter(filter: String, status: DomainRulesManager.DomainStatus) {
         this.status = status

@@ -64,7 +64,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     private var _binding: BottomSheetConnTrackBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
-    private val b get() = _binding!!
+    private val b
+        get() = _binding!!
 
     private var ipDetails: ConnectionTracker? = null
 
@@ -72,8 +73,11 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         const val INSTANCE_STATE_IPDETAILS = "IPDETAILS"
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetConnTrackBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -83,8 +87,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         _binding = null
     }
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int =
+        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
     private val persistentState by inject<PersistentState>()
 
@@ -96,7 +100,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun initView() {
@@ -136,8 +141,10 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             return
         }
         // updates the app firewall's button
-        updateFirewallRulesUi(FirewallManager.appStatus(ipDetails!!.uid),
-                              FirewallManager.connectionStatus(ipDetails!!.uid))
+        updateFirewallRulesUi(
+            FirewallManager.appStatus(ipDetails!!.uid),
+            FirewallManager.connectionStatus(ipDetails!!.uid)
+        )
     }
 
     private fun updateDnsIfAvailable() {
@@ -157,19 +164,22 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         }
 
         val protocol = Protocol.getProtocolName(ipDetails!!.protocol).name
-        val time = DateUtils.getRelativeTimeSpanString(ipDetails!!.timeStamp,
-                                                       System.currentTimeMillis(),
-                                                       DateUtils.MINUTE_IN_MILLIS,
-                                                       DateUtils.FORMAT_ABBREV_RELATIVE)
+        val time =
+            DateUtils.getRelativeTimeSpanString(
+                ipDetails!!.timeStamp,
+                System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            )
         val protocolDetails = "$protocol/${ipDetails!!.port}"
         if (ipDetails!!.isBlocked) {
-            b.bsConnTrackPortDetailChip.text = getString(R.string.bsct_conn_desc_blocked,
-                                                         protocolDetails, time)
+            b.bsConnTrackPortDetailChip.text =
+                getString(R.string.bsct_conn_desc_blocked, protocolDetails, time)
             return
         }
 
-        b.bsConnTrackPortDetailChip.text = getString(R.string.bsct_conn_desc_allowed,
-                                                     protocolDetails, time)
+        b.bsConnTrackPortDetailChip.text =
+            getString(R.string.bsct_conn_desc_allowed, protocolDetails, time)
     }
 
     private fun updateBlockedRulesChip() {
@@ -179,9 +189,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         }
 
         val rule = ipDetails!!.blockedByRule
-        b.bsConnTrackAppKill.text = getFirewallRule(rule)?.title?.let {
-            getString(it)
-        }
+        b.bsConnTrackAppKill.text = getFirewallRule(rule)?.title?.let { getString(it) }
     }
 
     private fun updateAppDetails() {
@@ -192,15 +200,20 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val appCount = appNames.count()
         if (appCount >= 1) {
             b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-            b.bsConnTrackAppName.text = if (appCount >= 2) {
-                getString(R.string.ctbs_app_other_apps, appNames[0],
-                          appCount.minus(1).toString()) + "      ❯"
-            } else {
-                appNames[0] + "      ❯"
-            }
+            b.bsConnTrackAppName.text =
+                if (appCount >= 2) {
+                    getString(
+                        R.string.ctbs_app_other_apps,
+                        appNames[0],
+                        appCount.minus(1).toString()
+                    ) + "      ❯"
+                } else {
+                    appNames[0] + "      ❯"
+                }
             val pkgName = FirewallManager.getPackageNameByAppName(appNames[0]) ?: return
             b.bsConnTrackAppIcon.setImageDrawable(
-                getIcon(requireContext(), pkgName, ipDetails?.appName))
+                getIcon(requireContext(), pkgName, ipDetails?.appName)
+            )
         } else {
             // apps which are not available in cache are treated as non app.
             // TODO: check packageManager#getApplicationInfo() for appInfo
@@ -210,22 +223,30 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     private fun lightenUpChip() {
         // Load icons for the firewall rules if available
-        b.bsConnTrackAppKill.chipIcon = ContextCompat.getDrawable(requireContext(),
-                                                                  FirewallRuleset.getRulesIcon(
-                                                                      ipDetails?.blockedByRule))
+        b.bsConnTrackAppKill.chipIcon =
+            ContextCompat.getDrawable(
+                requireContext(),
+                FirewallRuleset.getRulesIcon(ipDetails?.blockedByRule)
+            )
         if (ipDetails!!.isBlocked) {
             b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
-            val colorFilter = PorterDuffColorFilter(
-                fetchColor(requireContext(), R.attr.chipTextNegative), PorterDuff.Mode.SRC_IN)
-            b.bsConnTrackAppKill.chipBackgroundColor = ColorStateList.valueOf(
-                fetchColor(requireContext(), R.attr.chipBgColorNegative))
+            val colorFilter =
+                PorterDuffColorFilter(
+                    fetchColor(requireContext(), R.attr.chipTextNegative),
+                    PorterDuff.Mode.SRC_IN
+                )
+            b.bsConnTrackAppKill.chipBackgroundColor =
+                ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
             b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
         } else {
             b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
-            val colorFilter = PorterDuffColorFilter(
-                fetchColor(requireContext(), R.attr.chipTextPositive), PorterDuff.Mode.SRC_IN)
-            b.bsConnTrackAppKill.chipBackgroundColor = ColorStateList.valueOf(
-                fetchColor(requireContext(), R.attr.chipBgColorPositive))
+            val colorFilter =
+                PorterDuffColorFilter(
+                    fetchColor(requireContext(), R.attr.chipTextPositive),
+                    PorterDuff.Mode.SRC_IN
+                )
+            b.bsConnTrackAppKill.chipBackgroundColor =
+                ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorPositive))
             b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
         }
     }
@@ -242,8 +263,11 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     private fun setupClickListeners() {
         b.bsConnUnknownAppCheck.setOnCheckedChangeListener(null)
         b.bsConnUnknownAppCheck.setOnClickListener {
-            if (DEBUG) Log.d(LOG_TAG_FIREWALL,
-                             "Unknown app, universal firewall settings(block unknown app): ${b.bsConnUnknownAppCheck.isChecked} ")
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_FIREWALL,
+                    "Unknown app, universal firewall settings(block unknown app): ${b.bsConnUnknownAppCheck.isChecked} "
+                )
             persistentState.blockUnknownConnections = b.bsConnUnknownAppCheck.isChecked
         }
 
@@ -255,8 +279,11 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             val ai = FirewallManager.getAppInfoByUid(ipDetails!!.uid)
             // case: app is uninstalled but still available in RethinkDNS database
             if (ai == null || ipDetails?.uid == Constants.INVALID_UID) {
-                showToastUiCentered(requireContext(), getString(R.string.ct_bs_app_info_error),
-                                    Toast.LENGTH_SHORT)
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.ct_bs_app_info_error),
+                    Toast.LENGTH_SHORT
+                )
                 return@setOnClickListener
             }
 
@@ -264,50 +291,70 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         }
 
         // spinner to show firewall rules
-        b.bsConnFirewallSpinner.adapter = FirewallStatusSpinnerAdapter(requireContext(),
-                                                                       FirewallManager.FirewallStatus.getLabel(
-                                                                           requireContext()))
-        b.bsConnFirewallSpinner.onItemSelectedListener = object :
-                AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int,
-                                        id: Long) {
-                val iv = view?.findViewById<AppCompatImageView>(R.id.spinner_icon)
-                iv?.visibility = View.VISIBLE
-                val fStatus = FirewallManager.FirewallStatus.getStatusByLabel(position)
-                val connStatus = FirewallManager.ConnectionStatus.getStatusByLabel(position)
+        b.bsConnFirewallSpinner.adapter =
+            FirewallStatusSpinnerAdapter(
+                requireContext(),
+                FirewallManager.FirewallStatus.getLabel(requireContext())
+            )
+        b.bsConnFirewallSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val iv = view?.findViewById<AppCompatImageView>(R.id.spinner_icon)
+                    iv?.visibility = View.VISIBLE
+                    val fStatus = FirewallManager.FirewallStatus.getStatusByLabel(position)
+                    val connStatus = FirewallManager.ConnectionStatus.getStatusByLabel(position)
 
-                // no change, prev selection and current selection are same
-                if (FirewallManager.appStatus(
-                        ipDetails!!.uid) == fStatus && FirewallManager.connectionStatus(
-                        ipDetails!!.uid) == connStatus) return
+                    // no change, prev selection and current selection are same
+                    if (
+                        FirewallManager.appStatus(ipDetails!!.uid) == fStatus &&
+                            FirewallManager.connectionStatus(ipDetails!!.uid) == connStatus
+                    )
+                        return
 
-                Log.i(LOG_TAG_FIREWALL,
-                      "Change in firewall rule for app uid: ${ipDetails?.uid}, firewall status: $fStatus, conn status: $connStatus")
-                applyFirewallRule(fStatus, connStatus)
+                    Log.i(
+                        LOG_TAG_FIREWALL,
+                        "Change in firewall rule for app uid: ${ipDetails?.uid}, firewall status: $fStatus, conn status: $connStatus"
+                    )
+                    applyFirewallRule(fStatus, connStatus)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+        b.bsConnIpRuleSpinner.adapter =
+            FirewallStatusSpinnerAdapter(requireContext(), IpRulesManager.IpRuleStatus.getLabel())
+        b.bsConnIpRuleSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val iv = view?.findViewById<AppCompatImageView>(R.id.spinner_icon)
+                    iv?.visibility = View.VISIBLE
+                    val fid = IpRulesManager.IpRuleStatus.getStatus(position)
 
-        b.bsConnIpRuleSpinner.adapter = FirewallStatusSpinnerAdapter(requireContext(),
-                                                                     IpRulesManager.IpRuleStatus.getLabel())
-        b.bsConnIpRuleSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int,
-                                        id: Long) {
-                val iv = view?.findViewById<AppCompatImageView>(R.id.spinner_icon)
-                iv?.visibility = View.VISIBLE
-                val fid = IpRulesManager.IpRuleStatus.getStatus(position)
+                    // no need to apply rule, prev selection and current selection are same
+                    if (
+                        IpRulesManager.hasRule(
+                            ipDetails!!.uid,
+                            ipDetails!!.ipAddress,
+                            ipDetails!!.port
+                        ) == fid
+                    )
+                        return
 
-                // no need to apply rule, prev selection and current selection are same
-                if (IpRulesManager.hasRule(ipDetails!!.uid, ipDetails!!.ipAddress,
-                                           ipDetails!!.port) == fid) return
+                    applyIpRule(fid)
+                }
 
-                applyIpRule(fid)
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-
     }
 
     private fun openAppDetailActivity(uid: Int) {
@@ -316,8 +363,10 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         requireContext().startActivity(intent)
     }
 
-    private fun updateFirewallRulesUi(firewallStatus: FirewallManager.FirewallStatus,
-                                      connStatus: FirewallManager.ConnectionStatus) {
+    private fun updateFirewallRulesUi(
+        firewallStatus: FirewallManager.FirewallStatus,
+        connStatus: FirewallManager.ConnectionStatus
+    ) {
         // no need to update the state if it's untracked
         if (firewallStatus.isUntracked()) return
 
@@ -347,7 +396,6 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                 // no-op
             }
         }
-
     }
 
     private fun updateIpRulesUi(uid: Int, ipAddress: String, port: Int) {
@@ -368,24 +416,27 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val icon = dialogBinding.infoRulesDialogRulesIcon
         icon.visibility = View.VISIBLE
 
-        heading.text = getFirewallRule(blockedRule)?.let { getString(it.title) } ?: getString(
-            R.string.firewall_rule_no_rule)
-        val desc = getFirewallRule(blockedRule)?.let { getString(it.desc) } ?: getString(
-            R.string.firewall_rule_no_rule_desc)
+        heading.text =
+            getFirewallRule(blockedRule)?.let { getString(it.title) }
+                ?: getString(R.string.firewall_rule_no_rule)
+        val desc =
+            getFirewallRule(blockedRule)?.let { getString(it.desc) }
+                ?: getString(R.string.firewall_rule_no_rule_desc)
 
         descText.text = updateHtmlEncodedText(desc)
 
         icon.setImageDrawable(
-            ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(blockedRule)))
+            ContextCompat.getDrawable(requireContext(), FirewallRuleset.getRulesIcon(blockedRule))
+        )
 
-        okBtn.setOnClickListener {
-            dialog.dismiss()
-        }
+        okBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
-    private fun applyFirewallRule(firewallStatus: FirewallManager.FirewallStatus,
-                                  connStatus: FirewallManager.ConnectionStatus) {
+    private fun applyFirewallRule(
+        firewallStatus: FirewallManager.FirewallStatus,
+        connStatus: FirewallManager.ConnectionStatus
+    ) {
         val appNames = FirewallManager.getAppNamesByUid(ipDetails!!.uid)
         if (appNames.count() > 1) {
             val prevStatus = FirewallManager.appStatus(ipDetails!!.uid)
@@ -401,10 +452,16 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val protocol = Protocol.getProtocolName(ipDetails!!.protocol).name
         val connRules = ConnectionRules(ipDetails!!.ipAddress, ipDetails!!.port, protocol)
 
-        Log.i(LOG_TAG_FIREWALL,
-              "Apply ip rule for ${connRules.ipAddress}, ${FirewallRuleset.RULE2.name}")
-        IpRulesManager.updateRule(ipDetails!!.uid, connRules.ipAddress, connRules.port,
-                                  ipRuleStatus)
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "Apply ip rule for ${connRules.ipAddress}, ${FirewallRuleset.RULE2.name}"
+        )
+        IpRulesManager.updateRule(
+            ipDetails!!.uid,
+            connRules.ipAddress,
+            connRules.port,
+            ipRuleStatus
+        )
     }
 
     private fun getAppName(): String {
@@ -418,42 +475,50 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         }
     }
 
-    private fun showFirewallDialog(packageList: List<String>,
-                                   status: FirewallManager.FirewallStatus,
-                                   prevStatus: FirewallManager.FirewallStatus,
-                                   connStatus: FirewallManager.ConnectionStatus) {
+    private fun showFirewallDialog(
+        packageList: List<String>,
+        status: FirewallManager.FirewallStatus,
+        prevStatus: FirewallManager.FirewallStatus,
+        connStatus: FirewallManager.ConnectionStatus
+    ) {
 
-        val builderSingle: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(
-            requireContext())
+        val builderSingle: android.app.AlertDialog.Builder =
+            android.app.AlertDialog.Builder(requireContext())
 
         builderSingle.setIcon(R.drawable.spinner_firewall)
         val count = packageList.count()
         builderSingle.setTitle(
-            this.getString(R.string.ctbs_block_other_apps, getAppName(), count.toString()))
+            this.getString(R.string.ctbs_block_other_apps, getAppName(), count.toString())
+        )
 
-        val arrayAdapter = ArrayAdapter<String>(requireContext(),
-                                                android.R.layout.simple_list_item_activated_1)
+        val arrayAdapter =
+            ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_activated_1)
         arrayAdapter.addAll(packageList)
         builderSingle.setCancelable(false)
 
         builderSingle.setItems(packageList.toTypedArray(), null)
 
-        builderSingle.setPositiveButton(getString(status.getLabelId())) { dialog: DialogInterface, _: Int ->
-            // call dialog.dismiss() before updating the details.
-            // Without dismissing this dialog, the bottom sheet dialog is not
-            // refreshing/updating its UI. One way is to dismiss the dialog
-            // before updating the UI.
-            // b.root.invalidate()/ b.root.notify didn't help in this case.
-            dialog.dismiss()
+        builderSingle
+            .setPositiveButton(getString(status.getLabelId())) { dialog: DialogInterface, _: Int ->
+                // call dialog.dismiss() before updating the details.
+                // Without dismissing this dialog, the bottom sheet dialog is not
+                // refreshing/updating its UI. One way is to dismiss the dialog
+                // before updating the UI.
+                // b.root.invalidate()/ b.root.notify didn't help in this case.
+                dialog.dismiss()
 
-            Log.i(LOG_TAG_FIREWALL,
-                  "Apply firewall rule for uid: ${ipDetails?.uid}, ${status.name}")
-            FirewallManager.updateFirewallStatus(ipDetails!!.uid, status, connStatus)
-            updateFirewallRulesUi(status, connStatus)
-        }.setNeutralButton(
-            this.getString(R.string.ctbs_dialog_negative_btn)) { _: DialogInterface, _: Int ->
-            updateFirewallRulesUi(prevStatus, FirewallManager.connectionStatus(ipDetails!!.uid))
-        }
+                Log.i(
+                    LOG_TAG_FIREWALL,
+                    "Apply firewall rule for uid: ${ipDetails?.uid}, ${status.name}"
+                )
+                FirewallManager.updateFirewallStatus(ipDetails!!.uid, status, connStatus)
+                updateFirewallRulesUi(status, connStatus)
+            }
+            .setNeutralButton(this.getString(R.string.ctbs_dialog_negative_btn)) {
+                _: DialogInterface,
+                _: Int ->
+                updateFirewallRulesUi(prevStatus, FirewallManager.connectionStatus(ipDetails!!.uid))
+            }
 
         val alertDialog: android.app.AlertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }

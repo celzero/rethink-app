@@ -24,7 +24,6 @@ import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -51,8 +50,9 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
 
-class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
-                             LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
+class DnsConfigureFragment :
+    Fragment(R.layout.fragment_dns_configure),
+    LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
 
     private val persistentState by inject<PersistentState>()
@@ -100,10 +100,14 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
 
         if (persistentState.blocklistEnabled) {
             b.dcLocalBlocklistCount.text = getString(R.string.dc_local_block_enabled)
-            b.dcLocalBlocklistDesc.text = getString(R.string.settings_local_blocklist_in_use,
-                                                    persistentState.numberOfLocalBlocklists.toString())
+            b.dcLocalBlocklistDesc.text =
+                getString(
+                    R.string.settings_local_blocklist_in_use,
+                    persistentState.numberOfLocalBlocklists.toString()
+                )
             b.dcLocalBlocklistCount.setTextColor(
-                fetchColor(requireContext(), R.attr.secondaryTextColor))
+                fetchColor(requireContext(), R.attr.secondaryTextColor)
+            )
             return
         }
 
@@ -113,7 +117,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
 
     private fun initObservers() {
         observeBraveMode()
-        observeWorkManager()
         observeDnscryptStatus()
         observeAppState()
     }
@@ -133,32 +136,32 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     private fun updateConnectedStatus(connectedDns: String) {
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitleUrl.text =
+                    resources.getString(R.string.configure_dns_connected_doh_status)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
             AppConfig.DnsType.DNSCRYPT -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_crypt_status)
+                b.connectedStatusTitleUrl.text =
+                    resources.getString(R.string.configure_dns_connected_dns_crypt_status)
             }
             AppConfig.DnsType.DNS_PROXY -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitleUrl.text =
+                    resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitleUrl.text =
+                    resources.getString(R.string.configure_dns_connected_doh_status)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
             AppConfig.DnsType.NETWORK_DNS -> {
-                b.connectedStatusTitleUrl.text = resources.getString(
-                    R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text = resources.getString(
-                    R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitleUrl.text =
+                    resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
         }
     }
@@ -217,21 +220,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
         }
     }
 
-    private fun observeWorkManager() {
-        val workManager = WorkManager.getInstance(requireContext().applicationContext)
-
-        // handle the check for blocklist switch based on the work manager's status
-        workManager.getWorkInfosByTagLiveData(BLOCKLIST_UPDATE_CHECK_JOB_TAG).observe(
-            viewLifecycleOwner) { workInfoList ->
-            val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
-                  "WorkManager state: ${workInfo.state} for $BLOCKLIST_UPDATE_CHECK_JOB_TAG")
-            // disable the switch only when the work is in a CANCELLED state.
-            // enable the switch for all the other states (ENQUEUED, RUNNING, SUCCEEDED, FAILED, BLOCKED)
-            b.dcCheckUpdateSwitch.isChecked = WorkInfo.State.CANCELLED != workInfo.state
-        }
-    }
-
     private fun observeBraveMode() {
         appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
             if (it == null) return@observe
@@ -241,9 +229,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
             }
         }
 
-        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            updateSelectedDns()
-        }
+        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) { updateSelectedDns() }
     }
 
     private fun updateDnsOnlyModeUi() {
@@ -257,7 +243,6 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
         // disable prevent dns leaks in dns-only mode
         b.dcPreventDnsLeaksSwitch.isClickable = false
         b.dcPreventDnsLeaksSwitch.isEnabled = false
-
     }
 
     private fun initClickListeners() {
@@ -269,27 +254,25 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
             openCustomDomainDialog()*/
         }
 
-        b.dcLocalBlocklistRl.setOnClickListener {
-            openLocalBlocklist()
-        }
+        b.dcLocalBlocklistRl.setOnClickListener { openLocalBlocklist() }
 
-        b.dcLocalBlocklistImg.setOnClickListener {
-            openLocalBlocklist()
-        }
+        b.dcLocalBlocklistImg.setOnClickListener { openLocalBlocklist() }
 
         b.dcCheckUpdateRl.setOnClickListener {
             b.dcCheckUpdateSwitch.isChecked = !b.dcCheckUpdateSwitch.isChecked
         }
 
         b.dcCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+            persistentState.periodicallyCheckBlocklistUpdate = enabled
             if (enabled) {
-                persistentState.periodicallyCheckBlocklistUpdate = true
                 get<WorkScheduler>().scheduleBlocklistUpdateCheckJob()
             } else {
-                Log.i(LoggerConstants.LOG_TAG_SCHEDULER,
-                      "Cancel all the work related to blocklist update check")
-                WorkManager.getInstance(requireContext().applicationContext).cancelAllWorkByTag(
-                    BLOCKLIST_UPDATE_CHECK_JOB_TAG)
+                Log.i(
+                    LoggerConstants.LOG_TAG_SCHEDULER,
+                    "Cancel all the work related to blocklist update check"
+                )
+                WorkManager.getInstance(requireContext().applicationContext)
+                    .cancelAllWorkByTag(BLOCKLIST_UPDATE_CHECK_JOB_TAG)
             }
         }
 
@@ -306,7 +289,8 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
             b.dcPreventDnsLeaksSwitch.isChecked = !b.dcPreventDnsLeaksSwitch.isChecked
         }
 
-        b.dcPreventDnsLeaksSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+        b.dcPreventDnsLeaksSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean
+            ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcPreventDnsLeaksSwitch)
             persistentState.preventDnsLeaks = enabled
         }
@@ -339,7 +323,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     private fun openLocalBlocklist() {
         val bottomSheetFragment = LocalBlocklistsBottomSheet()
         bottomSheetFragment.setDismissListener(this)
-        bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun invokeRethinkActivity(type: ConfigureRethinkBasicActivity.FragmentLoader) {
@@ -392,7 +376,8 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {
@@ -406,11 +391,7 @@ class DnsConfigureFragment : Fragment(R.layout.fragment_dns_configure),
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                f()
-            }
-        }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     override fun onBtmSheetDismiss() {

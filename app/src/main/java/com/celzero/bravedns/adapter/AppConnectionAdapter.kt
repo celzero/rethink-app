@@ -19,6 +19,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -28,10 +29,11 @@ import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
 
 class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>, val uid: Int) :
-        RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
-        AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
+    RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
+    AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     private lateinit var adapter: AppConnectionAdapter
     private var ips: List<AppConnections>
@@ -40,16 +42,24 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
         ips = connLists
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): AppConnectionAdapter.ConnectionDetailsViewHolder {
-        val itemBinding = ListItemAppConnDetailsBinding.inflate(LayoutInflater.from(parent.context),
-                                                                parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): AppConnectionAdapter.ConnectionDetailsViewHolder {
+        val itemBinding =
+            ListItemAppConnDetailsBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         adapter = this
         return ConnectionDetailsViewHolder(itemBinding)
     }
 
-    override fun onBindViewHolder(holder: AppConnectionAdapter.ConnectionDetailsViewHolder,
-                                  position: Int) {
+    override fun onBindViewHolder(
+        holder: AppConnectionAdapter.ConnectionDetailsViewHolder,
+        position: Int
+    ) {
         // updates the app-wise connections from network log to AppInfo screen
         holder.update(position)
     }
@@ -70,7 +80,7 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
     }
 
     inner class ConnectionDetailsViewHolder(private val b: ListItemAppConnDetailsBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
         fun update(position: Int) {
             displayTransactionDetails(position)
             setupClickListeners(ips[position], position)
@@ -84,10 +94,14 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, port: Int,
-                                    ipRuleStatus: IpRulesManager.IpRuleStatus, position: Int) {
+        private fun openBottomSheet(
+            ipAddress: String,
+            port: Int,
+            ipRuleStatus: IpRulesManager.IpRuleStatus,
+            position: Int
+        ) {
             if (context !is AppCompatActivity) {
-                Log.wtf(LoggerConstants.LOG_TAG_UI, context.getString(R.string.ct_btm_sheet_error))
+                Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottomsheet")
                 return
             }
 
@@ -108,12 +122,20 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
 
             b.acdCount.text = conn.count.toString()
             b.acdFlag.text = conn.flag
-            b.acdIpAddress.text = "${conn.ipAddress}:${conn.port}"
-            if (conn.dnsQuery != null) {
-                b.acdDomainName.text = conn.dnsQuery
+            b.acdIpAddress.text =
+                context.getString(R.string.ct_ip_port, conn.ipAddress, conn.port.toString())
+            if (!conn.dnsQuery.isNullOrEmpty()) {
+                b.acdDomainName.visibility = View.VISIBLE
+                b.acdDomainName.text = beautifyDomainString(conn.dnsQuery)
+            } else {
+                b.acdDomainName.visibility = View.GONE
             }
+        }
 
+        private fun beautifyDomainString(d: String): String {
+            // replace two commas in the string to one
+            // add space after all the commas
+            return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
     }
-
 }

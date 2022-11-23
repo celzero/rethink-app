@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 
 import androidx.room.Transaction
 
-
 class DnsProxyEndpointRepository(private val dnsProxyEndpointDAO: DnsProxyEndpointDAO) {
 
     @Transaction
@@ -54,5 +53,4 @@ class DnsProxyEndpointRepository(private val dnsProxyEndpointDAO: DnsProxyEndpoi
     suspend fun getOrbotDnsEndpoint(): DnsProxyEndpoint? {
         return dnsProxyEndpointDAO.getOrbotDnsEndpoint()
     }
-
 }

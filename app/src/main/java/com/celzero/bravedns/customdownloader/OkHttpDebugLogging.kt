@@ -30,13 +30,15 @@ object OkHttpDebugLogging {
 
     fun enableTaskRunner() = enable(TaskRunner::class)
 
-    private fun logHandler() = ConsoleHandler().apply {
-        level = Level.FINEST
-        formatter = object : SimpleFormatter() {
-            override fun format(record: LogRecord) = String.format("[%1\$tF %1\$tT] %2\$s %n",
-                                                                   record.millis, record.message)
+    private fun logHandler() =
+        ConsoleHandler().apply {
+            level = Level.FINEST
+            formatter =
+                object : SimpleFormatter() {
+                    override fun format(record: LogRecord) =
+                        String.format("[%1\$tF %1\$tT] %2\$s %n", record.millis, record.message)
+                }
         }
-    }
 
     fun enable(loggerClass: String, handler: Handler = logHandler()): Closeable {
         val logger = Logger.getLogger(loggerClass)
@@ -44,9 +46,7 @@ object OkHttpDebugLogging {
             logger.addHandler(handler)
             logger.level = Level.FINEST
         }
-        return Closeable {
-            logger.removeHandler(handler)
-        }
+        return Closeable { logger.removeHandler(handler) }
     }
 
     fun enable(loggerClass: KClass<*>) = enable(loggerClass.java.name)

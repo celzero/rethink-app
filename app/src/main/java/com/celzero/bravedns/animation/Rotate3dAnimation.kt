@@ -23,18 +23,16 @@ import android.view.animation.Transformation
 // github.com/guardianproject/orbot/blob/ce3f265/appcore/src/main/java/org/torproject/android/core/ui/Rotate3dAnimation.kt
 
 /**
- * An animation that rotates the view on the Y axis between two specified angles.
- * This animation also adds a translation on the Z axis (depth) to improve the effect.
+ * An animation that rotates the view on the Y axis between two specified angles. This animation
+ * also adds a translation on the Z axis (depth) to improve the effect.
  */
 class Rotate3dAnimation
 /**
- * Creates a new 3D rotation on the Y axis. The rotation is defined by its
- * start angle and its end angle. Both angles are in degrees. The rotation
- * is performed around a center point on the 2D space, defined by a pair
- * of X and Y coordinates, called centerX and centerY. When the animation
- * starts, a translation on the Z axis (depth) is performed. The length
- * of the translation can be specified, as well as whether the translation
- * should be reversed in time.
+ * Creates a new 3D rotation on the Y axis. The rotation is defined by its start angle and its end
+ * angle. Both angles are in degrees. The rotation is performed around a center point on the 2D
+ * space, defined by a pair of X and Y coordinates, called centerX and centerY. When the animation
+ * starts, a translation on the Z axis (depth) is performed. The length of the translation can be
+ * specified, as well as whether the translation should be reversed in time.
  *
  * @param mFromDegrees the start angle of the 3D rotation
  * @param mToDegrees the end angle of the 3D rotation
@@ -42,9 +40,14 @@ class Rotate3dAnimation
  * @param mCenterY the Y center of the 3D rotation
  * @param mReverse true if the translation should be reversed, false otherwise
  */
-    (private val mFromDegrees: Float, private val mToDegrees: Float, private val mCenterX: Float,
-     private val mCenterY: Float, private val mDepthZ: Float, private val mReverse: Boolean) :
-        Animation() {
+(
+    private val mFromDegrees: Float,
+    private val mToDegrees: Float,
+    private val mCenterX: Float,
+    private val mCenterY: Float,
+    private val mDepthZ: Float,
+    private val mReverse: Boolean
+) : Animation() {
     private lateinit var mCamera: Camera
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
         super.initialize(width, height, parentWidth, parentHeight)

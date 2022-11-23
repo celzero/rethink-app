@@ -23,31 +23,37 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.ConnectionTrackerFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
-
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
-        ViewModel() {
+    ViewModel() {
 
     private var filterString: MutableLiveData<String> = MutableLiveData()
     private var filterRules: MutableSet<String> = mutableSetOf()
-    private var filterType: ConnectionTrackerFragment.TopLevelFilter = ConnectionTrackerFragment.TopLevelFilter.ALL
+    private var filterType: ConnectionTrackerFragment.TopLevelFilter =
+        ConnectionTrackerFragment.TopLevelFilter.ALL
 
     init {
         filterString.value = ""
     }
 
-    val connectionTrackerList = Transformations.switchMap(filterString,
-                                                          (Function<String, LiveData<PagingData<ConnectionTracker>>> { input ->
-                                                              fetchNetworkLogs(input)
-                                                          }))
+    val connectionTrackerList =
+        Transformations.switchMap(
+            filterString,
+            (Function<String, LiveData<PagingData<ConnectionTracker>>> { input ->
+                fetchNetworkLogs(input)
+            })
+        )
 
-    fun setFilter(searchString: String, filter: Set<String>,
-                  type: ConnectionTrackerFragment.TopLevelFilter) {
+    fun setFilter(
+        searchString: String,
+        filter: Set<String>,
+        type: ConnectionTrackerFragment.TopLevelFilter
+    ) {
         filterRules.clear()
 
         filterRules.addAll(filter)
         filterType = type
 
-        if (!searchString.isBlank()) filterString.value = searchString
+        if (searchString.isNotBlank()) filterString.value = searchString
         else filterString.value = ""
     }
 
@@ -68,30 +74,40 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     private fun getBlockedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules)
-            }.liveData.cachedIn(viewModelScope)
+                    connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules)
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                connectionTrackerDAO.getBlockedConnections("%$input%")
-            }.liveData.cachedIn(viewModelScope)
+                    connectionTrackerDAO.getBlockedConnections("%$input%")
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         }
     }
 
     private fun getAllowedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules)
-            }.liveData.cachedIn(viewModelScope)
+                    connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules)
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                connectionTrackerDAO.getAllowedConnections("%$input%")
-            }.liveData.cachedIn(viewModelScope)
+                    connectionTrackerDAO.getAllowedConnections("%$input%")
+                }
+                .liveData
+                .cachedIn(viewModelScope)
         }
     }
 
     private fun getAllNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-            connectionTrackerDAO.getConnectionTrackerByName("%$input%")
-        }.liveData.cachedIn(viewModelScope)
+                connectionTrackerDAO.getConnectionTrackerByName("%$input%")
+            }
+            .liveData
+            .cachedIn(viewModelScope)
     }
 }

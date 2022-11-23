@@ -40,27 +40,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DohEndpointAdapter(private val context: Context, private val lifecycleOwner: LifecycleOwner,
-                         private val appConfig: AppConfig) :
-        PagingDataAdapter<DoHEndpoint, DohEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
+class DohEndpointAdapter(
+    private val context: Context,
+    private val lifecycleOwner: LifecycleOwner,
+    private val appConfig: AppConfig
+) : PagingDataAdapter<DoHEndpoint, DohEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<DoHEndpoint>() {
-            override fun areItemsTheSame(oldConnection: DoHEndpoint,
-                                         newConnection: DoHEndpoint): Boolean {
-                return (oldConnection.id == newConnection.id && oldConnection.isSelected == newConnection.isSelected)
-            }
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<DoHEndpoint>() {
+                override fun areItemsTheSame(
+                    oldConnection: DoHEndpoint,
+                    newConnection: DoHEndpoint
+                ): Boolean {
+                    return (oldConnection.id == newConnection.id &&
+                        oldConnection.isSelected == newConnection.isSelected)
+                }
 
-            override fun areContentsTheSame(oldConnection: DoHEndpoint,
-                                            newConnection: DoHEndpoint): Boolean {
-                return (oldConnection.id == newConnection.id && oldConnection.isSelected != newConnection.isSelected)
+                override fun areContentsTheSame(
+                    oldConnection: DoHEndpoint,
+                    newConnection: DoHEndpoint
+                ): Boolean {
+                    return (oldConnection.id == newConnection.id &&
+                        oldConnection.isSelected != newConnection.isSelected)
+                }
             }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoHEndpointViewHolder {
-        val itemBinding = DohEndpointListItemBinding.inflate(LayoutInflater.from(parent.context),
-                                                             parent, false)
+        val itemBinding =
+            DohEndpointListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return DoHEndpointViewHolder(itemBinding)
     }
 
@@ -70,7 +79,7 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
     }
 
     inner class DoHEndpointViewHolder(private val b: DohEndpointListItemBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(endpoint: DoHEndpoint) {
             displayDetails(endpoint)
@@ -78,51 +87,47 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
         }
 
         private fun setupClickListeners(endpoint: DoHEndpoint) {
-            b.root.setOnClickListener {
-                updateConnection(endpoint)
-            }
+            b.root.setOnClickListener { updateConnection(endpoint) }
             b.dohEndpointListActionImage.setOnClickListener {
                 showExplanationOnImageClick(endpoint)
             }
-            b.dohEndpointListCheckImage.setOnClickListener {
-                updateConnection(endpoint)
-            }
+            b.dohEndpointListCheckImage.setOnClickListener { updateConnection(endpoint) }
         }
 
         private fun displayDetails(endpoint: DoHEndpoint) {
             b.dohEndpointListUrlName.text = endpoint.dohName
             b.dohEndpointListUrlExplanation.text = ""
             b.dohEndpointListCheckImage.isChecked = endpoint.isSelected
-            Log.i(LOG_TAG_DNS,
-                  "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}")
+            Log.i(
+                LOG_TAG_DNS,
+                "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}"
+            )
             if (endpoint.isSelected) {
-                val count = appConfig.getRemoteBlocklistCount()
-                b.dohEndpointListUrlExplanation.text = if (endpoint.isRethinkDnsPlus() && count > 0) {
-                    context.getString(R.string.dns_connected_rethink_plus, count.toString())
-                } else {
-                    context.getString(R.string.dns_connected)
-                }
+                b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
             }
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
-
         }
 
         private fun showIcon(endpoint: DoHEndpoint) {
             if (endpoint.isDeletable()) {
                 b.dohEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall))
+                    ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall)
+                )
             } else {
                 b.dohEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_info))
+                    ContextCompat.getDrawable(context, R.drawable.ic_info)
+                )
             }
         }
 
         private fun updateConnection(endpoint: DoHEndpoint) {
-            if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}")
-
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_DNS,
+                    "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}"
+                )
             io {
                 endpoint.isSelected = true
                 appConfig.handleDoHChanges(endpoint)
@@ -133,8 +138,12 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
             io {
                 appConfig.deleteDohEndpoint(id)
                 uiCtx {
-                    Toast.makeText(context, R.string.doh_custom_url_remove_success,
-                                   Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                            context,
+                            R.string.doh_custom_url_remove_success,
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
                 }
             }
         }
@@ -149,17 +158,24 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
-            builder.setPositiveButton(
-                context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
+            builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
+                dialogInterface,
+                _ ->
                 dialogInterface.dismiss()
             }
-            builder.setNeutralButton(
-                context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-
-                Utilities.clipboardCopy(context, url,
-                                        context.getString(R.string.copy_clipboard_label))
-                Utilities.showToastUiCentered(context, context.getString(
-                    R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
+                _: DialogInterface,
+                _: Int ->
+                Utilities.clipboardCopy(
+                    context,
+                    url,
+                    context.getString(R.string.copy_clipboard_label)
+                )
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.info_dialog_url_copy_toast_msg),
+                    Toast.LENGTH_SHORT
+                )
             }
             builder.create().show()
         }
@@ -180,18 +196,11 @@ class DohEndpointAdapter(private val context: Context, private val lifecycleOwne
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {
-            withContext(Dispatchers.Main) {
-                f()
-            }
+            withContext(Dispatchers.Main) { f() }
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    f()
-                }
-            }
+            lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
         }
-
     }
 }

@@ -33,17 +33,22 @@ class AppCustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
         filteredList.value = ""
     }
 
-    val customIpDetails = Transformations.switchMap(filteredList) { input ->
-        if (input.isNullOrBlank()) {
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                customIpDao.getAppWiseCustomIp(uid)
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                customIpDao.getAppWiseCustomIp("%$input%", uid)
-            }.liveData.cachedIn(viewModelScope)
+    val customIpDetails =
+        Transformations.switchMap(filteredList) { input ->
+            if (input.isNullOrBlank()) {
+                Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                        customIpDao.getAppWiseCustomIp(uid)
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                        customIpDao.getAppWiseCustomIp("%$input%", uid)
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
         }
-    }
 
     fun appWiseIpRulesSize(uid: Int): LiveData<Int> {
         return customIpDao.getBlockedConnectionCountForUid(uid)
@@ -56,5 +61,4 @@ class AppCustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
     fun setUid(i: Int) {
         this.uid = i
     }
-
 }

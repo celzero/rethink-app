@@ -28,35 +28,48 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.database.RethinkRemoteFileTag
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
-import com.celzero.bravedns.ui.RethinkBlocklistFragment.Companion.selectedFileTags
+import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RethinkRemoteAdvancedViewAdapter(val context: Context) :
-        PagingDataAdapter<RethinkRemoteFileTag, RethinkRemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder>(
-            DIFF_CALLBACK) {
+    PagingDataAdapter<
+        RethinkRemoteFileTag, RethinkRemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder
+    >(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<RethinkRemoteFileTag>() {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<RethinkRemoteFileTag>() {
 
-            override fun areItemsTheSame(oldConnection: RethinkRemoteFileTag,
-                                         newConnection: RethinkRemoteFileTag): Boolean {
-                return oldConnection == newConnection
-            }
+                override fun areItemsTheSame(
+                    oldConnection: RethinkRemoteFileTag,
+                    newConnection: RethinkRemoteFileTag
+                ): Boolean {
+                    return oldConnection == newConnection
+                }
 
-            override fun areContentsTheSame(oldConnection: RethinkRemoteFileTag,
-                                            newConnection: RethinkRemoteFileTag): Boolean {
-                return (oldConnection.value == newConnection.value && oldConnection.isSelected == newConnection.isSelected)
+                override fun areContentsTheSame(
+                    oldConnection: RethinkRemoteFileTag,
+                    newConnection: RethinkRemoteFileTag
+                ): Boolean {
+                    return (oldConnection.value == newConnection.value &&
+                        oldConnection.isSelected == newConnection.isSelected)
+                }
             }
-        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): RethinkRemoteFileTagViewHolder {
-        val itemBinding = ListItemRethinkBlocklistAdvBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RethinkRemoteFileTagViewHolder {
+        val itemBinding =
+            ListItemRethinkBlocklistAdvBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         return RethinkRemoteFileTagViewHolder(itemBinding)
     }
 
@@ -66,24 +79,19 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
         holder.update(filetag, position)
     }
 
-
     inner class RethinkRemoteFileTagViewHolder(private val b: ListItemRethinkBlocklistAdvBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(filetag: RethinkRemoteFileTag, position: Int) {
             displayHeaderIfNeeded(filetag, position)
             displayMetaData(filetag)
 
-            b.crpCheckBox.setOnClickListener {
-                toggleCheckbox(b.crpCheckBox.isChecked, filetag)
-            }
+            b.crpCheckBox.setOnClickListener { toggleCheckbox(b.crpCheckBox.isChecked, filetag) }
 
-            b.crpCard.setOnClickListener {
-                toggleCheckbox(!b.crpCheckBox.isChecked, filetag)
-            }
+            b.crpCard.setOnClickListener { toggleCheckbox(!b.crpCheckBox.isChecked, filetag) }
 
             b.crpDescEntriesTv.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW, filetag.url.toUri())
+                val intent = Intent(Intent.ACTION_VIEW, filetag.url[0].toUri())
                 context.startActivity(intent)
             }
         }
@@ -96,8 +104,8 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
             } else {
                 b.crpDescGroupTv.text = filetag.subg
             }
-            b.crpDescEntriesTv.text = context.getString(R.string.dc_entries,
-                                                        filetag.entries.toString())
+            b.crpDescEntriesTv.text =
+                context.getString(R.string.dc_entries, filetag.entries.toString())
 
             b.crpCheckBox.isChecked = filetag.isSelected
             setCardBackground(filetag.isSelected)
@@ -114,41 +122,22 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
         private fun toggleCheckbox(isSelected: Boolean, filetag: RethinkRemoteFileTag) {
             b.crpCheckBox.isChecked = isSelected
             setCardBackground(isSelected)
-
-            io {
-                if (isSelected) {
-                    addBlocklistTag(filetag)
-                    return@io
-                }
-
-                removeBlocklistTag(filetag)
-            }
+            setFileTag(filetag, isSelected)
         }
 
-        private fun addBlocklistTag(filetag: RethinkRemoteFileTag) {
+        private fun setFileTag(filetag: RethinkRemoteFileTag, selected: Boolean) {
             io {
-                filetag.isSelected = true
-                RethinkBlocklistManager.updateSelectedFiletagRemote(filetag)
+                filetag.isSelected = selected
+                RethinkBlocklistManager.updateFiletagRemote(filetag)
+                val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
+                val stamp =
+                    RethinkBlocklistManager.getStamp(
+                        context,
+                        list,
+                        RethinkBlocklistFragment.RethinkBlocklistType.REMOTE
+                    )
+                RethinkBlocklistFragment.modifiedStamp = stamp
             }
-            if (selectedFileTags.value == null) {
-                selectedFileTags.postValue(mutableSetOf(filetag.value))
-                return
-            }
-
-            selectedFileTags.value?.add(filetag.value)
-            selectedFileTags.postValue(selectedFileTags.value)
-        }
-
-        private fun removeBlocklistTag(filetag: RethinkRemoteFileTag) {
-            io {
-                filetag.isSelected = false
-                RethinkBlocklistManager.updateSelectedFiletagRemote(filetag)
-            }
-
-            if (selectedFileTags.value == null) return
-
-            selectedFileTags.value?.remove(filetag.value)
-            selectedFileTags.postValue(selectedFileTags.value)
         }
 
         private fun displayHeaderIfNeeded(filetag: RethinkRemoteFileTag, position: Int) {
@@ -161,24 +150,20 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
             b.crpTitleLl.visibility = View.GONE
         }
 
-        // fixme: remove this method, add it in strings.xml
         private fun getGroupName(group: String): String {
-            if (group == "parentalcontrol") {
-                return context.getString(R.string.rbl_parental_control)
+            return if (group == "parentalcontrol") {
+                context.getString(R.string.rbl_parental_control)
             } else if (group == "privacy") {
-                return context.getString(R.string.rbl_privacy)
+                context.getString(R.string.rbl_privacy)
             } else if (group == "security") {
-                return context.getString(R.string.rbl_security)
+                context.getString(R.string.rbl_security)
             } else {
-                return ""
+                ""
             }
         }
 
         private fun io(f: suspend () -> Unit) {
-            CoroutineScope(Dispatchers.IO).launch {
-                f()
-            }
+            CoroutineScope(Dispatchers.IO).launch { f() }
         }
-
     }
 }

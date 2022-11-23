@@ -20,7 +20,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.Transaction
 import com.celzero.bravedns.util.LoggerConstants
 
-
 class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) {
 
     @Transaction
@@ -68,9 +67,8 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
     }
 
     suspend fun getServersToAdd(): String {
-        val servers = getConnectedDNSCrypt().joinToString(separator = ",") {
-            "${it.id}#${it.dnsCryptURL}"
-        }
+        val servers =
+            getConnectedDNSCrypt().joinToString(separator = ",") { "${it.id}#${it.dnsCryptURL}" }
         Log.i(LoggerConstants.LOG_TAG_APP_MODE, "Crypt Server: $servers")
         return servers
     }

@@ -29,14 +29,16 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
     private val persistentState by inject<PersistentState>()
 
     enum class FragmentLoader {
-        REMOTE, LOCAL, DB_LIST;
+        REMOTE,
+        LOCAL,
+        DB_LIST
     }
 
     companion object {
         const val INTENT = "RethinkDns_Intent"
         const val RETHINK_BLOCKLIST_TYPE = "RethinkBlocklistType"
         const val RETHINK_BLOCKLIST_NAME = "RethinkBlocklistName"
-        const val RETHINK_BLOCKLIST_STAMP = "RethinkBlocklistStamp"
+        const val RETHINK_BLOCKLIST_URL = "RethinkBlocklistUrl"
         const val UID = "UID"
     }
 
@@ -51,33 +53,45 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
         when (intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)) {
             FragmentLoader.REMOTE.ordinal -> {
                 val name = intent.getStringExtra(RETHINK_BLOCKLIST_NAME) ?: ""
-                val stamp = intent.getStringExtra(RETHINK_BLOCKLIST_STAMP) ?: ""
+                val url = intent.getStringExtra(RETHINK_BLOCKLIST_URL) ?: ""
 
                 // load the Rethink remote dns configure screen (default)
                 val rr = RethinkBlocklistFragment.newInstance()
-                var bundle = createBundle(RETHINK_BLOCKLIST_TYPE,
-                                          RethinkBlocklistFragment.RethinkBlocklistType.REMOTE.ordinal)
+                var bundle =
+                    createBundle(
+                        RETHINK_BLOCKLIST_TYPE,
+                        RethinkBlocklistFragment.RethinkBlocklistType.REMOTE.ordinal
+                    )
                 bundle = updateBundle(bundle, RETHINK_BLOCKLIST_NAME, name)
-                rr.arguments = updateBundle(bundle, RETHINK_BLOCKLIST_STAMP, stamp)
-                supportFragmentManager.beginTransaction().replace(R.id.root_container, rr,
-                                                                  rr.javaClass.simpleName).commit()
+                rr.arguments = updateBundle(bundle, RETHINK_BLOCKLIST_URL, url)
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.root_container, rr, rr.javaClass.simpleName)
+                    .commit()
                 return
             }
             FragmentLoader.LOCAL.ordinal -> {
                 // load the local blocklist configure screen
                 val rl = RethinkBlocklistFragment.newInstance()
-                rl.arguments = createBundle(RETHINK_BLOCKLIST_TYPE,
-                                            RethinkBlocklistFragment.RethinkBlocklistType.LOCAL.ordinal)
-                supportFragmentManager.beginTransaction().replace(R.id.root_container, rl,
-                                                                  rl.javaClass.simpleName).commit()
+                rl.arguments =
+                    createBundle(
+                        RETHINK_BLOCKLIST_TYPE,
+                        RethinkBlocklistFragment.RethinkBlocklistType.LOCAL.ordinal
+                    )
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.root_container, rl, rl.javaClass.simpleName)
+                    .commit()
                 return
             }
             FragmentLoader.DB_LIST.ordinal -> {
                 // load the list of already added rethink doh urls
                 val r = RethinkListFragment.newInstance()
                 r.arguments = createBundle(UID, Constants.MISSING_UID)
-                supportFragmentManager.beginTransaction().replace(R.id.root_container, r,
-                                                                  r.javaClass.simpleName).commit()
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.root_container, r, r.javaClass.simpleName)
+                    .commit()
                 return
             }
         }
@@ -95,6 +109,7 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 }

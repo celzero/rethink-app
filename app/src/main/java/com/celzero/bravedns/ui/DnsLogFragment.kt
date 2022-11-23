@@ -29,8 +29,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsQueryAdapter
 import com.celzero.bravedns.database.DnsLogRepository
-import com.celzero.bravedns.databinding.ActivityQueryDetailBinding
-import com.celzero.bravedns.databinding.QueryListScrollListBinding
+import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -44,9 +43,8 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
-class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQueryTextListener {
-    private val b by viewBinding(ActivityQueryDetailBinding::bind)
-    private lateinit var includeView: QueryListScrollListBinding
+class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryTextListener {
+    private val b by viewBinding(FragmentDnsLogsBinding::bind)
 
     private var layoutManager: RecyclerView.LayoutManager? = null
 
@@ -62,7 +60,9 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     enum class DnsLogFilter(val id: Int) {
-        ALL(0), ALLOWED(1), BLOCKED(2)
+        ALL(0),
+        ALLOWED(1),
+        BLOCKED(2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,115 +72,114 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun initView() {
-        includeView = b.queryListScrollView
 
         if (!persistentState.logsEnabled) {
-            includeView.queryListLogsDisabledTv.visibility = View.VISIBLE
-            includeView.queryListCardViewTop.visibility = View.GONE
-            includeView.queryDetailsLl.visibility = View.GONE
+            b.queryListLogsDisabledTv.visibility = View.VISIBLE
+            b.queryListCardViewTop.visibility = View.GONE
+            b.queryDetailsLl.visibility = View.GONE
             return
         }
 
-        displayPerDnsUi(includeView)
-        setupClickListeners(includeView)
+        displayPerDnsUi()
+        setupClickListeners()
         remakeFilterChipsUi()
     }
 
     private fun observeDnsStats() {
         persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
             val lifeTimeConversion = formatDecimal(it)
-            includeView.totalQueriesTxt.text = getString(R.string.dns_logs_lifetime_queries,
-                                                         lifeTimeConversion)
+            b.totalQueriesTxt.text =
+                getString(R.string.dns_logs_lifetime_queries, lifeTimeConversion)
         }
 
         persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner) {
             val blocked = formatDecimal(it)
-            includeView.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
+            b.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
         }
-
     }
 
     private fun formatDecimal(i: Long?): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            CompactDecimalFormat.getInstance(Locale.US,
-                                             CompactDecimalFormat.CompactStyle.SHORT).format(i)
+            CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT)
+                .format(i)
         } else {
             i.toString()
         }
     }
 
-    private fun setupClickListeners(includeView: QueryListScrollListBinding) {
-        includeView.queryListSearch.setOnQueryTextListener(this)
-        includeView.queryListSearch.setOnClickListener {
+    private fun setupClickListeners() {
+        b.queryListSearch.setOnQueryTextListener(this)
+        b.queryListSearch.setOnClickListener {
             showChipsUi()
-            includeView.queryListSearch.requestFocus()
-            includeView.queryListSearch.onActionViewExpanded()
+            b.queryListSearch.requestFocus()
+            b.queryListSearch.onActionViewExpanded()
         }
 
-        includeView.queryListFilterIcon.setOnClickListener {
-            toggleChipsUi()
-        }
+        b.queryListFilterIcon.setOnClickListener { toggleChipsUi() }
 
-        includeView.queryListDeleteIcon.setOnClickListener {
-            showDnsLogsDeleteDialog()
-        }
+        b.queryListDeleteIcon.setOnClickListener { showDnsLogsDeleteDialog() }
     }
 
-    private fun displayPerDnsUi(includeView: QueryListScrollListBinding) {
-        includeView.queryListLogsDisabledTv.visibility = View.GONE
-        includeView.queryListCardViewTop.visibility = View.VISIBLE
-        includeView.queryDetailsLl.visibility = View.VISIBLE
+    private fun displayPerDnsUi() {
+        b.queryListLogsDisabledTv.visibility = View.GONE
+        b.queryListCardViewTop.visibility = View.VISIBLE
+        b.queryDetailsLl.visibility = View.VISIBLE
 
-        includeView.recyclerQuery.setHasFixedSize(true)
+        b.recyclerQuery.setHasFixedSize(true)
         layoutManager = CustomLinearLayoutManager(requireContext())
-        includeView.recyclerQuery.layoutManager = layoutManager
+        b.recyclerQuery.layoutManager = layoutManager
 
         val recyclerAdapter = DnsQueryAdapter(requireContext(), persistentState.fetchFavIcon)
         viewModel.dnsLogsList.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
-        includeView.recyclerQuery.adapter = recyclerAdapter
+        b.recyclerQuery.adapter = recyclerAdapter
 
-        val scrollListener = object : RecyclerView.OnScrollListener() {
+        val scrollListener =
+            object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-                if (recyclerView.getChildAt(0).tag == null) return
+                    if (recyclerView.getChildAt(0).tag == null) return
 
-                val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag: Long = recyclerView.getChildAt(0).tag as Long
 
-                if (dy > 0) {
-                    includeView.queryListRecyclerScrollHeader.text = formatToRelativeTime(tag)
-                    includeView.queryListRecyclerScrollHeader.visibility = View.VISIBLE
-                } else {
-                    includeView.queryListRecyclerScrollHeader.visibility = View.GONE
+                    if (dy > 0) {
+                        b.queryListRecyclerScrollHeader.text =
+                            formatToRelativeTime(requireContext(), tag)
+                        b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
+                    } else {
+                        b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    }
+                }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    }
                 }
             }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    includeView.queryListRecyclerScrollHeader.visibility = View.GONE
-                }
-            }
-        }
-        includeView.recyclerQuery.addOnScrollListener(scrollListener)
-
+        b.recyclerQuery.addOnScrollListener(scrollListener)
     }
 
     private fun remakeFilterChipsUi() {
-        includeView.filterChipGroup.removeAllViews()
+        b.filterChipGroup.removeAllViews()
 
         val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.dns_filter_parent_all), true)
-        val allowed = makeChip(DnsLogFilter.ALLOWED.id,
-                               getString(R.string.dns_filter_parent_allowed), false)
-        val blocked = makeChip(ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
-                               getString(R.string.dns_filter_parent_blocked), false)
+        val allowed =
+            makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.dns_filter_parent_allowed), false)
+        val blocked =
+            makeChip(
+                ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
+                getString(R.string.dns_filter_parent_blocked),
+                false
+            )
 
-        includeView.filterChipGroup.addView(all)
-        includeView.filterChipGroup.addView(allowed)
-        includeView.filterChipGroup.addView(blocked)
+        b.filterChipGroup.addView(all)
+        b.filterChipGroup.addView(allowed)
+        b.filterChipGroup.addView(blocked)
     }
 
     private fun makeChip(id: Int, label: String, checked: Boolean): Chip {
@@ -199,7 +198,7 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun toggleChipsUi() {
-        if (includeView.filterChipGroup.isVisible) {
+        if (b.filterChipGroup.isVisible) {
             hideChipsUi()
         } else {
             showChipsUi()
@@ -224,11 +223,11 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun showChipsUi() {
-        includeView.filterChipGroup.visibility = View.VISIBLE
+        b.filterChipGroup.visibility = View.VISIBLE
     }
 
     private fun hideChipsUi() {
-        includeView.filterChipGroup.visibility = View.GONE
+        b.filterChipGroup.visibility = View.GONE
     }
 
     private fun showDnsLogsDeleteDialog() {
@@ -259,8 +258,6 @@ class DnsLogFragment : Fragment(R.layout.activity_query_detail), SearchView.OnQu
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            f()
-        }
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

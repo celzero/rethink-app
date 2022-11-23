@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 
 import androidx.room.Transaction
 
-
 class DoHEndpointRepository(private val doHEndpointDAO: DoHEndpointDAO) {
 
     @Transaction

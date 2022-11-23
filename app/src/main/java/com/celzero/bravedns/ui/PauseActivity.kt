@@ -45,7 +45,9 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     @Volatile var j: CompletableJob? = null
 
     enum class AutoOp {
-        INCREASE, DECREASE, NONE
+        INCREASE,
+        DECREASE,
+        NONE
     }
 
     @Volatile var autoOp = AutoOp.NONE
@@ -69,7 +71,8 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
     private fun initView() {
         FirewallManager.getApplistObserver().observe(this) {
-            val blockedList = it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+            val blockedList =
+                it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
             b.pacTimerDesc.text = getString(R.string.pause_desc, blockedList.count().toString())
         }
     }
@@ -90,18 +93,14 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initClickListeners() {
-        b.pacPlusIv.setOnClickListener {
-            increaseTimer()
-        }
+        b.pacPlusIv.setOnClickListener { increaseTimer() }
 
         b.pacStopIv.setOnClickListener {
             VpnController.resumeApp()
             openHomeScreenAndFinish()
         }
 
-        b.pacMinusIv.setOnClickListener {
-            decreaseTimer()
-        }
+        b.pacMinusIv.setOnClickListener { decreaseTimer() }
 
         b.pacPlusIv.setOnLongClickListener {
             autoOp = AutoOp.INCREASE
@@ -116,14 +115,18 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
         }
 
         b.pacPlusIv.setOnTouchListener { _, event ->
-            if ((event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL)) {
+            if (
+                (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL)
+            ) {
                 autoOp = AutoOp.NONE
             }
             false
         }
 
         b.pacMinusIv.setOnTouchListener { _, event ->
-            if ((event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL)) {
+            if (
+                (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL)
+            ) {
                 autoOp = AutoOp.NONE
             }
             false
@@ -140,8 +143,10 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
     private fun openHomeScreenAndFinish() {
         // refrain from calling start activity multiple times
-        if (SystemClock.elapsedRealtime() - lastStopActivityInvokeTime < TimeUnit.SECONDS.toMillis(
-                1L)) {
+        if (
+            SystemClock.elapsedRealtime() - lastStopActivityInvokeTime <
+                TimeUnit.SECONDS.toMillis(1L)
+        ) {
             return
         }
 
@@ -154,7 +159,8 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun handleLongPress() {
@@ -182,5 +188,4 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
             j?.cancel()
         }
     }
-
 }

@@ -38,16 +38,20 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val b get() = _binding!!
+    private val b
+        get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
     private val sortValues = FirewallAppFragment.Filters()
 
-    override fun getTheme(): Int = Themes.getBottomsheetCurrentTheme(isDarkThemeOn(),
-                                                                     persistentState.theme)
+    override fun getTheme(): Int =
+        Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetFirewallSortFilterBinding.inflate(inflater, container, false)
         return b.root
     }
@@ -85,8 +89,10 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setFilter(topLevelFilter: FirewallAppFragment.TopLevelFilter,
-                          categories: MutableSet<String>) {
+    private fun setFilter(
+        topLevelFilter: FirewallAppFragment.TopLevelFilter,
+        categories: MutableSet<String>
+    ) {
         val topView: Chip = b.ffaParentChipGroup.findViewWithTag(topLevelFilter.id) ?: return
         b.ffaParentChipGroup.check(topView.id)
         colorUpChipIcon(topView)
@@ -98,7 +104,8 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onDestroyView() {
@@ -109,12 +116,24 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     private fun remakeParentFilterChipsUi() {
         b.ffaParentChipGroup.removeAllViews()
 
-        val all = makeParentChip(FirewallAppFragment.TopLevelFilter.ALL.id,
-                                 getString(R.string.fapps_filter_parent_all), true)
-        val allowed = makeParentChip(FirewallAppFragment.TopLevelFilter.INSTALLED.id,
-                                     getString(R.string.fapps_filter_parent_installed), false)
-        val blocked = makeParentChip(FirewallAppFragment.TopLevelFilter.SYSTEM.id,
-                                     getString(R.string.fapps_filter_parent_system), false)
+        val all =
+            makeParentChip(
+                FirewallAppFragment.TopLevelFilter.ALL.id,
+                getString(R.string.fapps_filter_parent_all),
+                true
+            )
+        val allowed =
+            makeParentChip(
+                FirewallAppFragment.TopLevelFilter.INSTALLED.id,
+                getString(R.string.fapps_filter_parent_installed),
+                false
+            )
+        val blocked =
+            makeParentChip(
+                FirewallAppFragment.TopLevelFilter.SYSTEM.id,
+                getString(R.string.fapps_filter_parent_system),
+                false
+            )
 
         b.ffaParentChipGroup.addView(all)
         b.ffaParentChipGroup.addView(allowed)
@@ -141,12 +160,14 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun colorUpChipIcon(chip: Chip) {
-        val colorFilter = PorterDuffColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.primaryText), PorterDuff.Mode.SRC_IN)
+        val colorFilter =
+            PorterDuffColorFilter(
+                ContextCompat.getColor(requireContext(), R.color.primaryText),
+                PorterDuff.Mode.SRC_IN
+            )
         chip.checkedIcon?.colorFilter = colorFilter
         chip.chipIcon?.colorFilter = colorFilter
     }
-
 
     private fun applyParentFilter(tag: Any) {
         when (tag) {

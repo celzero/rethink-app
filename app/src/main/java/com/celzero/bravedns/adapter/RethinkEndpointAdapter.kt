@@ -44,29 +44,43 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class RethinkEndpointAdapter(private val context: Context,
-                             private val lifecycleOwner: LifecycleOwner,
-                             private val appConfig: AppConfig) :
-        PagingDataAdapter<RethinkDnsEndpoint, RethinkEndpointAdapter.RethinkEndpointViewHolder>(
-            DIFF_CALLBACK) {
+class RethinkEndpointAdapter(
+    private val context: Context,
+    private val lifecycleOwner: LifecycleOwner,
+    private val appConfig: AppConfig
+) :
+    PagingDataAdapter<RethinkDnsEndpoint, RethinkEndpointAdapter.RethinkEndpointViewHolder>(
+        DIFF_CALLBACK
+    ) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<RethinkDnsEndpoint>() {
-            override fun areItemsTheSame(oldConnection: RethinkDnsEndpoint,
-                                         newConnection: RethinkDnsEndpoint): Boolean {
-                return (oldConnection.url == newConnection.url && oldConnection.isActive == newConnection.isActive)
-            }
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<RethinkDnsEndpoint>() {
+                override fun areItemsTheSame(
+                    oldConnection: RethinkDnsEndpoint,
+                    newConnection: RethinkDnsEndpoint
+                ): Boolean {
+                    return (oldConnection.url == newConnection.url &&
+                        oldConnection.isActive == newConnection.isActive)
+                }
 
-            override fun areContentsTheSame(oldConnection: RethinkDnsEndpoint,
-                                            newConnection: RethinkDnsEndpoint): Boolean {
-                return (oldConnection.url == newConnection.url && oldConnection.isActive != newConnection.isActive)
+                override fun areContentsTheSame(
+                    oldConnection: RethinkDnsEndpoint,
+                    newConnection: RethinkDnsEndpoint
+                ): Boolean {
+                    return (oldConnection.url == newConnection.url &&
+                        oldConnection.isActive != newConnection.isActive)
+                }
             }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RethinkEndpointViewHolder {
-        val itemBinding = RethinkEndpointListItemBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+        val itemBinding =
+            RethinkEndpointListItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         return RethinkEndpointViewHolder(itemBinding)
     }
 
@@ -76,7 +90,7 @@ class RethinkEndpointAdapter(private val context: Context,
     }
 
     inner class RethinkEndpointViewHolder(private val b: RethinkEndpointListItemBinding) :
-            RecyclerView.ViewHolder(b.root) {
+        RecyclerView.ViewHolder(b.root) {
 
         fun update(endpoint: RethinkDnsEndpoint) {
             displayDetails(endpoint)
@@ -84,23 +98,19 @@ class RethinkEndpointAdapter(private val context: Context,
         }
 
         private fun setupClickListeners(endpoint: RethinkDnsEndpoint) {
-            b.root.setOnClickListener {
-                updateConnection(endpoint)
-            }
-            b.rethinkEndpointListActionImage.setOnClickListener {
-                showDohMetadataDialog(endpoint)
-            }
-            b.rethinkEndpointListCheckImage.setOnClickListener {
-                updateConnection(endpoint)
-            }
+            b.root.setOnClickListener { updateConnection(endpoint) }
+            b.rethinkEndpointListActionImage.setOnClickListener { showDohMetadataDialog(endpoint) }
+            b.rethinkEndpointListCheckImage.setOnClickListener { updateConnection(endpoint) }
         }
 
         private fun displayDetails(endpoint: RethinkDnsEndpoint) {
             b.rethinkEndpointListUrlName.text = endpoint.name
             b.rethinkEndpointListUrlExplanation.text = ""
             b.rethinkEndpointListCheckImage.isChecked = endpoint.isActive
-            Log.i(LOG_TAG_DNS,
-                  "connected to rethink endpoint: ${endpoint.name} isSelected? ${endpoint.isActive}")
+            Log.i(
+                LOG_TAG_DNS,
+                "connected to rethink endpoint: ${endpoint.name} isSelected? ${endpoint.isActive}"
+            )
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
@@ -109,27 +119,35 @@ class RethinkEndpointAdapter(private val context: Context,
 
             // show blocklist count and status as connected if endpoint is active
             if (endpoint.blocklistCount > 0) {
-                b.rethinkEndpointListUrlExplanation.text = context.getString(
-                    R.string.dns_connected_rethink_plus, endpoint.blocklistCount.toString())
+                b.rethinkEndpointListUrlExplanation.text =
+                    context.getString(
+                        R.string.dns_connected_rethink_plus,
+                        endpoint.blocklistCount.toString()
+                    )
             } else {
-                b.rethinkEndpointListUrlExplanation.text = context.getString(
-                    R.string.dns_connected_no_count)
+                b.rethinkEndpointListUrlExplanation.text =
+                    context.getString(R.string.dns_connected_no_count)
             }
         }
 
         private fun showIcon(endpoint: RethinkDnsEndpoint) {
             if (endpoint.isEditable(context)) {
                 b.rethinkEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_edit_icon))
+                    ContextCompat.getDrawable(context, R.drawable.ic_edit_icon)
+                )
             } else {
                 b.rethinkEndpointListActionImage.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_info))
+                    ContextCompat.getDrawable(context, R.drawable.ic_info)
+                )
             }
         }
 
         private fun updateConnection(endpoint: RethinkDnsEndpoint) {
-            if (DEBUG) Log.d(LOG_TAG_DNS,
-                             "on rethink dns change - ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}")
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_DNS,
+                    "on rethink dns change - ${endpoint.name}, ${endpoint.url}, ${endpoint.isActive}"
+                )
 
             io {
                 endpoint.isActive = true
@@ -143,23 +161,31 @@ class RethinkEndpointAdapter(private val context: Context,
             builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
             builder.setCancelable(true)
             if (endpoint.isEditable(context)) {
-                builder.setPositiveButton(
-                    context.getString(R.string.rt_edit_dialog_positive)) { _, _ ->
+                builder.setPositiveButton(context.getString(R.string.rt_edit_dialog_positive)) {
+                    _,
+                    _ ->
                     openEditConfiguration(endpoint)
                 }
             } else {
-                builder.setPositiveButton(
-                    context.getString(R.string.dns_info_positive)) { dialogInterface, _ ->
+                builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
+                    dialogInterface,
+                    _ ->
                     dialogInterface.dismiss()
                 }
             }
-            builder.setNeutralButton(
-                context.getString(R.string.dns_info_neutral)) { _: DialogInterface, _: Int ->
-
-                Utilities.clipboardCopy(context, endpoint.url,
-                                        context.getString(R.string.copy_clipboard_label))
-                Utilities.showToastUiCentered(context, context.getString(
-                    R.string.info_dialog_url_copy_toast_msg), Toast.LENGTH_SHORT)
+            builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
+                _: DialogInterface,
+                _: Int ->
+                Utilities.clipboardCopy(
+                    context,
+                    endpoint.url,
+                    context.getString(R.string.copy_clipboard_label)
+                )
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.info_dialog_url_copy_toast_msg),
+                    Toast.LENGTH_SHORT
+                )
             }
             builder.create().show()
         }
@@ -168,20 +194,17 @@ class RethinkEndpointAdapter(private val context: Context,
             val stamp = getRemoteBlocklistStamp(endpoint.url)
 
             val intent = Intent(context, ConfigureRethinkBasicActivity::class.java)
-            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,
-                            RethinkBlocklistFragment.RethinkBlocklistType.REMOTE)
+            intent.putExtra(
+                ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,
+                RethinkBlocklistFragment.RethinkBlocklistType.REMOTE
+            )
             intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME, endpoint.name)
-            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_STAMP, stamp)
+            intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_URL, endpoint.url)
             context.startActivity(intent)
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    f()
-                }
-            }
+            lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
         }
-
     }
 }

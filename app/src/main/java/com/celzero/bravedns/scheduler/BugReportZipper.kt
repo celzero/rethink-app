@@ -132,9 +132,7 @@ object BugReportZipper {
         Log.i(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
         val entry = ZipEntry(file.name)
         zo.putNextEntry(entry)
-        FileInputStream(file).use { inStream ->
-            writeZipContents(zo, inStream)
-        }
+        FileInputStream(file).use { inStream -> writeZipContents(zo, inStream) }
     }
 
     private fun handleOlderFiles(zo: ZipOutputStream, zipFile: ZipFile?, ignoreFileName: String) {
@@ -158,9 +156,7 @@ object BugReportZipper {
             zo.putNextEntry(zipEntry)
 
             if (!e.isDirectory) {
-                zipFile.getInputStream(e).use { inStream ->
-                    writeZipContents(zo, inStream)
-                }
+                zipFile.getInputStream(e).use { inStream -> writeZipContents(zo, inStream) }
             }
             zo.closeEntry()
         }
@@ -169,23 +165,20 @@ object BugReportZipper {
     fun writeTrace(file: File, inputStream: InputStream?) {
         if (inputStream == null) return
 
-        FileOutputStream(file, true).use { outputStream ->
-            copy(inputStream, outputStream)
-        }
+        FileOutputStream(file, true).use { outputStream -> copy(inputStream, outputStream) }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun write(it: ApplicationExitInfo, file: File) {
-        val reportDetails = "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
+        val reportDetails =
+            "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
             Utilities.convertLongToTime(it.timestamp, Constants.TIME_FORMAT_3)
         }\n"
         file.appendText(reportDetails)
 
         // capture traces for ANR exit-infos
         if (it.reason == ApplicationExitInfo.REASON_ANR) {
-            it.traceInputStream.use { ins ->
-                writeTrace(file, ins)
-            }
+            it.traceInputStream.use { ins -> writeTrace(file, ins) }
         }
     }
 
@@ -198,5 +191,4 @@ object BugReportZipper {
             output.write(input.readBytes())
         }
     }
-
 }

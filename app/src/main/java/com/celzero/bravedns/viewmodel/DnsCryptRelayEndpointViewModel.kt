@@ -27,7 +27,8 @@ import com.celzero.bravedns.database.DnsCryptRelayEndpointDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DnsCryptRelayEndpointViewModel(
-        private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO) : ViewModel() {
+    private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO
+) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
 
@@ -35,15 +36,20 @@ class DnsCryptRelayEndpointViewModel(
         filteredList.value = ""
     }
 
-    val dnsCryptRelayEndpointList = Transformations.switchMap(filteredList) { input ->
-        if (input.isBlank()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsCryptRelayEndpointDAO.getDnsCryptRelayEndpointLiveData()
-            }.liveData.cachedIn(viewModelScope)
-        } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsCryptRelayEndpointDAO.getDnsCryptRelayEndpointLiveDataByName("%$input%")
-            }.liveData.cachedIn(viewModelScope)
+    val dnsCryptRelayEndpointList =
+        Transformations.switchMap(filteredList) { input ->
+            if (input.isBlank()) {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        dnsCryptRelayEndpointDAO.getDnsCryptRelayEndpointLiveData()
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        dnsCryptRelayEndpointDAO.getDnsCryptRelayEndpointLiveDataByName("%$input%")
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
         }
-    }
 }

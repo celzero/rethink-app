@@ -25,7 +25,7 @@ class ProxyEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var proxyName: String = ""
 
-    //Set as 1 for Socks5
+    // Set as 1 for Socks5
     var proxyMode: Int = 0
     var proxyType: String = ""
     var proxyAppName: String? = null
@@ -49,11 +49,22 @@ class ProxyEndpoint {
         return this.id.hashCode()
     }
 
-
-    constructor(id: Int, proxyName: String, proxyMode: Int, proxyType: String, proxyAppName: String,
-                proxyIP: String, proxyPort: Int, userName: String, password: String,
-                isSelected: Boolean, isCustom: Boolean, isUDP: Boolean, modifiedDataTime: Long,
-                latency: Int) {
+    constructor(
+        id: Int,
+        proxyName: String,
+        proxyMode: Int,
+        proxyType: String,
+        proxyAppName: String,
+        proxyIP: String,
+        proxyPort: Int,
+        userName: String,
+        password: String,
+        isSelected: Boolean,
+        isCustom: Boolean,
+        isUDP: Boolean,
+        modifiedDataTime: Long,
+        latency: Int
+    ) {
         // Room auto-increments id when its set to zero.
         // A non-zero id overrides and sets caller-specified id instead.
         this.id = id
@@ -72,5 +83,4 @@ class ProxyEndpoint {
         else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency
     }
-
 }
