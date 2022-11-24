@@ -42,7 +42,7 @@ interface RethinkLocalFileTagDao {
     @Query("Update RethinkLocalFileTag set isSelected = :isSelected where value = :value")
     fun updateSelectedTag(value: Int, isSelected: Int)
 
-    @Query("select * from RethinkLocalFileTag") fun getAllTags(): List<FileTag>
+    @Query("select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected  from RethinkLocalFileTag") fun getAllTags(): List<FileTag>
 
     @Query("select * from RethinkLocalFileTag order by `group`")
     fun getLocalFileTags(): PagingSource<Int, RethinkLocalFileTag>
@@ -83,14 +83,9 @@ interface RethinkLocalFileTagDao {
         selected: Set<Int>
     ): PagingSource<Int, RethinkLocalFileTag>
 
-    @Query(
-        "select value, simpleTagId from RethinkLocalFileTag where entries > 0 order by simpleTagId"
-    )
-    fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping>
-
     @Query("Update RethinkLocalFileTag set isSelected = 0") fun clearSelectedTags()
 
-    @Query("select * from RethinkLocalFileTag") fun fileTags(): List<RethinkLocalFileTag>
+    @Query("select  value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkLocalFileTag") fun fileTags(): List<FileTag>
 
     @Query("select value from RethinkLocalFileTag where isSelected = 1")
     fun getSelectedTags(): List<Int>

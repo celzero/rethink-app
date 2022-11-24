@@ -24,7 +24,8 @@ class Constants {
         // on-device blocklist download path
         val ONDEVICE_BLOCKLIST_DOWNLOAD_PATH = File.separator + "downloads" + File.separator
 
-        const val DOWNLOAD_BASE_URL = "https://download.rethinkdns.com"
+        // rethink base url (modified from download to dl on v053l)
+        const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
 
         const val FILE_TAG = "filetag.json"
 
@@ -74,9 +75,10 @@ class Constants {
 
         // url_param_compress_blob
         // search param
-        const val URL_SEARCHPARAM_COMPRESS_BLOB = "?compressed"
+        private const val URL_SEARCHPARAM_COMPRESS_BLOB = "?compressed"
 
-        val ONDEVICE_BLOCKLISTS =
+        // list of file details for Android Download Manager
+        val ONDEVICE_BLOCKLISTS_ADM =
             listOf(
                 OnDeviceBlocklistsMetadata(
                     "$DOWNLOAD_BASE_URL/blocklists",
@@ -102,7 +104,8 @@ class Constants {
                 OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v6", ONDEVICE_GEOIP_IPV6)
             )
 
-        val ONDEVICE_BLOCKLISTS_TEMP =
+        // list of file details for in-app downloader
+        val ONDEVICE_BLOCKLISTS_IN_APP =
             listOf(
                 OnDeviceBlocklistsMetadata("blocklists", ONDEVICE_BLOCKLIST_FILE_TAG),
                 OnDeviceBlocklistsMetadata("basicconfig", ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
@@ -121,8 +124,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v053i)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1657632597183
+        // default filetag.json for remote blocklist (stored in assets folder) (v053l)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1668635781244
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"

@@ -1136,6 +1136,11 @@
 
     <string name="ada_app_dns_settings">DNS Settings</string>
 
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Clear logs</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Clear all logs related to this application.</string>
+    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Proceed</string>
+    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">Cancel</string>
+
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc">Rules apply to this app only.</string>
     <string name="bsac_unblock">Unblock</string>
@@ -1170,9 +1175,12 @@
 
     <!-- rethink blocklist heading -->
 
-    <string name="rbl_parental_control">Parental Control</string>
-    <string name="rbl_privacy">Privacy</string>
-    <string name="rbl_security">Security</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Parental Control</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Block adult &amp; pirated content, online gambling &amp; dating, and social media.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines">Privacy</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Block attentionware, spyware, scareware.</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines">Security</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Block malware, ransomware, cryptoware, phishers, and other threats.</string>
 
     <!-- Rethink list fragment -->
     <string name="rt_rethink_dns">RethinkDNS</string>

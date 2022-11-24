@@ -595,7 +595,7 @@ class Utilities {
 
         fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
             val a =
-                Constants.ONDEVICE_BLOCKLISTS.all {
+                Constants.ONDEVICE_BLOCKLISTS_ADM.all {
                     localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
                 }
             return a

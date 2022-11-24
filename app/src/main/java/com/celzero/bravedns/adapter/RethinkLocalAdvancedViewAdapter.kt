@@ -112,12 +112,12 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
 
         // handle the group name (filetag.json)
         private fun getGroupName(group: String): String {
-            return if (group == "parentalcontrol") {
-                context.getString(R.string.rbl_parental_control)
-            } else if (group == "privacy") {
-                context.getString(R.string.rbl_privacy)
-            } else if (group == "security") {
-                context.getString(R.string.rbl_security)
+            return if (group.equals(RethinkBlocklistManager.PARENTAL_CONTROL.name, true)) {
+                context.getString(RethinkBlocklistManager.PARENTAL_CONTROL.label)
+            } else if (group.equals(RethinkBlocklistManager.SECURITY.name, true)) {
+                context.getString(RethinkBlocklistManager.SECURITY.label)
+            } else if (group.equals(RethinkBlocklistManager.PRIVACY.name, true)){
+                context.getString(RethinkBlocklistManager.PRIVACY.label)
             } else {
                 ""
             }

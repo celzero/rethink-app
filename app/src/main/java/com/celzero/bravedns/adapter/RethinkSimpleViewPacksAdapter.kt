@@ -141,11 +141,13 @@ class RethinkSimpleViewPacksAdapter(
 
         private fun getTitleDesc(title: String): String {
             return if (title.equals(RethinkBlocklistManager.PARENTAL_CONTROL.name, true)) {
-                RethinkBlocklistManager.PARENTAL_CONTROL.desc
+                context.getString(RethinkBlocklistManager.PARENTAL_CONTROL.desc)
             } else if (title.equals(RethinkBlocklistManager.SECURITY.name, true)) {
-                RethinkBlocklistManager.SECURITY.desc
+                context.getString(RethinkBlocklistManager.SECURITY.desc)
+            } else if (title.equals(RethinkBlocklistManager.PRIVACY.name, true)){
+                context.getString(RethinkBlocklistManager.PRIVACY.desc)
             } else {
-                RethinkBlocklistManager.PRIVACY.desc
+                ""
             }
         }
 
