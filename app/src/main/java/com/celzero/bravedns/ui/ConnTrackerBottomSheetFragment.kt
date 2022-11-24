@@ -486,7 +486,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val builderSingle: android.app.AlertDialog.Builder =
             android.app.AlertDialog.Builder(requireContext())
 
-        builderSingle.setIcon(R.drawable.spinner_firewall)
+        builderSingle.setIcon(R.drawable.ic_firewall_block)
         val count = packageList.count()
         builderSingle.setTitle(
             this.getString(R.string.ctbs_block_other_apps, getAppName(), count.toString())

@@ -1128,6 +1128,7 @@
 
     <string name="ada_network_log_title">network log for this app</string>
 
+    <string name="ada_app_firewall">Firewall</string>
     <string name="ada_app_metered">Metered</string>
     <string name="ada_app_unmetered">Unmetered</string>
     <string name="ada_app_whitelist">Bypass Universal</string>

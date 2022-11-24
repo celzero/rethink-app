@@ -219,6 +219,21 @@ class AppInfoActivity :
         }
 
         b.aadAppSettingsBlock.setOnClickListener {
+            // update both the wifi and mobile data to either block or allow state
+            if (appStatus == FirewallManager.FirewallStatus.ALLOW) {
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.BLOCK,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            } else {
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            }
+        }
+
+        b.aadAppSettingsBlockWifi.setOnClickListener {
             toggleWifi(appInfo)
             updateFirewallStatusUi(appStatus, connStatus)
         }
@@ -536,7 +551,8 @@ class AppInfoActivity :
     }
 
     private fun enableAppWhitelistedUi() {
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_on, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
@@ -544,7 +560,8 @@ class AppInfoActivity :
     }
 
     private fun enableAppExcludedUi() {
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_on, b.aadAppSettingsExclude)
@@ -561,12 +578,13 @@ class AppInfoActivity :
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
     }
 
     private fun enableLockdownUi() {
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
@@ -574,7 +592,8 @@ class AppInfoActivity :
     }
 
     private fun enableAllow() {
-        setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
@@ -585,18 +604,19 @@ class AppInfoActivity :
     private fun enableBlock(cStat: FirewallManager.ConnectionStatus) {
         when (cStat) {
             FirewallManager.ConnectionStatus.MOBILE_DATA -> {
-                setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlock)
+                setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlockWifi)
                 setDrawable(R.drawable.ic_firewall_data_off, b.aadAppSettingsBlockMd)
             }
             FirewallManager.ConnectionStatus.WIFI -> {
-                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlock)
+                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlockWifi)
                 setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
             }
             FirewallManager.ConnectionStatus.BOTH -> {
-                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlock)
+                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlockWifi)
                 setDrawable(R.drawable.ic_firewall_data_off, b.aadAppSettingsBlockMd)
             }
         }
+        setDrawable(R.drawable.ic_firewall_block, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
     }
@@ -747,7 +767,7 @@ class AppInfoActivity :
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(this)
 
-        builderSingle.setIcon(R.drawable.spinner_firewall)
+        builderSingle.setIcon(R.drawable.ic_firewall_block)
         val count = packageList.count()
         builderSingle.setTitle(
             this.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())
