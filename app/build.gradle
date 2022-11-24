@@ -97,6 +97,10 @@ android {
         viewBinding true
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     kapt {
         correctErrorTypes true
     }
