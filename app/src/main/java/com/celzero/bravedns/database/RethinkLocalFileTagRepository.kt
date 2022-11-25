@@ -17,7 +17,6 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.room.Transaction
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.FileTag
 
 class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkLocalFileTagDao) {
@@ -53,5 +52,9 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
 
     suspend fun getSelectedTags(): List<Int> {
         return rethinkLocalFileTagDao.getSelectedTags()
+    }
+
+    suspend fun deleteAll() {
+        return rethinkLocalFileTagDao.deleteAll()
     }
 }

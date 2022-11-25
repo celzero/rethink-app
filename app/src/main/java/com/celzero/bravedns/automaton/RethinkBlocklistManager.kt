@@ -37,9 +37,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.BraveDNS
 import dnsx.Dnsx
-import java.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 
@@ -156,6 +156,11 @@ object RethinkBlocklistManager : KoinComponent {
 
                 dbFileTagLocal.add(l)
             }
+            // edge case: found a residual block list entry still available in the database
+            // during the insertion of new block list entries. This occurred when the number of
+            // block lists in the preceding list is greater than the current list. Always
+            // empty the data base entries before creating new entries.
+            localFileTagRepository.deleteAll()
             localFileTagRepository.insertAll(dbFileTagLocal.toList())
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Local blocklist files inserted into database")
             return true
@@ -200,6 +205,11 @@ object RethinkBlocklistManager : KoinComponent {
                 val r = getRethinkRemoteObj(t)
                 dbFileTagRemote.add(r)
             }
+            // edge case: found a residual block list entry still available in the database
+            // during the insertion of new block list entries. This occurred when the number of
+            // block lists in the preceding list is greater than the current list. Always
+            // empty the data base entries before creating new entries.
+            remoteFileTagRepository.deleteAll()
             remoteFileTagRepository.insertAll(dbFileTagRemote.toList())
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Remote blocklist files inserted into database")
             return true

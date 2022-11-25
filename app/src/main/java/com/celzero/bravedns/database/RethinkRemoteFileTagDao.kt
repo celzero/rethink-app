@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.FileTag
 
 @Dao
@@ -68,7 +67,10 @@ interface RethinkRemoteFileTagDao {
         subg: Set<String>
     ): PagingSource<Int, RethinkRemoteFileTag>
 
-    @Query("select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkRemoteFileTag order by `group`") fun getAllTags(): List<FileTag>
+    @Query(
+        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkRemoteFileTag order by `group`"
+    )
+    fun getAllTags(): List<FileTag>
 
     @Transaction
     @Query(
@@ -85,12 +87,17 @@ interface RethinkRemoteFileTagDao {
     @Query("Update RethinkRemoteFileTag set isSelected = :isSelected where value = :value")
     fun updateSelectedTag(value: Int, isSelected: Int)
 
-    @Query("select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkRemoteFileTag") fun fileTags(): List<FileTag>
+    @Query(
+        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkRemoteFileTag"
+    )
+    fun fileTags(): List<FileTag>
 
     @Query("Update RethinkRemoteFileTag set isSelected = 0") fun clearSelectedTags()
 
     @Query("select value from RethinkRemoteFileTag where isSelected = 1")
     fun getSelectedTags(): List<Int>
+
+    @Query("delete from RethinkRemoteFileTag") fun deleteAll()
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

@@ -116,7 +116,7 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
                 context.getString(RethinkBlocklistManager.PARENTAL_CONTROL.label)
             } else if (group.equals(RethinkBlocklistManager.SECURITY.name, true)) {
                 context.getString(RethinkBlocklistManager.SECURITY.label)
-            } else if (group.equals(RethinkBlocklistManager.PRIVACY.name, true)){
+            } else if (group.equals(RethinkBlocklistManager.PRIVACY.name, true)) {
                 context.getString(RethinkBlocklistManager.PRIVACY.label)
             } else {
                 ""
