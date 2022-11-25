@@ -1112,8 +1112,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val capabilities =
             connectivityManager.getNetworkCapabilities(activeNetwork)
                 ?: // It's not clear when this can happen, but it has occurred for at least one
-                   // user.
-            return false
+                // user.
+                return false
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
     }
 

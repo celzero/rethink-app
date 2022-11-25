@@ -324,7 +324,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun moveLocalBlocklistFiles() {
         val path = oldLocalBlocklistDownloadDir(this, persistentState.localBlocklistTimestamp)
         val blocklistsExist =
-            Constants.ONDEVICE_BLOCKLISTS_ADM.all { File(path + File.separator + it.filename).exists() }
+            Constants.ONDEVICE_BLOCKLISTS_ADM.all {
+                File(path + File.separator + it.filename).exists()
+            }
         if (!blocklistsExist) return
 
         changeDefaultLocalBlocklistLocation()

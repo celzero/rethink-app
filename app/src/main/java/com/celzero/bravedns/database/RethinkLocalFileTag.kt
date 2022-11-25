@@ -15,14 +15,8 @@
  */
 package com.celzero.bravedns.database
 
-import android.text.TextUtils
-import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.data.FileTag
-import com.google.gson.*
-import com.google.gson.reflect.TypeToken
-import java.lang.reflect.Type
 
 @Entity(tableName = "RethinkLocalFileTag")
 class RethinkLocalFileTag {

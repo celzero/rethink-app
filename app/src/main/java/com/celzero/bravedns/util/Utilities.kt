@@ -781,7 +781,7 @@ class Utilities {
 
         enum class PrivateDnsMode {
             NONE, // The setting is "Off" or "Opportunistic", and the DNS connection is not using
-                  // TLS.
+            // TLS.
             UPGRADED, // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
             STRICT // The setting is "Strict".
         }

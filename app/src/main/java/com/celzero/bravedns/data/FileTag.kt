@@ -22,17 +22,17 @@ import java.lang.reflect.Type
 
 // data class to handle filetags for both local and remote blocklist (filetag.json)
 data class FileTag(
-        val value: Int,
-        val uname: String,
-        val vname: String,
-        var group: String,
-        var subg: String,
-        var urls: List<String>,
-        val show: Int,
-        var pack: List<String> = arrayListOf(),
-        val entries: Int,
-        var simpleTagId: Int = INVALID_SIMPLE_TAG_ID,
-        var isSelected: Boolean = false
+    val value: Int,
+    val uname: String,
+    val vname: String,
+    var group: String,
+    var subg: String,
+    var urls: List<String>,
+    val show: Int,
+    var pack: List<String> = arrayListOf(),
+    val entries: Int,
+    var simpleTagId: Int = INVALID_SIMPLE_TAG_ID,
+    var isSelected: Boolean = false
 ) : Serializable
 
 private const val INVALID_SIMPLE_TAG_ID = -1
