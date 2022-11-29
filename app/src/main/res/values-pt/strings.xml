@@ -95,7 +95,7 @@
 \n
 \nQuer continuar\?</string>
     <string name="settings_theme_desc">Tema escuro/claro</string>
-    <string name="settings_http_proxy_desc">"Envio para   %1$s:%2$s"</string>
+    <string name="settings_http_proxy_desc">Envio para %1$s:%2$s</string>
     <string name="settings_http_proxy_error_text4">A ligação do hospedeiro falhou. Tente novamente.</string>
     <string name="settings_http_proxy_port">Porta</string>
     <string name="settings_socks_forwarding_desc_no_app">Envio para%1$s:%2$s</string>
@@ -559,7 +559,7 @@
     <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar a uma rede <i>Ilimitada</i>.<br/><br/> Para alterar, vá para <i>Todos os aplicativos</i> i&gt; guia.</string>
     <string name="firewall_rule_bypass_apprule_ip">IP ignorado (aplicativo)</string>
     <string name="firewall_rule_new_app_desc">Este aplicativo fez conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, vá para a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall definida pelo usuário bloqueia esta conexão &lt;if&gt;UDP&lt;/is&gt;.&lt;br/&gt;&lt;br/&gt; Para alterar, vá para a guia &lt;i&gt;Universal&lt;/i&gt;.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall definida pelo usuário bloqueia esta conexão <i>UDP</i>.<br/><br/> Para alterar, vá para a guia <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Esta conexão foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está definido para ignorar todas as regras de firewall universal.&lt;br/&gt;&lt;br/&gt; Para alterar, vá para &lt;i&gt;Regras de IP&lt;i&gt; em &lt;i&gt;Universal&lt; /i&gt; guia.</string>
     <string name="firewall_rule_foreground_desc">Esta conexão foi protegida por firewall porque o aplicativo de origem <i>não estava em primeiro plano</i>.<br/><br/> Para alterar esse comportamento, vá para a guia <i>Universal</i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Esta conexão foi bloqueada porque o <i>aplicativo de origem</i> ignorou o DNS preferencial do usuário.<br/><br/> Para alterar esse comportamento, vá para a guia <i>Universal</i>.</string>
@@ -567,7 +567,7 @@
     <string name="new_app_notification_action_allow">Permitir</string>
     <string name="firewall_rule_device_lock_desc">Esta conexão foi protegida por firewall porque o <i>dispositivo estava bloqueado</i> no momento.<br/><br/> Para alterar este comportamento, vá para a guia <i>Universal</i>.</string>
     <string name="firewall_rule_global_lockdown_desc">Esta conexão foi bloqueada porque o bloqueio universal foi definido.<br/><br/> Para alterar, vá para a guia <i>Universal</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta conexão foi permitida porque o &lt;i&gt;aplicativo de origem&lt;/i&gt; está configurado para &lt;i&gt;ignorar regras de firewall universais&lt;/i&gt;.&lt;br/&gt;&lt;br/&gt; Para alterar, vá para &lt;i&gt;Firewall específico do aplicativo&lt; /i&gt; tela.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Esta conexão foi permitida porque o <i>aplicativo de origem</i> está configurado para <i>ignorar regras de firewall universais</i>.<br/><br/> Para alterar, vá para <i>Firewall específico do aplicativo</i> tela.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">Esta conexão DNS foi feita por proxy e encaminhada para o terminal DNS preferido do usuário.<br/><br/> Para alterar, desative <i>Evitar vazamentos de DNS</i> na tela <i>Configurar</i> do DNS.</string>
     <string name="new_app_notification_action_toast_allow">Conexão de rede permitida para o aplicativo</string>
     <string name="cd_dns_crypt_title">resolvedores</string>
@@ -788,7 +788,7 @@
     <string name="ada_ip_rules_status_blocked">Bloqueado</string>
     <string name="ada_ip_rules_status_allowed">sem regra</string>
     <string name="ada_firewall_status">Este aplicativo <b><i>%1$s</i></b>.</string>
-    <string name="ada_uid">ID do aplicativo: &lt;i&gt;%1$s&lt;/i&gt;&lt;br/&gt;Categoria: &lt;i&gt;%2$s&lt;/i&gt;&lt;br/&gt;Instalado em: &lt;i&gt;%3$s&lt;/i&gt;&lt; br/&gt;Atualizado em: &lt;i&gt;%4$s&lt;/i&gt;</string>
+    <string name="ada_uid">ID do aplicativo: <i>%1$s</i><br/>Categoria: <i>%2$s</i><br/>Instalado em: <i>%3$s</i><br/>Atualizado em: <i>%4$s</i></string>
     <string name="ada_ip_connection_count">Conectado ao(s) endereço(s) IP %1$s</string>
     <string name="ada_ip_connection_count_zero">0 endereços de IP</string>
     <string name="ada_app_status_block">está bloqueado</string>
