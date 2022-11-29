@@ -90,7 +90,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
             }
             .attach()
 
-        b.firewallActViewpager.setCurrentItem(fragmentIndex, true)
+        b.firewallActViewpager.setCurrentItem(fragmentIndex, false)
 
         observeAppState()
     }

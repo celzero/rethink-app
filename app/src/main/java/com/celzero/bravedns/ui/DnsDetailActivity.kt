@@ -50,7 +50,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, fragmentIndex)
+        fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
         init()
     }
 
@@ -81,7 +81,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             }
             .attach()
 
-        b.dnsDetailActViewpager.setCurrentItem(fragmentIndex, true)
+        b.dnsDetailActViewpager.setCurrentItem(fragmentIndex, false)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

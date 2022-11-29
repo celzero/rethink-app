@@ -1284,5 +1284,7 @@
     <string name="brbs_backup_complete_toast">Backup completed</string>
     <string name="brbs_restore_no_uri_toast">Restore failed; try again</string>
 
+    <!-- Rethink simple view -->
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s blocklists</string>
 
 </resources>
