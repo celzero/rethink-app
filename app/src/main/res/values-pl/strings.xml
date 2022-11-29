@@ -59,4 +59,26 @@
     <string name="status_protected_with_private_dns">zabezpieczone prywatnym dns</string>
     <string name="status_protected_with_proxy_private_dns">zabezpieczone przez proxy &amp; prywatnym dns</string>
     <string name="status_protected_with_socks5_private_dns">zabezpieczone przez socks5 &amp; prywatnym dns</string>
+    <string name="bsct_conn_block_desc_device">zablokowane %1$s na urządzeniu</string>
+    <string name="bsct_block_app">Blokowanie, omijanie <u>tego IP</u> dla <u>tej aplikacji</u></string>
+    <string name="bsct_block">Blokuj, omijaj, wyklucz, blokuj <u>tę aplikację</u></string>
+    <string name="bsct_conn_block_desc">zablokowany %1$s przez %2$s</string>
+    <string name="bsct_conn_desc_allowed">dozwolony na %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked">zablokowany na %1$s %2$s</string>
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS korzysta z usługi ułatwień dostępu, aby śledzić, które aplikacje są używane (pierwszy plan), a które nie są używane (w tłe).
+\n
+\nRethinkDNS nie gromadzi żadnych informacji ani nie szpieguje Cię w żaden sposób.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">Usługa ułatwień dostępu RethinkDNS została zatrzymana lub uległa awarii. <i><b>Przejdź do ustawień i wymuś zatrzymanie</b></i> RethinkDNS i uruchom go ponownie, aby użyć funkcji <i>Zablokuj nieużywane aplikacje</i>.
+\n
+\nRethinkDNS korzysta z usługi ułatwień dostępu, aby śledzić, które aplikacje są używane (pierwszy plan), a które nie są używane (w tłe).</string>
+    <string name="alert_firewall_accessibility_exception">Błąd podczas otwierania ustawień ułatwień dostępu. Spróbuj ponownie później!</string>
+    <string name="brave_dns_connect_mode_change_firewall">Wybierz Tryb.</string>
+    <string name="brave_dns_connect_mode_change_dns">Wybierz Tryb.</string>
+    <string name="default_dns_name">RDNS Ustawienie Domyślne</string>
+    <string name="custom_url_error_invalid_url">Nieprawidłowy URL</string>
+    <string name="conn_track_clear_logs_title">Usunąć wszystkie logi sieciowe\?</string>
+    <string name="conn_track_clear_logs_message">Powoduje to usunięcie tylko dzienników sieciowych, ale nie reguł zapory sieciowej. Ta operacja nie jest odwracalna. Czy chcesz kontynuować\?</string>
+    <string name="dns_query_clear_logs_title">Usunąć wszystkie logi DNS\?</string>
+    <string name="dns_query_clear_logs_message">Powoduje to usunięcie dzienników DNS na urządzeniu. Ta operacja nie jest odwracalna. Czy chcesz kontynuować\?</string>
+    <string name="bsct_app_info">Informacje o Aplikacji</string>
 </resources>
