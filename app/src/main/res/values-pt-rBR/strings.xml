@@ -168,7 +168,6 @@
     <string name="ada_ip_rules_status_bypass_app_rules">Regras de autorização do app</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_block_wifi">está bloqueado em redes de banda larga (wifi)</string>
-    <string name="ada_lockdown_desc">Quando ativado, o app pode conectar-se apenas a IPs definidos em <i>Regras de autorização do app</i>; conexões a qualquer outro IP serão bloqueadas.</string>
     <string name="ada_app_status_allow">está permitido</string>
     <string name="ada_ip_no_connection">Nenhum registro da rede para este app.</string>
     <string name="ada_app_status_block_md">está bloqueado em redes com franquia de dados (móvel)</string>
@@ -275,8 +274,6 @@
     <string name="settings_title_desc">DNS e Firewall altamente personalizável</string>
     <string name="about_title_desc">Detecte e bloqueie as ameaças à segurança da rede</string>
     <string name="txt_home">Início</string>
-    <string name="admin_receiver_status_enabled">Pronto para definir bloqueador de conteúdo baseado em dns.</string>
-    <string name="admin_receiver_status_disabled">Bloqueador de conteúdo não está mais ativo.</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">Avançar</string>
     <string name="skip">Pular</string>
@@ -506,7 +503,6 @@
 \n%3$s excluído
 \n%4$s restrito</string>
     <string name="firewall_card_text_inactive">Ative modo de firewall.</string>
-    <string name="firewall_card_configure_btn">bloquear apps</string>
     <string name="dns_card_connected_status_failure">Desativado</string>
     <string name="dns_card_latency_active">Latência: %1$sms</string>
     <string name="dns_card_latency_inactive">Ative modo DNS.</string>
@@ -587,7 +583,6 @@
     <string name="ct_delete_logs_positive_btn">Apagar registros</string>
     <string name="ct_delete_logs_negative_btn">Cancelar</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_btm_sheet_error">Não é possível abrir a barra inferior</string>
     <string name="ct_filter_parent_all">Tudo</string>
     <string name="ct_filter_parent_allowed">Permitido</string>
     <string name="ct_filter_parent_blocked">Bloqueado</string>
@@ -791,7 +786,6 @@
     <string name="ada_ip_rules_status_allowed">Nenhuma regra</string>
     <string name="ada_firewall_status">Este app <b><i>%1$s</i></b> .</string>
     <string name="ada_uid">ID do app: <i>%1$s</i><br/>Categoria: <i>%2$s</i><br/>Instalado em: <i>%3$s</i><br/>Atualizado em: <i>%4$s</i></string>
-    <string name="ada_lockdown_title">Restringir app</string>
     <string name="ada_ip_connection_count">Conectado ao(s) endereço(s) IP %1$s</string>
     <string name="ada_ip_connection_count_zero">0 endereço de IP</string>
     <string name="ada_app_status_block">está bloqueado</string>

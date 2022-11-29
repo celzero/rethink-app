@@ -237,7 +237,6 @@
     <string name="settings_check_update_desc">সপ্তাহে একবার অ্যাপ আপডেটের জন্য স্বয়ংক্রিয়ভাবে পরীক্ষা করুন।</string>
     <string name="settings_http_proxy_error_text3">হোস্টনাম খালি</string>
     <string name="settings_notification_dialog_title">বিজ্ঞপ্তি কর্ম চয়ন করুন</string>
-    <string name="firewall_card_configure_btn">অ্যাপ্লিকেশন ব্লক করুন</string>
     <string name="cd_dns_crypt_title">সমাধানকারী</string>
     <string name="dns_delete_positive">মুছুন</string>
     <string name="dns_info_positive">ঠিক আছে</string>
@@ -267,7 +266,6 @@
     <string name="about_mozilla">RethinkDNS হল Mozilla Builders MVP প্রোগ্রামের অংশ।</string>
     <string name="about_mail_bugreport_share_title">ইমেল প্রদানকারী নির্বাচন করুন</string>
     <string name="ct_delete_logs_positive_btn">লগ মুছুন</string>
-    <string name="ct_btm_sheet_error">নীচের শীট খুলতে পারে না</string>
     <string name="dns_info_neutral">অনুলিপি</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="fapps_filter_parent_installed">ইনস্টলকৃত</string>
@@ -409,7 +407,6 @@
     <string name="univ_firewall_rule_7">IPv6 তে IPv4 ব্লক করুন (পরীক্ষামূলক)</string>
     <string name="app_name">RethinkDNS</string>
     <string name="pause_title_desc">ঘুমানো…</string>
-    <string name="admin_receiver_status_enabled">ডিএনএস ভিত্তিক বিষয়বস্তু ব্লকার সেট করতে প্রস্তুত।</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_settings">পছন্দসমূহ</string>
     <string name="app_name_rethink">Rethink</string>
@@ -418,7 +415,6 @@
     <string name="finish">শেষ করুন</string>
     <string name="settings_title_desc">একটি অত্যন্ত কাস্টমাইজযোগ্য DNS এবং ফায়ারওয়াল</string>
     <string name="skip">এড়িয়ে যান</string>
-    <string name="admin_receiver_status_disabled">কন্টেন্ট ব্লকার আর কার্যকর নেই।</string>
     <string name="accessibility_service_description">RethinkDNS ব্যাকগ্রাউন্ড অ্যাপ্লিকেশন সনাক্ত করতে এবং ফায়ারওয়াল করার জন্য অ্যাক্সেসিবিলিটি পরিষেবা ব্যবহার করে। RethinkDNS কোনো তথ্য সংগ্রহ বা বিক্রি করে না।</string>
     <string name="slide_2_desc">RethinkDNS হল নেটওয়ার্ক কার্যকলাপ নিরীক্ষণ, ইন্টারনেট সেন্সরশিপ বাইপাস, এবং আপনার Android ডিভাইসে ফায়ারওয়াল অ্যাপ্লিকেশানগুলির সবচেয়ে সহজ উপায়৷</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">ব্যক্তিগত ডিএনএস সক্রিয় করা হয়েছে</string>
@@ -770,7 +766,6 @@
     <string name="category_name_installed">ইনস্টল করা অ্যাপস</string>
     <string name="ci_blocked_initial">নীল</string>
     <string name="ci_blocked_txt">Blocked</string>
-    <string name="ada_lockdown_desc">সক্রিয় করা হলে, অ্যাপটি শুধুমাত্র <i>বাইপাস অ্যাপের নিয়মে</i> আইপি-তে সংযোগ করতে পারে; অন্য কোনো আইপি সংযোগ ব্লক করা হবে.</string>
     <string name="bsac_bypass_app_rules">বাইপাস অ্যাপের নিয়ম</string>
     <string name="notif_download_failure_content">নামাতে ব্যার্থ. আবার চেষ্টা করুন.</string>
     <string name="rt_download_desc">এই বৈশিষ্ট্যটি ব্যবহার করতে ব্লকলিস্ট ডাউনলোড করুন (প্রায় 60MB)।</string>
@@ -807,7 +802,6 @@
     <string name="cd_sample_unicode_invalid">❌</string>
     <string name="cd_dialog_error_invalid_tld">অবৈধ শীর্ষ স্তরের ডোমেন৷</string>
     <string name="cd_no_rule_initial">এন</string>
-    <string name="ada_lockdown_title">লকডাউন অ্যাপ</string>
     <string name="bsac_delete">মুছুন</string>
     <string name="rt_dialog_message">আপনি কি নতুন কনফিগার করা ব্লকলিস্ট প্রয়োগ করতে চান\?</string>
     <string name="rt_chip_update_available">হালনাগাদ আছে</string>

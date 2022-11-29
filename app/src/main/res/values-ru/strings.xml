@@ -66,7 +66,6 @@
     <string name="about_app_contributors">Авторы</string>
     <string name="local_blocklist_redownload">Актуально!</string>
     <string name="accessibility_service_description">RethinkDNS использует службу доступности для обнаружения и брандмауэра фоновых приложений. RethinkDNS не собирает и не продает никакую информацию.</string>
-    <string name="admin_receiver_status_enabled">Готов к установке блокировщика содержимого на основе DNS.</string>
     <string name="slide_2_desc">RethinkDNS - это самый простой способ мониторинга сетевой активности, обхода интернет-цензуры и приложений брандмауэра на вашем устройстве Android.</string>
     <string name="title_about">О нас</string>
     <string name="next">Следующий</string>
@@ -84,7 +83,6 @@
     <string name="slide_1_desc">RethinkDNS - это ПО с открытым исходным кодом, поддерживаемое программой Mozilla Builders MVP.</string>
     <string name="hybrid_mode_notification_title">Защищен! Подключен к DNS + брандмауэр.</string>
     <string name="pause_title_desc">сплю…</string>
-    <string name="admin_receiver_status_disabled">Блокировщик содержимого больше не действует.</string>
     <string name="bypass_universal">обход универсальный</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Нажмите, чтобы изменить настройки защиты</string>
     <string name="dns_mode_notification_title">Защищено! Подключен к быстрому и безопасному DNS.</string>

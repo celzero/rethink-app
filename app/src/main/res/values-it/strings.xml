@@ -33,7 +33,6 @@
     <string name="pause_title_desc">faccio un pisolino…</string>
     <string name="about_title_desc">Rileva e blocca pericoli per la sicurezza in rete</string>
     <string name="txt_home">Panoramica</string>
-    <string name="admin_receiver_status_disabled">Blocco dei contenuti non più attivo.</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">Avanti</string>
     <string name="skip">Salta</string>
@@ -237,7 +236,6 @@
     <string name="settings_http_proxy_toast_success">Proxy HTTP impostato</string>
     <string name="settings_http_proxy_hostname">Nome host</string>
     <string name="settings_title_desc">DNS e Firewall ampiamente personalizzabili</string>
-    <string name="admin_receiver_status_enabled">Pronto a bloccare dei contenuti attraverso il dns.</string>
     <string name="accessibility_service_description">RethinkDNS utilizza i servizi di accessibilità per rilevare e filtrare le connessioni in background. RethinkDNS non raccoglie o vende alcuna informazione.</string>
     <string name="bsct_conn_desc_blocked">bloccato su %1$s %2$s</string>
     <string name="bsct_conn_block_desc_device">bloccato %1$s sul dispositivo</string>
@@ -424,7 +422,6 @@
 \n%3$s escluse
 \n%4$s in quarantena</string>
     <string name="firewall_card_text_inactive">Abilita la modalità firewall.</string>
-    <string name="firewall_card_configure_btn">blocca app</string>
     <string name="dns_card_connected_status_failure">Disabilitato</string>
     <string name="dns_card_latency_active">Latenza: %1$sms</string>
     <string name="dns_card_latency_inactive">Abilita la modalità DNS.</string>
@@ -555,7 +552,6 @@
     <string name="ct_delete_logs_positive_btn">Cancella registro</string>
     <string name="ct_delete_logs_negative_btn">Annulla</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_btm_sheet_error">Impossibile aprire il foglio inferiore</string>
     <string name="ct_filter_parent_all">Tutti</string>
     <string name="ct_filter_parent_allowed">Consentiti</string>
     <string name="ct_filter_parent_blocked">Bloccati</string>
@@ -800,8 +796,6 @@
     <string name="ada_ip_rules_status_allowed">Nessuna regola</string>
     <string name="ada_firewall_status">Quest\'app <b><i>%1$s</i></b>.</string>
     <string name="ada_uid">ID Applicazione: <i>%1$s</i><br/>Categoria: <i>%2$s</i><br/>Installata il: <i>%3$s</i><br/>Aggiornata il: <i>%4$s</i></string>
-    <string name="ada_lockdown_title">Quarantena app</string>
-    <string name="ada_lockdown_desc">Se abilitata, l\'app può connettersi solo agli IP in <i>Aggira regole app</i>; le connessioni a qualsiasi altro IP verranno bloccate.</string>
     <string name="ada_ip_connection_count">Connessioni effettuate a %1$s indirizzi/o IP</string>
     <string name="ada_ip_connection_count_zero">0 indirizzi IP</string>
     <string name="ada_ip_no_connection">Nessun registro di rete per quest\'app.</string>

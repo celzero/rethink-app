@@ -57,7 +57,6 @@
     <string name="about_bug_report">تقرير الشوائب</string>
     <string name="cd_doh_dialog_resolver_name">اسم المحلل</string>
     <string name="ada_noapp_dialog_title">لم يتم العثور على معلومات التطبيق</string>
-    <string name="ada_lockdown_title">تطبيق Lockdown</string>
     <string name="settings_enable_logs_desc">تخزين سجلات DNS وجدار الحماية محليًا على الجهاز.</string>
     <string name="settings_selected_theme">الموضوع الحالي: %1$s</string>
     <string name="hsf_blocklist_chip_text_no_data">قم بتمكين RethinkDNS +</string>
@@ -200,7 +199,6 @@
     <string name="rt_download_start">جارٍ تنزيل قوائم الحظر …</string>
     <string name="rt_download">تنزيل قوائم الحظر</string>
     <string name="bsrf_apply_filter">طبّق</string>
-    <string name="admin_receiver_status_disabled">لم يعد مانع المحتوى ساري المفعول.</string>
     <string name="untracked">لم يتم تعقبه</string>
     <string name="notification_action_resume_vpn">سيرة ذاتية</string>
     <string name="notification_action_pause_vpn">وقفة</string>
@@ -520,7 +518,6 @@
     <string name="notif_channel_proxy_failure">تنبيهات الوكيل</string>
     <string name="cd_filter_all">الكل</string>
     <string name="ci_no_rule_txt">لا توجد قاعدة</string>
-    <string name="ada_lockdown_desc">عند التمكين ، يمكن للتطبيق الاتصال فقط بعناوين IP في <i> تجاوز قواعد التطبيق </i> ؛ سيتم حظر الاتصالات بأي IP آخر.</string>
     <string name="bsac_title_desc">تنطبق القواعد على هذا التطبيق فقط.</string>
     <string name="bsdl_domain_rule_norule">لا توجد قاعدة</string>
     <string name="rt_cancel_btn">إلغاء</string>
@@ -540,7 +537,6 @@
     <string name="settings_orbot_install_desc">انقر هنا لتثبيت Orbot</string>
     <string name="settings_orbot_notification_content">فشل بدء Tor-a-Proxy. افتح تطبيق Orbot لبدء تشغيله يدويًا.</string>
     <string name="settings_notification_heading">اختر إجراء الإخطار</string>
-    <string name="firewall_card_configure_btn">حظر التطبيقات</string>
     <string name="hsf_network_logs_chip_text">سجلات الشبكة</string>
     <string name="hsf_proxy_chip_removed_toast">تمت إزالة الوكيل</string>
     <string name="dc_other_dns_heading">النوع</string>
@@ -673,7 +669,6 @@
     <string name="status_protected_with_socks5">محمي ببروكسي socks</string>
     <string name="cd_dns_crypt_dialog_title">أضف محلل أو مرحل DNSCrypt</string>
     <string name="ci_dialog_added_success">تمت إضافة IP إلى القائمة</string>
-    <string name="ct_btm_sheet_error">لا يمكن فتح الورقة السفلية</string>
     <string name="ct_filter_parent_allowed">مسموح</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s تطبيق (تطبيقات) أخرى</string>
     <string name="fapps_filter_parent_all">الكل</string>
@@ -758,7 +753,6 @@
     <string name="slide_1_desc">RethinkDNS هو برنامج مفتوح المصدر يدعمه برنامج Mozilla Builders MVP.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">انقر لتغيير إعداد الحماية</string>
     <string name="status_no_internet">لا يوجد إنترنت</string>
-    <string name="admin_receiver_status_enabled">جاهز لتعيين مانع محتوى قائم على نظام DNS.</string>
     <string name="orbot_bs_status_1">إعادة توجيه %1$s اتصالات إلى Orbot.</string>
     <string name="slide_2_desc">RethinkDNS هي أسهل طريقة لمراقبة نشاط الشبكة وتجاوز الرقابة على الإنترنت وتطبيقات جدار الحماية على جهاز Android الخاص بك.</string>
     <string name="rdns_plus">RDNS Plus</string>

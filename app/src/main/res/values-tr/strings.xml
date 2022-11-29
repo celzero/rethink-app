@@ -6,7 +6,6 @@
     <string name="pause_title_desc">ara veriliyor…</string>
     <string name="settings_title_desc">Son derece özelleştirilebilir bir DNS ve güvenlik duvarı</string>
     <string name="txt_home">Ana sayfa</string>
-    <string name="admin_receiver_status_enabled">DNS tabanlı içerik engelleyici ayarlanmaya hazır.</string>
     <string name="accessibility_service_description">RethinkDNS, arka plan uygulamalarını algılamak ve güvenlik duvarı oluşturmak için erişilebilirlik hizmetini kullanır. RethinkDNS herhangi bir bilgi toplamaz veya satmaz.</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">İleri</string>
@@ -27,7 +26,6 @@
     <string name="block">engelle</string>
     <string name="bypass_universal">genel olarak atla</string>
     <string name="lockdown">kilitle</string>
-    <string name="admin_receiver_status_disabled">İçerik engelleyici artık etkin değil.</string>
     <string name="slide_2_title">Hoş Geldiniz</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="exclude">hariç tut</string>
@@ -223,7 +221,6 @@
     <string name="settings_orbot_notification_action">Açık Orbot</string>
     <string name="settings_socks_forwarding_desc">%1$s adresine yönlendirme :%2$s, %3$s</string>
     <string name="firewall_status_allow">izin verildi</string>
-    <string name="firewall_card_configure_btn">blok uygulamaları</string>
     <string name="dns_card_latency_inactive">DNS modunu etkinleştirin.</string>
     <string name="hsf_whats_new_remove_text">Kapatılıyor…</string>
     <string name="cd_dnscrypt_relay_heading">Aktarıcılar</string>
@@ -517,7 +514,6 @@
     <string name="dc_dns_leaks_heading">DNS sızıntılarını önleyin</string>
     <string name="about_mail_bugreport_text">Bu e-postayı şu adrese gönderin: hello@celzero.com</string>
     <string name="cd_dns_crypt_dialog_desc">Açıklama (isteğe bağlı)</string>
-    <string name="ct_btm_sheet_error">Alt tabaka açılamıyor</string>
     <string name="univ_firewall_rule_9">Ölçülü (mobil) ağ üzerinde engelleme</string>
     <string name="dns_proxy_dialog_header_dns">DNS Proxy Ekleme</string>
     <string name="notif_channel_download">Uyarıları İndir</string>
@@ -824,8 +820,6 @@
     <string name="ada_noapp_dialog_message">Belirtilen uygulama için uygulama bilgileri bulunamadı.</string>
     <string name="ada_ip_rules_status_allowed">Kural Yok</string>
     <string name="ada_firewall_status">Bu uygulama <b><i>%1$s</i> </b> .</string>
-    <string name="ada_lockdown_title">Kilitleme uygulaması</string>
-    <string name="ada_lockdown_desc">Etkinleştirildiğinde, uygulama yalnızca <i>bypass uygulama kuralları</i> adresindeki IP\'lere bağlanabilir; diğer IP\'lere bağlantılar engellenir.</string>
     <string name="ada_ip_connection_count_zero">0 IP adresi</string>
     <string name="cd_add_dialog_sample_3">%1$s https://%2$s
 \n</string>

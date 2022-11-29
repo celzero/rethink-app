@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_home">Hjem</string>
-    <string name="admin_receiver_status_enabled">Klar til å sette DNS-basert innholdsblokkering.</string>
-    <string name="admin_receiver_status_disabled">Innholdsblokkering ikke lenger aktiv.</string>
     <string name="block">blokker</string>
     <string name="slide_2_title">Velkommen</string>
     <string name="app_name">RethinkDNS</string>
@@ -589,7 +587,6 @@
     <string name="download_update_dialog_message_success">Svarteliste nedlastet.</string>
     <string name="about_bravedns_toreport_text">Hjelp og tilbakemeldinger</string>
     <string name="download_update_dialog_message">Last ned ny versjon av programmet fra nettsiden\?</string>
-    <string name="firewall_card_configure_btn">Blokker programmer</string>
     <string name="collecting_logs_progress_text">Loggfører …</string>
     <string name="hsf_whats_new_chip_text">Nyheter</string>
     <string name="orbot_socks5">Kun-TCP-mellomtjener</string>
