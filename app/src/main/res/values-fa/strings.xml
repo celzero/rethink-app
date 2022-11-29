@@ -27,4 +27,35 @@
     <string name="finish">پایان</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">در انتظار</string>
     <string name="other_dns_list_tab1">DoH</string>
+    <string name="dns_mode_info_explanation_new">درخواست های DNS را نظارت، مسدود و رمزگذاری کنید.</string>
+    <string name="dns_firewall_mode_info_explanation_new">همه موارد بالا + دور زدن سانسور اینترنت.</string>
+    <string name="universal_firewall_explanation">قوانین فایروال را بر روی همه برنامه ها بر اساس رویدادهای دستگاه اعمال کنید، به عنوان مثال، فایروال زمانی که دستگاه قفل است یا زمانی که یک برنامه خاص در حال استفاده نیست.</string>
+    <string name="accessibility_service_description">RethinkDNS از سرویس دسترس‌پذیری برای شناسایی و فایروال برنامه های پس زمینه استفاده می کند. RethinkDNS هیچ اطلاعاتی را جمع آوری یا نمی فروشد.</string>
+    <string name="status_protected_with_http_private_dns">محافظت شده با پروکسی http و dns خصوصی</string>
+    <string name="slide_2_desc">RethinkDNS ساده ترین راه برای نظارت بر فعالیت شبکه، دور زدن سانسور اینترنت و برنامه های فایروال در دستگاه اندرویدی شما است.</string>
+    <string name="slide_1_desc">RethinkDNS یک نرم افزار متن باز است که توسط برنامه Mozilla Builders MVP حمایت می شود.</string>
+    <string name="status_protected_with_proxy_private_dns">محافظت شده با پروکسی و dns خصوصی</string>
+    <string name="slide_1_title">رایگان و متن‌باز</string>
+    <string name="hybrid_mode_info_title">DNS + فایروال</string>
+    <string name="dns_mode_info_title">DNS</string>
+    <string name="app_name_small_case">rethink</string>
+    <string name="firewall_mode_info_title">فایروال</string>
+    <string name="app_name_rethink">Rethink</string>
+    <string name="status_protected_with_tor_private_dns">محافظت شده با tor و dns خصوصی</string>
+    <string name="block">مسدود کردن</string>
+    <string name="firewall_mode_info_explanation_new">نظارت بر فعالیت شبکه و فایروال هر برنامه یا آدرس IP.</string>
+    <string name="status_dns_server_down">سرور dns از کار افتاده است</string>
+    <string name="status_protected_with_socks5">محافظت شده با پروکسی socks</string>
+    <string name="status_protected_with_socks5_private_dns">محافظت شده با socks5 و dns خصوصی</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">محافظت نشده</string>
+    <string name="notification_action_stop_vpn">متوقف کردن</string>
+    <string name="rethink_plus">RethinkDNS پلاس</string>
+    <string name="notification_action_dns_firewall_mode">DNS + فایروال</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">برای تغییر تنظیمات حفاظت ضربه بزنید</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="wireguard_mode_info_explanation_new">به زودی.</string>
+    <string name="skip">ردکردن</string>
+    <string name="apps_info_title">برنامه ها</string>
+    <string name="rdns_plus">RDNS پلاس</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">خصوصی dns فعال است</string>
 </resources>
