@@ -9,8 +9,6 @@
     <string name="settings_title_desc">一款可高度自訂的 DNS 與防火牆軟體</string>
     <string name="txt_home">首頁</string>
     <string name="accessibility_service_label">RethinkDNS</string>
-    <string name="admin_receiver_status_enabled">現可設定基於 DNS 的內容攔截器。</string>
-    <string name="admin_receiver_status_disabled">內容攔截器現不再生效。</string>
     <string name="next">下一步</string>
     <string name="skip">跳過</string>
     <string name="finish">完成</string>
@@ -301,8 +299,6 @@
     <string name="cd_remove_dialog_negative">取消</string>
     <string name="cd_add_dialog_sample_3">%1$s https://%2$s
 \n</string>
-    <string name="ada_lockdown_title">應用閉關</string>
-    <string name="ada_lockdown_desc">啓用時，應用將只可以連線至位於<i>繞行 IP 規則</i>中的 IP ；至其他 IP 的連線將被攔截。</string>
     <string name="ada_app_metered">計費網路</string>
     <string name="ada_app_whitelist">無條件放行</string>
     <string name="notif_download_content_text">正在下載……</string>
@@ -559,7 +555,6 @@
 \n排除 %3$s
 \n閉關 %4$s</string>
     <string name="firewall_card_text_inactive">啓用防火牆模式。</string>
-    <string name="firewall_card_configure_btn">攔截應用</string>
     <string name="dns_card_connected_status_failure">已禁用</string>
     <string name="dns_card_latency_active">延遲： %1$sms</string>
     <string name="dns_card_latency_inactive">啓用 DNS 模式。</string>
@@ -698,7 +693,6 @@
     <string name="ct_delete_logs_positive_btn">刪除日誌</string>
     <string name="ct_delete_logs_negative_btn">取消</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_btm_sheet_error">無法打開底部欄</string>
     <string name="ct_filter_parent_all">全部</string>
     <string name="ct_filter_parent_allowed">放行</string>
     <string name="ct_filter_parent_blocked">攔截</string>

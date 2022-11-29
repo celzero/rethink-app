@@ -93,7 +93,6 @@
     <string name="status_dns_error">kesalahan dns</string>
     <string name="title_about">Tentang</string>
     <string name="about_title_desc">Mendeteksi dan memblokir ancaman-ancaman keamanan jaringan</string>
-    <string name="admin_receiver_status_enabled">Siap mengatur pemblokir konten berbasis dns.</string>
     <string name="allow">Ijinkan</string>
     <string name="dns_mode_notification_title">Terlindungi! Terkoneksi dengan Fast and Secure DNS.</string>
     <string name="firewall_mode_notification_title">Terlindungi! Terkoneksi dengan Firewall.</string>
@@ -103,7 +102,6 @@
     <string name="dns_mode_info_explanation_new">Mengawasi, memblokir, dan mengenkripsi permohonan-permohonan DNS.</string>
     <string name="brave_dns_connect_mode_change_dns">Pilih Mode.</string>
     <string name="txt_home">Halaman muka</string>
-    <string name="admin_receiver_status_disabled">Pemblokir konten tidak lagi berpengaruh.</string>
     <string name="status_dns_server_down">peladen dns tidak berfungsi</string>
     <string name="status_app_error">kesalahan app</string>
     <string name="dns_firewall_mode_info_explanation_new">Semua di atas + pintasi sensor jaringan.</string>
@@ -304,7 +302,6 @@
     <string name="bsdl_domain_rule_norule">tanpa aturan</string>
     <string name="settings_all_networks_dialog_negative_btn">Batal</string>
     <string name="settings_theme_dialog_title">Tampilan</string>
-    <string name="firewall_card_configure_btn">blokir app-app</string>
     <string name="cd_dns_proxy_error_text_2">Port harus dalam rentang 1024-65535</string>
     <string name="brbs_backup_title">Cadangkan</string>
     <string name="univ_view_blocked_ip">aturan-aturan ip &amp; port</string>
@@ -660,12 +657,10 @@
     <string name="fapps_unmetered_block_dialog_title">Blokir yang tak dihitung</string>
     <string name="ada_app_status_lockdown">dalam mode terkunci</string>
     <string name="ci_bypass_universal_desc">- Memintas universal</string>
-    <string name="ada_lockdown_title">Kunci app</string>
     <string name="firewall_rule_block_metered">Dihitung (Selular)</string>
     <string name="settings_notification_dialog_option_1">"
 \nJeda / Hentikan (bawaan):
 \nMenampilkan dua tombol, untuk menjeda atau menghentikan RethinkDNS dengan cepat."</string>
-    <string name="ct_btm_sheet_error">Tidak dapat membuka lembar bawah</string>
     <string name="hsf_proxy_chip_removed_toast">Proksi dihapus</string>
     <string name="firewall_rule_global_lockdown">Kunci</string>
     <string name="cd_dns_crypt_dialog_title">Menambah Resolver atau Relay DNSCrypt</string>

@@ -76,7 +76,6 @@
 \n</string>
     <string name="cd_dialog_error_invalid_wildcard">无效通配符。</string>
     <string name="ci_no_rule">无规则</string>
-    <string name="ada_lockdown_desc">启用时，应用将只可以连接至位于<i>绕行 IP 规则</i>中的 IP ；至其他 IP 的连接将被拦截。</string>
     <string name="bsac_bypass_app_rules">绕行应用规则</string>
     <string name="rt_dialog_message">您是否想要应用新配置的屏蔽名单？</string>
     <string name="dc_dns_proxy">DNS 代理</string>
@@ -288,7 +287,6 @@
     <string name="rt_dialog_title">保存更改</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="title_settings">设置</string>
-    <string name="admin_receiver_status_enabled">现可设置基于 DNS 的内容拦截器。</string>
     <string name="untracked">未跟踪</string>
     <string name="status_protected_with_socks5_private_dns">已由 SOCKS5 与私人 DNS 保护</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">已连接至 RethinkDNS 与防火墙</string>
@@ -392,7 +390,6 @@
     <string name="category_name_installed">已安装程序</string>
     <string name="cd_sample_unicode_valid">✅</string>
     <string name="cd_whitelist_txt">放行</string>
-    <string name="ada_lockdown_title">应用闭关</string>
     <string name="ada_app_status_block_wifi">已于非收费网络（ WiFi ）拦截</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="bsac_go_pass_app_rules">移除绕行</string>
@@ -491,7 +488,6 @@
     <string name="settings_http_proxy_toast_success">HTTP 代理已设置</string>
     <string name="settings_selected_ip_desc">%1$s</string>
     <string name="firewall_status_unknown">未知</string>
-    <string name="firewall_card_configure_btn">拦截应用</string>
     <string name="hsf_whats_new_chip_text">新内容</string>
     <string name="hsf_proxy_chip_text">已启用代理</string>
     <string name="cd_dns_crypt_resolver_heading">解析服务</string>
@@ -568,7 +564,6 @@
     <string name="about_bug_no_log_dialog_message">无法获取崩溃日志。请问您是否想要手动报告漏洞？</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="cd_dns_crypt_error_text_1">印戳不能为空</string>
-    <string name="ct_btm_sheet_error">无法打开底部栏</string>
     <string name="univ_ip_delete_individual_positive">删除</string>
     <string name="dns_query_latency">%1$sms</string>
     <string name="unicode_x_sign">❌</string>
@@ -719,7 +714,6 @@
     <string name="settings_title_desc">一款可高度自定义的 DNS 与防火墙软件</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">关于</string>
-    <string name="admin_receiver_status_disabled">内容拦截器现不再生效。</string>
     <string name="next">下一步</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="lockdown">闭关</string>
