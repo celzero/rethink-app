@@ -101,7 +101,7 @@
     <string name="settings_socks5_dialog_hint_port">Bağlantı noktası</string>
     <string name="settings_ip_dialog_title">IP sürümünü seçin</string>
     <string name="dns_card_connected_status_failure">Devre Dışı</string>
-    <string name="hsf_blocklist_updating_text">Etkinleştirme…</string>
+    <string name="hsf_blocklist_updating_text">Etkinleştiriliyor…</string>
     <string name="about_connect">iletişim</string>
     <string name="about_whats_new">Yenilikler %1$s</string>
     <string name="about_mail_bugreport_share_title">E-posta sağlayıcısını seçin</string>
@@ -133,7 +133,7 @@
     <string name="dns_proxy_port">Liman Numarası</string>
     <string name="fapps_firewall_filter_blocked">Engellenen</string>
     <string name="fapps_firewall_filter_lockdown">Kilitlenme</string>
-    <string name="fapps_metered_unblock_dialog_message"><i>listelenen</i> uygulamaları için ölçülü (mobil) ağda bağlantılara izin ver\?</string>
+    <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi\?</string>
     <string name="fapps_metered_negative">İptal</string>
     <string name="network_log_app_name_unknown">Bilinmeyen</string>
     <string name="firewall_rule_block_metered">Ölçülü (Mobil)</string>
@@ -200,7 +200,7 @@
     <string name="univ_ip_delete_dialog_negative">İptal</string>
     <string name="dns_connected_rethink_plus">Bağlandı. %1$s kullanımdaki blok listeleri</string>
     <string name="rules_load_failure_reload">yeniden yükle</string>
-    <string name="firewall_rule_block_ip">IP / Bağlantı Noktası</string>
+    <string name="firewall_rule_block_ip">IP / Bağlantı Noktası (Uygulama)</string>
     <string name="firewall_rule_unknown">Kaynak Bilinmiyor</string>
     <string name="firewall_rule_block_dns_bypass">DNS Bypass Edildi</string>
     <string name="new_app_bulk_notification_title">Dikkat</string>
@@ -225,7 +225,7 @@
     <string name="firewall_status_allow">izin verildi</string>
     <string name="firewall_card_configure_btn">blok uygulamaları</string>
     <string name="dns_card_latency_inactive">DNS modunu etkinleştirin.</string>
-    <string name="hsf_whats_new_remove_text">Kapatıyorum…</string>
+    <string name="hsf_whats_new_remove_text">Kapatılıyor…</string>
     <string name="cd_dnscrypt_relay_heading">Aktarıcılar</string>
     <string name="hs_download_positive_website">Web sitesini ziyaret et</string>
     <string name="univ_firewall_rule_2">Kullanılmayan tüm uygulamaları engelleyin</string>
@@ -249,7 +249,7 @@
     <string name="brbs_restore_dialog_failure_title">Geri yükleme başarısız oldu</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
     <string name="unicode_question_sign">❔</string>
-    <string name="radio_max_btn">🪂 Max</string>
+    <string name="radio_max_btn">🪂 Maks</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="orbot_stop_dialog_neutral">DNS Değiştir</string>
     <string name="orbot_title">Orbot ve Proxy\'ler</string>
@@ -288,7 +288,7 @@
     <string name="firewall_act_universal_tab">Evrensel</string>
     <string name="dns_act_configure_tab">Yapılandır</string>
     <string name="configure_dns_connected_dns_proxy_status">DNS Proxy</string>
-    <string name="search_firewall_all_apps"><font size="12">Arama uygulamaları</font></string>
+    <string name="search_firewall_all_apps"><font size="12">Kullanıcı kimliği, ada göre uygulama ara</font></string>
     <string name="app_mode_dns_firewall">DNS ve Güvenlik Duvarı (varsayılan)</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_both">TCP + HTTP Proxy</string>
@@ -311,9 +311,9 @@
     <string name="new_app_notification_action_toast_deny">Uygulama için ağ bağlantısı reddedildi</string>
     <string name="notif_dialog_pause_dialog_message">Uygulama duraklama durumunda, devam etmek için devam edin</string>
     <string name="cd_add_dialog_show_btn">göster</string>
-    <string name="settings_all_networks_dialog_message">Etkinleştirildiğinde, ölçülü (örn: WiFi) ve ölçülü olmayan (örn: Mobil) uygulama güvenlik duvarı kuralları yerine getirilmeyecektir.
+    <string name="settings_all_networks_dialog_message">Etkinleştirildiğinde, ölçülü (örn: Mobil) ve ölçülü olmayan (örn: Wi-Fi) uygulama güvenlik duvarı kuralları yerine getirilmeyecektir.
 \n
-\nDevam etmek istiyor musun\?</string>
+\nDevam etmek istiyor musunuz\?</string>
     <string name="ci_blocked_initial">Si</string>
     <string name="ada_ip_rules_status_bypass_app_rules">Uygulama kurallarını atlayın</string>
     <string name="bsac_delete">Sil</string>
@@ -325,7 +325,7 @@
     <string name="search_universal_ips"><font size="12">IP\'leri arayın</font></string>
     <string name="info_dialog_copy_toast_msg">IP adresi kopyalandı.</string>
     <string name="orbot_none_desc">Yukarıdakilerin hiçbiri.</string>
-    <string name="orbot_install_dialog_title">Orbot\'u kurun\?</string>
+    <string name="orbot_install_dialog_title">Orbot kurulsun mu\?</string>
     <string name="hsf_start_dialog_message">Güvenli ve emniyetli Android\'e bir adım uzaktasınız: Ağ etkinliğini anında görün, web sitelerini, IP\'leri ve kötü davranan uygulamaları engelleyin.</string>
     <string name="hsf_exclude_error">VPN kilitleme modunda hariç tutma mümkün değil</string>
     <string name="dc_entries">%1$s girişler 🔗</string>
@@ -336,7 +336,7 @@
     <string name="univ_ip_delete_dialog_positive">Tümünü sil</string>
     <string name="univ_accessibility_dialog_positive">İzin ver</string>
     <string name="fapps_firewall_filter_all">Tümü</string>
-    <string name="fapps_unmetered_unblock_dialog_message"><i>listelenen</i> uygulamaları için ölçülmemiş (WiFi) ağda bağlantılara izin ver\?</string>
+    <string name="fapps_unmetered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılara izin verilsin mi\?</string>
     <string name="fapps_all_network_hint"><u>Tüm ağları kullan</u> etkinleştirildi. Güvenlik Duvarı Ölçülü / Ölçüsüz kurallarına uymayacaktır.</string>
     <string name="settings_local_blocklist_in_use">%1$s kullanımdaki blok listeleri</string>
     <string name="firewall_rule_block_udp_ntp">UDP Engellendi</string>
@@ -389,7 +389,7 @@
     <string name="settings_orbot_heading">Orbot Kurulumu</string>
     <string name="settings_dns_proxy_dialog_app_desc">Seçilen uygulama, sizin adınıza bağlantıları proxy\'lemesine izin vermek için VPN\'den hariç tutulacaktır.</string>
     <string name="firewall_card_text_inactive">Güvenlik duvarı modunu etkinleştirin.</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS kullanımda</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS kullanımda</string>
     <string name="about_bug_no_log_dialog_negative_btn">İptal</string>
     <string name="about_settings_vpn_profile">VPN Profili</string>
     <string name="cd_dns_crypt_resolver_heading">Çözümleyici</string>
@@ -454,7 +454,7 @@
     <string name="settings_notification_desc">RethinkDNS bildirimiyle birlikte gösterilecek eylem düğmeleri: %1$s</string>
     <string name="settings_notification_dialog_title">Bildirim eylemini seçin</string>
     <string name="firewall_card_status_inactive">Devre Dışı</string>
-    <string name="hsf_blocklist_chip_text_no_data">RethinkDNS+\'ı Etkinleştir</string>
+    <string name="hsf_blocklist_chip_text_no_data">RDNS+\'ı Etkinleştir</string>
     <string name="dns_logs_lifetime_queries">Ömür boyu sorgular: %1$s</string>
     <string name="about_bravedns_toreport_text">yardim &amp; geri̇ bi̇ldi̇ri̇m</string>
     <string name="about_github">GitHub üzerinden katkıda bulunun</string>
@@ -528,10 +528,10 @@
     <string name="notif_download_content_text">İndirme işlemi devam ediyor…</string>
     <string name="rt_chip_check_update">Güncellemeleri denetle</string>
     <string name="rt_list_adv_btn_txt">gelişmiş</string>
-    <string name="bsrf_sub_group_heading">Alt Grup</string>
+    <string name="bsrf_sub_group_heading">Alt grup</string>
     <string name="lbbs_search">Blok listelerindeki alan adlarını arama</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
-    <string name="radio_sky_btn">⛅ Sky</string>
+    <string name="radio_sky_btn">⛅ Gökyüzü</string>
     <string name="always_on_dialog_negative">İptal</string>
     <string name="configure_dns_connected_doh_status">HTTPS üzerinden DNS</string>
     <string name="settings_enable_logs">Aygıt üzerinde günlük kaydını etkinleştirme</string>
@@ -553,7 +553,7 @@
     <string name="univ_ip_delete_individual_negative">İptal</string>
     <string name="univ_accessibility_crash_dialog_positive">Ayarlara Git</string>
     <string name="dns_proxy_name">Vekil Adı</string>
-    <string name="fapps_unmetered_block_dialog_message"><i>listelenen</i> uygulamaları için ölçülmemiş (WiFi) ağdaki bağlantıları engelleyin\?</string>
+    <string name="fapps_unmetered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılar engellensin mi\?</string>
     <string name="rules_load_failure_heading">Not</string>
     <string name="pause_text">duraklatıldı</string>
     <string name="firewall_rule_global_lockdown">Kilitlenme</string>
@@ -588,7 +588,7 @@
     <string name="hs_download_positive_play_store">Eksiksiz Güncelleme</string>
     <string name="univ_delete_firewall_dialog_title">Tüm IP Kuralları silinsin mi\?</string>
     <string name="fapps_filter_apply_btn">Uygula</string>
-    <string name="fapps_metered_block_dialog_message"><i>listesindeki</i> uygulamaları için ölçülü (mobil) ağdaki bağlantıları engelleyin\?</string>
+    <string name="fapps_metered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılar engellensin mi\?</string>
     <string name="update_complete_action_snack">YENİDEN BAŞLAT</string>
     <string name="new_app_notification_content">RethinkDNS son yüklenen %1$s uygulamasını engelledi.</string>
     <string name="category_name_others">Diğer</string>
@@ -596,7 +596,7 @@
 \nDuraklat / Durdur (varsayılan):
 \nRethinkDNS\'i hızlı bir şekilde duraklatmak ve durdurmak için iki düğme gösterir."</string>
     <string name="ada_noapp_dialog_title">Uygulama Bilgisi bulunamadı</string>
-    <string name="rt_download_start">Blok listeleri indiriliyor…</string>
+    <string name="rt_download_start">Engelleme listeleri indiriliyor…</string>
     <string name="lbbs_update_check">Güncellemeleri denetle</string>
     <string name="brbs_title">Yedekle &amp; Geri Yükle</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
@@ -674,12 +674,12 @@
     <string name="dns_query_clear_logs_message">Bu, aygıt üzerindeki DNS günlüklerini siler. Bu işlem geri döndürülemez. Devam etmek istiyor musunuz\?</string>
     <string name="always_on_dialog_neutral">Ayarlar</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Bir uygulamanın internete bağlanmasını engeller.
-\n<u>#2</u>: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller.
-\n<u>#3</u>: Cihaz kilitliyken tüm bağlantıları engeller (Evrensel Güvenlik Duvarı).
-\n<u>#4</u>: Kullanılmayan herhangi bir uygulamayı engeller (Evrensel Güvenlik Duvarı).
-\n<u>#5</u>: Kaynak uygulama bilinmediğinde bağlantıları engeller (Evrensel Güvenlik Duvarı).
-\n<u>#6</u>: DNS hariç tüm UDP trafiğini engeller (Evrensel Güvenlik Duvarı).
-\n<u>#7</u>: DNS atlandığında bağlantıları engeller (Evrensel Güvenlik Duvarı).</string>
+\n <u>#2</u>: Herhangi bir uygulamanın belirli bir IP\'ye bağlanmasını engeller.
+\n <u>#3</u>: Cihaz kilitliyken tüm bağlantıları engeller (Evrensel Güvenlik Duvarı).
+\n <u>#4</u>: Kullanılmayan herhangi bir uygulamayı engeller (Evrensel Güvenlik Duvarı).
+\n <u>#5</u>: Kaynak uygulama bilinmediğinde bağlantıları engeller (Evrensel Güvenlik Duvarı).
+\n <u>#6</u>: DNS hariç tüm UDP trafiğini engeller (Evrensel Güvenlik Duvarı).
+\n <u>#7</u>: DNS atlandığında bağlantıları engeller (Evrensel Güvenlik Duvarı).</string>
     <string name="bsct_block_app">Bu uygulamayı <u>için <u>bu IP\'yi</u> engelleyin, atlayın</u></string>
     <string name="private_dns_toast">Özel DNS ayarlandı.</string>
     <string name="bsct_conn_block_desc">%1$s tarafından engellendi %2$s</string>
@@ -702,17 +702,7 @@
     <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz\?</string>
     <string name="download_update_dialog_message_ok">Zaten en son sürümü kullanıyorsunuz.</string>
     <string name="info_dialog_url_copy_toast_msg">URL kopyalandı</string>
-    <string name="whats_new_version_update"><b>Maksimum çaba</b>
-\n
-\n1. Daha özel bir Rethink çözümleyicisinin tanıtımı, <i>Max</i>.
-\n2. IPv6\'yı deneysel olarak işaretleyin; varsayılan olarak IPv4\'e geçin.
-\n3. <i>Yeni özellik</i>: Uygulama ayarlarını yedekleme ve geri yükleme.
-\n4. <i>Yeni özellik</i>: Uygulama kilitleme modu.
-\n5. <i>Yeni özellik</i>: Evrensel kilitleme modu.
-\n6. <i>Yeni özellik</i>: Port numaralarına güvenlik duvarı kuralları uygulayın.
-\n7. <i>Yeni özellik</i>: Uygulama güvenlik duvarı kurallarını toplu olarak uygulayın.
-\n8. Küçük kullanıcı arayüzü yenilemesi.
-\n9. Diğer bellek ve çökme düzeltmeleri. </string>
+    <string name="whats_new_version_update">&lt;b&gt;Azami çaba&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Daha özel bir Rethink çözümleyicisinin tanıtımı, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. IPv6\'yı deneysel olarak işaretleyin; varsayılan olarak IPv4\'e geçin.&lt;br/&gt; 3. &lt;i&gt;Yeni özellik&lt;/i&gt;: Uygulama ayarlarını yedekleme ve geri yükleme.&lt;br/&gt; 4. &lt;i&gt;Yeni özellik&lt;/i&gt;: Uygulama kilitleme modu.&lt;br/&gt; 5. &lt;i&gt;Yeni özellik&lt;/i&gt;: Evrensel kilitleme modu.&lt;br/&gt; 6. &lt;i&gt;Yeni özellik&lt;/i&gt;: Bağlantı noktası numaralarına güvenlik duvarı kuralları uygulayın.&lt;br/&gt; 7. &lt;i&gt;Yeni özellik&lt;/i&gt;: Uygulama güvenlik duvarı kurallarını toplu olarak uygulayın.&lt;br/&gt; 8. Küçük kullanıcı arayüzü yenilemesi.&lt;br/&gt; 9. Diğer bellek ve çökme düzeltmeleri.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Bu uygulamanın çevrilmesine yardımcı olun.&lt;/a&gt;</string>
     <string name="settings_ip_network_desc">İnternet Protokolü sürümleri arasından seçim yapın.</string>
     <string name="orbot_http">HTTP Vekili</string>
     <string name="orbot_bs_status_2">HTTP Proxy ayarlanmıştır (uygulamalar bunu göz ardı edebilir).</string>
@@ -746,12 +736,12 @@
     <string name="about_bravedns_whoarewe">RethinkDNS, Amazon, IBM ve Scientific Games\'in eski mühendisleri tarafından yönetilen ücretsiz ve açık kaynaklı bir projedir.</string>
     <string name="about_bug_no_log_dialog_message">Kilitlenme günlükleri alınamadı. Hatanızı manuel olarak bildirmek ister misiniz\?</string>
     <string name="about_faq">SSS\'leri Görüntüle</string>
-    <string name="contributors_list">&lt;i&gt;Rethink Açık Kaynak Projesi&lt;/i&gt; varlığını, geliştirilmesine sayısız saatler ayıran bu gönüllülere borçludur.&lt;br/&gt; &lt;br/&gt;🛡️ Android uygulaması &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Ağ motoru &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Topluluk modları &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">&lt;i&gt;Rethink Açık Kaynak Projesi&lt;/i&gt; varlığını, geliştirilmesine sayısız saatler ayıran bu gönüllülere borçludur.&lt;br/&gt; &lt;br/&gt;🛡️ Android uygulaması &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Ağ motoru &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Topluluk modları &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP coğrafi konum veri tabanı &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt;</string>
     <string name="cd_custom_doh_dialog_title">Özel Sunucu URL\'si</string>
     <string name="dc_check_update_desc">Her <i>üç</i> günde bir blok listesi güncellemelerini kontrol edin</string>
     <string name="about_web">bağlantılar</string>
     <string name="about_bug_report">Hata raporu</string>
-    <string name="collecting_logs_progress_text">Yakalamak…</string>
+    <string name="collecting_logs_progress_text">Yakalanıyor…</string>
     <string name="ct_filter_parent_blocked">Engellenen</string>
     <string name="ct_delete_logs_positive_btn">Günlükleri sil</string>
     <string name="cd_dialog_error_invalid_tld">Geçersiz Üst düzey alan adı.</string>
@@ -774,7 +764,7 @@
     <string name="ada_app_unmetered">Ölçülmeyen</string>
     <string name="bsac_block">Engelle</string>
     <string name="network_dns">Sistem DNS</string>
-    <string name="cd_remove_dialog_title">Alan adını sil\?</string>
+    <string name="cd_remove_dialog_title">Etki alanı silinsin mi\?</string>
     <string name="firewall_rule_bypass_universal_ip">Bypass edilen IP</string>
     <string name="cd_dialog_error_invalid_domain">Geçersiz URL (alan adı).</string>
     <string name="cd_whitelist_initial">B</string>
@@ -884,4 +874,27 @@
     <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="other_dns_list_tab3">Dns Vekil</string>
     <string name="cd_sample_unicode_valid">✅</string>
+    <string name="ada_firewall_title">bu uygulama için güvenlik duvarı kuralları</string>
+    <string name="rt_filter_parent_all">Tümü</string>
+    <string name="notif_download_cancel_content">İndirme iptal edildi.</string>
+    <string name="rt_filter_parent_selected">Seçili</string>
+    <string name="rt_filter_hint"><u>Tüm</u> engelleme listeleri gösteriliyor</string>
+    <string name="rt_filter_desc_groups">Grup: %2$s içindeki <u>%1$s</u> engelleme listesi gösteriliyor</string>
+    <string name="relative_time_today">Bugün</string>
+    <string name="settings_app_notification_a13_desc">Uygulama için bildirim iznini etkinleştirin</string>
+    <string name="hsf_notification_permission_failure">Ayarlar ekranından bildirim iznini etkinleştirin</string>
+    <string name="settings_app_notification_a13_heading">Uygulama Bildirimi</string>
+    <string name="about_privacy_policy">Gizlilik ilkesi</string>
+    <string name="about_app_translate">Çevir</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="notification_screen_error">Uygulama Bildirim ekranı başlatılamadı.</string>
+    <string name="intent_launch_error">Sayım başlatılmadı %1$s</string>
+    <string name="no_browser_error">Tarayıcıdan web sayfası açılamıyor.</string>
+    <string name="ct_ip_port">%1$s:%2$s</string>
+    <string name="ada_app_lockdown">Kilitlenme</string>
+    <string name="firewall_rule_block_univ_ip">IP / Bağlantı Noktası (Evrensel)</string>
+    <string name="rt_filter_desc"><u>%1$s</u> engelleme listesi gösteriliyor</string>
+    <string name="rt_filter_desc_subgroups">Grup: %2$s ve alt grup: %3$s içindeki <u>%1$s</u> engelleme listesi gösteriliyor</string>
+    <string name="relative_time_yesterday">Dün</string>
 </resources>
