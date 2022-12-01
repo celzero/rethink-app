@@ -461,7 +461,16 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
         val trim = transaction!!.queryStr.dropLast(1)
 
-        lookupForImageNextDns(trim)
+        // no need to check in glide cache if the value is available in failed cache
+        if (FavIconDownloader.isUrlAvailableInFailedCache(trim) != null) {
+            b.dnsBlockFavIcon.visibility = View.GONE
+        } else {
+            // Glide will cache the icons against the urls. To extract the fav icon from the
+            // cache, first verify that the cache is available with the next dns url.
+            // If it is not available then glide will throw an error, do the duckduckgo
+            // url check in that case.
+            lookupForImageNextDns(trim)
+        }
     }
 
     // FIXME: the glide app code to fetch the image from the cache is repeated in

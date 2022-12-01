@@ -23,6 +23,8 @@ import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import java.io.File
 
 /**
@@ -37,9 +39,14 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
 
     companion object {
         // base-url for fav icon download
-        const val FAV_ICON_DUCK_URL = "https://icons.duckduckgo.com/ip2/"
-        const val FAV_ICON_NEXTDNS_BASE_URL = "https://favicons.nextdns.io/"
-        const val FAV_ICON_SIZE = "@1x.png"
+        private const val FAV_ICON_DUCK_URL = "https://icons.duckduckgo.com/ip2/"
+        private const val FAV_ICON_NEXTDNS_BASE_URL = "https://favicons.nextdns.io/"
+        private const val FAV_ICON_SIZE = "@1x.png"
+        private const val CACHE_BUILDER_MAX_SIZE = 10000L
+
+        private val failedFavIconUrls: Cache<String, Boolean> =
+            CacheBuilder.newBuilder().maximumSize(CACHE_BUILDER_MAX_SIZE).build()
+
 
         fun getDomainUrlFromFdqnDuckduckgo(url: String): String {
             // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
@@ -58,16 +65,25 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         fun constructFavIcoUrlNextDns(url: String): String {
             return "$FAV_ICON_NEXTDNS_BASE_URL$url$FAV_ICON_SIZE"
         }
+
+        fun isUrlAvailableInFailedCache(url: String): Boolean? {
+            return failedFavIconUrls.getIfPresent(url)
+        }
     }
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
         // url will have . at end of the file, which needs to be removed.
         val fdqnUrl = url.dropLast(1)
-        fetchFromNextDns(fdqnUrl)
-        // val url = constructFavIcoUrlNextDns(fdqnUrl)
-        // val url = constructFavUrl(fdqnUrl)
-        // updateImage(fdqnUrl, getDomainUrlFromFdqn(fdqnUrl), true)
+
+        // only proceed to fetch the fav icon if the url is not in failed cache
+        // Returns the value associated with key in this cache, or null if there is no cached
+        // value for key.
+        if (failedFavIconUrls.getIfPresent(fdqnUrl) == null) {
+            fetchFromNextDns(fdqnUrl)
+        } else {
+            // no-op
+        }
     }
 
 
@@ -84,7 +100,12 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         } catch (e: Exception) {
             // on exception, initiate the download of fav icon from duckduckgo
             Log.i(LOG_TAG_DNS_LOG, "Glide, load failure from nextdns $subUrl")
-            updateImage(constructFavUrlDuckDuckGo(url), getDomainUrlFromFdqnDuckduckgo(url), true)
+            updateImage(
+                url,
+                constructFavUrlDuckDuckGo(url),
+                getDomainUrlFromFdqnDuckduckgo(url),
+                true
+            )
         } finally {
             GlideApp.with(context.applicationContext).clear(futureTarget)
         }
@@ -92,7 +113,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
 
     // ref: https://github.com/bumptech/glide/issues/2972
     // https://github.com/bumptech/glide/issues/509
-    private fun updateImage(subUrl: String, url: String, retry: Boolean) {
+    private fun updateImage(fdqnUrl: String, subUrl: String, url: String, retry: Boolean) {
         val futureTarget: FutureTarget<File> =
             GlideApp.with(context.applicationContext)
                 .downloadOnly()
@@ -106,7 +127,12 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
             // Will initiate the download of fav icon for the top level domain.
             if (retry) {
                 if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide, download failed from duckduckgo $subUrl")
-                updateImage(url, "", false)
+                updateImage(fdqnUrl, url, "", false)
+            } else {
+                // add failed urls to a local cache, no need to attempt again and again
+                // add the value as false by default
+                // FIXME: add metadata instead of boolean
+                failedFavIconUrls.put(fdqnUrl, true)
             }
             Log.e(LOG_TAG_DNS_LOG, "Glide, no fav icon available for the url: $subUrl")
         } finally {

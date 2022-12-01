@@ -114,10 +114,17 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                 return
             }
 
-            // Glide will cache the icons against the urls. To extract the fav icon from the cache,
-            // first verify that the cache is available with the next dns url. If it is not
-            // available then glide will throw an error, do the duckduckgo url check in that case.
-            displayNextDnsFavIcon(dnsLog)
+            // no need to check in glide cache if the value is available in failed cache
+            if (FavIconDownloader.isUrlAvailableInFailedCache(dnsLog.queryStr.dropLast(1)) != null) {
+                hideFavIcon()
+                showFlag()
+            } else {
+                // Glide will cache the icons against the urls. To extract the fav icon from the
+                // cache, first verify that the cache is available with the next dns url.
+                // If it is not available then glide will throw an error, do the duckduckgo
+                // url check in that case.
+                displayNextDnsFavIcon(dnsLog)
+            }
         }
 
         private fun clearFavIcon() {
