@@ -597,14 +597,14 @@
     <string name="about_github">Contribute on GitHub</string>
     <string name="about_faq">View FAQs</string>
     <string name="about_docs">Read docs</string>
-    <string name="about_privacy_policy">Privacy policy</string>
+    <string name="about_privacy_policy">Read privacy policy</string>
     <string name="about_connect">contact</string>
     <string name="about_sponsor">sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_app">app</string>
     <string name="about_email">Email us</string>
     <string name="about_settings">system</string>
-    <string name="about_settings_app_info">App info</string>
+    <string name="about_settings_app_info">App Info</string>
     <string name="about_settings_vpn_profile">VPN Profile</string>
     <string name="about_settings_notification">Notification Settings</string>
     <string name="about_whats_new">What\'s new in %1$s</string>
@@ -691,6 +691,8 @@
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
                                               <br/>📌 IP geo-location database <br/>
                                               <a href="https://db-ip.com">db-ip.com</a><br/>
+                                              <br/>❇ Translation <br/>
+                                              <a href="https://weblate.org/en/">Weblate</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_crypt_title">resolvers</string>
@@ -1075,7 +1077,7 @@
 
     <string name="ci_header">IP &amp; Port Rules</string>
 
-    <string name="ci_no_rules_text">No universal IP block or bypass rules found.</string>
+    <string name="ci_no_rules_text">No IP or Port rules found.</string>
 
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">Bypass Universal</string>

@@ -28,13 +28,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.FragmentUniversalFirewallBinding
 import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.CustomIpActivity.Companion.INTENT_UID
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -225,6 +228,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         // existing task, then it will be launched as the front door of the task.
         // This will result in the application to have that task in the proper state.
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra(INTENT_UID, IpRulesManager.UID_EVERYBODY)
         startActivity(intent)
     }
 

@@ -72,7 +72,7 @@ interface CustomIpDao {
     fun getCustomIpsLiveData(): LiveData<Int>
 
     @Query("select count(*) from CustomIp where uid = :uid")
-    fun getBlockedConnectionCountForUid(uid: Int): LiveData<Int>
+    fun getAppWiseIpRulesCount(uid: Int): LiveData<Int>
 
     @Query(
         "select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc"

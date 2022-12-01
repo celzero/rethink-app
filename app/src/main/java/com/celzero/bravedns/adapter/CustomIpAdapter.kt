@@ -294,7 +294,7 @@ class CustomIpAdapter(private val context: Context) :
             builder.setPositiveButton(
                 context.getString(R.string.univ_ip_delete_individual_positive)
             ) { _, _ ->
-                IpRulesManager.removeFirewallRules(UID_EVERYBODY, customIp.ipAddress, customIp.port)
+                IpRulesManager.removeFirewallRules(customIp.uid, customIp.ipAddress, customIp.port)
                 Toast.makeText(
                         context,
                         context.getString(

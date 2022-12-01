@@ -237,10 +237,7 @@ class Constants {
         const val ACTION_VPN_SETTINGS_INTENT = "android.net.vpn.SETTINGS"
 
         // default live data page size used by recycler views
-        const val LIVEDATA_PAGE_SIZE = 50
-
-        // dns logs live data page size
-        const val DNS_LIVEDATA_PAGE_SIZE = 30
+        const val LIVEDATA_PAGE_SIZE = 30
 
         // To initiate / reset the timestamp in milliseconds
         const val INIT_TIME_MS = 0L

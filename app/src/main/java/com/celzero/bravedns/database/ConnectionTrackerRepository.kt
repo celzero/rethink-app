@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.database
 
-import com.celzero.bravedns.data.AppConnections
+import com.celzero.bravedns.data.AppConnection
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
@@ -25,10 +25,6 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun insertBatch(conns: List<ConnectionTracker>) {
         connectionTrackerDAO.insertBatch(conns)
-    }
-
-    suspend fun getLogsForApp(uid: Int): List<AppConnections>? {
-        return connectionTrackerDAO.getLogsForApp(uid)
     }
 
     suspend fun purgeLogsByDate(date: Long) {

@@ -19,6 +19,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -33,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
+import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.databinding.ActivityCustomIpBinding
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
@@ -58,10 +60,19 @@ class CustomIpActivity :
     private val b by viewBinding(ActivityCustomIpBinding::bind)
     private val viewModel: CustomIpViewModel by viewModel()
     private val persistentState by inject<PersistentState>()
+    private var uid = IpRulesManager.UID_EVERYBODY
+
+    companion object {
+        const val INTENT_UID = "UID"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        uid = intent.getIntExtra(INTENT_UID, IpRulesManager.UID_EVERYBODY)
+
+        b.customDialogHeading.text = "${getString(R.string.ci_header)}: ${getAppName()}"
 
         b.cipSearchView.setOnQueryTextListener(this)
         observeCustomRules()
@@ -71,13 +82,28 @@ class CustomIpActivity :
         b.cipRecycler.requestFocus()
     }
 
+    private fun getAppName(): String {
+        if (uid == IpRulesManager.UID_EVERYBODY) {
+            return getString(R.string.firewall_act_universal_tab)
+        }
+
+        val appNames = FirewallManager.getAppNamesByUid(uid)
+
+        val packageCount = appNames.count()
+        return if (packageCount >= 2) {
+            getString(R.string.ctbs_app_other_apps, appNames[0], packageCount.minus(1).toString())
+        } else {
+            appNames[0]
+        }
+    }
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun observeCustomRules() {
-        viewModel.customIpSize.observe(this) {
+        viewModel.customIpSize(uid).observe(this) {
             if (it <= 0) {
                 showNoRulesUi()
                 hideRulesUi()
@@ -121,6 +147,7 @@ class CustomIpActivity :
         b.cipRecycler.layoutManager = layoutManager
         val adapter = CustomIpAdapter(this)
 
+        viewModel.setUid(uid)
         viewModel.customIpDetails.observe(this) { adapter.submitData(this.lifecycle, it) }
         b.cipRecycler.adapter = adapter
     }
@@ -201,11 +228,7 @@ class CustomIpActivity :
     private fun insertCustomIp(ip: HostName?) {
         if (ip == null) return
 
-        IpRulesManager.addIpRule(
-            IpRulesManager.UID_EVERYBODY,
-            ip,
-            IpRulesManager.IpRuleStatus.BLOCK
-        )
+        IpRulesManager.addIpRule(uid, ip, IpRulesManager.IpRuleStatus.BLOCK)
         Utilities.showToastUiCentered(
             this,
             getString(R.string.ci_dialog_added_success),
