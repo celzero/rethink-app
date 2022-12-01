@@ -32,7 +32,7 @@ import android.net.LinkProperties
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.provider.Settings.ACTION_VPN_SETTINGS
+import android.provider.Settings.*
 import android.text.Html
 import android.text.Spanned
 import android.text.TextUtils
@@ -72,8 +72,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
-import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -82,6 +80,9 @@ import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
+import kotlinx.coroutines.launch
+import xdns.Xdns
+import java.lang.System
 
 class Utilities {
 
@@ -349,6 +350,21 @@ class Utilities {
                     Toast.LENGTH_SHORT
                 )
                 Log.w(LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
+            }
+        }
+
+        fun openNetworkSettings(context: Context) {
+            try {
+                val intent =  Intent(ACTION_WIRELESS_SETTINGS)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.private_dns_error),
+                    Toast.LENGTH_SHORT
+                )
+                Log.w(LOG_TAG_VPN, "Failure opening network setting screen: ${e.message}", e)
             }
         }
 

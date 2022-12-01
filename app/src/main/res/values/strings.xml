@@ -192,7 +192,6 @@
         \n &lt;u>#7&lt;/u>: Block connections when DNS is bypassed (Universal Firewall).
         </string>
 
-    <string name="private_dns_toast">Private DNS has been set.</string>
     <string name="always_on_dialog_heading">Disable Always-on VPN</string>
     <string name="always_on_dialog">\"Always-On VPN\" is enabled on this device. To start Rethink, please go to Settings app and disable \"Always-on VPN\".</string>
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
@@ -204,6 +203,11 @@
     <string name="always_on_dialog_positive">Stop</string>
     <string name="always_on_dialog_negative">Cancel</string>
     <string name="always_on_dialog_neutral">Settings</string>
+
+    <string name="private_dns_dialog_heading">Turn off Private DNS</string>
+    <string name="private_dns_dialog_desc">Rethink\'s DNS settings are overridden by Android\'s Private DNS.\n\nTo use Rethink\'s DNS go to Android Settings and turn off \"Private DNS\".</string>
+    <string name="private_dns_dialog_positive">Go to Settings</string>
+    <string name="private_dns_dialog_negative">Dismiss</string>
 
     <string name="firewall_act_universal_tab">Universal</string>
 
@@ -427,7 +431,7 @@
     <string name="settings_http_proxy_hostname">Hostname</string>
     <string name="settings_http_proxy_port">Port</string>
 
-    <string name="settings_dns_proxy_dialog_header">Set SOCKS5 (TCP) Proxy</string>
+    <string name="settings_dns_proxy_dialog_header">Set SOCKS5 Proxy</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostname</string>
     <string name="settings_dns_proxy_dialog_port_number">Port Number</string>
@@ -530,7 +534,7 @@
 
     <string name="hsf_whats_new_chip_text">What\'s new</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
-    <string name="hsf_blocklist_chip_text">%1$s blocklists configured</string>
+    <string name="hsf_blocklist_chip_text">%1$s blocklists</string>
     <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in-use</string>
     <string name="hsf_blocklist_chip_text_no_data">Enable RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
@@ -571,7 +575,7 @@
     <string name="dc_custom_block_desc">Coming soon</string>
 
     <string name="dc_dns_website_heading">Show website icon in DNS logs (experimental)</string>
-    <string name="dc_dns_website_desc">Fetches website icons from <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
+  <string name="dc_dns_website_desc">Fetches website icons from <i>nextdns.com</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
 
     <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
     <string name="dc_dns_leaks_desc">When enabled, RethinkDNS captures all packets on port 53 and forwards it to a user-set DNS endpoint</string>
@@ -635,6 +639,7 @@
 
     <string name="app_info_error">Could not launch App info.</string>
     <string name="vpn_profile_error">Could not launch VPN profile.</string>
+    <string name="private_dns_error">Could not launch private dns screen.</string>
     <string name="notification_screen_error">Could not launch App Notification screen.</string>
     <string name="intent_launch_error">Count not launch %1$s</string>
     <string name="no_browser_error">Cannot open webpage from browser.</string>
