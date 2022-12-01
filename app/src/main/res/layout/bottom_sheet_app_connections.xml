@@ -89,19 +89,6 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/bsac_delete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
-        android:text="@string/bsac_delete"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/extra_large_font_text_view"
-        app:drawableEndCompat="@drawable/ic_delete_16" />
-
-    <TextView
         android:id="@+id/bsac_desc"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"

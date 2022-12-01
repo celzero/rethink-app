@@ -61,15 +61,6 @@ class DnsLog {
         return format.format(date)
     }
 
-    fun favIcoUrl(): String {
-        return "${FavIconDownloader.FAV_ICON_URL}${this.queryStr}ico"
-    }
-
-    fun subdomain(): String {
-        val subDomainURL = Utilities.getETldPlus1(this.queryStr).toString()
-        return "${FavIconDownloader.FAV_ICON_URL}${subDomainURL}.ico"
-    }
-
     fun groundedQuery(): Boolean {
         return (this.status != Transaction.Status.COMPLETE.toString() ||
             this.response == Constants.NXDOMAIN ||
