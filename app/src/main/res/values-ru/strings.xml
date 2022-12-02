@@ -66,7 +66,6 @@
     <string name="about_app_contributors">Авторы</string>
     <string name="local_blocklist_redownload">Актуально!</string>
     <string name="accessibility_service_description">RethinkDNS использует службу доступности для обнаружения и брандмауэра фоновых приложений. RethinkDNS не собирает и не продает никакую информацию.</string>
-    <string name="admin_receiver_status_enabled">Готов к установке блокировщика содержимого на основе DNS.</string>
     <string name="slide_2_desc">RethinkDNS - это самый простой способ мониторинга сетевой активности, обхода интернет-цензуры и приложений брандмауэра на вашем устройстве Android.</string>
     <string name="title_about">О нас</string>
     <string name="next">Следующий</string>
@@ -84,7 +83,6 @@
     <string name="slide_1_desc">RethinkDNS - это ПО с открытым исходным кодом, поддерживаемое программой Mozilla Builders MVP.</string>
     <string name="hybrid_mode_notification_title">Защищен! Подключен к DNS + брандмауэр.</string>
     <string name="pause_title_desc">сплю…</string>
-    <string name="admin_receiver_status_disabled">Блокировщик содержимого больше не действует.</string>
     <string name="bypass_universal">обход универсальный</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Нажмите, чтобы изменить настройки защиты</string>
     <string name="dns_mode_notification_title">Защищено! Подключен к быстрому и безопасному DNS.</string>
@@ -201,7 +199,6 @@
 \n
 \nRethinkDNS не собирает никакой информации и не шпионит за вами каким-либо образом.</string>
     <string name="conn_track_clear_logs_message">При этом удаляются только сетевые логи, но не правила брандмауэра. Эта операция не является обратимой. Вы хотите продолжить\?</string>
-    <string name="about_sponsor">спонсор</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="hybrid_mode_info_title">DNS + Брандмауэр</string>
     <string name="dns_query_clear_logs_title">Удалить все DNS-логи\?</string>
@@ -217,7 +214,6 @@
     <string name="fapps_firewall_filter_all">Все</string>
     <string name="other_dns_list_tab2">Dnscrypt</string>
     <string name="cd_filter_all">Все</string>
-    <string name="bsac_delete">Удалить</string>
     <string name="bsct_conn_desc_allowed">разрешено на %1$s %2$s</string>
     <string name="univ_firewall_dialog_title">Удалить правило IP\?</string>
     <string name="fapps_filter_clear_btn">Очистить</string>
@@ -303,7 +299,6 @@
     <string name="build__flavor_play_store">play</string>
     <string name="refresh_complete">Повторная синхронизация списка приложений завершена.</string>
     <string name="wireguard_mode_info_explanation_new">Скоро будет.</string>
-    <string name="private_dns_toast">Частный DNS установлен.</string>
     <string name="settings_theme_dialog_themes_2">Светлый</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="fapps_filter_categories_heading">Категории</string>

@@ -103,7 +103,6 @@
     <string name="cd_dialog_title">加網域</string>
     <string name="ada_app_unmetered">唔收費嘅網絡</string>
     <string name="ada_ip_block_count">%1$s 個 IP 規則</string>
-    <string name="ada_ip_block_no_rules">呢個 app 冇 IP 規則。</string>
     <string name="ada_ip_rules_title">呢個 app 嘅 IP 規則</string>
     <string name="ada_network_log_title">呢個 app 嘅網絡日誌</string>
     <string name="ada_app_metered">收費嘅網絡</string>
@@ -119,7 +118,6 @@
     <string name="settings_title_desc">一款可以高度自訂嘅 DNS 同防火牆軟件</string>
     <string name="about_title_desc">偵測同攔截網絡威脅，保護您嘅安全</string>
     <string name="txt_home">首頁</string>
-    <string name="admin_receiver_status_disabled">內容攔截器而家唔再生效。</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">下一步</string>
     <string name="finish">搞掂</string>
@@ -169,7 +167,6 @@
     <string name="dns_query_clear_logs_title">係咪要丟哂所有 DNS 日誌？</string>
     <string name="dns_query_clear_logs_message">咁做會丟咗裝置上面所有嘅 DNS 日誌。呢個動作冇得返轉頭㗎。請問您係咪想繼續？</string>
     <string name="bsct_app_info">應用程式資訊</string>
-    <string name="private_dns_toast">私人 DNS 已經設定好。</string>
     <string name="always_on_dialog_heading">禁用永久連線 VPN</string>
     <string name="always_on_dialog_positive_btn">去設定</string>
     <string name="always_on_dialog_negative_btn">取消</string>
@@ -345,7 +342,6 @@
 \n排除 %3$s
 \n閉關 %4$s</string>
     <string name="firewall_card_text_inactive">啓用防火牆模式。</string>
-    <string name="firewall_card_configure_btn">攔截 app</string>
     <string name="dns_card_latency_active">延遲：%1$sms</string>
     <string name="dns_card_latency_inactive">啓用 DNS 模式。</string>
     <string name="apps_card_ips_count">%1$s IP 同埠規則</string>
@@ -405,7 +401,6 @@
     <string name="about_faq">睇常見問題</string>
     <string name="about_docs">睇文檔</string>
     <string name="about_connect">聯繫我哋</string>
-    <string name="about_sponsor">贊助</string>
     <string name="about_sponsor_link_text">贊助</string>
     <string name="about_app">app</string>
     <string name="about_email">電郵聯繫</string>
@@ -467,7 +462,6 @@
     <string name="ct_delete_logs_positive_btn">刪除日誌</string>
     <string name="ct_delete_logs_negative_btn">取消</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_btm_sheet_error">打開唔到底部欄</string>
     <string name="ct_filter_parent_all">全部</string>
     <string name="ctbs_app_info_not_available_toast">搵唔到程式設定頁</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s 個其他應用程式</string>
@@ -680,12 +674,7 @@
     <string name="ada_noapp_dialog_title">搵唔到應用程式資訊</string>
     <string name="ada_noapp_dialog_message">搵唔到你講嗰隻 app 嘅資訊。</string>
     <string name="ada_noapp_dialog_positive">確認</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">繞行應用程式規則</string>
-    <string name="ada_ip_rules_status_allowed">冇規則</string>
     <string name="ada_firewall_status">呢個 app <b><i>%1$s</i></b>。</string>
-    <string name="ada_uid">應用程式 ID：<i>%1$s</i><br/>分類：<i>%2$s</i><br/>安裝於：<i>%3$s</i><br/>更新於：<i>%4$s</i></string>
-    <string name="ada_lockdown_title">應用閉關</string>
-    <string name="ada_lockdown_desc">如果開咗呢個，應用程式就只可以連線去<i>繞行 IP 規則</i>入面嘅 IP；連去其他 IP 嘅連線將被攔截。</string>
     <string name="ada_ip_connection_count">已連線至 %1$s 個 IP 地址</string>
     <string name="ada_ip_connection_count_zero">0 個 IP 地址</string>
     <string name="ada_ip_no_connection">呢個 app 冇網絡日誌。</string>
@@ -698,10 +687,8 @@
     <string name="bsac_unblock">解封</string>
     <string name="bsac_bypass_app_rules">繞行應用規則</string>
     <string name="bsac_go_pass_app_rules">移除繞行</string>
-    <string name="bsac_delete">刪除</string>
     <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
     <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
-    <string name="bsac_delete_toast">刪除咗 %1$s</string>
     <string name="bsdl_domain_heading">網域規則</string>
     <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
     <string name="bsac_whitelist_toast">針對呢個 IP %1$s 嘅繞行應用規則</string>
@@ -781,7 +768,6 @@
     <string name="brbs_restore_complete_toast">恢復完，重啓緊 app……</string>
     <string name="cd_remove_dialog_message">喺儲存咗嘅配置入面刪除呢個網域。</string>
     <string name="pause_title_desc">瞌陣先…</string>
-    <string name="admin_receiver_status_enabled">而家可以設定基於 DNS 嘅內容攔截器。</string>
     <string name="accessibility_service_description">唔該比 RethinkDNS 用無障礙服務，嚟偵測同攔截背景應用程式。RethinkDNS 並唔會偷同埋賣您嘅任何資訊。</string>
     <string name="slide_2_desc">RethinkDNS 係而家喺 Android 裝置度最易用嘅監測網絡活動、繞過互聯網審查同攔截應用程式嘅防火牆軟件。</string>
     <string name="slide_1_desc">RethinkDNS 係一款受到 Mozilla Builders MVP 計劃資助同支持嘅開放原始碼軟件。</string>
@@ -865,7 +851,6 @@
     <string name="ci_blocked_desc">- 攔截</string>
     <string name="ci_block">攔截</string>
     <string name="ci_bypass_universal">無條件放行</string>
-    <string name="ada_ip_rules_status_blocked">攔截咗</string>
     <string name="ada_app_status_allow">放行咗</string>
     <string name="ada_app_status_block">攔截咗</string>
     <string name="ada_app_status_block_wifi">已經喺唔收費嘅網絡（WiFi）攔截咗</string>

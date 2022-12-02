@@ -76,7 +76,6 @@
 \n</string>
     <string name="cd_dialog_error_invalid_wildcard">无效通配符。</string>
     <string name="ci_no_rule">无规则</string>
-    <string name="ada_lockdown_desc">启用时，应用将只可以连接至位于<i>绕行 IP 规则</i>中的 IP ；至其他 IP 的连接将被拦截。</string>
     <string name="bsac_bypass_app_rules">绕行应用规则</string>
     <string name="rt_dialog_message">您是否想要应用新配置的屏蔽名单？</string>
     <string name="dc_dns_proxy">DNS 代理</string>
@@ -159,7 +158,6 @@
     <string name="build__flavor_play_store">play</string>
     <string name="cd_remove_dialog_message">于已保存配置中删除此域名。</string>
     <string name="ada_firewall_status">此应用<b><i>%1$s</i></b>。</string>
-    <string name="ada_ip_block_no_rules">此应用无 IP 规则。</string>
     <string name="bsdl_domain_rule_norule">无规则</string>
     <string name="bsdl_domain_rule_allow">放行</string>
     <string name="rt_chip_update_available">更新可用</string>
@@ -248,7 +246,6 @@
     <string name="rt_apply_btn">应用</string>
     <string name="rt_download_desc">请下载屏蔽名单（约 60 MB ）以使用此功能。</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
-    <string name="private_dns_toast">已设置私人 DNS 。</string>
     <string name="always_on_dialog_positive">停止</string>
     <string name="dns_crypt_url_remove_dialog_message">于已保存的配置中删除此 DNSCrypt 解析服务。</string>
     <string name="local_blocklist_download">下载屏蔽名单</string>
@@ -288,7 +285,6 @@
     <string name="rt_dialog_title">保存更改</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="title_settings">设置</string>
-    <string name="admin_receiver_status_enabled">现可设置基于 DNS 的内容拦截器。</string>
     <string name="untracked">未跟踪</string>
     <string name="status_protected_with_socks5_private_dns">已由 SOCKS5 与私人 DNS 保护</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">已连接至 RethinkDNS 与防火墙</string>
@@ -392,7 +388,6 @@
     <string name="category_name_installed">已安装程序</string>
     <string name="cd_sample_unicode_valid">✅</string>
     <string name="cd_whitelist_txt">放行</string>
-    <string name="ada_lockdown_title">应用闭关</string>
     <string name="ada_app_status_block_wifi">已于非收费网络（ WiFi ）拦截</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="bsac_go_pass_app_rules">移除绕行</string>
@@ -430,7 +425,6 @@
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ci_bypass_universal_initial">绕</string>
     <string name="ci_bypass_universal_txt">无条件放行</string>
-    <string name="ada_ip_rules_status_blocked">已拦截</string>
     <string name="notif_download_content_text">正在下载……</string>
     <string name="rt_re_download">重新下载屏蔽名单</string>
     <string name="rethink_dns_txt">RethinkDNS %1$s</string>
@@ -471,9 +465,7 @@
     <string name="cd_whitelist_initial">放</string>
     <string name="ci_dialog_added_success">已将 IP 加入列表</string>
     <string name="ci_no_rule_txt">无规则</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">绕行应用规则</string>
     <string name="ada_app_metered">收费网络</string>
-    <string name="bsac_delete_toast">已删除 %1$s</string>
     <string name="notif_download_content_title">下载本地屏蔽名单</string>
     <string name="bsrf_clear_filter">清除</string>
     <string name="status_protected_with_proxy_private_dns">已由代理与私人 DNS 保护</string>
@@ -491,7 +483,6 @@
     <string name="settings_http_proxy_toast_success">HTTP 代理已设置</string>
     <string name="settings_selected_ip_desc">%1$s</string>
     <string name="firewall_status_unknown">未知</string>
-    <string name="firewall_card_configure_btn">拦截应用</string>
     <string name="hsf_whats_new_chip_text">新内容</string>
     <string name="hsf_proxy_chip_text">已启用代理</string>
     <string name="cd_dns_crypt_resolver_heading">解析服务</string>
@@ -568,7 +559,6 @@
     <string name="about_bug_no_log_dialog_message">无法获取崩溃日志。请问您是否想要手动报告漏洞？</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="cd_dns_crypt_error_text_1">印戳不能为空</string>
-    <string name="ct_btm_sheet_error">无法打开底部栏</string>
     <string name="univ_ip_delete_individual_positive">删除</string>
     <string name="dns_query_latency">%1$sms</string>
     <string name="unicode_x_sign">❌</string>
@@ -586,8 +576,6 @@
     <string name="cd_add_dialog_show_btn">显示</string>
     <string name="cd_sample_unicode_invalid">❌</string>
     <string name="ci_delete">删除</string>
-    <string name="ada_ip_rules_status_allowed">无规则</string>
-    <string name="ada_uid">应用 ID ： <i>%1$s</i><br/>分类： <i>%2$s</i><br/>安装于： <i>%3$s</i><br/>更新于： <i>%4$s</i></string>
     <string name="ada_ip_rules_title">此应用的 IP 规则</string>
     <string name="bsac_block">拦截</string>
     <string name="bsac_unblock_toast">已为此应用放行 %1$s</string>
@@ -707,7 +695,6 @@
     <string name="notif_channel_vpn_notification">VPN 已启用</string>
     <string name="category_name_sys_apps">系统应用</string>
     <string name="ci_blocked_txt">拦截</string>
-    <string name="bsac_delete">删除</string>
     <string name="lbbs_enabled">已启用</string>
     <string name="brbs_backup_dialog_positive">备份</string>
     <string name="orbot_http_desc">推荐应用程序使用 Orbot 的 HTTP 代理。</string>
@@ -719,7 +706,6 @@
     <string name="settings_title_desc">一款可高度自定义的 DNS 与防火墙软件</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">关于</string>
-    <string name="admin_receiver_status_disabled">内容拦截器现不再生效。</string>
     <string name="next">下一步</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="lockdown">闭关</string>
@@ -786,7 +772,6 @@
 \n<u>TCP 代理</u>： Rethink 只将未被排除应用的 TCP 连接转发至 Orbot 。
 \n<u>HTTP 代理</u>： Rethink <i>设置</i> HTTP 代理，但不强制应用程序使用它。如 Chrome 和 Firefox 等的浏览器通常会使用 HTTP 代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
-    <string name="about_sponsor">赞助</string>
     <string name="about_mozilla">RethinkDNS 为 Mozilla Builders MVP 计划的一部分。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) 代理</string>
     <string name="http_proxy_dialog_desc">HTTP(S) 代理设置仅为对应用程序的一个提醒，它们可选择是否使用代理；但如 Chrome 及 Firefox 等的浏览器则会使用代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>

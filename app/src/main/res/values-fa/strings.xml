@@ -14,8 +14,6 @@
     <string name="app_name">RethinkDNS</string>
     <string name="settings_title_desc">DNS و فایروال بسیار قابل تنظیم</string>
     <string name="orbot_install_dialog_positive">نصب</string>
-    <string name="admin_receiver_status_enabled">آماده تنظیم مسدود کننده محتوای مبتنی بر DNS.</string>
-    <string name="admin_receiver_status_disabled">مسدودکننده محتوا دیگر فعال نیست.</string>
     <string name="about_title_desc">شناسایی و مسدود کردن تهدیدات امنیتی شبکه</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">هشدار: RethinkDNS غیرفعال شده است</string>
     <string name="slide_2_title">خوش آمدید</string>

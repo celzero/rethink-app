@@ -10,7 +10,6 @@
     <string name="title_about">Apie</string>
     <string name="about_title_desc">Aptik ir blokuok tinklo saugumo grėsmes</string>
     <string name="txt_home">Pagrindinis</string>
-    <string name="admin_receiver_status_enabled">Paruošta nustatyti DNS pagrįstą turinio blokatorių.</string>
     <string name="accessibility_service_description">RethinkDNS naudoja pritaikymo neįgaliesiems paslaugą, kad aptiktų ir foninėms programėlėms pritaikytų ugniasienės taisykles . RethinkDNS nerenka ir neparduoda jokios informacijos.</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">Toliau</string>
@@ -58,7 +57,6 @@
 \n <u>#5</u>: blokuoja ryšius, kai šaltinio programėlė nežinoma (universali ugniasienė).
 \n <u>#6</u>: blokuoja visą UDP srautą, išskyrus DNS (universali ugniasienė).
 \n <u>#7</u>: blokuoja ryšius, kai DNS apeinamas (universali ugniasienė).</string>
-    <string name="private_dns_toast">Privatus DNS nustatytas.</string>
     <string name="always_on_dialog_heading">Išjungti nuolatinį VPN</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Ištrinti DNSCrypt sprendiklį\?</string>
     <string name="dns_crypt_url_remove_dialog_message">Ištrinti DNSCrypt sprendiklį iš išsaugotos konfigūracijos.</string>
@@ -196,7 +194,6 @@
 \n%3$s išskirta
 \n%4$s visiškai užrakinta</string>
     <string name="firewall_card_text_inactive">Įjungti ugniasienės režimą.</string>
-    <string name="firewall_card_configure_btn">blokuoti programėles</string>
     <string name="dns_card_connected_status_failure">Išjungta</string>
     <string name="dns_card_latency_inactive">Įjungti DNS režimą.</string>
     <string name="apps_card_ips_count">%1$s IP ir prievado taisyklės</string>
@@ -274,7 +271,6 @@
     <string name="ct_delete_logs_positive_btn">Ištrinti žurnalus</string>
     <string name="ct_delete_logs_negative_btn">Atšaukti</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_btm_sheet_error">Negalima atidaryti apatinio lapo</string>
     <string name="ct_filter_parent_all">Visi</string>
     <string name="ct_filter_parent_allowed">Leidžiama</string>
     <string name="ct_filter_parent_blocked">Užblokuota</string>
@@ -438,12 +434,7 @@
     <string name="ci_blocked_txt">Užblokuota</string>
     <string name="ada_noapp_dialog_message">Programėlės informacija nurodytai programėlei nerasta.</string>
     <string name="ada_noapp_dialog_positive">Gerai</string>
-    <string name="ada_ip_rules_status_blocked">Užblokuota</string>
-    <string name="ada_ip_rules_status_allowed">Nėra taisyklės</string>
     <string name="ada_firewall_status">Ši programėlė <b><i>%1$s</i></b>.</string>
-    <string name="ada_uid">Programėlės ID: <i>%1$s</i><br/>Kategorija: <i>%2$s</i><br/>Įdiegta: <i>%3$s</i><br/>Atnaujinta: <i>%4$s</i></string>
-    <string name="ada_lockdown_title">Visiškai užrakinti programėlę</string>
-    <string name="ada_lockdown_desc">Kai ši funkcija įjungta, programėlė gali prisijungti tik prie IP, esančių <i>apeiti programėlės taisykles</i>; prisijungimai prie bet kurio kito IP bus blokuojami.</string>
     <string name="ada_ip_connection_count">Prisijungta prie %1$s IP adreso (-ų)</string>
     <string name="ada_ip_connection_count_zero">0 IP adresų</string>
     <string name="ada_app_status_allow">yra leidžiama</string>
@@ -456,8 +447,6 @@
     <string name="bsac_block">Blokuoti</string>
     <string name="bsac_bypass_app_rules">Apeiti programėlės taisykles</string>
     <string name="bsac_go_pass_app_rules">Pašalinti apėjimą</string>
-    <string name="bsac_delete">Išrinti</string>
-    <string name="bsac_delete_toast">%1$s ištrinta</string>
     <string name="bsdl_domain_heading">Domeno taisyklė</string>
     <string name="bsdl_domain_desc">Spustelėkite žemiau, kad leistumėte arba blokuotumėte DNS užklausą</string>
     <string name="rt_dialog_negative">Atšaukti</string>
@@ -660,7 +649,6 @@
     <string name="about_connect">susisiekti</string>
     <string name="about_bug_no_log_dialog_message">Nepavyko gauti gedimų žurnalų. Ar norite rankiniu būdu pranešti apie klaidą\?</string>
     <string name="about_web">nuorodos</string>
-    <string name="about_sponsor">paremti</string>
     <string name="about_sponsor_link_text">Paremti</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="about_dialog_neutral_button">Pasiūlyti funkcijas</string>
@@ -810,7 +798,6 @@
     <string name="ada_app_status_unknown">yra nežinoma</string>
     <string name="ada_ip_block_count">%1$s IP taisyklė (-ės)</string>
     <string name="ada_app_metered">Matuojami</string>
-    <string name="ada_ip_block_no_rules">Šiai programėlei nėra IP taisyklių.</string>
     <string name="ada_network_log_title">šios programėlės tinklo žurnalas</string>
     <string name="notif_download_content_title">Įrenginyje esančio blokavimo sąrašo atsisiuntimas</string>
     <string name="bsdl_domain_rule_norule">nėra taisyklės</string>
@@ -822,7 +809,6 @@
     <string name="radio_max_btn">🪂 Maks</string>
     <string name="pause_title_desc">snaudžiama…</string>
     <string name="settings_title_desc">Itin pritaikoma DNS bei ugniasienė</string>
-    <string name="admin_receiver_status_disabled">Turinio blokavimas nebeveikia.</string>
     <string name="bypass_universal">apeiti universaliąsias</string>
     <string name="lockdown">visiškas užrakinimas</string>
     <string name="notification_action_resume_vpn">TĘSTI</string>
@@ -874,7 +860,6 @@
     <string name="ada_app_status_exclude">yra išskiriama DNS ir ugniasienėje</string>
     <string name="ada_app_exclude">Išskirti</string>
     <string name="ci_bypass_universal">apeiti universaliąsias</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Apeiti programėlės taisykles</string>
     <string name="ada_app_unmetered">Nematuojami</string>
     <string name="ada_app_whitelist">Apeiti universaliąsias</string>
     <string name="bsac_block_toast">%1$s blokuojamas šiais programėlei</string>

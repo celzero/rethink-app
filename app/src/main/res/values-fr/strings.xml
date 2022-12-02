@@ -73,7 +73,6 @@
     <string name="dns_mode_info_title">DNS</string>
     <string name="wireguard_mode_info_explanation_new">Prochainement.</string>
     <string name="dns_query_clear_logs_title">Effacer tous les journaux DNS \?</string>
-    <string name="private_dns_toast">Un DNS Privé a été configuré.</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">protégé</string>
     <string name="status_protected_with_proxy">protégé par proxy</string>
     <string name="apps_info_title">Applis</string>
@@ -98,11 +97,9 @@
     <string name="dns_query_clear_logs_message">Cette opération supprime les journaux DNS sur le périphérique. Cette opération est irréversible. Voulez-vous continuer \?</string>
     <string name="notification_action_dns_firewall_mode">DNS + Pare-feu</string>
     <string name="always_on_dialog_stop_message">Le paramètre VPN permanent est activé pour RethinkDNS. Êtes-vous sûr de vouloir arrêter RethinkDNS \?</string>
-    <string name="admin_receiver_status_enabled">Prêt à définir un DNS bloqueur de contenu.</string>
     <string name="about_title_desc">Détecter et bloquer les menaces réseau</string>
     <string name="finish">Finir</string>
     <string name="slide_2_desc">RethinkDNS est le moyen le plus simple pour surveiller l’activité réseau, contourner la censure sur Internet et mettre en place un pare-feu sur votre appareil Android.</string>
-    <string name="admin_receiver_status_disabled">Bloqueur de contenu désactivé.</string>
     <string name="skip">Passer</string>
     <string name="slide_2_title">Bienvenue</string>
     <string name="settings_title_desc">Un DNS et pare-feu hautement configurable</string>
@@ -264,7 +261,6 @@
     <string name="firewall_rule_unknown_desc">Cette connexion a été bloquée par un pare-feu car <i>l\'application source</i> n\'a pas pu être déterminée.<br/><br/> Pour modifier cela, allez sur l\'onglet <i>Global</i>.</string>
     <string name="firewall_rule_bypass_app_rules_ip_desc">Cette connexion a été autorisée car <i>l\'IP de destination</i> est configurée pour contourner les règles spécifiques de l\'application.<br/><br/> Pour modifier cela, allez à l\'écran <i>Pare-feu de l\'application</i>.</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">Cette connexion a été autorisée parce que <i>l\'application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l\'écran <i>Pare-feu de l\'application</i> .</string>
-    <string name="ada_uid">ID appli : <i>%1$s</i><br/>Catégorie : <i>%2$s</i><br/>Installée le : <i>%3$s</i><br/>Mise à jour le : <i>%4$s</i></string>
     <string name="bsdl_domain_rule_allow">autoriser</string>
     <string name="lbbs_download">Mettre à jour les listes de blocage</string>
     <string name="brbs_backup_title">Sauvegarder</string>
@@ -318,7 +314,6 @@
     <string name="firewall_rule_block_app_desc">Une règle de pare-feu définie par l\'utilisateur a bloqué cette <i>application</i> .<br/><br/> Pour la modifier, allez dans l\'onglet <i>Toutes les applications</i>.</string>
     <string name="cd_sample_unicode_invalid">❌</string>
     <string name="ci_no_rule_txt">Sans règle</string>
-    <string name="ada_ip_rules_status_blocked">Bloquée</string>
     <string name="notif_channel_vpn_notification">VPN actif</string>
     <string name="doh_custom_url_remove_success">Point de terminaison supprimé.</string>
     <string name="dc_custom_block_desc">Prochainement</string>
@@ -341,9 +336,7 @@
     <string name="cd_blocked_initial">B</string>
     <string name="ci_bypass_universal_desc">- Exception globale</string>
     <string name="ada_app_status_block">est bloquée</string>
-    <string name="ada_ip_block_no_rules">Aucune règle IP pour cette application.</string>
     <string name="ada_ip_rules_title">règles d\'IP pour cette application</string>
-    <string name="bsac_delete">Supprimer</string>
     <string name="bsac_block_toast">Blocage de %1$s pour cette application</string>
     <string name="rt_chip_update_available">Mise à jour disponible</string>
     <string name="dc_doh">DNS over HTTPS</string>
@@ -377,7 +370,6 @@
     <string name="firewall_rule_block_http_desc">Cette connexion a été bloquée car elle utilisait probablement <i>une liaison HTTP non sécurisée</i>.<br/><br/> Pour modifier cela, allez sur l\'onglet <i>Global</i>.</string>
     <string name="new_app_bulk_notification_title">Attention</string>
     <string name="cd_remove_dialog_positive">Supprimer</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Exception aux règles de l\'appli</string>
     <string name="rt_dialog_message">Voulez-vous appliquer les listes de blocage nouvellement configurées \?</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="dc_local_block_disabled">Désactivé</string>
@@ -516,9 +508,7 @@
     <string name="category_name_others">Autre</string>
     <string name="cd_dialog_header">Domaine(s) personnalisé(s)</string>
     <string name="ci_block">bloquer</string>
-    <string name="ada_ip_rules_status_allowed">Sans règle</string>
     <string name="ada_app_whitelist">Exception globale</string>
-    <string name="bsac_delete_toast">%1$s supprimée</string>
     <string name="bsdl_blocked_desc">bloqué %1$s par %2$s</string>
     <string name="dc_dns_proxy">Proxy DNS</string>
     <string name="lbbs_configure">Paramétrer</string>
@@ -559,7 +549,6 @@
     <string name="notif_channel_vpn_failure">VPN inactif</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="hsf_uptime">(actif depuis %1$s ; protocoles : %2$s)</string>
-    <string name="ada_lockdown_desc">Si activé, l\'application ne pourra se connecter qu\'aux IP dans <i>exception aux règles de l\'application</i> ; les connexions à toute autre IP seront bloquées.</string>
     <string name="local_blocklist_download_desc">Télécharger les listes de blocage (environ 60MB) pour utiliser cette fonctionnalité \?</string>
     <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
     <string name="app_mode_dns">DNS</string>
@@ -607,7 +596,6 @@
     <string name="cd_doh_dialog_resolver_name">Nom du résolveur</string>
     <string name="ct_delete_logs_positive_btn">Supprimer les journaux</string>
     <string name="settings_notification_heading">Choisir l\'action de notification</string>
-    <string name="about_sponsor">soutenir</string>
     <string name="dns_btm_sheet_chip_allowed">Autorisées</string>
     <string name="dns_select_toast">Au moins un résolveur doit être sélectionné.</string>
     <string name="firewall_rule_block_ip_univ_desc">Une règle de pare-feu définie par l\'utilisateur a bloqué <i>l\'IP de destination / le port</i>.<br/><br/> Pour la modifier, allez sur l\'onglet <i>Global</i>.</string>
@@ -689,7 +677,6 @@
     <string name="bsrf_sub_group_heading">Sous-groupe</string>
     <string name="brbs_title">Sauvegarde &amp; restauration</string>
     <string name="dc_check_update_heading">Rappel des mises à jour des listes de blocage</string>
-    <string name="ct_btm_sheet_error">Can not open bottom sheet</string>
     <string name="orbot_bs_status_3">Transfert de %1$s à Orbot, proxy HTTP également configuré.</string>
     <string name="search_firewall_all_apps"><font size="12">Recherche d\'applis</font></string>
     <string name="app_mode_wireguard">VPN</string>
@@ -756,10 +743,8 @@
     <string name="cd_filter_allowed">Autorisé</string>
     <string name="ci_no_rules_text">Aucune règle globale de blocage ou d\'exception d\'IP n\'a été trouvée.</string>
     <string name="cd_whitelist_initial">LB</string>
-    <string name="ada_lockdown_title">Confiner l\'application</string>
     <string name="ada_app_status_whitelist">contournera les règles du pare-feu global</string>
     <string name="rt_list_adv_btn_txt">avancé</string>
-    <string name="firewall_card_configure_btn">bloquer les applis</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
     <string name="dc_dns_leaks_desc">Si activé, RethinkDNS capturera tous les paquets sur le port 53 et les transmettra à un point de terminaison DNS défini par l\'utilisateur</string>
     <string name="univ_firewall_no_ip_message">Aucune IP trouvée. Appuyez sur les entrées de l\'écran Journal du réseau pour bloquer des adresses IP individuelles.</string>

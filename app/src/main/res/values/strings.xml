@@ -603,7 +603,6 @@
     <string name="about_docs">Read docs</string>
     <string name="about_privacy_policy">Read privacy policy</string>
     <string name="about_connect">contact</string>
-    <string name="about_sponsor">sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_app">app</string>
     <string name="about_email">Email us</string>
@@ -1106,12 +1105,7 @@
     <string name="ada_noapp_dialog_message">App information for the specified application is not found.</string>
     <string name="ada_noapp_dialog_positive">Okay</string>
 
-    <string name="ada_ip_rules_status_bypass_app_rules">Bypass app rules</string>
-    <string name="ada_ip_rules_status_blocked">Blocked</string>
-    <string name="ada_ip_rules_status_allowed">No Rule</string>
-
     <string name="ada_firewall_status"><![CDATA[This app <b><i>%1$s</i></b>.]]></string>
-    <string name="ada_uid"><![CDATA[App ID: <i>%1$s</i><br/>Category: <i>%2$s</i><br/>Installed at: <i>%3$s</i><br/>Updated at: <i>%4$s</i>]]></string>
 
     <string name="ada_ip_connection_count">Connected to %1$s IP address(es)</string>
     <string name="ada_ip_connection_count_zero">0 IP address</string>
@@ -1127,7 +1121,6 @@
     <string name="ada_app_status_unknown">is unknown</string>
 
     <string name="ada_ip_block_count">%1$s IP rule(s)</string>
-    <string name="ada_ip_block_no_rules">No IP rules for this app.</string>
 
     <string name="ada_firewall_title">firewall rules for this app</string>
 
@@ -1155,13 +1148,11 @@
     <string name="bsac_block">Block</string>
     <string name="bsac_bypass_app_rules">Bypass app rules</string>
     <string name="bsac_go_pass_app_rules">Remove Bypass</string>
-    <string name="bsac_delete">Delete</string>
 
     <string name="bsac_block_toast">Blocking %1$s for this app</string>
     <string name="bsac_unblock_toast">Unblocked %1$s for this app</string>
     <string name="bsac_whitelist_toast">Bypassing app rules for this IP %1$s</string>
     <string name="bsac_whitelist_remove_toast">Removed bypass for this IP %1$s</string>
-    <string name="bsac_delete_toast">%1$s deleted</string>
 
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_domain_heading">Domain rule</string>

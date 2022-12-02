@@ -57,7 +57,6 @@
     <string name="about_bug_report">تقرير الشوائب</string>
     <string name="cd_doh_dialog_resolver_name">اسم المحلل</string>
     <string name="ada_noapp_dialog_title">لم يتم العثور على معلومات التطبيق</string>
-    <string name="ada_lockdown_title">تطبيق Lockdown</string>
     <string name="settings_enable_logs_desc">تخزين سجلات DNS وجدار الحماية محليًا على الجهاز.</string>
     <string name="settings_selected_theme">الموضوع الحالي: %1$s</string>
     <string name="hsf_blocklist_chip_text_no_data">قم بتمكين RethinkDNS +</string>
@@ -77,7 +76,6 @@
     <string name="category_name_others">أخرى</string>
     <string name="firewall_rule_block_udp_ntp">UDP محظور</string>
     <string name="network_log_app_name_unknown">مجهول</string>
-    <string name="bsac_delete">احذف</string>
     <string name="ada_app_status_allow">مسموح</string>
     <string name="settings_title_desc">نظام DNS وجدار حماية قابلين للتخصيص بدرجة عالية</string>
     <string name="always_on_dialog_positive">إيقاف</string>
@@ -141,7 +139,6 @@
     <string name="conn_track_clear_logs_title">هل تريد حذف كافة سجلات الشبكة؟</string>
     <string name="conn_track_clear_logs_message">يؤدي هذا إلى حذف سجلات الشبكة فقط وليس قواعد جدار الحماية. هذه العملية غير قابلة للعكس. هل تريد المتابعة؟</string>
     <string name="bsct_app_info">معلومات التطبيق</string>
-    <string name="private_dns_toast">تم تعيين DNS الخاص.</string>
     <string name="dns_proxy_remove_dialog_title">هل تريد حذف وكيل DNS؟</string>
     <string name="local_blocklist_redownload">حتى الآن!</string>
     <string name="settings_lock_down_mode_desc">لا يمكن السماح بالخوادم الوكيلة للتخطي أو الإعداد عند تشغيل VPN في وضع التأمين. <u> اذهب إلى إعدادات VPN </u>.</string>
@@ -178,7 +175,6 @@
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="dc_dns_leaks_heading">منع تسرب DNS</string>
     <string name="dc_check_update_heading">موجه في تحديثات قائمة الحظر</string>
-    <string name="about_sponsor">كفيل</string>
     <string name="collecting_logs_progress_text">اسر…</string>
     <string name="cd_dns_crypt_dialog_heading">أضف محلل أو مرحل DNSCrypt</string>
     <string name="univ_delete_firewall_dialog_title">هل تريد حذف كافة قواعد IP؟</string>
@@ -200,7 +196,6 @@
     <string name="rt_download_start">جارٍ تنزيل قوائم الحظر …</string>
     <string name="rt_download">تنزيل قوائم الحظر</string>
     <string name="bsrf_apply_filter">طبّق</string>
-    <string name="admin_receiver_status_disabled">لم يعد مانع المحتوى ساري المفعول.</string>
     <string name="untracked">لم يتم تعقبه</string>
     <string name="notification_action_resume_vpn">سيرة ذاتية</string>
     <string name="notification_action_pause_vpn">وقفة</string>
@@ -411,7 +406,6 @@
     <string name="cd_dialog_error_invalid_domain">URL غير صالح (المجال).</string>
     <string name="cd_no_rule_initial">ش</string>
     <string name="ci_header">قواعد عناوين IP و المنافذ</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">تجاوز قواعد التطبيق</string>
     <string name="ada_app_status_exclude">مستثنى من نظام dns وجدار الحماية</string>
     <string name="ada_network_log_title">سجل الشبكة لهذا التطبيق</string>
     <string name="notif_download_failure_content">التحميل فشل. حاول مرة أخرى.</string>
@@ -520,7 +514,6 @@
     <string name="notif_channel_proxy_failure">تنبيهات الوكيل</string>
     <string name="cd_filter_all">الكل</string>
     <string name="ci_no_rule_txt">لا توجد قاعدة</string>
-    <string name="ada_lockdown_desc">عند التمكين ، يمكن للتطبيق الاتصال فقط بعناوين IP في <i> تجاوز قواعد التطبيق </i> ؛ سيتم حظر الاتصالات بأي IP آخر.</string>
     <string name="bsac_title_desc">تنطبق القواعد على هذا التطبيق فقط.</string>
     <string name="bsdl_domain_rule_norule">لا توجد قاعدة</string>
     <string name="rt_cancel_btn">إلغاء</string>
@@ -540,7 +533,6 @@
     <string name="settings_orbot_install_desc">انقر هنا لتثبيت Orbot</string>
     <string name="settings_orbot_notification_content">فشل بدء Tor-a-Proxy. افتح تطبيق Orbot لبدء تشغيله يدويًا.</string>
     <string name="settings_notification_heading">اختر إجراء الإخطار</string>
-    <string name="firewall_card_configure_btn">حظر التطبيقات</string>
     <string name="hsf_network_logs_chip_text">سجلات الشبكة</string>
     <string name="hsf_proxy_chip_removed_toast">تمت إزالة الوكيل</string>
     <string name="dc_other_dns_heading">النوع</string>
@@ -555,9 +547,7 @@
     <string name="new_app_bulk_notification_title">انتباه</string>
     <string name="cd_add_dialog_sample_4">%1$s https: // %2$s</string>
     <string name="cd_dialog_error_invalid_wildcard">بدل غير صالح.</string>
-    <string name="ada_ip_rules_status_allowed">لا توجد قاعدة</string>
     <string name="ada_ip_block_count">%1$s قاعدة (قواعد) IP</string>
-    <string name="bsac_delete_toast">%1$s محذوفة</string>
     <string name="bsdl_domain_rule_allow">السماح</string>
     <string name="brbs_backup_dialog_failure_positive">أعد محاولة النسخ الاحتياطي</string>
     <string name="alert_permission_accessibility">إذن - إمكانية الوصول</string>
@@ -588,7 +578,6 @@
     <string name="notif_channel_vpn_failure">VPN غير نشط</string>
     <string name="ci_blocked_desc">- ممنوع</string>
     <string name="ci_delete">حذف</string>
-    <string name="ada_ip_rules_status_blocked">تم حجبه</string>
     <string name="ada_app_status_block">تم حظره</string>
     <string name="bsac_unblock_toast">غير محظور %1$s لهذا التطبيق</string>
     <string name="notif_download_success_content">تم التنزيل بنجاح.</string>
@@ -673,7 +662,6 @@
     <string name="status_protected_with_socks5">محمي ببروكسي socks</string>
     <string name="cd_dns_crypt_dialog_title">أضف محلل أو مرحل DNSCrypt</string>
     <string name="ci_dialog_added_success">تمت إضافة IP إلى القائمة</string>
-    <string name="ct_btm_sheet_error">لا يمكن فتح الورقة السفلية</string>
     <string name="ct_filter_parent_allowed">مسموح</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s تطبيق (تطبيقات) أخرى</string>
     <string name="fapps_filter_parent_all">الكل</string>
@@ -724,11 +712,9 @@
     <string name="ada_noapp_dialog_message">لم يتم العثور على معلومات التطبيق للتطبيق المحدد.</string>
     <string name="ada_noapp_dialog_positive">حسنًا</string>
     <string name="ada_firewall_status">هذا التطبيق <b> <i> %1$s </i> </b>.</string>
-    <string name="ada_uid">معرف التطبيق: <i> %1$s </i> <br/> الفئة: <i> %2$s </i> <br/> مثبت على: <i> %3$s </i> <br/> تم التحديث في: <i> %4$s </i></string>
     <string name="ada_ip_connection_count">متصل بـ %1$s عنوان (عناوين) IP</string>
     <string name="ada_app_status_block_wifi">محظور على شبكات (wifi) غير المحسوبة</string>
     <string name="ada_app_status_lockdown">في وضع القفل</string>
-    <string name="ada_ip_block_no_rules">لا توجد قواعد IP لهذا التطبيق.</string>
     <string name="rt_edit_dialog_positive">تحرير</string>
     <string name="rt_cancel_download">إلغاء</string>
     <string name="rt_chip_update_available">تحديث متوفر</string>
@@ -758,7 +744,6 @@
     <string name="slide_1_desc">RethinkDNS هو برنامج مفتوح المصدر يدعمه برنامج Mozilla Builders MVP.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">انقر لتغيير إعداد الحماية</string>
     <string name="status_no_internet">لا يوجد إنترنت</string>
-    <string name="admin_receiver_status_enabled">جاهز لتعيين مانع محتوى قائم على نظام DNS.</string>
     <string name="orbot_bs_status_1">إعادة توجيه %1$s اتصالات إلى Orbot.</string>
     <string name="slide_2_desc">RethinkDNS هي أسهل طريقة لمراقبة نشاط الشبكة وتجاوز الرقابة على الإنترنت وتطبيقات جدار الحماية على جهاز Android الخاص بك.</string>
     <string name="rdns_plus">RDNS Plus</string>
