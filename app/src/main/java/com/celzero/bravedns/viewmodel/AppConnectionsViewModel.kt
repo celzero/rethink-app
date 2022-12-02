@@ -21,14 +21,12 @@ class AppConnectionsViewModel(private val connectionTrackerDAO: ConnectionTracke
 
     private fun fetchNetworkLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         return if (input.isEmpty()) {
-            Log.d("TEST", "TEST:1 Fetch network logs for uid: $uid, filter: ${filter.value}")
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getLogsForApp(uid)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
-            Log.d("TEST", "TEST:2 Fetch network logs for uid: $uid, filter: ${filter.value}")
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getLogsForAppFiltered(uid, "%$input%")
                 }
