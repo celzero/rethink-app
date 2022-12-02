@@ -136,7 +136,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                port,
+                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.BLOCK,
                 getString(R.string.bsac_block_toast, ipAddress)
             )
@@ -146,7 +146,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                port,
+                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.NONE,
                 getString(R.string.bsac_unblock_toast, ipAddress)
             )
@@ -156,7 +156,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                port,
+                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
                 getString(R.string.bsac_whitelist_toast, ipAddress)
             )
@@ -166,7 +166,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                port,
+                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.NONE,
                 getString(R.string.bsac_whitelist_remove_toast, ipAddress)
             )
@@ -181,12 +181,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         toastMsg: String
     ) {
         io { IpRulesManager.addIpRule(uid, ipAddress, port, status) }
-        Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
-        this.dismiss()
-    }
-
-    private fun deleteRule(uid: Int, ipAddress: String, port: Int, toastMsg: String) {
-        io { IpRulesManager.removeFirewallRules(uid, ipAddress, port) }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()
     }

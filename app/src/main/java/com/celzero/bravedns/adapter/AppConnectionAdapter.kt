@@ -30,6 +30,7 @@ import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
 
@@ -88,9 +89,9 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
 
         private fun setupClickListeners(appConn: AppConnection) {
             b.acdContainer.setOnClickListener {
-                val status = IpRulesManager.hasRule(uid, appConn.ipAddress, appConn.port)
+                val status = IpRulesManager.hasRule(uid, appConn.ipAddress, Constants.UNSPECIFIED_PORT)
                 // open bottom sheet for options
-                openBottomSheet(appConn.ipAddress, appConn.port, status)
+                openBottomSheet(appConn.ipAddress, Constants.UNSPECIFIED_PORT, status)
             }
         }
 
