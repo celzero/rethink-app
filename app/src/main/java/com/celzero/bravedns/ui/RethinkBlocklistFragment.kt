@@ -249,7 +249,6 @@ class RethinkBlocklistFragment :
                     return@uiCtx
                 }
 
-                persistentState.localBlocklistTimestamp = INIT_TIME_MS
                 showDownloadUi()
                 hideConfigureUi()
             }
@@ -556,7 +555,7 @@ class RethinkBlocklistFragment :
                     RethinkBlocklistManager.getStamp(
                         requireContext(),
                         list,
-                        RethinkBlocklistType.LOCAL
+                        RethinkBlocklistType.REMOTE
                     )
                 modifiedStamp = stamp
             }

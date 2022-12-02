@@ -41,7 +41,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         // base-url for fav icon download
         private const val FAV_ICON_DUCK_URL = "https://icons.duckduckgo.com/ip2/"
         private const val FAV_ICON_NEXTDNS_BASE_URL = "https://favicons.nextdns.io/"
-        private const val FAV_ICON_SIZE = "@1x.png"
+        private const val FAV_ICON_SIZE = "@2x.png"
         private const val CACHE_BUILDER_MAX_SIZE = 10000L
 
         private val failedFavIconUrls: Cache<String, Boolean> =

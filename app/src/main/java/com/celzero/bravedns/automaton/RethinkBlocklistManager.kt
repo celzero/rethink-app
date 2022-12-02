@@ -156,12 +156,14 @@ object RethinkBlocklistManager : KoinComponent {
 
                 dbFileTagLocal.add(l)
             }
+            val selectedTags = localFileTagRepository.getSelectedTags()
             // edge case: found a residual block list entry still available in the database
             // during the insertion of new block list entries. This occurred when the number of
             // block lists in the preceding list is greater than the current list. Always
             // empty the data base entries before creating new entries.
             localFileTagRepository.deleteAll()
             localFileTagRepository.insertAll(dbFileTagLocal.toList())
+            localFileTagRepository.updateTags(selectedTags.toSet(), 1)
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Local blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
@@ -205,12 +207,14 @@ object RethinkBlocklistManager : KoinComponent {
                 val r = getRethinkRemoteObj(t)
                 dbFileTagRemote.add(r)
             }
+            val selectedTags = remoteFileTagRepository.getSelectedTags()
             // edge case: found a residual block list entry still available in the database
             // during the insertion of new block list entries. This occurred when the number of
             // block lists in the preceding list is greater than the current list. Always
             // empty the data base entries before creating new entries.
             remoteFileTagRepository.deleteAll()
             remoteFileTagRepository.insertAll(dbFileTagRemote.toList())
+            remoteFileTagRepository.updateTags(selectedTags.toSet(), 1)
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Remote blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {

@@ -298,7 +298,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun moveRemoteBlocklistFileFromAsset() {
         io {
             // already there is a remote blocklist file available
-            if (persistentState.remoteBlocklistTimestamp != INIT_TIME_MS) {
+            if (persistentState.remoteBlocklistTimestamp > Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP) {
                 RethinkBlocklistManager.readJson(
                     this,
                     AppDownloadManager.DownloadType.REMOTE,
