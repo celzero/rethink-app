@@ -2,7 +2,6 @@
 <resources>
     <string name="next">Selanjutnya</string>
     <string name="always_on_dialog">\"VPN Selalu-Menyala\" telah dinyalakan di perangkat ini. Untuk menjalankan Rethink, silakan masuk ke Pengaturan dan matikan \"VPN Selalu-Menyala\".</string>
-    <string name="private_dns_toast">DNS privat telah diatur.</string>
     <string name="always_on_dialog_neutral">Pengaturan</string>
     <string name="blocklist_update_check_failure">Terjadi kesalahan. Coba beberapa saat lagi!</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
@@ -130,7 +129,6 @@
     <string name="rules_load_failure_desc">Aturan firewall tidak ditemukan</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="firewall_rule_block_app_new_install">App Baru</string>
-    <string name="about_sponsor">sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_settings_app_info">Info app</string>
     <string name="hsf_stop_btn_state">berhenti</string>
@@ -270,7 +268,6 @@
     <string name="univ_accessibility_crash_dialog_negative">Batal</string>
     <string name="settings_http_proxy_port">Port</string>
     <string name="ada_app_exclude">Kecualikan</string>
-    <string name="ada_ip_rules_status_blocked">Diblokir</string>
     <string name="cd_custom_dns_proxy_name_default">Proksi</string>
     <string name="network_dns">DNS Sistem</string>
     <string name="lbbs_copy">Kopi sebagai URL RDNS+</string>
@@ -309,7 +306,6 @@
     <string name="brbs_backup_dialog_negative">Batal</string>
     <string name="dns_proxy_toast_parameter">Proksi DNS</string>
     <string name="orbot_title">Orbot dan Proksi-proksi</string>
-    <string name="ada_ip_rules_status_allowed">Tanpa Aturan</string>
     <string name="ci_no_rule_desc">- Tanpa Aturan</string>
     <string name="settings_local_blocklist_in_use">%1$s daftar-daftar blokir sedang digunakan</string>
     <string name="dc_check_update_desc">Cek pembaharuan daftar blokir setiap <i>tiga</i> hari</string>
@@ -353,7 +349,6 @@
     <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
 \n</string>
     <string name="ada_app_dns_settings">Pengaturan DNS</string>
-    <string name="bsac_delete_toast">%1$s telah dihapus</string>
     <string name="bsac_unblock_toast">Blokir %1$s untuk app ini telah dibuka</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="app_info_error">Tidak dapat meluncurkan info App.</string>
@@ -448,7 +443,6 @@
     <string name="notif_download_success_content">Berhasil mengunduh.</string>
     <string name="rt_dialog_title">Simpan Perubahan</string>
     <string name="brbs_backup_dialog_failure_positive">Cadangkan Ulang</string>
-    <string name="ada_ip_block_no_rules">Tidak ada aturan IP untuk app ini.</string>
     <string name="blocklist_update_check_not_required">Daftar-daftar blokir telah dalam versi terbaru.</string>
     <string name="notif_download_content_text">Sedang mengunduh…</string>
     <string name="bsdl_domain_rule_allow">ijinkan</string>
@@ -552,7 +546,6 @@
     <string name="ctbs_dialog_negative_btn">Kembali</string>
     <string name="fapps_filter_parent_system">Sistem</string>
     <string name="rules_load_failure_heading">Catatan</string>
-    <string name="bsac_delete">Hapus</string>
     <string name="settings_orbot_notification_heading">Butuh tindakan</string>
     <string name="orbot_bs_status_2">Proksi HTTP telah diatur (app-app mungkin mengabaikannya).</string>
     <string name="status_protected_with_proxy_private_dns">terproteksi proksi &amp; dns privat</string>
@@ -608,7 +601,6 @@
     <string name="settings_orbot_disabled_error">Matikan proksi HTTP(S) dan/atau SOCKS5 untuk melanjutkan dengan pengaturan Tor-sebagai-proksi.</string>
     <string name="dns_btm_latency_ms">%1$s mili-detik</string>
     <string name="orbot_install_dialog_message">Orbot menyediakan fitur-fitur dan fungsi Tor kepada Android.</string>
-    <string name="ada_uid">ID app: <i>%1$s</i><br/>Kategori: <i>%2$s</i><br/>Diinstal pada: <i>%3$s</i><br/>Diperbarui pada: <i>%4$s</i></string>
     <string name="notif_channel_desc_vpn_notification">Informasikan ketika RethinkDNS sedang aktif dan bekerja di latar belakang</string>
     <string name="settings_orbot_notification_content">Gagal menjalankan Tor-sebagai-Proksi. Buka app Orbot untuk menjalankannya secara manual.</string>
     <string name="ada_noapp_dialog_message">Informasi app ini tidak ditemukan.</string>
@@ -677,7 +669,6 @@
     <string name="pause_text">terjeda</string>
     <string name="error_loading_log_file">Gagal memuat fail catatan</string>
     <string name="dns_btm_resolved_doh">%1$s telah ter-resolve %2$s</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Pintaskan aturan-aturan app</string>
     <string name="cd_doh_dialog_resolver_url">URL Resolver</string>
     <string name="dns_log_dialog_positive">Hapus catatan-catatan</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Hapus resolver DNSCrypt\?</string>

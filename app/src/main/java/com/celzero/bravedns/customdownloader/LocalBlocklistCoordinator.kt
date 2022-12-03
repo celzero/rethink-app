@@ -126,7 +126,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         // create a temp folder to download, format (timestamp ==> -timestamp)
         val file = makeTempDownloadDir(timestamp) ?: return false
 
-        Constants.ONDEVICE_BLOCKLISTS_TEMP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
+        Constants.ONDEVICE_BLOCKLISTS_IN_APP.forEachIndexed { _, onDeviceBlocklistsMetadata ->
             val id = generateCustomDownloadId()
 
             downloadStatuses[id] = DownloadStatus.RUNNING
@@ -297,7 +297,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 } else {
                     0
                 }
-            result = Constants.ONDEVICE_BLOCKLISTS.count() == total
+            result = Constants.ONDEVICE_BLOCKLISTS_IN_APP.count() == total
         } catch (e: Exception) {
             Log.w(LOG_TAG_DOWNLOAD, "Local block list validation failed: ${e.message}", e)
         }

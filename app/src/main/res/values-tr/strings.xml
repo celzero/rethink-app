@@ -239,7 +239,6 @@
     <string name="ci_block">engelle</string>
     <string name="ada_network_log_title">bu uygulama için ağ günlüğü</string>
     <string name="lbbs_heading">185+ blok listesini yapılandırma</string>
-    <string name="about_sponsor">sponsor</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="brbs_backup_dialog_failure_positive">Yedeklemeyi Yeniden Dene</string>
@@ -312,8 +311,6 @@
 \n
 \nDevam etmek istiyor musunuz\?</string>
     <string name="ci_blocked_initial">Si</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Uygulama kurallarını atlayın</string>
-    <string name="bsac_delete">Sil</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>
     <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt Aktarıcısı Silinsin mi\?</string>
@@ -677,7 +674,6 @@
 \n <u>#6</u>: DNS hariç tüm UDP trafiğini engeller (Evrensel Güvenlik Duvarı).
 \n <u>#7</u>: DNS atlandığında bağlantıları engeller (Evrensel Güvenlik Duvarı).</string>
     <string name="bsct_block_app">Bu uygulamayı <u>için <u>bu IP\'yi</u> engelleyin, atlayın</u></string>
-    <string name="private_dns_toast">Özel DNS ayarlandı.</string>
     <string name="bsct_conn_block_desc">%1$s tarafından engellendi %2$s</string>
     <string name="always_on_dialog">Bu cihazda \"Her Zaman Açık VPN\" etkinleştirilmiştir. Rethink\'i başlatmak için lütfen Ayarlar uygulamasına gidin ve \"Her Zaman Açık VPN \"i devre dışı bırakın.</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS, VPN\'i <i>Lockdown</i> modunda çalıştırıyor. Durdurulması, bu kullanıcı profilinde İnternet bağlantısının kaybına neden olur. Yine de devam etmek istiyor musunuz\?</string>
@@ -755,7 +751,6 @@
 \n
 \nLiman numarası: %2$s</string>
     <string name="ada_app_status_block">engellendi</string>
-    <string name="ada_ip_block_no_rules">Bu uygulama için IP kuralı yok.</string>
     <string name="ada_ip_rules_title">Bu uygulama için ip kuralları</string>
     <string name="ada_app_unmetered">Ölçülmeyen</string>
     <string name="bsac_block">Engelle</string>
@@ -808,8 +803,6 @@
     <string name="cd_no_rule_txt">Kural Yok</string>
     <string name="ci_dialog_added_success">IP listeye eklendi</string>
     <string name="ci_no_rule_initial">K</string>
-    <string name="ada_ip_rules_status_blocked">Engellenen</string>
-    <string name="ada_uid">Uygulama Kimliği: <i>%1$s</i><br/>Kategori: <i>%2$s</i><br/>Şu tarihte yüklendi: <i>%3$s</i><br/>Şu tarihte güncellendi: <i>%4$s</i></string>
     <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
 \n</string>
     <string name="ada_app_status_allow">izin verilir</string>
@@ -818,7 +811,6 @@
     <string name="ci_no_rule">kural yok</string>
     <string name="ci_bypass_universal">genel olarak atla</string>
     <string name="ada_noapp_dialog_message">Belirtilen uygulama için uygulama bilgileri bulunamadı.</string>
-    <string name="ada_ip_rules_status_allowed">Kural Yok</string>
     <string name="ada_firewall_status">Bu uygulama <b><i>%1$s</i> </b> .</string>
     <string name="ada_ip_connection_count_zero">0 IP adresi</string>
     <string name="cd_add_dialog_sample_3">%1$s https://%2$s
@@ -850,7 +842,6 @@
     <string name="ada_app_metered">Ölçülü</string>
     <string name="ada_app_dns_settings">DNS Ayarları</string>
     <string name="bsac_unblock">Engelleme kaldır</string>
-    <string name="bsac_delete_toast">%1$s silindi</string>
     <string name="bsac_block_toast">Bu uygulama için %1$s adresini engelleme</string>
     <string name="notif_download_content_title">Cihaz Üzerinde Engelleme Listesi indir</string>
     <string name="rbl_parental_control">Ebeveyn Kontrolü</string>

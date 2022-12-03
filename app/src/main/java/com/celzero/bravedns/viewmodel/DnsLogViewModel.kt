@@ -20,7 +20,7 @@ import androidx.paging.*
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.ui.DnsLogFragment
-import com.celzero.bravedns.util.Constants.Companion.DNS_LIVEDATA_PAGE_SIZE
+import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 
@@ -48,7 +48,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getAllDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                 dnsLogDAO.getDnsLogsByName("%$filter%")
             }
             .liveData
@@ -56,7 +56,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getAllowedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                 dnsLogDAO.getAllowedDnsLogsByName("%$filter%")
             }
             .liveData
@@ -64,7 +64,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(DNS_LIVEDATA_PAGE_SIZE)) {
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                 dnsLogDAO.getBlockedDnsLogsByName("%$filter%")
             }
             .liveData

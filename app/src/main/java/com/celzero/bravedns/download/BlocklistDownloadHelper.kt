@@ -53,7 +53,7 @@ class BlocklistDownloadHelper {
                     } else {
                         0
                     }
-                result = Constants.ONDEVICE_BLOCKLISTS.count() == total
+                result = Constants.ONDEVICE_BLOCKLISTS_ADM.count() == total
             } catch (ignored: Exception) {
                 Log.w(
                     LOG_TAG_DOWNLOAD,

@@ -358,6 +358,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun openAppDetailActivity(uid: Int) {
+        this.dismiss()
         val intent = Intent(requireContext(), AppInfoActivity::class.java)
         intent.putExtra(AppInfoActivity.UID_INTENT_NAME, uid)
         requireContext().startActivity(intent)
@@ -485,7 +486,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val builderSingle: android.app.AlertDialog.Builder =
             android.app.AlertDialog.Builder(requireContext())
 
-        builderSingle.setIcon(R.drawable.spinner_firewall)
+        builderSingle.setIcon(R.drawable.ic_firewall_block)
         val count = packageList.count()
         builderSingle.setTitle(
             this.getString(R.string.ctbs_block_other_apps, getAppName(), count.toString())

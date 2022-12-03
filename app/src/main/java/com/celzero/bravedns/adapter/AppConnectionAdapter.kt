@@ -22,25 +22,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.automaton.IpRulesManager
-import com.celzero.bravedns.data.AppConnections
+import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
 
-class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>, val uid: Int) :
-    RecyclerView.Adapter<AppConnectionAdapter.ConnectionDetailsViewHolder>(),
-    AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
+class AppConnectionAdapter(val context: Context, val uid: Int) :
+    PagingDataAdapter<AppConnection, AppConnectionAdapter.ConnectionDetailsViewHolder>(
+        DIFF_CALLBACK
+    ) {
+
+    companion object {
+        private val DIFF_CALLBACK =
+            object : DiffUtil.ItemCallback<AppConnection>() {
+
+                override fun areItemsTheSame(
+                    oldConnection: AppConnection,
+                    newConnection: AppConnection
+                ) = oldConnection.ipAddress == newConnection.ipAddress
+
+                override fun areContentsTheSame(
+                    oldConnection: AppConnection,
+                    newConnection: AppConnection
+                ) = oldConnection == newConnection
+            }
+    }
 
     private lateinit var adapter: AppConnectionAdapter
-    private var ips: List<AppConnections>
-
-    init {
-        ips = connLists
-    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -60,45 +75,30 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
         holder: AppConnectionAdapter.ConnectionDetailsViewHolder,
         position: Int
     ) {
+        val appConnection: AppConnection = getItem(position) ?: return
         // updates the app-wise connections from network log to AppInfo screen
-        holder.update(position)
-    }
-
-    override fun getItemCount(): Int {
-        return ips.size
-    }
-
-    override fun notifyDataset(position: Int) {
-        this.notifyItemChanged(position)
-    }
-
-    fun filter(filtered: List<AppConnections>?) {
-        if (filtered == null) return
-
-        ips = filtered
-        notifyDataSetChanged()
+        holder.update(appConnection)
     }
 
     inner class ConnectionDetailsViewHolder(private val b: ListItemAppConnDetailsBinding) :
         RecyclerView.ViewHolder(b.root) {
-        fun update(position: Int) {
-            displayTransactionDetails(position)
-            setupClickListeners(ips[position], position)
+        fun update(conn: AppConnection) {
+            displayTransactionDetails(conn)
+            setupClickListeners(conn)
         }
 
-        private fun setupClickListeners(appConn: AppConnections, position: Int) {
+        private fun setupClickListeners(appConn: AppConnection) {
             b.acdContainer.setOnClickListener {
-                val status = IpRulesManager.hasRule(uid, appConn.ipAddress, appConn.port)
+                val status = IpRulesManager.hasRule(uid, appConn.ipAddress, Constants.UNSPECIFIED_PORT)
                 // open bottom sheet for options
-                openBottomSheet(appConn.ipAddress, appConn.port, status, position)
+                openBottomSheet(appConn.ipAddress, Constants.UNSPECIFIED_PORT, status)
             }
         }
 
         private fun openBottomSheet(
             ipAddress: String,
             port: Int,
-            ipRuleStatus: IpRulesManager.IpRuleStatus,
-            position: Int
+            ipRuleStatus: IpRulesManager.IpRuleStatus
         ) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottomsheet")
@@ -106,27 +106,31 @@ class AppConnectionAdapter(val context: Context, connLists: List<AppConnections>
             }
 
             val bottomSheetFragment = AppConnectionBottomSheet()
-            // see AppIpRulesAdapter.kt#openBottomSheet()
+            // Fix: free-form window crash
+            // all BottomSheetDialogFragment classes created must have a public, no-arg constructor.
+            // the best practice is to simply never define any constructors at all.
+            // so sending the data using Bundles
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
             bundle.putInt(AppConnectionBottomSheet.PORT, port)
             bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
             bottomSheetFragment.arguments = bundle
-            bottomSheetFragment.dismissListener(adapter, position)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
-        private fun displayTransactionDetails(position: Int) {
-            val conn = ips[position]
-
-            b.acdCount.text = conn.count.toString()
-            b.acdFlag.text = conn.flag
+        private fun displayTransactionDetails(appConnection: AppConnection) {
+            b.acdCount.text = appConnection.count.toString()
+            b.acdFlag.text = appConnection.flag
             b.acdIpAddress.text =
-                context.getString(R.string.ct_ip_port, conn.ipAddress, conn.port.toString())
-            if (!conn.dnsQuery.isNullOrEmpty()) {
+                context.getString(
+                    R.string.ct_ip_port,
+                    appConnection.ipAddress,
+                    appConnection.port.toString()
+                )
+            if (!appConnection.dnsQuery.isNullOrEmpty()) {
                 b.acdDomainName.visibility = View.VISIBLE
-                b.acdDomainName.text = beautifyDomainString(conn.dnsQuery)
+                b.acdDomainName.text = beautifyDomainString(appConnection.dnsQuery)
             } else {
                 b.acdDomainName.visibility = View.GONE
             }

@@ -36,7 +36,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkLocalAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RethinkRemoteAdvancedViewAdapter
-import com.celzero.bravedns.adapter.RethinkSimpleViewAdapter
 import com.celzero.bravedns.adapter.RethinkSimpleViewPacksAdapter
 import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator.Companion.CUSTOM_DOWNLOAD
@@ -91,7 +90,6 @@ class RethinkBlocklistFragment :
 
     private var advanceRemoteListAdapter: RethinkRemoteAdvancedViewAdapter? = null
     private var advanceLocalListAdapter: RethinkLocalAdvancedViewAdapter? = null
-    private var simpleListAdapter: RethinkSimpleViewAdapter? = null
     private var simplePacksListAdapter: RethinkSimpleViewPacksAdapter? = null
 
     private val remoteFileTagViewModel: RethinkRemoteFileTagViewModel by viewModel()
@@ -110,15 +108,12 @@ class RethinkBlocklistFragment :
     }
 
     enum class BlocklistView(val tag: String) {
-        SIMPLE("0"),
         PACKS("1"),
         ADVANCED("2");
 
         companion object {
             fun getTag(tag: String): BlocklistView {
-                return if (tag == SIMPLE.tag) {
-                    SIMPLE
-                } else if (tag == PACKS.tag) {
+                return if (tag == PACKS.tag) {
                     PACKS
                 } else {
                     ADVANCED
@@ -254,7 +249,6 @@ class RethinkBlocklistFragment :
                     return@uiCtx
                 }
 
-                persistentState.localBlocklistTimestamp = INIT_TIME_MS
                 showDownloadUi()
                 hideConfigureUi()
             }
@@ -491,20 +485,12 @@ class RethinkBlocklistFragment :
     private fun showList(id: String) {
         // change the check based on the tag
         when (BlocklistView.getTag(id)) {
-            BlocklistView.SIMPLE -> {
-                setSimpleViewAdapter()
-                b.lbSimpleRecycler.visibility = View.VISIBLE
-                b.lbSimpleRecyclerPacks.visibility = View.GONE
-                b.lbAdvContainer.visibility = View.INVISIBLE
-            }
             BlocklistView.PACKS -> {
                 setSimplePacksViewAdapter()
-                b.lbSimpleRecycler.visibility = View.GONE
                 b.lbSimpleRecyclerPacks.visibility = View.VISIBLE
                 b.lbAdvContainer.visibility = View.INVISIBLE
             }
             BlocklistView.ADVANCED -> {
-                b.lbSimpleRecycler.visibility = View.INVISIBLE
                 b.lbSimpleRecyclerPacks.visibility = View.GONE
                 b.lbAdvContainer.visibility = View.VISIBLE
             }
@@ -569,7 +555,7 @@ class RethinkBlocklistFragment :
                     RethinkBlocklistManager.getStamp(
                         requireContext(),
                         list,
-                        RethinkBlocklistType.LOCAL
+                        RethinkBlocklistType.REMOTE
                     )
                 modifiedStamp = stamp
             }
@@ -659,23 +645,6 @@ class RethinkBlocklistFragment :
 
     private fun formatQuery(q: String): String {
         return "%$q%"
-    }
-
-    private fun setSimpleViewAdapter() {
-        io {
-            val tags = RethinkBlocklistManager.getSimpleViewTags(type)
-            val selectedTags = getSelectedTags()
-            uiCtx {
-                // set recycler for simple view adapter
-                simpleListAdapter =
-                    RethinkSimpleViewAdapter(requireContext(), tags, selectedTags, type)
-                // getSimpleViewFileTags
-                val layoutManager = LinearLayoutManager(requireContext())
-                b.lbSimpleRecycler.layoutManager = layoutManager
-                b.lbSimpleRecycler.adapter = simpleListAdapter
-                b.lbSimpleProgress.visibility = View.GONE
-            }
-        }
     }
 
     private suspend fun getSelectedTags(): List<Int> {

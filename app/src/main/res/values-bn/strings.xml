@@ -100,7 +100,6 @@
     <string name="apps_card_ips_count">%1$s আইপি এবং পোর্টের নিয়ম</string>
     <string name="hsf_network_logs_chip_text">নেটওয়ার্ক লগ</string>
     <string name="dc_custom_block_heading">পৃথক ডোমেনের অনুমতি দিন বা অস্বীকার করুন</string>
-    <string name="about_sponsor">পৃষ্ঠপোষক</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="error_loading_log_file">লগ ফাইল লোড করার সময় ত্রুটি</string>
@@ -199,7 +198,6 @@
     <string name="block">ব্লক</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">সুরক্ষিত নয়</string>
     <string name="dns_query_clear_logs_message">এটি ডিভাইসে থাকা DNS লগ মুছে দেয়। এই অপারেশন বিপরীত করা যায় না. আপনি কি এগিয়ে যেতে চান\?</string>
-    <string name="private_dns_toast">ব্যক্তিগত DNS সেট করা হয়েছে।</string>
     <string name="always_on_dialog_heading">সবসময়-চালু VPN অক্ষম করুন</string>
     <string name="always_on_dialog_neutral">পছন্দসমূহ</string>
     <string name="doh_custom_url_remove_success">এন্ডপয়েন্ট মুছে ফেলা হয়েছে।</string>
@@ -580,8 +578,6 @@
     <string name="firewall_rule_block_dns_bypass">DNS বাইপাস</string>
     <string name="firewall_rule_global_lockdown_desc">এই সংযোগটি অবরুদ্ধ করা হয়েছে কারণ সর্বজনীন লকডাউন সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="ci_bypass_universal">বাইপাস সার্বজনীন</string>
-    <string name="ada_uid">অ্যাপ আইডি: <i>%1$s</i><br/>বিভাগ: <i>%2$s</i><br/>এ ইনস্টল করা হয়েছে: <i>%3$s</i><br/>এ আপডেট করা হয়েছে: <i> %4$s</i></string>
-    <string name="bsac_delete_toast">%1$s মুছে ফেলা হয়েছে</string>
     <string name="bsdl_domain_rule_norule">কোন নিয়ম নেই</string>
     <string name="rt_dialog_positive">প্রয়োগ করুন</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
@@ -612,7 +608,6 @@
     <string name="cd_dialog_title">ডোমেইন যোগ করুন</string>
     <string name="ci_dialog_title">আইপি / পোর্ট নিয়ম যোগ করুন</string>
     <string name="ci_bypass_universal_initial">বিইউ</string>
-    <string name="ada_ip_rules_status_blocked">Blocked</string>
     <string name="ada_app_status_block_wifi">মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে ব্লক করা আছে</string>
     <string name="ada_app_status_whitelist">সার্বজনীন ফায়ারওয়াল নিয়ম বাইপাস হবে</string>
     <string name="bsdl_domain_desc">ডিএনএস ক্যোয়ারীকে অনুমতি দিতে বা ব্লক করতে নিচে ক্লিক করুন</string>
@@ -646,7 +641,6 @@
     <string name="new_app_notification_action_allow">অনুমোদন</string>
     <string name="notif_dialog_pause_dialog_message">বিরতি অবস্থায় আবেদন, চালিয়ে যেতে পুনরায় শুরু করুন</string>
     <string name="cd_remove_dialog_positive">মুছুন</string>
-    <string name="ada_ip_rules_status_allowed">কোন নিয়ম নেই</string>
     <string name="bsac_block">অবরোধ</string>
     <string name="bsac_whitelist_toast">এই IP %1$s এর জন্য অ্যাপের নিয়মগুলি বাইপাস করা</string>
     <string name="rt_cancel_download">বাতিল</string>
@@ -665,7 +659,6 @@
     <string name="ada_ip_connection_count_zero">0 আইপি ঠিকানা</string>
     <string name="ada_ip_no_connection">এই অ্যাপের জন্য কোনো নেটওয়ার্ক লগ নেই।</string>
     <string name="ada_app_status_unknown">অজানা</string>
-    <string name="ada_ip_block_no_rules">এই অ্যাপের জন্য কোন আইপি নিয়ম নেই।</string>
     <string name="ada_network_log_title">এই অ্যাপের জন্য নেটওয়ার্ক লগ</string>
     <string name="ada_app_exclude">বাদ দিন</string>
     <string name="bsac_unblock_toast">এই অ্যাপের জন্য %1$s আনব্লক করা হয়েছে</string>
@@ -781,7 +774,6 @@
     <string name="ci_header">আইপি এবং পোর্টের নিয়ম</string>
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">বাইপাস অ্যাপের নিয়ম</string>
     <string name="ada_app_metered">মিটারযুক্ত</string>
     <string name="bsac_unblock">Unblock</string>
     <string name="rbl_security">নিরাপত্তা</string>
@@ -802,7 +794,6 @@
     <string name="cd_sample_unicode_invalid">❌</string>
     <string name="cd_dialog_error_invalid_tld">অবৈধ শীর্ষ স্তরের ডোমেন৷</string>
     <string name="cd_no_rule_initial">এন</string>
-    <string name="bsac_delete">মুছুন</string>
     <string name="rt_dialog_message">আপনি কি নতুন কনফিগার করা ব্লকলিস্ট প্রয়োগ করতে চান\?</string>
     <string name="rt_chip_update_available">হালনাগাদ আছে</string>
     <string name="rt_cancel_btn">বাতিল</string>

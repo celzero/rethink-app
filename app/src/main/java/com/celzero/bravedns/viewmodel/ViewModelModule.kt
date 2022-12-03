@@ -33,6 +33,7 @@ object ViewModelModule {
         viewModel { AppCustomIpViewModel(get()) }
         viewModel { RethinkRemoteFileTagViewModel(get()) }
         viewModel { RethinkLocalFileTagViewModel(get()) }
+        viewModel { AppConnectionsViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)

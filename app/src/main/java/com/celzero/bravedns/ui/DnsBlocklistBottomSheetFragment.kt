@@ -53,7 +53,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.getETldPlus1
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -61,8 +60,8 @@ import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import org.koin.android.ext.android.inject
 import java.util.*
+import org.koin.android.ext.android.inject
 
 class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -461,18 +460,80 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         if (!persistentState.fetchFavIcon || transaction!!.groundedQuery()) return
 
         val trim = transaction!!.queryStr.dropLast(1)
-        val url = "${FavIconDownloader.FAV_ICON_URL}$trim.ico"
-        val domainURL = getETldPlus1(trim)
-        val glideURL = "${FavIconDownloader.FAV_ICON_URL}$domainURL.ico"
-        updateImage(url, glideURL)
+
+        // no need to check in glide cache if the value is available in failed cache
+        if (FavIconDownloader.isUrlAvailableInFailedCache(trim) != null) {
+            b.dnsBlockFavIcon.visibility = View.GONE
+        } else {
+            // Glide will cache the icons against the urls. To extract the fav icon from the
+            // cache, first verify that the cache is available with the next dns url.
+            // If it is not available then glide will throw an error, do the duckduckgo
+            // url check in that case.
+            lookupForImageNextDns(trim)
+        }
     }
 
-    private fun updateImage(url: String, subDomainUrl: String) {
+    // FIXME: the glide app code to fetch the image from the cache is repeated in
+    // both lookupForImageNextDns() and lookupForImageDuckduckgo().
+    // come up with common method to handle this
+    private fun lookupForImageNextDns(query: String) {
+        val url = FavIconDownloader.constructFavIcoUrlNextDns(query)
+        val duckduckgoUrl = FavIconDownloader.constructFavUrlDuckDuckGo(query)
+        val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(query)
+        try {
+            if (DEBUG)
+                Log.d(LOG_TAG_DNS_LOG, "Glide, TransactionViewHolder lookupForImageNextDns :$url")
+            val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+            GlideApp.with(requireContext().applicationContext)
+                .load(url)
+                .onlyRetrieveFromCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .error(lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL))
+                .transition(DrawableTransitionOptions.withCrossFade(factory))
+                .into(
+                    object : CustomViewTarget<ImageView, Drawable>(b.dnsBlockFavIcon) {
+                        override fun onLoadFailed(errorDrawable: Drawable?) {
+                            if (!isAdded) return
+
+                            b.dnsBlockFavIcon.visibility = View.GONE
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable>?
+                        ) {
+                            if (DEBUG)
+                                Log.d(
+                                    LOG_TAG_DNS_LOG,
+                                    "Glide - CustomViewTarget onResourceReady() nextdns: $url"
+                                )
+                            if (!isAdded) return
+
+                            b.dnsBlockFavIcon.visibility = View.VISIBLE
+                            b.dnsBlockFavIcon.setImageDrawable(resource)
+                        }
+
+                        override fun onResourceCleared(placeholder: Drawable?) {
+                            if (!isAdded) return
+
+                            b.dnsBlockFavIcon.visibility = View.GONE
+                        }
+                    }
+                )
+        } catch (e: Exception) {
+            if (DEBUG)
+                Log.d(LOG_TAG_DNS_LOG, "Glide - TransactionViewHolder Exception() -${e.message}")
+            lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL)
+        }
+    }
+
+    private fun lookupForImageDuckduckgo(url: String, domainUrl: String) {
         try {
             if (DEBUG)
                 Log.d(
                     LOG_TAG_DNS_LOG,
-                    "Glide - TransactionViewHolder updateImage() -$url, $subDomainUrl"
+                    "Glide - TransactionViewHolder lookupForImageDuckduckgo: $url, $domainUrl"
                 )
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
             GlideApp.with(requireContext().applicationContext)
@@ -482,7 +543,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                 .error(
                     GlideApp.with(requireContext().applicationContext)
-                        .load(subDomainUrl)
+                        .load(domainUrl)
                         .onlyRetrieveFromCache(true)
                 )
                 .transition(DrawableTransitionOptions.withCrossFade(factory))

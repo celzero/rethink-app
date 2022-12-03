@@ -165,7 +165,6 @@
     <string name="ci_bypass_universal_desc">- Autorização universal</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_blocked_desc">-Bloqueado</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Regras de autorização do app</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_block_wifi">está bloqueado em redes de banda larga (wifi)</string>
     <string name="ada_app_status_allow">está permitido</string>
@@ -332,7 +331,6 @@
     <string name="bsct_conn_block_desc">%1$s bloqueado por %2$s</string>
     <string name="bsct_conn_block_desc_device">%1$s bloqueado no dispositivo</string>
     <string name="bsct_conn_desc_blocked">bloqueado em %1$s %2$s</string>
-    <string name="private_dns_toast">DNS privado foi definido.</string>
     <string name="always_on_dialog_heading">Desative a VPN sempre ligada</string>
     <string name="always_on_dialog_positive_btn">Vá para Configurações</string>
     <string name="always_on_dialog_stop_message">A VPN sempre ligada está ativada para Rethink app. Tem certeza que quer parar Rethink mesmo assim\?</string>
@@ -548,7 +546,6 @@
     <string name="dc_dns_leaks_heading">Impedir vazamentos do DNS</string>
     <string name="about_docs">Leia docs</string>
     <string name="about_connect">contato</string>
-    <string name="about_sponsor">patrocinador</string>
     <string name="about_sponsor_link_text">Patrocinador</string>
     <string name="about_email">Entre em contato pelo email</string>
     <string name="log_file_not_available">Nenhum relatório de falha encontrado</string>
@@ -782,10 +779,7 @@
     <string name="ada_noapp_dialog_title">Detalhes do app não encontrados</string>
     <string name="ada_noapp_dialog_message">Detalhes do app para o aplicativo especificado não foram encontrados.</string>
     <string name="ada_noapp_dialog_positive">Ok</string>
-    <string name="ada_ip_rules_status_blocked">Bloqueado</string>
-    <string name="ada_ip_rules_status_allowed">Nenhuma regra</string>
     <string name="ada_firewall_status">Este app <b><i>%1$s</i></b> .</string>
-    <string name="ada_uid">ID do app: <i>%1$s</i><br/>Categoria: <i>%2$s</i><br/>Instalado em: <i>%3$s</i><br/>Atualizado em: <i>%4$s</i></string>
     <string name="ada_ip_connection_count">Conectado ao(s) endereço(s) IP %1$s</string>
     <string name="ada_ip_connection_count_zero">0 endereço de IP</string>
     <string name="ada_app_status_block">está bloqueado</string>
@@ -793,7 +787,6 @@
     <string name="ada_app_status_lockdown">está no modo restrito</string>
     <string name="ada_app_status_unknown">é desconhecido</string>
     <string name="ada_ip_block_count">%1$s Regra(s) de IP</string>
-    <string name="ada_ip_block_no_rules">Não há regras de IP para este app.</string>
     <string name="ada_ip_rules_title">regras de ip para este app</string>
     <string name="ada_network_log_title">registro da rede para este app</string>
     <string name="ada_app_metered">Franquia de dados</string>
@@ -806,12 +799,10 @@
     <string name="bsac_block">Bloquear</string>
     <string name="bsac_bypass_app_rules">Regras de autorização do app</string>
     <string name="bsac_go_pass_app_rules">Remover autorização</string>
-    <string name="bsac_delete">Apagar</string>
     <string name="bsac_block_toast">Bloqueando %1$s para este app</string>
     <string name="bsac_unblock_toast">Desbloqueado %1$s para este app</string>
     <string name="bsac_whitelist_toast">Contornando as regras do app para este IP %1$s</string>
     <string name="bsac_whitelist_remove_toast">Foi removida a autorização para este IP %1$s</string>
-    <string name="bsac_delete_toast">%1$s apagada</string>
     <string name="bsdl_blocked_desc">bloqueado %1$s por %2$s</string>
     <string name="bsdl_domain_rule_norule">nenhuma regra</string>
     <string name="network_dns">DNS do sistema</string>

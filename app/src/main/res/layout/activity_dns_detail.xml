@@ -8,12 +8,6 @@
     android:orientation="vertical"
     tools:context=".ui.DnsDetailActivity">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/border"
-        android:visibility="gone" />
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/dns_detail_act_tabLayout"
         style="@style/TabbedLayoutDefault"

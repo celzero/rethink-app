@@ -119,7 +119,7 @@ class RethinkSimpleViewPacksAdapter(
             // with those pre defined values.
             if (position == 0 || fileTags[position - 1].group != simpleView.group) {
                 b.crpTitleLl.visibility = View.VISIBLE
-                b.crpBlocktypeHeadingTv.text = simpleView.group.replaceFirstChar(Char::titlecase)
+                b.crpBlocktypeHeadingTv.text = getGroupName(simpleView.group)
                 b.crpBlocktypeDescTv.text = getTitleDesc(simpleView.group)
             } else {
                 b.crpTitleLl.visibility = View.GONE
@@ -127,7 +127,10 @@ class RethinkSimpleViewPacksAdapter(
 
             b.crpLabelTv.text = simpleView.name.replaceFirstChar(Char::titlecase)
             b.crpDescGroupTv.text =
-                simpleView.desc.replaceFirstChar(Char::titlecase) + " blocklists"
+                context.getString(
+                    R.string.rsv_blocklist_count_text,
+                    simpleView.desc.replaceFirstChar(Char::titlecase)
+                )
             b.crpCheckBox.isChecked = false
 
             // enable the check box if the stamp contains all the values
@@ -141,11 +144,26 @@ class RethinkSimpleViewPacksAdapter(
 
         private fun getTitleDesc(title: String): String {
             return if (title.equals(RethinkBlocklistManager.PARENTAL_CONTROL.name, true)) {
-                RethinkBlocklistManager.PARENTAL_CONTROL.desc
+                context.getString(RethinkBlocklistManager.PARENTAL_CONTROL.desc)
             } else if (title.equals(RethinkBlocklistManager.SECURITY.name, true)) {
-                RethinkBlocklistManager.SECURITY.desc
+                context.getString(RethinkBlocklistManager.SECURITY.desc)
+            } else if (title.equals(RethinkBlocklistManager.PRIVACY.name, true)) {
+                context.getString(RethinkBlocklistManager.PRIVACY.desc)
             } else {
-                RethinkBlocklistManager.PRIVACY.desc
+                ""
+            }
+        }
+
+        // handle the group name (filetag.json)
+        private fun getGroupName(group: String): String {
+            return if (group.equals(RethinkBlocklistManager.PARENTAL_CONTROL.name, true)) {
+                context.getString(RethinkBlocklistManager.PARENTAL_CONTROL.label)
+            } else if (group.equals(RethinkBlocklistManager.SECURITY.name, true)) {
+                context.getString(RethinkBlocklistManager.SECURITY.label)
+            } else if (group.equals(RethinkBlocklistManager.PRIVACY.name, true)) {
+                context.getString(RethinkBlocklistManager.PRIVACY.label)
+            } else {
+                ""
             }
         }
 

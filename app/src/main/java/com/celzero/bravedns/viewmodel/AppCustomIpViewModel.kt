@@ -50,8 +50,8 @@ class AppCustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
             }
         }
 
-    fun appWiseIpRulesSize(uid: Int): LiveData<Int> {
-        return customIpDao.getBlockedConnectionCountForUid(uid)
+    fun appWiseIpRulesCount(uid: Int): LiveData<Int> {
+        return customIpDao.getAppWiseIpRulesCount(uid)
     }
 
     fun setFilter(filter: String) {

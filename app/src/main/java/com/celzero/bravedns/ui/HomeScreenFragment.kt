@@ -63,18 +63,19 @@ import com.celzero.bravedns.util.Utilities.Companion.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
 import com.celzero.bravedns.util.Utilities.Companion.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.Companion.isPrivateDnsActive
+import com.celzero.bravedns.util.Utilities.Companion.openNetworkSettings
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -718,13 +719,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         if (isPrivateDnsActive(requireContext())) {
-            showToastUiCentered(
-                requireContext(),
-                resources.getText(R.string.private_dns_toast).toString().replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                },
-                Toast.LENGTH_SHORT
-            )
+            showPrivateDnsDialog()
             return
         }
 
@@ -744,6 +739,21 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 },
             Toast.LENGTH_SHORT
         )
+    }
+
+    private fun showPrivateDnsDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(R.string.private_dns_dialog_heading)
+        builder.setMessage(R.string.private_dns_dialog_desc)
+        builder.setCancelable(false)
+        builder.setPositiveButton(R.string.private_dns_dialog_positive) { _, _ ->
+            openNetworkSettings(requireContext())
+        }
+
+        builder.setNegativeButton(R.string.private_dns_dialog_negative) { _, _ ->
+            /* No Op */
+        }
+        builder.create().show()
     }
 
     private fun startFirewallActivity(screenToLoad: Int) {
@@ -915,8 +925,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 return false
             }
         // If the VPN.prepare() is not null, then the first time VPN dialog is shown, Show info
-        // dialog
-        // before that.
+        // dialog before that.
         if (prepareVpnIntent != null) {
             showFirstTimeVpnDialog(prepareVpnIntent)
             return false
@@ -1112,8 +1121,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         val capabilities =
             connectivityManager.getNetworkCapabilities(activeNetwork)
                 ?: // It's not clear when this can happen, but it has occurred for at least one
-                   // user.
-            return false
+                // user.
+                return false
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
     }
 

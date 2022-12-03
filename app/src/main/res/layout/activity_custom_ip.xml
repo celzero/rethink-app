@@ -14,28 +14,30 @@
         app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/custom_dialog_heading"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:focusable="true"
+            android:padding="5dp"
+            android:text="@string/ci_header"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
+
         <RelativeLayout
             android:id="@+id/custom_dialog_no_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@id/custom_dialog_heading"
             android:visibility="gone">
-
-            <TextView
-                android:id="@+id/custom_dialog_heading_no_ui"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:padding="5dp"
-                android:text="@string/ci_header"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/custom_dialog_no_rules_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/custom_dialog_heading_no_ui"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="30dp"
@@ -57,20 +59,9 @@
             android:id="@+id/custom_dialog_show_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/custom_dialog_heading"
             android:orientation="vertical"
             android:visibility="visible">
-
-            <TextView
-                android:id="@+id/custom_dialog_heading"
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:focusable="true"
-                android:padding="5dp"
-                android:text="@string/ci_header"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
 
             <requestFocus />
 
@@ -78,11 +69,10 @@
                 android:id="@+id/cip_search_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                android:layout_below="@id/custom_dialog_heading"
                 android:layout_margin="4dp"
                 android:elevation="4dp"
-                android:visibility="visible">
+                android:visibility="visible"
+                app:cardCornerRadius="16dp">
 
                 <LinearLayout
                     android:id="@+id/cip_search_ll"
@@ -143,6 +133,7 @@
                     android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cip_bypass_hint_initial"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/rectangle_border_background"
@@ -153,6 +144,7 @@
                     android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cip_bypass_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"

@@ -37,6 +37,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
+import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.DnsBlocklistBottomSheetFragment
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -113,9 +114,17 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                 return
             }
 
-            val url = dnsLog.favIcoUrl()
-            val subDomainURL = dnsLog.subdomain()
-            displayFavIcon(url, subDomainURL)
+            // no need to check in glide cache if the value is available in failed cache
+            if (FavIconDownloader.isUrlAvailableInFailedCache(dnsLog.queryStr.dropLast(1)) != null) {
+                hideFavIcon()
+                showFlag()
+            } else {
+                // Glide will cache the icons against the urls. To extract the fav icon from the
+                // cache, first verify that the cache is available with the next dns url.
+                // If it is not available then glide will throw an error, do the duckduckgo
+                // url check in that case.
+                displayNextDnsFavIcon(dnsLog)
+            }
         }
 
         private fun clearFavIcon() {
@@ -149,6 +158,53 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
+        private fun displayNextDnsFavIcon(dnsLog: DnsLog) {
+            val trim = dnsLog.queryStr.dropLast(1)
+            // url to check if the icon is cached from nextdns
+            val nextDnsUrl = FavIconDownloader.constructFavIcoUrlNextDns(trim)
+            // url to check if the icon is cached from duckduckgo
+            val duckduckGoUrl = FavIconDownloader.constructFavUrlDuckDuckGo(trim)
+            // subdomain to check if the icon is cached from duckduckgo
+            val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(trim)
+            try {
+                val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
+                GlideApp.with(context.applicationContext)
+                    .load(nextDnsUrl)
+                    .onlyRetrieveFromCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                    .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                    .error(
+                        // on error, check if the icon is stored in the name of duckduckgo url
+                        displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
+                    )
+                    .transition(withCrossFade(factory))
+                    .into(
+                        object : CustomViewTarget<ImageView, Drawable>(b.favIcon) {
+                            override fun onLoadFailed(errorDrawable: Drawable?) {
+                                showFlag()
+                                hideFavIcon()
+                            }
+
+                            override fun onResourceReady(
+                                resource: Drawable,
+                                transition: Transition<in Drawable>?
+                            ) {
+                                hideFlag()
+                                showFavIcon(resource)
+                            }
+
+                            override fun onResourceCleared(placeholder: Drawable?) {
+                                hideFavIcon()
+                                showFlag()
+                            }
+                        }
+                    )
+            } catch (e: Exception) {
+                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
+            }
+        }
+
         /**
          * Loads the fav icons from the cache, the icons are cached by favIconDownloader. On
          * failure, will check if there is a icon for top level domain is available in cache. Else,
@@ -156,7 +212,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
          *
          * This method will be executed only when show fav icon setting is turned on.
          */
-        private fun displayFavIcon(url: String, subDomainURL: String) {
+        private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String) {
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
                 GlideApp.with(context.applicationContext)

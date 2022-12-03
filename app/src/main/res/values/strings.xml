@@ -192,7 +192,6 @@
         \n &lt;u>#7&lt;/u>: Block connections when DNS is bypassed (Universal Firewall).
         </string>
 
-    <string name="private_dns_toast">Private DNS has been set.</string>
     <string name="always_on_dialog_heading">Disable Always-on VPN</string>
     <string name="always_on_dialog">\"Always-On VPN\" is enabled on this device. To start Rethink, please go to Settings app and disable \"Always-on VPN\".</string>
     <string name="always_on_dialog_positive_btn">Go to Settings</string>
@@ -204,6 +203,11 @@
     <string name="always_on_dialog_positive">Stop</string>
     <string name="always_on_dialog_negative">Cancel</string>
     <string name="always_on_dialog_neutral">Settings</string>
+
+    <string name="private_dns_dialog_heading">Turn off Private DNS</string>
+    <string name="private_dns_dialog_desc">Rethink\'s DNS settings are overridden by Android\'s Private DNS.\n\nTo use Rethink\'s DNS go to Android Settings and turn off \"Private DNS\".</string>
+    <string name="private_dns_dialog_positive">Go to Settings</string>
+    <string name="private_dns_dialog_negative">Dismiss</string>
 
     <string name="firewall_act_universal_tab">Universal</string>
 
@@ -289,18 +293,19 @@
 
     <string name="app_mode_choose">Choose mode</string>
 
-    <string name="whats_dialog_title">What\'s new in v053k</string>
+    <string name="whats_dialog_title">What\'s new in v053l</string>
     <string name="whats_new_version_name">🌎&#128330; World Student\'s Day (15 Oct) &#128330;🌎</string>
-    <string name="whats_new_version_update"><![CDATA[<b>Maximum effort</b><br/><br/>
-        1. Introducing a more private Rethink resolver, <i>Max</i>.<br/>
-        2. Mark IPv6 as experimental; switch to IPv4 by default.<br/>
-        3. <i>New feature</i>: Backup and restore app settings.<br/>
-        4. <i>New feature</i>: App lockdown mode.<br/>
-        5. <i>New feature</i>: Universal lockdown mode.<br/>
-        6. <i>New feature</i>: Apply firewall rules on port numbers.<br/>
-        7. <i>New feature</i>: Apply app firewall rules in batches.<br/>
-        8. Minor UI refresh.<br/>
-        9. Other memory and crash fixes.<br/><br/>
+    <string name="whats_new_version_update"><![CDATA[<b>Polyglottic!</b><br/><br/>
+        1. Re-support Android 6.<br/>
+        2. All new RDNS+ UI.<br/>
+        3. All new firewall and network engine.<br/>
+        4. <i>New feature</i>: Translations in 15+ languages.<br/>
+        5. <i>New feature</i>: Adaptive icons.<br/>
+        6. <i>New feature</i>: Show domain names in per app network logs.<br/>
+        7. Fix missing notifications on Android 13.<br/>
+        8. Fix misbehaving Orbot DNS integration.<br/>
+        9. Apps screen now accessible in DNS-only mode.<br/>
+        10. Major improvements to built-in Download Manager.<br/><br/>
         <a href="https://hosted.weblate.org/projects/rethink-dns-firewall/app/">Help translate this app</a>]]>
     </string>
 
@@ -427,7 +432,7 @@
     <string name="settings_http_proxy_hostname">Hostname</string>
     <string name="settings_http_proxy_port">Port</string>
 
-    <string name="settings_dns_proxy_dialog_header">Set SOCKS5 (TCP) Proxy</string>
+    <string name="settings_dns_proxy_dialog_header">Set SOCKS5 Proxy</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostname</string>
     <string name="settings_dns_proxy_dialog_port_number">Port Number</string>
@@ -530,7 +535,7 @@
 
     <string name="hsf_whats_new_chip_text">What\'s new</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
-    <string name="hsf_blocklist_chip_text">%1$s blocklists configured</string>
+    <string name="hsf_blocklist_chip_text">%1$s blocklists</string>
     <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in-use</string>
     <string name="hsf_blocklist_chip_text_no_data">Enable RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
@@ -571,7 +576,7 @@
     <string name="dc_custom_block_desc">Coming soon</string>
 
     <string name="dc_dns_website_heading">Show website icon in DNS logs (experimental)</string>
-    <string name="dc_dns_website_desc">Fetches website icons from <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
+  <string name="dc_dns_website_desc">Fetches website icons from <i>nextdns.com</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
 
     <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
     <string name="dc_dns_leaks_desc">When enabled, RethinkDNS captures all packets on port 53 and forwards it to a user-set DNS endpoint</string>
@@ -597,14 +602,13 @@
     <string name="about_github">Contribute on GitHub</string>
     <string name="about_faq">View FAQs</string>
     <string name="about_docs">Read docs</string>
-    <string name="about_privacy_policy">Privacy policy</string>
+    <string name="about_privacy_policy">Read privacy policy</string>
     <string name="about_connect">contact</string>
-    <string name="about_sponsor">sponsor</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_app">app</string>
     <string name="about_email">Email us</string>
     <string name="about_settings">system</string>
-    <string name="about_settings_app_info">App info</string>
+    <string name="about_settings_app_info">App Info</string>
     <string name="about_settings_vpn_profile">VPN Profile</string>
     <string name="about_settings_notification">Notification Settings</string>
     <string name="about_whats_new">What\'s new in %1$s</string>
@@ -635,6 +639,7 @@
 
     <string name="app_info_error">Could not launch App info.</string>
     <string name="vpn_profile_error">Could not launch VPN profile.</string>
+    <string name="private_dns_error">Could not launch private dns screen.</string>
     <string name="notification_screen_error">Could not launch App Notification screen.</string>
     <string name="intent_launch_error">Count not launch %1$s</string>
     <string name="no_browser_error">Cannot open webpage from browser.</string>
@@ -689,8 +694,13 @@
                                               <a href="https://t.me/Billi_ance">Billi_ance</a><br/>
                                               <a href="https://t.me/kaliangel">kaliangel</a><br/>
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
-                                              <br/>📌 IP geo-location database <br/>
+                                              <br/>📌 Geo-IP <br/>
                                               <a href="https://db-ip.com">db-ip.com</a><br/>
+                                              <br/>❇ Translations <br/>
+                                              <a href="https://weblate.org/en/">Weblate</a><br/>
+                                              <br/>📦 Build servers <br/>
+                                              <a href="https://jitpack.io/">JitPack</a><br/>
+                                              <a href="https://github.com/">GitHub</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_crypt_title">resolvers</string>
@@ -1075,11 +1085,15 @@
 
     <string name="ci_header">IP &amp; Port Rules</string>
 
-    <string name="ci_no_rules_text">No universal IP block or bypass rules found.</string>
+    <string name="ci_no_rules_text">No IP or Port rules found.</string>
 
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">Bypass Universal</string>
     <string name="ci_bypass_universal_desc">- Bypasses universal</string>
+
+    <string name="ci_bypass_app_initial">BA</string>
+    <string name="ci_bypass_app_txt">Bypass app rules</string>
+    <string name="ci_bypass_app_desc">- Bypasses app rules</string>
 
     <string name="ci_blocked_initial">B</string>
     <string name="ci_blocked_txt">Blocked</string>
@@ -1099,12 +1113,7 @@
     <string name="ada_noapp_dialog_message">App information for the specified application is not found.</string>
     <string name="ada_noapp_dialog_positive">Okay</string>
 
-    <string name="ada_ip_rules_status_bypass_app_rules">Bypass app rules</string>
-    <string name="ada_ip_rules_status_blocked">Blocked</string>
-    <string name="ada_ip_rules_status_allowed">No Rule</string>
-
     <string name="ada_firewall_status"><![CDATA[This app <b><i>%1$s</i></b>.]]></string>
-    <string name="ada_uid"><![CDATA[App ID: <i>%1$s</i><br/>Category: <i>%2$s</i><br/>Installed at: <i>%3$s</i><br/>Updated at: <i>%4$s</i>]]></string>
 
     <string name="ada_ip_connection_count">Connected to %1$s IP address(es)</string>
     <string name="ada_ip_connection_count_zero">0 IP address</string>
@@ -1120,7 +1129,6 @@
     <string name="ada_app_status_unknown">is unknown</string>
 
     <string name="ada_ip_block_count">%1$s IP rule(s)</string>
-    <string name="ada_ip_block_no_rules">No IP rules for this app.</string>
 
     <string name="ada_firewall_title">firewall rules for this app</string>
 
@@ -1128,6 +1136,7 @@
 
     <string name="ada_network_log_title">network log for this app</string>
 
+    <string name="ada_app_firewall">Firewall</string>
     <string name="ada_app_metered">Metered</string>
     <string name="ada_app_unmetered">Unmetered</string>
     <string name="ada_app_whitelist">Bypass Universal</string>
@@ -1136,19 +1145,22 @@
 
     <string name="ada_app_dns_settings">DNS Settings</string>
 
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Clear logs</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Clear all logs related to this application.</string>
+    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Proceed</string>
+    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">Cancel</string>
+
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc">Rules apply to this app only.</string>
     <string name="bsac_unblock">Unblock</string>
     <string name="bsac_block">Block</string>
     <string name="bsac_bypass_app_rules">Bypass app rules</string>
     <string name="bsac_go_pass_app_rules">Remove Bypass</string>
-    <string name="bsac_delete">Delete</string>
 
     <string name="bsac_block_toast">Blocking %1$s for this app</string>
     <string name="bsac_unblock_toast">Unblocked %1$s for this app</string>
     <string name="bsac_whitelist_toast">Bypassing app rules for this IP %1$s</string>
     <string name="bsac_whitelist_remove_toast">Removed bypass for this IP %1$s</string>
-    <string name="bsac_delete_toast">%1$s deleted</string>
 
     <!-- DNS logs bottom sheet -->
     <string name="bsdl_domain_heading">Domain rule</string>
@@ -1170,9 +1182,12 @@
 
     <!-- rethink blocklist heading -->
 
-    <string name="rbl_parental_control">Parental Control</string>
-    <string name="rbl_privacy">Privacy</string>
-    <string name="rbl_security">Security</string>
+    <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Parental Control</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Block adult &amp; pirated content, online gambling &amp; dating, and social media.</string>
+    <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines">Privacy</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Block attentionware, spyware, scareware.</string>
+    <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines">Security</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Block malware, ransomware, cryptoware, phishers, and other threats.</string>
 
     <!-- Rethink list fragment -->
     <string name="rt_rethink_dns">RethinkDNS</string>
@@ -1275,5 +1290,7 @@
     <string name="brbs_backup_complete_toast">Backup completed</string>
     <string name="brbs_restore_no_uri_toast">Restore failed; try again</string>
 
+    <!-- Rethink simple view -->
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s blocklists</string>
 
 </resources>

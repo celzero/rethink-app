@@ -15,20 +15,17 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
-import androidx.paging.liveData
+import androidx.lifecycle.*
+import androidx.paging.*
+import com.celzero.bravedns.automaton.IpRulesManager
+import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpDao
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
+    private var uid: Int = IpRulesManager.UID_EVERYBODY
 
     init {
         filteredList.value = ""
@@ -36,24 +33,56 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
 
     val customIpDetails =
         Transformations.switchMap(filteredList) { input ->
-            if (input.isNullOrBlank()) {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                        customIpDao.getUnivBlockedConnectionsLiveData()
-                    }
-                    .liveData
-                    .cachedIn(viewModelScope)
+            if (uid != IpRulesManager.UID_EVERYBODY) {
+                getAppWise(uid, input)
             } else {
-                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                        customIpDao.getUnivBlockedConnectionsByIP("%$input%")
-                    }
-                    .liveData
-                    .cachedIn(viewModelScope)
+                getUniversal(input)
             }
         }
 
-    val customIpSize = customIpDao.getCustomIpsLiveData()
+    fun customIpSize(uid: Int): LiveData<Int> {
+        return if (uid == IpRulesManager.UID_EVERYBODY) {
+            customIpDao.getCustomIpsLiveData()
+        } else {
+            customIpDao.getAppWiseIpRulesCount(uid)
+        }
+    }
+
+    private fun getAppWise(uid: Int, input: String?): LiveData<PagingData<CustomIp>> {
+        return if (input.isNullOrBlank()) {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { customIpDao.getAppWiseCustomIp(uid) }
+                .liveData
+                .cachedIn(viewModelScope)
+        } else {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    customIpDao.getAppWiseCustomIp("%$input%", uid)
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+    }
+
+    private fun getUniversal(input: String?): LiveData<PagingData<CustomIp>> {
+        return if (input.isNullOrBlank()) {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    customIpDao.getUnivBlockedConnectionsLiveData()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        } else {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    customIpDao.getUnivBlockedConnectionsByIP("%$input%")
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+    }
 
     fun setFilter(filter: String) {
         filteredList.value = filter
+    }
+
+    fun setUid(i: Int) {
+        this.uid = i
     }
 }

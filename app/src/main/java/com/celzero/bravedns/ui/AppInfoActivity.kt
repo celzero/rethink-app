@@ -18,8 +18,7 @@ package com.celzero.bravedns.ui
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -34,16 +33,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
-import com.celzero.bravedns.adapter.AppIpRulesAdapter
 import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.automaton.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.automaton.IpRulesManager
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.data.AppConnections
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
@@ -54,12 +50,12 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_3
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
-import com.celzero.bravedns.viewmodel.AppCustomIpViewModel
+import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
+import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import inet.ipaddr.HostName
 import inet.ipaddr.HostNameException
 import inet.ipaddr.IPAddressString
@@ -77,17 +73,13 @@ class AppInfoActivity :
     private val appConfig by inject<AppConfig>()
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
-    private val appCustomIpViewModel: AppCustomIpViewModel by viewModel()
+    private val customIpViewModel: CustomIpViewModel by viewModel()
+    private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
 
     private var uid: Int = 0
     private lateinit var appInfo: AppInfo
 
-    private var connIpList: List<AppConnections>? = null
-    private var appConnAdapter: AppConnectionAdapter? = null
-
     private var ipListUiState: Boolean = true
-    private var ipRulesUiState: Boolean = false
-    private var appDetailsUiState: Boolean = false
     private var firewallUiState: Boolean = false
 
     private var appStatus = FirewallManager.FirewallStatus.ALLOW
@@ -101,23 +93,35 @@ class AppInfoActivity :
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         uid = intent.getIntExtra(UID_INTENT_NAME, INVALID_UID)
+        customIpViewModel.setUid(uid)
+        networkLogsViewModel.setUid(uid)
         init()
-        appCustomIpViewModel.setUid(uid)
+        observeNetworkLogSize()
         observeCustomIpSize()
         setupClickListeners()
     }
 
     private fun observeCustomIpSize() {
-        appCustomIpViewModel.appWiseIpRulesSize(uid).observe(this) {
+        customIpViewModel.customIpSize(uid).observe(this) {
             b.aadIpBlockDesc.text = getString(R.string.ada_ip_block_count, it.toString())
-            if (it == 0) {
-                b.aadIpBlockEmptyTxt.visibility = View.VISIBLE
-                b.aadIpBlockRecycler.visibility = View.GONE
-                return@observe
-            }
+        }
+    }
 
-            b.aadIpBlockEmptyTxt.visibility = View.GONE
-            b.aadIpBlockRecycler.visibility = View.VISIBLE
+    private fun observeNetworkLogSize() {
+        networkLogsViewModel.getConnectionsCount(uid).observe(this) {
+            b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count, it.toString())
+            if (it == 0) {
+                b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
+                b.aadConnDetailRecycler.visibility = View.GONE
+                b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
+                b.aadConnDetailSearchLl.visibility = View.GONE
+                toggleFirewallUiState(firewallUiState)
+                toggleIpConnectionsState(ipListUiState)
+            } else {
+                b.aadConnDetailRecycler.visibility = View.VISIBLE
+                b.aadConnDetailEmptyTxt.visibility = View.GONE
+                b.aadConnDetailSearchLl.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -138,24 +142,30 @@ class AppInfoActivity :
         }
 
         b.aadAppDetailName.text = appName(packages.count())
-        b.aadAppDetailDesc.text = appInfo.packageInfo
         appStatus = FirewallManager.appStatus(appInfo.uid)
         connStatus = FirewallManager.connectionStatus(appInfo.uid)
         updateFirewallStatusUi(appStatus, connStatus)
-        toggleIpConnectionsState(ipListUiState)
-        toggleIpRulesState(ipRulesUiState)
-        toggleFirewallUiState(firewallUiState)
-        updateBasicAppInfo()
-        updateDnsDetails()
+        // introduce this on v054
+        // updateDnsDetails()
 
         displayIcon(
             Utilities.getIcon(this, appInfo.packageInfo, appInfo.appName),
             b.aadAppDetailIcon
         )
 
-        appCustomIpViewModel.setUid(appInfo.uid)
-        displayIpRulesIfAny(appInfo.uid)
-        displayNetworkLogsIfAny(appInfo.uid)
+        showNetworkLogsIfAny(appInfo.uid)
+        toggleFirewallUiState(firewallUiState)
+        toggleIpConnectionsState(ipListUiState)
+    }
+
+    private fun openCustomIpScreen() {
+        val intent = Intent(this, CustomIpActivity::class.java)
+        // this activity is either being started in a new task or bringing to the top an
+        // existing task, then it will be launched as the front door of the task.
+        // This will result in the application to have that task in the proper state.
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra("UID", uid)
+        startActivity(intent)
     }
 
     private fun updateDnsDetails() {
@@ -219,6 +229,21 @@ class AppInfoActivity :
         }
 
         b.aadAppSettingsBlock.setOnClickListener {
+            // update both the wifi and mobile data to either block or allow state
+            if (appStatus == FirewallManager.FirewallStatus.ALLOW) {
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.BLOCK,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            } else {
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            }
+        }
+
+        b.aadAppSettingsBlockWifi.setOnClickListener {
             toggleWifi(appInfo)
             updateFirewallStatusUi(appStatus, connStatus)
         }
@@ -290,17 +315,15 @@ class AppInfoActivity :
 
         b.aadAapFirewallIndicator.setOnClickListener { toggleFirewallUiState(firewallUiState) }
 
-        b.aadFirewallTitleRl.setOnClickListener { toggleFirewallUiState(firewallUiState) }
+        b.aadAapFirewallNewCard.setOnClickListener { toggleFirewallUiState(firewallUiState) }
 
-        b.aadIpBlockIndicator.setOnClickListener { toggleIpRulesState(ipRulesUiState) }
+        b.aadIpBlockIndicator.setOnClickListener { toggleFirewallUiState(firewallUiState) }
 
-        b.aadIpBlockRl.setOnClickListener { toggleIpRulesState(ipRulesUiState) }
+        b.aadIpBlockRl.setOnClickListener { openCustomIpScreen() }
 
-        b.aadDownArrowIcon.setOnClickListener { toggleAppDetailsState(appDetailsUiState) }
+        b.aadAppDetailIcon.setOnClickListener { toggleFirewallUiState(firewallUiState) }
 
-        b.aadAppDetailIcon.setOnClickListener { toggleAppDetailsState(appDetailsUiState) }
-
-        b.aadAppDetailLl.setOnClickListener { toggleAppDetailsState(appDetailsUiState) }
+        b.aadAppDetailLl.setOnClickListener { toggleFirewallUiState(firewallUiState) }
 
         b.aadDnsHeading.setOnCheckedChangeListener { _: CompoundButton, isSelected: Boolean ->
             if (isSelected) {
@@ -315,7 +338,7 @@ class AppInfoActivity :
 
         b.aadAppDnsRethinkConfigure.setOnClickListener { rethinkListBottomSheet() }
 
-        b.aadIpAddIndicator.setOnClickListener { showAddIpDialog() }
+        b.aadConnDelete.setOnClickListener { showDeleteConnectionsDialog() }
     }
 
     private fun setAppDns(url: String) {
@@ -440,56 +463,33 @@ class AppInfoActivity :
         updateFirewallStatusUi(aStat, cStat)
     }
 
-    private fun displayIpRulesIfAny(uid: Int) {
-        b.aadIpBlockEmptyTxt.visibility = View.GONE
-        appCustomIpViewModel.setUid(uid)
-        b.aadIpBlockRecycler.setHasFixedSize(false)
+    private fun showNetworkLogsIfAny(uid: Int) {
+        networkLogsViewModel.setUid(uid)
+        b.aadConnDetailRecycler.setHasFixedSize(false)
         val layoutManager = CustomLinearLayoutManager(this)
-        b.aadIpBlockRecycler.layoutManager = layoutManager
-        val recyclerAdapter = AppIpRulesAdapter(this, uid)
-        appCustomIpViewModel.customIpDetails.observe(this) {
+        b.aadConnDetailRecycler.layoutManager = layoutManager
+        val recyclerAdapter = AppConnectionAdapter(this, uid)
+        networkLogsViewModel.appNetworkLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
-        b.aadIpBlockRecycler.adapter = recyclerAdapter
-    }
-
-    private fun displayNetworkLogsIfAny(uid: Int) {
-        io {
-            connIpList = connectionTrackerRepository.getLogsForApp(uid)
-
-            uiCtx {
-                if (connIpList.isNullOrEmpty()) {
-                    b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
-                    b.aadConnDetailSearchContainer.visibility = View.GONE
-                    b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
-                    b.aadConnDetailRecycler.visibility = View.GONE
-                    toggleFirewallUiState(firewallUiState)
-                    return@uiCtx
-                }
-
-                // asserting as the null check is above
-                b.aadConnDetailDesc.text =
-                    getString(R.string.ada_ip_connection_count, connIpList!!.size.toString())
-                // set listview adapter
-                b.aadConnDetailRecycler.setHasFixedSize(true)
-                val layoutManager = LinearLayoutManager(this)
-                b.aadConnDetailRecycler.layoutManager = layoutManager
-                appConnAdapter = AppConnectionAdapter(this, connIpList!!, uid)
-                b.aadConnDetailRecycler.adapter = appConnAdapter
-            }
-        }
+        b.aadConnDetailRecycler.isNestedScrollingEnabled = false
+        b.aadConnDetailRecycler.adapter = recyclerAdapter
+        networkLogsViewModel.setFilter("")
     }
 
     private fun toggleIpConnectionsState(state: Boolean) {
         ipListUiState = !state
+
         if (state) {
-            b.aadConnDetailTopLl.visibility = View.VISIBLE
-            b.aadConnDetailSearchLl.visibility = View.VISIBLE
+            b.aadConnListTopLl.visibility = View.VISIBLE
             b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_up)
+            b.aadConnDelete.visibility = View.VISIBLE
+            b.aadConnDetailSearchLl.visibility = View.VISIBLE
         } else {
-            b.aadConnDetailSearchLl.visibility = View.GONE
-            b.aadConnDetailTopLl.visibility = View.GONE
+            b.aadConnListTopLl.visibility = View.GONE
             b.aadConnDetailIndicator.setImageResource(R.drawable.ic_arrow_down)
+            b.aadConnDelete.visibility = View.GONE
+            b.aadConnDetailSearchLl.visibility = View.GONE
         }
     }
 
@@ -505,35 +505,9 @@ class AppInfoActivity :
         }
     }
 
-    private fun toggleIpRulesState(state: Boolean) {
-        ipRulesUiState = !state
-
-        if (state) {
-            b.aadIpBlockTopLl.visibility = View.VISIBLE
-            b.aadIpBlockIndicator.setImageResource(R.drawable.ic_arrow_up)
-            b.aadIpAddIndicator.visibility = View.VISIBLE
-            return
-        }
-
-        b.aadIpBlockTopLl.visibility = View.GONE
-        b.aadIpAddIndicator.visibility = View.GONE
-        b.aadIpBlockIndicator.setImageResource(R.drawable.ic_arrow_down)
-    }
-
-    private fun toggleAppDetailsState(state: Boolean) {
-        appDetailsUiState = !state
-        if (state) {
-            b.aadAppStatsCard.visibility = View.VISIBLE
-            b.aadDownArrowIcon.setImageResource(R.drawable.ic_arrow_up)
-            return
-        }
-
-        b.aadAppStatsCard.visibility = View.GONE
-        b.aadDownArrowIcon.setImageResource(R.drawable.ic_arrow_down)
-    }
-
     private fun enableAppWhitelistedUi() {
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_on, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
@@ -541,7 +515,8 @@ class AppInfoActivity :
     }
 
     private fun enableAppExcludedUi() {
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_on, b.aadAppSettingsExclude)
@@ -558,12 +533,13 @@ class AppInfoActivity :
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
     }
 
     private fun enableLockdownUi() {
-        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
@@ -571,7 +547,8 @@ class AppInfoActivity :
     }
 
     private fun enableAllow() {
-        setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_allow, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
@@ -582,18 +559,19 @@ class AppInfoActivity :
     private fun enableBlock(cStat: FirewallManager.ConnectionStatus) {
         when (cStat) {
             FirewallManager.ConnectionStatus.MOBILE_DATA -> {
-                setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlock)
+                setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlockWifi)
                 setDrawable(R.drawable.ic_firewall_data_off, b.aadAppSettingsBlockMd)
             }
             FirewallManager.ConnectionStatus.WIFI -> {
-                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlock)
+                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlockWifi)
                 setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
             }
             FirewallManager.ConnectionStatus.BOTH -> {
-                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlock)
+                setDrawable(R.drawable.ic_firewall_wifi_off, b.aadAppSettingsBlockWifi)
                 setDrawable(R.drawable.ic_firewall_data_off, b.aadAppSettingsBlockMd)
             }
         }
+        setDrawable(R.drawable.ic_firewall_block, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
     }
@@ -695,6 +673,26 @@ class AppInfoActivity :
         dialog.show()
     }
 
+    private fun showDeleteConnectionsDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.ada_delete_logs_dialog_title)
+        builder.setMessage(R.string.ada_delete_logs_dialog_desc)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.ada_delete_logs_dialog_positive)) { _, _ ->
+            deleteAppLogs()
+        }
+
+        builder.setNegativeButton(getString(R.string.ada_delete_logs_delete_negative)) { _, _ -> }
+        builder.create().show()
+    }
+
+    private fun deleteAppLogs() {
+        io {
+            connectionTrackerRepository.clearLogsByUid(uid)
+            // displayNetworkLogsIfAny(uid)
+        }
+    }
+
     private fun getHostName(ip: String): HostName? {
         return try {
             val host = HostName(ip)
@@ -724,7 +722,7 @@ class AppInfoActivity :
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(this)
 
-        builderSingle.setIcon(R.drawable.spinner_firewall)
+        builderSingle.setIcon(R.drawable.ic_firewall_block)
         val count = packageList.count()
         builderSingle.setTitle(
             this.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())
@@ -737,7 +735,7 @@ class AppInfoActivity :
         builderSingle.setItems(packageList.toTypedArray(), null)
 
         builderSingle
-            .setPositiveButton(aStat.name) { di: DialogInterface, _: Int ->
+            .setPositiveButton(getString(aStat.getLabelId())) { di: DialogInterface, _: Int ->
                 di.dismiss()
                 completeFirewallChanges(aStat, cStat)
             }
@@ -749,57 +747,6 @@ class AppInfoActivity :
         val alertDialog: AlertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.show()
-    }
-
-    private fun updateBasicAppInfo() {
-        // TODO: As we get the packageInfo details, we can now show the permission
-        // details of the application as well. Need to add when the permission manager is
-        // introduced.
-        try {
-            val packageInfo: PackageInfo =
-                this.packageManager.getPackageInfo(
-                    appInfo.packageInfo,
-                    PackageManager.GET_PERMISSIONS
-                )
-            val installTime =
-                Utilities.convertLongToTime(packageInfo.firstInstallTime, TIME_FORMAT_3)
-            val updateTime = Utilities.convertLongToTime(packageInfo.lastUpdateTime, TIME_FORMAT_3)
-            b.aadDetails.text =
-                updateHtmlEncodedText(
-                    getString(
-                        R.string.ada_uid,
-                        appInfo.uid.toString(),
-                        appInfo.appCategory,
-                        installTime,
-                        updateTime
-                    )
-                )
-            toggleAppDetailsState(appDetailsUiState)
-            enableAppInfoIndicators()
-        } catch (ignored: PackageManager.NameNotFoundException) {
-            // pass the app state to false; so that the toggle will
-            // hide the app's basic info for non-apps
-            toggleAppDetailsState(state = false)
-            disableAppInfoIndicators()
-        }
-    }
-
-    private fun enableAppInfoIndicators() {
-        b.aadAppInfoIcon.visibility = View.VISIBLE
-        b.aadDownArrowIcon.visibility = View.VISIBLE
-        b.aadAppDetailIcon.isEnabled = true
-        b.aadAppDetailLl.isEnabled = true
-        b.aadAppDetailLl.isClickable = true
-        b.aadAppDetailIcon.isClickable = true
-    }
-
-    private fun disableAppInfoIndicators() {
-        b.aadAppInfoIcon.visibility = View.GONE
-        b.aadDownArrowIcon.visibility = View.GONE
-        b.aadAppDetailIcon.isEnabled = false
-        b.aadAppDetailLl.isEnabled = false
-        b.aadAppDetailLl.isClickable = false
-        b.aadAppDetailIcon.isClickable = false
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
@@ -823,18 +770,12 @@ class AppInfoActivity :
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
-        if (appConnAdapter == null) return true
-
-        val filter = connIpList?.filter { it.ipAddress.contains(query) }
-        appConnAdapter?.filter(filter)
+        networkLogsViewModel.setFilter(query)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        if (appConnAdapter == null) return true
-
-        val filter = connIpList?.filter { it.ipAddress.contains(query) }
-        appConnAdapter?.filter(filter)
+        networkLogsViewModel.setFilter(query)
         return true
     }
 }

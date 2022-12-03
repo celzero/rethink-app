@@ -17,6 +17,9 @@ package com.celzero.bravedns.automaton
 
 import android.content.Context
 import android.util.Log
+import com.celzero.bravedns.R
+import com.celzero.bravedns.data.FileTag
+import com.celzero.bravedns.data.FileTagDeserializer
 import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.database.RethinkLocalFileTagRepository
 import com.celzero.bravedns.database.RethinkRemoteFileTag
@@ -30,6 +33,7 @@ import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_F
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.BraveDNS
 import dnsx.Dnsx
@@ -47,15 +51,6 @@ object RethinkBlocklistManager : KoinComponent {
     private val persistentState by inject<PersistentState>()
 
     private const val EMPTY_SUBGROUP = "others"
-    private const val INVALID_SIMPLE_TAG_ID = -1
-
-    data class SimpleViewTag(
-        val id: Int,
-        val name: String,
-        val desc: String,
-        val tags: MutableList<Int>,
-        val rethinkBlockType: RethinkBlockType
-    )
 
     data class SimpleViewPacksTag(
         val name: String,
@@ -64,212 +59,56 @@ object RethinkBlocklistManager : KoinComponent {
         val group: String
     )
 
-    data class RethinkBlockType(val name: String, val desc: String)
-
-    data class SimpleViewMapping(val value: Int, val simpleTagId: Int)
-
-    suspend fun getSimpleViewTags(
-        type: RethinkBlocklistFragment.RethinkBlocklistType
-    ): List<SimpleViewTag> {
-
-        val simpleTags =
-            mutableListOf(
-                ADULT,
-                PIRACY,
-                GAMBLING,
-                DATING,
-                SOCIAL_MEDIA,
-                SEC_FULL,
-                SEC_EXTRA,
-                PRIVACY_LITE,
-                PRIVACY_AGGRESSIVE,
-                PRIVACY_EXTREME
-            )
-
-        val tags =
-            if (type.isRemote()) {
-                remoteFileTagRepository.getSimpleViewTags()
-            } else {
-                localFileTagRepository.getSimpleViewTags()
-            }
-
-        val groups = tags.groupBy { it.simpleTagId }
-
-        groups.keys.forEach { key ->
-            if (key == INVALID_SIMPLE_TAG_ID) return@forEach
-
-            groups[key]?.map { it.value }?.let { it1 -> simpleTags[key].tags.addAll(it1) }
-        }
-        return simpleTags
-    }
-
-    private suspend fun getRemoteSimpleViewPacks(): List<SimpleViewPacksTag> {
-        val fileTags = remoteFileTagRepository.fileTags()
-        val uniquePacks: MutableSet<String> = mutableSetOf()
-        fileTags.forEach {
-            if (it.pack?.isEmpty() == true) return@forEach
-
-            it.pack?.let { it1 -> uniquePacks.addAll(it1) }
-        }
-
-        uniquePacks.removeIf { it.isEmpty() }
-        val packs: MutableList<SimpleViewPacksTag> = mutableListOf()
-
-        uniquePacks.forEach { p ->
-            val tags: MutableList<Int> = mutableListOf()
-            var group = ""
-            var count = 0
-            fileTags.forEach {
-                if (it.pack?.contains(p) == true) {
-                    group = it.group
-                    tags.add(it.value)
-                    count++
-                }
-            }
-            val pack = SimpleViewPacksTag(p, count.toString(), tags, group)
-            packs.add(pack)
-        }
-
-        packs.sortBy { it.group }
-
-        return packs
-    }
-
-    private suspend fun getLocalSimpleViewPacks(): List<SimpleViewPacksTag> {
-        val fileTags = localFileTagRepository.fileTags()
-        val uniquePacks: MutableSet<String> = mutableSetOf()
-        fileTags.forEach {
-            if (it.pack?.isEmpty() == true) return@forEach
-
-            it.pack?.let { it1 -> uniquePacks.addAll(it1) }
-        }
-
-        uniquePacks.removeIf { it.isEmpty() }
-        val packs: MutableList<SimpleViewPacksTag> = mutableListOf()
-
-        uniquePacks.forEach { p ->
-            val tags: MutableList<Int> = mutableListOf()
-            var group = ""
-            var count = 0
-            fileTags.forEach {
-                if (it.pack?.contains(p) == true) {
-                    group = it.group
-                    tags.add(it.value)
-                    count++
-                }
-            }
-            val pack = SimpleViewPacksTag(p, count.toString(), tags, group)
-            packs.add(pack)
-        }
-        packs.sortBy { it.group }
-
-        return packs
-    }
+    data class RethinkBlockType(val name: String, val label: Int, val desc: Int)
 
     suspend fun getSimpleViewPacksTags(
         type: RethinkBlocklistFragment.RethinkBlocklistType
     ): List<SimpleViewPacksTag> {
-        return if (type.isRemote()) {
-            getRemoteSimpleViewPacks()
-        } else {
-            getLocalSimpleViewPacks()
+        val fileTags =
+            if (type.isRemote()) {
+                remoteFileTagRepository.fileTags()
+            } else {
+                localFileTagRepository.fileTags()
+            }
+
+        val uniquePacks: MutableSet<String> = mutableSetOf()
+        fileTags.forEach {
+            if (it.pack.isEmpty()) return@forEach
+
+            it.pack.let { it1 -> uniquePacks.addAll(it1) }
         }
+
+        uniquePacks.removeIf { it.isEmpty() }
+        val packs: MutableList<SimpleViewPacksTag> = mutableListOf()
+
+        uniquePacks.forEach { p ->
+            val tags: MutableList<Int> = mutableListOf()
+            var group = ""
+            var count = 0
+            fileTags.forEach {
+                if (it.pack.contains(p)) {
+                    group = it.group
+                    tags.add(it.value)
+                    count++
+                }
+            }
+            val pack = SimpleViewPacksTag(p, count.toString(), tags, group)
+            packs.add(pack)
+        }
+        packs.sortBy { it.group }
+
+        return packs
     }
 
-    // fixme: remove the below code when the filetag is updated from version 1 to 2.
     // TODO: move this strings to strings.xml
     val PARENTAL_CONTROL =
         RethinkBlockType(
             "ParentalControl",
-            "Block adult & pirated content, online gambling & dating, and social media."
+            R.string.rbl_parental_control,
+            R.string.rbl_parental_control_desc
         )
-    val SECURITY =
-        RethinkBlockType(
-            "Security",
-            "Block malware, ransomware, cryptoware, phishers, and other threats."
-        )
-    val PRIVACY = RethinkBlockType("Privacy", "Block attentionware, spyware, scareware.")
-
-    private val ADULT =
-        SimpleViewTag(
-            0,
-            "Adult",
-            "Blocks over 30,000 adult websites.",
-            mutableListOf(),
-            PARENTAL_CONTROL
-        )
-    private val PIRACY =
-        SimpleViewTag(
-            1,
-            "Piracy",
-            "Blocks torrent, dubious video streaming and file sharing websites.",
-            mutableListOf(),
-            PARENTAL_CONTROL
-        )
-    private val GAMBLING =
-        SimpleViewTag(
-            2,
-            "Gambling",
-            "Blocks over 2000+ online gambling websites.",
-            mutableListOf(),
-            PARENTAL_CONTROL
-        )
-    private val DATING =
-        SimpleViewTag(
-            3,
-            "Dating",
-            "Blocks over 3000+ online dating websites.",
-            mutableListOf(),
-            PARENTAL_CONTROL
-        )
-    private val SOCIAL_MEDIA =
-        SimpleViewTag(
-            4,
-            "Social Media",
-            "Blocks popular social media including Facebook, Instagram, and WhatsApp.",
-            mutableListOf(),
-            PARENTAL_CONTROL
-        )
-    private val SEC_FULL =
-        SimpleViewTag(
-            5,
-            "Full",
-            "Blocks over 150,000 malware, ransomware, phishing and other threats.",
-            mutableListOf(),
-            SECURITY
-        )
-    private val SEC_EXTRA =
-        SimpleViewTag(
-            6,
-            "Extra",
-            "Blocks over 3000+ cryptoware websites",
-            mutableListOf(),
-            SECURITY
-        )
-    private val PRIVACY_LITE =
-        SimpleViewTag(
-            7,
-            "Lite",
-            "Blocks over 50,000+ attentionware through some of the most well-curated blocklists.",
-            mutableListOf(),
-            PRIVACY
-        )
-    private val PRIVACY_AGGRESSIVE =
-        SimpleViewTag(
-            8,
-            "Aggressive",
-            "Blocks over 100,000+ attentionware, spyware through some of the most extensive blocklists.",
-            mutableListOf(),
-            PRIVACY
-        )
-    private val PRIVACY_EXTREME =
-        SimpleViewTag(
-            9,
-            "Extreme",
-            "Blocks over 1,000,000+ suspected websites.",
-            mutableListOf(),
-            PRIVACY
-        )
+    val SECURITY = RethinkBlockType("Security", R.string.rbl_privacy, R.string.rbl_security_desc)
+    val PRIVACY = RethinkBlockType("Privacy", R.string.rbl_security, R.string.rbl_privacy_desc)
 
     // read and parse the json file, either remote or local blocklist
     // returns the parsed FileTag list, on error return empty array list
@@ -278,6 +117,7 @@ object RethinkBlocklistManager : KoinComponent {
         type: AppDownloadManager.DownloadType,
         timestamp: Long
     ): Boolean {
+        // TODO: merge both the remote and local json parsing into one
         return if (type.isRemote()) {
             readRemoteJson(context, timestamp)
         } else {
@@ -288,31 +128,42 @@ object RethinkBlocklistManager : KoinComponent {
     private suspend fun readLocalJson(context: Context, timestamp: Long): Boolean {
         try {
             val dbFileTagLocal: MutableList<RethinkLocalFileTag> = mutableListOf()
-            /*val dir = Utilities.blocklistDownloadBasePath(context,
-            LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-            timestamp)*/
-
-            val dir = Utilities.blocklistDownloadBasePath(context, "Test", timestamp)
+            val dir =
+                Utilities.blocklistDownloadBasePath(
+                    context,
+                    LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                    timestamp
+                )
 
             val file = Utilities.blocklistFile(dir, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
 
             val jsonString = file.bufferedReader().use { it.readText() }
+            // register the type adapter to deserialize the class.
+            // see FileTag.kt for more info (FileTagDeserializer)
+            val gson =
+                GsonBuilder()
+                    .registerTypeAdapter(FileTag::class.java, FileTagDeserializer())
+                    .create()
             val entries: JsonObject = Gson().fromJson(jsonString, JsonObject::class.java)
             entries.entrySet().forEach {
-                val t = Gson().fromJson(it.value, RethinkLocalFileTag::class.java)
+                val t = gson.fromJson(it.value, FileTag::class.java)
                 // add subg tag as "others" if its empty
                 if (t.subg.isEmpty()) {
                     t.subg = EMPTY_SUBGROUP
                 }
-                if (t.pack == null) {
-                    t.pack = arrayListOf()
-                }
                 t.group = t.group.lowercase()
-                val simpleViewTag = getSimpleBlocklistDetails(t.uname, t.subg)
-                t.simpleTagId = simpleViewTag?.id ?: RethinkLocalFileTag.INVALID_SIMPLE_TAG_ID
-                dbFileTagLocal.add(t)
+                val l = getRethinkLocalObj(t)
+
+                dbFileTagLocal.add(l)
             }
+            val selectedTags = localFileTagRepository.getSelectedTags()
+            // edge case: found a residual block list entry still available in the database
+            // during the insertion of new block list entries. This occurred when the number of
+            // block lists in the preceding list is greater than the current list. Always
+            // empty the data base entries before creating new entries.
+            localFileTagRepository.deleteAll()
             localFileTagRepository.insertAll(dbFileTagLocal.toList())
+            localFileTagRepository.updateTags(selectedTags.toSet(), 1)
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Local blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
@@ -329,31 +180,41 @@ object RethinkBlocklistManager : KoinComponent {
         try {
             val dbFileTagRemote: MutableList<RethinkRemoteFileTag> = mutableListOf()
 
-            val dir = Utilities.blocklistDownloadBasePath(context, "Test", timestamp)
-
-            /*val dir = Utilities.blocklistDownloadBasePath(context,
-            REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-            timestamp)*/
+            val dir =
+                Utilities.blocklistDownloadBasePath(
+                    context,
+                    REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                    timestamp
+                )
 
             val file = Utilities.blocklistFile(dir, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
+            // register typeadapter to enable custom deserialization of the FileTag object.
+            // see FileTag.kt for more info (FileTagDeserializer)
+            val gson =
+                GsonBuilder()
+                    .registerTypeAdapter(FileTag::class.java, FileTagDeserializer())
+                    .create()
 
             val jsonString = file.bufferedReader().use { it.readText() }
             val entries: JsonObject = Gson().fromJson(jsonString, JsonObject::class.java)
             entries.entrySet().forEach {
-                val t = Gson().fromJson(it.value, RethinkRemoteFileTag::class.java)
+                val t = gson.fromJson(it.value, FileTag::class.java)
                 // add subg tag as "others" if its empty
                 if (t.subg.isEmpty()) {
                     t.subg = EMPTY_SUBGROUP
                 }
-                if (t.pack == null) {
-                    t.pack = arrayListOf()
-                }
                 t.group = t.group.lowercase()
-                val simpleViewTag = getSimpleBlocklistDetails(t.uname, t.subg)
-                t.simpleTagId = simpleViewTag?.id ?: RethinkRemoteFileTag.INVALID_SIMPLE_TAG_ID
-                dbFileTagRemote.add(t)
+                val r = getRethinkRemoteObj(t)
+                dbFileTagRemote.add(r)
             }
+            val selectedTags = remoteFileTagRepository.getSelectedTags()
+            // edge case: found a residual block list entry still available in the database
+            // during the insertion of new block list entries. This occurred when the number of
+            // block lists in the preceding list is greater than the current list. Always
+            // empty the data base entries before creating new entries.
+            remoteFileTagRepository.deleteAll()
             remoteFileTagRepository.insertAll(dbFileTagRemote.toList())
+            remoteFileTagRepository.updateTags(selectedTags.toSet(), 1)
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Remote blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
@@ -364,6 +225,38 @@ object RethinkBlocklistManager : KoinComponent {
             )
         }
         return false
+    }
+
+    private fun getRethinkLocalObj(t: FileTag): RethinkLocalFileTag {
+        return RethinkLocalFileTag(
+            t.value,
+            t.uname,
+            t.vname,
+            t.group,
+            t.subg,
+            t.pack,
+            t.urls,
+            t.show,
+            t.entries,
+            t.simpleTagId,
+            t.isSelected
+        )
+    }
+
+    private fun getRethinkRemoteObj(t: FileTag): RethinkRemoteFileTag {
+        return RethinkRemoteFileTag(
+            t.value,
+            t.uname,
+            t.vname,
+            t.group,
+            t.subg,
+            t.pack,
+            t.urls,
+            t.show,
+            t.entries,
+            t.simpleTagId,
+            t.isSelected
+        )
     }
 
     suspend fun updateFiletagRemote(remote: RethinkRemoteFileTag) {
@@ -533,103 +426,5 @@ object RethinkBlocklistManager : KoinComponent {
         type: RethinkBlocklistFragment.RethinkBlocklistType
     ) {
         getBraveDns(context, timestamp, type)
-    }
-
-    // this is for version 1 of filetag.json
-    // from version 2, packs will be introduced
-    // for simple blocklist ui constructions
-    private fun getSimpleBlocklistDetails(name: String, subgroup: String): SimpleViewTag? {
-        return if (subgroup == "threat-intelligence-feeds") {
-            SEC_FULL
-        } else if (subgroup == "cryptojacking" || subgroup == "parked-domains-cname") {
-            SEC_EXTRA
-        } else if (subgroup == "porn") {
-            ADULT
-        } else if (subgroup == "piracy") {
-            PIRACY
-        } else if (subgroup == "gambling") {
-            GAMBLING
-        } else if (subgroup == "dating") {
-            DATING
-        } else if (subgroup == "social-networks") {
-            SOCIAL_MEDIA
-        } else if (subgroup == "affiliate-tracking-domains") {
-            PRIVACY_EXTREME
-        } else if (subgroup == "notracking") {
-            PRIVACY_EXTREME
-        } else if (subgroup == "rethinkdns-recommended") {
-            PRIVACY_LITE
-        } else if (subgroup == "others") {
-            if (name == "OHE") { // 1Hosts (Complete)
-                PRIVACY_AGGRESSIVE
-            } else if (name == "XAT") { // ABPVN
-                PRIVACY_AGGRESSIVE
-            } else if (name == "OSE") { // ADWars
-                PRIVACY_AGGRESSIVE
-            } else if (name == "IBB") { // ADAway
-                PRIVACY_AGGRESSIVE
-            } else if (name == "HZD") { // Adguard
-                PRIVACY_LITE
-            } else if (name == "FLW") { // AntiAd
-                PRIVACY_AGGRESSIVE
-            } else if (name == "OFY") { // Anudeep's Blacklist
-                PRIVACY_LITE
-            } else if (name == "IJO") { // Cameleon
-                PRIVACY_EXTREME
-            } else if (name == "EMY") { // Disconnect ads
-                PRIVACY_LITE
-            } else if (name == "XMM") { // Disconnect Malware
-                SEC_FULL
-            } else if (name == "CQT") { // Disconnect Tracking
-                PRIVACY_EXTREME
-            } else if (name == "ANW") { // EasyList China
-                PRIVACY_AGGRESSIVE
-            } else if (
-                name == "DGE" ||
-                    name == "BBS" ||
-                    name == "OKW" ||
-                    name == "ONV" ||
-                    name == "CDE" ||
-                    name == "PAL" ||
-                    name == "MDE" ||
-                    name == "EOO"
-            ) {
-                PRIVACY_EXTREME // EasyList (regional)
-            } else if (name == "DBP" || name == "MHP") {
-                PRIVACY_LITE // EasyList (privacy)
-            } else if (name == "OUU") { // Energized Blu Go
-                PRIVACY_LITE
-            } else if (name == "YXS") { // Energized Blu
-                PRIVACY_AGGRESSIVE
-            } else if (name == "TXJ" || name == "DPY") { // Energized Extreme
-                PRIVACY_EXTREME // and Energized Ultimate
-            } else if (name == "EOK") { // GoodbyeAds
-                PRIVACY_EXTREME
-            } else if (name == "HQL") { // HostsVN
-                PRIVACY_LITE
-            } else if (name == "QKN" || name == "MPR") { // Lightswitch
-                PRIVACY_EXTREME
-            } else if (name == "XIO") { // NoTrack Tracker
-                PRIVACY_AGGRESSIVE
-            } else if (name == "YBO" || name == "NML") { // Ru AdList
-                PRIVACY_AGGRESSIVE // and Perflyst's SmartTV Blockers
-            } else if (name == "TTW") { // Peter Lowe
-                PRIVACY_LITE
-            } else if (name == "AMI") { // someonewhocare.org
-                PRIVACY_AGGRESSIVE
-            } else if (name == "FHM" || name == "IAJ") { // dbl.oisd.nl
-                PRIVACY_EXTREME // and 1Hosts (Pro)
-            } else if (name == "MIN" || name == "IFD") {
-                PRIVACY_EXTREME // Shalla's Blacklists
-            } else if (name == "TTI") { // MVPS Hosts
-                PRIVACY_EXTREME
-            } else if (name == "WWI") { // AdAway Japan
-                PRIVACY_EXTREME
-            } else {
-                null
-            }
-        } else {
-            null
-        }
     }
 }

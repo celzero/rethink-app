@@ -93,7 +93,6 @@
     <string name="cd_dialog_title">加網域</string>
     <string name="ada_app_unmetered">唔收費嘅網絡</string>
     <string name="ada_ip_block_count">%1$s 個 IP 規則</string>
-    <string name="ada_ip_block_no_rules">呢個 app 冇 IP 規則。</string>
     <string name="ada_ip_rules_title">呢個 app 嘅 IP 規則</string>
     <string name="ada_network_log_title">呢個 app 嘅網絡日誌</string>
     <string name="ada_app_metered">收費嘅網絡</string>
@@ -158,7 +157,6 @@
     <string name="dns_query_clear_logs_title">係咪要丟哂所有 DNS 日誌？</string>
     <string name="dns_query_clear_logs_message">咁做會丟咗裝置上面所有嘅 DNS 日誌。呢個動作冇得返轉頭㗎。請問您係咪想繼續？</string>
     <string name="bsct_app_info">應用程式資訊</string>
-    <string name="private_dns_toast">私人 DNS 已經設定好。</string>
     <string name="always_on_dialog_heading">禁用永久連線 VPN</string>
     <string name="always_on_dialog_positive_btn">去設定</string>
     <string name="always_on_dialog_negative_btn">取消</string>
@@ -393,7 +391,6 @@
     <string name="about_faq">睇常見問題</string>
     <string name="about_docs">睇文檔</string>
     <string name="about_connect">聯繫我哋</string>
-    <string name="about_sponsor">贊助</string>
     <string name="about_sponsor_link_text">贊助</string>
     <string name="about_app">app</string>
     <string name="about_email">電郵聯繫</string>
@@ -667,10 +664,7 @@
     <string name="ada_noapp_dialog_title">搵唔到應用程式資訊</string>
     <string name="ada_noapp_dialog_message">搵唔到你講嗰隻 app 嘅資訊。</string>
     <string name="ada_noapp_dialog_positive">確認</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">繞行應用程式規則</string>
-    <string name="ada_ip_rules_status_allowed">冇規則</string>
     <string name="ada_firewall_status">呢個 app <b><i>%1$s</i></b>。</string>
-    <string name="ada_uid">應用程式 ID：<i>%1$s</i><br/>分類：<i>%2$s</i><br/>安裝於：<i>%3$s</i><br/>更新於：<i>%4$s</i></string>
     <string name="ada_ip_connection_count">已連線至 %1$s 個 IP 地址</string>
     <string name="ada_ip_connection_count_zero">0 個 IP 地址</string>
     <string name="ada_ip_no_connection">呢個 app 冇網絡日誌。</string>
@@ -683,10 +677,8 @@
     <string name="bsac_unblock">解封</string>
     <string name="bsac_bypass_app_rules">繞行應用規則</string>
     <string name="bsac_go_pass_app_rules">移除繞行</string>
-    <string name="bsac_delete">刪除</string>
     <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
     <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
-    <string name="bsac_delete_toast">刪除咗 %1$s</string>
     <string name="bsdl_domain_heading">網域規則</string>
     <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
     <string name="bsac_whitelist_toast">針對呢個 IP %1$s 嘅繞行應用規則</string>
@@ -849,7 +841,6 @@
     <string name="ci_blocked_desc">- 攔截</string>
     <string name="ci_block">攔截</string>
     <string name="ci_bypass_universal">無條件放行</string>
-    <string name="ada_ip_rules_status_blocked">攔截咗</string>
     <string name="ada_app_status_allow">放行咗</string>
     <string name="ada_app_status_block">攔截咗</string>
     <string name="ada_app_status_block_wifi">已經喺唔收費嘅網絡（WiFi）攔截咗</string>

@@ -33,7 +33,7 @@ import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS
+import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
@@ -203,8 +203,8 @@ class AppDownloadManager(
             return DownloadManagerStatus.FAILURE
 
         purge(context, timestamp, DownloadType.LOCAL)
-        val downloadIds = LongArray(ONDEVICE_BLOCKLISTS.count())
-        ONDEVICE_BLOCKLISTS.forEachIndexed { i, it ->
+        val downloadIds = LongArray(ONDEVICE_BLOCKLISTS_ADM.count())
+        ONDEVICE_BLOCKLISTS_ADM.forEachIndexed { i, it ->
             val fileName = it.filename
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
             downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())

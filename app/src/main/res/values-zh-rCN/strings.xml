@@ -158,7 +158,6 @@
     <string name="build__flavor_play_store">play</string>
     <string name="cd_remove_dialog_message">于已保存配置中删除此域名。</string>
     <string name="ada_firewall_status">此应用<b><i>%1$s</i></b>。</string>
-    <string name="ada_ip_block_no_rules">此应用无 IP 规则。</string>
     <string name="bsdl_domain_rule_norule">无规则</string>
     <string name="bsdl_domain_rule_allow">放行</string>
     <string name="rt_chip_update_available">更新可用</string>
@@ -247,7 +246,6 @@
     <string name="rt_apply_btn">应用</string>
     <string name="rt_download_desc">请下载屏蔽名单（约 60 MB ）以使用此功能。</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
-    <string name="private_dns_toast">已设置私人 DNS 。</string>
     <string name="always_on_dialog_positive">停止</string>
     <string name="dns_crypt_url_remove_dialog_message">于已保存的配置中删除此 DNSCrypt 解析服务。</string>
     <string name="local_blocklist_download">下载屏蔽名单</string>
@@ -427,7 +425,6 @@
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ci_bypass_universal_initial">绕</string>
     <string name="ci_bypass_universal_txt">无条件放行</string>
-    <string name="ada_ip_rules_status_blocked">已拦截</string>
     <string name="notif_download_content_text">正在下载……</string>
     <string name="rt_re_download">重新下载屏蔽名单</string>
     <string name="rethink_dns_txt">RethinkDNS %1$s</string>
@@ -468,9 +465,7 @@
     <string name="cd_whitelist_initial">放</string>
     <string name="ci_dialog_added_success">已将 IP 加入列表</string>
     <string name="ci_no_rule_txt">无规则</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">绕行应用规则</string>
     <string name="ada_app_metered">收费网络</string>
-    <string name="bsac_delete_toast">已删除 %1$s</string>
     <string name="notif_download_content_title">下载本地屏蔽名单</string>
     <string name="bsrf_clear_filter">清除</string>
     <string name="status_protected_with_proxy_private_dns">已由代理与私人 DNS 保护</string>
@@ -581,8 +576,6 @@
     <string name="cd_add_dialog_show_btn">显示</string>
     <string name="cd_sample_unicode_invalid">❌</string>
     <string name="ci_delete">删除</string>
-    <string name="ada_ip_rules_status_allowed">无规则</string>
-    <string name="ada_uid">应用 ID ： <i>%1$s</i><br/>分类： <i>%2$s</i><br/>安装于： <i>%3$s</i><br/>更新于： <i>%4$s</i></string>
     <string name="ada_ip_rules_title">此应用的 IP 规则</string>
     <string name="bsac_block">拦截</string>
     <string name="bsac_unblock_toast">已为此应用放行 %1$s</string>
@@ -702,7 +695,6 @@
     <string name="notif_channel_vpn_notification">VPN 已启用</string>
     <string name="category_name_sys_apps">系统应用</string>
     <string name="ci_blocked_txt">拦截</string>
-    <string name="bsac_delete">删除</string>
     <string name="lbbs_enabled">已启用</string>
     <string name="brbs_backup_dialog_positive">备份</string>
     <string name="orbot_http_desc">推荐应用程序使用 Orbot 的 HTTP 代理。</string>
@@ -780,7 +772,6 @@
 \n<u>TCP 代理</u>： Rethink 只将未被排除应用的 TCP 连接转发至 Orbot 。
 \n<u>HTTP 代理</u>： Rethink <i>设置</i> HTTP 代理，但不强制应用程序使用它。如 Chrome 和 Firefox 等的浏览器通常会使用 HTTP 代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
-    <string name="about_sponsor">赞助</string>
     <string name="about_mozilla">RethinkDNS 为 Mozilla Builders MVP 计划的一部分。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) 代理</string>
     <string name="http_proxy_dialog_desc">HTTP(S) 代理设置仅为对应用程序的一个提醒，它们可选择是否使用代理；但如 Chrome 及 Firefox 等的浏览器则会使用代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>

@@ -31,19 +31,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="125dp"
-                android:tag="0"
-                android:text="@string/rt_list_simple_btn_txt"
-                android:textColor="?attr/defaultToggleBtnTxt"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/lb_packs_toggle_btn"
-                style="@style/toggleButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="125dp"
                 android:tag="1"
-                android:text="Packs"
+                android:text="@string/rt_list_simple_btn_txt"
                 android:textColor="?attr/defaultToggleBtnTxt"
                 app:cornerRadius="16dp" />
 
@@ -73,11 +62,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:visibility="visible" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/lb_simple_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lb_simple_recycler_packs"

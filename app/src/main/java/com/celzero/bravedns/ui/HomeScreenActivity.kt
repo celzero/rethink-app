@@ -298,7 +298,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun moveRemoteBlocklistFileFromAsset() {
         io {
             // already there is a remote blocklist file available
-            if (persistentState.remoteBlocklistTimestamp != INIT_TIME_MS) {
+            if (persistentState.remoteBlocklistTimestamp > Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP) {
                 RethinkBlocklistManager.readJson(
                     this,
                     AppDownloadManager.DownloadType.REMOTE,
@@ -324,7 +324,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun moveLocalBlocklistFiles() {
         val path = oldLocalBlocklistDownloadDir(this, persistentState.localBlocklistTimestamp)
         val blocklistsExist =
-            Constants.ONDEVICE_BLOCKLISTS.all { File(path + File.separator + it.filename).exists() }
+            Constants.ONDEVICE_BLOCKLISTS_ADM.all {
+                File(path + File.separator + it.filename).exists()
+            }
         if (!blocklistsExist) return
 
         changeDefaultLocalBlocklistLocation()
@@ -339,7 +341,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 persistentState.localBlocklistTimestamp
             )
         File(baseDir).mkdirs()
-        Constants.ONDEVICE_BLOCKLISTS.forEach {
+        Constants.ONDEVICE_BLOCKLISTS_ADM.forEach {
             val currentFile =
                 File(
                     oldLocalBlocklistDownloadDir(this, persistentState.localBlocklistTimestamp) +

@@ -366,7 +366,7 @@ class FirewallAppListAdapter(
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
-            builderSingle.setIcon(R.drawable.spinner_firewall)
+            builderSingle.setIcon(R.drawable.ic_firewall_block)
             val count = packageList.count()
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())

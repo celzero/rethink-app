@@ -32,7 +32,7 @@ object OkHttpDebugLogging {
 
     private fun logHandler() =
         ConsoleHandler().apply {
-            level = Level.FINEST
+            level = Level.INFO
             formatter =
                 object : SimpleFormatter() {
                     override fun format(record: LogRecord) =
@@ -44,7 +44,7 @@ object OkHttpDebugLogging {
         val logger = Logger.getLogger(loggerClass)
         if (configuredLoggers.add(logger)) {
             logger.addHandler(handler)
-            logger.level = Level.FINEST
+            logger.level = Level.INFO
         }
         return Closeable { logger.removeHandler(handler) }
     }

@@ -76,7 +76,6 @@
     <string name="category_name_others">أخرى</string>
     <string name="firewall_rule_block_udp_ntp">UDP محظور</string>
     <string name="network_log_app_name_unknown">مجهول</string>
-    <string name="bsac_delete">احذف</string>
     <string name="ada_app_status_allow">مسموح</string>
     <string name="settings_title_desc">نظام DNS وجدار حماية قابلين للتخصيص بدرجة عالية</string>
     <string name="always_on_dialog_positive">إيقاف</string>
@@ -140,7 +139,6 @@
     <string name="conn_track_clear_logs_title">هل تريد حذف كافة سجلات الشبكة؟</string>
     <string name="conn_track_clear_logs_message">يؤدي هذا إلى حذف سجلات الشبكة فقط وليس قواعد جدار الحماية. هذه العملية غير قابلة للعكس. هل تريد المتابعة؟</string>
     <string name="bsct_app_info">معلومات التطبيق</string>
-    <string name="private_dns_toast">تم تعيين DNS الخاص.</string>
     <string name="dns_proxy_remove_dialog_title">هل تريد حذف وكيل DNS؟</string>
     <string name="local_blocklist_redownload">حتى الآن!</string>
     <string name="settings_lock_down_mode_desc">لا يمكن السماح بالخوادم الوكيلة للتخطي أو الإعداد عند تشغيل VPN في وضع التأمين. <u> اذهب إلى إعدادات VPN </u>.</string>
@@ -177,7 +175,6 @@
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="dc_dns_leaks_heading">منع تسرب DNS</string>
     <string name="dc_check_update_heading">موجه في تحديثات قائمة الحظر</string>
-    <string name="about_sponsor">كفيل</string>
     <string name="collecting_logs_progress_text">اسر…</string>
     <string name="cd_dns_crypt_dialog_heading">أضف محلل أو مرحل DNSCrypt</string>
     <string name="univ_delete_firewall_dialog_title">هل تريد حذف كافة قواعد IP؟</string>
@@ -409,7 +406,6 @@
     <string name="cd_dialog_error_invalid_domain">URL غير صالح (المجال).</string>
     <string name="cd_no_rule_initial">ش</string>
     <string name="ci_header">قواعد عناوين IP و المنافذ</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">تجاوز قواعد التطبيق</string>
     <string name="ada_app_status_exclude">مستثنى من نظام dns وجدار الحماية</string>
     <string name="ada_network_log_title">سجل الشبكة لهذا التطبيق</string>
     <string name="notif_download_failure_content">التحميل فشل. حاول مرة أخرى.</string>
@@ -551,9 +547,7 @@
     <string name="new_app_bulk_notification_title">انتباه</string>
     <string name="cd_add_dialog_sample_4">%1$s https: // %2$s</string>
     <string name="cd_dialog_error_invalid_wildcard">بدل غير صالح.</string>
-    <string name="ada_ip_rules_status_allowed">لا توجد قاعدة</string>
     <string name="ada_ip_block_count">%1$s قاعدة (قواعد) IP</string>
-    <string name="bsac_delete_toast">%1$s محذوفة</string>
     <string name="bsdl_domain_rule_allow">السماح</string>
     <string name="brbs_backup_dialog_failure_positive">أعد محاولة النسخ الاحتياطي</string>
     <string name="alert_permission_accessibility">إذن - إمكانية الوصول</string>
@@ -584,7 +578,6 @@
     <string name="notif_channel_vpn_failure">VPN غير نشط</string>
     <string name="ci_blocked_desc">- ممنوع</string>
     <string name="ci_delete">حذف</string>
-    <string name="ada_ip_rules_status_blocked">تم حجبه</string>
     <string name="ada_app_status_block">تم حظره</string>
     <string name="bsac_unblock_toast">غير محظور %1$s لهذا التطبيق</string>
     <string name="notif_download_success_content">تم التنزيل بنجاح.</string>
@@ -719,11 +712,9 @@
     <string name="ada_noapp_dialog_message">لم يتم العثور على معلومات التطبيق للتطبيق المحدد.</string>
     <string name="ada_noapp_dialog_positive">حسنًا</string>
     <string name="ada_firewall_status">هذا التطبيق <b> <i> %1$s </i> </b>.</string>
-    <string name="ada_uid">معرف التطبيق: <i> %1$s </i> <br/> الفئة: <i> %2$s </i> <br/> مثبت على: <i> %3$s </i> <br/> تم التحديث في: <i> %4$s </i></string>
     <string name="ada_ip_connection_count">متصل بـ %1$s عنوان (عناوين) IP</string>
     <string name="ada_app_status_block_wifi">محظور على شبكات (wifi) غير المحسوبة</string>
     <string name="ada_app_status_lockdown">في وضع القفل</string>
-    <string name="ada_ip_block_no_rules">لا توجد قواعد IP لهذا التطبيق.</string>
     <string name="rt_edit_dialog_positive">تحرير</string>
     <string name="rt_cancel_download">إلغاء</string>
     <string name="rt_chip_update_available">تحديث متوفر</string>
