@@ -770,17 +770,17 @@
     <string name="dns_query_clear_logs_message">هذا يحذف سجلات DNS على الجهاز. هذه العملية غير قابلة للعكس. هل تريد المتابعة؟</string>
     <string name="settings_ip_network_heading">اختر إصدار IP</string>
     <string name="orbot_bs_status_2">تم تعيين وكيل HTTP (قد تتجاهله التطبيقات).</string>
-    <string name="whats_new_version_update"><b> أقصى جهد </b>
+    <string name="whats_new_version_update">&lt;b&gt;Maximum effort&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Introducing a more private Rethink resolver, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Mark IPv6 as experimental; switch to IPv4 by default.&lt;br/&gt; 3. &lt;i&gt;New feature&lt;/i&gt;: Backup and restore app settings.&lt;br/&gt; 4. &lt;i&gt;New feature&lt;/i&gt;: App lockdown mode.&lt;br/&gt; 5. &lt;i&gt;New feature&lt;/i&gt;: Universal lockdown mode.&lt;br/&gt; 6. &lt;i&gt;New feature&lt;/i&gt;: Apply firewall rules on port numbers.&lt;br/&gt; 7. &lt;i&gt;New feature&lt;/i&gt;: Apply app firewall rules in batches.&lt;br/&gt; 8. Minor UI refresh.&lt;br/&gt; 9. Other memory and crash fixes.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Help translate this app&lt;/a&gt;
 \n
-\n1. تقديم محلل إعادة تفكير أكثر خصوصية ، <i> ماكس </i>.
+\n1. تقديم محلل إعادة تفكير أكثر خصوصية ، &lt;i&gt; ماكس &lt;/i&gt;.
 \n2. وضع علامة IPv6 على أنها تجريبية ؛ قم بالتبديل إلى IPv4 افتراضيًا.
-\n3. <i> ميزة جديدة </i>: النسخ الاحتياطي واستعادة إعدادات التطبيق.
-\n4. <i> ميزة جديدة </i>: وضع قفل التطبيق.
-\n5. <i> ميزة جديدة </i>: وضع القفل الشامل.
-\n6. <i> ميزة جديدة </i>: تطبيق قواعد جدار الحماية على أرقام المنافذ.
-\n7. <i> ميزة جديدة </i>: تطبيق قواعد جدار حماية التطبيق على دفعات.
+\n3. &lt;i&gt; ميزة جديدة &lt;/i&gt;: النسخ الاحتياطي واستعادة إعدادات التطبيق.
+\n4. &lt;i&gt; ميزة جديدة &lt;/i&gt;: وضع قفل التطبيق.
+\n5. &lt;i&gt; ميزة جديدة &lt;/i&gt;: وضع القفل الشامل.
+\n6. &lt;i&gt; ميزة جديدة &lt;/i&gt;: تطبيق قواعد جدار الحماية على أرقام المنافذ.
+\n7. &lt;i&gt; ميزة جديدة &lt;/i&gt;: تطبيق قواعد جدار حماية التطبيق على دفعات.
 \n8. تحديث بسيط لواجهة المستخدم.
-\n9. الذاكرة الأخرى وإصلاحات الأعطال. </string>
+\n9. الذاكرة الأخرى وإصلاحات الأعطال.</string>
     <string name="bsct_block_app">حظر ، تجاوز <u> عنوان IP هذا </u> لـ <u> هذا التطبيق </u></string>
     <string name="bsct_block">حظر ، تجاوز ، استبعاد ، تأمين <u> هذا التطبيق </u></string>
     <string name="orbot_both_desc">كل ما ورداعلاه.</string>
@@ -791,7 +791,7 @@
     <string name="always_on_dialog_lockdown_stop_message">تقوم RethinkDNS بتشغيل VPN في وضع <i> Lockdown </i>. قد يؤدي إيقافه إلى فقدان الاتصال بالإنترنت في ملف تعريف المستخدم هذا. هل تريد المتابعة على أية حال؟</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">هل تريد حذف محلل DNSCrypt؟</string>
     <string name="dns_crypt_url_remove_dialog_message">احذف محلل DNSCrypt من التكوين المحفوظ.</string>
-    <string name="download_update_dialog_failure_title">هناك خطأ ما</string>
+    <string name="download_update_dialog_failure_title">هناك خطأ ما !</string>
     <string name="download_update_dialog_failure_message">إما أن خوادمنا معطلة أو لا يمكن إنشاء الاتصال. من فضلك حاول مرة أخرى بعد بعض من الوقت.</string>
     <string name="dns_explanation_dns_connected">متصل RethinkDNS</string>
     <string name="settings_http_proxy_error_text1">يجب أن يتراوح نطاق المنفذ بين 1024 و 65535</string>
@@ -869,4 +869,26 @@
     <string name="unicode_warning_sign">⚠</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
     <string name="ci_blocked_initial">B</string>
+    <string name="about_privacy_policy">سياسة الخصوصية</string>
+    <string name="about_app_translate">ترجم</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="notification_screen_error">تعذر تشغيل شاشة إعلام التطبيق.</string>
+    <string name="intent_launch_error">العد لا يتم إطلاقه %1$s</string>
+    <string name="no_browser_error">لا يمكن فتح صفحة الويب من المتصفح.</string>
+    <string name="firewall_rule_block_univ_ip">IP / منفذ (عالمي)</string>
+    <string name="ada_firewall_title">قواعد جدار الحماية لهذا التطبيق</string>
+    <string name="ada_app_lockdown">إغلاق</string>
+    <string name="notif_download_cancel_content">تم إلغاء التنزيل.</string>
+    <string name="rt_filter_parent_all">الكل</string>
+    <string name="rt_filter_parent_selected">المحدد</string>
+    <string name="rt_filter_hint">إظهار <u> كل قوائم الحظر </u></string>
+    <string name="rt_filter_desc">إظهار قوائم الحظر <u> %1$s </u></string>
+    <string name="rt_filter_desc_groups">إظهار قوائم الحظر <u> %1$s </u> في المجموعة: %2$s</string>
+    <string name="rt_filter_desc_subgroups">عرض قوائم الحظر <u> %1$s </u> في المجموعة: %2$s والمجموعة الفرعية: %3$s</string>
+    <string name="relative_time_today">اليوم</string>
+    <string name="settings_app_notification_a13_desc">اعطاء التطبيق صلاحية التنبيهات</string>
+    <string name="hsf_notification_permission_failure">تمكين إذن الإعلام من شاشة الإعدادات</string>
+    <string name="relative_time_yesterday">الامس</string>
+    <string name="settings_app_notification_a13_heading">تنبيهات التطبيق</string>
 </resources>
