@@ -59,7 +59,7 @@
     <string name="ada_noapp_dialog_title">لم يتم العثور على معلومات التطبيق</string>
     <string name="settings_enable_logs_desc">تخزين سجلات DNS وجدار الحماية محليًا على الجهاز.</string>
     <string name="settings_selected_theme">الموضوع الحالي: %1$s</string>
-    <string name="hsf_blocklist_chip_text_no_data">قم بتمكين RethinkDNS +</string>
+    <string name="hsf_blocklist_chip_text_no_data">تمكين +RDNS</string>
     <string name="hs_download_positive_play_store">استكمال التحديث</string>
     <string name="dns_connected_no_count">متصّل</string>
     <string name="dc_local_block_enabled">‮مُفعّل</string>
@@ -182,7 +182,7 @@
     <string name="fapps_metered_positive">طبّق</string>
     <string name="dns_proxy_toast_parameter">وكيل DNS</string>
     <string name="update_complete_snack_message">تم تنزيل إصدار جديد.</string>
-    <string name="firewall_rule_block_ip">IP / منفذ</string>
+    <string name="firewall_rule_block_ip">آي بي / منفذ (التطبيق)</string>
     <string name="firewall_rule_exempt_app_bypass_univ">التطبيق الذي تم تجاوزه</string>
     <string name="firewall_rule_exempt_dns_proxied">وكيل DNS</string>
     <string name="build__flavor_play_store">لعب</string>
@@ -243,7 +243,7 @@
     <string name="settings_socks5_dialog_hint_port">المنفذ</string>
     <string name="settings_theme_dialog_themes_1">حسب النظام</string>
     <string name="settings_theme_dialog_themes_3">مظهر داكن</string>
-    <string name="settings_all_networks_dialog_message">عند التمكين ، لن يتم الالتزام بقواعد جدار حماية التطبيق للمقاييس (على سبيل المثال: WiFi) وغير المحسوبة (على سبيل المثال: الجوال).
+    <string name="settings_all_networks_dialog_message">عند التمكين، لن يتم احترام قواعد جدار الحماية للتطبيق للاتصال المقنن (على سبيل المثال: WiFiMobile) وللاتصال غير المقنن (على سبيل المثال: MobileWiFi).
 \n
 \nهل تريد الاستمرار؟</string>
     <string name="dc_check_update_desc">تحقق من وجود تحديثات لقائمة الحظر مرة واحدة كل <i> ثلاثة </i> أيام</string>
@@ -289,7 +289,7 @@
     <string name="univ_firewall_rule_4">حظر UDP باستثناء DNS و NTP</string>
     <string name="univ_firewall_rule_9">حظر على شبكة (جوال) مقننة</string>
     <string name="fapps_metered_unblock_dialog_title">السماح في المقياس</string>
-    <string name="fapps_firewall_filter_hint">تطبيق القواعد غير المحسوبة / المحسوبة على التطبيقات المدرجة</string>
+    <string name="fapps_firewall_filter_hint">طبق قواعد الاتصال المقنن وغير المقنن على قائمة التطبيقات</string>
     <string name="system_dns_connection_failure">لا يمكن تحديد خادم DNS الحالي</string>
     <string name="firewall_rule_exempt_orbot_setup">إعداد Orbot</string>
     <string name="firewall_rule_no_rule_desc">لا توجد قواعد جدار حماية مطابقة لهذا الاتصال.</string>
@@ -421,7 +421,7 @@
     <string name="orbot_install_dialog_message">يجلب Orbot ميزات ووظائف Tor إلى Android.</string>
     <string name="settings_orbot_heading">إعداد Orbot</string>
     <string name="settings_notification_desc3">لا شيء</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS قيد الاستخدام</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS قيد الاستخدام</string>
     <string name="hsf_chip_appearance">الموضوع: %1$s</string>
     <string name="dc_custom_block_heading">السماح بالمجالات الفردية أو رفضها</string>
     <string name="about_bug_no_log_dialog_positive_btn">أرسل بريد الكتروني</string>
@@ -526,7 +526,7 @@
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_connection_name">متصل بـ %1$s</string>
     <string name="download_update_dialog_trylater_title">لا يمكن التحديث الآن</string>
-    <string name="search_firewall_all_apps"><font size="12"> تطبيقات البحث </font></string>
+    <string name="search_firewall_all_apps"><font size="12"> ابحث في التطبيقات باستخدام UID أو الاسم </font></string>
     <string name="settings_ip_network_desc">اختر من بين إصدارات بروتوكول الإنترنت.</string>
     <string name="orbot_bs_status_3">إعادة توجيه %1$s إلى Orbot ، تم تعيين وكيل HTTP أيضًا.</string>
     <string name="orbot_bs_status_4">بنقرة واحدة إعداد Tor-as-a-Proxy (Orbot).</string>
@@ -770,17 +770,17 @@
     <string name="dns_query_clear_logs_message">هذا يحذف سجلات DNS على الجهاز. هذه العملية غير قابلة للعكس. هل تريد المتابعة؟</string>
     <string name="settings_ip_network_heading">اختر إصدار IP</string>
     <string name="orbot_bs_status_2">تم تعيين وكيل HTTP (قد تتجاهله التطبيقات).</string>
-    <string name="whats_new_version_update"><b> أقصى جهد </b>
+    <string name="whats_new_version_update">&lt;b&gt;Maximum effort&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Introducing a more private Rethink resolver, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Mark IPv6 as experimental; switch to IPv4 by default.&lt;br/&gt; 3. &lt;i&gt;New feature&lt;/i&gt;: Backup and restore app settings.&lt;br/&gt; 4. &lt;i&gt;New feature&lt;/i&gt;: App lockdown mode.&lt;br/&gt; 5. &lt;i&gt;New feature&lt;/i&gt;: Universal lockdown mode.&lt;br/&gt; 6. &lt;i&gt;New feature&lt;/i&gt;: Apply firewall rules on port numbers.&lt;br/&gt; 7. &lt;i&gt;New feature&lt;/i&gt;: Apply app firewall rules in batches.&lt;br/&gt; 8. Minor UI refresh.&lt;br/&gt; 9. Other memory and crash fixes.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Help translate this app&lt;/a&gt;
 \n
-\n1. تقديم محلل إعادة تفكير أكثر خصوصية ، <i> ماكس </i>.
+\n1. تقديم محلل إعادة تفكير أكثر خصوصية ، &lt;i&gt; ماكس &lt;/i&gt;.
 \n2. وضع علامة IPv6 على أنها تجريبية ؛ قم بالتبديل إلى IPv4 افتراضيًا.
-\n3. <i> ميزة جديدة </i>: النسخ الاحتياطي واستعادة إعدادات التطبيق.
-\n4. <i> ميزة جديدة </i>: وضع قفل التطبيق.
-\n5. <i> ميزة جديدة </i>: وضع القفل الشامل.
-\n6. <i> ميزة جديدة </i>: تطبيق قواعد جدار الحماية على أرقام المنافذ.
-\n7. <i> ميزة جديدة </i>: تطبيق قواعد جدار حماية التطبيق على دفعات.
+\n3. &lt;i&gt; ميزة جديدة &lt;/i&gt;: النسخ الاحتياطي واستعادة إعدادات التطبيق.
+\n4. &lt;i&gt; ميزة جديدة &lt;/i&gt;: وضع قفل التطبيق.
+\n5. &lt;i&gt; ميزة جديدة &lt;/i&gt;: وضع القفل الشامل.
+\n6. &lt;i&gt; ميزة جديدة &lt;/i&gt;: تطبيق قواعد جدار الحماية على أرقام المنافذ.
+\n7. &lt;i&gt; ميزة جديدة &lt;/i&gt;: تطبيق قواعد جدار حماية التطبيق على دفعات.
 \n8. تحديث بسيط لواجهة المستخدم.
-\n9. الذاكرة الأخرى وإصلاحات الأعطال. </string>
+\n9. الذاكرة الأخرى وإصلاحات الأعطال.</string>
     <string name="bsct_block_app">حظر ، تجاوز <u> عنوان IP هذا </u> لـ <u> هذا التطبيق </u></string>
     <string name="bsct_block">حظر ، تجاوز ، استبعاد ، تأمين <u> هذا التطبيق </u></string>
     <string name="orbot_both_desc">كل ما ورداعلاه.</string>
@@ -791,7 +791,7 @@
     <string name="always_on_dialog_lockdown_stop_message">تقوم RethinkDNS بتشغيل VPN في وضع <i> Lockdown </i>. قد يؤدي إيقافه إلى فقدان الاتصال بالإنترنت في ملف تعريف المستخدم هذا. هل تريد المتابعة على أية حال؟</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">هل تريد حذف محلل DNSCrypt؟</string>
     <string name="dns_crypt_url_remove_dialog_message">احذف محلل DNSCrypt من التكوين المحفوظ.</string>
-    <string name="download_update_dialog_failure_title">هناك خطأ ما</string>
+    <string name="download_update_dialog_failure_title">هناك خطأ ما !</string>
     <string name="download_update_dialog_failure_message">إما أن خوادمنا معطلة أو لا يمكن إنشاء الاتصال. من فضلك حاول مرة أخرى بعد بعض من الوقت.</string>
     <string name="dns_explanation_dns_connected">متصل RethinkDNS</string>
     <string name="settings_http_proxy_error_text1">يجب أن يتراوح نطاق المنفذ بين 1024 و 65535</string>
@@ -812,7 +812,7 @@
     <string name="settings_check_update_heading">تحقق من وجود تحديثات التطبيق</string>
     <string name="settings_ip_dialog_title">اختر إصدار IP</string>
     <string name="settings_notification_desc">تظهر أزرار الإجراءات مع إشعار RethinkDNS: %1$s</string>
-    <string name="settings_protocol_translation_dns_inactive">قم بالتبديل إلى وضع DNS / DNS + جدار الحماية لتمكين هذا الإعداد</string>
+    <string name="settings_protocol_translation_dns_inactive">حول إلى وضع DNS/DNS+Firewall لتفعيل هذا الإعداد</string>
     <string name="orbot_explanation">Orbot هو تطبيق بروكسي مجاني يمكّن التطبيقات الأخرى من استخدام الإنترنت بشكل <u>أكثر أمانًا </u>.
 \nيستخدم Orbot <u> Tor </u> لتشفير حركة المرور الخاصة بك على الإنترنت مما يساعدك <u> على تجاوز الرقابة </u> والدفاع ضد أشكال <u> مراقبة الشبكة </u> التي تهدد الحرية الشخصية والخصوصية.
 \n<u> بروكسي TCP </u>: يقوم RethinkDNS فقط بإعادة توجيه اتصالات TCP الخاصة بجميع التطبيقات إلّا تلك المستثنية إلى Orbot.
@@ -842,7 +842,7 @@
     <string name="hsf_vpn_dialog_message">يحتاج RethinkDNS إلى إذن لإعداد VPN محلي لتشفير طلبات DNS الخاصة بالجهاز ، وتنفيذ مراقبة الشبكة ، وفرض قواعد جدار الحماية.
 \n
 \nلا تجمع RethinkDNS أي معلومات أو تتجسس عليك بأي شكل من الأشكال.</string>
-    <string name="contributors_list">يدين مشروع &lt;i&gt; Rethink Open Source Project &lt;/i&gt; بوجوده إلى هؤلاء المتطوعين الذين كرسوا ساعات لا تحصى لتطويره. &lt;br/&gt; &lt;br/&gt; 🛡️ تطبيق Android &lt;br/&gt; &lt;a href = https: // github .com / BayLee4&gt; BayLee4 &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt; Ch4t4r &lt;/a&gt; &lt;br/&gt; &lt;a href = https: //github.com/HrBDev &gt; HrBDev &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt; hussainmohd-a &lt;/a&gt; &lt;br/&gt; &lt;a href = https: //github.com/ignoramous &gt; جاهل &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt; markwmuller &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt; Poussinou &lt;/ a&gt; &lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt; pjosingh &lt;/a&gt; &lt;br/&gt; &lt;br/&gt; 🚂 محرك الشبكة &lt;br/&gt; &lt;a href = https: // github. com / alalamav&gt; alalamav &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/bemasc&gt; bemasc &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt; dmcardle &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/fortuna&gt; fortuna &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt; جاهل &lt;/ a &gt; &lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt; PeterDaveHello &lt;/a&gt; &lt;br/&gt; &lt;a href = https: //github.com/SeanBurford &gt; SeanBurford &lt;/a&gt; &lt;br/&gt; &lt;br/&gt; 📚 محلل &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt; ahmed-tasaly &lt;/a&gt; &lt;br/&gt; &lt;a href = https: //github.com/amithm7&gt; amithm7 &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/arfshl&gt; arfshl &lt;/a&gt; &lt;br/&gt; &lt;a href = https: / /github.com/badmojr&gt;badmojr &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/bongochong&gt; bongochong &lt;/a&gt; &lt;br/&gt; &lt;a href = https: //github.com / elliotwutingfeng&gt; elliotwutingfeng &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/georgyo&gt; georgyo &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/harish83a&gt; harish83a &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt; جاهل &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt; MasterKia &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt; mtxadmin &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/neneeen&gt; neneeen &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt; PeterDaveHello &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt; santhosh-ponnusamy &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/shruuub&gt; shruuub &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt; shuvashish76 &lt;/a&gt; &lt;br/&gt; &lt;br/&gt; ⚜ تعديل المجتمع &lt;br/&gt; &lt;أ href = https: //t.me/amithm7&gt; amithm7 &lt;/a&gt; &lt;br/&gt; &lt;a href=https://t.me/ppatra&gt; ppatra &lt;/a&gt; &lt;br/&gt; &lt;a href = https: //t.me/InFamous23&gt;InFamous23 &lt;/a&gt; &lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt; TheTr1ckst3r &lt;/a&gt; &lt;br/&gt; &lt;a href = https: // t. me / Ch4t4r&gt; Ch4t4r &lt;/a&gt; &lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt; Billi_ance &lt;/a&gt; &lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt; kaliangel &lt;/a&gt; &lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt; PoneyClairDeLune &lt;/a&gt; &lt;br/&gt;</string>
+    <string name="contributors_list">يدين &lt;i&gt;مشروع إعادة التفكير المفتوح المصدر&lt;/i&gt;بوجوده لهؤلاء المتطوعين الذين يكرسون ساعات لا حصر لها لتطويره.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP geo-location database &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt;</string>
     <string name="cd_dns_proxy_error_text_2">يجب أن يتراوح نطاق المنفذ بين 1024 و 65535</string>
     <string name="cd_dns_crypt_dialog_stamp">ختم</string>
     <string name="unicode_x_sign">❌</string>
@@ -869,4 +869,27 @@
     <string name="unicode_warning_sign">⚠</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
     <string name="ci_blocked_initial">B</string>
+    <string name="about_privacy_policy">سياسة الخصوصية</string>
+    <string name="about_app_translate">ترجم</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="notification_screen_error">تعذر تشغيل شاشة إعلام التطبيق.</string>
+    <string name="intent_launch_error">العد لا يتم إطلاقه %1$s</string>
+    <string name="no_browser_error">لا يمكن فتح صفحة الويب من المتصفح.</string>
+    <string name="firewall_rule_block_univ_ip">IP / منفذ (عالمي)</string>
+    <string name="ada_firewall_title">قواعد جدار الحماية لهذا التطبيق</string>
+    <string name="ada_app_lockdown">إغلاق</string>
+    <string name="notif_download_cancel_content">تم إلغاء التنزيل.</string>
+    <string name="rt_filter_parent_all">الكل</string>
+    <string name="rt_filter_parent_selected">المحدد</string>
+    <string name="rt_filter_hint">إظهار <u> كل قوائم الحظر </u></string>
+    <string name="rt_filter_desc">إظهار قوائم الحظر <u> %1$s </u></string>
+    <string name="rt_filter_desc_groups">إظهار قوائم الحظر <u> %1$s </u> في المجموعة: %2$s</string>
+    <string name="rt_filter_desc_subgroups">عرض قوائم الحظر <u> %1$s </u> في المجموعة: %2$s والمجموعة الفرعية: %3$s</string>
+    <string name="relative_time_today">اليوم</string>
+    <string name="settings_app_notification_a13_desc">اعطاء التطبيق صلاحية التنبيهات</string>
+    <string name="hsf_notification_permission_failure">تمكين إذن الإعلام من شاشة الإعدادات</string>
+    <string name="relative_time_yesterday">الامس</string>
+    <string name="settings_app_notification_a13_heading">تنبيهات التطبيق</string>
+    <string name="ct_ip_port">%1$s:%2$s</string>
 </resources>
