@@ -1091,6 +1091,10 @@
     <string name="ci_bypass_universal_txt">Bypass Universal</string>
     <string name="ci_bypass_universal_desc">- Bypasses universal</string>
 
+    <string name="ci_bypass_app_initial">BA</string>
+    <string name="ci_bypass_app_txt">Bypass app rules</string>
+    <string name="ci_bypass_app_desc">- Bypasses app rules</string>
+
     <string name="ci_blocked_initial">B</string>
     <string name="ci_blocked_txt">Blocked</string>
     <string name="ci_blocked_desc">- Blocked</string>

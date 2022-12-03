@@ -133,6 +133,7 @@
                     android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cip_bypass_hint_initial"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/rectangle_border_background"
@@ -143,6 +144,7 @@
                     android:textSize="@dimen/default_font_text_view" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cip_bypass_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
