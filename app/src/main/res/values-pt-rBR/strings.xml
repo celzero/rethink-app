@@ -119,7 +119,7 @@
     <string name="firewall_rule_block_app_new_install">Novo app</string>
     <string name="fapps_unmetered_unblock_dialog_title">Permitir em redes de banda larga</string>
     <string name="firewall_rule_block_app_exception">Erro</string>
-    <string name="firewall_rule_block_ip">IP / Porta (App)</string>
+    <string name="firewall_rule_block_ip">IP / porta (app)</string>
     <string name="firewall_rule_exempt_app_bypass_univ">App contornado</string>
     <string name="firewall_rule_block_http">HTTP inseguro</string>
     <string name="fapps_unmetered_block_dialog_title">Bloquear em redes de banda larga</string>
@@ -186,7 +186,7 @@
     <string name="rt_edit_dialog_positive">Editar</string>
     <string name="rt_download">Baixar listas de bloqueio</string>
     <string name="rt_chip_update_available">Atualização disponível</string>
-    <string name="rt_list_adv_btn_txt">Avançado</string>
+    <string name="rt_list_adv_btn_txt">avançado</string>
     <string name="rt_cancel_download">Cancelar</string>
     <string name="rt_cancel_btn">Cancelar</string>
     <string name="lbbs_redownload">Baixar novamente listas de bloqueio</string>
@@ -529,7 +529,7 @@
     <string name="dns_logs_blocked_queries">Consultas bloqueadas: %1$s</string>
     <string name="dc_dns_website_desc">Obtém ícones de sites via <i>duckduckgo.com</i>. Consome até 350 MB de espaço no disco</string>
     <string name="dc_dns_leaks_desc">Quando ativado, RethinkDNS captura todos pacotes na porta 53 e os encaminha para um endpoint de DNS definido pelo usuário</string>
-    <string name="dc_check_update_heading">Avisar sobre atualizações da lista de bloqueio</string>
+    <string name="dc_check_update_heading">Avisar sobre atualizações das listas de bloqueio</string>
     <string name="dc_check_update_desc">Verifique por atualizações da lista de bloqueio a cada <i>três</i> dias</string>
     <string name="about_bravedns_explantion">RethinkDNS é a melhor maneira de monitorar as atividades da rede, contornar a censura da internet e implementar um firewall para os apps em seu dispositivo Android.</string>
     <string name="about_bravedns_whoarewe">RethinkDNS é um projeto gratuito e de software livre, liderado por ex-engenheiros da Amazon, IBM e Scientific Games.</string>
@@ -546,7 +546,8 @@
     <string name="dc_dns_leaks_heading">Impedir vazamentos do DNS</string>
     <string name="about_docs">Leia docs</string>
     <string name="about_connect">contato</string>
-    <string name="about_sponsor_link_text">Patrocinador</string>
+    <string name="about_sponsor">patrocinar</string>
+    <string name="about_sponsor_link_text">Patrocinar</string>
     <string name="about_email">Entre em contato pelo email</string>
     <string name="log_file_not_available">Nenhum relatório de falha encontrado</string>
     <string name="error_loading_log_file">Erro ao carregar arquivo de registro</string>
@@ -590,7 +591,7 @@
     <string name="ctbs_dialog_negative_btn">Voltar</string>
     <string name="dns_log_dialog_positive">Apagar registros</string>
     <string name="dns_log_dialog_negative">Cancelar</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;tamanho da fonte=8&gt;%1$s&lt;/fonte&gt;&lt;/u&gt;: %2$s lista(s) de bloqueio&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s lista(s) de bloqueio&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip_blocked">Bloqueado</string>
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
@@ -692,16 +693,16 @@
     <string name="firewall_rule_no_rule">Sem regras</string>
     <string name="firewall_rule_block_app">App bloqueado</string>
     <string name="firewall_rule_block_unmetered">Banda larga (WiFi)</string>
-    <string name="firewall_rule_block_metered">Franquia de dados (Móvel)</string>
-    <string name="firewall_rule_univ_block_metered">Franquia de dados (Universal)</string>
+    <string name="firewall_rule_block_metered">Franquia de dados (móvel)</string>
+    <string name="firewall_rule_univ_block_metered">Franquia de dados (universal)</string>
     <string name="firewall_rule_lockdown">Restrito (App)</string>
-    <string name="firewall_rule_bypass_apprule_ip">IP contornado (App)</string>
+    <string name="firewall_rule_bypass_apprule_ip">IP contornado (app)</string>
     <string name="firewall_rule_bypass_universal_ip">IP contornado</string>
     <string name="firewall_rule_device_lock">Dispositivo bloqueado</string>
     <string name="firewall_rule_foreground">App não está em uso</string>
     <string name="firewall_rule_unknown">Fonte desconhecida</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_block_app_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i>.<br/><br/> Para alterar, acesse <i>. Todos os apps</i>.</string>
+    <string name="firewall_rule_block_app_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
     <string name="firewall_rule_new_app_desc">Este app fez a conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i> ao tentar conectar-se com a rede de <i>Banda larga</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
     <string name="firewall_rule_lockdown_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>app</i> enquanto conectava a outros <i>IPs além dos contornados</i>.<br/><br/> Para alterar, acesse <i>Todos os apps</i>.</string>
@@ -879,7 +880,7 @@
     <string name="rt_filter_parent_all">Tudo</string>
     <string name="rt_filter_desc_groups">Mostrando <u>%1$s</u> listas de bloqueio no grupo: %2$s</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
-    <string name="firewall_rule_block_univ_ip">IP / Porta (Universal)</string>
+    <string name="firewall_rule_block_univ_ip">IP / porta (universal)</string>
     <string name="whats_new_version_update">&lt;b&gt;Esforço máximo&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Apresentando Rethink app um resolvedor mais privado, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Selecione IPv6 como experimental; altere para IPv4 por padrão.&lt;br/&gt; 3. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Backup e restauração de configurações do app.&lt;br/&gt; 4. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Modo restrito do app.&lt;br /&gt; 5. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Modo restrito universal.&lt;br/&gt; 6. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Aplicação de regras do firewall para portas específicas.&lt;br/&gt; 7. &lt;i&gt; Nova funcionalidade&lt;/i&gt;: Aplicação de regras do firewall em massa.&lt;br/&gt; 8. Pequena mudança na interface do usuário.&lt;br/&gt; 9. Correções de problemas com memória e outras falhas.&lt;br/&gt;&lt;br/&gt; &lt;a href=https: //hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Ajude a traduzir este app&lt;/a&gt;</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
 </resources>
