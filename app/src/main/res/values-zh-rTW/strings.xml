@@ -104,7 +104,7 @@
     <string name="download_update_dialog_failure_message">可能是我們的伺服器下線了，或者是網路問題。請稍後重試。</string>
     <string name="download_update_dialog_trylater_title">現在無法更新</string>
     <string name="download_update_dialog_trylater_message">現在無法更新，請稍後重試。</string>
-    <string name="search_firewall_all_apps"><font size="12">搜尋應用</font></string>
+    <string name="search_firewall_all_apps"><font size="12">以 UID / 應用名搜尋應用</font></string>
     <string name="search_universal_ips"><font size="12">搜尋 IP</font></string>
     <string name="search_firewall_network_log"><font size="12">搜尋應用、 IP 、網域</font></string>
     <string name="search_dns_logs"><font size="12">搜尋網域或 IP</font></string>
@@ -135,7 +135,7 @@
     <string name="orbot_bs_status_2">HTTP 代理已設定（應用可能會忽略它）。</string>
     <string name="orbot_bs_status_3">將 %1$s 轉送至 Orbot ， HTTP 代理亦已設定。</string>
     <string name="orbot_bs_status_4">一鍵 Tor 代理（ Orbot ）設定。</string>
-    <string name="orbot_app_issue">無法啓動 Orbot 。您是否已經安裝了它呢？</string>
+    <string name="orbot_app_issue">無法打開 Orbot 。您是否已經安裝了它呢？</string>
     <string name="orbot_stop_dialog_title">需手動干預</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
@@ -240,17 +240,7 @@
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_dialog_negative">忽略</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>
-    <string name="whats_new_version_update"><b>傾盡全力</b>
-\n
-\n 1. 隆重介紹一個更加私密的 Rethink 解析服務， <i>Max</i> 。
-\n 2. 將 IPv6 標記爲實驗性功能；默認切換爲 IPv4 。
-\n 3. <i>新特性</i>：備份與恢復應用設定。
-\n 4. <i>新特性</i>：應用閉關模式。
-\n 5. <i>新特性</i>：全局閉關模式。
-\n 6. <i>新特性</i>：針對埠應用防火牆規則。
-\n 7. <i>新特性</i>：批量應用應用防火牆規則。
-\n 8. 少量 UI 優化。
-\n 9. 其他記憶體與崩潰修復。 </string>
+    <string name="whats_new_version_update">&lt;b&gt;傾盡全力&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 隆重介紹一個更加私密的 Rethink 解析服務， &lt;i&gt;Max&lt;/i&gt; 。&lt;br/&gt; 2. 將 IPv6 標記爲實驗性功能；默認切換爲 IPv4 。&lt;br/&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：備份與恢復應用設定。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：應用閉關模式。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：全局閉關模式。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：針對埠應用防火牆規則。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：批量應用應用防火牆規則。&lt;br/&gt; 8. 少量 UI 優化。&lt;br/&gt; 9. 其他記憶體與崩潰修復。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;協助翻譯此應用&lt;/a&gt;</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
@@ -567,9 +557,9 @@
     <string name="hsf_start_dialog_negative">忽略</string>
     <string name="hsf_whats_new_chip_text">新內容</string>
     <string name="hsf_blocklist_chip_text">已配置 %1$s 個攔截清單</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">正使用 RethinkDNS</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS 使用中</string>
     <string name="settings_notification_dialog_title">選擇通知行爲</string>
-    <string name="hsf_blocklist_chip_text_no_data">啓用 RethinkDNS+</string>
+    <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS 日誌</string>
     <string name="hsf_network_logs_chip_text">網路日誌</string>
     <string name="hsf_exclude_error">VPN 閉關模式下無法排除</string>
@@ -649,7 +639,7 @@
     <string name="collecting_logs_progress_text">捕獲中……</string>
     <string name="contributors_dialog_title">作者</string>
     <string name="app_info_error">無法打開應用資訊。</string>
-    <string name="contributors_list">&lt;i&gt;Rethink 開放原始碼專案&lt;/i&gt;的存在歸功於這些在其開發工作上傾瀉大量時間的志願者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 應用程式 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 網路引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服務 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社羣協管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">&lt;i&gt;Rethink 開放原始碼專案&lt;/i&gt;的存在歸功於這些在其開發工作上傾瀉大量時間的志願者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 應用程式 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 網路引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服務 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社羣協管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位址資料庫 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt;</string>
     <string name="cd_dns_crypt_title">解析服務</string>
     <string name="cd_custom_doh_dialog_title">自訂伺服器 URL</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
@@ -842,7 +832,7 @@
     <string name="firewall_rule_lockdown">閉關模式（應用）</string>
     <string name="firewall_rule_block_app_new_install">新應用</string>
     <string name="firewall_rule_block_app_exception">錯誤</string>
-    <string name="firewall_rule_block_ip">IP / 埠</string>
+    <string name="firewall_rule_block_ip">IP / 埠（應用）</string>
     <string name="firewall_rule_bypass_apprule_ip">已繞行 IP （應用）</string>
     <string name="firewall_rule_bypass_universal_ip">已繞行 IP</string>
     <string name="firewall_rule_device_lock">裝置已鎖定</string>
@@ -869,4 +859,27 @@
     <string name="hsf_start_dialog_header">啓動 %1$s</string>
     <string name="dc_dns_leaks_heading">防止 DNS 洩漏</string>
     <string name="settings_notification_desc">與 RethinkDNS 的通知一同顯示的行爲按鈕：%1$s</string>
+    <string name="about_privacy_policy">隱私政策</string>
+    <string name="hsf_notification_permission_failure">於設定區啓用通知權限</string>
+    <string name="ada_firewall_title">應用防火牆規則</string>
+    <string name="ada_app_lockdown">閉關</string>
+    <string name="notif_download_cancel_content">下載已取消。</string>
+    <string name="rt_filter_parent_all">全部</string>
+    <string name="rt_filter_parent_selected">已選擇</string>
+    <string name="rt_filter_hint">正顯示<u>所有</u>攔截清單</string>
+    <string name="rt_filter_desc">正顯示 <u>%1$s</u> 個攔截清單</string>
+    <string name="rt_filter_desc_groups">正顯示 %2$s 組內的 <u>%1$s</u> 個攔截清單</string>
+    <string name="rt_filter_desc_subgroups">正顯示 %2$s 組與子分組 %3$s 的 <u>%1$s</u> 個攔截清單</string>
+    <string name="about_app_translate">翻譯</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="notification_screen_error">無法打開應用通知區。</string>
+    <string name="intent_launch_error">無法打開 %1$s</string>
+    <string name="no_browser_error">無法於瀏覽器打開網頁。</string>
+    <string name="firewall_rule_block_univ_ip">IP / 埠（全局）</string>
+    <string name="relative_time_today">今天</string>
+    <string name="relative_time_yesterday">昨天</string>
+    <string name="settings_app_notification_a13_desc">啓用此應用的通知權限</string>
+    <string name="settings_app_notification_a13_heading">應用通知</string>
+    <string name="ct_ip_port">%1$s:%2$s</string>
 </resources>
