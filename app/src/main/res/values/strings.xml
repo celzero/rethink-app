@@ -293,18 +293,19 @@
 
     <string name="app_mode_choose">Choose mode</string>
 
-    <string name="whats_dialog_title">What\'s new in v053k</string>
+    <string name="whats_dialog_title">What\'s new in v053l</string>
     <string name="whats_new_version_name">🌎&#128330; World Student\'s Day (15 Oct) &#128330;🌎</string>
-    <string name="whats_new_version_update"><![CDATA[<b>Maximum effort</b><br/><br/>
-        1. Introducing a more private Rethink resolver, <i>Max</i>.<br/>
-        2. Mark IPv6 as experimental; switch to IPv4 by default.<br/>
-        3. <i>New feature</i>: Backup and restore app settings.<br/>
-        4. <i>New feature</i>: App lockdown mode.<br/>
-        5. <i>New feature</i>: Universal lockdown mode.<br/>
-        6. <i>New feature</i>: Apply firewall rules on port numbers.<br/>
-        7. <i>New feature</i>: Apply app firewall rules in batches.<br/>
-        8. Minor UI refresh.<br/>
-        9. Other memory and crash fixes.<br/><br/>
+    <string name="whats_new_version_update"><![CDATA[<b>Polyglottic!</b><br/><br/>
+        1. Re-support Android 6.<br/>
+        2. All new RDNS+ UI.<br/>
+        3. All new firewall and network engine.<br/>
+        4. <i>New feature</i>: Translations in 15+ languages.<br/>
+        5. <i>New feature</i>: Adaptive icons.<br/>
+        6. <i>New feature</i>: Show domain names in per app network logs.<br/>
+        7. Fix missing notifications on Android 13.<br/>
+        8. Fix misbehaving Orbot DNS integration.<br/>
+        9. Apps screen now accessible in DNS-only mode.<br/>
+        10. Major improvements to built-in Download Manager.<br/><br/>
         <a href="https://hosted.weblate.org/projects/rethink-dns-firewall/app/">Help translate this app</a>]]>
     </string>
 
@@ -693,10 +694,13 @@
                                               <a href="https://t.me/Billi_ance">Billi_ance</a><br/>
                                               <a href="https://t.me/kaliangel">kaliangel</a><br/>
                                               <a href="https://github.com/PoneyClairDeLune">PoneyClairDeLune</a><br/>
-                                              <br/>📌 IP geo-location database <br/>
+                                              <br/>📌 Geo-IP <br/>
                                               <a href="https://db-ip.com">db-ip.com</a><br/>
-                                              <br/>❇ Translation <br/>
+                                              <br/>❇ Translations <br/>
                                               <a href="https://weblate.org/en/">Weblate</a><br/>
+                                              <br/>📦 Build servers <br/>
+                                              <a href="https://jitpack.io/">JitPack</a><br/>
+                                              <a href="https://github.com/">GitHub</a><br/>
                                               ]]></string>
     <!-- Configure DNS Fragment string == cd -->
     <string name="cd_dns_crypt_title">resolvers</string>
