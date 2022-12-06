@@ -50,7 +50,6 @@ import org.koin.core.component.inject
 import java.io.*
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
-import kotlin.math.pow
 
 class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
@@ -91,7 +90,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
             return when (processDownload(timestamp)) {
                 false -> {
-                    if (isStopped) {
+                    if (isDownloadCancelled()) {
                         notifyDownloadCancelled(context)
                     }
                     Result.failure()
@@ -184,7 +183,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     private fun isDownloadCancelled(): Boolean {
         // return if the download is cancelled by the user
         // sometimes the worker cancellation is not received as exception
-        Log.e(LOG_TAG_DOWNLOAD, "Download cancel check, isStopped? $isStopped")
+        Log.i(LOG_TAG_DOWNLOAD, "Download cancel check, isStopped? $isStopped")
         return isStopped
     }
 
@@ -232,57 +231,52 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     }
 
     private fun downloadFile(context: Context, body: ResponseBody?, fileName: String): Boolean {
-
         if (body == null) {
             return false
         }
 
         showNotification(context)
-        var bis: InputStream? = null
+        var input: InputStream? = null
         var output: OutputStream? = null
         try {
-            // below code will download the code with additional calculation of
-            // file size and download percentage
-            var totalFileSize: Double
-            var count: Int
-            val data = ByteArray(1024 * 4)
-            val fileSize = body.contentLength()
-            bis = BufferedInputStream(body.byteStream(), 1024 * 8)
             val outputFile = File(fileName)
             output = FileOutputStream(outputFile)
-            var total: Long = 0
-            val startTime = System.currentTimeMillis()
-            var timeCount = 1
-            var prevProgress = 0
-            while (bis.read(data).also { count = it } != -1) {
-                total += count.toLong()
-                totalFileSize = (fileSize / 1024.0.pow(2.0))
-                val current = (total / 1024.0.pow(2.0))
-                val progress = (total * 100 / fileSize).toInt()
-                val currentTime = System.currentTimeMillis() - startTime
-                val download = DownloadFile()
-                download.totalFileSize = totalFileSize
-                if (prevProgress - progress >= 5 || prevProgress - progress <= 5) {
-                    prevProgress = progress
+            // below code will download the code with additional calculation of
+            // file size and download percentage
+            var bytesRead: Int
+            val contentLength = body.contentLength()
+            val expectedMB: Double = contentLength / 1048576.0
+            var downloadedMB = 0.0
+            input = BufferedInputStream(body.byteStream(), 8192) // 8KB
+            val startMs = SystemClock.elapsedRealtime()
+            var progressJumpsMs = 1000
+            val buf = ByteArray(4096) // 4KB
+            while (input.read(buf).also { bytesRead = it } != -1) {
+                val elapsedMs = SystemClock.elapsedRealtime() - startMs
+                downloadedMB += bytesToMB(bytesRead)
+                val progress = if (contentLength == Long.MAX_VALUE) 0 else (downloadedMB * 100 / expectedMB).toInt()
+                if (elapsedMs >= progressJumpsMs) {
+                    updateProgress(context, progress)
+                    // increase the next update duration linearly by another sec; ie,
+                    // update in the intervals of once every [1, 2, 3, 4, ...] secs
+                    progressJumpsMs += 1000
                 }
-                if (currentTime > 1000 * timeCount) {
-                    download.currentFileSize = current
-                    download.progress = progress
-                    updateProgress(context, download.currentFileSize.toInt())
-                    timeCount++
-                }
-                output.write(data, 0, count)
+                output.write(buf, 0, bytesRead)
             }
             output.flush()
-            Log.i(LOG_TAG_DOWNLOAD, "$fileName downloaded")
+            Log.i(LOG_TAG_DOWNLOAD, "$fileName > ${downloadedMB}MB downloaded")
             return true
         } catch (e: Exception) {
             Log.e(LOG_TAG_DOWNLOAD, "$fileName download err: ${e.message}", e)
         } finally {
             output?.close()
-            bis?.close()
+            input?.close()
         }
         return false
+    }
+
+    private fun bytesToMB(sz: Int): Double {
+        return sz.toDouble() / 1048576.0
     }
 
     private fun isDownloadComplete(dir: File): Boolean {
@@ -444,7 +438,10 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
 
     private fun updateProgress(context: Context, progress: Int) {
         val builder = getBuilder(context)
-        builder.setProgress(100, progress, false)
+        val cur = if (progress <= 0) 0 else progress
+        val max = if (cur <= 0) 0 else 100
+        val forever = cur <= 0
+        builder.setProgress(max, cur, forever)
         getNotificationManager(context)
             .notify(DOWNLOAD_NOTIFICATION_TAG, DOWNLOAD_NOTIFICATION_ID, builder.build())
     }

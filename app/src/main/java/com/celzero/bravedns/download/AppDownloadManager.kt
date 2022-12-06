@@ -90,7 +90,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(ts, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(LOG_TAG_DNS, "Response for blocklist update is null")
+            Log.w(LOG_TAG_DNS, "blocklist update is check response is null for ${type.name}")
             downloadRequired.postValue(DownloadManagerStatus.FAILURE)
             return
         }
@@ -174,7 +174,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(LOG_TAG_DNS, "Response for blocklist update is null")
+            Log.w(LOG_TAG_DNS, "local blocklist update check is null")
             return DownloadManagerStatus.FAILURE
         }
 
@@ -229,7 +229,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(LOG_TAG_DNS, "Response for blocklist update is null")
+            Log.w(LOG_TAG_DNS, "remote blocklist update check is null")
             downloadRequired.postValue(DownloadManagerStatus.FAILURE)
             return false
         }
