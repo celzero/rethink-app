@@ -75,16 +75,16 @@ import inet.ipaddr.IPAddressString
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Blocker
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Blocker
 
 class BraveVPNService :
     VpnService(),
@@ -1477,7 +1477,16 @@ class BraveVPNService :
 
     private fun updateQuickSettingsTile() {
         if (VERSION.SDK_INT >= VERSION_CODES.N) {
-            requestListeningState(this, ComponentName(this, BraveTileService::class.java))
+            try {
+                requestListeningState(this, ComponentName(this, BraveTileService::class.java))
+            } catch (e: NullPointerException) { // https://github.com/celzero/rethink-app/issues/626
+                Log.e(LOG_TAG_VPN, "Error updating tile service, component is null", e)
+            } catch (e: SecurityException) {
+                Log.e(LOG_TAG_VPN, "Error updating tile service, package does not match", e)
+            } catch (
+                e: IllegalStateException) { // if the user of the context is not the current user
+                Log.e(LOG_TAG_VPN, "Error updating tile service, invalid user context", e)
+            }
         }
     }
 

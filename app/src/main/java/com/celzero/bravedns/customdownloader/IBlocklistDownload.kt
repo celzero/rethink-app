@@ -18,13 +18,17 @@ package com.celzero.bravedns.customdownloader
 import com.google.gson.JsonObject
 import okhttp3.ResponseBody
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
-import retrofit2.http.Streaming
+import retrofit2.http.*
 
 interface IBlocklistDownload {
 
+    /*@Headers(
+        "Accept-Encoding: gzip",
+        "Content-Type: application/octet-stream",
+        "Accept: application/wasm"
+    )*/
+    // above accept-encoding header is automatically sent by OkHttp, no need to add our headers
+    // for gzip. ref: https://github.com/square/okhttp/issues/2132
     @GET("/{fileName}")
     @Streaming
     suspend fun downloadLocalBlocklistFile(
