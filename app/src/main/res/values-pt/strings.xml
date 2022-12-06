@@ -155,7 +155,6 @@
     <string name="dns_query_clear_logs_title">Eliminar todos os registos DNS\?</string>
     <string name="bsct_conn_block_desc_device">%1$s bloqueado no dispositivo</string>
     <string name="bsct_conn_desc_blocked">bloqueado em %1$s %2$s</string>
-    <string name="private_dns_toast">O DNS privado foi definido.</string>
     <string name="always_on_dialog_neutral">Configurações</string>
     <string name="firewall_act_network_monitor_tab">Registos de rede</string>
     <string name="dns_act_configure_tab">Configurar</string>
@@ -417,7 +416,6 @@
     <string name="about_faq">Ver perguntas frequentes</string>
     <string name="about_docs">Ler documentos</string>
     <string name="about_connect">contactos</string>
-    <string name="about_sponsor">patrocinar</string>
     <string name="about_sponsor_link_text">patrocinador</string>
     <string name="about_settings">sistema</string>
     <string name="about_settings_vpn_profile">Perfil VPN</string>
@@ -785,10 +783,8 @@
     <string name="ada_noapp_dialog_title">Informação da aplicação não encontrada</string>
     <string name="ada_noapp_dialog_message">As informações da aplicação especificada não foram encontradas.</string>
     <string name="ada_noapp_dialog_positive">Ok</string>
-    <string name="ada_ip_rules_status_blocked">Bloqueado</string>
     <string name="ada_ip_rules_status_allowed">Sem regra</string>
     <string name="ada_firewall_status">Esta aplicação <b><i>%1$s</i></b>.</string>
-    <string name="ada_uid">ID da aplicação: <i>%1$s</i><br/>Categoria: <i>%2$s</i><br/>Instalada em: <i>%3$s</i><br/>Atualizada em: <i>%4$s</i></string>
     <string name="ada_ip_connection_count">Conectada aos endereços IP %1$s</string>
     <string name="ada_ip_connection_count_zero">0 endereço IP</string>
     <string name="ada_app_status_block">está bloqueada</string>
@@ -798,7 +794,6 @@
     <string name="ada_app_status_lockdown">está em modo de restrito</string>
     <string name="ada_app_status_unknown">é desconhecida</string>
     <string name="ada_ip_block_count">%1$s regra(s) de IP</string>
-    <string name="ada_ip_block_no_rules">Não há regras de IP para esta aplicação.</string>
     <string name="ada_firewall_title">regras de firewall para esta aplicação</string>
     <string name="ada_ip_rules_title">regras de ip para esta aplicação</string>
     <string name="ada_network_log_title">registo de rede para esta aplicação</string>
@@ -811,11 +806,9 @@
     <string name="bsac_block">Bloquear</string>
     <string name="bsac_bypass_app_rules">Regras de contorno da aplicação</string>
     <string name="bsac_go_pass_app_rules">Remover contorno</string>
-    <string name="bsac_delete">Eliminar</string>
     <string name="bsac_block_toast">Bloqueando %1$s para esta aplicação</string>
     <string name="bsac_unblock_toast">Desbloqueado %1$s para esta aplicação</string>
     <string name="bsac_whitelist_toast">A contornar as regras de aplicação para este IP %1$s</string>
-    <string name="bsac_delete_toast">%1$s eliminado</string>
     <string name="bsdl_domain_desc">Clique abaixo para permitir ou bloquear a consulta de DNS</string>
     <string name="bsdl_domain_rule_allow">permitir</string>
     <string name="bsdl_domain_rule_block">bloquear</string>
@@ -888,7 +881,6 @@
     <string name="fapps_firewall_filter_all">Tudo</string>
     <string name="notif_dialog_pause_dialog_negative">Ignorar</string>
     <string name="notif_channel_proxy_failure">Alertas de proxy</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Ignorar regras da aplicação</string>
     <string name="ada_app_unmetered">Ilimitado</string>
     <string name="lbbs_update_check">Ver se há atualizações</string>
 </resources>

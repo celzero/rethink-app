@@ -413,7 +413,6 @@
     <string name="firewall_rule_block_dns_bypass_desc">Это соединение было заблокировано, поскольку приложение-источник <i/> обходило предпочитаемый пользователем DNS.<br/><br/> Чтобы изменить это поведение, перейдите на вкладку <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">Это DNS-соединение было проксировано и перенаправлено на предпочитаемую пользователем конечную точку DNS.<br/><br/> Чтобы изменить отключение <i>Предотвращение утечек DNS</i> с экрана DNS <i>Настроить</i>.</string>
     <string name="bsac_title_desc">Правила распространяются только на это приложение.</string>
-    <string name="bsac_delete_toast">Удалено: %1$s</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Это соединение было разрешено, потому что <i>one-click Tor-as-a-proxy</i> был настроен через Orbot.</string>
     <string name="firewall_rule_block_http_desc">Это соединение было заблокировано, потому что оно, вероятно, использовало <i>небезопасный HTTP</i>.<br/><br/> Для изменения перейдите на вкладку <i>Universal</i>.</string>
     <string name="new_app_notification_title">Требуется действие</string>
@@ -453,11 +452,8 @@
     <string name="ada_app_status_whitelist">будет обходить универсальные правила брандмауэра</string>
     <string name="ci_no_rule_desc">- Нет правил</string>
     <string name="ada_noapp_dialog_title">Информация о приложении не найдена</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Обходить правила приложений</string>
-    <string name="ada_ip_rules_status_blocked">Заблокированный</string>
     <string name="ada_app_status_block">заблокирован</string>
     <string name="ada_app_status_block_md">блокируется в сетях с дозированной оплатой (мобильная связь)</string>
-    <string name="ada_uid">App ID: <i>%1$s</i><br/>Категория: <i>%2$s</i><br/>Установлено в: <i>%3$s</i><br/>Обновлено в: <i>%4$s</i></string>
     <string name="ada_ip_no_connection">В этом приложении нет журналов сети.</string>
     <string name="ada_app_status_exclude">исключен из dns и брандмауэра</string>
     <string name="ada_app_status_lockdown">находится в режиме блокировки</string>
@@ -614,14 +610,12 @@
     <string name="ci_no_rule_txt">Нет правил</string>
     <string name="ci_bypass_universal">обход универсальный</string>
     <string name="ada_noapp_dialog_message">Информация о приложении для указанного приложения не найдена.</string>
-    <string name="ada_ip_rules_status_allowed">Нет правил</string>
     <string name="ada_firewall_status">Это приложение <b><i>%1$s</i> </b> .</string>
     <string name="ada_ip_connection_count">Подключено к %1$s IP-адресу(ам)</string>
     <string name="ada_ip_connection_count_zero">0 IP-адрес</string>
     <string name="ada_app_status_block_wifi">блокируется в сетях без учета тарифов (wifi)</string>
     <string name="ada_app_status_unknown">неизвестно</string>
     <string name="ada_ip_block_count">%1$s IP правило(я)</string>
-    <string name="ada_ip_block_no_rules">Для этого приложения нет правил IP.</string>
     <string name="ada_firewall_title">правила брандмауэра для этого приложения</string>
     <string name="ada_ip_rules_title">правила ip для этого приложения</string>
     <string name="ada_network_log_title">сетевой журнал для этого приложения</string>
