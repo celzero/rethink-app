@@ -67,7 +67,7 @@
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Connecté via RethinkDNS et pare-feu</string>
     <string name="alert_firewall_accessibility_exception">Échec de l\'ouverture des paramètres d\'accessibilité. Réessayez plus tard !</string>
     <string name="bsct_conn_block_desc">bloquée %1$s par%2$s</string>
-    <string name="always_on_dialog_positive_btn">Aller dans les paramètres</string>
+    <string name="always_on_dialog_positive_btn">Aller dans les paramètres d\'Android</string>
     <string name="always_on_dialog_stop_heading">VPN permanent</string>
     <string name="exclude">exclure</string>
     <string name="dns_mode_info_title">DNS</string>
@@ -121,7 +121,7 @@
     <string name="download_update_dialog_trylater_message">La mise à jour ne peut être appliquée pour le moment, veuillez réessayer plus tard.</string>
     <string name="settings_enable_logs">Activer la journalisation embarquée sur l\'appareil</string>
     <string name="whats_new_version_name">🌎🕊 Journée mondiale des étudiants (15 oct) 🕊🌎</string>
-    <string name="whats_new_version_update">&lt;b&gt;Effort maximal&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Introduction d\'un résolveur Rethink plus privé, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Marquer IPv6 comme expérimental ; passer à IPv4 par défaut.&lt;br/&gt; 3. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Sauvegarde et restauration des paramètres de l\'application.&lt;br/&gt; 4. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Mode de confinement de l\'application.&lt;br/&gt; 5. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Mode de confinement global.&lt;br/&gt; 6. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Application de règles de pare-feu sur les numéros de port.&lt;br/&gt; 7. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Appliquer les règles de pare-feu des applications par lots.&lt;br/&gt; 8. Rafraîchissement mineur de l\'interface utilisateur.&lt;br/&gt; 9. Autres corrections de mémoire et de crash.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Aidez-nous à traduire cette application&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Polyglottisme !&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Support rétabli d\'Android 6.&lt;br/&gt; 2. Nouvelle interface RDNS+.&lt;br/&gt; 3. Nouveau moteur de réseau et de pare-feu.&lt;br/&gt; 4. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Traductions dans plus de 15 langues.&lt;br/&gt; 5. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Icônes adaptatives.&lt;br/&gt; 6. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Afficher les noms de domaine dans les journaux réseau des applications.&lt;br/&gt; 7. Corrections des notifications manquantes sur Android 13.&lt;br/&gt; 8. Correction d\'un mauvais comportement de l\'intégration Orbot DNS.&lt;br/&gt; 9. L\'écran des applications est désormais accessible en mode DNS uniquement.&lt;br/&gt; 10. Améliorations majeures du gestionnaire de téléchargement intégré.&lt;br/&gt;&lt;br/&gt; &lt;a href=https ://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Aidez-nous à traduire cette application&lt;/a&gt;</string>
     <string name="settings_ptrans_desc">Traduit le trafic sortant IPv6 en IPv4 sur l\'appareil. Activez cette option si vous êtes connecté à un réseau uniquement IPv4.</string>
     <string name="settings_allow_bypass_desc">Autorisez les applications à contourner le pare-feu de RethinkDNS à la demande. Certaines applications de conférence audio/vidéo comme Zoom et WhatsApp peuvent nécessiter cela pour fonctionner correctement.</string>
     <string name="settings_lock_down_mode_desc">Impossible de configurer un proxy ou d\'autoriser le contournement du VPN lorsque celui-ci fonctionne en mode confinement. <u>Accéder aux paramètres VPN d\'Android</u>.</string>
@@ -166,7 +166,7 @@
     <string name="settings_http_proxy_error_text3">Le nom d\'hôte est vide</string>
     <string name="settings_http_proxy_toast_success">Le proxy HTTP est défini</string>
     <string name="settings_http_proxy_port">Port</string>
-    <string name="settings_dns_proxy_dialog_header">Définir le proxy SOCKS5 (TCP)</string>
+    <string name="settings_dns_proxy_dialog_header">Définir le proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app">Application</string>
     <string name="settings_dns_proxy_dialog_username">Nom d’utilisateur</string>
     <string name="settings_dns_proxy_dialog_hostname">Nom d’hôte</string>
@@ -217,7 +217,7 @@
     <string name="hsf_start_dialog_message">Vous n\'êtes qu\'à un pas d\'un Android sûr et sécurisé : Voyez instantanément l\'activité du réseau, bloquez les sites web, les IP et les applications qui se comportent mal.</string>
     <string name="hsf_start_dialog_negative">Ignorer</string>
     <string name="hsf_whats_new_chip_text">Quoi de neuf</string>
-    <string name="hsf_blocklist_chip_text">%1$s listes de blocage configurées</string>
+    <string name="hsf_blocklist_chip_text">%1$s listes de blocage</string>
     <string name="hsf_proxy_chip_text">Proxy actif</string>
     <string name="hsf_exclude_error">Exclusion impossible en mode confinement VPN</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy supprimé</string>
@@ -258,7 +258,7 @@
     <string name="brbs_restore_dialog_message">Restaure les paramètres de l\'application ainsi que les journaux réseau et DNS à partir d\'un fichier de sauvegarde. Cela va redémarrer l\'application.</string>
     <string name="brbs_backup_dialog_failure_negative">Ignorer</string>
     <string name="brbs_restore_dialog_failure_message">Impossible de restaurer. Essayez à nouveau \?</string>
-    <string name="contributors_list">Le &lt;i&gt;projet libre et open source Rethink&lt;/i&gt; doit son existence à ces bénévoles qui consacrent d\'innombrables heures à son développement.&lt;br/&gt; &lt;br/&gt;🛡️ Application Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Moteur réseau &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Résolveur &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Modérateurs de la communauté &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 base de données de géo-localisation IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">Le &lt;i&gt;projet libre et open source Rethink&lt;/i&gt; doit son existence à ces bénévoles qui consacrent d\'innombrables heures à son développement.&lt;br/&gt; &lt;br/&gt;🛡️ Application Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Moteur réseau &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Résolveur &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Modérateurs de la communauté &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Géo-localisation IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traductions &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Serveurs de compilation &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="orbot_explanation">Orbot est une application proxy gratuite qui permet à d\'autres applications d\'utiliser Internet de manière plus <u>sûre</u> .
 \nOrbot utilise <u>Tor</u> pour chiffrer votre trafic Internet, ce qui vous aide à <u>contourner la censure</u> et à vous défendre contre les formes de <u>surveillance du réseau</u> qui menacent les libertés individuelles et la vie privée.
 \n<u>Proxy TCP</u> : RethinkDNS transmet à Orbot les connexions TCP de toutes les applications sauf celles qui sont exclues.
@@ -613,7 +613,7 @@
     <string name="cd_dns_crypt_relay_heading">Relais</string>
     <string name="ctbs_dialog_negative_btn">Retour</string>
     <string name="about_settings_app_info">Infos sur l\'appli</string>
-    <string name="dc_dns_website_desc">Récupère les icônes de sites Web à partir de <i>duckduckgo.com</i>. Consomme jusqu\'à 350 mb d\'espace disque</string>
+    <string name="dc_dns_website_desc">Récupère les icônes de sites Web à partir de <i>nextdns.com</i> et <i>duckduckgo.com</i>. Consomme jusqu\'à 350 mb d\'espace disque</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="orbot_toast_parameter">Tor-as-a-proxy</string>
     <string name="update_complete_snack_message">Nouvelle version téléchargée.</string>
@@ -623,7 +623,7 @@
     <string name="cd_dialog_edittext_hint">Entrez %1$s</string>
     <string name="ci_dialog_desc">Autoriser (ajout d\'exception) ou bloquer l\'adresse IP, le sous-réseau IP (plage), le port. Exemple : 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
     <string name="ci_dialog_added_success">IP ajoutée à la liste</string>
-    <string name="ci_bypass_universal_initial">Ex</string>
+    <string name="ci_bypass_universal_initial">EG</string>
     <string name="ada_noapp_dialog_positive">D\'accord</string>
     <string name="bsac_unblock">Débloquer</string>
     <string name="rt_download_desc">Téléchargez les listes de blocage (environ 60MB) pour utiliser cette fonctionnalité.</string>
@@ -731,7 +731,7 @@
     <string name="notif_channel_desc_firewall_alerts">Alerte sur les erreurs et anomalies du pare-feu</string>
     <string name="cd_remove_dialog_title">Supprimer le domaine \?</string>
     <string name="cd_filter_allowed">Autorisé</string>
-    <string name="ci_no_rules_text">Aucune règle globale de blocage ou d\'exception d\'IP n\'a été trouvée.</string>
+    <string name="ci_no_rules_text">Aucune règle IP ou port n\'a été trouvée.</string>
     <string name="cd_whitelist_initial">LB</string>
     <string name="ada_app_status_whitelist">contournera les règles du pare-feu global</string>
     <string name="rt_list_adv_btn_txt">avancé</string>
@@ -841,7 +841,7 @@
     <string name="firewall_act_network_monitor_tab">Journaux du réseau</string>
     <string name="dns_crypt_url_remove_success">Résolveur DNSCrypt supprimé.</string>
     <string name="local_blocklist_download">Télécharger les listes de blocage</string>
-    <string name="whats_dialog_title">Quoi de neuf dans la v053k</string>
+    <string name="whats_dialog_title">Quoi de neuf dans la v053l</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_stop_dialog_neutral">Changer de DNS</string>
@@ -868,7 +868,7 @@
     <string name="hsf_notification_permission_failure">Activer l\'autorisation de notification depuis les paramètres d\'Android</string>
     <string name="relative_time_today">Aujourd\'hui</string>
     <string name="relative_time_yesterday">Hier</string>
-    <string name="about_privacy_policy">Politique de confidentialité</string>
+    <string name="about_privacy_policy">Lire la politique de confidentialité</string>
     <string name="settings_app_notification_a13_desc">Activer les notifications pour l\'application</string>
     <string name="settings_app_notification_a13_heading">Notifications</string>
     <string name="about_app_translate">Traduire</string>
@@ -882,4 +882,23 @@
     <string name="rt_filter_parent_all">Toutes</string>
     <string name="rt_filter_parent_selected">Sélectionnées</string>
     <string name="rt_filter_hint">Affichage de <u>toutes</u> les listes de blocage</string>
+    <string name="private_dns_dialog_heading">Désactiver le DNS privé</string>
+    <string name="private_dns_dialog_desc">Les paramètres DNS de Rethink sont écrasés par le DNS privé d\'Android.
+\n
+\nPour utiliser le DNS de Rethink, allez dans les paramètres d\'Android et désactivez le \"DNS privé\".</string>
+    <string name="private_dns_dialog_positive">Aller dans les paramètres d\'Android</string>
+    <string name="private_dns_dialog_negative">Ignorer</string>
+    <string name="ci_bypass_app_txt">Exception aux règles de l\'appli</string>
+    <string name="ci_bypass_app_desc">- Exception aux règles de l\'appli</string>
+    <string name="ada_app_firewall">Pare-feu</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Effacer les journaux</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Effacer les journaux de cette application.</string>
+    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Procéder</string>
+    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">Annuler</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Bloquer les contenus piratés et pour adultes, les jeux d\'argent et les rencontres en ligne, ainsi que les médias sociaux.</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Bloquer les traceurs d\'attention, les logiciels espions et alarmiciels.</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Bloquer les logiciels malveillants, les rançongiciels, les hameçonneurs et autres menaces.</string>
+    <string name="ci_bypass_app_initial">EA</string>
+    <string name="private_dns_error">Impossible de charger l\'écran DNS privé.</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s listes de blocage</string>
 </resources>
