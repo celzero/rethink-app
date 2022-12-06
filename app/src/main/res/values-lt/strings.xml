@@ -95,7 +95,7 @@
     <string name="settings_vpn_heading">vpn</string>
     <string name="settings_enable_logs">Įgalinti registravimą įrenginyje</string>
     <string name="app_mode_choose">Pasirinkti režimą</string>
-    <string name="whats_dialog_title">Kas naujo v053k</string>
+    <string name="whats_dialog_title">Kas naujo v053l</string>
     <string name="whats_new_version_name">🌎🕊 Pasaulinė studentų diena (spalio 15 d.) 🕊🌎</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_heading">Pasirinkti IP versiją</string>
@@ -882,4 +882,7 @@
     <string name="settings_app_notification_a13_heading">Programėlės pranešimas</string>
     <string name="settings_app_notification_a13_desc">Įjungti pranešimų leidimą programėlei</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
+    <string name="private_dns_dialog_heading">Išjungti privatų DNS</string>
+    <string name="private_dns_dialog_positive">Eiti į nustatymus</string>
+    <string name="private_dns_dialog_negative">Atsisakyti</string>
 </resources>
