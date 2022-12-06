@@ -75,7 +75,6 @@
     <string name="settings_dns_proxy_dialog_header">SOCKS5 (TCP) proxy instellen</string>
     <string name="settings_vpn_heading">vpn</string>
     <string name="connection_http3">HTTP3</string>
-    <string name="private_dns_toast">Private DNS is ingesteld.</string>
     <string name="always_on_dialog_heading">VPN altijd aan uitschakelen</string>
     <string name="always_on_dialog_negative_btn">Annuleren</string>
     <string name="always_on_dialog_stop_heading">Altijd VPN</string>

@@ -546,7 +546,6 @@
     <string name="dc_dns_leaks_heading">Impedir vazamentos do DNS</string>
     <string name="about_docs">Leia docs</string>
     <string name="about_connect">contato</string>
-    <string name="about_sponsor">patrocinar</string>
     <string name="about_sponsor_link_text">Patrocinar</string>
     <string name="about_email">Entre em contato pelo email</string>
     <string name="log_file_not_available">Nenhum relatório de falha encontrado</string>
