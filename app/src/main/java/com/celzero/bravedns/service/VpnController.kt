@@ -131,17 +131,6 @@ object VpnController : KoinComponent {
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
-    fun onStartComplete(context: Context, succeeded: Boolean) {
-        if (!succeeded) {
-            // VPN setup only fails if VPN permission has been revoked.  If this happens, clear the
-            // user intent state and reset to the default state.
-            stop(context)
-        } else {
-            // no op
-        }
-        Log.i(LOG_TAG_VPN, "onStartComplete - VpnController")
-    }
-
     fun stop(context: Context) {
         Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null

@@ -180,6 +180,7 @@ class Constants {
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
+        const val FLAVOR_HEADLESS = "headless"
 
         // Various notification action constants used part of NotificationCompat.Action
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
@@ -252,5 +253,9 @@ class Constants {
 
         // max endpoint
         const val MAX_ENDPOINT = "max"
+
+        // The UID used to be generic uid used to block IP addresses which are intended to
+        // block for all the applications.
+        const val UID_EVERYBODY = -1000
     }
 }

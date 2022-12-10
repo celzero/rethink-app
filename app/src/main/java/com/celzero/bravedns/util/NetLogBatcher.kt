@@ -17,7 +17,7 @@
 package com.celzero.bravedns.util
 
 import android.util.Log
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -51,17 +51,17 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
     // signal channel, holds at most 1 signal, and drops the oldest
     private val signal = Channel<Int>(Channel.Factory.CONFLATED)
 
-    var batches = mutableListOf<T>()
+    private var batches = mutableListOf<T>()
 
     fun begin(scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
-            golooper(scope) { sig() }
-            golooper(scope) { consume() }
+            golooperAsync(scope) { sig() }
+            golooperAsync(scope) { consume() }
             monitorCancellation()
         }
     }
 
-    private suspend fun golooper(s: CoroutineScope, f: suspend () -> Unit): Deferred<Unit> {
+    private suspend fun golooperAsync(s: CoroutineScope, f: suspend () -> Unit): Deferred<Unit> {
         return s.async(s.coroutineContext + looper + n2, CoroutineStart.DEFAULT) { f() }
     }
 
@@ -86,7 +86,7 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
 
     private suspend fun txswap() {
         val b = batches
-        batches = mutableListOf<T>() // swap buffers
+        batches = mutableListOf() // swap buffers
         if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "transfer and swap (${lsn}) ${b.size}")
         lsn = (lsn + 1)
         buffers.send(b)

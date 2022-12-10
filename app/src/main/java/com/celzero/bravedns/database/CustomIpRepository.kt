@@ -23,10 +23,6 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         customIpDao.update(customIp)
     }
 
-    suspend fun clearFirewallRules(uid: Int) {
-        customIpDao.clearIpRuleByUid(uid)
-    }
-
     suspend fun insert(customIp: CustomIp) {
         customIpDao.insert(customIp)
     }
@@ -43,16 +39,8 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         customIpDao.deleteIPRulesForUID(uid, ipAddress, port)
     }
 
-    suspend fun deleteIpRule(customIp: CustomIp) {
-        customIpDao.delete(customIp)
-    }
-
     suspend fun deleteAllIPRulesUniversal() {
         customIpDao.deleteAllIPRulesUniversal()
-    }
-
-    suspend fun getBlockedConnectionsCount(): Int {
-        return customIpDao.getBlockedConnectionsCount()
     }
 
     fun getCustomIpsLiveData(): LiveData<Int> {

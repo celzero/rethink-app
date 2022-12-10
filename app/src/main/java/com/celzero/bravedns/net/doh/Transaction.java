@@ -75,16 +75,8 @@ public class Transaction implements Serializable {
             return DOH;
         }
 
-        public Boolean isDoH() {
-            return this == DOH;
-        }
-
         public Boolean isDnsCrypt() {
             return this == DNS_CRYPT;
-        }
-
-        public Boolean isDnsProxy() {
-            return this == DNS_PROXY;
         }
     }
 }

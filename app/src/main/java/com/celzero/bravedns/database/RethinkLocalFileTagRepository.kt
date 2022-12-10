@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.database.Cursor
 import androidx.room.Transaction
 import com.celzero.bravedns.data.FileTag
 
@@ -24,14 +25,6 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
     @Transaction
     suspend fun update(fileTag: RethinkLocalFileTag) {
         rethinkLocalFileTagDao.update(fileTag)
-    }
-
-    suspend fun insertAsync(fileTag: RethinkLocalFileTag) {
-        rethinkLocalFileTagDao.insert(fileTag)
-    }
-
-    suspend fun insertWithReplace(fileTag: RethinkLocalFileTag) {
-        rethinkLocalFileTagDao.insertReplace(fileTag)
     }
 
     suspend fun insertAll(fileTags: List<RethinkLocalFileTag>): LongArray {
@@ -57,4 +50,5 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
     suspend fun deleteAll() {
         return rethinkLocalFileTagDao.deleteAll()
     }
+
 }

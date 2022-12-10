@@ -20,7 +20,7 @@ class KnownPorts {
 
     companion object {
         const val DNS_PORT: Int = 53
-        const val NTP_PORT: Int = 123
+        private const val NTP_PORT: Int = 123
         const val HTTP_PORT: Int = 80
         const val HTTPS_PORT: Int = 443
 

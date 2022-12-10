@@ -20,13 +20,13 @@ import android.net.*
 import android.os.*
 import android.system.OsConstants.RT_SCOPE_UNIVERSE
 import android.util.Log
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
+import java.util.concurrent.TimeUnit
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.TimeUnit
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
@@ -221,6 +221,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
          */
         private fun processActiveNetwork(isForceUpdate: Boolean) {
             val newActiveNetwork = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(newActiveNetwork)
             // set active network's connection status
             val isActiveNetworkMetered = isConnectionMetered()
             val newNetworks = createNetworksSet(newActiveNetwork)
@@ -228,7 +229,14 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
             Log.i(
                 LOG_TAG_CONNECTION,
-                "Connected network: ${newActiveNetwork?.networkHandle}, Is new network? $isNewNetwork, is force update? $isForceUpdate"
+                "Connected network: ${
+                                when {
+                                    networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true -> "VPN"
+                                    networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "WiFi"
+                                    networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "Cellular"
+                                    else -> "Unknown"
+                                }
+                            }, Is new network? $isNewNetwork, is force update? $isForceUpdate"
             )
 
             if (isNewNetwork || isForceUpdate) {

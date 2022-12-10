@@ -47,11 +47,6 @@ interface RethinkDnsEndpointDao {
     @Query("update RethinkDnsEndpoint set isActive = 0 where uid = :uid")
     fun removeAppWiseDns(uid: Int)
 
-    @Query(
-        "delete from RethinkDnsEndpoint where name = :name and url =:url and uid = :uid and isCustom = 1 and uid = $MISSING_UID"
-    )
-    fun deleteDoHEndpoint(name: String, url: String, uid: Int)
-
     @Transaction
     @Query("select * from RethinkDnsEndpoint where uid =  $MISSING_UID order by isActive desc")
     fun getRethinkEndpoints(): PagingSource<Int, RethinkDnsEndpoint>

@@ -40,11 +40,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.DomainRulesManager
-import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.automaton.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
-import com.celzero.bravedns.automaton.IpRulesManager
-import com.celzero.bravedns.automaton.IpRulesManager.UID_EVERYBODY
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.AppInfo
@@ -53,14 +48,16 @@ import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.go.GoVpnAdapter.Companion.establish
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
@@ -631,15 +628,18 @@ class BraveVPNService :
         // isAccessibilityServiceRunning default value(false) is passed instead of
         // checking it from accessibility service for the first time.
         if (ts == null || Math.abs(now - ts) > Constants.ACTIVE_NETWORK_CHECK_THRESHOLD_MS) {
-            if (DEBUG)
+            if (DEBUG) {
+                val ifname =
+                    connectivityManager
+                        .getLinkProperties(connectivityManager.activeNetwork)
+                        ?.interfaceName
+                val metered = connectivityManager.isActiveNetworkMetered
                 Log.d(
                     LOG_TAG_VPN,
-                    "Active network check, activeNetworkHeartbeatTimestamp: $ts, is connection metered?: ${connectivityManager.isActiveNetworkMetered}," +
-                        "active network? ${connectivityManager.activeNetwork}, name: ${
-                                 connectivityManager.getLinkProperties(
-                                     connectivityManager.activeNetwork)?.interfaceName
-                             }"
+                    "activeNetworkHeartbeatTimestamp: $ts, metered?: $metered," +
+                        "active? ${connectivityManager.activeNetwork}, name: $ifname"
                 )
+            }
             underlyingNetworks?.lastUpdated = now
             underlyingNetworks?.isActiveNetworkMetered = connectivityManager.isActiveNetworkMetered
         }
@@ -1818,12 +1818,12 @@ class BraveVPNService :
     }
 
     private fun route6(): Boolean {
-        when (appConfig.getInternetProtocol()) {
+        return when (appConfig.getInternetProtocol()) {
             InternetProtocol.IPv4 -> {
-                return false
+                false
             }
             InternetProtocol.IPv6 -> {
-                return true
+                true
             }
             InternetProtocol.IPv46 -> {
                 // when no underlying-networks are unknown, or if use-multiple-networks is enabled,
@@ -1831,22 +1831,22 @@ class BraveVPNService :
                 // must only use the active-network (always the first network in allNet), then check
                 // if active-network has v6 connectivity (that is, it must be present in ipv6Net).
                 if (underlyingNetworks?.useActive != true) {
-                    return underlyingNetworks?.ipv6Net?.size != 0
+                    underlyingNetworks?.ipv6Net?.size != 0
                 } else {
                     val activeNetwork = underlyingNetworks?.allNet?.first()
-                    return underlyingNetworks?.ipv6Net?.contains(activeNetwork) == true
+                    underlyingNetworks?.ipv6Net?.contains(activeNetwork) == true
                 }
             }
         }
     }
 
     private fun route4(): Boolean {
-        when (appConfig.getInternetProtocol()) {
+        return when (appConfig.getInternetProtocol()) {
             InternetProtocol.IPv4 -> {
-                return true
+                true
             }
             InternetProtocol.IPv6 -> {
-                return false
+                false
             }
             InternetProtocol.IPv46 -> {
                 // when no underlying-networks are unknown, or if use-multiple-networks is enabled,
@@ -1854,10 +1854,10 @@ class BraveVPNService :
                 // must only use the active-network (always the first network in allNet), then check
                 // if active-network has v4 connectivity (that is, it must be present in ipv4Net).
                 if (underlyingNetworks?.useActive != true) {
-                    return underlyingNetworks?.ipv4Net?.size != 0
+                    underlyingNetworks?.ipv4Net?.size != 0
                 } else {
                     val activeNetwork = underlyingNetworks?.allNet?.first()
-                    return underlyingNetworks?.ipv4Net?.contains(activeNetwork) == true
+                    underlyingNetworks?.ipv4Net?.contains(activeNetwork) == true
                 }
             }
         }

@@ -18,7 +18,6 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.FirewallManager
 import com.celzero.bravedns.data.IPDetails
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
@@ -44,21 +43,6 @@ internal constructor(
     private val connectionTrackerRepository: ConnectionTrackerRepository,
     private val context: Context
 ) : KoinComponent {
-
-    private val persistentState by inject<PersistentState>()
-    private val dnsLogTracker by inject<DnsLogTracker>()
-
-    fun recordTransaction(ipDetails: IPDetails?) {
-        if (ipDetails == null) return
-        if (!persistentState.logsEnabled) return
-
-        // Modified the call of the insert to database inside the coroutine scope.
-        io { insertToDB(ipDetails) }
-    }
-
-    private suspend fun insertToDB(ipDetails: IPDetails) {
-        connectionTrackerRepository.insert(makeConnectionTracker(ipDetails))
-    }
 
     suspend fun makeConnectionTracker(ipDetails: IPDetails): ConnectionTracker {
         val connTracker = ConnectionTracker()
@@ -146,7 +130,4 @@ internal constructor(
         return appName
     }
 
-    private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch { f() }
-    }
 }

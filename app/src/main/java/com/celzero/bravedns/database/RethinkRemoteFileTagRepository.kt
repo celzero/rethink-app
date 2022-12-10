@@ -26,14 +26,6 @@ class RethinkRemoteFileTagRepository(private val rethinkRemoteFileTagDao: Rethin
         rethinkRemoteFileTagDao.update(fileTag)
     }
 
-    suspend fun insertAsync(fileTag: RethinkRemoteFileTag) {
-        rethinkRemoteFileTagDao.insert(fileTag)
-    }
-
-    suspend fun insertWithReplace(fileTag: RethinkRemoteFileTag) {
-        rethinkRemoteFileTagDao.insertReplace(fileTag)
-    }
-
     suspend fun insertAll(fileTags: List<RethinkRemoteFileTag>): LongArray {
         return rethinkRemoteFileTagDao.insertAll(fileTags)
     }
