@@ -194,7 +194,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 
-    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
+    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
 }
