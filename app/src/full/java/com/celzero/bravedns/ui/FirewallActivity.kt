@@ -31,7 +31,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.Companion.openPauseActivityAndFinish
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
 
