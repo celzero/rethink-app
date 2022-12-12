@@ -40,7 +40,6 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import com.celzero.bravedns.util.Utilities.Companion.openPauseActivityAndFinish
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
