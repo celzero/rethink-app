@@ -28,10 +28,6 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         proxyEndpointDAO.deleteOlderData(date)
     }
 
-    suspend fun deleteDNSProxyEndpoint(proxyIP: String, port: Int) {
-        proxyEndpointDAO.deleteDNSProxyEndpoint(proxyIP, port)
-    }
-
     suspend fun removeConnectionStatus() {
         proxyEndpointDAO.removeConnectionStatus()
     }

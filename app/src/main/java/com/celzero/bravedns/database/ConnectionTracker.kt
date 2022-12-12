@@ -43,12 +43,4 @@ class ConnectionTracker {
     override fun hashCode(): Int {
         return this.id.hashCode()
     }
-
-    fun isWhitelisted(): Boolean {
-        return this.blockedByRule == FirewallRuleset.RULE8.id
-    }
-
-    fun isProxied(): Boolean {
-        return this.blockedByRule == FirewallRuleset.RULE9.id
-    }
 }

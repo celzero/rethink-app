@@ -44,12 +44,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
         // const val APP_STATE = "app_state"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
-
-        fun expandUrl(context: Context, url: String?): String {
-            return if (url == null || url.isEmpty()) {
-                context.resources.getStringArray(R.array.doh_endpoint_names)[3]
-            } else url
-        }
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -113,7 +107,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         booleanPref("allow_bypass").withDefault<Boolean>(!Utilities.isFdroidFlavour())
 
     // user set among AppConfig.DnsType enum; RETHINK_REMOTE is default which is Rethink-DoH
-    var dnsType by intPref("dns_type").withDefault<Int>(AppConfig.DnsType.RETHINK_REMOTE.type)
+    var dnsType by
+        intPref("dns_type")
+            .withDefault<Int>(
+                if (!Utilities.isHeadlessFlavour()) AppConfig.DnsType.RETHINK_REMOTE.type
+                else AppConfig.DnsType.NETWORK_DNS.type
+            )
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot").withDefault<Boolean>(true)

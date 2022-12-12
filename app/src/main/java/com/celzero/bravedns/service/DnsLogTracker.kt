@@ -21,15 +21,14 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.collection.LongSparseArray
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.automaton.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.LOOPBACK_IPV6
 import com.celzero.bravedns.util.Constants.Companion.NXDOMAIN
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
@@ -44,15 +43,15 @@ import dnsx.Dnsx
 import dnsx.Summary
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.ProtocolException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DnsLogTracker
 internal constructor(
