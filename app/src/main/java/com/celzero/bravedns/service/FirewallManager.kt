@@ -19,30 +19,31 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfosLiveData
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUids
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoRepository
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.OrbotHelper
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.collect.HashMultimap
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.Multimap
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 object FirewallManager : KoinComponent {
 
@@ -236,7 +237,7 @@ object FirewallManager : KoinComponent {
         SYSTEM_APP(R.string.category_name_sys_apps),
         OTHER(R.string.category_name_others),
         NON_APP(R.string.category_name_non_app_sys),
-        INSTALLED(R.string.category_name_installed);
+        INSTALLED(R.string.category_name_installed)
     }
 
     object GlobalVariable {
@@ -258,15 +259,17 @@ object FirewallManager : KoinComponent {
     }
 
     fun isUidSystemApp(uid: Int): Boolean {
-        return getAppInfosByUidLocked(uid).any { it.isSystemApp }
+        lock.read {
+            return ImmutableList.copyOf(appInfos.get(uid)).any { it.isSystemApp }
+        }
     }
 
     fun getTotalApps(): Int {
-        return getAppInfosLocked().count()
+        return getAppInfos().count()
     }
 
     fun getPackageNames(): Set<AppInfoTuple> {
-        return getAppInfosLocked().map { AppInfoTuple(it.uid, it.packageInfo) }.toHashSet()
+        return getAppInfos().map { AppInfoTuple(it.uid, it.packageInfo) }.toHashSet()
     }
 
     fun deletePackagesFromCache(packagesToDelete: Set<AppInfoTuple>) {
@@ -285,12 +288,12 @@ object FirewallManager : KoinComponent {
     }
 
     fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
-        return getAppInfosLocked().filter { it.firewallStatus != FirewallStatus.BLOCK.id }
+        return getAppInfos().filter { it.firewallStatus != FirewallStatus.BLOCK.id }
     }
 
     // TODO: Use the package-manager API instead
     fun isOrbotInstalled(): Boolean {
-        return getAppInfosLocked().any { it.packageInfo == OrbotHelper.ORBOT_PACKAGE_NAME }
+        return getAppInfos().any { it.packageInfo == OrbotHelper.ORBOT_PACKAGE_NAME }
     }
 
     fun hasUid(uid: Int): Boolean {
@@ -329,64 +332,66 @@ object FirewallManager : KoinComponent {
     }
 
     fun getExcludedApps(): MutableSet<String> {
-        return getAppInfosLocked()
+        return getAppInfos()
             .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
             .map { it.packageInfo }
             .toMutableSet()
     }
 
     fun getPackageNameByAppName(appName: String): String? {
-        return getAppInfosLocked().firstOrNull { it.appName == appName }?.packageInfo
+        return getAppInfos().firstOrNull { it.appName == appName }?.packageInfo
     }
 
     fun getAppNamesByUid(uid: Int): List<String> {
-        return getAppInfosByUidLocked(uid).map { it.appName }
+        lock.read {
+            return ImmutableList.copyOf(appInfos.get(uid)).map { it.appName }
+        }
     }
 
     fun getPackageNamesByUid(uid: Int): List<String> {
-        return getAppInfosByUidLocked(uid).map { it.packageInfo }
+        lock.read {
+            return ImmutableList.copyOf(appInfos.get(uid)).map { it.packageInfo }
+        }
     }
 
     fun getAllAppNames(): List<String> {
-        return getAppInfosLocked().map { it.appName }.sortedBy { it.lowercase() }
+        return getAppInfos().map { it.appName }.sortedBy { it.lowercase() }
     }
 
     fun getAppNameByUid(uid: Int): String? {
-        return getAppInfosByUidLocked(uid).firstOrNull()?.appName
+        lock.read {
+            return ImmutableList.copyOf(appInfos.get(uid)).firstOrNull()?.appName
+        }
     }
 
     fun getAppInfoByPackage(packageName: String?): AppInfo? {
         if (packageName.isNullOrBlank()) return null
 
-        return getAppInfosLocked().firstOrNull { it.packageInfo == packageName }
+        return getAppInfos().firstOrNull { it.packageInfo == packageName }
     }
 
     fun getAppInfoByUid(uid: Int): AppInfo? {
-        return getAppInfosByUidLocked(uid).firstOrNull()
+        lock.read {
+            return ImmutableList.copyOf(appInfos.get(uid)).firstOrNull()
+        }
     }
 
     fun getPackageNameByUid(uid: Int): String? {
-        return getAppInfosByUidLocked(uid).firstOrNull()?.packageInfo
+        lock.read {
+            return ImmutableList.copyOf(appInfos.get(uid)).firstOrNull()?.packageInfo
+        }
     }
 
     fun getCategoriesForSystemApps(): List<String> {
-        return getAppInfosLocked()
-            .filter { it.isSystemApp }
-            .map { it.appCategory }
-            .distinct()
-            .sorted()
+        return getAppInfos().filter { it.isSystemApp }.map { it.appCategory }.distinct().sorted()
     }
 
     fun getCategoriesForInstalledApps(): List<String> {
-        return getAppInfosLocked()
-            .filter { !it.isSystemApp }
-            .map { it.appCategory }
-            .distinct()
-            .sorted()
+        return getAppInfos().filter { !it.isSystemApp }.map { it.appCategory }.distinct().sorted()
     }
 
     fun getAllCategories(): List<String> {
-        return getAppInfosLocked().map { it.appCategory }.distinct().sorted()
+        return getAppInfos().map { it.appCategory }.distinct().sorted()
     }
 
     suspend fun loadAppFirewallRules() {
@@ -498,20 +503,14 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private fun getAppInfosLocked(): MutableCollection<AppInfo> {
+    private fun getAppInfos(): Collection<AppInfo> {
         lock.read {
-            return appInfos.values()
-        }
-    }
-
-    private fun getAppInfosByUidLocked(uid: Int): MutableCollection<AppInfo> {
-        lock.read {
-            return appInfos.get(uid)
+            return ImmutableList.copyOf(appInfos.values())
         }
     }
 
     private fun informObservers() {
-        val v = getAppInfosLocked()
+        val v = getAppInfos()
         v.let { appInfosLiveData.postValue(v) }
     }
 
