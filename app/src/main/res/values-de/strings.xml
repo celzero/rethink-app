@@ -5,4 +5,377 @@
     <string name="title_settings">Einstellungen</string>
     <string name="app_name_rethink">Rethink</string>
     <string name="title_about">Info</string>
+    <string name="about_title_desc">Netzwerkbedrohungen erkennen und blockieren</string>
+    <string name="pause_title_desc">pausieren…</string>
+    <string name="txt_home">Startseite</string>
+    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: RethinkDNS wurde deaktiviert</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
+    <string name="universal_firewall_explanation">Anwendung von Firewall-Regeln auf alle Anwendungen auf der Grundlage von Geräteereignissen, z. B. Firewall, wenn das Gerät gesperrt ist oder wenn eine bestimmte Anwendung nicht verwendet wird.</string>
+    <string name="accessibility_service_description">RethinkDNS verwendet den VPN-Dienst, um Hintergrundanwendungen zu erkennen und abzuwehren. RethinkDNS sammelt oder verkauft keine Informationen.</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="next">Nächste</string>
+    <string name="skip">Überspringen</string>
+    <string name="finish">Fertig</string>
+    <string name="slide_2_desc">Als Firewall-App ist RethinkDNS der einfachste Weg, um Netzwerkaktivitäten zu überwachen und Internetzensur auf Ihrem Android-Gerät zu umgehen.</string>
+    <string name="slide_1_desc">RethinkDNS ist eine Open-Source-Software, die vom MVP-Programm der Mozilla Builders unterstützt wird.</string>
+    <string name="rdns_plus">RDNS Plus</string>
+    <string name="block">blockiert</string>
+    <string name="untracked">nicht verfolgt</string>
+    <string name="dns_mode_notification_title">Geschützt! Verbunden mit schnellem und sicherem DNS.</string>
+    <string name="firewall_mode_notification_title">Geschützt! Verbunden mit der Firewall.</string>
+    <string name="hybrid_mode_notification_title">Geschützt! Verbunden mit DNS + Firewall.</string>
+    <string name="pause_mode_notification_title">Pausiert! Blockierte Anwendungen werden weiterhin mit einer Firewall geschützt.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">warten</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">ausfallend</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">geschützt</string>
+    <string name="status_protected_with_tor">geschützt mit Tor</string>
+    <string name="status_app_error">Anwendungsfehler</string>
+    <string name="status_dns_error">DNS Fehler</string>
+    <string name="status_dns_server_down">DNS Server offline</string>
+    <string name="status_no_internet">Kein Internet</string>
+    <string name="status_protected_with_private_dns">geschützt durch privaten DNS</string>
+    <string name="status_protected_with_tor_private_dns">geschützt mit Tor &amp; privaten DNS</string>
+    <string name="status_protected_with_socks5_private_dns">geschützt mit Socks5 &amp; privaten DNS</string>
+    <string name="status_protected_with_proxy_private_dns">geschützt mit Proxy &amp; privaten DNS</string>
+    <string name="status_protected_with_socks5">geschützt mit Socks-Proxy</string>
+    <string name="status_protected_with_http_private_dns">geschützt mit http-Proxy &amp; privaten DNS</string>
+    <string name="status_protected_with_proxy">geschützt mit Proxy</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">private DNS ist eingeschaltet</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">nicht geschützt</string>
+    <string name="dns_explanation_dns_connected">Verbunden mit RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected">Verbunden mit der Firewall</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Verbunden mit RethinkDNS und Firewall</string>
+    <string name="notification_action_resume_vpn">FORTSETZEN</string>
+    <string name="notification_action_pause_vpn">PAUSE</string>
+    <string name="notification_action_stop_vpn">STOPP</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="notification_action_dns_firewall_mode">DNS + Firewall</string>
+    <string name="dns_mode_info_title">DNS</string>
+    <string name="firewall_mode_info_title">Firewall</string>
+    <string name="firewall_rules">Netzwerkregeln</string>
+    <string name="firewall_mode_info_explanation_new">Überwachen Sie die Netzwerkaktivitäten und stellen Sie eine Firewall für jede Anwendung oder IP-Adresse auf.</string>
+    <string name="apps_info_title">Apps</string>
+    <string name="hybrid_mode_info_title">DNS + Firewall</string>
+    <string name="dns_firewall_mode_info_explanation_new">Alle oben genannten Möglichkeiten + Umgehung der Internetzensur.</string>
+    <string name="wireguard_mode_info_explanation_new">Demnächst verfügbar.</string>
+    <string name="alert_permission_accessibility">Erlaubnis - Zugänglichkeit</string>
+    <string name="alert_permission_accessibility_regrant">Erforderliche Maßnahmen</string>
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS verwendet den VPN-Dienst, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).
+\n
+\nRethinkDNS sammelt keine Informationen und spioniert Sie in keiner Weise aus.</string>
+    <string name="brave_dns_connect_mode_change_firewall">Modus wählen.</string>
+    <string name="brave_dns_connect_mode_change_dns">Modus wählen.</string>
+    <string name="default_dns_name">RDNS Standard</string>
+    <string name="custom_url_error_invalid_url">Ungültige URL</string>
+    <string name="conn_track_clear_logs_message">Dabei werden nur die Netzwerkprotokolle, nicht aber die Firewall-Regeln gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchten Sie fortfahren\?</string>
+    <string name="dns_query_clear_logs_title">Alle DNS-Protokolle löschen\?</string>
+    <string name="dns_query_clear_logs_message">Dadurch werden die DNS-Protokolle auf dem Gerät gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchten Sie fortfahren\?</string>
+    <string name="bsct_block_app">Blockieren, Umgehen <u>diese IP</u> für <u>diese App</u></string>
+    <string name="bsct_block">Blockieren, umgehen, ausschließen, sperren <u>diese Anwendung</u></string>
+    <string name="bsct_conn_block_desc">blockiert %1$s durch %2$s</string>
+    <string name="bsct_conn_desc_blocked">blockiert am %1$s %2$s</string>
+    <string name="always_on_dialog_negative_btn">Abbrechen</string>
+    <string name="always_on_dialog_positive_btn">Einstellungen öffnen</string>
+    <string name="always_on_dialog_stop_heading">Immer eingeschaltetes VPN</string>
+    <string name="always_on_dialog_stop_message">Always-on VPN ist für Rethink aktiviert. Sind Sie sicher, dass Sie Rethink trotzdem beenden wollen\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS führt VPN im <i>Sperr-</i> Modus aus. Ein Beenden würde zum Verlust der Internetverbindung für dieses Benutzerprofil führen. Möchten Sie trotzdem fortfahren\?</string>
+    <string name="always_on_dialog_positive">Beenden</string>
+    <string name="always_on_dialog_negative">Abbrechen</string>
+    <string name="firewall_act_network_monitor_tab">Netzwerk-Protokolle</string>
+    <string name="dns_act_configure_tab">Konfigurieren</string>
+    <string name="doh_custom_url_remove_dialog_title">DoH-Endpunkt löschen\?</string>
+    <string name="doh_custom_url_remove_dialog_message">Löschen Sie den Endpunkt DNS über Https aus der gespeicherten Konfiguration.</string>
+    <string name="doh_custom_url_remove_success">Endpunkt gelöscht.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt-Auflöser löschen\?</string>
+    <string name="dns_crypt_relay_remove_success">DNSCrypt-Relay gelöscht.</string>
+    <string name="dns_proxy_remove_dialog_title">DNS-Proxy löschen\?</string>
+    <string name="dns_proxy_remove_dialog_message">Löschen Sie den DNS-Proxy aus der gespeicherten Konfiguration.</string>
+    <string name="dns_crypt_url_remove_dialog_message">Löschen Sie den DNSCrypt-Resolver aus der gespeicherten Konfiguration.</string>
+    <string name="dns_crypt_url_remove_success">DNSCrypt-Auflöser gelöscht.</string>
+    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt-Relay löschen\?</string>
+    <string name="local_blocklist_download_desc">Blocklisten herunterladen (ca. 60 MB), um diese Funktion zu nutzen\?</string>
+    <string name="dns_proxy_remove_success">DNS-Proxy gelöscht.</string>
+    <string name="configure_dns_connected_doh_status">DNS über HTTPS</string>
+    <string name="download_update_dialog_title">Neues Update!</string>
+    <string name="download_update_dialog_message">Eine neue Version der App steht auf der Website zum Download bereit. Möchten Sie fortfahren\?</string>
+    <string name="download_update_dialog_message_ok_title">Aktuell!</string>
+    <string name="download_update_dialog_message_ok">Sie sind bereits auf der neuesten Version.</string>
+    <string name="app_mode_firewall">Firewall</string>
+    <string name="app_mode_dns">DNS</string>
+    <string name="settings_vpn_heading">vpn</string>
+    <string name="info_dialog_copy_toast_msg">IP-Adresse kopiert.</string>
+    <string name="settings_enable_logs_desc">Speichern Sie DNS- und Firewall-Protokolle lokal auf dem Gerät.</string>
+    <string name="settings_enable_logs">Aktivieren der geräteinternen Protokollierung</string>
+    <string name="conn_track_clear_logs_title">Alle Netzwerkprotokolle löschen\?</string>
+    <string name="bsct_conn_block_desc_device">blockiert %1$s auf dem Gerät</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Verhindert, dass sich eine App mit dem Internet verbindet.
+\n <u>#2</u>: Verhindert, dass sich eine App mit einer bestimmten IP verbindet.
+\n <u>#3</u>: Blockiert alle Verbindungen, wenn das Gerät gesperrt ist (Universal Firewall).
+\n <u>#4</u>: Blockiert jede App, die nicht verwendet wird (Universal Firewall).
+\n <u>#5</u>: Blockiert Verbindungen, wenn die Quell-App unbekannt ist (Universal Firewall).
+\n <u>#6</u>: Blockiert den gesamten UDP-Verkehr außer DNS (Universal Firewall).
+\n <u>#7</u>: Blockiert Verbindungen, wenn DNS umgangen wird (Universal Firewall).</string>
+    <string name="always_on_dialog_heading">Always-on VPN deaktivieren</string>
+    <string name="always_on_dialog">\"Always-On VPN\" ist auf diesem Gerät aktiviert. Um Rethink zu starten, gehen Sie bitte zur App \"Einstellungen\" und deaktivieren Sie \"Always-on VPN\".</string>
+    <string name="private_dns_dialog_heading">Private DNS ausschalten</string>
+    <string name="private_dns_dialog_desc">Die DNS-Einstellungen von Rethink werden von Android\'s Private DNS außer Kraft gesetzt.
+\n
+\nUm Rethink\'s DNS zu verwenden, gehen Sie zu den Android-Einstellungen und deaktivieren Sie \"Private DNS\".</string>
+    <string name="univ_firewall_no_ip_message">Keine IPs gefunden. Tippen Sie auf Einträge im Netzwerkprotokoll, um einzelne IP-Adressen zu sperren.</string>
+    <string name="dns_crypt_relay_remove_dialog_message">Löschen Sie das DNSCrypt-Relais aus der gespeicherten Konfiguration.</string>
+    <string name="local_blocklist_download">Blocklisten herunterladen</string>
+    <string name="settings_lock_down_mode_desc">Kann keine Umgehung zulassen oder Proxys einrichten, wenn VPN im Lockdown-Modus läuft. <u>Gehen Sie zu den VPN-Einstellungen</u>.</string>
+    <string name="local_blocklist_redownload">Aktuell!</string>
+    <string name="blocklist_update_check_not_required">Die Blocklisten sind bereits auf dem neuesten Stand.</string>
+    <string name="local_blocklist_redownload_desc">Die geräteinternen Blocklisten sind bereits auf dem neuesten Stand (%1$s).</string>
+    <string name="show_logs_disabled_network_message">Die Verbindungsprotokollierung wurde deaktiviert. Um sie wieder zu aktivieren, gehen Sie zu <i>Einstellungen</i> und aktivieren Sie <i>Protokollierung auf dem Gerät aktivieren.</i></string>
+    <string name="show_logs_disabled_dns_message">Die Protokollierung von DNS-Anfragen wurde deaktiviert. Um sie wieder zu aktivieren, gehen Sie zu <i>Einstellungen</i> und aktivieren Sie <i>Aktivierung der geräteinterne Protokollierung.</i></string>
+    <string name="http_proxy_dialog_desc">Die HTTP(S)-Proxy-Einstellungen sind nur Hinweise für Anwendungen. Diese können sie verwenden oder auch nicht. Browser wie Chrome und Firefox verwenden sie jedoch. Anwendungen, die HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
+    <string name="download_update_dialog_message_success">Download der Blockliste erfolgreich.</string>
+    <string name="info_dialog_url_copy_toast_msg">URL kopiert</string>
+    <string name="info_dialog_rethink_toast_msg">Kopiert als RDNS+ DNS-über-HTTPS URL</string>
+    <string name="app_mode_wireguard">VPN</string>
+    <string name="relative_time_yesterday">Gestern</string>
+    <string name="settings_allow_bypass_desc">Erlauben Sie anfragenden Apps, die RethinkDNS-Firewall bei Bedarf zu umgehen. Einige Audio-/Videokonferenz-Apps wie Zoom und WhatsApp können eine On-Demand-Umgehung erfordern, um richtig zu funktionieren.</string>
+    <string name="orbot_http_desc">Empfiehlt, dass Anwendungen den HTTP-Proxy von Orbot verwenden.</string>
+    <string name="orbot_stop_dialog_message">RethinkDNS hat aufgehört Verbindungen zu Orbot weiterzuleiten, aber Orbot läuft vielleicht noch im Hintergrund.</string>
+    <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet sicherer zu nutzen <u/> .
+\nOrbot benutzt <u>Tor</u> um deinen Internetverkehr zu verschlüsseln, was dir hilft <u>Zensur zu umgehen</u> und dich gegen Formen der <u>Netzwerküberwachung</u> zu schützen, die deine persönliche Freiheit und Privatsphäre bedrohen.
+\n<u>TCP-Proxy</u>: RethinkDNS leitet nur TCP-Verbindungen von allen ausgeschlossenen Anwendungen an Orbot weiter.
+\n<u>HTTP-Proxy</u>: RethinkDNS <i>setzt</i> HTTP-Proxy ein, erzwingt aber nicht, dass die Anwendungen ihn verwenden. Normalerweise verwenden Browser wie Chrome und Firefox ihn. Anwendungen, die den HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
+    <string name="orbot_install_dialog_title">Orbot installieren\?</string>
+    <string name="settings_orbot_desc">Orbot im nicht-VPN-Modus mit HTTPS/SOCKS5.</string>
+    <string name="private_dns_dialog_positive">Einstellungen öffnen</string>
+    <string name="private_dns_dialog_negative">Verwerfen</string>
+    <string name="univ_firewall_dialog_title">IP-Regel löschen\?</string>
+    <string name="univ_firewall_dialog_message">Das Löschen dieser Regel würde jeder Anwendung erlauben, sich mit dieser IP zu verbinden. Möchten Sie fortfahren\?</string>
+    <string name="blocklist_update_check_failure">Ein Fehler ist aufgetreten. Versuchen Sie es später noch einmal!</string>
+    <string name="refresh_complete">Neusynchronisierung der App-Liste abgeschlossen.</string>
+    <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
+    <string name="configure_dns_connected_dns_proxy_status">DNS-Proxy</string>
+    <string name="configure_dns_connection_name">Verbunden mit %1$s</string>
+    <string name="configure_dns_crypt">DNSCrypt: %1$s Auflöser</string>
+    <string name="http_proxy_dialog_heading">HTTP(S)-Proxy einstellen</string>
+    <string name="download_update_dialog_failure_title">Etwas ist schiefgelaufen!</string>
+    <string name="download_update_dialog_failure_message">Entweder sind unsere Server ausgefallen oder die Verbindung konnte nicht hergestellt werden. Bitte versuchen Sie es nach einiger Zeit erneut.</string>
+    <string name="download_update_dialog_trylater_title">Kann im Moment nicht aktualisieren</string>
+    <string name="download_update_dialog_trylater_message">Das Update kann im Moment nicht ausgeführt werden, bitte versuchen Sie es später noch einmal.</string>
+    <string name="search_firewall_network_log"><font size="12">Suche nach Anwendungen, IPs, Domänen</font></string>
+    <string name="search_firewall_all_apps"><font size="12">Anwendungen suchen</font></string>
+    <string name="search_dns_logs"><font size="12">Suche nach Domänennamen oder IPs</font></string>
+    <string name="search_universal_ips"><font size="12">IPs suchen</font></string>
+    <string name="search_custom_domains"><font size="12">Domänennamen suchen</font></string>
+    <string name="search_rethinkplus_file_tag"><font size="12">Suche in Blocklisten</font></string>
+    <string name="app_mode_choose">Modus wählen</string>
+    <string name="whats_dialog_title">Was ist neu in v053l</string>
+    <string name="whats_new_version_name">🌎🕊 Weltschülertag (15. Oktober) 🕊🌎</string>
+    <string name="whats_new_version_update"><b>Maximale Anstrengung</b>
+\n
+\n 1. Einführung eines privateren Rethink-Resolvers, <i>Max</i>.
+\n 2. IPv6 als experimentell kennzeichnen; standardmäßig zu IPv4 wechseln.
+\n 3. <i>Neue Funktion</i>: Sichern und Wiederherstellen von App-Einstellungen.
+\n 4. <i>Neue Funktion</i>: App-Sperrmodus.
+\n 5. <i>Neue Funktion</i>: Universeller Sperrmodus.
+\n 6. <i>Neue Funktion</i>: Anwendung von Firewall-Regeln auf Portnummern.
+\n 7. <i>Neue Funktion</i>: Anwendung von App-Firewall-Regeln in Stapeln.
+\n 8. Kleine Aktualisierung der Benutzeroberfläche.
+\n 9. Andere Speicher- und Absturzbehebungen.</string>
+    <string name="connection_http3">HTTP3</string>
+    <string name="relative_time_today">Heute</string>
+    <string name="app_mode_dns_firewall">DNS und Firewall (Standard)</string>
+    <string name="orbot_install_dialog_message">Orbot bringt die Eigenschaften und Funktionen von Tor auf Android.</string>
+    <string name="dns_mode_info_explanation_new">Überwachen, blockieren und verschlüsseln Sie DNS-Anfragen.</string>
+    <string name="settings_proxy_header">Proxy</string>
+    <string name="orbot_install_dialog_negative">Verwerfen</string>
+    <string name="settings_orbot_heading">Einrichtung Orbot</string>
+    <string name="orbot_status_arg_3">DNS und TCP</string>
+    <string name="orbot_socks5">reine TCP-Proxy</string>
+    <string name="settings_https_desc">Diese Einstellung ist nur eine Empfehlung und es ist möglich, dass Anwendungen sie ignorieren. Anwendungen, die einen HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
+    <string name="orbot_bs_status_trying_connect">Orbot einrichten…</string>
+    <string name="orbot_stop_dialog_dns_message">RethinkDNS ist so eingerichtet, dass DNS-Anfragen an Orbot weitergeleitet werden. Ändern Sie dies nach Bedarf.</string>
+    <string name="orbot_stop_dialog_message_combo">%1$s
+\n
+\n%2$s</string>
+    <string name="settings_orbot_notification_content">Der Start von Tor-as-a-Proxy ist fehlgeschlagen. Öffne die Orbot-App, um sie manuell zu starten.</string>
+    <string name="settings_ip_network_desc">Wählen Sie zwischen den Versionen des Internetprotokolls.</string>
+    <string name="settings_socks5_desc">Verbindungen zum SOCKS5-Endpunkt weiterleiten.</string>
+    <string name="dns_act_log">Protokoll</string>
+    <string name="orbot_bs_status_3">Weiterleitung %1$s an Orbot, HTTP Proxy ebenfalls eingestellt.</string>
+    <string name="orbot_install_activity_error">Irgendetwas ist schief gelaufen, versuchen Sie es nach einiger Zeit erneut</string>
+    <string name="settings_orbot_notification_action">Orbot öffnen</string>
+    <string name="orbot">Orbot</string>
+    <string name="orbot_status_arg_2">TCP</string>
+    <string name="settings_https_disabled_error">Verbunden mit Orbot. Schalten Sie es aus, um fortzufahren.</string>
+    <string name="orbot_install_dialog_neutral">Webseite</string>
+    <string name="settings_socks5_disabled_error">Verbunden mit Orbot. Schalten Sie es aus, um fortzufahren.</string>
+    <string name="settings_autostart_bootup_desc">Starten Sie beim Einschalten des Geräts RethinkDNS, wenn es vor dem Herunterfahren gelaufen ist.</string>
+    <string name="slide_1_title">Frei und quelloffen</string>
+    <string name="settings_ptrans_heading">IPv4-Ausgang erzwingen</string>
+    <string name="settings_socks5_heading">SOCKS5-Proxy einrichten</string>
+    <string name="orbot_none_desc">Keine der oben genannten Möglichkeiten.</string>
+    <string name="orbot_bs_status_4">Tor-as-a-Proxy (Orbot) mit einem Klick einrichten.</string>
+    <string name="orbot_stop_dialog_neutral">DNS ändern</string>
+    <string name="orbot_stop_dialog_positive">Verwerfen</string>
+    <string name="orbot_title">Orbot und Proxys</string>
+    <string name="settings_orbot_disabled_error">Schalte HTTP(S) und/oder SOCKS5 Proxy aus, um mit der Tor-as-a-proxy Einrichtung fortzufahren.</string>
+    <string name="settings_network_all_networks_desc">Wenn diese Funktion aktiviert ist, verwendet RethinkDNS alle verfügbaren Netzwerke, um eine Verbindung zum Internet herzustellen. Wenn nicht, wird das Netzwerk verwendet, das von Android als <i>aktiv</i> angesehen wird.</string>
+    <string name="settings_ip_network_heading">IP-Version wählen</string>
+    <string name="settings_ptrans_desc">Übersetzt ausgehenden IPv6-Datenverkehr geräteintern in IPv4. Aktivieren Sie diese Option, wenn Sie mit einem reinen IPv4-Netzwerk verbunden sind.</string>
+    <string name="orbot_both_desc">Alle der oben genannten Punkte.</string>
+    <string name="settings_autostart_bootup_heading">Auto-Start beim Einschalten (experimentell)</string>
+    <string name="status_protected_with_http">geschützt mit http-Proxy</string>
+    <string name="orbot_socks5_desc">Leitet alle TCP-Verbindungen an Orbot weiter.</string>
+    <string name="orbot_both">TCP + HTTP-Proxy</string>
+    <string name="orbot_none">Keine (Standard)</string>
+    <string name="orbot_install_dialog_positive">Installieren</string>
+    <string name="settings_orbot_header">Orbot ❯</string>
+    <string name="settings_all_networks_dialog_title">Achtung!</string>
+    <string name="bsct_conn_desc_allowed">erlaubt am %1$s %2$s</string>
+    <string name="app_mode_dns_low_battery">DNS (Akkusparer)</string>
+    <string name="orbot_bs_status_2">HTTP Proxy ist eingestellt (Anwendungen können dies ignorieren).</string>
+    <string name="orbot_stop_dialog_title">Manueller Eingriff erforderlich</string>
+    <string name="orbot_stop_dialog_negative">Orbot stoppen</string>
+    <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
+    <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
+    <string name="allow">erlaubt</string>
+    <string name="settings_allow_bypass_heading">Umgehung zulassen</string>
+    <string name="settings_title_desc">Eine hochgradig anpassbare DNS und Firewall</string>
+    <string name="slide_2_title">Herzlich willkommen</string>
+    <string name="exclude">ausschließen</string>
+    <string name="bsct_app_info">App-Informationen</string>
+    <string name="settings_orbot_install_desc">Tippen Sie hier, um Orbot zu installieren</string>
+    <string name="settings_socks5_vpn_disabled_error">Starten Sie RethinkDNS, um fortzufahren.</string>
+    <string name="orbot_app_issue">Orbot konnte nicht gestartet werden. Ist es installiert\?</string>
+    <string name="settings_general_header">Allgemein</string>
+    <string name="settings_network_all_networks">Alle verfügbaren Netze nutzen (experimentell)</string>
+    <string name="settings_https_heading">HTTP(S)-Proxy einrichten</string>
+    <string name="orbot_http">HTTP Proxy</string>
+    <string name="orbot_bs_status_1">Weiterleitung von %1$s Verbindungen an Orbot.</string>
+    <string name="settings_orbot_notification_heading">Erforderliche Maßnahmen</string>
+    <string name="lockdown">alles blockiert</string>
+    <string name="always_on_dialog_neutral">Einstellungen</string>
+    <string name="settings_app_notification_a13_heading">App-Benachrichtigung</string>
+    <string name="settings_theme_heading">Erscheinungsbild</string>
+    <string name="settings_theme_desc">Thema dunkel/hell</string>
+    <string name="settings_http_proxy_desc">Weiterleitung an %1$s:%2$s</string>
+    <string name="settings_http_proxy_toast_success">HTTP-Proxy ist eingestellt</string>
+    <string name="settings_http_proxy_hostname">Hostname</string>
+    <string name="settings_dns_proxy_dialog_header">SOCKS5 (TCP) Proxy einstellen</string>
+    <string name="settings_dns_proxy_dialog_hostname">Hostname</string>
+    <string name="settings_dns_proxy_dialog_port_number">Port-Nummer</string>
+    <string name="settings_dns_proxy_dialog_app">App</string>
+    <string name="settings_dns_proxy_dialog_username">Benutzername</string>
+    <string name="settings_dns_proxy_dialog_password">Passwort</string>
+    <string name="settings_dns_proxy_dialog_positive_btn">festlegen</string>
+    <string name="settings_dns_proxy_dialog_negative_btn">abbrechen</string>
+    <string name="settings_socks5_dialog_hint_username">Benutzername (optional)</string>
+    <string name="settings_socks5_dialog_hint_port">Port</string>
+    <string name="settings_notification_desc3">Keine</string>
+    <string name="settings_notification_desc1">Pause / Stopp (Standard)</string>
+    <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
+    <string name="settings_notification_dialog_title">Benachrichtigungsaktion auswählen</string>
+    <string name="settings_notification_dialog_option_1">"
+\nPause / Stopp (Standard):
+\nZeigt zwei Schaltflächen, um RethinkDNS schnell anzuhalten oder zu beenden."</string>
+    <string name="settings_notification_dialog_option_3">"
+\nKeine:
+\nZeigt keine Schaltfläche an.
+\n"</string>
+    <string name="pause_text">pausiert</string>
+    <string name="pause_desc">Hinweis: %1$s blockierte Anwendungen werden weiterhin mit einer Firewall versehen.</string>
+    <string name="other_dns_list_tab1">DoH</string>
+    <string name="other_dns_list_tab3">Dns-Proxy</string>
+    <string name="other_dns_list_tab2">Dnscrypt</string>
+    <string name="firewall_rule_block_app">App gesperrt</string>
+    <string name="firewall_rule_no_rule">Keine Regel</string>
+    <string name="firewall_rule_block_unmetered">Ungezählt (Wlan)</string>
+    <string name="firewall_rule_block_metered">Gemessen (Mobil)</string>
+    <string name="firewall_rule_univ_block_metered">Gemessen (Universell)</string>
+    <string name="firewall_rule_lockdown">totale Sperrung (App)</string>
+    <string name="firewall_rule_block_app_new_install">Neue App</string>
+    <string name="firewall_rule_block_app_exception">Fehler</string>
+    <string name="firewall_rule_block_dns_bypass">DNS umgangen</string>
+    <string name="firewall_rule_exempt_app_bypass_univ">umgangene App</string>
+    <string name="firewall_rule_block_app_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert diese <i>App</i>.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
+    <string name="firewall_rule_new_app_desc">Diese App hat die Verbindung zum <i>ersten Mal</i> hergestellt.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Eine vom Benutzer eingestellte Firewall-Regel blockiert diese <i>App</i> beim Versuch, eine Verbindung zum <i>Gezählt</i> Netzwerk herzustellen.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert die <i>Ziel-IP / Port</i>.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_block_ip_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert die <i>Ziel-IP</i>.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.</string>
+    <string name="settings_app_notification_a13_desc">Benachrichtigungserlaubnis für die App aktivieren</string>
+    <string name="settings_http_proxy_error_text4">Verbindung mit dem Host fehlgeschlagen. Versuchen Sie es erneut.</string>
+    <string name="settings_ip_dialog_ipv46">Auto (experimentell)</string>
+    <string name="settings_http_proxy_port">Port</string>
+    <string name="settings_socks5_dialog_hint_password">Passwort (optional)</string>
+    <string name="settings_dns_proxy_dialog_app_desc">Die gewählte Anwendung wird vom VPN ausgeschlossen, damit es in Ihrem Namen Verbindungen projizieren kann.</string>
+    <string name="settings_ip_dialog_ipv6">IPv6 (experimentell)</string>
+    <string name="apps_icon_content_desc">Anwendungssymbol</string>
+    <string name="accessibility_notification_content">Der RethinkDNS-VPN Dienst wurde angehalten oder ist abgestürzt. Im Hintergrund laufende Anwendungen werden nicht mehr blockiert. Tippen Sie auf , um ihn wieder zu aktivieren.</string>
+    <string name="accessibility_notification_title">Erforderliche Maßnahmen</string>
+    <string name="firewall_rule_block_univ_ip">IP / Port (Universell)</string>
+    <string name="firewall_rule_device_lock">Gerät gesperrt</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Eine vom Benutzer eingestellte Firewall-Regel blockiert diese <i>App</i> beim Versuch, eine Verbindung mit <i>Ungezählt</i> Netzwerk herzustellen.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Eine vom Benutzer eingestellte universelle Firewall-Regel blockiert diese <i>App</i> beim Versuch, eine Verbindung mit <i>Gezählt</i> (Mobil) Netzwerk herzustellen.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_device_lock_desc">Diese Verbindung wurde gesperrt, weil <i>Gerät zu diesem Zeitpunkt</i> gesperrt war.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc">Diese Verbindung wurde zugelassen, weil die &lt;i&gt;Ziel-IP&lt;/i&gt; so eingestellt ist, dass sie alle universellen Firewall-Regeln umgeht.&lt;br/&gt;&lt;br/&gt; Um dies zu ändern, gehen Sie zu &lt;i&gt;IP-Regeln&lt;i&gt; auf der Registerkarte &lt;i&gt;Universell&lt;/i&gt;.</string>
+    <string name="firewall_rule_foreground_desc">Diese Verbindung wurde gesperrt, weil die Quelle der Anwendung <i>sich nicht im Vordergrund befand</i>.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">Diese Verbindung wurde blockiert, weil die <i>Quelle der App</i> den vom Benutzer bevorzugten DNS umgangen hat.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert diese <i>UDP</i> Verbindung.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_block_http_desc">Diese Verbindung wurde blockiert, weil sie wahrscheinlich <i>unsicheres HTTP</i> verwendet hat.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Diese Verbindung wurde zugelassen, weil die <i>Quelle der Anwendung</i> so eingestellt ist, dass <i>die universellen</i> Firewall-Regeln umgeht.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.</string>
+    <string name="settings_all_networks_dialog_message">Wenn diese Option aktiviert ist, werden App-Firewall-Regeln für gebührenpflichtige Verbindungen (z. B. mobiles Datenvolumen) und nicht gebührenpflichtige Verbindungen (z. B. Wlan) nicht beachtet.
+\n
+\nMöchten Sie fortfahren\?</string>
+    <string name="settings_http_proxy_dialog_title">Benutzerdefinierte Server-URL</string>
+    <string name="settings_http_proxy_error_text1">Der Portbereich sollte zwischen 1024 und 65535 liegen</string>
+    <string name="settings_http_proxy_error_text2">Ungültiger Port</string>
+    <string name="settings_http_proxy_error_text3">Hostname ist leer</string>
+    <string name="settings_app_list_default_app">Niemand</string>
+    <string name="settings_socks_forwarding_desc">Weiterleitung an %1$s:%2$s, %3$s</string>
+    <string name="settings_socks_forwarding_desc_no_app">Weiterleitung an %1$s:%2$s</string>
+    <string name="settings_socks_forwarding_default_desc">Verbindungen zum SOCKS5-Endpunkt weiterleiten.</string>
+    <string name="settings_socks5_dialog_hint_ip">IP-Adresse</string>
+    <string name="settings_theme_dialog_title">Erscheinungsbild</string>
+    <string name="settings_theme_dialog_themes_1">Vom System eingestellt</string>
+    <string name="settings_theme_dialog_themes_2">Hell</string>
+    <string name="settings_theme_dialog_themes_3">Dunkel</string>
+    <string name="settings_theme_dialog_themes_4">Schwarz</string>
+    <string name="settings_ip_dialog_title">IP-Version wählen</string>
+    <string name="settings_ip_dialog_ipv4">IPv4 (Standard)</string>
+    <string name="settings_ip_text_ipv4">IPv4</string>
+    <string name="settings_ip_text_ipv6">IPv6</string>
+    <string name="settings_ip_text_ipv46">Auto</string>
+    <string name="settings_selected_ip_desc">%1$s</string>
+    <string name="settings_notification_heading">Benachrichtigungsaktion auswählen</string>
+    <string name="settings_notification_desc">Aktionsschaltflächen, die mit der RethinkDNS-Benachrichtigung angezeigt werden sollen: %1$s</string>
+    <string name="settings_notification_dialog_option_2">"
+\nDNS / DNS + Firewall:
+\nZeigt zwei Tasten zum schnellen Umschalten zwischen dem batteriesparenden DNS-Modus und dem normalen DNS + Firewall-Modus."</string>
+    <string name="settings_selected_theme">Aktuelles Farbschema: %1$s</string>
+    <string name="settings_protocol_translation_dns_inactive">Wechseln Sie in den Modus DNS/DNS+Firewall, um diese Einstellung zu aktivieren.</string>
+    <string name="firewall_status_allow">erlaubt</string>
+    <string name="accessibility_failure_toast">Der RethinkDNS-VPN Dienst wurde angehalten oder ist abgestürzt. Anwendungen im Hintergrund werden nicht mehr blockiert.</string>
+    <string name="coming_soon_toast">demnächst</string>
+    <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn VPN <i>gesperrt ist</i>. Tippen Sie auf <u>, um die VPN-Einstellungen zu bearbeiten</u>.</string>
+    <string name="firewall_rule_block_ip">IP/ Port (App)</string>
+    <string name="firewall_rule_bypass_apprule_ip">Umgangene IP (App)</string>
+    <string name="firewall_rule_bypass_universal_ip">Umgangene IP</string>
+    <string name="firewall_rule_foreground">Nicht genutzte App</string>
+    <string name="firewall_rule_unknown">Quelle Unbekannt</string>
+    <string name="firewall_rule_block_udp_ntp">UDP geblockt</string>
+    <string name="firewall_rule_global_lockdown">totale Sperrung</string>
+    <string name="firewall_rule_no_rule_desc">Für diese Verbindung gibt es keine passenden Firewall-Regeln.</string>
+    <string name="firewall_rule_lockdown_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert diese <i>App</i> Verbindung zu anderen als <i>umgangenen IPs</i>.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
+    <string name="firewall_rule_bypass_app_rules_ip_desc">Diese Verbindung wurde zugelassen, weil die <i>Ziel-IP</i> so eingestellt ist, dass alle app-spezifischen Regeln umgangen werden.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.</string>
+    <string name="firewall_rule_unknown_desc">Diese Verbindung wurde gesperrt, weil die <i>Quelle der App</i> nicht ermittelt werden konnte.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">Diese DNS-Verbindung wurde durch einen Proxy vermittelt und an den vom Benutzer bevorzugten DNS-Endpunkt weitergeleitet.<br/><br/> So ändern Sie die Deaktivierung von <i>DNS-Lecks verhindern</i> im Bildschirm DNS <i>Konfigurieren</i>.</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc">Diese Verbindung wurde zugelassen, weil <i>mit einem Klick Tor-as-a-proxy</i> über Orbot eingerichtet wurde.</string>
+    <string name="settings_all_networks_dialog_negative_btn">Abbrechen</string>
+    <string name="settings_import_export_desc">Manuelles Sichern oder Wiederherstellen der App-Daten und Einstellungen.</string>
+    <string name="settings_custom_downloader_heading">In-App-Downloader verwenden</string>
+    <string name="settings_all_networks_dialog_positive_btn">Trotzdem aktivieren</string>
+    <string name="settings_check_update_desc">Einmal pro Woche automatisch nach App-Updates suchen.</string>
+    <string name="settings_check_update_heading">Nach App-Updates suchen</string>
+    <string name="settings_custom_downloader_desc">Wenn diese Funktion deaktiviert ist, wird der in Android integrierte <i>Download Manager</i> verwendet.</string>
+    <string name="settings_import_export_heading">Sichern und Wiederherstellen</string>
 </resources>
