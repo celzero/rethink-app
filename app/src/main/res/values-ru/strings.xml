@@ -341,7 +341,7 @@
     <string name="info_dialog_rethink_toast_msg">Копируется как URL RDNS+ DNS-over-HTTPS</string>
     <string name="settings_enable_logs_desc">Храните журналы DNS и брандмауэра локально на устройстве.</string>
     <string name="settings_enable_logs">Включить ведение журнала на устройстве</string>
-    <string name="whats_dialog_title">Что нового в v053k</string>
+    <string name="whats_dialog_title">Что нового в v053l</string>
     <string name="whats_new_version_name">🌎🕊 Всемирный день студента (15 октября) 🕊🌎</string>
     <string name="relative_time_today">Сегодня</string>
     <string name="relative_time_yesterday">Вчера</string>
@@ -501,7 +501,7 @@
     <string name="rt_download_desc">Скачать блок-листы (около 60 МБ) для использования этой функции.</string>
     <string name="rt_filter_hint">Показывать <u>все</u> блоклисты</string>
     <string name="settings_http_proxy_dialog_title">URL пользовательского сервера</string>
-    <string name="settings_dns_proxy_dialog_header">Установка прокси-сервера SOCKS5 (TCP)</string>
+    <string name="settings_dns_proxy_dialog_header">Установка прокси-сервера SOCKS5</string>
     <string name="settings_socks5_dialog_hint_password">Пароль (необязательно)</string>
     <string name="settings_notification_desc">Кнопки действий, которые будут отображаться вместе с уведомлением RethinkDNS: %1$s</string>
     <string name="settings_http_proxy_desc">Переадресация на %1$s:%2$s</string>
@@ -533,7 +533,7 @@
     <string name="dc_custom_block_heading">Разрешить или запретить отдельные домены</string>
     <string name="dc_check_update_heading">Уведомление об обновлении блок-листа</string>
     <string name="dc_check_update_desc">Проверяйте обновления блок-листов раз в <i>три</i> дня</string>
-    <string name="dc_dns_website_desc">Получает иконки сайтов с сайта <i>duckduckgo.com</i>. Потребляет до 350 мб дискового пространства</string>
+    <string name="dc_dns_website_desc">Получает иконки сайтов с <i>nextdns.com</i> и <i>duckduckgo.com</i>. Потребляет до 350 мб дискового пространства</string>
     <string name="dc_local_block_heading">Блокирующие списки на устройствах</string>
     <string name="dc_dns_leaks_heading">Предотвращение утечек DNS</string>
     <string name="about_bravedns_explantion">RethinkDNS - это самый простой способ контролировать активность приложений, обходить интернет-цензуру и брандмауэр приложений на вашем устройстве Android.</string>
@@ -696,7 +696,7 @@
     <string name="hsf_vpn_prepare_failure">Либо отсутствует разрешение VPN, либо другое приложение находится в режиме постоянного VPN.</string>
     <string name="hsf_start_dialog_message">Вы в одном шаге от безопасного и надежного Android: мгновенно просматривайте сетевую активность, блокируйте веб-сайты, IP-адреса и приложения с плохим поведением.</string>
     <string name="hsf_proxy_chip_text">Прокси активен</string>
-    <string name="hsf_blocklist_chip_text">%1$s настроенные блок-листы</string>
+    <string name="hsf_blocklist_chip_text">%1$s блок-листов</string>
     <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS в использовании</string>
     <string name="hsf_blocklist_chip_text_no_data">Включить RethinkDNS+</string>
     <string name="hsf_network_logs_chip_text">Сетевые журналы</string>
@@ -716,7 +716,7 @@
     <string name="about_bug_no_log_dialog_title">Сообщение об ошибке</string>
     <string name="about_bug_no_log_dialog_message">Не удалось получить журналы аварий. Вы хотите вручную сообщить о своей ошибке\?</string>
     <string name="about_github">Внесение вклада на GitHub’е</string>
-    <string name="about_privacy_policy">Политика конфиденциальности</string>
+    <string name="about_privacy_policy">Ознакомиться с политикой конфиденциальности</string>
     <string name="about_settings_app_info">Информация</string>
     <string name="about_settings_vpn_profile">Профиль VPN</string>
     <string name="about_whats_new">Что нового в %1$s</string>
@@ -882,4 +882,6 @@
     <string name="ctbs_dialog_negative_btn">Вернуться</string>
     <string name="dns_log_dialog_positive">Удаление журналов</string>
     <string name="ctbs_block_other_apps">Правила, применяемые для %1$s, будут применимы и для %2$s других приложений</string>
+    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Продолжить</string>
+    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">Отмена</string>
 </resources>
