@@ -86,7 +86,7 @@
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="dns_btm_sheet_chip">+%1$s Outros IPs</string>
     <string name="dns_filter_parent_all">Tudo</string>
-    <string name="dns_btm_sheet_chip_allowed">Permitido</string>
+    <string name="dns_btm_sheet_chip_allowed">Permitidos</string>
     <string name="dns_btm_resolved_doh">resolvido %1$s por %2$s</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
     <string name="hs_download_positive_default">ok</string>
@@ -106,7 +106,7 @@
     <string name="fapps_firewall_filter_excluded">Excluído</string>
     <string name="dns_proxy_app">App</string>
     <string name="fapps_filter_apply_btn">Aplicar</string>
-    <string name="fapps_filter_parent_all">Tudo</string>
+    <string name="fapps_filter_parent_all">Todas</string>
     <string name="fapps_info_dialog_positive_btn">Ok</string>
     <string name="fapps_unmetered_positive">Aplicar</string>
     <string name="fapps_metered_block_dialog_title">Bloqueie em redes com franquia de dados</string>
@@ -536,7 +536,7 @@
     <string name="about_bravedns_toreport_text">ajuda e feedback</string>
     <string name="about_bug_report_desc">Enviar email com registros de falhas</string>
     <string name="about_join_telegram">Telegram</string>
-    <string name="about_bug_report">Relatório de problemas</string>
+    <string name="about_bug_report">Relat. de prob.</string>
     <string name="about_bug_report_dialog_positive_btn">Enviar email</string>
     <string name="about_bug_report_dialog_negative_btn">Cancelar</string>
     <string name="about_bug_no_log_dialog_title">Relatório de problemas</string>
@@ -592,10 +592,10 @@
     <string name="dns_log_dialog_negative">Cancelar</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s lista(s) de bloqueio&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_chip_blocked">Bloqueado</string>
+    <string name="dns_btm_sheet_chip_blocked">Bloqueados</string>
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
     <string name="dns_filter_parent_allowed">Permitido</string>
-    <string name="dns_filter_parent_blocked">Bloqueado</string>
+    <string name="dns_filter_parent_blocked">Bloqueados</string>
     <string name="dns_btm_resolved_crypt">resolvido <u>de forma anônima</u> %1$s por %2$s</string>
     <string name="hs_download_positive_play_store">Concluir a atualização</string>
     <string name="hs_download_positive_website">Visite o site</string>
@@ -642,7 +642,7 @@
     <string name="dns_proxy_ip_address">Endereço do IP</string>
     <string name="dns_proxy_negative_btn">Cancelar</string>
     <string name="dns_proxy_positive_btn">adicionar</string>
-    <string name="fapps_filter_parent_installed">Instalado</string>
+    <string name="fapps_filter_parent_installed">Instalada</string>
     <string name="fapps_filter_parent_system">Sistema</string>
     <string name="fapps_firewall_filter_all">Tudo</string>
     <string name="fapps_firewall_filter_allowed">Permitido</string>
@@ -655,8 +655,8 @@
     <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes com franquia de dados (móvel) para apps <i>listados</i>\?</string>
     <string name="fapps_metered_positive">Aplicar</string>
     <string name="fapps_metered_negative">Cancelar</string>
-    <string name="fapps_firewall_filter_desc">Mostrando <u>%1$s</u> %2$s apps</string>
-    <string name="fapps_firewall_filter_desc_category">Mostrando <u>%1$s</u> %2$s apps em categorias: %3$s</string>
+    <string name="fapps_firewall_filter_desc">Mostrando apps: <u>%1$s</u>, %2$s</string>
+    <string name="fapps_firewall_filter_desc_category">Mostrando apps (<u>%1$s</u>, %2$s) em categorias: %3$s</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_x_sign">❌</string>
     <string name="unicode_question_sign">❔</string>
@@ -780,13 +780,13 @@
     <string name="ada_noapp_dialog_message">Detalhes do app para o aplicativo especificado não foram encontrados.</string>
     <string name="ada_noapp_dialog_positive">Ok</string>
     <string name="ada_firewall_status">Este app <b><i>%1$s</i></b> .</string>
-    <string name="ada_ip_connection_count">Conectado ao(s) endereço(s) IP %1$s</string>
-    <string name="ada_ip_connection_count_zero">0 endereço de IP</string>
+    <string name="ada_ip_connection_count">Nº de endereços IP: %1$s</string>
+    <string name="ada_ip_connection_count_zero">Endereços IP: 0</string>
     <string name="ada_app_status_block">está bloqueado</string>
     <string name="ada_app_status_exclude">está excluído do dns e firewall</string>
     <string name="ada_app_status_lockdown">está no modo restrito</string>
     <string name="ada_app_status_unknown">é desconhecido</string>
-    <string name="ada_ip_block_count">%1$s Regra(s) de IP</string>
+    <string name="ada_ip_block_count">Regras de IP: %1$s</string>
     <string name="ada_ip_rules_title">regras de ip para este app</string>
     <string name="ada_network_log_title">registro da rede para este app</string>
     <string name="ada_app_metered">Franquia de dados</string>
