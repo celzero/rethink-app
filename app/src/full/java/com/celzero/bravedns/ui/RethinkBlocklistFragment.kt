@@ -37,7 +37,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkLocalAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RethinkRemoteAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RethinkSimpleViewPacksAdapter
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator.Companion.CUSTOM_DOWNLOAD
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.FileTag
@@ -46,6 +45,7 @@ import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.DownloadConstants.Companion.DOWNLOAD_TAG
 import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.RethinkBlocklistManager.RethinkBlocklistType.Companion.getType
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
@@ -66,12 +66,12 @@ import com.celzero.bravedns.viewmodel.RethinkRemoteFileTagViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
+import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
@@ -81,7 +81,8 @@ class RethinkBlocklistFragment :
     private val appDownloadManager by inject<AppDownloadManager>()
     private val appConfig by inject<AppConfig>()
 
-    private var type: RethinkBlocklistManager.RethinkBlocklistType = RethinkBlocklistManager.RethinkBlocklistType.REMOTE
+    private var type: RethinkBlocklistManager.RethinkBlocklistType =
+        RethinkBlocklistManager.RethinkBlocklistType.REMOTE
     private var remoteName: String = ""
     private var remoteUrl: String = ""
 
@@ -94,6 +95,8 @@ class RethinkBlocklistFragment :
     private val remoteFileTagViewModel: RethinkRemoteFileTagViewModel by viewModel()
     private val localFileTagViewModel: RethinkLocalFileTagViewModel by viewModel()
 
+    private var modifiedStamp: String = ""
+
     enum class BlocklistSelectionFilter(val id: Int) {
         ALL(0),
         SELECTED(1)
@@ -102,7 +105,6 @@ class RethinkBlocklistFragment :
     class Filters {
         var query: String = "%%"
         var filterSelected: BlocklistSelectionFilter = BlocklistSelectionFilter.ALL
-        var groups: MutableSet<String> = mutableSetOf()
         var subGroups: MutableSet<String> = mutableSetOf()
     }
 
@@ -123,7 +125,15 @@ class RethinkBlocklistFragment :
 
     companion object {
         fun newInstance() = RethinkBlocklistFragment()
-        var modifiedStamp: String = ""
+        private var selectedFileTags: MutableLiveData<MutableSet<Int>> = MutableLiveData()
+
+        fun updateFileTagList(fileTags: Set<Int>) {
+            selectedFileTags.postValue(fileTags.toMutableSet())
+        }
+
+        fun getSelectedFileTags(): Set<Int> {
+            return selectedFileTags.value ?: emptySet()
+        }
     }
 
     override fun onCreateView(
@@ -134,7 +144,10 @@ class RethinkBlocklistFragment :
         val bundle = this.arguments
         type =
             getType(
-                bundle?.getInt(RETHINK_BLOCKLIST_TYPE, RethinkBlocklistManager.RethinkBlocklistType.REMOTE.ordinal)
+                bundle?.getInt(
+                    RETHINK_BLOCKLIST_TYPE,
+                    RethinkBlocklistManager.RethinkBlocklistType.REMOTE.ordinal
+                )
                     ?: RethinkBlocklistManager.RethinkBlocklistType.REMOTE.ordinal
             )
         remoteName = bundle?.getString(RETHINK_BLOCKLIST_NAME, "") ?: ""
@@ -154,6 +167,12 @@ class RethinkBlocklistFragment :
             observeWorkManager()
         }
 
+        selectedFileTags.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+
+            modifiedStamp = RethinkBlocklistManager.getStamp(requireContext(), it, type)
+        }
+
         filters.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
@@ -171,6 +190,8 @@ class RethinkBlocklistFragment :
     private fun init() {
         modifiedStamp = getStamp()
 
+        updateFileTagList(emptySet())
+
         // update ui based on blocklist availability
         hasBlocklist()
 
@@ -182,32 +203,20 @@ class RethinkBlocklistFragment :
     }
 
     private fun updateFilteredTxtUi(filter: Filters) {
-        if (filter.groups.isEmpty()) {
+        if (filter.subGroups.isEmpty()) {
             b.lbAdvancedFilterLabelTv.text =
                 Utilities.updateHtmlEncodedText(
                     getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase())
                 )
         } else {
-            if (filter.subGroups.isEmpty()) {
-                b.lbAdvancedFilterLabelTv.text =
-                    Utilities.updateHtmlEncodedText(
-                        getString(
-                            R.string.rt_filter_desc_groups,
-                            filter.filterSelected.name.lowercase(),
-                            filter.groups
-                        )
+            b.lbAdvancedFilterLabelTv.text =
+                Utilities.updateHtmlEncodedText(
+                    getString(
+                        R.string.rt_filter_desc_subgroups,
+                        filter.filterSelected.name.lowercase(), "",
+                        filter.subGroups
                     )
-            } else {
-                b.lbAdvancedFilterLabelTv.text =
-                    Utilities.updateHtmlEncodedText(
-                        getString(
-                            R.string.rt_filter_desc_subgroups,
-                            filter.filterSelected.name.lowercase(),
-                            filter.groups,
-                            filter.subGroups
-                        )
-                    )
-            }
+                )
         }
     }
 
@@ -519,23 +528,11 @@ class RethinkBlocklistFragment :
             if (type.isLocal()) {
                 RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
                 val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                val stamp =
-                    RethinkBlocklistManager.getStamp(
-                        requireContext(),
-                        list,
-                        RethinkBlocklistManager.RethinkBlocklistType.LOCAL
-                    )
-                modifiedStamp = stamp
+                updateFileTagList(list)
             } else {
                 RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
                 val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                val stamp =
-                    RethinkBlocklistManager.getStamp(
-                        requireContext(),
-                        list,
-                        RethinkBlocklistManager.RethinkBlocklistType.REMOTE
-                    )
-                modifiedStamp = stamp
+                updateFileTagList(list)
             }
         }
     }
@@ -636,10 +633,8 @@ class RethinkBlocklistFragment :
     private fun setSimplePacksViewAdapter() {
         io {
             val tags = RethinkBlocklistManager.getSimpleViewPacksTags(type)
-            val selectedTags = getSelectedTags()
             uiCtx {
-                simplePacksListAdapter =
-                    RethinkSimpleViewPacksAdapter(requireContext(), tags, selectedTags, type)
+                simplePacksListAdapter = RethinkSimpleViewPacksAdapter(requireContext(), tags, type)
                 val layoutManager = LinearLayoutManager(requireContext())
                 b.lbSimpleRecyclerPacks.layoutManager = layoutManager
                 b.lbSimpleRecyclerPacks.adapter = simplePacksListAdapter

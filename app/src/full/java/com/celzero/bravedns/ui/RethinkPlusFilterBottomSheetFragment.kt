@@ -73,17 +73,7 @@ class RethinkPlusFilterBottomSheetFragment(
 
     private fun initView() {
         filters = activity?.filterObserver()?.value
-        makeChipGroup(fileTags)
         makeChipSubGroup(fileTags)
-    }
-
-    private fun makeChipGroup(ft: List<FileTag>) {
-        b.rpfFilterChipGroup.removeAllViews()
-        ft.distinctBy { it.group }
-            .forEach {
-                val checked = filters?.groups?.contains(it.group) == true
-                b.rpfFilterChipGroup.addView(remakeChipGroup(it.group, checked))
-            }
     }
 
     private fun makeChipSubGroup(ft: List<FileTag>) {
@@ -109,24 +99,6 @@ class RethinkPlusFilterBottomSheetFragment(
             activity?.filterObserver()?.postValue(RethinkBlocklistFragment.Filters())
             this.dismiss()
         }
-    }
-
-    private fun remakeChipGroup(label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = label
-        chip.text = label
-        chip.isChecked = checked
-
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) {
-                applyGroupFilter(button.tag as String)
-                colorUpChipIcon(chip)
-            } else {
-                removeGroupFilter(button.tag as String)
-            }
-        }
-
-        return chip
     }
 
     private fun remakeChipSubgroup(label: String, checked: Boolean): Chip {
@@ -157,40 +129,11 @@ class RethinkPlusFilterBottomSheetFragment(
         chip.chipIcon?.colorFilter = colorFilter
     }
 
-    private fun applyGroupFilter(tag: String) {
-        if (filters == null) {
-            filters = RethinkBlocklistFragment.Filters()
-        }
-        // asserting the filters object with above check
-        filters!!.groups.add(tag)
-
-        // filter sub group ui
-        val filteredTag: MutableList<FileTag> = ArrayList()
-        filters!!.groups.forEach { g -> filteredTag.addAll(fileTags.filter { it.group == g }) }
-        makeChipSubGroup(filteredTag)
-    }
-
-    private fun removeGroupFilter(tag: String) {
-        if (filters == null) return
-
-        // asserting the filters object with above check
-        filters!!.groups.remove(tag)
-
-        // filter sub group ui
-        val filteredTag: MutableList<FileTag> = ArrayList()
-        if (filters!!.groups.isEmpty()) return
-
-        filters!!.groups.forEach { g -> filteredTag.addAll(fileTags.filter { it.group == g }) }
-        makeChipSubGroup(filteredTag)
-    }
-
     private fun applySubgroupFilter(tag: String) {
-        val ft = fileTags.first { tag == it.subg }
         if (filters == null) {
             filters = RethinkBlocklistFragment.Filters()
         }
         // asserting the filters object with above check
-        filters!!.groups.add(ft.group)
         filters!!.subGroups.add(tag)
     }
 

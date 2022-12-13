@@ -130,13 +130,7 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagRemote(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                val stamp =
-                    RethinkBlocklistManager.getStamp(
-                        context,
-                        list,
-                        RethinkBlocklistManager.RethinkBlocklistType.REMOTE
-                    )
-                RethinkBlocklistFragment.modifiedStamp = stamp
+                RethinkBlocklistFragment.updateFileTagList(list)
             }
         }
 

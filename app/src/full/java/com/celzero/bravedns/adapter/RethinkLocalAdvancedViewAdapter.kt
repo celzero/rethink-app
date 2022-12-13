@@ -142,13 +142,7 @@ class RethinkLocalAdvancedViewAdapter(val context: Context) :
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagLocal(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                val stamp =
-                    RethinkBlocklistManager.getStamp(
-                        context,
-                        list,
-                        RethinkBlocklistManager.RethinkBlocklistType.LOCAL
-                    )
-                RethinkBlocklistFragment.modifiedStamp = stamp
+                RethinkBlocklistFragment.updateFileTagList(list)
             }
         }
 

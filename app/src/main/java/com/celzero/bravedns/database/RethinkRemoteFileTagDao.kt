@@ -35,43 +35,41 @@ interface RethinkRemoteFileTagDao {
 
     @Query("select * from RethinkRemoteFileTag order by `group`")
     fun getRemoteFileTags(): PagingSource<Int, RethinkRemoteFileTag>
-    
+
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
     fun getRemoteFileTags(
         query: String,
         selected: Set<Int>,
-        group: Set<String>,
         subg: Set<String>
     ): PagingSource<Int, RethinkRemoteFileTag>
-    
+
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
     fun getRemoteFileTagsGroup(
         query: String,
-        selected: Set<Int>,
-        group: Set<String>
+        selected: Set<Int>
     ): PagingSource<Int, RethinkRemoteFileTag>
-    
+
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
     fun getRemoteFileTagsSubg(
         query: String,
         selected: Set<Int>,
         subg: Set<String>
     ): PagingSource<Int, RethinkRemoteFileTag>
-    
+
     @Query(
         "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkRemoteFileTag order by `group`"
     )
     fun getAllTags(): List<FileTag>
-    
+
     @Transaction
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and (vname like :input or `group` like :input or subg like :input) order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and (vname like :input or `group` like :input or subg like :input) order by `group`"
     )
     fun getRemoteFileTagsWithFilter(
         input: String,

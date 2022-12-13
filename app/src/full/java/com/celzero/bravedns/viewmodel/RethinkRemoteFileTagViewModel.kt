@@ -45,22 +45,9 @@ class RethinkRemoteFileTagViewModel(private val rethinkRemoteDao: RethinkRemoteF
                 if (blocklistFilter != null) {
                     val query = blocklistFilter?.query ?: "%%"
                     val selected = getSelectedFilter()
-                    val groups = blocklistFilter?.groups ?: mutableSetOf()
                     val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
-                    if (groups.isNotEmpty() && subg.isNotEmpty()) {
-                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                                rethinkRemoteDao.getRemoteFileTags(query, selected, groups, subg)
-                            }
-                            .liveData
-                            .cachedIn(viewModelScope)
-                    } else if (groups.isNotEmpty()) {
-                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                                rethinkRemoteDao.getRemoteFileTagsGroup(query, selected, groups)
-                            }
-                            .liveData
-                            .cachedIn(viewModelScope)
-                    } else if (subg.isNotEmpty()) {
+                    if (subg.isNotEmpty()) {
                         Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                                 rethinkRemoteDao.getRemoteFileTagsSubg(query, selected, subg)
                             }
