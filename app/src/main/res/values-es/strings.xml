@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="app_name">RethinkDNS</string>
+    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_rethink">Rethink</string>
+</resources>
