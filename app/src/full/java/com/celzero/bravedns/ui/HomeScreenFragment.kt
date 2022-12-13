@@ -269,7 +269,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             persistentState.showWhatsNewChip = false
             b.fhsWhatsNewChip.text = getString(R.string.hsf_whats_new_remove_text)
             delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
-                b.fhsWhatsNewChip.visibility = View.GONE
+                if (isAdded) {
+                    b.fhsWhatsNewChip.visibility = View.GONE
+                }
             }
         }
 
@@ -304,6 +306,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsProxyChip.text = getString(R.string.hsf_proxy_chip_remove_text)
         syncDnsStatus()
         delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
+            if (!isAdded) return@delay
+
             b.fhsProxyChip.visibility = View.GONE
             b.fhsProxyChip.isEnabled = true
             showToastUiCentered(
@@ -823,20 +827,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.hsf_start_dialog_positive) { _, _ ->
             handleMainScreenBtnClickEvent()
-            delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
-                if (isVpnActivated) {
-                    openBottomSheet()
-                    showToastUiCentered(
-                        requireContext(),
-                        resources
-                            .getText(R.string.brave_dns_connect_mode_change_dns)
-                            .toString()
-                            .replaceFirstChar {
-                                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                            },
-                        Toast.LENGTH_SHORT
-                    )
-                }
+            if (isVpnActivated) {
+                openBottomSheet()
+                showToastUiCentered(
+                    requireContext(),
+                    resources
+                        .getText(R.string.brave_dns_connect_mode_change_dns)
+                        .toString()
+                        .replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+                        },
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 
