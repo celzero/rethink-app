@@ -611,7 +611,7 @@
     <string name="log_file_not_available">Gedimo ataskaitai nerasta</string>
     <string name="hsf_vpn_dialog_message">RethinkDNS reikia leidimo nustatyti vietinį VPN, kad būtų galima užšifruoti įrenginio DNS užklausas, įdiegti tinklo monitorių ir vykdyti ugniasienės taisykles.
 \n
-\nRethinkDNS nerenka jokios informacijos ir jokiu būdu nesnipinėja jūsų.</string>
+\nRethinkDNS nerenka jokios informacijos ir jokiu būdu nešnipinėja jūsų.</string>
     <string name="hsf_start_dialog_message">Iki saugaus ir patikimo Android liko vienas žingsnis: akimirksniu peržiūrėkite tinklo veiklą, blokuokite svetaines, IP adresus ir blogai besielgiančias programėles.</string>
     <string name="hsf_blocklist_chip_text">Sukonfigūruoti %1$s blokavimo sąrašai</string>
     <string name="hsf_proxy_chip_removed_toast">Įgaliotasis serveris pašalintas</string>

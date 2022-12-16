@@ -615,4 +615,28 @@
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s svarteliste(r)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dc_check_update_heading">Spør om oppdatering av svartelister</string>
     <string name="new_app_notification_title">Handling kreves</string>
+    <string name="settings_selected_theme">Iført drakt: %1$s</string>
+    <string name="firewall_status_excluded">utelatt fra DNS og brannmur</string>
+    <string name="firewall_status_whitelisted">omgår universelle brannmursregler</string>
+    <string name="firewall_card_text_inactive">Skru på brannmursmodus.</string>
+    <string name="relative_time_today">I dag</string>
+    <string name="relative_time_yesterday">I går</string>
+    <string name="settings_http_proxy_error_text1">Portområde skal være fra 1024–65535</string>
+    <string name="settings_theme_dialog_themes_1">Satt av systemet</string>
+    <string name="firewall_status_unknown">ukjent</string>
+    <string name="apps_card_ips_count">%1$s IP- og portregler</string>
+    <string name="private_dns_dialog_positive">Gå til innstillinger</string>
+    <string name="private_dns_dialog_negative">Avslå</string>
+    <string name="univ_firewall_dialog_message">Fortsett ved å slette denne regelen og la ethvert program koble til denne IP-en\?</string>
+    <string name="download_update_dialog_trylater_title">Kan ikke oppdatere akkurat nå</string>
+    <string name="download_update_dialog_trylater_message">Oppdateringen kan ikke kjøres akkurat nå. Prøv igjen senere.</string>
+    <string name="settings_app_notification_a13_heading">Programmerknad</string>
+    <string name="firewall_mode_notification_title">Beskyttet. Tilkoblet brannmur.</string>
+    <string name="univ_firewall_no_ip_message">Fant ingen IP-er. Trykk på oppføringer i nettverkslogg-skjermen for å blokkere individuelle IP-adresser.</string>
+    <string name="orbot_none_desc">Ingen av ovennevnte.</string>
+    <string name="pause_mode_notification_title">Pauset. Blokkerte programmer vil forbli bak brannmur.</string>
+    <string name="firewall_status_blocked">blokkert</string>
+    <string name="settings_proxy_header">mellomtjener</string>
+    <string name="settings_check_update_heading">Se etter nye programversjoner</string>
+    <string name="firewall_status_allow">tillatt</string>
 </resources>

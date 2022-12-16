@@ -16,7 +16,7 @@
     <string name="settings_vpn_heading">vpn</string>
     <string name="orbot_stop_dialog_negative">Hentikan Orbot</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns privat telah aktif</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns pribadi telah aktif</string>
     <string name="always_on_dialog_negative_btn">Batal</string>
     <string name="orbot_status_arg_3">DNS dan TCP</string>
     <string name="orbot_bs_status_trying_connect">Mengatur Orbot…</string>
@@ -77,21 +77,21 @@
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">gagal</string>
     <string name="conn_track_clear_logs_title">Hapus semua riwayat catatan jaringan\?</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">menunggu</string>
-    <string name="status_protected_with_private_dns">terlindungi dns privat</string>
+    <string name="status_protected_with_private_dns">terlindungi dengan dns pribadi</string>
     <string name="dns_query_clear_logs_title">Hapus semua riwayat catatan DNS\?</string>
     <string name="exclude">kecualikan</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">terlindungi</string>
-    <string name="status_protected_with_socks5_private_dns">terlindungi socks5 &amp; dns privat</string>
+    <string name="status_protected_with_socks5_private_dns">terlindungi dengan socks5 &amp; dns pribadi</string>
     <string name="wireguard_mode_info_explanation_new">Segera tersedia.</string>
-    <string name="status_protected_with_tor">terlindungi tor</string>
+    <string name="status_protected_with_tor">terlindungi dengan tor</string>
     <string name="brave_dns_connect_mode_change_firewall">Pilih Mode.</string>
     <string name="settings_title_desc">DNS dan Firewall yang sangat mudah disesuaikan</string>
-    <string name="status_protected_with_tor_private_dns">terlindungi tor &amp; dns privat</string>
+    <string name="status_protected_with_tor_private_dns">terlindungi dengan tor &amp; dns pribadi</string>
     <string name="block">blokir</string>
     <string name="title_settings">Pengaturan</string>
     <string name="status_dns_error">kesalahan dns</string>
     <string name="title_about">Tentang</string>
-    <string name="about_title_desc">Mendeteksi dan memblokir ancaman-ancaman keamanan jaringan</string>
+    <string name="about_title_desc">Mendeteksi dan menangkal ancaman-ancaman keamanan jaringan</string>
     <string name="allow">Ijinkan</string>
     <string name="dns_mode_notification_title">Terlindungi! Terkoneksi dengan Fast and Secure DNS.</string>
     <string name="firewall_mode_notification_title">Terlindungi! Terkoneksi dengan Firewall.</string>
@@ -101,7 +101,7 @@
     <string name="dns_mode_info_explanation_new">Mengawasi, memblokir, dan mengenkripsi permohonan-permohonan DNS.</string>
     <string name="brave_dns_connect_mode_change_dns">Pilih Mode.</string>
     <string name="txt_home">Halaman muka</string>
-    <string name="status_dns_server_down">peladen dns tidak berfungsi</string>
+    <string name="status_dns_server_down">server dns tidak berfungsi</string>
     <string name="status_app_error">kesalahan app</string>
     <string name="dns_firewall_mode_info_explanation_new">Semua di atas + pintasi sensor jaringan.</string>
     <string name="alert_permission_accessibility_regrant">Perlu Tindakan</string>
@@ -322,7 +322,7 @@
     <string name="dns_proxy_port">Nomor Port</string>
     <string name="cd_blocked_txt">Diblokir</string>
     <string name="socks5_proxy_toast_parameter">Proksi SOCKS5</string>
-    <string name="status_protected_with_socks5">terproteksi proksi socks</string>
+    <string name="status_protected_with_socks5">terproteksi dengan proksi socks</string>
     <string name="dns_proxy_positive_btn">tambahkan</string>
     <string name="brbs_backup_complete_toast">Selesai mencadangkan</string>
     <string name="ci_header">Aturan-aturan IP &amp; Port</string>
@@ -365,7 +365,7 @@
     <string name="ci_blocked_txt">Diblokir</string>
     <string name="rbl_privacy">Privasi</string>
     <string name="settings_socks5_heading">Atur Proksi SOCKS5</string>
-    <string name="status_protected_with_http_private_dns">terproteksi proksi http &amp; dns privat</string>
+    <string name="status_protected_with_http_private_dns">terproteksi dengan proksi http &amp; dns pribadi</string>
     <string name="ci_blocked_desc">- Terblokir</string>
     <string name="settings_socks_forwarding_desc_no_app">Meneruskan ke %1$s:%2$s</string>
     <string name="bsac_block_toast">Memblokir %1$s untuk app ini</string>
@@ -384,7 +384,7 @@
     <string name="cd_filter_blocked">Diblokir</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="cd_no_rule_txt">Tanpa Aturan</string>
-    <string name="system_dns_connection_failure">Tidak dapat memastikan peladen DNS ini</string>
+    <string name="system_dns_connection_failure">Tidak dapat menentukan server DNS saat ini</string>
     <string name="lbbs_search">Cari domain-domain dalam daftar-daftar blokir</string>
     <string name="notif_download_content_title">Unduhan Daftar Blokir di Perangkat</string>
     <string name="slide_2_desc">RethinkDNS adalah cara termudah untuk memantau aktivltas jaringan, memintas sensor jaringan, dan mem-firewall aplikasi-aplikasi di perangkat Anda.</string>
@@ -524,7 +524,7 @@
     <string name="rt_apply_btn">Terapkan</string>
     <string name="dns_proxy_ip_address">Alamat IP</string>
     <string name="network_log_app_name_unnamed">Tanpa nama (%1$s)</string>
-    <string name="status_protected_with_proxy">terproteksi proksi</string>
+    <string name="status_protected_with_proxy">terproteksi dengan proksi</string>
     <string name="lbbs_enable">Tidak aktif</string>
     <string name="dc_local_block_enabled">Aktif</string>
     <string name="settings_dns_proxy_dialog_hostname">Nama host</string>
@@ -548,7 +548,7 @@
     <string name="rules_load_failure_heading">Catatan</string>
     <string name="settings_orbot_notification_heading">Butuh tindakan</string>
     <string name="orbot_bs_status_2">Proksi HTTP telah diatur (app-app mungkin mengabaikannya).</string>
-    <string name="status_protected_with_proxy_private_dns">terproteksi proksi &amp; dns privat</string>
+    <string name="status_protected_with_proxy_private_dns">terproteksi dengan proksi &amp; dns pribadi</string>
     <string name="firewall_card_status_inactive">Tidak aktif</string>
     <string name="fapps_filter_clear_btn">Kosongkan</string>
     <string name="dc_rethink_dns">DNS Rethink</string>
@@ -569,7 +569,7 @@
     <string name="ci_block">blokir</string>
     <string name="ci_delete">hapus</string>
     <string name="orbot_bs_status_3">Meneruskan %1$s ke Orbot, Proksi HTTP pun telah diatur.</string>
-    <string name="status_protected_with_http">terproteksi proksi http</string>
+    <string name="status_protected_with_http">terproteksi dengan proksi http</string>
     <string name="settings_proxy_header">proksi</string>
     <string name="dns_proxy_dialog_message">Nama app: %1$s
 \n
@@ -730,4 +730,22 @@
     <string name="brbs_restore_dialog_positive">Pulihkan</string>
     <string name="brbs_restore_dialog_title">Pemulihkan cadangan</string>
     <string name="brbs_restore_dialog_failure_title">Pemulihan gagal</string>
+    <string name="private_dns_dialog_desc">Pengaturan DNS Rethink ditimpa oleh DNS Pribadi Android.
+\n
+\nUntuk menggunakan DNS Rethink, buka Pengaturan Android dan matikan \"DNS Pribadi\".</string>
+    <string name="untracked">tak terlacak</string>
+    <string name="private_dns_dialog_heading">Matikan DNS pribadi</string>
+    <string name="private_dns_dialog_positive">Pergi ke pengaturan</string>
+    <string name="private_dns_dialog_negative">Tutup</string>
+    <string name="universal_firewall_explanation">Menerapkan aturan firewall pada semua aplikasi berdasarkan peristiwa perangkat, misalnya, firewall ketika perangkat terkunci atau ketika aplikasi tertentu tidak digunakan.</string>
+    <string name="notification_action_resume_vpn">LANJUTKAN</string>
+    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS menjalankan VPN pada mode <i>Lockdown</i>. Menghentikannya akan mengakibatkan hilangnya konektivitas Internet pada profil pengguna ini. Apakah anda tetap ingin melanjutkan\?</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Memblokir aplikasi agar tidak terhubung ke Internet.
+\n <u>#2</u>: Memblokir aplikasi apa pun agar tidak terhubung ke IP tertentu.
+\n <u>#3</u>: Memblokir semua koneksi ketika perangkat terkunci (Universal Firewall).
+\n <u>#4</u>: Memblokir aplikasi apa pun yang tidak digunakan (Universal Firewall).
+\n <u>#5</u>: Memblokir koneksi ketika sumber aplikasi tidak diketahui (Universal Firewall).
+\n <u>#6</u>: Memblokir semua lalu lintas UDP kecuali DNS (Universal Firewall).
+\n <u>#7</u>: Memblokir koneksi ketika DNS dilewati (Universal Firewall).</string>
+    <string name="dns_query_clear_logs_message">Ini menghapus pencatatan DNS di perangkat. Operasi ini tidak dapat dibatalkan. Apakah kamu ingin melanjutkan\?</string>
 </resources>

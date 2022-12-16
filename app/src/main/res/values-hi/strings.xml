@@ -1,2 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">रीथिंकडीएनएस</string>
+    <string name="app_name_small_case">रीथिंक</string>
+    <string name="app_name_rethink">रीथिंक</string>
+    <string name="title_about">एप के बारे में</string>
+    <string name="title_settings">सेटिंग्स</string>
+    <string name="pause_title_desc">एक झपकी लेते हुए…</string>
+    <string name="settings_title_desc">एक उच्च अनुकूलन DNS और फ़ायरवॉल</string>
+    <string name="about_title_desc">नेटवर्क सुरक्षा खतरों का पता लगाएं और उन्हें ब्लॉक करें</string>
+    <string name="txt_home">मुख्यपृष्ठ</string>
+    <string name="accessibility_service_description">रीथिंकडीएनएस पृष्ठभूमि अनुप्रयोगों का पता लगाने और फ़ायरवॉल करने के लिए पहुँच सेवा का उपयोग करता है। रीथिंकडीएनएस कोई जानकारी एकत्र या बेचता नहीं है।</string>
+    <string name="accessibility_service_label">रीथिंकडीएनएस</string>
+    <string name="next">अगला</string>
+    <string name="skip">छोड़ें</string>
+    <string name="finish">पूर्ण करें</string>
+    <string name="slide_2_title">सुस्वागतम</string>
+    <string name="slide_2_desc">रीथिंकडीएनएस नेटवर्क गतिविधि की निगरानी करने, इंटरनेट सेंसरशिप को बायपास करने और अपने एंड्रॉइड डिवाइस पर फ़ायरवॉल ऐप्स का सबसे आसान तरीका है।</string>
+    <string name="slide_1_title">नि: शुल्क और मुक्त स्रोत</string>
+    <string name="slide_1_desc">रीथिंकडीएस एक ओपन सोर्स सॉफ्टवेयर है जो मोज़िला बिल्डर्स एमवीपी प्रोग्राम द्वारा समर्थित है।</string>
+    <string name="rethink_plus">रीथिंकडीएनएस प्लस</string>
+    <string name="rdns_plus">आरडीएनएस प्लस</string>
+    <string name="allow">अनुमति दें</string>
+    <string name="block">ब्लॉक करें</string>
+    <string name="bypass_universal">बाईपास सार्वभौमिक</string>
+    <string name="lockdown">लॉकडाउन</string>
+    <string name="untracked">ट्रैक न किए गए</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">चेतावनी: रीथिंकडीएनएस निष्क्रिय कर दिया गया है</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">सुरक्षा सेटिंग बदलने के लिए टैप करें</string>
+    <string name="dns_mode_notification_title">संरक्षित! तेज और सुरक्षित डीएनएस से जुड़ा है।</string>
+    <string name="firewall_mode_notification_title">संरक्षित! फ़ायरवॉल से जुड़ा हुआ है।.</string>
+    <string name="hybrid_mode_notification_title">संरक्षित! डीएनएस + फ़ायरवॉल से जुड़ा हुआ है।.</string>
+    <string name="pause_mode_notification_title">रोका गया! ब्लॉक किए गए ऐप्स फ़ायरवॉल किए जाते रहेंगे।</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">प्रतीक्षा की जा रही है</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">असफलता</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">संरक्षित</string>
+    <string name="status_app_error">ऐप त्रुटि</string>
+    <string name="status_dns_error">डीएनएस त्रुटि</string>
+    <string name="status_dns_server_down">डीएनएस सर्वर डाउन</string>
+    <string name="status_no_internet">इंटरनेट उपलब्ध नहीं</string>
+    <string name="status_protected_with_tor">टोर से सुरक्षित</string>
+    <string name="status_protected_with_private_dns">निजी डीएनएस के साथ संरक्षित</string>
+</resources>
