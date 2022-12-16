@@ -1484,7 +1484,7 @@ class BraveVPNService :
             } catch (e: SecurityException) {
                 Log.e(LOG_TAG_VPN, "Error updating tile service, package does not match", e)
             } catch (
-                e: IllegalStateException) { // if the user of the context is not the current user
+                e: IllegalArgumentException) { // if the user of the context is not the current user
                 Log.e(LOG_TAG_VPN, "Error updating tile service, invalid user context", e)
             }
         }
