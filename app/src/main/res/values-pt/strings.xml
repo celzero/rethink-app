@@ -16,7 +16,7 @@
     <string name="lockdown">confinamento</string>
     <string name="exclude">excluir</string>
     <string name="accessibility_service_label">Rethink DNS</string>
-    <string name="pause_mode_notification_title">Pausado! As aplicações bloqueadas continuarão a ser protegidas pela firewall.</string>
+    <string name="pause_mode_notification_title">Pausado! Firewall continua a bloquear aplicações.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Toque aqui para alterar a configuração de proteção</string>
     <string name="dns_mode_notification_title">Protegido! Conectado ao DNS rápido e seguro.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">a esperar</string>
@@ -56,10 +56,10 @@
     <string name="relative_time_yesterday">Ontem</string>
     <string name="always_on_dialog_heading">Desativar VPN sempre ativa</string>
     <string name="always_on_dialog_negative_btn">Cancelar</string>
-    <string name="always_on_dialog">A \"VPN ativada sempre\" está ativada neste dispositivo. Para iniciar o Rethink, por favor vá a Configurações da aplicação e desative a opção \"VPN ativada sempre\".</string>
-    <string name="always_on_dialog_stop_heading">VPN ativada sempre</string>
-    <string name="always_on_dialog_stop_message">A \"VPN ativada sempre\" está ativada para o Rethink. Tem a certeza de que quer parar o Rethink mesmo assim\?</string>
-    <string name="always_on_dialog_lockdown_stop_message">O RethinkDNS está a executar a VPN no modo <i>Confinamento</i>. Interrompê-lo resultaria na perda de conectividade com a Internet neste perfil de utilizador. Quer continuar mesmo assim\?</string>
+    <string name="always_on_dialog">A opção \"VPN sempre ativa\" está ativada neste dispositivo. Para iniciar o Rethink, vá às configurações de VPN do Android e desative a opção \"VPN sempre ativa\".</string>
+    <string name="always_on_dialog_stop_heading">VPN sempre ativa</string>
+    <string name="always_on_dialog_stop_message">A opção \"VPN sempre ativa\" das configurações de VPN do Android está ativada para o RethinkDNS. Quer mesmo parar o RethinkDNS\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">O RethinkDNS está a executar a VPN no modo <i>bloqueado</i>. Se o parar não terá ligação à Internet neste perfil de utilizador. Quer mesmo parar\?</string>
     <string name="dns_act_log">Registos</string>
     <string name="always_on_dialog_negative">Cancelar</string>
     <string name="blocklist_update_check_not_required">As listas de bloqueio já são da última versão.</string>
@@ -123,18 +123,18 @@
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Firewall:
-\nMostra dois botões para alternar rapidamente entre o modo DNS de poupança de bateria e o modo normal DNS + Firewall."</string>
+\nMostra dois botões para mudar rapidamente entre o modo DNS para poupar bateria e o modo normal DNS + Firewall."</string>
     <string name="hsf_vpn_dialog_message">O RethinkDNS necessita da sua permissão para criar uma VPN local para encriptar os pedidos DNS, implementar um monitor de rede e impor as regras da firewall.
 \n
 \nO RethinkDNS não recolhe nenhuma informação nem espia de forma alguma.</string>
     <string name="dc_block_heading">regras</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
-    <string name="firewall_status_excluded">excluído do dns e firewall</string>
+    <string name="firewall_status_excluded">excluída do dns e firewall</string>
     <string name="firewall_card_text_inactive">Ativar o modo firewall.</string>
     <string name="hsf_start_dialog_message">Está a um passo de distância do Android seguro e protegido: veja instantaneamente a atividade da rede, bloqueie sites, IPs e aplicações suspeitas.</string>
-    <string name="firewall_status_lockdown">confinamento</string>
+    <string name="firewall_status_lockdown">confinada</string>
     <string name="hsf_dns_logs_chip_text">Registos de DNS</string>
-    <string name="firewall_status_block_metered">bloqueado em redes limitadas (móveis)</string>
+    <string name="firewall_status_block_metered">bloqueada em redes limitadas (móveis)</string>
     <string name="hsf_stop_btn_state">parar</string>
     <string name="hsf_notification_permission_failure">Ative a permissão de notificação em Configurações</string>
     <string name="hsf_blocklist_updating_text">A ativar…</string>
@@ -219,12 +219,12 @@
     <string name="settings_ip_dialog_ipv46">Automático (experimental)</string>
     <string name="settings_ip_text_ipv46">Automático</string>
     <string name="settings_selected_ip_desc">%1$s</string>
-    <string name="settings_notification_heading">Escolher ação de notificação</string>
-    <string name="settings_notification_desc">Botões de ação a mostrar na notificação do RethinkDNS: %1$s</string>
+    <string name="settings_notification_heading">Botões na notificação</string>
+    <string name="settings_notification_desc">Botões a mostrar na notificação do RethinkDNS: %1$s</string>
     <string name="settings_notification_desc1">Pausar / parar (predefinido)</string>
     <string name="settings_notification_desc2">DNS / DNS + Firewall</string>
     <string name="settings_notification_desc3">Nenhum</string>
-    <string name="settings_notification_dialog_title">Escolher ação de notificação</string>
+    <string name="settings_notification_dialog_title">Botões na notificação</string>
     <string name="settings_notification_dialog_option_3">"
 \nNenhum:
 \nNão mostra nenhum botão.
@@ -232,13 +232,13 @@
     <string name="settings_selected_theme">Tema atual: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">Mudar para o modo DNS/DNS+Firewall para ativar esta configuração</string>
     <string name="apps_icon_content_desc">Ícone de aplicação</string>
-    <string name="firewall_status_allow">permitido</string>
+    <string name="firewall_status_allow">permitida</string>
     <string name="firewall_status_whitelisted">ignora as regras de firewall universal</string>
-    <string name="firewall_status_block_unmetered">bloqueado em redes ilimitadas (wifi)</string>
-    <string name="firewall_status_blocked">bloqueado</string>
+    <string name="firewall_status_block_unmetered">bloqueada em redes ilimitadas (wifi)</string>
+    <string name="firewall_status_blocked">bloqueada</string>
     <string name="firewall_status_unknown">desconhecido</string>
-    <string name="ct_bs_app_info_error">Informação da aplicação não encontrada</string>
-    <string name="firewall_card_status_inactive">Desativado</string>
+    <string name="ct_bs_app_info_error">Informação da aplicação não foi encontrada</string>
+    <string name="firewall_card_status_inactive">Desativada</string>
     <string name="firewall_card_status_active">%1$s aplicações</string>
     <string name="firewall_card_text_active">%1$s bloqueadas
 \n%2$s contornadas
@@ -247,14 +247,14 @@
     <string name="dns_card_connected_status_failure">Desativado</string>
     <string name="dns_card_latency_active">Latência: %1$sms</string>
     <string name="dns_card_latency_inactive">Ativar o modo DNS.</string>
-    <string name="apps_card_ips_count">%1$s regras de IP e portas</string>
+    <string name="apps_card_ips_count">%1$s regras IP/portas</string>
     <string name="hsf_start_btn_state">iniciar</string>
     <string name="hsf_uptime">(ativo desde %1$s; protos: %2$s)</string>
     <string name="hsf_downtime">(inativo desde %1$s)</string>
     <string name="hsf_vpn_dialog_header">Atenção!</string>
     <string name="hsf_vpn_dialog_positive">Continuar</string>
     <string name="hsf_vpn_dialog_negative">Cancelar</string>
-    <string name="hsf_vpn_prepare_failure">Falta a permissão VPN ou outra aplicação está no modo VPN sempre ativa.</string>
+    <string name="hsf_vpn_prepare_failure">Falta a permissão de VPN ou então outra aplicação está com a opção \"VPN sempre ativa\".</string>
     <string name="hsf_start_dialog_header">Iniciar %1$s</string>
     <string name="hsf_start_dialog_positive">Começar</string>
     <string name="hsf_start_dialog_negative">Ignorar</string>
@@ -264,15 +264,15 @@
     <string name="hsf_blocklist_chip_text_no_blocklist">RDNS utilizado</string>
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_network_logs_chip_text">Registos de rede</string>
-    <string name="hsf_exclude_error">Não é possível excluir no modo de VPN confinado</string>
+    <string name="hsf_exclude_error">Não é possível excluir no modo de VPN bloqueado</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy removido</string>
     <string name="hsf_proxy_chip_remove_text">A parar…</string>
     <string name="hsf_whats_new_remove_text">A encerrar…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausar: o RethinkDNS não está ativo</string>
     <string name="hsf_pause_lockdown_failure">Não é possível pausar: o RethinkDNS está no modo confinado</string>
-    <string name="dns_logs_lifetime_queries">Consultas desde começou: %1$s</string>
-    <string name="dns_logs_blocked_queries">Consultas bloqueadas: %1$s</string>
+    <string name="dns_logs_lifetime_queries">Pedidos desde o início: %1$s</string>
+    <string name="dns_logs_blocked_queries">Pedidos bloqueados: %1$s</string>
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="conn_track_clear_logs_message">Isto só elimina os registos da rede, mas não as regras de firewall. Esta operação não é reversível. Quer prosseguir\?</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiado</string>
@@ -319,20 +319,20 @@
     <string name="accessibility_service_description">O RethinkDNS usa o serviço de acessibilidade para detetar e proteger aplicações em segundo plano. O RethinkDNS não recolhe nem vende nenhuma informação.</string>
     <string name="orbot_both">Proxy TCP + HTTP</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="settings_lock_down_mode_desc">Não é possível permitir o contorno ou a configuração de proxies quando a VPN está a ser executada no modo de confinamento. <u>Ir às configurações da VPN</u>.</string>
-    <string name="settings_https_desc">Esta configuração é apenas uma recomendação e é possível que as aplicações a ignorem. As aplicações que utilizam proxy HTTP(S) contornarão tanto a Firewall como as regras DNS.</string>
+    <string name="settings_lock_down_mode_desc">Não é possível permitir ignorar nem configurar proxies quando a VPN está no modo bloqueado. <u>Ir às configurações da VPN</u>.</string>
+    <string name="settings_https_desc">Esta configuração é apenas uma recomendação e é possível que as aplicações a ignorem. As aplicações que utilizam proxy HTTP(S) ignorarão as regras da Firewall e do DNS.</string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_stop_dialog_message">O RethinkDNS parou de encaminhar conexões para o Orbot, mas o Orbot pode estar a ser executado em segundo plano.</string>
-    <string name="orbot_explanation">Orbot é uma aplicação de proxy gratuita que permite que outras aplicações usem a Internet com mais <u>segurança</u>.
-\nO Orbot usa o <u>Tor</u> para encriptar o seu tráfego de Internet, que ajuda a <u>contornar a censura</u> e proteger contra várias formas de <u>vigilância na rede</u> que ameaçam a liberdade e a privacidade de pessoas.
-\n<u>Proxy TCP</u>: RethinkDNS encaminha apenas conexões TCP de todas as aplicações, exceto as excluídas ao Orbot.
-\n<u>Proxy HTTP</u>: RethinkDNS <i>configura</i> um proxy HTTP, mas não impõe que as aplicações o usem. Normalmente os navegadores como Chrome e Firefox usam-no. As aplicações que usam o proxy HTTP(S) ignorarão as regras do firewall e DNS.</string>
+    <string name="orbot_explanation">O Orbot é uma aplicação de proxy gratuita que permite que as outras aplicações usem a Internet de forma mais <u>segura</u>.
+\nO Orbot usa o <u>Tor</u> para encriptar o seu tráfego na Internet, ajudando a <u>contornar a censura</u> e proteger contra várias formas de <u>vigilância na rede</u> que ameaçam a liberdade e a privacidade das pessoas.
+\n<u>Proxy TCP</u>: o RethinkDNS reencaminha apenas conexões TCP de todas as aplicações, exceto as excluídas do Orbot.
+\n<u>Proxy HTTP</u>: o RethinkDNS <i>configura</i> um proxy HTTP, mas não força as aplicações a uzá-lo. Normalmente os navegadores como o Chrome e o Firefox usam-no. As aplicações que usam o proxy HTTP(S) ignorarão as regras da firewall e DNS.</string>
     <string name="settings_custom_downloader_heading">Usar o descarregador da aplicação</string>
     <string name="orbot_both_desc">Todas as anteriores.</string>
     <string name="orbot_none">Nenhuma (predefinido)</string>
     <string name="orbot_none_desc">Nenhuma das anteriores.</string>
     <string name="orbot_status_arg_2">TCP</string>
-    <string name="orbot_stop_dialog_dns_message">O RethinkDNS está configurado para reencaminhar as consultas DNS para o Orbot. Altere conforme necessário.</string>
+    <string name="orbot_stop_dialog_dns_message">O RethinkDNS está configurado para reencaminhar os pedidos do DNS para o Orbot. Altere conforme necessário.</string>
     <string name="orbot_stop_dialog_neutral">Alterar DNS</string>
     <string name="settings_orbot_install_desc">Toque aqui para instalar o Orbot</string>
     <string name="settings_all_networks_dialog_title">Atenção!</string>
@@ -346,7 +346,7 @@
     <string name="settings_general_header">geral</string>
     <string name="settings_import_export_heading">Cópia de segurança e restauro</string>
     <string name="rdns_plus">RDNS Plus</string>
-    <string name="settings_ip_network_heading">Escolha a versão do IP</string>
+    <string name="settings_ip_network_heading">Versão do IP a utilizar</string>
     <string name="settings_socks5_desc">Encaminhar conexões para o endpoint SOCKS5.</string>
     <string name="orbot_install_dialog_negative">Ignorar</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
@@ -362,7 +362,7 @@
     <string name="orbot_stop_dialog_title">Intervenção manual necessária</string>
     <string name="orbot_stop_dialog_positive">Ignorar</string>
     <string name="untracked">não rastreado</string>
-    <string name="settings_allow_bypass_heading">Permitir contornar</string>
+    <string name="settings_allow_bypass_heading">Permitir ignorar</string>
     <string name="settings_socks5_heading">Configurar proxy SOCKS5</string>
     <string name="orbot_socks5">Proxy de apenas TCP</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
@@ -370,7 +370,7 @@
 \n%2$s</string>
     <string name="orbot_install_dialog_positive">Instalar</string>
     <string name="settings_socks5_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
-    <string name="settings_allow_bypass_desc">Permitir que os pedidos de aplicações contornem (ignorem) a firewall RethinkDNS a pedido. Algumas aplicações de conferências áudio/vídeo como o Zoom e o WhatsApp podem requerer um contorno a pedido para funcionar corretamente.</string>
+    <string name="settings_allow_bypass_desc">Permite que as aplicações ignorem a firewall do RethinkDNS. Algumas aplicações de conferências áudio/vídeo como o Zoom e o WhatsApp podem necessitar de contornar a firewall para funcionar corretamente.</string>
     <string name="orbot_http_desc">Recomenda que as aplicações utilizem o proxy HTTP do Orbot.</string>
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
     <string name="settings_autostart_bootup_heading">Arranque automático ao ligar (experimental)</string>
@@ -380,7 +380,7 @@
     <string name="dc_dns_website_desc">Obtém ícones de sites de <i>nextdns.com</i> e <i>duckduckgo.com</i>. Usa até 350 MB de espaço de armazenamento</string>
     <string name="about_bravedns_explantion">O RethinkDNS é a forma mais fácil de monitorizar a atividade da aplicação, contornar a censura da Internet e aplicações de firewall no seu dispositivo Android.</string>
     <string name="about_bravedns_whoarewe">O RethinkDNS é um projeto gratuito e de código aberto, liderado por ex-engenheiros da Amazon, IBM e Scientific Games.</string>
-    <string name="about_bug_report_desc">enviar email com as falhas</string>
+    <string name="about_bug_report_desc">reportar por email</string>
     <string name="about_bug_report_dialog_positive_btn">Enviar e-mail</string>
     <string name="about_bug_no_log_dialog_message">Não foi possível obter os registros de falhas. Quer reportar manualmente o seu problema\?</string>
     <string name="about_email">Envie-nos um e-mail</string>
@@ -462,11 +462,11 @@
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s listas de bloqueio&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_filter_parent_blocked">Bloqueados</string>
     <string name="univ_firewall_rule_1">Bloquear todas as aplicações quando o dispositivo estiver bloqueado</string>
-    <string name="dns_btm_record_type">Tipo de consulta: %1$s</string>
+    <string name="dns_btm_record_type">Tipo de pedido: %1$s</string>
     <string name="firewall_rule_block_ip_univ_desc">Uma regra de firewall definida pelo utilizador bloqueou o <i>IP / porta de destino</i>.<br/><br/> Para alterar, vá ao separador <i>Universal</i>.</string>
     <string name="univ_firewall_rule_8">Bloquear tráfego na porta 80 (HTTP inseguro)</string>
     <string name="univ_ip_delete_individual_negative">Cancelar</string>
-    <string name="dns_proxy_connection_failure_lockdown">Ao excluir %1$s para %2$s no modo confinado pode causar problemas de conectividade com a Internet.</string>
+    <string name="dns_proxy_connection_failure_lockdown">Se excluir %1$s para %2$s no modo confinado pode causar problemas de conectividade com a Internet.</string>
     <string name="firewall_rule_block_app_desc">Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i>.<br/><br/> Para alterar, vá ao separador <i>Todas as aplicações</i>.</string>
     <string name="notif_dialog_pause_dialog_message">Aplicação no modo de pausa, retome para continuar</string>
     <string name="notif_channed_desc_download">Alertar sobre o progresso do descarregamento de listas de bloqueio no dispositivo</string>
@@ -488,7 +488,7 @@
     <string name="ada_app_whitelist">Contorno universal</string>
     <string name="ada_ip_no_connection">Não há registos de rede para esta aplicação.</string>
     <string name="ada_app_status_allow">é permitida</string>
-    <string name="bsac_whitelist_remove_toast">Contorno removido para este IP %1$s</string>
+    <string name="bsac_whitelist_remove_toast">Ignorar das regras da aplicação removido para o IP %1$s</string>
     <string name="bsdl_domain_heading">Regra de domínio</string>
     <string name="notif_download_content_text">A descarregar…</string>
     <string name="bsdl_blocked_desc">%1$s bloqueado por %2$s</string>
@@ -539,11 +539,11 @@
 \n
 \nAs regras de firewall em redes limitadas (móvel) / não limitadas (WiFi) não serão respeitadas quando:
 \n
-\n1. A VPN está no modo confinado (ou seja a opção nas configurações do Android em Definições, Rede e Internet, <i>Bloquear as ligações sem VPN</i> está ativada).
+\n1. A VPN está no modo bloqueado (ou seja a opção <i>Bloquear as ligações sem VPN</i> está ativada nas configurações de VPN do Android).
 \n
 \n2.A opção <i>Utilizar todas as redes disponíveis</i> no RethinkDNS está ativada.</string>
     <string name="fapps_metered_positive">Aplicar</string>
-    <string name="fapps_lockdown_hint">A VPN está em modo confinado. A firewall não respeitará as regras em redes limitadas/ilimitadas.</string>
+    <string name="fapps_lockdown_hint">A VPN está no modo bloqueado. A firewall não respeitará as regras em redes limitadas / ilimitadas.</string>
     <string name="fapps_all_network_hint"><u>Usar todas as redes</u> está ativado. A firewall não respeitará as regras em redes limitadas/ilimitadas.</string>
     <string name="fapps_firewall_filter_desc_category">A mostrar aplicações (<u>%1$s</u>, %2$s) nas categorias: %3$s</string>
     <string name="rules_load_failure_heading">Nota</string>
@@ -656,7 +656,7 @@
     <string name="fapps_firewall_filter_excluded">Excluídas</string>
     <string name="fapps_firewall_filter_lockdown">Confinadas</string>
     <string name="fapps_info_dialog_positive_btn">OK</string>
-    <string name="fapps_unmetered_unblock_dialog_title">Permitir em ilimitado</string>
+    <string name="fapps_unmetered_unblock_dialog_title">Permitir em redes ilimitadas</string>
     <string name="fapps_unmetered_block_dialog_title">Bloquear em redes ilimitadas</string>
     <string name="fapps_unmetered_block_dialog_message">Bloquear conexões em rede ilimitada (WiFi) para aplicações <i>na lista</i>\?</string>
     <string name="fapps_unmetered_unblock_dialog_message">Permitir conexões em rede ilimitada (WiFi) para aplicações <i>na lista</i>\?</string>
@@ -690,13 +690,13 @@
     <string name="other_dns_list_tab1">DoH</string>
     <string name="other_dns_list_tab2">DNSCrypt</string>
     <string name="other_dns_list_tab3">Proxy DNS</string>
-    <string name="hs_btm_sheet_lock_down">Não é possível alterar o modo quando a VPN está no modo <i>confinado</i>. <u>Toque aqui para editar as configurações de VPN</u>.</string>
+    <string name="hs_btm_sheet_lock_down">Não é possível alterar o modo quando a VPN está no modo <i>bloqueado</i>. <u>Toque aqui para editar as configurações de VPN</u>.</string>
     <string name="firewall_rule_no_rule">Sem regra</string>
     <string name="firewall_rule_block_app">Aplicação bloqueada</string>
-    <string name="firewall_rule_block_unmetered">Ilimitado (Wi-Fi)</string>
-    <string name="firewall_rule_block_metered">Limitado (móvel)</string>
-    <string name="firewall_rule_univ_block_metered">Limitado (universal)</string>
-    <string name="firewall_rule_lockdown">Confinado (aplicação)</string>
+    <string name="firewall_rule_block_unmetered">Ilimitada (Wi-Fi)</string>
+    <string name="firewall_rule_block_metered">Limitada (móvel)</string>
+    <string name="firewall_rule_univ_block_metered">Limitada (universal)</string>
+    <string name="firewall_rule_lockdown">Confinada (aplicação)</string>
     <string name="firewall_rule_block_app_new_install">Nova aplicação</string>
     <string name="firewall_rule_block_app_exception">Erro</string>
     <string name="firewall_rule_block_ip">IP / porta (aplicação)</string>
@@ -796,19 +796,19 @@
     <string name="ada_firewall_title">regras de firewall para esta aplicação</string>
     <string name="ada_ip_rules_title">regras de ip para esta aplicação</string>
     <string name="ada_network_log_title">registo de rede para esta aplicação</string>
-    <string name="ada_app_metered">Limitado</string>
-    <string name="ada_app_exclude">Excluir</string>
-    <string name="ada_app_lockdown">Confinado</string>
+    <string name="ada_app_metered">Rede limitada</string>
+    <string name="ada_app_exclude">Excluída</string>
+    <string name="ada_app_lockdown">Confinada</string>
     <string name="ada_app_dns_settings">Configurações de DNS</string>
     <string name="bsac_title_desc">As regras aplicam-se apenas a esta aplicação.</string>
     <string name="bsac_unblock">Desbloquear</string>
     <string name="bsac_block">Bloquear</string>
-    <string name="bsac_bypass_app_rules">Regras de contorno da aplicação</string>
-    <string name="bsac_go_pass_app_rules">Remover contorno</string>
-    <string name="bsac_block_toast">Bloqueando %1$s para esta aplicação</string>
-    <string name="bsac_unblock_toast">Desbloqueado %1$s para esta aplicação</string>
-    <string name="bsac_whitelist_toast">A contornar as regras de aplicação para este IP %1$s</string>
-    <string name="bsdl_domain_desc">Clique abaixo para permitir ou bloquear a consulta de DNS</string>
+    <string name="bsac_bypass_app_rules">Ignorar regras da aplicação</string>
+    <string name="bsac_go_pass_app_rules">Remover ignorar das regras</string>
+    <string name="bsac_block_toast">A bloquear %1$s nesta aplicação</string>
+    <string name="bsac_unblock_toast">A desbloquear %1$s nesta aplicação</string>
+    <string name="bsac_whitelist_toast">A ignorar as regras da aplicação para o IP %1$s</string>
+    <string name="bsdl_domain_desc">Clique abaixo para permitir ou bloquear pedidos do DNS</string>
     <string name="bsdl_domain_rule_allow">permitir</string>
     <string name="bsdl_domain_rule_block">bloquear</string>
     <string name="notif_download_content_title">Descarregamento da lista de bloqueio no dispositivo</string>
@@ -845,7 +845,7 @@
     <string name="bsrf_sub_group_heading">Subgrupo</string>
     <string name="bsrf_apply_filter">Aplicar</string>
     <string name="bsrf_clear_filter">Limpar</string>
-    <string name="dc_local_block_enabled">Ativo</string>
+    <string name="dc_local_block_enabled">Ativado</string>
     <string name="dc_local_block_disabled">Desativado</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
     <string name="dc_doh">DNS sobre HTTPS</string>
@@ -853,7 +853,7 @@
     <string name="dc_dns_proxy">Proxy DNS</string>
     <string name="lbbs_enabled">Ativado</string>
     <string name="lbbs_configure">Configurar</string>
-    <string name="lbbs_copy">Copiar como URL RDNS+</string>
+    <string name="lbbs_copy">Copiar URL RDNS+</string>
     <string name="lbbs_search">Pesquisar domínios em listas de bloqueio</string>
     <string name="lbbs_redownload">Descarregar novamente as listas de bloqueio</string>
     <string name="lbbs_download">Atualizar listas de bloqueio</string>
@@ -880,7 +880,7 @@
     <string name="fapps_firewall_filter_all">Tudo</string>
     <string name="notif_dialog_pause_dialog_negative">Ignorar</string>
     <string name="notif_channel_proxy_failure">Alertas de proxy</string>
-    <string name="ada_app_unmetered">Ilimitado</string>
+    <string name="ada_app_unmetered">Rede ilimitada</string>
     <string name="lbbs_update_check">Ver se há atualizações</string>
     <string name="private_dns_dialog_positive">Ir às configurações</string>
     <string name="private_dns_dialog_heading">Desativar DNS privado</string>
