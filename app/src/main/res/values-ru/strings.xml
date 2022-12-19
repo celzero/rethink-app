@@ -445,7 +445,7 @@
     <string name="cd_dialog_desc">Пользовательский URL (домен) или дикий символ для разрешения или блокировки. например, *.test.com, test.com/test</string>
     <string name="cd_dialog_error_invalid_tld">Недействительный домен верхнего уровня.</string>
     <string name="ci_dialog_desc">Разрешить (обход) или заблокировать IP-адрес, IP-подсеть (диапазон), порт. Пример: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
-    <string name="ci_header">Правила IP и портов</string>
+    <string name="ci_header">Правила IP и портов: %1$s</string>
     <string name="ci_no_rule">нет правил</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_allow">разрешено</string>

@@ -765,7 +765,7 @@
     <string name="ci_dialog_edittext_hint">Endereço IP, sub-rede ou porta</string>
     <string name="ci_dialog_error_invalid_ip">Endereço IP, sub-rede ou porta inválida.</string>
     <string name="ci_dialog_added_success">IP adicionado à lista</string>
-    <string name="ci_header">Regras de IP e porta</string>
+    <string name="ci_header">Regras de IP e porta: %1$s</string>
     <string name="ci_no_rules_text">Nenhuma regra de IP ou porta encontrada.</string>
     <string name="ci_bypass_universal_initial">CU</string>
     <string name="ci_bypass_universal_txt">Contorno universal</string>

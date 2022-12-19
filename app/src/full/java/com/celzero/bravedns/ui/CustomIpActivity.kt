@@ -33,10 +33,10 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.databinding.ActivityCustomIpBinding
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -72,7 +72,7 @@ class CustomIpActivity :
 
         uid = intent.getIntExtra(INTENT_UID, UID_EVERYBODY)
 
-        b.customDialogHeading.text = "${getString(R.string.ci_header)}: ${getAppName()}"
+        b.customDialogHeading.text = getString(R.string.ci_header, getAppName())
 
         b.cipSearchView.setOnQueryTextListener(this)
         observeCustomRules()

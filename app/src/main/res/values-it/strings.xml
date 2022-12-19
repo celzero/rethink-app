@@ -770,7 +770,7 @@
     <string name="ci_dialog_edittext_hint">Indirizzo IP, sottorete o porta</string>
     <string name="ci_dialog_error_invalid_ip">Indirizzo IP, sottorete o porta non validi.</string>
     <string name="ci_dialog_added_success">IP aggiunto alla lista</string>
-    <string name="ci_header">Regole IP e Porte</string>
+    <string name="ci_header">Regole IP e Porte: %1$s</string>
     <string name="ci_no_rules_text">Nessuna regola universale IP di blocco o consenso trovata.</string>
     <string name="ci_bypass_universal_initial">AU</string>
     <string name="ci_bypass_universal_txt">Aggira regole Universali</string>

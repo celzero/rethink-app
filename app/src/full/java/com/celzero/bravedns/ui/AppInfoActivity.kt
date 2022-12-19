@@ -317,7 +317,7 @@ class AppInfoActivity :
 
         b.aadAapFirewallNewCard.setOnClickListener { toggleFirewallUiState(firewallUiState) }
 
-        b.aadIpBlockIndicator.setOnClickListener { toggleFirewallUiState(firewallUiState) }
+        b.aadIpBlockIndicator.setOnClickListener { openCustomIpScreen() }
 
         b.aadIpBlockRl.setOnClickListener { openCustomIpScreen() }
 

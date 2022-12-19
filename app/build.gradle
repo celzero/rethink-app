@@ -45,11 +45,6 @@ android {
         jvmTarget = "11"
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
@@ -122,7 +117,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
 
     fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    fullImplementation 'androidx.appcompat:appcompat:1.5.1'
+    fullImplementation 'androidx.appcompat:appcompat:1.7.0-alpha01'
     fullImplementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -148,9 +143,9 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation "androidx.fragment:fragment-ktx:1.5.4"
+    fullImplementation 'androidx.fragment:fragment-ktx:1.5.5'
     implementation 'com.google.android.material:material:1.7.0'
-    fullImplementation "androidx.viewpager2:viewpager2:1.0.0"
+    fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     fullImplementation 'com.squareup.okhttp3:okhttp:4.10.0'
     fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0'

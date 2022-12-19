@@ -480,6 +480,14 @@
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nShows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.</string>
     <string name="settings_notification_dialog_option_3">\nNone:\nShows no button.\n</string>
 
+    <string name="settings_locale_heading">Language</string>
+    <string name="settings_locale_desc">Choose your preferred language</string>
+    <string name="settings_locale_dialog_title">Choose your preferred language</string>
+    <string name="settings_locale_dialog_option_1">System Default</string>
+    <string name="settings_locale_dialog_message">Restart the app to apply the changes</string>
+    <string name="settings_locale_dialog_positive_btn">Restart</string>
+    <string name="settings_locale_dialog_negative_btn">Cancel</string>
+
     <string name="settings_selected_theme">Current theme: %1$s</string>
 
     <string name="settings_protocol_translation_dns_inactive">Switch to DNS/DNS+Firewall mode to enable this setting</string>
@@ -657,6 +665,7 @@
                                               <a href="https://github.com/hussainmohd-a">hussainmohd-a</a><br/>
                                               <a href="https://github.com/ignoramous">ignoramous</a><br/>
                                               <a href="https://github.com/markwmuller">markwmuller</a><br/>
+                                              <a href="https://github.com/Uldiniad">Uldiniad</a><br/>
                                               <a href="https://github.com/Poussinou">Poussinou</a><br/>
                                               <a href="https://github.com/pjosingh">pjosingh</a><br/>
                                               <br/>🚂 Network engine <br/>
@@ -1083,7 +1092,7 @@
 
     <string name="ci_dialog_added_success">IP added to the list</string>
 
-    <string name="ci_header">IP &amp; Port Rules</string>
+    <string name="ci_header">IP &amp; Port Rules: %1$s</string>
 
     <string name="ci_no_rules_text">No IP or Port rules found.</string>
 
@@ -1106,6 +1115,7 @@
     <string name='ci_no_rule'>no rule</string>
     <string name='ci_block'>block</string>
     <string name='ci_bypass_universal'>bypass universal</string>
+    <string name="ci_bypass_app_rule">bypass app rules</string>
     <string name="ci_delete">delete</string>
 
     <!-- app info -->

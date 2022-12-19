@@ -322,7 +322,7 @@
     <string name="rt_download_desc">請下載攔截清單（約 60 MB ）以使用此功能。</string>
     <string name="brbs_restore_desc">從備份檔中恢復</string>
     <string name="firewall_rule_block_ip_univ_desc">一項用戶定義的全局防火牆規則攔截了此<i>目標 IP / 埠</i>。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
-    <string name="ci_header">IP 與埠規則</string>
+    <string name="ci_header">IP 與埠規則: %1$s</string>
     <string name="ada_app_status_block">已攔截</string>
     <string name="bsdl_domain_rule_block">攔截</string>
     <string name="rbl_parental_control">家長控制</string>

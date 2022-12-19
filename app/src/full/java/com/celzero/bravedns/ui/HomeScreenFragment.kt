@@ -30,6 +30,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.VpnService
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -48,6 +49,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.RethinkDnsEndpoint
+import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -226,7 +228,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsDnsConfigureChip.setOnClickListener {
             b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_updating_text)
             io {
-                kotlinx.coroutines.delay(1500)
                 val plusEndpoint = appConfig.getRethinkPlusEndpoint()
                 val stamp = getRemoteBlocklistStamp(plusEndpoint.url)
 
@@ -451,23 +452,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showNewFeaturesDialog() {
-        val inflater: LayoutInflater = LayoutInflater.from(requireContext())
-        val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
-
-        builder.setPositiveButton(getString(R.string.about_dialog_positive_button)) {
-            dialogInterface,
-            _ ->
-            dialogInterface.dismiss()
-        }
-
-        builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
-            sendEmailIntent(requireContext())
-        }
-
-        builder.setCancelable(false)
-        builder.create().show()
+        val binding =
+            DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
+        binding.desc.movementMethod = LinkMovementMethod.getInstance()
+        binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+        AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .setTitle(getString(R.string.whats_dialog_title))
+            .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
+                dialogInterface,
+                _ ->
+                dialogInterface.dismiss()
+            }
+            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) {
+                _: DialogInterface,
+                _: Int ->
+                sendEmailIntent(requireContext())
+            }
+            .setCancelable(true)
+            .create()
+            .show()
     }
 
     private fun enableFirewallCardIfNeeded() {

@@ -653,7 +653,7 @@
     <string name="ci_dialog_edittext_hint">IP 地址、子網或者埠</string>
     <string name="ci_dialog_error_invalid_ip">冇效嘅 IP 地址、子網或者埠。</string>
     <string name="ci_dialog_added_success">已經將 IP 加咗入清單</string>
-    <string name="ci_header">IP 同埠規則</string>
+    <string name="ci_header">IP 同埠規則: %1$s</string>
     <string name="ci_no_rules_text">搵唔到 IP 或者埠規則。</string>
     <string name="ci_bypass_universal_initial">繞</string>
     <string name="ci_no_rule_initial">冇</string>

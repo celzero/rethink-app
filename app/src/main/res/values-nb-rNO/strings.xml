@@ -334,7 +334,7 @@
     <string name="fapps_filter_categories_heading">Kategorier</string>
     <string name="fapps_filter_clear_btn">Tøm</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="ci_header">IP og portregler</string>
+    <string name="ci_header">IP og portregler: %1$s</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">Ikke beskyttet</string>
     <string name="cd_dns_proxy_mode_internal">Intern</string>
     <string name="coming_soon_toast">Kommer snart</string>

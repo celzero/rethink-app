@@ -771,7 +771,7 @@
     <string name="new_app_notification_title">অ্যাকশন প্রয়োজন</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_blocked_txt">Blocked</string>
-    <string name="ci_header">আইপি এবং পোর্টের নিয়ম</string>
+    <string name="ci_header">আইপি এবং পোর্টের নিয়ম: %1$s</string>
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
     <string name="ada_app_metered">মিটারযুক্ত</string>

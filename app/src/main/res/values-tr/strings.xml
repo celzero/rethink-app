@@ -516,7 +516,7 @@
     <string name="notif_channel_download">Uyarıları İndir</string>
     <string name="category_name_non_app_sys">Sistem Hizmetleri</string>
     <string name="category_name_installed">Yüklü Uygulamalar</string>
-    <string name="ci_header">IP ve Bağlantı Noktası Kuralları</string>
+    <string name="ci_header">IP ve Bağlantı Noktası Kuralları: %1$s</string>
     <string name="ada_app_status_block_md">ölçülü (mobil) ağlarda engellenir</string>
     <string name="notif_download_content_text">İndirme işlemi devam ediyor…</string>
     <string name="rt_chip_check_update">Güncellemeleri denetle</string>

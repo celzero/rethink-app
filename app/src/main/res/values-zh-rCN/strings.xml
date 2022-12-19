@@ -538,7 +538,7 @@
     <string name="cd_remove_dialog_negative">取消</string>
     <string name="cd_no_rule_txt">无规则</string>
     <string name="ci_dialog_error_invalid_ip">无效 IP 地址、子网或端口。</string>
-    <string name="ci_header">IP 与端口规则</string>
+    <string name="ci_header">IP 与端口规则: %1$s</string>
     <string name="ci_no_rule_desc">- 无规则</string>
     <string name="ada_app_exclude">排除</string>
     <string name="rt_dialog_positive">应用</string>

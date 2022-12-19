@@ -660,7 +660,7 @@
     <string name="firewall_rule_no_rule_desc">Aucune règle de pare-feu ne s’applique à cette connexion.</string>
     <string name="cd_sample_unicode_valid">✅</string>
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
-    <string name="ci_header">Règles IP &amp; port</string>
+    <string name="ci_header">Règles IP &amp; port: %1$s</string>
     <string name="ci_blocked_txt">Bloquée</string>
     <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_download_start">Téléchargement des listes de blocage…</string>

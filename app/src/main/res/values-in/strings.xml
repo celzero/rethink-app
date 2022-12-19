@@ -325,7 +325,7 @@
     <string name="status_protected_with_socks5">terproteksi dengan proksi socks</string>
     <string name="dns_proxy_positive_btn">tambahkan</string>
     <string name="brbs_backup_complete_toast">Selesai mencadangkan</string>
-    <string name="ci_header">Aturan-aturan IP &amp; Port</string>
+    <string name="ci_header">Aturan-aturan IP &amp; Port: %1$s</string>
     <string name="default_dns_name">Bawaan RDNS</string>
     <string name="ci_dialog_added_success">IP telah ditambahkan ke daftar</string>
     <string name="ci_dialog_error_invalid_ip">Alamat IP, sub-jaringan atau port tidak sah.</string>

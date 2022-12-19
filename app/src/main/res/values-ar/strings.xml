@@ -405,7 +405,7 @@
     <string name="cd_toast_deleted">تمت إزالة المجال من القائمة المخصصة</string>
     <string name="cd_dialog_error_invalid_domain">URL غير صالح (المجال).</string>
     <string name="cd_no_rule_initial">ش</string>
-    <string name="ci_header">قواعد عناوين IP و المنافذ</string>
+    <string name="ci_header">قواعد عناوين IP و المنافذ: %1$s</string>
     <string name="ada_app_status_exclude">مستثنى من نظام dns وجدار الحماية</string>
     <string name="ada_network_log_title">سجل الشبكة لهذا التطبيق</string>
     <string name="notif_download_failure_content">التحميل فشل. حاول مرة أخرى.</string>
