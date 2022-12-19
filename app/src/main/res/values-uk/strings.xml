@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_about">Про нас</string>
+    <string name="title_settings">Налаштування</string>
+    <string name="pause_title_desc">дрімаю…</string>
+    <string name="txt_home">Головна</string>
+    <string name="next">Далі</string>
+    <string name="skip">Пропустити</string>
+    <string name="finish">Закінчити</string>
+    <string name="slide_2_title">Ласкаво просимо</string>
+    <string name="slide_1_title">Вільний і з відкритим вихідним кодом</string>
+    <string name="slide_1_desc">RethinkDNS - це ПЗ з відкритим вихідним кодом, яке підтримується програмою Mozilla Builders MVP.</string>
+    <string name="block">блокувати</string>
+    <string name="exclude">виключити</string>
+    <string name="lockdown">карантин</string>
+    <string name="untracked">не відстежуваний</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Попередження: RethinkDNS було деактивовано</string>
+    <string name="dns_mode_notification_title">Захищено! Підключено до Швидкого та Безпечного DNS.</string>
+    <string name="firewall_mode_notification_title">Захищено! Підключено до Брандмауера.</string>
+    <string name="always_on_dialog_positive">Зупинити</string>
+    <string name="always_on_dialog_negative">Скасування</string>
+    <string name="always_on_dialog_neutral">Налаштування</string>
+    <string name="app_name">RethinkDNS</string>
+    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_rethink">Rethink</string>
+    <string name="settings_title_desc">DNS і Брандмауер, що легко налаштовуються</string>
+    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
+    <string name="private_dns_dialog_heading">Вимкнути Приватний DNS</string>
+    <string name="about_title_desc">Виявлення та блокування загроз мережевої безпеки</string>
+    <string name="accessibility_service_description">RethinkDNS використовує службу спеціальних можливостей для виявлення і блокування фонових додатків. RethinkDNS не збирає та не продає жодної інформації.</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="slide_2_desc">RethinkDNS - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
+    <string name="rdns_plus">RDNS Plus</string>
+    <string name="allow">дозволити</string>
+    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="bypass_universal">універсальний обхід</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисніть, щоб змінити налаштування захисту</string>
+</resources>
