@@ -66,12 +66,5 @@
                 android:value="true" />
         </service>
 
-        <!-- fixme: should be in headless? (manifest), added it for testing -->
-        <provider
-            android:name=".provider.BlocklistProvider"
-            android:authorities="com.celzero.bravedns.contentprovider"
-            android:exported="true"
-            android:permission="com.celzero.bravedns.contentprovider.READ_WRITE" />
-
     </application>
 </manifest>
