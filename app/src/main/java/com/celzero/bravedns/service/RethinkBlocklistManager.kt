@@ -92,9 +92,7 @@ object RethinkBlocklistManager : KoinComponent {
         }
     }
 
-    suspend fun getSimpleViewPacksTags(
-        type: RethinkBlocklistType
-    ): List<SimpleViewPacksTag> {
+    suspend fun getSimpleViewPacksTags(type: RethinkBlocklistType): List<SimpleViewPacksTag> {
         val fileTags =
             if (type.isRemote()) {
                 remoteFileTagRepository.fileTags()
@@ -143,11 +141,7 @@ object RethinkBlocklistManager : KoinComponent {
 
     // read and parse the json file, either remote or local blocklist
     // returns the parsed FileTag list, on error return empty array list
-    suspend fun readJson(
-        context: Context,
-        type: DownloadType,
-        timestamp: Long
-    ): Boolean {
+    suspend fun readJson(context: Context, type: DownloadType, timestamp: Long): Boolean {
         // TODO: merge both the remote and local json parsing into one
         return if (type.isRemote()) {
             readRemoteJson(context, timestamp)
@@ -302,7 +296,7 @@ object RethinkBlocklistManager : KoinComponent {
         remoteFileTagRepository.updateTags(values, isSelected)
     }
 
-    suspend fun updateFiletagsLocal(values: Set<Int>, isSelected: Int) {
+    fun updateFiletagsLocal(values: Set<Int>, isSelected: Int) {
         localFileTagRepository.updateTags(values, isSelected)
     }
 
@@ -319,14 +313,11 @@ object RethinkBlocklistManager : KoinComponent {
     }
 
     suspend fun clearTagsSelectionLocal() {
-        localFileTagRepository.clearSelectedTags()
+        // FIXME: removed below code for testing, add it back
+        // localFileTagRepository.clearSelectedTags()
     }
 
-    fun getStamp(
-        context: Context,
-        fileValues: Set<Int>,
-        type: RethinkBlocklistType
-    ): String {
+    fun getStamp(context: Context, fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
             getBraveDns(context, blocklistTimestamp(type), type)?.flagsToStamp(flags) ?: ""
@@ -347,11 +338,7 @@ object RethinkBlocklistManager : KoinComponent {
         }
     }
 
-    fun getTagsFromStamp(
-        context: Context,
-        stamp: String,
-        type: RethinkBlocklistType
-    ): Set<Int> {
+    fun getTagsFromStamp(context: Context, stamp: String, type: RethinkBlocklistType): Set<Int> {
         return try {
             convertCsvToList(
                 getBraveDns(context, blocklistTimestamp(type), type)?.stampToFlags(stamp)
@@ -451,11 +438,7 @@ object RethinkBlocklistManager : KoinComponent {
         return getBraveDnsLocal(context, timestamp)
     }
 
-    fun createBraveDns(
-        context: Context,
-        timestamp: Long,
-        type: RethinkBlocklistType
-    ) {
+    fun createBraveDns(context: Context, timestamp: Long, type: RethinkBlocklistType) {
         getBraveDns(context, timestamp, type)
     }
 }
