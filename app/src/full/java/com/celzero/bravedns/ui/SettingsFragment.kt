@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui
 
 import android.Manifest
 import android.app.Dialog
+import android.app.LocaleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -24,6 +25,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.os.LocaleList
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -33,23 +35,26 @@ import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
 import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentSettingsScreenBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
@@ -57,11 +62,14 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
 
 class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     private val b by viewBinding(FragmentSettingsScreenBinding::bind)
@@ -111,6 +119,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         } else {
             persistentState.protocolTranslationType = false
             b.settingsActivityPtransSwitch.isChecked = false
+        }
+        // for app locale (default system/user selected locale)
+        if (isAtleastT()) {
+            val currentAppLocales: LocaleList =
+                requireContext().getSystemService(LocaleManager::class.java).applicationLocales
+            b.settingsLocaleDesc.text = currentAppLocales[0].displayName
+        } else {
+            b.settingsLocaleDesc.text =
+                AppCompatDelegate.getApplicationLocales().get(0)?.displayName
         }
 
         observeCustomProxy()
@@ -511,7 +528,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
         }
 
-        // settings_activity_import_export_rl
         b.settingsActivityImportExportRl.setOnClickListener { invokeImportExport() }
 
         b.settingsActivityAppNotificationSwitch.setOnClickListener {
@@ -519,6 +535,62 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
                 !b.settingsActivityAppNotificationSwitch.isChecked
             invokeNotificationPermission()
         }
+
+        b.settingsLocaleRl.setOnClickListener { invokeChangeLocaleDialog() }
+    }
+
+    private fun invokeChangeLocaleDialog() {
+        val alertBuilder = AlertDialog.Builder(requireContext())
+        alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
+        val languages = getLocaleEntries()
+        val items = languages.keys.toTypedArray()
+        val selectedKey = AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag()
+        var checkedItem = 0
+        languages.values.forEachIndexed { index, s ->
+            if (s == selectedKey) {
+                checkedItem = index
+            }
+        }
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            val item = items[which]
+            // https://developer.android.com/guide/topics/resources/app-languages#app-language-settings
+            val locale = languages.getOrDefault(item, "en-US")
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(locale))
+        }
+        alertBuilder.create().show()
+    }
+
+    // read the list of supported languages from locale_config.xml
+    private fun getLocalesFromLocaleConfig(): LocaleListCompat {
+        val tagsList = mutableListOf<CharSequence>()
+        try {
+            val xpp: XmlPullParser = resources.getXml(R.xml.locale_config)
+            while (xpp.eventType != XmlPullParser.END_DOCUMENT) {
+                if (xpp.eventType == XmlPullParser.START_TAG) {
+                    if (xpp.name == "locale") {
+                        tagsList.add(xpp.getAttributeValue(0))
+                    }
+                }
+                xpp.next()
+            }
+        } catch (e: XmlPullParserException) {
+            Log.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+        } catch (e: IOException) {
+            Log.e(LOG_TAG_UI, "error parsing locale_config.xml", e)
+        }
+
+        return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
+    }
+
+    private fun getLocaleEntries(): Map<String, String> {
+        val localeList = getLocalesFromLocaleConfig()
+        val map = mutableMapOf<String, String>()
+
+        for (a in 0 until localeList.size()) {
+            localeList[a].let { it?.let { it1 -> map.put(it1.displayName, it1.toLanguageTag()) } }
+        }
+        return map
     }
 
     private fun invokeImportExport() {
