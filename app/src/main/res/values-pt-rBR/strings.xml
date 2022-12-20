@@ -289,7 +289,7 @@
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Toque para alterar a configuração de proteção</string>
     <string name="dns_mode_notification_title">Protegido! Conectado ao DNS rápido e seguro.</string>
     <string name="firewall_mode_notification_title">Protegido! Conectado ao Firewall.</string>
-    <string name="pause_mode_notification_title">Pausado! Os apps bloqueados continuarão sendo protegidos por firewall.</string>
+    <string name="pause_mode_notification_title">Pausado! Firewall continua bloqueando aplicações</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">esperando</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">falhando</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">protegido</string>
@@ -504,7 +504,7 @@
     <string name="dns_card_connected_status_failure">Desativado</string>
     <string name="dns_card_latency_active">Latência: %1$sms</string>
     <string name="dns_card_latency_inactive">Ative modo DNS.</string>
-    <string name="apps_card_ips_count">%1$s Regras de IP e portas</string>
+    <string name="apps_card_ips_count">%1$s regras IP/portas</string>
     <string name="hsf_start_btn_state">começar</string>
     <string name="hsf_stop_btn_state">parar</string>
     <string name="hsf_uptime">(ativo desde %1$s; protos: %2$s)</string>

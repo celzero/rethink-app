@@ -25,13 +25,17 @@ import com.celzero.bravedns.data.FileTag
 @Dao
 interface RethinkLocalFileTagDao {
 
-    @Update fun update(fileTag: RethinkLocalFileTag)
+    @Update fun update(fileTag: RethinkLocalFileTag): Int
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(fileTag: RethinkLocalFileTag)
+    @Update fun updateAll(fileTags: List<RethinkLocalFileTag>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(fileTag: RethinkLocalFileTag): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertReplace(fileTag: RethinkLocalFileTag)
 
     @Delete fun delete(fileTag: RethinkLocalFileTag)
+
+    @Query("delete from RethinkLocalFileTag where value = :id") fun contentDelete(id: Int): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(fileTags: List<RethinkLocalFileTag>): LongArray
@@ -95,6 +99,8 @@ interface RethinkLocalFileTagDao {
     fun getSelectedTags(): List<Int>
 
     @Query("delete from RethinkLocalFileTag") fun deleteAll()
+
+    @Query("select * from RethinkLocalFileTag order by `group`") fun getFileTags(): Cursor
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

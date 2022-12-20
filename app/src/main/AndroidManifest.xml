@@ -65,5 +65,6 @@
                 android:name="android.service.quicksettings.ACTIVE_TILE"
                 android:value="true" />
         </service>
+
     </application>
 </manifest>

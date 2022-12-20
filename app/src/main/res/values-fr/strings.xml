@@ -208,7 +208,7 @@
     <string name="firewall_status_lockdown">confinée</string>
     <string name="firewall_card_text_inactive">Activez le mode pare-feu.</string>
     <string name="dns_card_latency_active">Latence : %1$sms</string>
-    <string name="apps_card_ips_count">%1$s règles IP &amp; port</string>
+    <string name="apps_card_ips_count">%1$s règle(s) IP &amp; port</string>
     <string name="dns_card_latency_inactive">Activer le mode DNS.</string>
     <string name="hsf_downtime">(inactif depuis %1$s)</string>
     <string name="hsf_vpn_dialog_positive">Continuer</string>

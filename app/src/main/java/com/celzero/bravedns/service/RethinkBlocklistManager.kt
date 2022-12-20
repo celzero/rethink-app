@@ -300,7 +300,7 @@ object RethinkBlocklistManager : KoinComponent {
         remoteFileTagRepository.updateTags(values, isSelected)
     }
 
-    suspend fun updateFiletagsLocal(values: Set<Int>, isSelected: Int) {
+    fun updateFiletagsLocal(values: Set<Int>, isSelected: Int) {
         localFileTagRepository.updateTags(values, isSelected)
     }
 
@@ -317,7 +317,8 @@ object RethinkBlocklistManager : KoinComponent {
     }
 
     suspend fun clearTagsSelectionLocal() {
-        localFileTagRepository.clearSelectedTags()
+        // FIXME: removed below code for testing, add it back
+        // localFileTagRepository.clearSelectedTags()
     }
 
     fun getStamp(context: Context, fileValues: Set<Int>, type: RethinkBlocklistType): String {

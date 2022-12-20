@@ -725,17 +725,17 @@
 \n
 \n%2$s</string>
     <string name="firewall_status_lockdown">إغلاق</string>
-    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_small_case">إعادة التفكير</string>
     <string name="about_title_desc">كشف ومنع التهديدات الأمنية للشبكة</string>
     <string name="bypass_universal">تجاوز كلي</string>
     <string name="firewall_mode_notification_title">محمي! متصل بجدار الحماية.</string>
     <string name="status_dns_error">خطأ في نظام أسماء النطاقات</string>
-    <string name="title_about">عن التطبيق</string>
+    <string name="title_about">حول التطبيق</string>
     <string name="title_settings">الإعدادات</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">يفشل</string>
     <string name="status_dns_server_down">خادم نظام أسماء النطاقات متوقف</string>
-    <string name="app_name">RethinkDNS</string>
-    <string name="app_name_rethink">Rethink</string>
+    <string name="app_name">إعادة التفكير</string>
+    <string name="app_name_rethink">إعادة التفكير</string>
     <string name="pause_title_desc">يأخذ غفوة…</string>
     <string name="next">التالي</string>
     <string name="slide_2_title">أهلاً وسهلاً</string>
