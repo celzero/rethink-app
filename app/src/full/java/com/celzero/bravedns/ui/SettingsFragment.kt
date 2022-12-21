@@ -36,6 +36,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
@@ -128,6 +129,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         } else {
             b.settingsLocaleDesc.text =
                 AppCompatDelegate.getApplicationLocales().get(0)?.displayName
+                    ?: getString(R.string.settings_locale_desc)
+        }
+        // biometric authentication
+        if (
+            BiometricManager.from(requireContext())
+                .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
+                BiometricManager.BIOMETRIC_SUCCESS
+        ) {
+            b.settingsBiometricSwitch.isChecked = persistentState.biometricAuth
+        } else {
+            b.settingsBiometricRl.visibility = View.GONE
         }
 
         observeCustomProxy()
@@ -537,6 +549,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
 
         b.settingsLocaleRl.setOnClickListener { invokeChangeLocaleDialog() }
+
+        b.settingsBiometricRl.setOnClickListener {
+            b.settingsBiometricSwitch.isChecked = !b.settingsBiometricSwitch.isChecked
+        }
+
+        b.settingsBiometricSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean
+            ->
+            persistentState.biometricAuth = checked
+        }
     }
 
     private fun invokeChangeLocaleDialog() {

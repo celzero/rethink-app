@@ -28,6 +28,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -62,6 +64,7 @@ import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.util.*
+import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,10 +83,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
 
-    /* TODO : This task need to be completed.
-    Add all the appinfo in the global variable during appload
-    Handle those things in the application instead of reaching to DB every time
-    Call the coroutine scope to insert/update/delete the values */
+    // support for biometric authentication
+    private lateinit var executor: Executor
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     object GlobalVariable {
         var DEBUG = BuildConfig.DEBUG
@@ -125,6 +128,77 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
+
+        if (persistentState.biometricAuth) {
+            biometricPrompt()
+        }
+    }
+
+    private fun biometricPrompt() {
+        // ref: https://developer.android.com/training/sign-in/biometric-auth
+        executor = ContextCompat.getMainExecutor(this)
+        biometricPrompt =
+            BiometricPrompt(
+                this,
+                executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        super.onAuthenticationError(errorCode, errString)
+                        Log.i(
+                            LOG_TAG_UI,
+                            "Biometric authentication error (code: $errorCode): $errString"
+                        )
+                        showToastUiCentered(
+                            applicationContext,
+                            getString(R.string.hs_biometeric_error) + errString,
+                            Toast.LENGTH_SHORT
+                        )
+                        finish()
+                    }
+
+                    override fun onAuthenticationSucceeded(
+                        result: BiometricPrompt.AuthenticationResult
+                    ) {
+                        super.onAuthenticationSucceeded(result)
+                        Log.i(LOG_TAG_UI, "Biometric authentication succeeded")
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        showToastUiCentered(
+                            applicationContext,
+                            getString(R.string.hs_biometeric_failed),
+                            Toast.LENGTH_SHORT
+                        )
+                        Log.i(LOG_TAG_UI, "Biometric authentication failed")
+                        biometricPrompt.authenticate(promptInfo)
+                    }
+                }
+            )
+
+        promptInfo =
+            BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.hs_biometeric_title))
+                .setSubtitle(getString(R.string.hs_biometeric_desc))
+                .setDeviceCredentialAllowed(true)
+                .setConfirmationRequired(false)
+                .build()
+
+        // BIOMETRIC_WEAK :Any biometric (e.g. fingerprint, iris, or face) on the device that meets
+        // or exceeds the requirements for Class 2(formerly Weak), as defined by the Android CDD.
+        if (
+            BiometricManager.from(this)
+                .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
+                BiometricManager.BIOMETRIC_SUCCESS
+        ) {
+            biometricPrompt.authenticate(promptInfo)
+        } else {
+            showToastUiCentered(
+                applicationContext,
+                getString(R.string.hs_biometeric_feature_not_supported),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     private fun handleIntent() {

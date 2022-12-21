@@ -191,6 +191,8 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
+    fullImplementation 'androidx.biometric:biometric:1.1.0'
+
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
 }
 

@@ -219,6 +219,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var shouldRequestNotificationPermission by
         booleanPref("notification_permission_request").withDefault<Boolean>(true)
 
+    // biometric authentication
+    var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()

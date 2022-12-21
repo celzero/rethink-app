@@ -483,10 +483,9 @@
     <string name="settings_locale_heading">Language</string>
     <string name="settings_locale_desc">Choose your preferred language</string>
     <string name="settings_locale_dialog_title">Choose your preferred language</string>
-    <string name="settings_locale_dialog_option_1">System Default</string>
-    <string name="settings_locale_dialog_message">Restart the app to apply the changes</string>
-    <string name="settings_locale_dialog_positive_btn">Restart</string>
-    <string name="settings_locale_dialog_negative_btn">Cancel</string>
+
+    <string name="settings_biometeric_heading">Biometric Authentication</string>
+    <string name="settings_biometric_desc">Enable / Disable biometric authentication</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 
@@ -506,6 +505,13 @@
 
     <!--Connection tracker bottom sheet -->
     <string name="ct_bs_app_info_error">App Info not found</string>
+
+    <!-- Home screen activity -->
+    <string name="hs_biometeric_title">Unlock Rethink</string>
+    <string name="hs_biometeric_desc">Use biometric authentication to unlock RethinkDNS</string>
+    <string name="hs_biometeric_feature_not_supported">Biometric authentication is not supported or disabled on this device</string>
+    <string name="hs_biometeric_failed">Biometric authentication failed</string>
+    <string name="hs_biometeric_error">Biometric authentication error</string>
 
     <!-- Home screen -->
     <string name="firewall_card_status_inactive">Disabled</string>
@@ -1112,10 +1118,10 @@
     <string name="ci_no_rule_txt">No Rule</string>
     <string name="ci_no_rule_desc">- No Rule</string>
 
-    <string name='ci_no_rule'>no rule</string>
-    <string name='ci_block'>block</string>
-    <string name='ci_bypass_universal'>bypass universal</string>
-    <string name="ci_bypass_app_rule">bypass app rules</string>
+    <string name='ci_no_rule'>No Rule</string>
+    <string name='ci_block'>Block</string>
+    <string name='ci_bypass_universal'>Bypass Universal</string>
+    <string name="ci_bypass_app_rule">Bypass App Rules</string>
     <string name="ci_delete">delete</string>
 
     <!-- app info -->
