@@ -35,4 +35,35 @@
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="bypass_universal">універсальний обхід</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисніть, щоб змінити налаштування захисту</string>
+    <string name="hybrid_mode_notification_title">Захищено! Підключено до DNS + Брандмауер.</string>
+    <string name="pause_mode_notification_title">Призупинено! Заблоковані додатки будуть продовжувати блокуватися брандмауером.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">очікування</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">невдало</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">захищено</string>
+    <string name="status_app_error">помилка програми</string>
+    <string name="status_dns_error">помилка dns</string>
+    <string name="status_dns_server_down">сервер dns не працює</string>
+    <string name="status_no_internet">немає інтернету</string>
+    <string name="status_protected_with_tor">захищено tor</string>
+    <string name="status_protected_with_private_dns">захищено приватним dns</string>
+    <string name="status_protected_with_tor_private_dns">захищено tor та приватним dns</string>
+    <string name="status_protected_with_proxy_private_dns">захищено проксі та приватним dns</string>
+    <string name="status_protected_with_socks5_private_dns">захищено socks5 та приватним dns</string>
+    <string name="status_protected_with_socks5">захищено socks проксі</string>
+    <string name="status_protected_with_http_private_dns">захищено http проксі та приватним dns</string>
+    <string name="status_protected_with_http">захищено http проксі</string>
+    <string name="status_protected_with_proxy">захищено проксі</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">ввімкнено приватний dns</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">не захищено</string>
+    <string name="dns_explanation_dns_connected">Підключено до RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected">Підключено до Брандмауера</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Підключено до RethinkDNS та Брандмауера</string>
+    <string name="notification_action_resume_vpn">ПРОДОВЖИТИ</string>
+    <string name="notification_action_pause_vpn">ПАУЗА</string>
+    <string name="notification_action_stop_vpn">СТОП</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="notification_action_dns_firewall_mode">DNS + Брандмауер</string>
+    <string name="dns_mode_info_title">DNS</string>
+    <string name="firewall_rules">Правила мережі</string>
+    <string name="firewall_mode_info_title">Брандмауер</string>
 </resources>
