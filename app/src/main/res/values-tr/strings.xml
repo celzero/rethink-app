@@ -160,7 +160,7 @@
     <string name="firewall_status_excluded">dns ve güvenlik duvarından hariç tutuldu</string>
     <string name="hsf_start_dialog_header">Başlangıç %1$s</string>
     <string name="dc_custom_dns_radio">Diğer DNS</string>
-    <string name="about_settings_app_info">Uygulama bilgisi</string>
+    <string name="about_settings_app_info">Uygulama Bilgisi</string>
     <string name="cd_dns_crypt_title">çözücüler</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="cd_dns_crypt_relay_heading">Aktarım</string>
@@ -528,7 +528,7 @@
     <string name="always_on_dialog_negative">İptal</string>
     <string name="configure_dns_connected_doh_status">HTTPS üzerinden DNS</string>
     <string name="settings_enable_logs">Aygıt üzerinde günlük kaydını etkinleştirme</string>
-    <string name="whats_dialog_title">v053k\'deki yenilikler</string>
+    <string name="whats_dialog_title">v053l\'deki yenilikler</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_lock_down_mode_desc">VPN kilitleme modunda çalışırken bypass\'a izin verilemez veya proxy\'ler kurulamaz. <u>VPN ayarlarına gidin</u>.</string>
     <string name="orbot_stop_dialog_message">RethinkDNS, bağlantıları Orbot\'a yönlendirmeyi durdurdu, ancak Orbot arka planda çalışıyor olabilir.</string>
@@ -564,7 +564,7 @@
     <string name="orbot_install_activity_error">Bir şeyler ters gitti, bir süre sonra deneyin</string>
     <string name="settings_network_all_networks">Mevcut tüm ağları kullanın (deneysel)</string>
     <string name="settings_check_update_desc">Uygulama güncellemelerini haftada bir otomatik olarak kontrol edin.</string>
-    <string name="settings_dns_proxy_dialog_header">SOCKS5 (TCP) Proxy Ayarlama</string>
+    <string name="settings_dns_proxy_dialog_header">SOCKS5 Vekili Ayarla</string>
     <string name="settings_dns_proxy_dialog_negative_btn">iptal</string>
     <string name="settings_theme_dialog_title">Görünüm</string>
     <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)</string>
@@ -598,7 +598,7 @@
     <string name="settings_theme_dialog_themes_1">Sistem tarafından ayarlanır</string>
     <string name="settings_ip_text_ipv46">Otomatik</string>
     <string name="settings_notification_desc3">Hiçbiri</string>
-    <string name="hsf_blocklist_chip_text">%1$s blok listeleri yapılandırıldı</string>
+    <string name="hsf_blocklist_chip_text">%1$s engel listesi</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy kaldırıldı</string>
     <string name="dns_logs_blocked_queries">Engellenen sorgular: %1$s</string>
     <string name="dc_block_heading">kurallar</string>
@@ -723,7 +723,7 @@
     <string name="hsf_vpn_dialog_message">RethinkDNS, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar.
 \n
 \nRethinkDNS herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
-    <string name="dc_dns_website_desc">Web sitesi simgelerini <i>duckduckgo.com</i> adresinden alır. 350 mb\'a kadar disk alanı tüketir</string>
+    <string name="dc_dns_website_desc">Web sitesi simgelerini <i>nextdns.com</i> ve <i>duckduckgo.com</i> adresinden alır. 350 mb\'a kadar disk alanı tüketir</string>
     <string name="about_bravedns_explantion">RethinkDNS, Android cihazınızda uygulama etkinliğini izlemenin, İnternet sansürünü aşmanın ve uygulamaları güvenlik duvarına almanın en kolay yoludur.</string>
     <string name="about_bravedns_whoarewe">RethinkDNS, Amazon, IBM ve Scientific Games\'in eski mühendisleri tarafından yönetilen ücretsiz ve açık kaynaklı bir projedir.</string>
     <string name="about_bug_no_log_dialog_message">Kilitlenme günlükleri alınamadı. Hatanızı manuel olarak bildirmek ister misiniz\?</string>
@@ -806,7 +806,7 @@
     <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
 \n</string>
     <string name="ada_app_status_allow">izin verilir</string>
-    <string name="ci_no_rules_text">Evrensel IP engelleme veya bypass kuralı bulunamadı.</string>
+    <string name="ci_no_rules_text">IP veya bağlantı noktası kuralı bulunamadı.</string>
     <string name="ci_bypass_universal_desc">- Evrensel baypaslar</string>
     <string name="ci_no_rule">kural yok</string>
     <string name="ci_bypass_universal">genel olarak atla</string>
@@ -869,7 +869,7 @@
     <string name="settings_app_notification_a13_desc">Uygulama için bildirim iznini etkinleştirin</string>
     <string name="hsf_notification_permission_failure">Ayarlar ekranından bildirim iznini etkinleştirin</string>
     <string name="settings_app_notification_a13_heading">Uygulama Bildirimi</string>
-    <string name="about_privacy_policy">Gizlilik ilkesi</string>
+    <string name="about_privacy_policy">Gizlilik ilkesini oku</string>
     <string name="about_app_translate">Çevir</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
@@ -882,4 +882,23 @@
     <string name="rt_filter_desc"><u>%1$s</u> engelleme listesi gösteriliyor</string>
     <string name="rt_filter_desc_subgroups">Grup: %2$s ve alt grup: %3$s içindeki <u>%1$s</u> engelleme listesi gösteriliyor</string>
     <string name="relative_time_yesterday">Dün</string>
+    <string name="private_dns_dialog_heading">Özel DNS\'yi kapatın</string>
+    <string name="private_dns_dialog_desc">Rethink\'in DNS ayarları Android\'in Özel DNS\'i tarafından geçersiz kılınır.
+\n
+\nRethink\'in DNS\'sini kullanmak için Android Ayarları\'na gidin ve \"Özel DNS \"yi kapatın.</string>
+    <string name="private_dns_dialog_positive">Ayarlara git</string>
+    <string name="private_dns_dialog_negative">Yok say</string>
+    <string name="private_dns_error">Özel dns ekranı başlatılamadı.</string>
+    <string name="ci_bypass_app_txt">Uygulama kurallarını atlayın</string>
+    <string name="ci_bypass_app_desc">- Uygulama kurallarını atlar</string>
+    <string name="ci_bypass_app_initial">UA</string>
+    <string name="ada_app_firewall">Güvenlik Duvarı</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Günlükleri temizleyin</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Bu uygulamayla ilgili tüm günlükleri temizleyin.</string>
+    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Devam Et</string>
+    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">İptal</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Yetişkinlere yönelik ve korsan içerikleri, çevrim içi kumar ve randevuları ve sosyal medyayı engelleyin.</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Dikkat yazılımlarını, casus yazılımları, korkutucu yazılımları engelleyin.</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Kötü amaçlı yazılımları, fidye yazılımlarını, kripto yazılımlarını, kimlik avcılarını ve diğer tehditleri engelleyin.</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s engel listesi</string>
 </resources>
