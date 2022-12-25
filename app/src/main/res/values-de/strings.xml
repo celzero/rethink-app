@@ -632,4 +632,7 @@
     <string name="hsf_stop_btn_state">Stopp</string>
     <string name="hsf_uptime">(aktiv seit %1$s; Prototypen: %2$s)</string>
     <string name="hsf_downtime">(inaktiv seit %1$s)</string>
+    <string name="hsf_start_dialog_header">%1$s starten</string>
+    <string name="hsf_start_dialog_positive">Start</string>
+    <string name="hsf_start_dialog_negative">Verwerfen</string>
 </resources>
