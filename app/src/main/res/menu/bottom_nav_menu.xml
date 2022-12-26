@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_internet_manager"
+        android:id="@+id/navigation_home_screen"
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/txt_home" />
+    <item
+        android:id="@+id/navigation_statistics"
+        android:icon="@drawable/ic_statistics"
+        android:title="@string/title_statistics" />
     <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/ic_settings"

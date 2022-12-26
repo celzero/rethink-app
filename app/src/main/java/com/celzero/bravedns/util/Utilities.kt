@@ -761,7 +761,9 @@ class Utilities {
                     R.attr.defaultToggleBtnTxt
                 } else if (attr == R.color.accentGood) {
                     R.attr.accentGood
-                } else {
+                } else if (attr == R.color.accentBad) {
+                    R.attr.accentBad
+                }else {
                     R.attr.chipBgColorPositive
                 }
             val typedValue = TypedValue()

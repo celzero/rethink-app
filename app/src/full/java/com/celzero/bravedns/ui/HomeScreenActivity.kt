@@ -78,6 +78,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var settingsFragment: SettingsFragment
     private lateinit var homeScreenFragment: HomeScreenFragment
     private lateinit var aboutFragment: AboutFragment
+    private lateinit var statisticsFragment: SummaryStatisticsFragment
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -681,7 +682,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun setupNavigationItemSelectedListener() {
         b.navView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_internet_manager -> {
+                R.id.navigation_home_screen -> {
                     homeScreenFragment = HomeScreenFragment()
                     supportFragmentManager
                         .beginTransaction()
@@ -701,6 +702,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             R.id.fragment_container,
                             settingsFragment,
                             settingsFragment.javaClass.simpleName
+                        )
+                        .commit()
+                    return@setOnItemSelectedListener true
+                }
+                R.id.navigation_statistics -> {
+                    statisticsFragment = SummaryStatisticsFragment()
+                    supportFragmentManager
+                        .beginTransaction()
+                        .replace(
+                            R.id.fragment_container,
+                            statisticsFragment,
+                            statisticsFragment.javaClass.simpleName
                         )
                         .commit()
                     return@setOnItemSelectedListener true

@@ -4,6 +4,7 @@
     <string name="app_name_rethink">Rethink</string>
     <string name="title_about">About</string>
     <string name="title_settings">Settings</string>
+    <string name="title_statistics">Statistics</string>
     <string name="pause_title_desc">taking a nap…</string>
     <string name="settings_title_desc">A highly customizable DNS and Firewall</string>
     <string name="about_title_desc">Detect and block network security threats</string>
@@ -590,7 +591,7 @@
     <string name="dc_custom_block_desc">Coming soon</string>
 
     <string name="dc_dns_website_heading">Show website icon in DNS logs (experimental)</string>
-  <string name="dc_dns_website_desc">Fetches website icons from <i>nextdns.com</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
+    <string name="dc_dns_website_desc">Fetches website icons from <i>nextdns.com</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
 
     <string name="dc_dns_leaks_heading">Prevent DNS leaks</string>
     <string name="dc_dns_leaks_desc">When enabled, RethinkDNS captures all packets on port 53 and forwards it to a user-set DNS endpoint</string>
@@ -1309,4 +1310,12 @@
     <!-- Rethink simple view -->
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s blocklists</string>
 
+    <!-- Summary statistics view-->
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">most allowed apps</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">most blocked apps</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">most contacted domains</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">most blocked domains</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">most contacted ips</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">most blocked ips</string>
+    <string name="ssv_desc" description="This label will apear on the stats screen as a description for the summary statistics screen" translatable="true">Statistics will display information according to available logs. There are six sections: Most Allowed Apps, Most Blocked Apps, Most Contacted Domains, Most Blocked Domains, Most Contacted IPs, Most Blocked IPs.</string>
 </resources>
