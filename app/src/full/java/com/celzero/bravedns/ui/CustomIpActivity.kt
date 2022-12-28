@@ -254,7 +254,7 @@ class CustomIpActivity :
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
-            IpRulesManager.clearAllIpRules()
+            IpRulesManager.deleteIpRulesByUid(uid)
             Utilities.showToastUiCentered(
                 this,
                 getString(R.string.univ_ip_delete_toast_success),

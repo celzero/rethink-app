@@ -61,7 +61,10 @@ interface CustomIpDao {
 
     @Transaction
     @Query("delete from CustomIp where ipAddress = :ipAddress and uid = :uid and port = :port")
-    fun deleteIPRulesForUID(uid: Int, ipAddress: String, port: Int)
+    fun deleteIpRules(uid: Int, ipAddress: String, port: Int)
+
+    @Query("delete from CustomIp where uid = :uid")
+    fun deleteIpRuleByUid(uid: Int)
 
     @Query("delete from CustomIp where uid = $UID_EVERYBODY") fun deleteAllIPRulesUniversal()
 
