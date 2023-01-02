@@ -263,7 +263,7 @@
     <string name="hsf_start_dialog_positive">启动</string>
     <string name="dc_other_dns_heading">类型</string>
     <string name="dc_other_settings_heading">高级</string>
-    <string name="dc_dns_website_desc">从 <i>nextdns.com</i> 与 <i>duckduckgo.com</i> 获取网站图标。约占用 350 MB 磁盘空间</string>
+    <string name="dc_dns_website_desc">从 <i>nextdns.io</i> 与 <i>duckduckgo.com</i> 获取网站图标。约占用 350 MB 磁盘空间</string>
     <string name="about_faq">查阅常见问题</string>
     <string name="about_sponsor_link_text">赞助</string>
     <string name="univ_firewall_rule_1">设备锁定时拦截所有应用</string>

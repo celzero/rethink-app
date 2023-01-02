@@ -582,7 +582,7 @@
     <string name="dc_custom_block_heading">放行或攔截個別網域</string>
     <string name="dc_custom_block_desc">即將推出</string>
     <string name="dc_dns_website_heading">於 DNS 日誌中展示網站圖示（實驗性）</string>
-    <string name="dc_dns_website_desc">從 <i>nextdns.com</i> 與 <i>duckduckgo.com</i> 獲取網站圖示。約佔用 350 MB 磁碟空間</string>
+    <string name="dc_dns_website_desc">從 <i>nextdns.io</i> 與 <i>duckduckgo.com</i> 獲取網站圖示。約佔用 350 MB 磁碟空間</string>
     <string name="dc_dns_leaks_desc">若啓用， RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
     <string name="dc_check_update_heading">提示攔截清單更新</string>
     <string name="dc_check_update_desc">每<i>三</i>天檢查有無攔截清單更新</string>

@@ -454,7 +454,7 @@
     <string name="about_settings">sistema</string>
     <string name="about_whats_new">Novedades en %1$s</string>
     <string name="about_app_contributors">Autores</string>
-    <string name="dc_dns_website_desc">Obtener los iconos del sitio web <i>nextdns.com</i> y <i>duckduckgo.com</i>. Consume hasta 350 mb de espacio en disco</string>
+    <string name="dc_dns_website_desc">Obtener los iconos del sitio web <i>nextdns.io</i> y <i>duckduckgo.com</i>. Consume hasta 350 mb de espacio en disco</string>
     <string name="settings_theme_dialog_themes_1">Fijado por el sistema</string>
     <string name="settings_all_networks_dialog_message">Cuando está activa, las reglas del Cortafuegos para las aplicaciones con límites (por ej. móvil) y sin límites (por ej. wiffi) no se respetarán.
 \n

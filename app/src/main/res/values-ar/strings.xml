@@ -353,7 +353,7 @@
     <string name="hsf_vpn_dialog_positive">المضي قدما</string>
     <string name="hsf_start_dialog_positive">ابدأ</string>
     <string name="hsf_start_dialog_negative">إلغاء</string>
-    <string name="dc_dns_website_desc">يجلب ايقونات مواقع الويب من <i> nextdns.com </i> و <i> duckduckgo.com </i>. يستهلك ما يصل إلى 350 ميغابايت في مساحة القرص</string>
+    <string name="dc_dns_website_desc">يجلب ايقونات مواقع الويب من <i> nextdns.io </i> و <i> duckduckgo.com </i>. يستهلك ما يصل إلى 350 ميغابايت في مساحة القرص</string>
     <string name="about_sponsor_link_text">كفيل</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_dns_proxy_mode_external">خارجي</string>

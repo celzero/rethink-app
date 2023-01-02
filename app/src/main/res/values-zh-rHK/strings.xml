@@ -372,7 +372,7 @@
     <string name="dc_local_block_heading">本地攔截清單</string>
     <string name="dc_local_block_desc_1">喺超過 185 條攔截清單之中揀。㩒一下呢度下載或者配置攔截清單。</string>
     <string name="dc_custom_block_desc">就嚟推出</string>
-    <string name="dc_dns_website_desc">由 <i>nextdns.com</i> 同 <i>duckduckgo.com</i> 拎網站圖示。大約佔用 350 MB 磁碟空間</string>
+    <string name="dc_dns_website_desc">由 <i>nextdns.io</i> 同 <i>duckduckgo.com</i> 拎網站圖示。大約佔用 350 MB 磁碟空間</string>
     <string name="dc_dns_leaks_heading">防止 DNS 洩漏</string>
     <string name="dc_dns_leaks_desc">如果啓用，RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
     <string name="dc_check_update_heading">提示攔截清單更新</string>

@@ -613,7 +613,7 @@
     <string name="cd_dns_crypt_relay_heading">Relais</string>
     <string name="ctbs_dialog_negative_btn">Retour</string>
     <string name="about_settings_app_info">Infos sur l’appli</string>
-    <string name="dc_dns_website_desc">Récupère les icônes de sites Web à partir de <i>nextdns.com</i> et <i>duckduckgo.com</i>. Consomme jusqu’à 350 mb d’espace disque</string>
+    <string name="dc_dns_website_desc">Récupère les icônes de sites Web à partir de <i>nextdns.io</i> et <i>duckduckgo.com</i>. Consomme jusqu’à 350 mb d’espace disque</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="orbot_toast_parameter">Tor-as-a-proxy</string>
     <string name="update_complete_snack_message">Nouvelle version téléchargée.</string>

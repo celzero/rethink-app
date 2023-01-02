@@ -533,7 +533,7 @@
     <string name="dc_custom_block_heading">Разрешить или запретить отдельные домены</string>
     <string name="dc_check_update_heading">Уведомление об обновлении блок-листа</string>
     <string name="dc_check_update_desc">Проверяйте обновления блок-листов раз в <i>три</i> дня</string>
-    <string name="dc_dns_website_desc">Получает иконки сайтов с <i>nextdns.com</i> и <i>duckduckgo.com</i>. Потребляет до 350 мб дискового пространства</string>
+    <string name="dc_dns_website_desc">Получает иконки сайтов с <i>nextdns.io</i> и <i>duckduckgo.com</i>. Потребляет до 350 мб дискового пространства</string>
     <string name="dc_local_block_heading">Блокирующие списки на устройствах</string>
     <string name="dc_dns_leaks_heading">Предотвращение утечек DNS</string>
     <string name="about_bravedns_explantion">RethinkDNS - это самый простой способ контролировать активность приложений, обходить интернет-цензуру и брандмауэр приложений на вашем устройстве Android.</string>

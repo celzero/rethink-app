@@ -451,7 +451,7 @@
     <string name="dc_custom_block_heading">Consenti o blocca singoli domini</string>
     <string name="dc_custom_block_desc">Presto in arrivo</string>
     <string name="dc_dns_website_heading">Mostra l\'icona dei siti web nel registro DNS (sperimentale)</string>
-    <string name="dc_dns_website_desc">Recupera icone dei siti web da <i>nextdns.com</i> e <i>duckduckgo.com</i>. Utilizza fino a 350 MB di spazio su disco</string>
+    <string name="dc_dns_website_desc">Recupera icone dei siti web da <i>nextdns.io</i> e <i>duckduckgo.com</i>. Utilizza fino a 350 MB di spazio su disco</string>
     <string name="dc_dns_leaks_heading">Previeni aggiramenti del DNS</string>
     <string name="dc_dns_leaks_desc">Se abilitata, RethinkDNS cattura i pacchetti sulla porta 53 e li invia invece all\'endpoint DNS scelto dall\'utente</string>
     <string name="dc_check_update_heading">Promemoria aggiornamenti liste dei filtri</string>

@@ -377,7 +377,7 @@
     <string name="dc_custom_block_heading">Permitir ou negar domínios individuais</string>
     <string name="dc_custom_block_desc">Brevemente</string>
     <string name="dc_dns_website_heading">Mostrar ícone do site nos registos de DNS (experimental)</string>
-    <string name="dc_dns_website_desc">Obtém ícones de sites de <i>nextdns.com</i> e <i>duckduckgo.com</i>. Usa até 350 MB de espaço de armazenamento</string>
+    <string name="dc_dns_website_desc">Obtém ícones de sites de <i>nextdns.io</i> e <i>duckduckgo.com</i>. Usa até 350 MB de espaço de armazenamento</string>
     <string name="about_bravedns_explantion">O RethinkDNS é a forma mais fácil de monitorizar a atividade da aplicação, contornar a censura da Internet e aplicações de firewall no seu dispositivo Android.</string>
     <string name="about_bravedns_whoarewe">O RethinkDNS é um projeto gratuito e de código aberto, liderado por ex-engenheiros da Amazon, IBM e Scientific Games.</string>
     <string name="about_bug_report_desc">reportar por email</string>
