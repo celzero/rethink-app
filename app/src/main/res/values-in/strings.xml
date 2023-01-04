@@ -305,7 +305,7 @@
     <string name="univ_accessibility_dialog_negative">Tolak</string>
     <string name="brbs_backup_dialog_negative">Batal</string>
     <string name="dns_proxy_toast_parameter">Proksi DNS</string>
-    <string name="orbot_title">Orbot dan Proksi</string>
+    <string name="orbot_title">Orbot dan Proksi-proksi</string>
     <string name="ci_no_rule_desc">- Tanpa Aturan</string>
     <string name="settings_local_blocklist_in_use">%1$s daftar-daftar blokir sedang digunakan</string>
     <string name="dc_check_update_desc">Cek pembaharuan daftar blokir setiap <i>tiga</i> hari</string>
