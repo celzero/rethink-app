@@ -635,4 +635,24 @@
     <string name="hsf_start_dialog_header">%1$s starten</string>
     <string name="hsf_start_dialog_positive">Start</string>
     <string name="hsf_start_dialog_negative">Verwerfen</string>
+    <string name="hsf_whats_new_chip_text">Was ist neu</string>
+    <string name="hsf_start_dialog_message">Sie sind einen Schritt von einem sicheren Android entfernt: Kontrollieren Sie Netzwerkaktivitäten, blockieren Sie Webseiten, IP-Adressen oder Apps mit unerwünschten Verhaltensweisen.</string>
+    <string name="hsf_proxy_chip_text">Proxy aktiviert</string>
+    <string name="hsf_blocklist_chip_text">%1$s Blocklisten</string>
+    <string name="hsf_blocklist_chip_text_no_data">RDNS+ aktivieren</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS aktiviert</string>
+    <string name="hsf_dns_logs_chip_text">DNS Logs</string>
+    <string name="hsf_network_logs_chip_text">Netzwerk Logs</string>
+    <string name="hsf_exclude_error">Ausschließen im VPN-Lockdown-Modus nicht möglich</string>
+    <string name="hsf_proxy_chip_removed_toast">Proxy entfernt</string>
+    <string name="hsf_proxy_chip_remove_text">Stoppen…</string>
+    <string name="hsf_whats_new_remove_text">Schließen…</string>
+    <string name="hsf_blocklist_updating_text">Aktivieren…</string>
+    <string name="hsf_chip_appearance">Thema: %1$s</string>
+    <string name="hsf_pause_vpn_failure">Kann nicht pausieren: RethinkDNS nicht aktiv</string>
+    <string name="hsf_pause_lockdown_failure">Kann nicht pausieren: RethinkDNS im Lockdown-Modus</string>
+    <string name="dns_logs_lifetime_queries">Alle Abfragen: %1$s</string>
+    <string name="dns_logs_blocked_queries">Blockierte Abfragen: %1$s</string>
+    <string name="dc_block_heading">Regeln</string>
+    <string name="dc_other_dns_heading">Typ</string>
 </resources>
