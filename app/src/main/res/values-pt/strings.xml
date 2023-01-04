@@ -13,7 +13,7 @@
     <string name="slide_1_title">Código livre e aberto</string>
     <string name="slide_1_desc">O RethinkDNS é um programa de código aberto apoiado pelo programa Mozilla Builders MVP.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: RethinkDNS foi desativado</string>
-    <string name="lockdown">confinamento</string>
+    <string name="lockdown">modo lockdown</string>
     <string name="exclude">excluir</string>
     <string name="accessibility_service_label">Rethink DNS</string>
     <string name="pause_mode_notification_title">Pausado! Firewall continua a bloquear aplicações.</string>
@@ -301,7 +301,7 @@
     <string name="orbot_install_activity_error">Algo correu mal, tente novamente após algum tempo</string>
     <string name="settings_network_all_networks">Utilizar todas as redes disponíveis (experimental)</string>
     <string name="settings_check_update_heading">Verificar atualizações da aplicação</string>
-    <string name="about_title_desc">Deteta e bloqueia ameaças à segurança da rede</string>
+    <string name="about_title_desc">Detecta e bloqueia ameaças à segurança da rede</string>
     <string name="orbot_status_arg_3">DNS e TCP</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="settings_autostart_bootup_desc">Ao ligar o dispositivo, inicia o RethinkDNS caso tenha estado em execução ao desligar.</string>
@@ -316,7 +316,7 @@
     <string name="settings_orbot_disabled_error">Desative o proxy HTTP(S) e/ou SOCKS5 para continuar com a configuração do Tor-como-proxy.</string>
     <string name="title_settings">Configurações</string>
     <string name="pause_title_desc">a tirar uma soneca…</string>
-    <string name="accessibility_service_description">O RethinkDNS usa o serviço de acessibilidade para detetar e proteger aplicações em segundo plano. O RethinkDNS não recolhe nem vende nenhuma informação.</string>
+    <string name="accessibility_service_description">O RethinkDNS usa o serviço de acessibilidade para detectar e proteger aplicações em segundo plano. O RethinkDNS não coleta nem vende nenhuma informação.</string>
     <string name="orbot_both">Proxy TCP + HTTP</string>
     <string name="app_name_small_case">rethink</string>
     <string name="settings_lock_down_mode_desc">Não é possível permitir ignorar nem configurar proxies quando a VPN está no modo bloqueado. <u>Ir às configurações da VPN</u>.</string>
