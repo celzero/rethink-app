@@ -896,4 +896,7 @@
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Блокировка вредоносного ПО, привлекающего внимание, программ шпионов и программ-страшилок.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s списки блокировок</string>
     <string name="private_dns_error">Не удалось запустить частный экран DNS.</string>
+    <string name="ci_bypass_app_txt">Обход правил приложения</string>
+    <string name="ada_app_firewall">Брандмауэр</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Очистить логи</string>
 </resources>
