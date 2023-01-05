@@ -821,7 +821,6 @@
     <string name="brbs_backup_complete_toast">ব্যাকআপ সম্পন্ন</string>
     <string name="fapps_unmetered_positive">প্রয়োগ করুন</string>
     <string name="fapps_firewall_filter_all">All</string>
-    <string name="fapps_metered_positive">প্রয়োগ করুন</string>
     <string name="fapps_firewall_filter_hint">তালিকাভুক্ত অ্যাপে আনমিটারড/মিটারড নিয়ম প্রয়োগ করুন</string>
     <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s অ্যাপ দেখানো হচ্ছে</string>
     <string name="fapps_info_dialog_title">তথ্য</string>
@@ -842,7 +841,6 @@
     <string name="fapps_firewall_filter_bypass_universal">বাইপাস</string>
     <string name="fapps_unmetered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগ ব্লক করবেন\?</string>
     <string name="fapps_metered_block_dialog_title">মিটারে ব্লক</string>
-    <string name="fapps_metered_negative">বাতিল</string>
     <string name="fapps_lockdown_hint">Vpn লকডাউন মোডে আছে। ফায়ারওয়াল মিটারড / আনমিটারড নিয়ম মেনে চলবে না।</string>
     <string name="fapps_firewall_filter_desc_category">বিভাগে দেখানো হচ্ছে <u>%1$s</u> %2$s অ্যাপগুলি: %3$s</string>
     <string name="fav_icon">fav_icon</string>

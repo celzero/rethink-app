@@ -784,8 +784,6 @@
     <string name="fapps_metered_block_dialog_message">是否於計費網路（行動數據）攔截<i>所列出的</i>應用？</string>
     <string name="fapps_metered_unblock_dialog_title">於計費網路放行</string>
     <string name="fapps_metered_unblock_dialog_message">是否於計費網路放行<i>所列出的</i>應用？</string>
-    <string name="fapps_metered_positive">應用</string>
-    <string name="fapps_metered_negative">取消</string>
     <string name="fapps_lockdown_hint">VPN 正處於閉關模式。防火牆將不會遵守計費 / 非計費規則。</string>
     <string name="fapps_all_network_hint"><u>使用所有可用網路</u>已啓用。防火牆將不會遵守計費 / 非計費規則。</string>
     <string name="fapps_firewall_filter_hint">於已列出的應用應用非計費 / 計費規則</string>

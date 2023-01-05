@@ -150,7 +150,6 @@
     <string name="firewall_mode_info_title">Firewall</string>
     <string name="cd_add_dialog_show_btn">tampilkan</string>
     <string name="cd_sample_unicode_valid">✅</string>
-    <string name="fapps_metered_negative">Batal</string>
     <string name="rules_load_failure_reload">muat ulang</string>
     <string name="settings_local_blocklist_dialog_negative">Batal</string>
     <string name="pause_desc">Catatan: %1$s app terblokir akan tetap ter-firewall.</string>
@@ -166,7 +165,6 @@
     <string name="about_mail_bugreport_share_title">Pilih penyedia surel</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
     <string name="cd_remove_dialog_negative">Batal</string>
-    <string name="fapps_metered_positive">Terapkan</string>
     <string name="build__flavor_play_store">play</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="hsf_vpn_dialog_negative">Batal</string>

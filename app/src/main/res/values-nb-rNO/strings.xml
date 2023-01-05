@@ -300,7 +300,6 @@
     <string name="about_settings">System</string>
     <string name="settings_notification_dialog_title">Velg merknadshandling</string>
     <string name="dns_proxy_ip_address">IP</string>
-    <string name="fapps_metered_positive">Bruk</string>
     <string name="settings_local_blocklist_dialog_negative">Avbryt</string>
     <string name="settings_local_blocklist_version">Versjon v%1$s</string>
     <string name="firewall_rule_block_dns_bypass">DNS omgått</string>
@@ -355,7 +354,6 @@
     <string name="hsf_start_btn_state">Start</string>
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_proxy_chip_text">Mellomtjener aktiv</string>
-    <string name="fapps_metered_negative">Avbryt</string>
     <string name="dns_crypt_connection_failure">Kunne ikke koble til DNSCrypt-tjener.</string>
     <string name="notif_channel_vpn_failure">Inaktiv VPN</string>
     <string name="cd_dialog_header">Egendefinert(e) domene(r)</string>

@@ -132,7 +132,6 @@
     <string name="fapps_firewall_filter_blocked">Engellenen</string>
     <string name="fapps_firewall_filter_lockdown">Kilitlenme</string>
     <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi\?</string>
-    <string name="fapps_metered_negative">İptal</string>
     <string name="network_log_app_name_unknown">Bilinmeyen</string>
     <string name="firewall_rule_block_metered">Ölçülü (Mobil)</string>
     <string name="firewall_rule_foreground">Kullanılmayan Uygulama</string>
@@ -390,7 +389,6 @@
     <string name="dns_filter_parent_allowed">İzin veriliyor</string>
     <string name="fapps_firewall_filter_bypass_universal">Bypass edildi</string>
     <string name="fapps_metered_unblock_dialog_title">Ölçülü olarak izin ver</string>
-    <string name="fapps_metered_positive">Uygula</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 vekil</string>
     <string name="accessibility_failure_toast">RethinkDNS erişilebilirlik hizmeti durdu veya çöktü. Artık arka plandaki uygulamaları engellemiyor.</string>
     <string name="firewall_rule_exempt_orbot_setup">Orbot Kurulumu</string>

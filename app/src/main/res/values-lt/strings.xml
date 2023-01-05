@@ -339,7 +339,6 @@
     <string name="fapps_metered_block_dialog_message">Blokuoti prisijungimus matuojamame (mobiliajame) tinkle <i>išvardytoms</i> programėlėms\?</string>
     <string name="fapps_metered_unblock_dialog_title">Leisti matuojamuose</string>
     <string name="fapps_metered_block_dialog_title">Blokuoti matuojamuose</string>
-    <string name="fapps_metered_positive">Taikyti</string>
     <string name="fapps_firewall_filter_hint">Taikyti nematuojamų / matuojamų tinklų taisykles išvardytoms programėlėms</string>
     <string name="fapps_firewall_filter_desc">Rodomos <u>%1$s</u> %2$s programėlės</string>
     <string name="fapps_unmetered_unblock_dialog_title">Leisti nematuojamuose tinkluose</string>
@@ -667,7 +666,6 @@
     <string name="cd_dialog_positive_btn">pridėti</string>
     <string name="cd_doh_dialog_heading">Pridėti DNS per HTTPS</string>
     <string name="dns_btm_record_type">Užklausos tipas: %1$s</string>
-    <string name="fapps_metered_negative">Atšaukti</string>
     <string name="cd_dialog_negative_btn">atšaukti</string>
     <string name="dns_filter_parent_all">Visi</string>
     <string name="dns_filter_parent_blocked">Užblokuota</string>

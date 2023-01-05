@@ -306,11 +306,9 @@
     <string name="dns_proxy_port">Numero porta</string>
     <string name="dns_proxy_negative_btn">Annulla</string>
     <string name="fapps_filter_filter_heading">Tipo</string>
-    <string name="fapps_metered_positive">Applica</string>
     <string name="fapps_unmetered_negative">Annulla</string>
     <string name="fapps_metered_unblock_dialog_title">Consenti su rete a consumo</string>
     <string name="dns_crypt_connection_failure">Errore di connessione al server DNSCrypt.</string>
-    <string name="fapps_metered_negative">Annulla</string>
     <string name="fapps_metered_unblock_dialog_message">Consentire le connessioni su rete a consumo (dati mobili) alle le applicazioni <i>elencate</i>\?</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>

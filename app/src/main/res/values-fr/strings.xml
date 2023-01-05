@@ -554,7 +554,6 @@
     <string name="ctbs_block_other_apps">Les règles appliquées pour %1$s seront également applicables pour %2$s autres applications</string>
     <string name="dns_proxy_ip_address">Adresse IP</string>
     <string name="firewall_rule_block_unmetered">Sans abonnement (Wi-Fi, Appli)</string>
-    <string name="fapps_metered_negative">Annuler</string>
     <string name="fav_icon">fav_icon</string>
     <string name="network_log_app_name_unnamed">Sans nom (%1$s)</string>
     <string name="new_app_notification_action_allow">Autoriser</string>
@@ -752,7 +751,6 @@
     <string name="fapps_metered_unblock_dialog_title">Autoriser sur réseau avec abonnement</string>
     <string name="firewall_rule_block_app_univ_mobile_desc">Une règle de pare-feu global définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Avec abonnement</i> (Mobile).<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
     <string name="fapps_unmetered_negative">Annuler</string>
-    <string name="fapps_metered_positive">Appliquer</string>
     <string name="system_dns_connection_failure">Impossible de déterminer le serveur DNS actuel</string>
     <string name="firewall_rule_foreground">Application non utilisée</string>
     <string name="firewall_rule_block_http">HTTP non sécurisé</string>

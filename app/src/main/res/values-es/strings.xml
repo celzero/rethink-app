@@ -277,8 +277,6 @@
     <string name="fapps_metered_unblock_dialog_title">Permitir en redes con límites</string>
     <string name="fapps_metered_unblock_dialog_message">¿Permitir las conexiones en la red con límites (móvil) para las aplicaciones <i>listadas</i>\?</string>
     <string name="fapps_lockdown_hint">La VPN está en modo de aislamiento. El cortafuegos no respetará las reglas de “con límites / sin límites”.</string>
-    <string name="fapps_metered_positive">Aplicar</string>
-    <string name="fapps_metered_negative">Cancelar</string>
     <string name="fapps_firewall_filter_desc">Mostrando <u>%1$s</u> %2$s aplicaciones</string>
     <string name="fapps_firewall_filter_desc_category">Mostrando <u>%1$s</u> %2$s aplicaciones en las categorías: %3$s</string>
     <string name="unicode_x_sign">❌</string>

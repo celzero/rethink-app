@@ -155,7 +155,6 @@
     <string name="about_app_update_check">تحقق من وجود تحديثات التطبيق</string>
     <string name="about_app_contributors">المؤلفين</string>
     <string name="about_dialog_positive_button">لنذهب</string>
-    <string name="fapps_metered_negative">إلغاء</string>
     <string name="notif_dialog_pause_dialog_title">تم إيقاف التطبيق مؤقتا!</string>
     <string name="cd_no_rule_txt">لا توجد قاعدة</string>
     <string name="ci_block">الكتلة</string>
@@ -179,7 +178,6 @@
     <string name="cd_dns_crypt_dialog_heading">أضف محلل أو مرحل DNSCrypt</string>
     <string name="univ_delete_firewall_dialog_title">هل تريد حذف كافة قواعد IP؟</string>
     <string name="dns_delete_negative">إلغاء</string>
-    <string name="fapps_metered_positive">طبّق</string>
     <string name="dns_proxy_toast_parameter">وكيل DNS</string>
     <string name="update_complete_snack_message">تم تنزيل إصدار جديد.</string>
     <string name="firewall_rule_block_ip">آي بي / منفذ (التطبيق)</string>

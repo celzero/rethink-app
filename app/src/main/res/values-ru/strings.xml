@@ -232,7 +232,6 @@
     <string name="always_on_dialog_heading">Отключить постоянно включенную VPN</string>
     <string name="local_blocklist_redownload_desc">Блок-листы на устройствах уже имеют последнюю версию v%1$s.</string>
     <string name="cd_dialog_positive_btn">добавить</string>
-    <string name="fapps_metered_positive">Применить</string>
     <string name="fav_icon">fav_icon</string>
     <string name="cd_remove_dialog_negative">Отмена</string>
     <string name="conn_track_clear_logs_title">Удалить все сетевые логи\?</string>
@@ -257,7 +256,6 @@
     <string name="dns_crypt_url_remove_success">Резольвер DNSCrypt удален.</string>
     <string name="firewall_status_unknown">неизвестно</string>
     <string name="hsf_vpn_dialog_positive">Продолжить</string>
-    <string name="fapps_metered_negative">Отмена</string>
     <string name="blocklist_update_check_not_required">Блок-листы уже имеют последнюю версию.</string>
     <string name="alert_firewall_accessibility_explanation">RethinkDNS использует службу универсального доступа для выявления того, какие приложения работают на переднем плане, а какие - в фоновом режиме.
 \n
