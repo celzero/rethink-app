@@ -34,6 +34,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val b by viewBinding(ActivityDnsDetailBinding::bind)
 
     private var fragmentIndex = 0
+    private var searchParam: String = ""
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
@@ -51,6 +52,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
+        searchParam = intent.getStringExtra(Constants.SEARCH_QUERY) ?: ""
         init()
     }
 
@@ -60,7 +62,7 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             object : FragmentStateAdapter(this) {
                 override fun createFragment(position: Int): Fragment {
                     return when (position) {
-                        Tabs.LOGS.screen -> DnsLogFragment.newInstance()
+                        Tabs.LOGS.screen -> DnsLogFragment.newInstance(searchParam)
                         Tabs.CONFIGURE.screen -> DnsConfigureFragment.newInstance()
                         else -> DnsConfigureFragment.newInstance()
                     }

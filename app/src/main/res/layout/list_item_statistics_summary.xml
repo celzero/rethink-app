@@ -11,6 +11,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         android:animateLayoutChanges="true">
 
         <LinearLayout
@@ -24,7 +26,6 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="start|center_vertical"
-                android:alpha="0.75"
                 android:contentDescription="@string/fav_icon"
                 android:minWidth="40dp"
                 android:padding="10dp"
@@ -51,11 +52,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/ss_count"
             android:layout_toEndOf="@id/ss_icon_container"
             android:baselineAligned="false"
             android:gravity="center"
-            android:layout_marginEnd="10dp"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -65,7 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:alpha="0.5"
+                android:alpha="0.75"
                 android:ellipsize="start"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:padding="2dp"
@@ -77,10 +78,10 @@
                 android:id="@+id/ss_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:padding="3dp"
-                android:layout_marginBottom="5dp"
                 android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="3dp"
                 app:trackColor="?attr/background" />
 
         </LinearLayout>
@@ -89,16 +90,25 @@
             android:id="@+id/ss_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@id/ss_indicator"
             android:gravity="center_vertical"
             android:padding="2dp"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/large_font_text_view" />
+            android:textSize="@dimen/heading_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ss_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:alpha="0.5"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_right_arrow_white" />
 
     </RelativeLayout>
 

@@ -15,21 +15,32 @@
  */
 package com.celzero.bravedns.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics) {
     private val b by viewBinding(FragmentSummaryStatisticsBinding::bind)
 
     private val viewModel: SummaryStatisticsViewModel by viewModel()
+    private val appConfig by inject<AppConfig>()
+    private val persistentState by inject<PersistentState>()
+
+    private var isVpnActive: Boolean = false
 
     enum class SummaryStatisticsType {
         MOST_CONNECTED_APPS,
@@ -43,6 +54,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeAppStart()
+        initClickListeners()
     }
 
     private fun initView() {
@@ -52,6 +65,69 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showBlockedDomains()
         showMostContactedIps()
         showBlockedIps()
+    }
+
+    private fun initClickListeners() {
+        b.fssAppInfoChip.setOnClickListener { openAppInfoScreen() }
+        b.fssAppInfoChipSecond.setOnClickListener { openAppInfoScreen() }
+
+        b.fssDnsLogsChip.setOnClickListener { openDnsLogsScreen() }
+        b.fssDnsLogsChipSecond.setOnClickListener { openDnsLogsScreen() }
+
+        b.fssNetworkLogsChip.setOnClickListener { openNetworkLogsScreen() }
+        b.fssNetworkLogsChipSecond.setOnClickListener { openNetworkLogsScreen() }
+    }
+
+    private fun openAppInfoScreen() {
+        val intent = Intent(requireContext(), AppDetailActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        startActivity(intent)
+    }
+
+    private fun openDnsLogsScreen() {
+        if (!isVpnActive) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.ssv_toast_start_rethink),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
+        if (appConfig.getBraveMode().isDnsActive()) {
+            startActivity(isDns = true, DnsDetailActivity.Tabs.LOGS.screen)
+        } else {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.dns_card_latency_inactive),
+                Toast.LENGTH_SHORT
+            )
+        }
+    }
+
+    private fun openNetworkLogsScreen() {
+        if (!isVpnActive) {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.ssv_toast_start_rethink),
+                Toast.LENGTH_SHORT
+            )
+            return
+        }
+
+        if (appConfig.getBraveMode().isFirewallActive()) {
+            startActivity(isDns = false, FirewallActivity.Tabs.LOGS.screen)
+        } else {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                getString(R.string.firewall_card_text_inactive),
+                Toast.LENGTH_SHORT
+            )
+        }
+    }
+
+    private fun observeAppStart() {
+        persistentState.vpnEnabledLiveData.observe(viewLifecycleOwner) { isVpnActive = it }
     }
 
     companion object {
@@ -64,13 +140,29 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssAppNetworkActivityRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
-            SummaryStatisticsAdapter(requireContext(), SummaryStatisticsType.MOST_CONNECTED_APPS)
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_CONNECTED_APPS
+            )
 
         viewModel.getAllowedAppNetworkActivity.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
-        val height = (resources.displayMetrics.heightPixels * 0.45).toInt()
-        b.fssAppNetworkActivityRecyclerView.minimumHeight = height
+
+        // remove the view if there is no data
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssAppAllowedLl.visibility = View.GONE
+                }
+            }
+        }
+
+        val scale = resources.displayMetrics.density
+        val pixels = (420 * scale + 0.5f)
+        b.fssAppNetworkActivityRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppNetworkActivityRecyclerView.adapter = recyclerAdapter
     }
 
@@ -80,13 +172,28 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssAppBlockedRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
-            SummaryStatisticsAdapter(requireContext(), SummaryStatisticsType.MOST_BLOCKED_APPS)
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_BLOCKED_APPS
+            )
 
         viewModel.getBlockedAppNetworkActivity.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
-        val height = (resources.displayMetrics.heightPixels * 0.45).toInt()
-        b.fssAppBlockedRecyclerView.minimumHeight = height
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssAppBlockedLl.visibility = View.GONE
+                }
+            }
+        }
+
+        val scale = resources.displayMetrics.density
+        val pixels = (420 * scale + 0.5f)
+        b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
     }
 
@@ -96,13 +203,27 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssContactedDomainRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
-            SummaryStatisticsAdapter(requireContext(), SummaryStatisticsType.MOST_CONTACTED_DOMAINS)
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_CONTACTED_DOMAINS
+            )
 
         viewModel.getMostContactedDomain.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
-        val height = (resources.displayMetrics.heightPixels * 0.55).toInt()
-        b.fssContactedDomainRecyclerView.minimumHeight = height
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssDomainAllowedLl.visibility = View.GONE
+                }
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = (420 * scale + 0.5f)
+        b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedDomainRecyclerView.adapter = recyclerAdapter
     }
 
@@ -112,13 +233,27 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssBlockedDomainRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
-            SummaryStatisticsAdapter(requireContext(), SummaryStatisticsType.MOST_BLOCKED_DOMAINS)
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_BLOCKED_DOMAINS
+            )
 
         viewModel.getMostBlockedDomain.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
-        val height = (resources.displayMetrics.heightPixels * 0.55).toInt()
-        b.fssBlockedDomainRecyclerView.minimumHeight = height
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssDomainBlockedLl.visibility = View.GONE
+                }
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = (420 * scale + 0.5f)
+        b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedDomainRecyclerView.adapter = recyclerAdapter
     }
 
@@ -128,12 +263,26 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssContactedIpsRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
-            SummaryStatisticsAdapter(requireContext(), SummaryStatisticsType.MOST_CONTACTED_IPS)
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_CONTACTED_IPS
+            )
         viewModel.getMostContactedIps.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
-        val height = (resources.displayMetrics.heightPixels * 0.45).toInt()
-        b.fssContactedIpsRecyclerView.minimumHeight = height
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssIpAllowedLl.visibility = View.GONE
+                }
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = (420 * scale + 0.5f)
+        b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
     }
 
@@ -143,12 +292,37 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssBlockedIpsRecyclerView.layoutManager = layoutManager
 
         val recyclerAdapter =
-            SummaryStatisticsAdapter(requireContext(), SummaryStatisticsType.MOST_BLOCKED_IPS)
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_BLOCKED_IPS
+            )
         viewModel.getMostBlockedIps.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
-        val height = (resources.displayMetrics.heightPixels * 0.45).toInt()
-        b.fssBlockedIpsRecyclerView.minimumHeight = height
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssIpBlockedLl.visibility = View.GONE
+                }
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = (420 * scale + 0.5f)
+        b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
+    }
+
+    private fun startActivity(isDns: Boolean, screenToLoad: Int) {
+        val intent =
+            when (isDns) {
+                true -> Intent(requireContext(), DnsDetailActivity::class.java)
+                false -> Intent(requireContext(), FirewallActivity::class.java)
+            }
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
+        startActivity(intent)
     }
 }
