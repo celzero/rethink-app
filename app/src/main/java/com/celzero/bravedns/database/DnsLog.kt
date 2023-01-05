@@ -25,7 +25,7 @@ import com.celzero.bravedns.util.Utilities
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Entity(tableName = "DNSLogs")
+@Entity(tableName = "DnsLogs")
 class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0

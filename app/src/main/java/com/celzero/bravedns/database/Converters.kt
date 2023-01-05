@@ -19,7 +19,6 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
-import java.sql.Date
 
 class Converters {
 
@@ -30,7 +29,24 @@ class Converters {
     }
 
     @TypeConverter
-    fun listToString(set: List<String>): String {
+    fun intToList(string: String?): List<Int> {
+        if (string.isNullOrEmpty()) return arrayListOf()
+
+        val listType: Type = object : TypeToken<List<Int>?>() {}.type
+        return Gson().fromJson(string, listType) ?: arrayListOf()
+    }
+
+    @TypeConverter
+    fun listToString(set: List<String>?): String {
+        if (set == null) return ""
+
+        return Gson().toJson(set)
+    }
+
+    @TypeConverter
+    fun listToInt(set: List<Int>?): String {
+        if (set == null) return ""
+
         return Gson().toJson(set)
     }
 }

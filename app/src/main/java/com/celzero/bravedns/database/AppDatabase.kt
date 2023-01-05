@@ -16,6 +16,7 @@
 package com.celzero.bravedns.database
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -29,20 +30,20 @@ import com.celzero.bravedns.util.Constants
     entities =
         [
             AppInfo::class,
-            ConnectionTracker::class,
             CustomIp::class,
             DoHEndpoint::class,
             DnsCryptEndpoint::class,
             DnsProxyEndpoint::class,
             DnsCryptRelayEndpoint::class,
             ProxyEndpoint::class,
-            DnsLog::class,
             CustomDomain::class,
             RethinkDnsEndpoint::class,
             RethinkRemoteFileTag::class,
-            RethinkLocalFileTag::class
+            RethinkLocalFileTag::class,
+            LocalBlocklistPacksMap::class,
+            RemoteBlocklistPacksMap::class
         ],
-    version = 15,
+    version = 16,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -77,6 +78,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_12_13)
                 .addMigrations(MIGRATION_13_14)
                 .addMigrations(MIGRATION_14_15)
+                .addMigrations(MIGRATION_15_16)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -520,6 +522,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
+        // migration part of v053l
         private val MIGRATION_14_15: Migration =
             object : Migration(14, 15) {
                 override fun migrate(database: SupportSQLiteDatabase) {
@@ -537,17 +540,50 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 }
             }
+
+        // migration part of v053m
+        private val MIGRATION_15_16: Migration =
+            object : Migration(15, 16) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    modifyAppInfo(database)
+                    database.execSQL("ALTER TABLE RethinkLocalFileTag add column level TEXT")
+                    database.execSQL("ALTER TABLE RethinkRemoteFileTag add column level TEXT")
+                    database.execSQL(
+                        "CREATE TABLE 'LocalBlocklistPacksMap' ( 'pack' TEXT NOT NULL, 'level' INTEGER NOT NULL DEFAULT 0, 'blocklistIds' TEXT NOT NULL, 'group' TEXT NOT NULL, PRIMARY KEY (pack, level)) "
+                    )
+                    database.execSQL(
+                        "CREATE TABLE 'RemoteBlocklistPacksMap' ( 'pack' TEXT NOT NULL, 'level' INTEGER NOT NULL DEFAULT 0, 'blocklistIds' TEXT NOT NULL, 'group' TEXT NOT NULL, PRIMARY KEY (pack, level)) "
+                    )
+                }
+
+                private fun modifyAppInfo(database: SupportSQLiteDatabase) {
+                    with(database) {
+                        execSQL(
+                            "CREATE TABLE 'AppInfo_backup' ('packageName' TEXT NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 0, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'metered' INTEGER NOT NULL DEFAULT 0, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0,  PRIMARY KEY(uid, packageName))"
+                        )
+                        execSQL(
+                            "INSERT INTO AppInfo_backup SELECT packageInfo, appName, uid, isSystemApp, firewallStatus, appCategory, wifiDataUsed, mobileDataUsed, metered, screenOffAllowed, backgroundAllowed FROM AppInfo"
+                        )
+                        execSQL(" DROP TABLE if exists AppInfo")
+                        execSQL(
+                            "CREATE TABLE 'AppInfo' ('packageName' TEXT NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 0, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'metered' INTEGER NOT NULL DEFAULT 0, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0,  PRIMARY KEY(uid, packageName))"
+                        )
+                        execSQL(
+                            "INSERT INTO AppInfo SELECT packageName, appName, uid, isSystemApp, firewallStatus, appCategory, wifiDataUsed, mobileDataUsed, metered, screenOffAllowed, backgroundAllowed FROM AppInfo_backup"
+                        )
+                        execSQL("DROP TABLE AppInfo_backup")
+                    }
+                }
+            }
     }
 
     fun checkPoint() {
         appInfoDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        connectionTrackerDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         dohEndpointsDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         dnsCryptEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         dnsCryptRelayEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         dnsProxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         proxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsLogDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         customDomainEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         customIpEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
         rethinkEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
@@ -556,21 +592,20 @@ abstract class AppDatabase : RoomDatabase() {
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
-    abstract fun connectionTrackerDAO(): ConnectionTrackerDAO
     abstract fun dohEndpointsDAO(): DoHEndpointDAO
     abstract fun dnsCryptEndpointDAO(): DnsCryptEndpointDAO
     abstract fun dnsCryptRelayEndpointDAO(): DnsCryptRelayEndpointDAO
     abstract fun dnsProxyEndpointDAO(): DnsProxyEndpointDAO
     abstract fun proxyEndpointDAO(): ProxyEndpointDAO
-    abstract fun dnsLogDAO(): DnsLogDAO
     abstract fun customDomainEndpointDAO(): CustomDomainDAO
     abstract fun customIpEndpointDao(): CustomIpDao
     abstract fun rethinkEndpointDao(): RethinkDnsEndpointDao
     abstract fun rethinkRemoteFileTagDao(): RethinkRemoteFileTagDao
     abstract fun rethinkLocalFileTagDao(): RethinkLocalFileTagDao
+    abstract fun localBlocklistPacksMapDao(): LocalBlocklistPacksMapDao
+    abstract fun remoteBlocklistPacksMapDao(): RemoteBlocklistPacksMapDao
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
-    fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
     fun dnsCryptEndpointRepository() = DnsCryptEndpointRepository(dnsCryptEndpointDAO())
     fun dnsCryptRelayEndpointRepository() =
@@ -578,10 +613,13 @@ abstract class AppDatabase : RoomDatabase() {
 
     fun dnsProxyEndpointRepository() = DnsProxyEndpointRepository(dnsProxyEndpointDAO())
     fun proxyEndpointRepository() = ProxyEndpointRepository(proxyEndpointDAO())
-    fun dnsLogRepository() = DnsLogRepository(dnsLogDAO())
     fun customDomainRepository() = CustomDomainRepository(customDomainEndpointDAO())
     fun customIpRepository() = CustomIpRepository(customIpEndpointDao())
     fun rethinkEndpointRepository() = RethinkDnsEndpointRepository(rethinkEndpointDao())
     fun rethinkRemoteFileTagRepository() = RethinkRemoteFileTagRepository(rethinkRemoteFileTagDao())
     fun rethinkLocalFileTagRepository() = RethinkLocalFileTagRepository(rethinkLocalFileTagDao())
+    fun localBlocklistPacksMapRepository() =
+        LocalBlocklistPacksMapRepository(localBlocklistPacksMapDao())
+    fun remoteBlocklistPacksMapRepository() =
+        RemoteBlocklistPacksMapRepository(remoteBlocklistPacksMapDao())
 }
