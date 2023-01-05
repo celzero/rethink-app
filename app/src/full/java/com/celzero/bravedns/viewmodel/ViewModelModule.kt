@@ -35,6 +35,8 @@ object ViewModelModule {
         viewModel { RethinkLocalFileTagViewModel(get()) }
         viewModel { AppConnectionsViewModel(get()) }
         viewModel { SummaryStatisticsViewModel(get(), get()) }
+        viewModel { LocalBlocklistPacksMapViewModel(get()) }
+        viewModel { RemoteBlocklistPacksMapViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)

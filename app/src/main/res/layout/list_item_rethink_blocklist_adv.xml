@@ -61,7 +61,6 @@
                 android:ellipsize="end"
                 android:padding="5dp"
                 android:layout_marginStart="10dp"
-                android:text="Dummy Label"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -86,12 +85,12 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
-                    android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <com.google.android.material.chip.Chip
                     android:id="@+id/crp_desc_entries_tv"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="0.75"
@@ -102,7 +101,6 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
-                    android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
