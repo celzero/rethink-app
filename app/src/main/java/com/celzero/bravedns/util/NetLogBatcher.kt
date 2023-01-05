@@ -71,9 +71,9 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
             awaitCancellation()
         } finally {
             withContext(NonCancellable) {
+                looper.close()
                 signal.close()
                 buffers.close()
-                looper.close()
             }
         }
     }
