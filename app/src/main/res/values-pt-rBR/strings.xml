@@ -162,9 +162,7 @@
     <string name="cd_remove_dialog_positive">Apagar</string>
     <string name="cd_remove_dialog_negative">Cancelar</string>
     <string name="cd_sample_unicode_invalid">❌</string>
-    <string name="ci_bypass_universal_desc">- Autorização universal</string>
     <string name="ci_blocked_initial">B</string>
-    <string name="ci_blocked_desc">-Bloqueado</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_block_wifi">está bloqueado em redes de banda larga (wifi)</string>
     <string name="ada_app_status_allow">está permitido</string>
@@ -649,7 +647,6 @@
     <string name="fapps_firewall_filter_blocked">Bloqueado</string>
     <string name="fapps_firewall_filter_bypass_universal">Contornado</string>
     <string name="fapps_firewall_filter_lockdown">Restrito</string>
-    <string name="fapps_info_dialog_title">Detalhes</string>
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede com franquia de dados (móvel) para apps <i>listados</i>\?</string>
     <string name="fapps_metered_unblock_dialog_title">Permitir em redes com franquia de dados</string>
     <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes com franquia de dados (móvel) para apps <i>listados</i>\?</string>
@@ -769,7 +766,6 @@
     <string name="ci_bypass_universal_txt">Autorização universal</string>
     <string name="ci_blocked_txt">Bloqueado</string>
     <string name="ci_no_rule_txt">Nenhuma regra</string>
-    <string name="ci_no_rule_desc">- Nenhuma regra</string>
     <string name="ci_no_rule">nenhuma regra</string>
     <string name="ci_block">bloquear</string>
     <string name="ci_bypass_universal">autorização universal</string>
@@ -810,17 +806,14 @@
     <string name="rbl_parental_control">Controle parental</string>
     <string name="rbl_privacy">Privacidade</string>
     <string name="rbl_security">Segurança</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Salvar alterações</string>
     <string name="rt_dialog_message">Deseja aplicar listas de bloqueio recém configuradas\?</string>
     <string name="rt_dialog_positive">Aplicar</string>
     <string name="rt_download_desc">Baixe listas de bloqueio (cerca de 60 MB) para usar esta funcionalidade.</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_sky_btn">⛅ Céu</string>
     <string name="radio_max_btn">🪂 Máx</string>
     <string name="rethink_sky_desc">mais de 280 localizações; melhor tempo operacional; resolvedor stub rodando em cloudflare.com</string>
     <string name="rethink_max_desc">50+ localizações; mais privado; resolvedor recursivo rodando em fly.io</string>
-    <string name="bsrf_group_heading">Grupo</string>
     <string name="bsrf_sub_group_heading">Subgrupo</string>
     <string name="bsrf_apply_filter">Aplicar</string>
     <string name="bsrf_clear_filter">Limpar</string>
@@ -875,7 +868,6 @@
     <string name="rt_filter_desc_subgroups">Mostrando <u>%1$s</u> listas de bloqueio no grupo: %2$s e subgrupo: %3$s</string>
     <string name="notif_download_cancel_content">Download cancelado.</string>
     <string name="rt_filter_parent_all">Tudo</string>
-    <string name="rt_filter_desc_groups">Mostrando <u>%1$s</u> listas de bloqueio no grupo: %2$s</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / porta (universal)</string>
     <string name="whats_new_version_update">&lt;b&gt;Esforço máximo&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Apresentando Rethink app um resolvedor mais privado, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Selecione IPv6 como experimental; altere para IPv4 por padrão.&lt;br/&gt; 3. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Backup e restauração de configurações do app.&lt;br/&gt; 4. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Modo restrito do app.&lt;br /&gt; 5. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Modo restrito universal.&lt;br/&gt; 6. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Aplicação de regras do firewall para portas específicas.&lt;br/&gt; 7. &lt;i&gt; Nova funcionalidade&lt;/i&gt;: Aplicação de regras do firewall em massa.&lt;br/&gt; 8. Pequena mudança na interface do usuário.&lt;br/&gt; 9. Correções de problemas com memória e outras falhas.&lt;br/&gt;&lt;br/&gt; &lt;a href=https: //hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Ajude a traduzir este app&lt;/a&gt;</string>

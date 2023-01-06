@@ -227,7 +227,6 @@
     <string name="about_mail_bugreport_text">Kirim surel ini ke : hello@celzero.com</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_filter_allowed">Diijinkan</string>
-    <string name="fapps_info_dialog_title">Info</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="new_app_bulk_notification_title">Perhatian</string>
     <string name="about_settings">sistem</string>
@@ -290,7 +289,6 @@
     <string name="ada_ip_block_count">%1$s aturan IP</string>
     <string name="about_docs">Baca documentasi</string>
     <string name="rt_download_start">Mengunduh daftar-daftar blokir…</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="slide_1_title">Gratis dan SumberTerbuka</string>
     <string name="doh_custom_url_remove_dialog_message">Menghapus titik-akhir DNS over Https dari konfigurasi tersimpan.</string>
     <string name="search_custom_domains"><font size="12">Mencari nama-nama domain</font></string>
@@ -304,7 +302,6 @@
     <string name="brbs_backup_dialog_negative">Batal</string>
     <string name="dns_proxy_toast_parameter">Proksi DNS</string>
     <string name="orbot_title">Orbot dan Proksi-proksi</string>
-    <string name="ci_no_rule_desc">- Tanpa Aturan</string>
     <string name="settings_local_blocklist_in_use">%1$s daftar-daftar blokir sedang digunakan</string>
     <string name="dc_check_update_desc">Cek pembaharuan daftar blokir setiap <i>tiga</i> hari</string>
     <string name="rt_dialog_message">Apakah Anda ingin menerapkan daftar-daftar blokir yang baru saja diatur\?</string>
@@ -364,7 +361,6 @@
     <string name="rbl_privacy">Privasi</string>
     <string name="settings_socks5_heading">Atur Proksi SOCKS5</string>
     <string name="status_protected_with_http_private_dns">terproteksi dengan proksi http &amp; dns pribadi</string>
-    <string name="ci_blocked_desc">- Terblokir</string>
     <string name="settings_socks_forwarding_desc_no_app">Meneruskan ke %1$s:%2$s</string>
     <string name="bsac_block_toast">Memblokir %1$s untuk app ini</string>
     <string name="ci_dialog_edittext_hint">Alamat IP, sub-jaringan atau port</string>
@@ -413,7 +409,6 @@
     <string name="hsf_start_dialog_negative">Tutup</string>
     <string name="ct_delete_logs_negative_btn">Batal</string>
     <string name="fapps_firewall_filter_excluded">Dikecualikan</string>
-    <string name="bsrf_group_heading">Grup</string>
     <string name="cd_custom_dns_proxy_name">Proksi %1$s</string>
     <string name="dns_proxy_name">Nama Proksi</string>
     <string name="brbs_backup_dialog_failure_title">Gagal mencadangkan</string>
@@ -646,7 +641,6 @@
     <string name="firewall_rule_univ_block_metered">Dihitung (Universal)</string>
     <string name="fapps_unmetered_block_dialog_title">Blokir yang tak dihitung</string>
     <string name="ada_app_status_lockdown">dalam mode terkunci</string>
-    <string name="ci_bypass_universal_desc">- Memintas universal</string>
     <string name="firewall_rule_block_metered">Dihitung (Selular)</string>
     <string name="settings_notification_dialog_option_1">"
 \nJeda / Hentikan (bawaan):

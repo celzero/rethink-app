@@ -388,7 +388,6 @@
     <string name="vpn_profile_error">Kunne ikke igangsette VPN-profil.</string>
     <string name="dns_filter_parent_allowed">Tillatt</string>
     <string name="dns_proxy_negative_btn">Avbryt</string>
-    <string name="fapps_info_dialog_title">Info</string>
     <string name="fapps_unmetered_positive">Bruk</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Advarsel: Rethink har blitt avslått</string>
     <string name="dc_custom_block_heading">Tillat eller nekt individuelle domener</string>
@@ -446,7 +445,6 @@
     <string name="settings_socks_forwarding_default_desc">Videresend tilkoblinger til SOCKS5-endepunkt.</string>
     <string name="dns_btm_record_type">Spørringstype: %1$s</string>
     <string name="univ_accessibility_crash_dialog_positive">Åpne innstillingene</string>
-    <string name="ci_blocked_desc">- Blokkert</string>
     <string name="ada_app_dns_settings">DNS-innstillinger</string>
     <string name="rt_dialog_neutral">Fortsett</string>
     <string name="cd_dialog_positive_btn">Legg til</string>
@@ -516,7 +514,6 @@
     <string name="notif_channel_vpn_notification">Aktiv VPN</string>
     <string name="rt_cancel_download">Avbryt</string>
     <string name="rt_cancel_btn">Avbryt</string>
-    <string name="bsrf_group_heading">Gruppe</string>
     <string name="dc_doh">DNS over HTTPS</string>
     <string name="brbs_backup_title">Sikkerhetskopiering</string>
     <string name="brbs_restore_dialog_negative">Avbryt</string>

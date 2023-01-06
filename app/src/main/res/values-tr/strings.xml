@@ -86,7 +86,6 @@
     <string name="settings_dns_proxy_dialog_username">Kullanıcı adı</string>
     <string name="univ_view_blocked_ip_desc">Engellenen veya atlanan IP / Port kurallarını değiştirin.</string>
     <string name="dns_filter_parent_all">Tümü</string>
-    <string name="fapps_info_dialog_title">Bilgiler</string>
     <string name="settings_all_networks_dialog_positive_btn">Yine de etkinleştir</string>
     <string name="notif_channel_desc_vpn_failure">RethinkDNS Android veya başka bir VPN uygulaması tarafından durdurulduğunda bilgilendirin</string>
     <string name="settings_dns_proxy_dialog_app">Uygulama</string>
@@ -114,7 +113,6 @@
     <string name="notif_channel_proxy_failure">Proxy Uyarıları</string>
     <string name="cd_toast_deleted">Alan adı özel listeden kaldırıldı</string>
     <string name="rt_apply_btn">Uygula</string>
-    <string name="bsrf_group_heading">Grup</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
     <string name="bsct_conn_desc_allowed">izin verilir %1$s %2$s</string>
     <string name="dns_act_log">Günlükler</string>
@@ -234,7 +232,6 @@
     <string name="firewall_rule_lockdown_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamasının</i> <i> atlanan IP\'ler</i> dışındaki IP\'lere bağlanmasını engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
     <string name="cd_filter_allowed">İzin veriliyor</string>
     <string name="ci_dialog_title">IP / Port Kuralı Ekle</string>
-    <string name="ci_blocked_desc">- Engellendi</string>
     <string name="ci_block">engelle</string>
     <string name="ada_network_log_title">bu uygulama için ağ günlüğü</string>
     <string name="lbbs_heading">185+ blok listesini yapılandırma</string>
@@ -362,7 +359,6 @@
     <string name="new_app_bulk_notification_content">RethinkDNS %1$s yeni uygulamaları engelledi. Görüntülemek veya değiştirmek için dokunun.</string>
     <string name="notif_channel_desc_proxy_failure">Proxy hataları ve anomalileri hakkında uyarı</string>
     <string name="cd_filter_all">Tümü</string>
-    <string name="ci_no_rule_desc">- Kural Yok</string>
     <string name="rt_cancel_btn">İptal</string>
     <string name="rt_download_desc">Bu özelliği kullanmak için blok listelerini (yaklaşık 60MB) indirin.</string>
     <string name="brbs_restore_title">Geri Yükle</string>
@@ -805,7 +801,6 @@
 \n</string>
     <string name="ada_app_status_allow">izin verilir</string>
     <string name="ci_no_rules_text">Evrensel IP engelleme veya bypass kuralı bulunamadı.</string>
-    <string name="ci_bypass_universal_desc">- Evrensel baypaslar</string>
     <string name="ci_no_rule">kural yok</string>
     <string name="ci_bypass_universal">genel olarak atla</string>
     <string name="ada_noapp_dialog_message">Belirtilen uygulama için uygulama bilgileri bulunamadı.</string>
@@ -846,7 +841,6 @@
     <string name="ctbs_block_other_apps">%1$s için uygulanan kurallar %2$s diğer uygulamalar için de geçerli olacaktır</string>
     <string name="bsac_bypass_app_rules">Uygulama kurallarını atlayın</string>
     <string name="notif_download_failure_content">İndirme başarısız oldu. Tekrar deneyin.</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Değişiklikleri Kaydet</string>
     <string name="rt_dialog_positive">Uygula</string>
     <string name="cd_sample_unicode_invalid">❌</string>
@@ -854,7 +848,6 @@
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_delete">sil</string>
     <string name="ci_bypass_universal_initial">BE</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="other_dns_list_tab3">Dns Vekil</string>
     <string name="cd_sample_unicode_valid">✅</string>
     <string name="ada_firewall_title">bu uygulama için güvenlik duvarı kuralları</string>
@@ -862,7 +855,6 @@
     <string name="notif_download_cancel_content">İndirme iptal edildi.</string>
     <string name="rt_filter_parent_selected">Seçili</string>
     <string name="rt_filter_hint"><u>Tüm</u> engelleme listeleri gösteriliyor</string>
-    <string name="rt_filter_desc_groups">Grup: %2$s içindeki <u>%1$s</u> engelleme listesi gösteriliyor</string>
     <string name="relative_time_today">Bugün</string>
     <string name="settings_app_notification_a13_desc">Uygulama için bildirim iznini etkinleştirin</string>
     <string name="hsf_notification_permission_failure">Ayarlar ekranından bildirim iznini etkinleştirin</string>

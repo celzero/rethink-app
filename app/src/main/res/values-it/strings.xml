@@ -340,7 +340,6 @@
     <string name="rt_dialog_neutral">Continua</string>
     <string name="rethink_max_desc">50+ posizioni; più privato; resolver ricorsivo che utilizza fly.io</string>
     <string name="bsrf_sub_group_heading">Sottogruppo</string>
-    <string name="bsrf_group_heading">Gruppo</string>
     <string name="ci_dialog_title">Aggiungi regola IP / Porta</string>
     <string name="brbs_backup_dialog_negative">Annulla</string>
     <string name="brbs_restore_dialog_title">Ripristina backup</string>
@@ -606,7 +605,6 @@
     <string name="fapps_firewall_filter_bypass_universal">Aggirano il firewall</string>
     <string name="fapps_firewall_filter_excluded">Escluse</string>
     <string name="fapps_firewall_filter_lockdown">Quarantena</string>
-    <string name="fapps_info_dialog_title">Info</string>
     <string name="fapps_info_dialog_message">Impedisci alle app di connettersi a Internet. Limitare l\'accesso a Internet aiuta a prevenire l\'uso eccessivo dei dati e a risparmiare batteria.
 \n
 \nLe regole del firewall A Consumo (Mobile) / Non a Consumo (WiFi) non saranno rispettate quando:
@@ -762,12 +760,9 @@
     <string name="ci_no_rules_text">Non è stata trovata alcuna regola IP o porta.</string>
     <string name="ci_bypass_universal_initial">AU</string>
     <string name="ci_bypass_universal_txt">Aggira regole Universali</string>
-    <string name="ci_bypass_universal_desc">- Aggira le regole universali</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_blocked_txt">Bloccato</string>
-    <string name="ci_blocked_desc">- Bloccato</string>
     <string name="ci_no_rule_txt">Nessuna regola</string>
-    <string name="ci_no_rule_desc">- Nessuna regola</string>
     <string name="ci_no_rule">nessuna regola</string>
     <string name="ci_block">blocca</string>
     <string name="ci_bypass_universal">aggira regole universali</string>
@@ -805,7 +800,6 @@
     <string name="bsdl_domain_rule_block">blocca</string>
     <string name="notif_download_content_title">Scaricamento liste dei filtri su dispositivo</string>
     <string name="notif_download_content_text">Scaricamento in corso…</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Salva cambiamenti</string>
     <string name="rt_dialog_message">Vuoi applicare le nuove liste dei filtri configurate\?</string>
     <string name="rt_dialog_negative">Annulla</string>
@@ -818,7 +812,6 @@
     <string name="rt_list_simple_btn_txt">semplice</string>
     <string name="rt_list_adv_btn_txt">avanzate</string>
     <string name="rt_download_desc">Per utilizzare questa funzione, scarica le liste dei filtri (circa 60 MB).</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rt_cancel_btn">Annulla</string>
@@ -876,7 +869,6 @@
     <string name="no_browser_error">Impossibile aprire pagina web da browser.</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (universale)</string>
     <string name="ci_bypass_app_txt">Aggira regole app</string>
-    <string name="ci_bypass_app_desc">- Aggira le regole dell\'app</string>
     <string name="ada_app_firewall">Firewall</string>
     <string name="ada_firewall_title">regole firewall per questa app</string>
     <string name="ada_app_lockdown">Quarantena</string>
@@ -892,7 +884,6 @@
     <string name="rt_filter_parent_selected">Selezionati</string>
     <string name="rt_filter_hint">Mostra <u>tutte</u> le blocklist</string>
     <string name="rt_filter_desc">Liste dei filtri <u>%1$s</u> mostrate</string>
-    <string name="rt_filter_desc_groups">Liste dei filtri <u>%1$s</u> nel gruppo %2$s mostrate</string>
     <string name="rt_filter_desc_subgroups">Liste dei filtri <u>%1$s</u> nel sottogruppo %3$s del gruppo %2$s mostrate</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s blocklist</string>
     <string name="ct_ip_port">%1$s:%2$s</string>

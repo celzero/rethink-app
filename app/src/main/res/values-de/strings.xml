@@ -419,9 +419,7 @@
     <string name="ci_no_rules_text">Keine universellen IP-Blockierungs- oder Umgehungsregeln gefunden.</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">universelle Umgehung</string>
-    <string name="ci_bypass_universal_desc">- universelle Umgehungen</string>
     <string name="ci_no_rule_initial">N</string>
-    <string name="ci_no_rule_desc">- Keine Regel</string>
     <string name="ci_bypass_universal">universelle Umgehung</string>
     <string name="ada_noapp_dialog_title">App Info nicht gefunden</string>
     <string name="ci_no_rule_txt">Keine Regel</string>
@@ -457,14 +455,12 @@
     <string name="rt_re_download">Blocklisten erneut herunterladen</string>
     <string name="rt_download_desc">Laden Sie Blocklisten herunter (ca. 60 MB), um diese Funktion zu nutzen.</string>
     <string name="radio_sky_btn">⛅ Himmel</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rt_filter_hint">Zeige <u>alle</u> Blocklisten</string>
     <string name="rt_filter_desc"><u>%1$s</u> Blocklisten anzeigen</string>
     <string name="rethink_max_desc">50+ Standorte; mehr privat; rekursiver Resolver läuft auf fly.io</string>
     <string name="rt_filter_desc_subgroups">Zeigt <u>%1$s</u> Blocklisten in Gruppe: %2$s und Untergruppe: %3$s</string>
     <string name="rethink_sky_desc">280+ Standorte; höhere Betriebszeit; Stub Resolver läuft auf cloudflare.com</string>
-    <string name="bsrf_group_heading">Gruppe</string>
     <string name="bsrf_sub_group_heading">Untergruppe</string>
     <string name="bsrf_apply_filter">Übernehmen</string>
     <string name="bsrf_clear_filter">Leeren</string>
@@ -558,9 +554,7 @@
     <string name="cd_blocked_txt">Blockiert</string>
     <string name="ci_bypass_app_initial">BA</string>
     <string name="ci_bypass_app_txt">Umgehen von App-Regeln</string>
-    <string name="ci_bypass_app_desc">- Umgeht die Regeln der App</string>
     <string name="ci_blocked_txt">Blockiert</string>
-    <string name="ci_blocked_desc">- Blockiert</string>
     <string name="ada_app_status_block_md">ist in gebührenpflichtigen (mobilen) Netzen gesperrt</string>
     <string name="ada_ip_block_count">%1$s IP-Regel(n)</string>
     <string name="ada_network_log_title">Netzwerkprotokoll für diese Anwendung</string>
@@ -586,7 +580,6 @@
     <string name="notif_download_failure_content">Download fehlgeschlagen. Versuchen Sie es erneut.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Attentionware, Spyware und Scareware.</string>
     <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines">Sicherheit</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Änderungen speichern</string>
     <string name="rt_list_simple_btn_txt">einfach</string>
     <string name="rt_list_adv_btn_txt">Fortgeschritten</string>
@@ -594,7 +587,6 @@
     <string name="rt_filter_parent_selected">Ausgewählt</string>
     <string name="rt_cancel_btn">Abbrechen</string>
     <string name="rt_apply_btn">Übernehmen</string>
-    <string name="rt_filter_desc_groups">Anzeige von <u>%1$s</u> Blocklisten in der Gruppe: %2$s</string>
     <string name="dc_local_block_enabled">Aktiviert</string>
     <string name="dc_local_block_disabled">Deaktiviert</string>
     <string name="lbbs_configure">Konfigurieren</string>

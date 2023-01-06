@@ -40,7 +40,6 @@
     <string name="firewall_rule_block_ip_desc">قاعدة-مستخدم حظرت الـ <i> آي بي الوجهة </i>.<br/><br/> للتغيير غذهب إلى <i> شاشة جدار الحماية </i> الخاص-بالتطبيق.</string>
     <string name="build__flavor_website">موقع الكتروني</string>
     <string name="cd_dialog_title">أضف المجال</string>
-    <string name="bsrf_group_heading">مجموعة</string>
     <string name="brbs_backup_dialog_failure_message">تعذر النسخ الاحتياطي. حاول مرة أخرى؟</string>
     <string name="show_logs_disabled_dns_message">تم تعطيل تسجيل طلب DNS. لإعادة التمكين ، انتقل إلى <i> الإعدادات </i> وتشغيل <i> تمكين التسجيل على الجهاز. </i></string>
     <string name="settings_socks5_dialog_hint_password">كلمة السر (اختيارية)</string>
@@ -223,9 +222,7 @@
     <string name="notif_channel_desc_vpn_failure">أبلغ عندما يتم إيقاف RethinkDNS بواسطة Android أو بواسطة تطبيق VPN آخر</string>
     <string name="cd_remove_dialog_message">احذف المجال من التكوين المحفوظ.</string>
     <string name="cd_whitelist_txt">القائمة البيضاء</string>
-    <string name="ci_bypass_universal_desc">- تجاوزات عالمية</string>
     <string name="ci_blocked_txt">تم حجبه</string>
-    <string name="ci_no_rule_desc">- لا توجد قاعدة</string>
     <string name="ada_app_exclude">استثن</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="lbbs_heading">تكوين 185+ قوائم الحظر</string>
@@ -574,7 +571,6 @@
     <string name="fapps_metered_block_dialog_message">هل تريد حظر الاتصالات على شبكة (جوال) محدودة القياس لتطبيقات <i> المدرجة </i>؟</string>
     <string name="other_dns_list_tab2">Dnscrypt</string>
     <string name="notif_channel_vpn_failure">VPN غير نشط</string>
-    <string name="ci_blocked_desc">- ممنوع</string>
     <string name="ci_delete">حذف</string>
     <string name="ada_app_status_block">تم حظره</string>
     <string name="bsac_unblock_toast">غير محظور %1$s لهذا التطبيق</string>
@@ -609,14 +605,12 @@
     <string name="univ_view_blocked_ip_desc">تعديل قواعد IP / المنفذ المحظورة أو المتجاوزة.</string>
     <string name="univ_ip_delete_dialog_negative">إلغاء</string>
     <string name="dns_proxy_desc_no_app">%1$s: %2$s</string>
-    <string name="fapps_info_dialog_title">معلومات</string>
     <string name="fapps_lockdown_hint">Vpn في وضع القفل. لن يلتزم جدار الحماية بالقواعد المقننة / غير المقاسة.</string>
     <string name="fapps_firewall_filter_desc">إظهار تطبيقات <u> %1$s </u> %2$s</string>
     <string name="rules_load_failure_desc">لم يتم العثور على قواعد جدار الحماية</string>
     <string name="other_dns_list_tab3">وكيل DNS</string>
     <string name="firewall_rule_block_app_mobile_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i> هذا عند محاولة الاتصال على شبكة <i> Metered </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
     <string name="bsdl_domain_heading">حكم المجال</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="bsrf_sub_group_heading">المجموعة الفرعية</string>
     <string name="lbbs_configure">الضبط</string>
     <string name="brbs_title">النسخ الاحتياطي والاستعادة</string>
@@ -835,7 +829,6 @@
     <string name="cd_dns_crypt_dialog_stamp">ختم</string>
     <string name="unicode_x_sign">❌</string>
     <string name="fav_icon">fav_icon</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
@@ -872,7 +865,6 @@
     <string name="rt_filter_parent_selected">المحدد</string>
     <string name="rt_filter_hint">إظهار <u> كل قوائم الحظر </u></string>
     <string name="rt_filter_desc">إظهار قوائم الحظر <u> %1$s </u></string>
-    <string name="rt_filter_desc_groups">إظهار قوائم الحظر <u> %1$s </u> في المجموعة: %2$s</string>
     <string name="rt_filter_desc_subgroups">عرض قوائم الحظر <u> %1$s </u> في المجموعة: %2$s والمجموعة الفرعية: %3$s</string>
     <string name="relative_time_today">اليوم</string>
     <string name="settings_app_notification_a13_desc">اعطاء التطبيق صلاحية التنبيهات</string>
@@ -886,7 +878,6 @@
     <string name="private_dns_error">تعذر تشغيل شاشة DNS الخاصة.</string>
     <string name="ci_bypass_app_initial">BA</string>
     <string name="ci_bypass_app_txt">تجاوز قواعد التطبيق</string>
-    <string name="ci_bypass_app_desc">- تجاوز قواعد التطبيق</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">امسح جميع السجلات المتعلقة بهذا التطبيق.</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">واصل</string>
     <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">إلغاء</string>

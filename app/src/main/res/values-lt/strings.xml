@@ -330,7 +330,6 @@
     <string name="fapps_firewall_filter_allowed">Leidžiama</string>
     <string name="fapps_firewall_filter_blocked">Užblokuota</string>
     <string name="fapps_firewall_filter_lockdown">Visiškas užrakinimas</string>
-    <string name="fapps_info_dialog_title">Informacija</string>
     <string name="fapps_info_dialog_positive_btn">Gerai</string>
     <string name="fapps_unmetered_block_dialog_message">Blokuoti prisijungimus nematuojamame (WiFi) tinkle <i>išvardytoms</i> programėlėms\?</string>
     <string name="fapps_unmetered_unblock_dialog_message">Leisti prisijungimus nematuojamame (WiFi) tinkle <i>išvardytoms</i> programėlėms\?</string>
@@ -455,7 +454,6 @@
     <string name="rt_cancel_btn">Atšaukti</string>
     <string name="rt_apply_btn">Taikyti</string>
     <string name="rt_download_desc">Atsisiųsti blokavimo sąrašus (apie 60 MB), kad galėtumėte naudotis šia funkcija.</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_sky_btn">⛅ Dangus</string>
     <string name="bsrf_apply_filter">Taikyti</string>
     <string name="bsrf_clear_filter">Išvalyti</string>
@@ -754,10 +752,8 @@
     <string name="category_name_installed">Įdiegtos programėlės</string>
     <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
 \n</string>
-    <string name="ci_blocked_desc">- Užblokuota</string>
     <string name="rt_dialog_message">Ar norite taikyti naujai sukonfigūruotus blokavimo sąrašus\?</string>
     <string name="ci_no_rule_initial">N</string>
-    <string name="ci_no_rule_desc">- Nėra taisyklės</string>
     <string name="ci_block">blokuoti</string>
     <string name="ci_no_rule_txt">Nėra taisyklės</string>
     <string name="ci_no_rule">nėra taisyklės</string>
@@ -770,7 +766,6 @@
     <string name="rt_download">Atsisiųsti blokavimo sąrašus</string>
     <string name="ada_ip_no_connection">Nėra šios programėlės tinklo žurnalų.</string>
     <string name="rbl_parental_control">Tėvų kontrolė</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Išsaugoti pakeitimus</string>
     <string name="notif_download_failure_content">Atsisiųsti nepavyko. Bandykite dar kartą.</string>
     <string name="bsdl_domain_rule_block">blokuoti</string>
@@ -818,7 +813,6 @@
     <string name="settings_dns_proxy_dialog_hostname">Pagrindinio kompiuterio vardas</string>
     <string name="settings_dns_proxy_dialog_app_desc">Pasirinkta programėlė bus išskirta iš VPN, kad ji galėtų prisijungti prie įgaliotojo serverio jūsų vardu.</string>
     <string name="settings_socks_forwarding_default_desc">Peradresuoti ryšius į SOCKS5 galinį punktą.</string>
-    <string name="bsrf_group_heading">Grupė</string>
     <string name="bsrf_sub_group_heading">Pogrupis</string>
     <string name="bsct_conn_block_desc">%1$s užblokuota pagal %2$s</string>
     <string name="bsct_conn_block_desc_device">%1$s užblokuotas įrenginyje</string>
@@ -843,7 +837,6 @@
     <string name="firewall_rule_exempt_dns_proxied_desc">Šis DNS ryšys buvo atliktas naudojant įgaliotąjį serverį ir persiųstas į naudotojo pageidaujamą DNS galinį punktą.<br/><br/> Norėdami pakeisti, išjunkite <i>Užkirsti kelią DNS nutekėjimui</i> DNS <i>Konfigūravimas</i> ekrane.</string>
     <string name="notif_dialog_pause_dialog_message">Programėlė pristabdyta, kad atnaujintumėte, pasirinkite tęsti</string>
     <string name="ci_bypass_universal_txt">Apeiti universaliąsias</string>
-    <string name="ci_bypass_universal_desc">- Apeina universaliąsias</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ada_app_status_exclude">yra išskiriama DNS ir ugniasienėje</string>
     <string name="ada_app_exclude">Išskirti</string>
@@ -858,7 +851,6 @@
     <string name="rethink_sky_desc">Daugiau nei 280 vietų; geresnis veikimo laikas; stub sprendiklis veikia cloudflare.com</string>
     <string name="rethink_max_desc">Daugiau nei 50 vietovių; daugiau privatumo; rekursyvus sprendiklis veikia fly.io</string>
     <string name="rt_filter_desc">Rodomi <u>%1$s</u> blokavimo sąrašai</string>
-    <string name="rt_filter_desc_groups">Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s</string>
     <string name="rt_filter_desc_subgroups">Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s ir pogrupyje: %3$s</string>
     <string name="hsf_notification_permission_failure">Įjunkite pranešimų leidimą nustatymų ekrane</string>
     <string name="about_privacy_policy">Privatumo politika</string>

@@ -290,7 +290,6 @@
     <string name="ada_app_metered">計費網路</string>
     <string name="ada_app_whitelist">無條件放行</string>
     <string name="notif_download_content_text">正在下載……</string>
-    <string name="bsrf_group_heading">分組</string>
     <string name="bsrf_clear_filter">清除</string>
     <string name="dc_local_block_disabled">已停用</string>
     <string name="brbs_backup_desc">備份應用設定、網路日誌與 DNS 日誌</string>
@@ -398,13 +397,10 @@
     <string name="bsac_block">攔截</string>
     <string name="bsac_bypass_app_rules">繞行應用規則</string>
     <string name="rt_dialog_title">儲存更改</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="new_app_notification_action_deny">繼續攔截</string>
     <string name="cd_dialog_edittext_hint">輸入 %1$s</string>
     <string name="cd_blocked_txt">攔截</string>
-    <string name="ci_blocked_desc">- 攔截</string>
     <string name="notif_download_success_content">下載成功。</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_edit_dialog_positive">編輯</string>
     <string name="lbbs_enable">已停用</string>
     <string name="lbbs_update_check">檢查更新</string>
@@ -418,7 +414,6 @@
     <string name="notif_channel_download">下載警報</string>
     <string name="cd_dialog_title">添加網域</string>
     <string name="ci_dialog_added_success">已將 IP 加入清單</string>
-    <string name="ci_no_rule_desc">- 無規則</string>
     <string name="ada_ip_no_connection">此應用無網路日誌。</string>
     <string name="bsac_go_pass_app_rules">移除繞行</string>
     <string name="rt_download">下載攔截清單</string>
@@ -438,7 +433,6 @@
     <string name="notif_channel_desc_vpn_failure">在 Rethink 被 Android 或其他 VPN 應用停止時提醒我</string>
     <string name="cd_dialog_error_invalid_domain">無效 URL （網域）。</string>
     <string name="ci_no_rules_text">未找到 IP 或埠規則。</string>
-    <string name="ci_bypass_universal_desc">- 無條件放行</string>
     <string name="ci_blocked_txt">攔截</string>
     <string name="ada_firewall_status">此應用<b><i>%1$s</i></b>。</string>
     <string name="ada_app_dns_settings">DNS 設定</string>
@@ -765,7 +759,6 @@
     <string name="fapps_firewall_filter_bypass_universal">已繞行</string>
     <string name="fapps_firewall_filter_excluded">已排除</string>
     <string name="fapps_firewall_filter_lockdown">已閉關</string>
-    <string name="fapps_info_dialog_title">資料</string>
     <string name="fapps_info_dialog_message">阻止應用連線互聯網。限制訪問互聯網有助於避免不必要的數據使用，也有助於節電。
 \n
 \n計費（行動數據）/非計費（ WiFi ）防火牆規則將不會在下述情形遵守：
@@ -866,7 +859,6 @@
     <string name="rt_filter_parent_selected">已選擇</string>
     <string name="rt_filter_hint">正顯示<u>所有</u>攔截清單</string>
     <string name="rt_filter_desc">正顯示 <u>%1$s</u> 個攔截清單</string>
-    <string name="rt_filter_desc_groups">正顯示 %2$s 組內的 <u>%1$s</u> 個攔截清單</string>
     <string name="rt_filter_desc_subgroups">正顯示 %2$s 組與子分組 %3$s 的 <u>%1$s</u> 個攔截清單</string>
     <string name="about_app_translate">翻譯</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
@@ -882,7 +874,6 @@
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ci_bypass_app_initial">繞應</string>
     <string name="ci_bypass_app_txt">放行應用規則</string>
-    <string name="ci_bypass_app_desc">- 繞過應用規則</string>
     <string name="ada_app_firewall">防火牆</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日誌</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有與此應用有聯繫的日誌。</string>

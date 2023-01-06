@@ -324,7 +324,6 @@
     <string name="cd_dialog_error_invalid_wildcard">Caractère joker non valide.</string>
     <string name="ci_blocked_initial">B</string>
     <string name="cd_blocked_initial">B</string>
-    <string name="ci_bypass_universal_desc">- Exception globale</string>
     <string name="ada_app_status_block">est bloquée</string>
     <string name="ada_ip_rules_title">règles d’IP pour cette application</string>
     <string name="bsac_block_toast">Blocage de %1$s pour cette application</string>
@@ -374,7 +373,6 @@
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="dns_log_dialog_positive">Supprimer les journaux</string>
     <string name="settings_http_proxy_dialog_title">URL du serveur personnalisé</string>
-    <string name="fapps_info_dialog_title">Informations</string>
     <string name="dns_filter_parent_allowed">Autorisés</string>
     <string name="dns_btm_resolved_doh_no_server">résolu %1$s</string>
     <string name="univ_view_blocked_ip">règles IP &amp; port</string>
@@ -626,7 +624,6 @@
     <string name="ada_noapp_dialog_positive">D’accord</string>
     <string name="bsac_unblock">Débloquer</string>
     <string name="rt_download_desc">Téléchargez les listes de blocage (environ 60MB) pour utiliser cette fonctionnalité.</string>
-    <string name="bsrf_group_heading">Groupe</string>
     <string name="brbs_restore_dialog_title">Restaurer une sauvegarde</string>
     <string name="hs_download_positive_default">ok</string>
     <string name="univ_accessibility_crash_dialog_positive">Aller aux paramètres</string>
@@ -661,7 +658,6 @@
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ci_header">Règles IP &amp; port: %1$s</string>
     <string name="ci_blocked_txt">Bloquée</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_download_start">Téléchargement des listes de blocage…</string>
     <string name="bsrf_sub_group_heading">Sous-groupe</string>
     <string name="brbs_title">Sauvegarde &amp; restauration</string>
@@ -693,7 +689,6 @@
     <string name="notif_channed_desc_download">Alerte sur la progression du téléchargement des listes de blocage embarquées</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_filter_all">Tout</string>
-    <string name="ci_blocked_desc">- Bloquée</string>
     <string name="bsac_title_desc">Les règles ne s’appliquent qu’à cette application.</string>
     <string name="rt_list_simple_btn_txt">simple</string>
     <string name="rt_apply_btn">Appliquer</string>
@@ -761,7 +756,6 @@
     <string name="cd_remove_dialog_message">Supprimer le domaine de la configuration sauvegardée.</string>
     <string name="cd_remove_dialog_negative">Annuler</string>
     <string name="ci_dialog_error_invalid_ip">Adresse IP, sous-réseau ou port non valide.</string>
-    <string name="ci_no_rule_desc">- Sans règle</string>
     <string name="notif_download_content_text">Téléchargement en cours…</string>
     <string name="bsrf_apply_filter">Appliquer</string>
     <string name="dc_local_block_enabled">Activé</string>
@@ -793,7 +787,6 @@
     <string name="ada_ip_block_count">%1$s règle(s) IP</string>
     <string name="notif_download_failure_content">Le téléchargement a échoué. Essayez à nouveau.</string>
     <string name="rt_edit_dialog_positive">Éditer</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="rethink_sky_desc">280+ emplacements ; uptime plus élevé ; ébauche de résolveur fonctionnant sur cloudflare.com</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="settings_custom_downloader_desc">Si désactivé, le <i>Gestionnaire de téléchargement</i> d’Android sera utilisé.</string>
@@ -859,7 +852,6 @@
     <string name="other_dns_list_tab2">DNSCrypt</string>
     <string name="rt_filter_desc">Affichage des listes de blocage <u>%1$s</u></string>
     <string name="rt_filter_desc_subgroups">Affichage des listes de blocage <u>%1$s</u> dans les groupes : %2$s et les sous-groupes : %3$s</string>
-    <string name="rt_filter_desc_groups">Affichage des listes de blocage <u>%1$s</u> dans les groupes : %2$s</string>
     <string name="intent_launch_error">Impossible de lancer %1$s</string>
     <string name="no_browser_error">Impossible d’ouvrir une page Web à partir du navigateur.</string>
     <string name="notification_screen_error">Impossible de lancer l’écran de notification de l’application.</string>
@@ -887,7 +879,6 @@
     <string name="private_dns_dialog_positive">Aller dans les paramètres d’Android</string>
     <string name="private_dns_dialog_negative">Ignorer</string>
     <string name="ci_bypass_app_txt">Exception aux règles de l’appli</string>
-    <string name="ci_bypass_app_desc">- Exception aux règles de l’appli</string>
     <string name="ada_app_firewall">Pare-feu</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Effacer les journaux</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Effacer les journaux de cette application.</string>

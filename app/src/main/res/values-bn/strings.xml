@@ -595,7 +595,6 @@
     <string name="cd_add_dialog_sample_3">%1$s https://%2$s
 \n</string>
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
-    <string name="ci_bypass_universal_desc">- বাইপাস সার্বজনীন</string>
     <string name="ada_ip_rules_title">এই অ্যাপের জন্য আইপি নিয়ম</string>
     <string name="bsac_whitelist_remove_toast">এই IP %1$s এর জন্য বাইপাস সরানো হয়েছে</string>
     <string name="bsdl_domain_rule_allow">অনুমতি</string>
@@ -645,7 +644,6 @@
     <string name="bsac_whitelist_toast">এই IP %1$s এর জন্য অ্যাপের নিয়মগুলি বাইপাস করা</string>
     <string name="rt_cancel_download">বাতিল</string>
     <string name="rt_apply_btn">প্রয়োগ করুন</string>
-    <string name="bsrf_group_heading">গ্রুপ</string>
     <string name="brbs_backup_dialog_message">একটি ফাইলে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ ব্যাক আপ করে। এটি VPN পুনরায় চালু করবে।</string>
     <string name="other_dns_list_tab2">ডিএনস্ক্রিপ্ট</string>
     <string name="firewall_rule_block_udp_ntp">UDP অবরুদ্ধ</string>
@@ -737,7 +735,6 @@
     <string name="ci_no_rules_text">কোনো সার্বজনীন আইপি ব্লক বা বাইপাস নিয়ম পাওয়া যায়নি।</string>
     <string name="ada_app_status_block_md">মিটারযুক্ত (মোবাইল) নেটওয়ার্কগুলিতে অবরুদ্ধ</string>
     <string name="notif_download_content_text">ডাউনলোড চলছে…</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="lbbs_enabled">সক্ষম করা হয়েছে</string>
     <string name="lbbs_redownload">ব্লকলিস্ট পুনরায় ডাউনলোড করুন</string>
     <string name="dns_proxy_connection_failure_lockdown">লকডাউন মোডে %2$s-এর জন্য %1$s বাদ দিলে ইন্টারনেট সংযোগ সমস্যা হতে পারে।</string>
@@ -747,12 +744,9 @@
     <string name="notif_dialog_pause_dialog_negative">বাতিল</string>
     <string name="notif_channel_desc_firewall_alerts">ফায়ারওয়াল ত্রুটি এবং অসঙ্গতির বিষয়ে সতর্কতা</string>
     <string name="ci_dialog_error_invalid_ip">অবৈধ IP ঠিকানা, সাবনেট বা পোর্ট।</string>
-    <string name="ci_blocked_desc">- অবরুদ্ধ</string>
-    <string name="ci_no_rule_desc">- কোন নিয়ম নেই</string>
     <string name="notif_download_content_title">অন-ডিভাইস ব্লকলিস্ট ডাউনলোড</string>
     <string name="rt_dialog_neutral">Continue</string>
     <string name="rt_download">ব্লকলিস্ট ডাউনলোড করুন</string>
-    <string name="rethink_dns_txt">রিথিঙ্কডিএনএস %1$s</string>
     <string name="dc_doh">HTTPS এর উপর Dns</string>
     <string name="brbs_backup_dialog_negative">বাতিল</string>
     <string name="new_app_bulk_notification_content">RethinkDNS ব্লক করেছে %1$s নতুন অ্যাপ। দেখতে বা পরিবর্তন করতে আলতো চাপুন।</string>
@@ -823,7 +817,6 @@
     <string name="fapps_firewall_filter_all">All</string>
     <string name="fapps_firewall_filter_hint">তালিকাভুক্ত অ্যাপে আনমিটারড/মিটারড নিয়ম প্রয়োগ করুন</string>
     <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s অ্যাপ দেখানো হচ্ছে</string>
-    <string name="fapps_info_dialog_title">তথ্য</string>
     <string name="fapps_info_dialog_positive_btn">ঠিক আছে</string>
     <string name="fapps_firewall_filter_allowed">অনুমোদিত</string>
     <string name="fapps_firewall_filter_blocked">Blocked</string>

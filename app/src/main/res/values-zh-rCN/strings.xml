@@ -9,7 +9,6 @@
     <string name="settings_orbot_notification_content">启动 Tor 代理失败。请手动开启 Orbot 应用。</string>
     <string name="settings_https_disabled_error">已连接至 Orbot 。请先将其关闭。</string>
     <string name="settings_socks5_dialog_hint_username">帐号（可选）</string>
-    <string name="fapps_info_dialog_title">数据</string>
     <string name="fapps_info_dialog_message">阻止应用连接互联网。限制访问互联网有助于避免不必要的数据使用，也有助于省电。
 \n
 \n收费（移动数据）/非收费（ WiFi ）防火墙规则将不会在下述情形遵守：
@@ -117,7 +116,6 @@
     <string name="cd_remove_dialog_positive">删除</string>
     <string name="cd_filter_all">全部</string>
     <string name="ci_no_rules_text">未找到 IP 或端口规则。</string>
-    <string name="ci_bypass_universal_desc">- 无条件放行</string>
     <string name="ada_ip_no_connection">此应用无网络日志。</string>
     <string name="ada_app_status_lockdown">正处闭关模式中</string>
     <string name="rt_edit_dialog_positive">編辑</string>
@@ -349,7 +347,6 @@
     <string name="new_app_notification_action_toast_deny">拦截应用网络连接</string>
     <string name="cd_filter_allowed">放行</string>
     <string name="cd_blocked_txt">拦截</string>
-    <string name="ci_blocked_desc">- 拦截</string>
     <string name="ada_app_whitelist">无条件放行</string>
     <string name="rethink_sky_desc">逾 280 处地点；更长的在线时间；于 cloudflare.com 上运行的中间解析服务</string>
     <string name="wireguard_mode_info_explanation_new">即将推出。</string>
@@ -390,7 +387,6 @@
     <string name="ada_app_status_unknown">未知</string>
     <string name="bsac_go_pass_app_rules">移除绕行</string>
     <string name="bsdl_blocked_desc">已由 %2$s 拦截 %1$s</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="bsrf_sub_group_heading">子分组</string>
     <string name="allow">放行</string>
     <string name="bypass_universal">无条件放行</string>
@@ -425,7 +421,6 @@
     <string name="ci_bypass_universal_txt">无条件放行</string>
     <string name="notif_download_content_text">正在下载……</string>
     <string name="rt_re_download">重新下载屏蔽名单</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="txt_home">首页</string>
     <string name="firewall_mode_info_explanation_new">监测网络活动与拦截任意应用或 IP 地址。</string>
@@ -537,11 +532,9 @@
     <string name="cd_no_rule_txt">无规则</string>
     <string name="ci_dialog_error_invalid_ip">无效 IP 地址、子网或端口。</string>
     <string name="ci_header">IP 与端口规则: %1$s</string>
-    <string name="ci_no_rule_desc">- 无规则</string>
     <string name="ada_app_exclude">排除</string>
     <string name="rt_dialog_positive">应用</string>
     <string name="rt_dialog_neutral">继续</string>
-    <string name="bsrf_group_heading">分组</string>
     <string name="bsrf_apply_filter">应用</string>
     <string name="settings_vpn_heading">vpn</string>
     <string name="settings_allow_bypass_desc">允许应用按需请求绕过 RethinkDNS 的防火墙。一些如 Zoom 和 Whatsapp 的音频/视频会议应用可能会需要按需绕行以正常运行。</string>
@@ -865,7 +858,6 @@
     <string name="ada_firewall_title">应用防火墙规则</string>
     <string name="rt_filter_parent_all">全部</string>
     <string name="rt_filter_hint">正显示<u>所有</u>屏蔽名单</string>
-    <string name="rt_filter_desc_groups">正显示 %2$s 组内的 <u>%1$s</u> 个屏蔽名单</string>
     <string name="firewall_rule_block_univ_ip">IP / 端口（全局）</string>
     <string name="ada_app_lockdown">闭关</string>
     <string name="rt_filter_parent_selected">已选择</string>
@@ -883,7 +875,6 @@
     <string name="private_dns_dialog_positive">前往设置</string>
     <string name="private_dns_dialog_negative">忽略</string>
     <string name="ci_bypass_app_txt">放行应用规则</string>
-    <string name="ci_bypass_app_desc">- 绕过应用规则</string>
     <string name="ada_app_firewall">防火墙</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日志</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有与此应用有联系的日志。</string>

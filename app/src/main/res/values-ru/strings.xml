@@ -183,7 +183,6 @@
     <string name="ada_noapp_dialog_positive">Окей</string>
     <string name="rt_edit_dialog_positive">Изменить</string>
     <string name="rt_cancel_download">Отмена</string>
-    <string name="bsrf_group_heading">Группа</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="collecting_logs_progress_text">Захват…</string>
     <string name="settings_notification_dialog_option_2">"
@@ -310,7 +309,6 @@
     <string name="dns_info_positive">Окей</string>
     <string name="rt_dialog_positive">Применить</string>
     <string name="cd_dialog_negative_btn">отмена</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s резольверы</string>
     <string name="download_update_dialog_title">Новое обновление!</string>
     <string name="search_firewall_network_log"><font size="12">Поиск приложений, IP-адресов, доменов</font></string>
@@ -439,7 +437,6 @@
     <string name="cd_remove_dialog_title">Удалить домен\?</string>
     <string name="cd_no_rule_txt">Нет правил</string>
     <string name="ci_bypass_universal_initial">BU</string>
-    <string name="ci_blocked_desc">- Заблокирован</string>
     <string name="cd_dialog_desc">Пользовательский URL (домен) или дикий символ для разрешения или блокировки. например, *.test.com, test.com/test</string>
     <string name="cd_dialog_error_invalid_tld">Недействительный домен верхнего уровня.</string>
     <string name="ci_dialog_desc">Разрешить (обход) или заблокировать IP-адрес, IP-подсеть (диапазон), порт. Пример: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
@@ -448,7 +445,6 @@
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_allow">разрешено</string>
     <string name="ada_app_status_whitelist">будет обходить универсальные правила брандмауэра</string>
-    <string name="ci_no_rule_desc">- Нет правил</string>
     <string name="ada_noapp_dialog_title">Информация о приложении не найдена</string>
     <string name="ada_app_status_block">заблокирован</string>
     <string name="ada_app_status_block_md">блокируется в сетях с дозированной оплатой (мобильная связь)</string>
@@ -475,7 +471,6 @@
     <string name="rt_dialog_message">Вы хотите применить новые настроенные списки блокировки\?</string>
     <string name="rt_download_start">Загрузка блокчейн…</string>
     <string name="rt_chip_check_update">Проверить наличие обновлений</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="dc_rethink_dns">Переосмыслить DNS</string>
     <string name="lbbs_redownload">Повторная загрузка блок-листов</string>
     <string name="brbs_backup_dialog_message">Резервное копирование настроек приложения, журналов сети и dns в файл. Это приведет к перезапуску VPN.</string>
@@ -485,7 +480,6 @@
     <string name="lbbs_enabled">Включено</string>
     <string name="rt_list_simple_btn_txt">простой</string>
     <string name="rt_list_adv_btn_txt">продвинутый</string>
-    <string name="rt_filter_desc_groups">Показывать <u>%1$s</u> блокчейн в группе: %2$s</string>
     <string name="rethink_sky_desc">280+ местоположений; более высокое время работы; резольвер заглушки работает на cloudflare.com</string>
     <string name="dc_local_block_disabled">Выключено</string>
     <string name="brbs_backup_dialog_positive">Резервное копирование</string>
@@ -574,7 +568,6 @@
     <string name="dns_select_toast">Необходимо выбрать как минимум один резольвер.</string>
     <string name="dns_proxy_ip_address">IP-адрес</string>
     <string name="fapps_firewall_filter_lockdown">Блокировка</string>
-    <string name="fapps_info_dialog_title">Информация</string>
     <string name="fapps_unmetered_block_dialog_title">Блокировка при бездоговорном режиме</string>
     <string name="fapps_unmetered_unblock_dialog_message">Разрешить подключения в сети без учета тарифов (WiFi) для приложений <i>, перечисленных в списке</i>\?</string>
     <string name="fapps_metered_block_dialog_title">Блок на дозированном</string>
@@ -602,7 +595,6 @@
     <string name="ci_dialog_added_success">IP добавлен в список</string>
     <string name="ci_no_rules_text">Не найдено универсальных правил блокировки или обхода IP-адресов.</string>
     <string name="ci_bypass_universal_txt">Байпас универсальный</string>
-    <string name="ci_bypass_universal_desc">- Обходы универсальные</string>
     <string name="ci_blocked_txt">Заблокированный</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_txt">Нет правил</string>

@@ -525,7 +525,6 @@
     <string name="fapps_filter_clear_btn">清除</string>
     <string name="fapps_filter_parent_all">全部</string>
     <string name="fapps_filter_parent_installed">裝咗嘅</string>
-    <string name="fapps_info_dialog_title">資料</string>
     <string name="fapps_filter_filter_heading">類型</string>
     <string name="fapps_filter_categories_heading">類別</string>
     <string name="fapps_filter_apply_btn">套用</string>
@@ -656,7 +655,6 @@
     <string name="ci_bypass_universal_initial">繞</string>
     <string name="ci_no_rule_initial">冇</string>
     <string name="ci_no_rule_txt">冇規則</string>
-    <string name="ci_no_rule_desc">- 冇規則</string>
     <string name="ci_no_rule">冇規則</string>
     <string name="ci_delete">刪除</string>
     <string name="ada_noapp_dialog_title">搵唔到應用程式資訊</string>
@@ -691,7 +689,6 @@
     <string name="rbl_parental_control">家長控制</string>
     <string name="rbl_privacy">私隱</string>
     <string name="rbl_security">安全</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">儲存更改</string>
     <string name="rt_dialog_message">您是係咪要套用新配置嘅攔截清單？</string>
     <string name="rt_dialog_positive">套用</string>
@@ -709,11 +706,9 @@
     <string name="rt_cancel_btn">取消</string>
     <string name="rt_apply_btn">套用</string>
     <string name="rt_download_desc">請下載攔截清單（大約 60 MB）嚟用呢個功能。</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rethink_max_desc">超過 50 個地方；更私密；喺 fly.io 上面行嘅遞歸解析服務</string>
-    <string name="bsrf_group_heading">分組</string>
     <string name="bsrf_sub_group_heading">子分組</string>
     <string name="bsrf_apply_filter">套用</string>
     <string name="bsrf_clear_filter">套用</string>
@@ -833,10 +828,8 @@
     <string name="cd_blocked_initial">攔</string>
     <string name="cd_blocked_txt">攔截</string>
     <string name="ci_bypass_universal_txt">無條件放行</string>
-    <string name="ci_bypass_universal_desc">- 無條件放行</string>
     <string name="ci_blocked_initial">攔</string>
     <string name="ci_blocked_txt">攔截</string>
-    <string name="ci_blocked_desc">- 攔截</string>
     <string name="ci_block">攔截</string>
     <string name="ci_bypass_universal">無條件放行</string>
     <string name="ada_app_status_allow">放行咗</string>
@@ -866,7 +859,6 @@
     <string name="rt_filter_parent_all">全部</string>
     <string name="rt_filter_parent_selected">揀咗嘅</string>
     <string name="rt_filter_hint">顯示緊<u>所有</u>攔截清單</string>
-    <string name="rt_filter_desc_groups">顯示緊 %2$s 分組入面嘅 <u>%1$s</u> 份攔截清單</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="relative_time_today">今日</string>
     <string name="relative_time_yesterday">尋日</string>
@@ -897,6 +889,5 @@
 \n要用 Rethink 嘅 DNS，請去 Android 設定度熄咗「私人 DNS」佢。</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">攔截惡意軟件、勒索軟件、加密軟件、釣魚同其他威脅。</string>
     <string name="ci_bypass_app_initial">繞應</string>
-    <string name="ci_bypass_app_desc">- 繞過應用程式規則</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">攔截吸睛軟件、間諜軟件同恐嚇軟件。</string>
 </resources>

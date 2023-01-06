@@ -265,7 +265,6 @@
     <string name="fapps_filter_parent_system">Sistema</string>
     <string name="fapps_firewall_filter_blocked">Bloqueado</string>
     <string name="fapps_firewall_filter_bypass_universal">Omitido</string>
-    <string name="fapps_info_dialog_title">Información</string>
     <string name="fapps_firewall_filter_lockdown">Aislamiento</string>
     <string name="fapps_firewall_filter_excluded">Excluído</string>
     <string name="fapps_unmetered_unblock_dialog_title">Permitir en redes sin límites</string>
@@ -362,11 +361,8 @@
     <string name="cd_filter_allowed">Permitido</string>
     <string name="ci_dialog_title">Añadir regla de IP/puerto</string>
     <string name="ci_blocked_txt">Bloquear</string>
-    <string name="ci_blocked_desc">- Bloqueado</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ci_no_rule_txt">Ninguna regla</string>
-    <string name="ci_no_rule_desc">- Ninguna regla</string>
-    <string name="ci_bypass_universal_desc">- Omisión global</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule">ninguna regla</string>
     <string name="ada_ip_no_connection">No hay registros de red para esta aplicación.</string>
@@ -411,10 +407,8 @@
     <string name="rt_filter_hint">Mostrando <u>todas</u> las listas de bloqueo</string>
     <string name="rt_filter_desc">Mostrando <u>%1$s</u> listas de bloqueo</string>
     <string name="rt_download_desc">Descargue las listas de bloqueo (alrededor de 60MB) para utilizar esta función.</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
-    <string name="rt_filter_desc_groups">Mostrando <u>%1$s</u> listas de bloqueo en el grupo: %2$s</string>
     <string name="rt_filter_desc_subgroups">Mostrando <u>%1$s</u> listas de bloques en el grupo: %2$s y el subgrupo: %3$s</string>
     <string name="bsrf_apply_filter">Aplicar</string>
     <string name="bsrf_clear_filter">Limpiar</string>
@@ -665,7 +659,6 @@
     <string name="ada_app_metered">Con límites</string>
     <string name="ci_bypass_universal_txt">Omisión global</string>
     <string name="ci_bypass_app_txt">Omitir las reglas de las aplicaciones</string>
-    <string name="ci_bypass_app_desc">- Omite las reglas de la aplicación</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_app_initial">BA</string>
     <string name="ci_bypass_universal">omisión global</string>
@@ -696,7 +689,6 @@
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Bloquea attentionware, spyware, scareware.</string>
     <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines">Seguridad</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Bloquee malware, ransomware, cryptoware, phishers y otras amenazas.</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="dc_doh">Dns sobre HTTPS</string>
     <string name="lbbs_download">Actualizar las listas de bloqueo</string>
     <string name="rt_dialog_title">Guardar Cambios</string>
@@ -726,7 +718,6 @@
     <string name="notif_dialog_pause_dialog_neutral">Mostrar</string>
     <string name="dc_local_block_enabled">Activado</string>
     <string name="settings_import_export_desc">Hace una copia de seguridad o restaura manualmente los datos y la configuración de la aplicación.</string>
-    <string name="bsrf_group_heading">Grupo</string>
     <string name="hsf_downtime">(inactivo desde %1$s)</string>
     <string name="fav_icon">icono_favorito</string>
     <string name="dns_connected_rethink_plus">Conectado. %1$s listas de bloqueo en uso</string>

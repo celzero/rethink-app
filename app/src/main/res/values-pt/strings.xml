@@ -495,7 +495,6 @@
     <string name="bsdl_domain_rule_norule">sem regra</string>
     <string name="rt_cancel_download">Cancelar</string>
     <string name="rt_chip_update_available">Atualização disponível</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="rethink_sky_desc">Mais de 280 localizações; maior tempo de atividade; resolvedor de stub em execução em cloudflare.com</string>
     <string name="lbbs_enable">Desativado</string>
     <string name="brbs_backup_desc">Fazer uma cópia de segurança das configurações da aplicação, rede e registos de DNS</string>
@@ -521,7 +520,6 @@
     <string name="univ_view_blocked_ip_desc">Alterar as regras de IP / porta bloqueadas ou contornadas.</string>
     <string name="univ_accessibility_dialog_negative">Negar</string>
     <string name="univ_delete_firewall_dialog_message">Ao eliminar estas regras irá permitir que qualquer aplicação se conecte aos IPs atualmente bloqueados.</string>
-    <string name="fapps_info_dialog_title">Informações</string>
     <string name="network_log_app_name_unnamed">Sem nome (%1$s)</string>
     <string name="accessibility_notification_title">Ação requerida</string>
     <string name="dns_connected_rethink_plus">Conectado. %1$s listas de bloqueio usadas</string>
@@ -767,13 +765,10 @@
     <string name="ci_no_rules_text">Nenhuma regra de IP ou porta encontrada.</string>
     <string name="ci_bypass_universal_initial">CU</string>
     <string name="ci_bypass_universal_txt">Contorno universal</string>
-    <string name="ci_bypass_universal_desc">- Contorno universal</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_blocked_txt">Bloqueado</string>
-    <string name="ci_blocked_desc">- Bloqueado</string>
     <string name="ci_no_rule_initial">S</string>
     <string name="ci_no_rule_txt">Sem regra</string>
-    <string name="ci_no_rule_desc">- Sem regra</string>
     <string name="ci_no_rule">sem regra</string>
     <string name="ci_block">bloquear</string>
     <string name="ci_bypass_universal">contorno universal</string>
@@ -815,7 +810,6 @@
     <string name="notif_download_success_content">Descarregado com sucesso.</string>
     <string name="rbl_privacy">Privacidade</string>
     <string name="rbl_security">Segurança</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Guardar alterações</string>
     <string name="rt_dialog_message">Quer aplicar as listas de bloqueio recém-configuradas\?</string>
     <string name="rt_dialog_positive">Aplicar</string>
@@ -836,10 +830,8 @@
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rt_filter_hint">A mostrar <u>todas</u> as listas de bloqueio</string>
     <string name="rt_filter_desc">A mostrar <u>%1$s</u> listas de bloqueio</string>
-    <string name="rt_filter_desc_groups">A mostrar <u>%1$s</u> listas de bloqueio no grupo: %2$s</string>
     <string name="rt_filter_desc_subgroups">A mostrar <u>%1$s</u>listas de bloqueio no grupo: %2$s e no subgrupo: %3$s</string>
     <string name="rethink_max_desc">Mais de 50 localizações; mais privado; resolvedor recursivo em execução em fly.io</string>
-    <string name="bsrf_group_heading">Grupo</string>
     <string name="bsrf_sub_group_heading">Subgrupo</string>
     <string name="bsrf_apply_filter">Aplicar</string>
     <string name="bsrf_clear_filter">Limpar</string>
@@ -888,7 +880,6 @@
     <string name="private_dns_dialog_negative">Cancelar</string>
     <string name="ci_bypass_app_initial">CA</string>
     <string name="ci_bypass_app_txt">Regras de contorno de aplicação</string>
-    <string name="ci_bypass_app_desc">- Regras de contorno de aplicação</string>
     <string name="ada_app_firewall">Firewall</string>
     <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">Cancelar</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Bloquear sites com conteúdo adulto, pirataria, jogos de azar, encontros online e redes sociais.</string>
