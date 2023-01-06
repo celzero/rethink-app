@@ -76,7 +76,6 @@
 \n</string>
     <string name="cd_dialog_error_invalid_wildcard">无效通配符。</string>
     <string name="ci_no_rule">无规则</string>
-    <string name="ada_lockdown_desc">启用时，应用将只可以连接至位于<i>绕行 IP 规则</i>中的 IP ；至其他 IP 的连接将被拦截。</string>
     <string name="bsac_bypass_app_rules">绕行应用规则</string>
     <string name="rt_dialog_message">您是否想要应用新配置的屏蔽名单？</string>
     <string name="dc_dns_proxy">DNS 代理</string>
@@ -88,7 +87,7 @@
     <string name="download_update_dialog_trylater_title">现在无法更新</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_enable_logs">启用本地日志</string>
-    <string name="whats_dialog_title">v053k 的新内容</string>
+    <string name="whats_dialog_title">v053l 的新内容</string>
     <string name="settings_allow_bypass_heading">允许绕行</string>
     <string name="settings_socks5_heading">设置 SOCKS5 代理</string>
     <string name="orbot">Orbot</string>
@@ -118,7 +117,7 @@
     <string name="new_app_bulk_notification_title">注意</string>
     <string name="cd_remove_dialog_positive">删除</string>
     <string name="cd_filter_all">全部</string>
-    <string name="ci_no_rules_text">未找到任何 IP 拦截或绕行规则。</string>
+    <string name="ci_no_rules_text">未找到 IP 或端口规则。</string>
     <string name="ci_bypass_universal_desc">- 无条件放行</string>
     <string name="ada_ip_no_connection">此应用无网络日志。</string>
     <string name="ada_app_status_lockdown">正处闭关模式中</string>
@@ -159,7 +158,6 @@
     <string name="build__flavor_play_store">play</string>
     <string name="cd_remove_dialog_message">于已保存配置中删除此域名。</string>
     <string name="ada_firewall_status">此应用<b><i>%1$s</i></b>。</string>
-    <string name="ada_ip_block_no_rules">此应用无 IP 规则。</string>
     <string name="bsdl_domain_rule_norule">无规则</string>
     <string name="bsdl_domain_rule_allow">放行</string>
     <string name="rt_chip_update_available">更新可用</string>
@@ -248,7 +246,6 @@
     <string name="rt_apply_btn">应用</string>
     <string name="rt_download_desc">请下载屏蔽名单（约 60 MB ）以使用此功能。</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
-    <string name="private_dns_toast">已设置私人 DNS 。</string>
     <string name="always_on_dialog_positive">停止</string>
     <string name="dns_crypt_url_remove_dialog_message">于已保存的配置中删除此 DNSCrypt 解析服务。</string>
     <string name="local_blocklist_download">下载屏蔽名单</string>
@@ -266,7 +263,7 @@
     <string name="hsf_start_dialog_positive">启动</string>
     <string name="dc_other_dns_heading">类型</string>
     <string name="dc_other_settings_heading">高级</string>
-    <string name="dc_dns_website_desc">從<i>duckduckgo.com</i> 获取网站图标。约占用 350 MB 磁盘空间</string>
+    <string name="dc_dns_website_desc">从 <i>nextdns.com</i> 与 <i>duckduckgo.com</i> 获取网站图标。约占用 350 MB 磁盘空间</string>
     <string name="about_faq">查阅常见问题</string>
     <string name="about_sponsor_link_text">赞助</string>
     <string name="univ_firewall_rule_1">设备锁定时拦截所有应用</string>
@@ -288,7 +285,6 @@
     <string name="rt_dialog_title">保存更改</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="title_settings">设置</string>
-    <string name="admin_receiver_status_enabled">现可设置基于 DNS 的内容拦截器。</string>
     <string name="untracked">未跟踪</string>
     <string name="status_protected_with_socks5_private_dns">已由 SOCKS5 与私人 DNS 保护</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">已连接至 RethinkDNS 与防火墙</string>
@@ -332,7 +328,7 @@
     <string name="settings_theme_dialog_title">外观</string>
     <string name="settings_notification_dialog_title">选择通知操作</string>
     <string name="firewall_card_status_inactive">已禁用</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">正使用 RethinkDNS</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS 使用中</string>
     <string name="hsf_pause_vpn_failure">无法暂停： RethinkDNS 未启用</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_check_update_heading">提示屏蔽名单更新</string>
@@ -392,7 +388,6 @@
     <string name="category_name_installed">已安装程序</string>
     <string name="cd_sample_unicode_valid">✅</string>
     <string name="cd_whitelist_txt">放行</string>
-    <string name="ada_lockdown_title">应用闭关</string>
     <string name="ada_app_status_block_wifi">已于非收费网络（ WiFi ）拦截</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="bsac_go_pass_app_rules">移除绕行</string>
@@ -430,7 +425,6 @@
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ci_bypass_universal_initial">绕</string>
     <string name="ci_bypass_universal_txt">无条件放行</string>
-    <string name="ada_ip_rules_status_blocked">已拦截</string>
     <string name="notif_download_content_text">正在下载……</string>
     <string name="rt_re_download">重新下载屏蔽名单</string>
     <string name="rethink_dns_txt">RethinkDNS %1$s</string>
@@ -471,9 +465,7 @@
     <string name="cd_whitelist_initial">放</string>
     <string name="ci_dialog_added_success">已将 IP 加入列表</string>
     <string name="ci_no_rule_txt">无规则</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">绕行应用规则</string>
     <string name="ada_app_metered">收费网络</string>
-    <string name="bsac_delete_toast">已删除 %1$s</string>
     <string name="notif_download_content_title">下载本地屏蔽名单</string>
     <string name="bsrf_clear_filter">清除</string>
     <string name="status_protected_with_proxy_private_dns">已由代理与私人 DNS 保护</string>
@@ -491,7 +483,6 @@
     <string name="settings_http_proxy_toast_success">HTTP 代理已设置</string>
     <string name="settings_selected_ip_desc">%1$s</string>
     <string name="firewall_status_unknown">未知</string>
-    <string name="firewall_card_configure_btn">拦截应用</string>
     <string name="hsf_whats_new_chip_text">新内容</string>
     <string name="hsf_proxy_chip_text">已启用代理</string>
     <string name="cd_dns_crypt_resolver_heading">解析服务</string>
@@ -521,7 +512,7 @@
     <string name="settings_enable_logs_desc">于本地保存 DNS 与防火墙日志。</string>
     <string name="orbot_stop_dialog_neutral">更改 DNS</string>
     <string name="orbot_install_dialog_message">Orbot 将 Tor 的特性与功能带入 Android 。</string>
-    <string name="settings_dns_proxy_dialog_header">设置 SOCKS5 (TCP) 代理</string>
+    <string name="settings_dns_proxy_dialog_header">设置 SOCKS5 代理</string>
     <string name="settings_dns_proxy_dialog_port_number">端口</string>
     <string name="settings_socks5_dialog_hint_password">密码（可选）</string>
     <string name="settings_notification_heading">选择通知</string>
@@ -568,7 +559,6 @@
     <string name="about_bug_no_log_dialog_message">无法获取崩溃日志。请问您是否想要手动报告漏洞？</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="cd_dns_crypt_error_text_1">印戳不能为空</string>
-    <string name="ct_btm_sheet_error">无法打开底部栏</string>
     <string name="univ_ip_delete_individual_positive">删除</string>
     <string name="dns_query_latency">%1$sms</string>
     <string name="unicode_x_sign">❌</string>
@@ -586,8 +576,6 @@
     <string name="cd_add_dialog_show_btn">显示</string>
     <string name="cd_sample_unicode_invalid">❌</string>
     <string name="ci_delete">删除</string>
-    <string name="ada_ip_rules_status_allowed">无规则</string>
-    <string name="ada_uid">应用 ID ： <i>%1$s</i><br/>分类： <i>%2$s</i><br/>安装于： <i>%3$s</i><br/>更新于： <i>%4$s</i></string>
     <string name="ada_ip_rules_title">此应用的 IP 规则</string>
     <string name="bsac_block">拦截</string>
     <string name="bsac_unblock_toast">已为此应用放行 %1$s</string>
@@ -703,11 +691,10 @@
     <string name="fapps_firewall_filter_desc_category">正显示 <u>%1$s</u> %2$s 个应用于分类：%3$s</string>
     <string name="settings_local_blocklist_version">版本： v%1$s</string>
     <string name="firewall_rule_block_metered">收费网络（移动数据）</string>
-    <string name="firewall_rule_block_ip">IP / 端口</string>
+    <string name="firewall_rule_block_ip">IP / 端口（应用）</string>
     <string name="notif_channel_vpn_notification">VPN 已启用</string>
     <string name="category_name_sys_apps">系统应用</string>
     <string name="ci_blocked_txt">拦截</string>
-    <string name="bsac_delete">删除</string>
     <string name="lbbs_enabled">已启用</string>
     <string name="brbs_backup_dialog_positive">备份</string>
     <string name="orbot_http_desc">推荐应用程序使用 Orbot 的 HTTP 代理。</string>
@@ -719,7 +706,6 @@
     <string name="settings_title_desc">一款可高度自定义的 DNS 与防火墙软件</string>
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">关于</string>
-    <string name="admin_receiver_status_disabled">内容拦截器现不再生效。</string>
     <string name="next">下一步</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="lockdown">闭关</string>
@@ -765,14 +751,14 @@
     <string name="download_update_dialog_failure_message">可能是我们的服务器下线了，或者是网络问题。请稍后重试。</string>
     <string name="settings_ip_network_heading">选择 IP 版本</string>
     <string name="hsf_start_dialog_negative">忽略</string>
-    <string name="hsf_blocklist_chip_text_no_data">启用 RethinkDNS+</string>
+    <string name="hsf_blocklist_chip_text_no_data">启用 RDNS+</string>
     <string name="hsf_exclude_error">VPN 闭关模式下无法排除</string>
     <string name="settings_https_desc">此设置并非强制性，且应用程序可能会将其忽略。使用 HTTP(S) 代理的应用会同时绕过防火墙与 DNS 规则。</string>
-    <string name="univ_firewall_no_ip_message">未找到任何 IP 地址。轻触网络日志屏幕下的请求项以逐个拦截 IP 地址。</string>
+    <string name="univ_firewall_no_ip_message">未找到任何 IP 地址。轻触网络日志屏下的请求项以逐个拦截 IP 地址。</string>
     <string name="hsf_start_dialog_message">您距安全的 Android 系统仅有一步之遥：即时查看网络活动，拦截网站、 IP 与不听话的应用。</string>
     <string name="app_info_error">无法打开应用信息。</string>
     <string name="doh_custom_url_remove_dialog_title">是否删除 DNS 端点？</string>
-    <string name="hsf_blocklist_chip_text">已配置 %1$s 个屏蔽名单</string>
+    <string name="hsf_blocklist_chip_text">%1$s 个屏蔽名单</string>
     <string name="cd_custom_doh_dialog_title">自定义服务器 URL</string>
     <string name="dns_crypt_relay_remove_dialog_title">是否删除此 DNSCrypt 中继？</string>
     <string name="show_logs_disabled_network_message">连接日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
@@ -780,28 +766,17 @@
     <string name="refresh_complete">应用列表已重新同步完毕。</string>
     <string name="dns_logs_lifetime_queries">总请求： %1$s</string>
     <string name="show_logs_disabled_dns_message">DNS 请求日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
-    <string name="search_firewall_all_apps"><font size="12">搜索应用</font></string>
+    <string name="search_firewall_all_apps"><font size="12">以 UID / 应用名搜索应用</font></string>
     <string name="orbot_explanation">Orbot 是一款能让其他程序更<u>安全</u>地连接到互联网的免费代理应用。
 \nOrbot 使用 <u>Tor</u> 来加密您的网络流量，帮您<u>绕过网络审查</u>，并抵御威胁个人自由及隐私的<u>网络监视</u>。
 \n<u>TCP 代理</u>： Rethink 只将未被排除应用的 TCP 连接转发至 Orbot 。
 \n<u>HTTP 代理</u>： Rethink <i>设置</i> HTTP 代理，但不强制应用程序使用它。如 Chrome 和 Firefox 等的浏览器通常会使用 HTTP 代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
-    <string name="about_sponsor">赞助</string>
     <string name="about_mozilla">RethinkDNS 为 Mozilla Builders MVP 计划的一部分。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) 代理</string>
     <string name="http_proxy_dialog_desc">HTTP(S) 代理设置仅为对应用程序的一个提醒，它们可选择是否使用代理；但如 Chrome 及 Firefox 等的浏览器则会使用代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
-    <string name="whats_new_version_update"><b>倾尽全力</b>
-\n
-\n 1. 隆重介绍一个更加私密的 Rethink 解析服务， <i>Max</i> 。
-\n 2. 将 IPv6 标记为实验性功能；默认切换为 IPv4 。
-\n 3. <i>新特性</i>：备份与恢复应用设置。
-\n 4. <i>新特性</i>：应用闭关模式。
-\n 5. <i>新特性</i>：全局闭关模式。
-\n 6. <i>新特性</i>：针对端口应用防火墙规则。
-\n 7. <i>新特性</i>：批量应用应用防火墙规则。
-\n 8. 少量 UI 优化。
-\n 9. 其他内存与崩溃修复。 </string>
+    <string name="whats_new_version_update">&lt;b&gt;打破语言隔阂！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 重新支持 Android 6。&lt;br/&gt; 2. 全新 RDNS+ 界面。&lt;br/&gt; 3. 全新防火墙与网络引擎。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：翻译为逾 15 种语言。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：自适应图标。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：在分应用网络日志内显示域名。&lt;br/&gt; 7. 修复通知于 Android 13 上消失的问题。&lt;br/&gt; 8. 修复异常工作的 Orbot DNS 支持。&lt;br/&gt; 9. 应用屏现可于仅 DNS 模式下访问。&lt;br/&gt;10. 对内建下载管理器的一些重大改进。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;帮助翻译此应用&lt;/a&gt;</string>
     <string name="about_website">访问 rethinkdns.com</string>
     <string name="settings_network_all_networks_desc">启用时， RethinkDNS 将使用所有可用的网络来连接至互联网。若未启用，则将使用 Android 认为<i>活跃</i>的网络。</string>
     <string name="settings_dns_proxy_dialog_app_desc">所选应用将被排除在 VPN 外，以允许其为您转发连接。</string>
@@ -813,7 +788,7 @@
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + 防火墙：
 \n显示两个按钮来快速在省电的 DNS 模式和普通的 DNS + 防火墙模式间切换。"</string>
-    <string name="contributors_list">&lt;i&gt;Rethink 开源项目&lt;/i&gt;的存在归功于这些在其开发工作上倾泻大量时间的志愿者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 应用程序 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 网络引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服务 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社区协管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">&lt;i&gt;Rethink 开源项目&lt;/i&gt;的存在归功于这些在其开发工作上倾泻大量时间的志愿者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 应用程序 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 网络引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服务 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社区协管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位置数据库 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻译 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 构建服务器 &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="hs_download_positive_default">确定</string>
     <string name="firewall_rule_block_app_unmetered_desc">一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>非收费网络</i>时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。</string>
     <string name="settings_protocol_translation_dns_inactive">切换至 DNS 或 DNS + 防火墙模式以启用此设置</string>
@@ -884,4 +859,46 @@
     <string name="brbs_restore_dialog_positive">恢复</string>
     <string name="brbs_restore_complete_toast">恢复完毕，正在重启应用……</string>
     <string name="brbs_restore_no_uri_toast">恢复失败；请重试</string>
+    <string name="hsf_notification_permission_failure">于设置屏启用通知权限</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="notif_download_cancel_content">下载已取消。</string>
+    <string name="about_privacy_policy">阅读隐私政策</string>
+    <string name="notification_screen_error">无法打开应用通知屏。</string>
+    <string name="ada_firewall_title">应用防火墙规则</string>
+    <string name="rt_filter_parent_all">全部</string>
+    <string name="rt_filter_hint">正显示<u>所有</u>屏蔽名单</string>
+    <string name="rt_filter_desc_groups">正显示 %2$s 组内的 <u>%1$s</u> 个屏蔽名单</string>
+    <string name="firewall_rule_block_univ_ip">IP / 端口（全局）</string>
+    <string name="ada_app_lockdown">闭关</string>
+    <string name="rt_filter_parent_selected">已选择</string>
+    <string name="rt_filter_desc">正显示 <u>%1$s</u> 个屏蔽名单</string>
+    <string name="rt_filter_desc_subgroups">正显示 %2$s 组与子分组 %3$s 的 <u>%1$s</u> 个屏蔽名单</string>
+    <string name="about_app_translate">翻译</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="intent_launch_error">无法打开 %1$s</string>
+    <string name="no_browser_error">无法于浏览器打开网页。</string>
+    <string name="ct_ip_port">%1$s:%2$s</string>
+    <string name="relative_time_today">今天</string>
+    <string name="relative_time_yesterday">昨天</string>
+    <string name="settings_app_notification_a13_heading">应用通知</string>
+    <string name="settings_app_notification_a13_desc">启用此应用的通知权限</string>
+    <string name="private_dns_dialog_positive">前往设置</string>
+    <string name="private_dns_dialog_negative">忽略</string>
+    <string name="ci_bypass_app_txt">放行应用规则</string>
+    <string name="ci_bypass_app_desc">- 绕过应用规则</string>
+    <string name="ada_app_firewall">防火墙</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日志</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有与此应用有联系的日志。</string>
+    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">继续</string>
+    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">取消</string>
+    <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">拦截成人、盗版内容，线上赌博、约会及社交媒体。</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">拦截吸睛软件、间谍软件及恐吓软件。</string>
+    <string name="private_dns_dialog_heading">关闭私人 DNS</string>
+    <string name="private_dns_dialog_desc">Rethink 的 DNS 设置已被 Android 的私人 DNS 覆盖。
+\n
+\n若要使用 Rethink 的 DNS ，请至 Android 设置并关闭「私人 DNS 」。</string>
+    <string name="ci_bypass_app_initial">绕应</string>
+    <string name="private_dns_error">无法打开私人 DNS 屏。</string>
+    <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">拦截恶意软件、勒索软件、加密软件、钓鱼及其他威胁。</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s 个屏蔽名单</string>
 </resources>

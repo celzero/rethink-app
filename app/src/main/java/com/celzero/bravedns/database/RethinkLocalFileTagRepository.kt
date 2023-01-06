@@ -16,8 +16,9 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.database.Cursor
 import androidx.room.Transaction
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
+import com.celzero.bravedns.data.FileTag
 
 class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkLocalFileTagDao) {
 
@@ -26,27 +27,32 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
         rethinkLocalFileTagDao.update(fileTag)
     }
 
-    suspend fun insertAsync(fileTag: RethinkLocalFileTag) {
-        rethinkLocalFileTagDao.insert(fileTag)
+    fun contentUpdate(fileTag: RethinkLocalFileTag): Int {
+        return rethinkLocalFileTagDao.update(fileTag)
     }
 
-    suspend fun insertWithReplace(fileTag: RethinkLocalFileTag) {
-        rethinkLocalFileTagDao.insertReplace(fileTag)
+    fun contentInsert(fileTag: RethinkLocalFileTag): Long {
+        return rethinkLocalFileTagDao.insert(fileTag)
+    }
+
+    fun contentDelete(id: Int): Int {
+        return rethinkLocalFileTagDao.contentDelete(id)
+    }
+
+    fun updateAll(fileTags: List<RethinkLocalFileTag>) {
+        rethinkLocalFileTagDao.updateAll(fileTags)
     }
 
     suspend fun insertAll(fileTags: List<RethinkLocalFileTag>): LongArray {
         return rethinkLocalFileTagDao.insertAll(fileTags)
     }
 
-    suspend fun updateTags(list: Set<Int>, isSelected: Int) {
+    // fixme: removed suspend for testing, add it back
+    fun updateTags(list: Set<Int>, isSelected: Int) {
         rethinkLocalFileTagDao.updateTags(list, isSelected)
     }
 
-    suspend fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping> {
-        return rethinkLocalFileTagDao.getSimpleViewTags()
-    }
-
-    suspend fun fileTags(): List<RethinkLocalFileTag> {
+    suspend fun fileTags(): List<FileTag> {
         return rethinkLocalFileTagDao.fileTags()
     }
 
@@ -56,5 +62,25 @@ class RethinkLocalFileTagRepository(private val rethinkLocalFileTagDao: RethinkL
 
     suspend fun getSelectedTags(): List<Int> {
         return rethinkLocalFileTagDao.getSelectedTags()
+    }
+
+    suspend fun deleteAll() {
+        return rethinkLocalFileTagDao.deleteAll()
+    }
+
+    fun contentGetFileTags(): Cursor {
+        return rethinkLocalFileTagDao.getFileTags()
+    }
+
+    fun contentGetSelectedFileTags(): Cursor {
+        return rethinkLocalFileTagDao.getFileTags()
+    }
+
+    fun contentGetAllFileTags(): Cursor {
+        return rethinkLocalFileTagDao.getFileTags()
+    }
+
+    fun contentGetFileTagById(id: Int): Cursor {
+        return rethinkLocalFileTagDao.getFileTags()
     }
 }

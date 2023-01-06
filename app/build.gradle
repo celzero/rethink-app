@@ -1,3 +1,7 @@
+plugins {
+  // to download blocklists for the headless variant
+  id "de.undercouch.download" version "5.3.0"
+}
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -14,9 +18,17 @@ try {
     keystoreProperties['storePassword'] = ''
 }
 
+// stackoverflow.com/a/28661942
+// stackoverflow.com/a/22743664
+tasks.whenTaskAdded { t ->
+    if (t.name.toLowerCase().contains('headless')) {
+        // this task maybe added more than once, but downloads happen only once
+        t.dependsOn downloadBlocklists
+    }
+}
+
 android {
     compileSdkVersion 33
-    buildToolsVersion '33.0.0'
     // https://developer.android.com/studio/build/configure-app-module
     namespace 'com.celzero.bravedns'
 
@@ -32,7 +44,7 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -66,7 +78,7 @@ android {
             initWith buildTypes.debug
         }
     }
-    flavorDimensions "releaseChannel"
+    flavorDimensions "releaseChannel", "releaseType"
     productFlavors {
         play {
             dimension "releaseChannel"
@@ -77,34 +89,47 @@ android {
         website {
             dimension "releaseChannel"
         }
+        headless {
+            dimension "releaseType"
+            // stackoverflow.com/a/60560178
+            // buildConfigField 'string', 'timestamp', '1662384683026'
+        }
+        full {
+            dimension "releaseType"
+        }
     }
 
     buildFeatures {
         viewBinding true
     }
+
+    kapt {
+        correctErrorTypes true
+    }
+
 }
 
 dependencies {
-    androidTestImplementation 'androidx.test:rules:1.4.0'
-    def koin_version = '3.2.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
     def room_version = "2.4.3"
     def paging_version = "3.1.1"
 
-    implementation "com.google.guava:guava:31.1-android"
+    implementation "com.google.guava:guava:31.1-jre"
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
+    // new version 2.0.0 need minimum of gradle plugin 7.4.0-alpha10
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'androidx.core:core-ktx:1.9.0'
+    fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    fullImplementation 'androidx.appcompat:appcompat:1.5.1'
+    fullImplementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     // For liveData implementation
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
@@ -117,21 +142,21 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
     implementation "android.arch.persistence.room:runtime:1.1.1"
 
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation "androidx.fragment:fragment-ktx:1.5.4"
+    fullImplementation "androidx.fragment:fragment-ktx:1.5.4"
     implementation 'com.google.android.material:material:1.7.0'
-    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    fullImplementation "androidx.viewpager2:viewpager2:1.0.0"
 
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // Glide implementation
     implementation('com.github.bumptech.glide:glide:4.14.2') {
@@ -141,21 +166,21 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.14.2'
 
     // Swipe button animation
-    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core features
-    implementation "io.insert-koin:koin-core:$koin_version"
+    implementation "io.insert-koin:koin-core:3.2.2"
     // Koin main features for Android (Scope,ViewModel ...)
-    implementation "io.insert-koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-android:3.2.3"
 
     implementation 'hu.autsoft:krate:2.0.0'
 
     // To use only without reflection variants of viewBinding
-    implementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.6'
-    implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.6'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
-    implementation 'com.github.celzero:firestack:34ee72663a'
+    implementation 'com.github.celzero:firestack:eaf8b8a2b5'
     //implementation project(":tun2socks")
 
     // Work manager
@@ -166,10 +191,36 @@ dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.3.4'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
+}
+
+// github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
+task downloadBlocklists(type: Download) {
+    // def assetsDir = new File(projectDir, 'src/main/assets'
+    def assetsDir = android.sourceSets.headless.assets.srcDirs[0]
+    // the filenames are ignored by dl, but acts as a hint for the output
+    // filename for the download-plugin, which does not respect the
+    // content-disposition http header, but rather guesses dest file names
+    // from the final segment of url's path
+    // github.com/michel-kraemer/gradle-download-task/blob/64d1ce32/src/main/java/de/undercouch/gradle/tasks/download/DownloadAction.java#L731
+    def sources = [
+      'https://dl.rethinkdns.com/blocklists/filetag.json',
+      'https://dl.rethinkdns.com/basicconfig/basicconfig.json',
+      'https://dl.rethinkdns.com/rank/rd.txt',
+      'https://dl.rethinkdns.com/trie/td.txt',
+    ]
+    src(sources)
+    dest assetsDir
+    // download files only if last-modified of the local file is less than
+    // the last-modified http header returned by the server
+    onlyIfModified true
+    // or if etag mismatches
+    useETag true
+    // overwrite older files as determined by last-modified, always
+    overwrite true
 }

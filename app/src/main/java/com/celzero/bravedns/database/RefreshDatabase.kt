@@ -32,27 +32,28 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.FirewallManager
-import com.celzero.bravedns.automaton.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isNonApp
 import com.google.common.collect.Sets
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class RefreshDatabase
 internal constructor(
@@ -104,8 +105,16 @@ internal constructor(
 
                 // installedPackages will also include apps which are disabled by the user
                 val installedPackages: List<PackageInfo> =
-                    context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)
-                        as List<PackageInfo>
+                    if (isAtleastT()) {
+                        context.packageManager?.getInstalledPackages(
+                            PackageManager.PackageInfoFlags.of(
+                                PackageManager.GET_META_DATA.toLong()
+                            )
+                        ) as List<PackageInfo>
+                    } else {
+                        context.packageManager?.getInstalledPackages(PackageManager.GET_META_DATA)
+                            as List<PackageInfo>
+                    }
 
                 val installedApps =
                     installedPackages

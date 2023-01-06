@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import android.content.ContentValues
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -70,5 +71,59 @@ class RethinkLocalFileTag {
         this.pack = pack
         this.simpleTagId = simpleTagId
         this.isSelected = isSelected
+    }
+
+    constructor()
+
+    fun fromContentValues(values: ContentValues?): RethinkLocalFileTag? {
+        if (values == null) return null
+        val a = values.valueSet()
+        a.forEach {
+            when (it.key) {
+                "value" -> value = it.value as Int
+                "uname" -> uname = it.value as String
+                "vname" -> vname = it.value as String
+                "group" -> group = it.value as String
+                "subg" -> subg = it.value as String
+                "url" -> {
+                    if (it.value is String) {
+                        url = listOf(it.value as String)
+                    } else if (it.value is List<*>) {
+                        url = it.value as List<String>
+                    }
+                }
+                "show" -> show = it.value as Int
+                "entries" -> entries = it.value as Int
+                "pack" -> {
+                    if (it.value is String) {
+                        pack = listOf(it.value as String)
+                    } else if (it.value is List<*>) {
+                        pack = it.value as List<String>
+                    }
+                }
+                "simpleTagId" -> simpleTagId = it.value as Int
+                "isSelected" -> {
+                    isSelected =
+                        if (it.value is Boolean) {
+                            it.value as Boolean
+                        } else {
+                            (it.value as Int) == 1
+                        }
+                }
+            }
+        }
+        return RethinkLocalFileTag(
+            value,
+            uname,
+            vname,
+            group,
+            subg,
+            pack,
+            url,
+            show,
+            entries,
+            simpleTagId,
+            isSelected
+        )
     }
 }

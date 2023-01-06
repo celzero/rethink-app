@@ -25,16 +25,16 @@
     <string name="ips6" translatable="false">cloudflare.net</string>
 
     <string name="url7" translatable="false">https://public.dns.iij.jp/dns-query</string>
-    <string name="ips7" translatable="false"></string>
+    <string name="ips7" translatable="false" />
 
     <string name="url8" translatable="false">https://dns.twnic.tw/dns-query</string>
-    <string name="ips8" translatable="false"></string>
+    <string name="ips8" translatable="false" />
 
     <string name="url9" translatable="false">https://doh.netweaver.uk/dns-query</string>
-    <string name="ips9" translatable="false"></string>
+    <string name="ips9" translatable="false" />
 
     <string name="url10" translatable="false">https://rdns.faelix.net/</string>
-    <string name="ips10" translatable="false"></string>
+    <string name="ips10" translatable="false" />
 
     <string name="url11" translatable="false">https://dns.aa.net.uk/dns-query</string>
     <string name="ips11" translatable="false">217.169.20.22,217.169.20.23,2001:8b0::2022,201:8b0::2023</string>

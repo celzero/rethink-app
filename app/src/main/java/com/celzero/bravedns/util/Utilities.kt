@@ -33,6 +33,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.ACTION_VPN_SETTINGS
+import android.provider.Settings.ACTION_WIRELESS_SETTINGS
 import android.text.Html
 import android.text.Spanned
 import android.text.TextUtils
@@ -52,10 +53,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.PauseActivity
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
+import com.celzero.bravedns.util.Constants.Companion.FLAVOR_HEADLESS
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_PLAY
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_WEBSITE
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
@@ -72,8 +73,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
-import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -82,6 +81,8 @@ import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
+import kotlinx.coroutines.launch
+import xdns.Xdns
 
 class Utilities {
 
@@ -352,6 +353,21 @@ class Utilities {
             }
         }
 
+        fun openNetworkSettings(context: Context) {
+            try {
+                val intent = Intent(ACTION_WIRELESS_SETTINGS)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.private_dns_error),
+                    Toast.LENGTH_SHORT
+                )
+                Log.w(LOG_TAG_VPN, "Failure opening network setting screen: ${e.message}", e)
+            }
+        }
+
         fun isMissingOrInvalidUid(uid: Int): Boolean {
             return when (uid) {
                 MISSING_UID -> true
@@ -371,7 +387,17 @@ class Utilities {
             var metadata: PackageInfo? = null
 
             try {
-                metadata = pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
+                metadata =
+                    if (isAtleastT()) {
+                        pm.getPackageInfo(
+                            pi,
+                            PackageManager.PackageInfoFlags.of(
+                                PackageManager.GET_META_DATA.toLong()
+                            )
+                        )
+                    } else {
+                        pm.getPackageInfo(pi, PackageManager.GET_META_DATA)
+                    }
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
             }
@@ -524,20 +550,36 @@ class Utilities {
         }
 
         fun isFdroidFlavour(): Boolean {
-            return BuildConfig.FLAVOR == FLAVOR_FDROID
+            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_FDROID
         }
 
         fun isWebsiteFlavour(): Boolean {
-            return BuildConfig.FLAVOR == FLAVOR_WEBSITE
+            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_WEBSITE
         }
 
         fun isPlayStoreFlavour(): Boolean {
-            return BuildConfig.FLAVOR == FLAVOR_PLAY
+            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_PLAY
+        }
+
+        fun isHeadlessFlavour(): Boolean {
+            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_HEADLESS
         }
 
         fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
             return try {
-                context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+                if (isAtleastT()) {
+                    context.packageManager.getApplicationInfo(
+                        packageName,
+                        PackageManager.ApplicationInfoFlags.of(
+                            PackageManager.GET_META_DATA.toLong()
+                        )
+                    )
+                } else {
+                    context.packageManager.getApplicationInfo(
+                        packageName,
+                        PackageManager.GET_META_DATA
+                    )
+                }
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.w(
                     LOG_TAG_FIREWALL,
@@ -595,7 +637,7 @@ class Utilities {
 
         fun hasLocalBlocklists(ctx: Context, timestamp: Long): Boolean {
             val a =
-                Constants.ONDEVICE_BLOCKLISTS.all {
+                Constants.ONDEVICE_BLOCKLISTS_ADM.all {
                     localBlocklistFile(ctx, it.filename, timestamp)?.exists() == true
                 }
             return a
@@ -657,13 +699,6 @@ class Utilities {
                 Log.e(LOG_TAG_VPN, "Could not fetch remote blocklist: " + e.message, e)
                 null
             }
-        }
-
-        fun openPauseActivityAndFinish(act: Activity) {
-            val intent = Intent()
-            intent.setClass(act, PauseActivity::class.java)
-            act.startActivity(intent)
-            act.finish()
         }
 
         fun isNonApp(p: String): Boolean {
@@ -781,7 +816,7 @@ class Utilities {
 
         enum class PrivateDnsMode {
             NONE, // The setting is "Off" or "Opportunistic", and the DNS connection is not using
-                  // TLS.
+            // TLS.
             UPGRADED, // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
             STRICT // The setting is "Strict".
         }

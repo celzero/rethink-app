@@ -10,7 +10,6 @@
     <string name="title_about">Apie</string>
     <string name="about_title_desc">Aptik ir blokuok tinklo saugumo grėsmes</string>
     <string name="txt_home">Pagrindinis</string>
-    <string name="admin_receiver_status_enabled">Paruošta nustatyti DNS pagrįstą turinio blokatorių.</string>
     <string name="accessibility_service_description">RethinkDNS naudoja pritaikymo neįgaliesiems paslaugą, kad aptiktų ir foninėms programėlėms pritaikytų ugniasienės taisykles . RethinkDNS nerenka ir neparduoda jokios informacijos.</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">Toliau</string>
@@ -58,7 +57,6 @@
 \n <u>#5</u>: blokuoja ryšius, kai šaltinio programėlė nežinoma (universali ugniasienė).
 \n <u>#6</u>: blokuoja visą UDP srautą, išskyrus DNS (universali ugniasienė).
 \n <u>#7</u>: blokuoja ryšius, kai DNS apeinamas (universali ugniasienė).</string>
-    <string name="private_dns_toast">Privatus DNS nustatytas.</string>
     <string name="always_on_dialog_heading">Išjungti nuolatinį VPN</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Ištrinti DNSCrypt sprendiklį\?</string>
     <string name="dns_crypt_url_remove_dialog_message">Ištrinti DNSCrypt sprendiklį iš išsaugotos konfigūracijos.</string>
@@ -85,7 +83,7 @@
     <string name="http_proxy_dialog_desc">HTTP(S) įgaliotojo serverio nustatymai yra tik užuomina programėlėms, tačiau jos gali juo naudoti arba nenaudoti; tačiau tokios naršyklės kaip „Chrome“ ir „Firefox“ juos naudoja. Programėlės, naudojančios HTTP(S) įgaliotąjį serverį, apeis ir ugniasienę, ir DNS taisykles.</string>
     <string name="download_update_dialog_message_success">Blokavimo sąrašas atsisiųstas sėkmingai.</string>
     <string name="search_firewall_network_log"><font size="12">Ieškoti programėlių, IP adresų, domenų</font></string>
-    <string name="search_firewall_all_apps"><font size="12">Ieškoti programėlių</font></string>
+    <string name="search_firewall_all_apps"><font size="12">Ieškoti programėlių pagal uid, pavadinimą</font></string>
     <string name="search_dns_logs"><font size="12">Ieškoti domenų vardų arba IP adresų</font></string>
     <string name="search_universal_ips"><font size="12">Ieškoti IP adresų</font></string>
     <string name="search_custom_domains"><font size="12">Ieškoti domenų vardų</font></string>
@@ -97,7 +95,7 @@
     <string name="settings_vpn_heading">vpn</string>
     <string name="settings_enable_logs">Įgalinti registravimą įrenginyje</string>
     <string name="app_mode_choose">Pasirinkti režimą</string>
-    <string name="whats_dialog_title">Kas naujo v053k</string>
+    <string name="whats_dialog_title">Kas naujo v053l</string>
     <string name="whats_new_version_name">🌎🕊 Pasaulinė studentų diena (spalio 15 d.) 🕊🌎</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_heading">Pasirinkti IP versiją</string>
@@ -196,7 +194,6 @@
 \n%3$s išskirta
 \n%4$s visiškai užrakinta</string>
     <string name="firewall_card_text_inactive">Įjungti ugniasienės režimą.</string>
-    <string name="firewall_card_configure_btn">blokuoti programėles</string>
     <string name="dns_card_connected_status_failure">Išjungta</string>
     <string name="dns_card_latency_inactive">Įjungti DNS režimą.</string>
     <string name="apps_card_ips_count">%1$s IP ir prievado taisyklės</string>
@@ -210,8 +207,8 @@
     <string name="hsf_start_dialog_positive">Paleisti</string>
     <string name="hsf_start_dialog_negative">Atsisakyti</string>
     <string name="hsf_proxy_chip_text">Įgaliotasis serveris aktyvus</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">Naudojamas RethinkDNS</string>
-    <string name="hsf_blocklist_chip_text_no_data">Įgalinti RethinkDNS+</string>
+    <string name="hsf_blocklist_chip_text_no_blocklist">Naudojamas RDNS</string>
+    <string name="hsf_blocklist_chip_text_no_data">Įgalinti RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS žurnalai</string>
     <string name="hsf_network_logs_chip_text">Tinklo žurnalai</string>
     <string name="hsf_whats_new_remove_text">Uždaroma…</string>
@@ -274,7 +271,6 @@
     <string name="ct_delete_logs_positive_btn">Ištrinti žurnalus</string>
     <string name="ct_delete_logs_negative_btn">Atšaukti</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_btm_sheet_error">Negalima atidaryti apatinio lapo</string>
     <string name="ct_filter_parent_all">Visi</string>
     <string name="ct_filter_parent_allowed">Leidžiama</string>
     <string name="ct_filter_parent_blocked">Užblokuota</string>
@@ -380,7 +376,7 @@
     <string name="firewall_rule_lockdown">Visiškas užrakinimas(programėlė)</string>
     <string name="firewall_rule_block_app_new_install">Nauja programėlė</string>
     <string name="firewall_rule_block_app_exception">Klaida</string>
-    <string name="firewall_rule_block_ip">IP / prievadas</string>
+    <string name="firewall_rule_block_ip">IP / prievadas (programėlei)</string>
     <string name="firewall_rule_exempt_orbot_setup">Orbot nustatymas</string>
     <string name="firewall_rule_block_http">Nesaugus HTTP</string>
     <string name="firewall_rule_global_lockdown">Visiškas užrakinimas</string>
@@ -438,12 +434,7 @@
     <string name="ci_blocked_txt">Užblokuota</string>
     <string name="ada_noapp_dialog_message">Programėlės informacija nurodytai programėlei nerasta.</string>
     <string name="ada_noapp_dialog_positive">Gerai</string>
-    <string name="ada_ip_rules_status_blocked">Užblokuota</string>
-    <string name="ada_ip_rules_status_allowed">Nėra taisyklės</string>
     <string name="ada_firewall_status">Ši programėlė <b><i>%1$s</i></b>.</string>
-    <string name="ada_uid">Programėlės ID: <i>%1$s</i><br/>Kategorija: <i>%2$s</i><br/>Įdiegta: <i>%3$s</i><br/>Atnaujinta: <i>%4$s</i></string>
-    <string name="ada_lockdown_title">Visiškai užrakinti programėlę</string>
-    <string name="ada_lockdown_desc">Kai ši funkcija įjungta, programėlė gali prisijungti tik prie IP, esančių <i>apeiti programėlės taisykles</i>; prisijungimai prie bet kurio kito IP bus blokuojami.</string>
     <string name="ada_ip_connection_count">Prisijungta prie %1$s IP adreso (-ų)</string>
     <string name="ada_ip_connection_count_zero">0 IP adresų</string>
     <string name="ada_app_status_allow">yra leidžiama</string>
@@ -456,8 +447,6 @@
     <string name="bsac_block">Blokuoti</string>
     <string name="bsac_bypass_app_rules">Apeiti programėlės taisykles</string>
     <string name="bsac_go_pass_app_rules">Pašalinti apėjimą</string>
-    <string name="bsac_delete">Išrinti</string>
-    <string name="bsac_delete_toast">%1$s ištrinta</string>
     <string name="bsdl_domain_heading">Domeno taisyklė</string>
     <string name="bsdl_domain_desc">Spustelėkite žemiau, kad leistumėte arba blokuotumėte DNS užklausą</string>
     <string name="rt_dialog_negative">Atšaukti</string>
@@ -534,17 +523,7 @@
     <string name="dns_firewall_mode_info_explanation_new">Visa tai + apeikite interneto cenzūrą.</string>
     <string name="wireguard_mode_info_explanation_new">Jau netrukus.</string>
     <string name="always_on_dialog_negative_btn">Atšaukti</string>
-    <string name="whats_new_version_update"><b>Didžiausios pastangos</b>
-\n
-\n 1. Pristatome privatesnį Rethink sprendiklį <i>Max</i>.
-\n 2. Pažymėti IPv6 kaip eksperimentinį; perjungti į IPv4 pagal numatytuosius nustatymus.
-\n 3. <i>Nauja funkcija</i>: kurkite atsarginę kopiją ir atkurkite programėlės nustatymus.
-\n 4. <i>Nauja funkcija</i>: programėlės užrakinimo režimas.
-\n 5. <i>Nauja funkcija</i>: universalus užrakinimo režimas.
-\n 6. <i>Nauja funkcija</i>: taikykite ugniasienės taisykles prievadų numeriams.
-\n 7. <i>Nauja funkcija</i>: programėlių ugniasienės taisykles taikykite paketais.
-\n 8. Nedidelis naudotojo sąsajos atnaujinimas.
-\n 9. Kiti atminties ir gedimų pataisymai. </string>
+    <string name="whats_new_version_update">&lt;b&gt;Didžiausios pastangos&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Pristatome privatesnį Rethink sprendiklį &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Pažymėti IPv6 kaip eksperimentinį; perjungti į IPv4 pagal numatytuosius nustatymus.&lt;br/&gt; 3. &lt;i&gt;Nauja funkcija&lt;/i&gt;: kurkite atsarginę kopiją ir atkurkite programėlės nustatymus.&lt;br/&gt; 4. &lt;i&gt;Nauja funkcija&lt;/i&gt;: programėlės užrakinimo režimas.&lt;br/&gt; 5. &lt;i&gt;Nauja funkcija&lt;/i&gt;: universalus užrakinimo režimas.&lt;br/&gt; 6. &lt;i&gt;Nauja funkcija&lt;/i&gt;: taikykite ugniasienės taisykles prievadų numeriams.&lt;br/&gt; 7. &lt;i&gt;Nauja funkcija&lt;/i&gt;: programėlių ugniasienės taisykles taikykite paketais.&lt;br/&gt; 8. Nedidelis naudotojo sąsajos atnaujinimas.&lt;br/&gt; 9. Kiti atminties ir gedimų pataisymai.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Padėkite išversti šią programėlę&lt;/a&gt;</string>
     <string name="firewall_mode_info_title">Ugniasienė</string>
     <string name="firewall_mode_info_explanation_new">Stebėkite tinklo veiklą ir uždarykite ugniasienę bet kuriai programėlei ar IP adresui.</string>
     <string name="dns_mode_info_explanation_new">Stebėkite, blokuokite ir šifruokite DNS užklausas.</string>
@@ -632,7 +611,7 @@
     <string name="log_file_not_available">Gedimo ataskaitai nerasta</string>
     <string name="hsf_vpn_dialog_message">RethinkDNS reikia leidimo nustatyti vietinį VPN, kad būtų galima užšifruoti įrenginio DNS užklausas, įdiegti tinklo monitorių ir vykdyti ugniasienės taisykles.
 \n
-\nRethinkDNS nerenka jokios informacijos ir jokiu būdu nesnipinėja jūsų.</string>
+\nRethinkDNS nerenka jokios informacijos ir jokiu būdu nešnipinėja jūsų.</string>
     <string name="hsf_start_dialog_message">Iki saugaus ir patikimo Android liko vienas žingsnis: akimirksniu peržiūrėkite tinklo veiklą, blokuokite svetaines, IP adresus ir blogai besielgiančias programėles.</string>
     <string name="hsf_blocklist_chip_text">Sukonfigūruoti %1$s blokavimo sąrašai</string>
     <string name="hsf_proxy_chip_removed_toast">Įgaliotasis serveris pašalintas</string>
@@ -660,7 +639,6 @@
     <string name="about_connect">susisiekti</string>
     <string name="about_bug_no_log_dialog_message">Nepavyko gauti gedimų žurnalų. Ar norite rankiniu būdu pranešti apie klaidą\?</string>
     <string name="about_web">nuorodos</string>
-    <string name="about_sponsor">paremti</string>
     <string name="about_sponsor_link_text">Paremti</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="about_dialog_neutral_button">Pasiūlyti funkcijas</string>
@@ -679,7 +657,7 @@
     <string name="contributors_dialog_title">Autoriai</string>
     <string name="collecting_logs_progress_text">Užfiksuojama…</string>
     <string name="dns_filter_parent_allowed">Leidžiama</string>
-    <string name="contributors_list">Už tai, kad projektas &lt;i&gt;Rethink Open Source Project&lt;/i&gt; egzistuoja, esame dėkingi šiems savanoriams, kurie jo kūrimui skiria daugybę valandų.&lt;br/&gt; &lt;br/&gt; &lt;br/&gt; &lt;br/&gt;🛡️ Android programėlė &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Tinklo variklis &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Sprendiklis &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Bendruomenės modifikacijos &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">Už tai, kad projektas &lt;i&gt;Rethink Open Source Project&lt;/i&gt; egzistuoja, esame dėkingi šiems savanoriams, kurie jo kūrimui skiria daugybę valandų.&lt;br/&gt; &lt;br/&gt; &lt;br/&gt; &lt;br/&gt;🛡️ Android programėlė &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Tinklo variklis &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Sprendiklis &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Bendruomenės modifikacijos &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP geografinės vietos duomenų bazė &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt;</string>
     <string name="cd_custom_dns_proxy_name_default">Įgaliotasis serveris</string>
     <string name="cd_dns_proxy_error_text_1">Neteisingas IP adresas</string>
     <string name="cd_custom_dns_proxy_name">Įgaliotasis serveris %1$s</string>
@@ -810,7 +788,6 @@
     <string name="ada_app_status_unknown">yra nežinoma</string>
     <string name="ada_ip_block_count">%1$s IP taisyklė (-ės)</string>
     <string name="ada_app_metered">Matuojami</string>
-    <string name="ada_ip_block_no_rules">Šiai programėlei nėra IP taisyklių.</string>
     <string name="ada_network_log_title">šios programėlės tinklo žurnalas</string>
     <string name="notif_download_content_title">Įrenginyje esančio blokavimo sąrašo atsisiuntimas</string>
     <string name="bsdl_domain_rule_norule">nėra taisyklės</string>
@@ -822,7 +799,6 @@
     <string name="radio_max_btn">🪂 Maks</string>
     <string name="pause_title_desc">snaudžiama…</string>
     <string name="settings_title_desc">Itin pritaikoma DNS bei ugniasienė</string>
-    <string name="admin_receiver_status_disabled">Turinio blokavimas nebeveikia.</string>
     <string name="bypass_universal">apeiti universaliąsias</string>
     <string name="lockdown">visiškas užrakinimas</string>
     <string name="notification_action_resume_vpn">TĘSTI</string>
@@ -874,7 +850,6 @@
     <string name="ada_app_status_exclude">yra išskiriama DNS ir ugniasienėje</string>
     <string name="ada_app_exclude">Išskirti</string>
     <string name="ci_bypass_universal">apeiti universaliąsias</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Apeiti programėlės taisykles</string>
     <string name="ada_app_unmetered">Nematuojami</string>
     <string name="ada_app_whitelist">Apeiti universaliąsias</string>
     <string name="bsac_block_toast">%1$s blokuojamas šiais programėlei</string>
@@ -884,4 +859,30 @@
     <string name="bsdl_blocked_desc">%1$s užblokuota pagal %2$s</string>
     <string name="rethink_sky_desc">Daugiau nei 280 vietų; geresnis veikimo laikas; stub sprendiklis veikia cloudflare.com</string>
     <string name="rethink_max_desc">Daugiau nei 50 vietovių; daugiau privatumo; rekursyvus sprendiklis veikia fly.io</string>
+    <string name="rt_filter_desc">Rodomi <u>%1$s</u> blokavimo sąrašai</string>
+    <string name="rt_filter_desc_groups">Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s</string>
+    <string name="rt_filter_desc_subgroups">Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s ir pogrupyje: %3$s</string>
+    <string name="hsf_notification_permission_failure">Įjunkite pranešimų leidimą nustatymų ekrane</string>
+    <string name="about_privacy_policy">Privatumo politika</string>
+    <string name="about_app_translate">Vertimai</string>
+    <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
+    <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
+    <string name="notification_screen_error">Nepavyko paleisti programėlės pranešimų ekrano.</string>
+    <string name="intent_launch_error">Nepavyko paleisti %1$s</string>
+    <string name="no_browser_error">Nepavyksta atidaryti tinklalapio iš naršyklės.</string>
+    <string name="firewall_rule_block_univ_ip">IP / prievadas (universali)</string>
+    <string name="ada_firewall_title">ugniasienės taisyklės šiai programėlei</string>
+    <string name="ada_app_lockdown">Visiškas užrakinimas</string>
+    <string name="notif_download_cancel_content">Atsisiuntimas atšauktas.</string>
+    <string name="rt_filter_parent_all">Visi</string>
+    <string name="rt_filter_parent_selected">Pasirinkti</string>
+    <string name="rt_filter_hint">Rodomi <u>visi</u> blokavimo sąrašai</string>
+    <string name="relative_time_today">Šiandien</string>
+    <string name="relative_time_yesterday">Vakar</string>
+    <string name="settings_app_notification_a13_heading">Programėlės pranešimas</string>
+    <string name="settings_app_notification_a13_desc">Įjungti pranešimų leidimą programėlei</string>
+    <string name="ct_ip_port">%1$s:%2$s</string>
+    <string name="private_dns_dialog_heading">Išjungti privatų DNS</string>
+    <string name="private_dns_dialog_positive">Eiti į nustatymus</string>
+    <string name="private_dns_dialog_negative">Atsisakyti</string>
 </resources>

@@ -529,6 +529,12 @@ abstract class AppDatabase : RoomDatabase() {
                     database.execSQL(
                         "ALTER TABLE RethinkRemoteFileTag add column pack TEXT DEFAULT ''"
                     )
+                    database.execSQL(
+                        "UPDATE DoHEndpoint set dohExplanation = 'Family filter blocks access to all adult, graphic and explicit sites. It also blocks proxy and VPN domains that could be used to bypass our filters. Mixed content sites (like Reddit) are also blocked. Google, Bing and Youtube are set to the Safe Mode.' where dohName = 'CleanBrowsing Family'"
+                    )
+                    database.execSQL(
+                        "UPDATE DoHEndpoint set dohExplanation = 'Adult filter blocks access to all adult, graphic and explicit sites. It does not block proxy or VPNs, nor mixed-content sites. Sites like Reddit are allowed. Google and Bing are set to the Safe Mode.'  where dohName = 'CleanBrowsing Adult'"
+                    )
                 }
             }
     }

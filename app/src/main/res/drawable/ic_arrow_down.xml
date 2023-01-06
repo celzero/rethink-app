@@ -4,7 +4,7 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M6,10l6,6l6,-6"
+      android:pathData="M5,10l5,5l5,-5"
       android:strokeLineJoin="miter"
       android:strokeWidth="2"
       android:fillColor="?attr/svgFillColor"

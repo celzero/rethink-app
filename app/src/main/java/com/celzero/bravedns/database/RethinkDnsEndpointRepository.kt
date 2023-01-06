@@ -26,10 +26,6 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
         rethinkDnsEndpointDao.update(rethinkDnsEndpoint)
     }
 
-    suspend fun insertAsync(rethinkDnsEndpoint: RethinkDnsEndpoint) {
-        rethinkDnsEndpointDao.insert(rethinkDnsEndpoint)
-    }
-
     suspend fun insertWithReplace(rethinkDnsEndpoint: RethinkDnsEndpoint) {
         rethinkDnsEndpointDao.insertReplace(rethinkDnsEndpoint)
     }
@@ -40,10 +36,6 @@ class RethinkDnsEndpointRepository(private val rethinkDnsEndpointDao: RethinkDns
 
     suspend fun removeAppWiseDns(uid: Int) {
         rethinkDnsEndpointDao.removeAppWiseDns(uid)
-    }
-
-    suspend fun deleteRethinkEndpoint(name: String, url: String, uid: Int) {
-        rethinkDnsEndpointDao.deleteDoHEndpoint(name, url, uid)
     }
 
     suspend fun isAppWiseDnsEnabled(uid: Int): Boolean {

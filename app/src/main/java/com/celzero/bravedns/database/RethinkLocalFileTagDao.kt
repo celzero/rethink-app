@@ -16,22 +16,26 @@ limitations under the License.
 
 package com.celzero.bravedns.database
 
+import android.database.Cursor
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.FileTag
 
 @Dao
 interface RethinkLocalFileTagDao {
 
-    @Update fun update(fileTag: RethinkLocalFileTag)
+    @Update fun update(fileTag: RethinkLocalFileTag): Int
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(fileTag: RethinkLocalFileTag)
+    @Update fun updateAll(fileTags: List<RethinkLocalFileTag>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(fileTag: RethinkLocalFileTag): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertReplace(fileTag: RethinkLocalFileTag)
 
     @Delete fun delete(fileTag: RethinkLocalFileTag)
+
+    @Query("delete from RethinkLocalFileTag where value = :id") fun contentDelete(id: Int): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(fileTags: List<RethinkLocalFileTag>): LongArray
@@ -42,7 +46,10 @@ interface RethinkLocalFileTagDao {
     @Query("Update RethinkLocalFileTag set isSelected = :isSelected where value = :value")
     fun updateSelectedTag(value: Int, isSelected: Int)
 
-    @Query("select * from RethinkLocalFileTag") fun getAllTags(): List<FileTag>
+    @Query(
+        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected  from RethinkLocalFileTag"
+    )
+    fun getAllTags(): List<FileTag>
 
     @Query("select * from RethinkLocalFileTag order by `group`")
     fun getLocalFileTags(): PagingSource<Int, RethinkLocalFileTag>
@@ -83,17 +90,19 @@ interface RethinkLocalFileTagDao {
         selected: Set<Int>
     ): PagingSource<Int, RethinkLocalFileTag>
 
-    @Query(
-        "select value, simpleTagId from RethinkLocalFileTag where entries > 0 order by simpleTagId"
-    )
-    fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping>
-
     @Query("Update RethinkLocalFileTag set isSelected = 0") fun clearSelectedTags()
 
-    @Query("select * from RethinkLocalFileTag") fun fileTags(): List<RethinkLocalFileTag>
+    @Query(
+        "select  value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkLocalFileTag"
+    )
+    fun fileTags(): List<FileTag>
 
     @Query("select value from RethinkLocalFileTag where isSelected = 1")
     fun getSelectedTags(): List<Int>
+
+    @Query("delete from RethinkLocalFileTag") fun deleteAll()
+
+    @Query("select * from RethinkLocalFileTag order by `group`") fun getFileTags(): Cursor
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

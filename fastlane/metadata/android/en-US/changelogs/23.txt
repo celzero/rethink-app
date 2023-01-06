@@ -1,0 +1,11 @@
+** v053l: Polyglottic ** 
+1. Re-support Android 6.
+2. All new RDNS+ UI.
+3. All new firewall and network engine.
+4. New feature: Translations in 15+ languages.
+5. New feature: Adaptive icons.
+6. New feature: Show domain names in per app network logs.
+7. Fix missing notifications on Android 13.
+8. Fix misbehaving Orbot DNS integration.
+9. Apps screen now accessible in DNS-only mode.
+10. Major improvements to built-in Download Manager.

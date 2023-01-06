@@ -15,10 +15,11 @@
  */
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.celzero.bravedns.data.AppConnections
+import com.celzero.bravedns.data.AppConnection
 
 @Dao
 interface ConnectionTrackerDAO {
@@ -45,7 +46,15 @@ interface ConnectionTrackerDAO {
     @Query(
         "select ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, GROUP_CONCAT(DISTINCT dnsQuery) as dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc"
     )
-    fun getLogsForApp(uid: Int): List<AppConnections>?
+    fun getLogsForApp(uid: Int): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, GROUP_CONCAT(DISTINCT dnsQuery) as dnsQuery from ConnectionTracker where uid = :uid and ipAddress like :ipAddress group by ipAddress, flag order by count desc"
+    )
+    fun getLogsForAppFiltered(uid: Int, ipAddress: String): PagingSource<Int, AppConnection>
+
+    @Query("select count(DISTINCT(ipAddress)) from ConnectionTracker where uid = :uid")
+    fun getAppConnectionsCount(uid: Int): LiveData<Int>
 
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query) order by timeStamp desc"
@@ -56,6 +65,8 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, ConnectionTracker>
 
     @Query("delete from ConnectionTracker") fun clearAllData()
+
+    @Query("delete from ConnectionTracker where uid = :uid") fun clearLogsByUid(uid: Int)
 
     @Query("DELETE FROM ConnectionTracker WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 

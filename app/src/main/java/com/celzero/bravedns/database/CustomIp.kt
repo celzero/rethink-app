@@ -17,8 +17,9 @@ package com.celzero.bravedns.database
 
 import android.util.Log
 import androidx.room.Entity
-import com.celzero.bravedns.automaton.IpRulesManager
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants
 import inet.ipaddr.HostName
@@ -33,7 +34,7 @@ import inet.ipaddr.IPAddressString
  */
 @Entity(primaryKeys = ["uid", "ipAddress", "port", "protocol"], tableName = "CustomIp")
 class CustomIp {
-    var uid: Int = IpRulesManager.UID_EVERYBODY
+    var uid: Int = UID_EVERYBODY
     var ipAddress: String = ""
     var port: Int = UNSPECIFIED_PORT
     var protocol: String = ""

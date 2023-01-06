@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.celzero.bravedns.automaton.RethinkBlocklistManager
 import com.celzero.bravedns.data.FileTag
 
 @Dao
@@ -29,9 +28,6 @@ interface RethinkRemoteFileTagDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(fileTag: RethinkRemoteFileTag)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertReplace(fileTag: RethinkRemoteFileTag)
-
     @Delete fun delete(fileTag: RethinkRemoteFileTag)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -39,7 +35,7 @@ interface RethinkRemoteFileTagDao {
 
     @Query("select * from RethinkRemoteFileTag order by `group`")
     fun getRemoteFileTags(): PagingSource<Int, RethinkRemoteFileTag>
-
+    
     @Query(
         "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
@@ -49,7 +45,7 @@ interface RethinkRemoteFileTagDao {
         group: Set<String>,
         subg: Set<String>
     ): PagingSource<Int, RethinkRemoteFileTag>
-
+    
     @Query(
         "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
@@ -58,7 +54,7 @@ interface RethinkRemoteFileTagDao {
         selected: Set<Int>,
         group: Set<String>
     ): PagingSource<Int, RethinkRemoteFileTag>
-
+    
     @Query(
         "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
@@ -67,9 +63,12 @@ interface RethinkRemoteFileTagDao {
         selected: Set<Int>,
         subg: Set<String>
     ): PagingSource<Int, RethinkRemoteFileTag>
-
-    @Query("select * from RethinkRemoteFileTag order by `group`") fun getAllTags(): List<FileTag>
-
+    
+    @Query(
+        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkRemoteFileTag order by `group`"
+    )
+    fun getAllTags(): List<FileTag>
+    
     @Transaction
     @Query(
         "select * from RethinkRemoteFileTag where isSelected in (:selected) and entries > 0 and (vname like :input or `group` like :input or subg like :input) order by `group`"
@@ -86,16 +85,16 @@ interface RethinkRemoteFileTagDao {
     fun updateSelectedTag(value: Int, isSelected: Int)
 
     @Query(
-        "select value, simpleTagId from RethinkRemoteFileTag where entries > 0 order by simpleTagId"
+        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkRemoteFileTag"
     )
-    fun getSimpleViewTags(): List<RethinkBlocklistManager.SimpleViewMapping>
-
-    @Query("select * from RethinkRemoteFileTag") fun fileTags(): List<RethinkRemoteFileTag>
+    fun fileTags(): List<FileTag>
 
     @Query("Update RethinkRemoteFileTag set isSelected = 0") fun clearSelectedTags()
 
     @Query("select value from RethinkRemoteFileTag where isSelected = 1")
     fun getSelectedTags(): List<Int>
+
+    @Query("delete from RethinkRemoteFileTag") fun deleteAll()
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

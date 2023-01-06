@@ -24,7 +24,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
@@ -37,6 +37,7 @@ import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
@@ -200,10 +201,6 @@ internal constructor(
         DNSPROXY_IP(Settings.DNSModeProxyIP),
         DNSPROXY_PORT(Settings.DNSModeProxyPort);
 
-        fun isDoh(): Boolean {
-            return mode == DOH_IP.mode || mode == DOH_PORT.mode
-        }
-
         fun isDnscrypt(): Boolean {
             return mode == DNSCRYPT_IP.mode || mode == DNSCRYPT_PORT.mode
         }
@@ -216,17 +213,6 @@ internal constructor(
             return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
         }
 
-        fun isNone(): Boolean {
-            return mode == NONE.mode
-        }
-
-        fun trapIP(): Boolean {
-            return mode == DOH_IP.mode || mode == DNSCRYPT_IP.mode || mode == DNSPROXY_IP.mode
-        }
-
-        fun trapPort(): Boolean {
-            return mode == DOH_PORT.mode || mode == DNSCRYPT_PORT.mode || mode == DNSPROXY_PORT.mode
-        }
     }
 
     enum class TunProxyMode(val mode: Long) {
@@ -511,10 +497,6 @@ internal constructor(
         }
     }
 
-    fun getConnectedDns(): String {
-        return persistentState.connectedDnsName
-    }
-
     suspend fun changeBraveMode(braveMode: Int) {
         persistentState.braveMode = braveMode
         braveModeObserver.postValue(braveMode)
@@ -538,13 +520,10 @@ internal constructor(
         }
 
         // app mode - Firewall & DNS+Firewall
-        return if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-        ) {
-            TunFirewallMode.FILTER_ANDROID8_BELOW
-        } else {
+        return if (isAtleastQ()) {
             TunFirewallMode.FILTER_ANDROID9_ABOVE
+        } else {
+            TunFirewallMode.FILTER_ANDROID8_BELOW
         }
     }
 
@@ -843,10 +822,6 @@ internal constructor(
 
     suspend fun deleteDohEndpoint(id: Int) {
         doHEndpointRepository.deleteDoHEndpoint(id)
-    }
-
-    suspend fun deleteRethinkEndpoint(name: String, url: String, uid: Int) {
-        rethinkDnsEndpointRepository.deleteRethinkEndpoint(name, url, uid)
     }
 
     suspend fun deleteDnsProxyEndpoint(id: Int) {

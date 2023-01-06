@@ -20,9 +20,11 @@ import android.os.Process
 import android.util.Log
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Utilities
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import java.io.File
 
 /**
@@ -37,32 +39,56 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
 
     companion object {
         // base-url for fav icon download
-        const val FAV_ICON_URL = "https://icons.duckduckgo.com/ip2/"
+        private const val FAV_ICON_DUCK_URL = "https://icons.duckduckgo.com/ip2/"
+        private const val FAV_ICON_NEXTDNS_BASE_URL = "https://favicons.nextdns.io/"
+        private const val FAV_ICON_SIZE = "@2x.png"
+        private const val CACHE_BUILDER_MAX_SIZE = 10000L
+
+        private val failedFavIconUrls: Cache<String, Boolean> =
+            CacheBuilder.newBuilder().maximumSize(CACHE_BUILDER_MAX_SIZE).build()
+
+
+        fun getDomainUrlFromFdqnDuckduckgo(url: String): String {
+            // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
+            val domainUrl = Utilities.getETldPlus1(url).toString()
+            return constructFavUrlDuckDuckGo(domainUrl)
+        }
+
+        // Add duckduckgo format to download the favicon.
+        // eg., https://icons.duckduckgo.com/ip2/google.com.ico
+        fun constructFavUrlDuckDuckGo(url: String): String {
+            return "${FAV_ICON_DUCK_URL}${url}.ico"
+        }
+
+        // Add nextdns format to download the favicon.
+        // eg., https://favicons.nextdns.io/some.subdomain.rethinkdns.com@1x.png
+        fun constructFavIcoUrlNextDns(url: String): String {
+            return "$FAV_ICON_NEXTDNS_BASE_URL$url$FAV_ICON_SIZE"
+        }
+
+        fun isUrlAvailableInFailedCache(url: String): Boolean? {
+            return failedFavIconUrls.getIfPresent(url)
+        }
     }
 
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
         // url will have . at end of the file, which needs to be removed.
         val fdqnUrl = url.dropLast(1)
-        val url = constructFavUrl(fdqnUrl)
-        updateImage(url, getDomainUrlFromFdqn(fdqnUrl), true)
+
+        // only proceed to fetch the fav icon if the url is not in failed cache
+        // Returns the value associated with key in this cache, or null if there is no cached
+        // value for key.
+        if (failedFavIconUrls.getIfPresent(fdqnUrl) == null) {
+            fetchFromNextDns(fdqnUrl)
+        } else {
+            // no-op
+        }
     }
 
-    private fun getDomainUrlFromFdqn(url: String): String {
-        // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
-        val domainUrl = Utilities.getETldPlus1(url).toString()
-        return constructFavUrl(domainUrl)
-    }
 
-    // Add duckduckgo format to download the favicon.
-    // eg., https://icons.duckduckgo.com/ip2/google.com.ico
-    private fun constructFavUrl(url: String): String {
-        return "${FAV_ICON_URL}${url}.ico"
-    }
-
-    // ref: https://github.com/bumptech/glide/issues/2972
-    // https://github.com/bumptech/glide/issues/509
-    private fun updateImage(subUrl: String, url: String, retry: Boolean) {
+    private fun fetchFromNextDns(url: String) {
+        val subUrl = constructFavIcoUrlNextDns(url)
         val futureTarget: FutureTarget<File> =
             GlideApp.with(context.applicationContext)
                 .downloadOnly()
@@ -70,18 +96,45 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
         try {
             futureTarget.get()
-            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - success() -$subUrl, $url")
+            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide, load success from nextdns for url: $url")
+        } catch (e: Exception) {
+            // on exception, initiate the download of fav icon from duckduckgo
+            Log.i(LOG_TAG_DNS_LOG, "Glide, load failure from nextdns $subUrl")
+            updateImage(
+                url,
+                constructFavUrlDuckDuckGo(url),
+                getDomainUrlFromFdqnDuckduckgo(url),
+                true
+            )
+        } finally {
+            GlideApp.with(context.applicationContext).clear(futureTarget)
+        }
+    }
+
+    // ref: https://github.com/bumptech/glide/issues/2972
+    // https://github.com/bumptech/glide/issues/509
+    private fun updateImage(fdqnUrl: String, subUrl: String, url: String, retry: Boolean) {
+        val futureTarget: FutureTarget<File> =
+            GlideApp.with(context.applicationContext)
+                .downloadOnly()
+                .load(subUrl)
+                .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
+        try {
+            futureTarget.get()
+            if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide, downloaded from duckduckgo $subUrl, $url")
         } catch (e: Exception) {
             // In case of failure the FutureTarget will throw an exception.
             // Will initiate the download of fav icon for the top level domain.
             if (retry) {
-                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - onLoadFailed() -$subUrl")
-                updateImage(url, "", false)
+                if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide, download failed from duckduckgo $subUrl")
+                updateImage(fdqnUrl, url, "", false)
+            } else {
+                // add failed urls to a local cache, no need to attempt again and again
+                // add the value as false by default
+                // FIXME: add metadata instead of boolean
+                failedFavIconUrls.put(fdqnUrl, true)
             }
-            Log.e(
-                LOG_TAG_DNS_LOG,
-                "Glide - Got ExecutionException waiting for background downloadOnly"
-            )
+            Log.e(LOG_TAG_DNS_LOG, "Glide, no fav icon available for the url: $subUrl")
         } finally {
             GlideApp.with(context.applicationContext).clear(futureTarget)
         }

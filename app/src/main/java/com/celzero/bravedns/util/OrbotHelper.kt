@@ -19,6 +19,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.*
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.VpnService
 import android.text.TextUtils
@@ -33,12 +34,13 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.getBroadcastPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
+import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
 import kotlinx.coroutines.*
@@ -61,10 +63,6 @@ class OrbotHelper(
 
         const val ORBOT_PACKAGE_NAME = "org.torproject.android"
         const val ORBOT_MARKET_URI = "market://details?id=$ORBOT_PACKAGE_NAME"
-        const val ORBOT_FDROID_URI =
-            "https://f-droid.org/repository/browse/?fdid=$ORBOT_PACKAGE_NAME"
-
-        const val FDROID_PACKAGE_NAME = "org.fdroid.fdroid"
         const val PLAY_PACKAGE_NAME = "com.android.vending"
 
         private const val ACTION_STATUS = "org.torproject.android.intent.action.STATUS"
@@ -136,7 +134,11 @@ class OrbotHelper(
             intent.data = Uri.parse(ORBOT_MARKET_URI)
 
             val pm = context.packageManager
-            val resInfos = pm.queryIntentActivities(intent, 0)
+            val resInfos = if (isAtleastT()) {
+                pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
+            } else {
+                pm.queryIntentActivities(intent, 0)
+            }
 
             var foundPackageName: String? = null
             for (r in resInfos) {
@@ -164,14 +166,6 @@ class OrbotHelper(
                 context.resources.getString(R.string.orbot_download_link_website).toUri()
             )
         }
-    }
-
-    /** Returns the intent to get the status of the Orbot App. Not used as of now. */
-    private fun getOrbotStatusIntent(): Intent? {
-        val intent = Intent(ACTION_STATUS)
-        intent.setPackage(ORBOT_PACKAGE_NAME)
-        intent.putExtra(EXTRA_PACKAGE_NAME, context.packageName)
-        return intent
     }
 
     /**

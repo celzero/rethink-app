@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.R
-import com.celzero.bravedns.automaton.FirewallManager
+import com.celzero.bravedns.service.FirewallManager
 
 @Entity(tableName = "DNSProxyEndpoint")
 class DnsProxyEndpoint {

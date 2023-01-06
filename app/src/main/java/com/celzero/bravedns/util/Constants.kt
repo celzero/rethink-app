@@ -24,7 +24,8 @@ class Constants {
         // on-device blocklist download path
         val ONDEVICE_BLOCKLIST_DOWNLOAD_PATH = File.separator + "downloads" + File.separator
 
-        const val DOWNLOAD_BASE_URL = "https://download.rethinkdns.com"
+        // rethink base url (modified from download to dl on v053l)
+        const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
 
         const val FILE_TAG = "filetag.json"
 
@@ -74,9 +75,10 @@ class Constants {
 
         // url_param_compress_blob
         // search param
-        const val URL_SEARCHPARAM_COMPRESS_BLOB = "?compressed"
+        private const val URL_SEARCHPARAM_COMPRESS_BLOB = "?compressed"
 
-        val ONDEVICE_BLOCKLISTS =
+        // list of file details for Android Download Manager
+        val ONDEVICE_BLOCKLISTS_ADM =
             listOf(
                 OnDeviceBlocklistsMetadata(
                     "$DOWNLOAD_BASE_URL/blocklists",
@@ -102,7 +104,8 @@ class Constants {
                 OnDeviceBlocklistsMetadata("$DOWNLOAD_BASE_URL/geoip?v6", ONDEVICE_GEOIP_IPV6)
             )
 
-        val ONDEVICE_BLOCKLISTS_TEMP =
+        // list of file details for in-app downloader
+        val ONDEVICE_BLOCKLISTS_IN_APP =
             listOf(
                 OnDeviceBlocklistsMetadata("blocklists", ONDEVICE_BLOCKLIST_FILE_TAG),
                 OnDeviceBlocklistsMetadata("basicconfig", ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG),
@@ -121,8 +124,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v053i)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1657632597183
+        // default filetag.json for remote blocklist (stored in assets folder) (v053l)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1669931764879
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"
@@ -177,6 +180,7 @@ class Constants {
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
+        const val FLAVOR_HEADLESS = "headless"
 
         // Various notification action constants used part of NotificationCompat.Action
         const val NOTIFICATION_ACTION = "NOTIFICATION_VALUE"
@@ -234,10 +238,7 @@ class Constants {
         const val ACTION_VPN_SETTINGS_INTENT = "android.net.vpn.SETTINGS"
 
         // default live data page size used by recycler views
-        const val LIVEDATA_PAGE_SIZE = 50
-
-        // dns logs live data page size
-        const val DNS_LIVEDATA_PAGE_SIZE = 30
+        const val LIVEDATA_PAGE_SIZE = 30
 
         // To initiate / reset the timestamp in milliseconds
         const val INIT_TIME_MS = 0L
@@ -252,5 +253,9 @@ class Constants {
 
         // max endpoint
         const val MAX_ENDPOINT = "max"
+
+        // The UID used to be generic uid used to block IP addresses which are intended to
+        // block for all the applications.
+        const val UID_EVERYBODY = -1000
     }
 }

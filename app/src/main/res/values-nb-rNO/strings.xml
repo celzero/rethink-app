@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_home">Hjem</string>
-    <string name="admin_receiver_status_enabled">Klar til å sette DNS-basert innholdsblokkering.</string>
-    <string name="admin_receiver_status_disabled">Innholdsblokkering ikke lenger aktiv.</string>
     <string name="block">blokker</string>
     <string name="slide_2_title">Velkommen</string>
     <string name="app_name">RethinkDNS</string>
@@ -56,7 +54,6 @@
     <string name="dns_query_clear_logs_title">Slett alle DNS-logger\?</string>
     <string name="bsct_app_info">Programinfo</string>
     <string name="bsct_conn_desc_allowed">Tillat på %1$s %2$s</string>
-    <string name="private_dns_toast">Privat DNS satt.</string>
     <string name="always_on_dialog_positive_btn">Gå til innstillingene</string>
     <string name="always_on_dialog_negative_btn">Avbryt</string>
     <string name="always_on_dialog_positive">Stopp</string>
@@ -286,7 +283,6 @@
     <string name="firewall_rule_unknown">Ukjent kilde</string>
     <string name="firewall_rule_block_http">Usikker HTTP</string>
     <string name="category_name_others">Annet</string>
-    <string name="about_sponsor">Sponsor</string>
     <string name="app_info_error">Kunne ikke starte programinfo.</string>
     <string name="univ_firewall_rule_3">Blokker når kildeprogram er ukjent</string>
     <string name="dns_proxy_port">Port</string>
@@ -446,8 +442,6 @@
     <string name="dns_btm_latency_ms">%1$s ms</string>
     <string name="firewall_rule_block_app">Program blokkert</string>
     <string name="new_app_notification_action_toast_deny">Nettverkstilgang nektet for programmet</string>
-    <string name="ada_ip_rules_status_bypass_app_rules">Omgå programregler</string>
-    <string name="bsac_delete_toast">%1$s slettet</string>
     <string name="rt_edit_dialog_positive">Rediger</string>
     <string name="lbbs_redownload">Last ned svartelister igjen</string>
     <string name="brbs_backup_complete_toast">Sikkerhetskopi utført</string>
@@ -463,7 +457,6 @@
     <string name="univ_firewall_rule_10">Blokker alle unntatt omgåtte programmer og IP-er</string>
     <string name="notif_dialog_pause_dialog_positive">Fortsett</string>
     <string name="notif_channel_firewall_alerts">Brannmursvarsler</string>
-    <string name="bsac_delete">Slett</string>
     <string name="notif_download_failure_content">Kunne ikke laste ned. Prøv igjen.</string>
     <string name="rbl_privacy">Personvern</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
@@ -475,7 +468,6 @@
     <string name="univ_firewall_rule_7">Blokker IPv4 i IPv6 (eksperimentelt)</string>
     <string name="new_app_notification_action_toast_allow">Nettverkstilkobling tillatt for programmet</string>
     <string name="ci_dialog_added_success">IP lagt til i listen</string>
-    <string name="ada_ip_block_no_rules">Ingen IP-regler for dette programmet.</string>
     <string name="dc_dns_proxy">DNS-mellomtjener</string>
     <string name="lbbs_configure">Sett opp</string>
     <string name="brbs_backup_dialog_positive">Sikkerhetskopier</string>
@@ -537,8 +529,6 @@
     <string name="system_dns_connection_failure">Kan ikke fastsette nåværende DNS-tjener</string>
     <string name="new_app_notification_action_deny">Fortsett å blokkere</string>
     <string name="ada_noapp_dialog_positive">OK</string>
-    <string name="ada_ip_rules_status_blocked">Blokkert</string>
-    <string name="ada_uid">Program-ID: <i>%1$s</i><br/>Kategori: <i>%2$s</i><br/>Installert: <i>%3$s</i><br/>Oppdatert: <i>%4$s</i></string>
     <string name="bsrf_apply_filter">Bruk</string>
     <string name="settings_custom_downloader_heading">Bruk programmets nedlaster</string>
     <string name="notif_dialog_pause_dialog_negative">Avslå</string>
@@ -554,7 +544,6 @@
     <string name="univ_firewall_rule_5">Blokker når DNS er omgått</string>
     <string name="univ_accessibility_crash_dialog_negative">Avbryt</string>
     <string name="univ_accessibility_dialog_positive">Innvilg</string>
-    <string name="ada_ip_rules_status_allowed">Ingen regel</string>
     <string name="rbl_parental_control">Foreldrekontroll</string>
     <string name="rt_list_adv_btn_txt">Avansert</string>
     <string name="settings_orbot_notification_content">Klarte ikke å starte «Tor-som-mellomtjener». Åpne Orbot-programmet for å starte det manuelt.</string>
@@ -589,7 +578,6 @@
     <string name="download_update_dialog_message_success">Svarteliste nedlastet.</string>
     <string name="about_bravedns_toreport_text">Hjelp og tilbakemeldinger</string>
     <string name="download_update_dialog_message">Last ned ny versjon av programmet fra nettsiden\?</string>
-    <string name="firewall_card_configure_btn">Blokker programmer</string>
     <string name="collecting_logs_progress_text">Loggfører …</string>
     <string name="hsf_whats_new_chip_text">Nyheter</string>
     <string name="orbot_socks5">Kun-TCP-mellomtjener</string>
@@ -627,4 +615,28 @@
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s svarteliste(r)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dc_check_update_heading">Spør om oppdatering av svartelister</string>
     <string name="new_app_notification_title">Handling kreves</string>
+    <string name="settings_selected_theme">Iført drakt: %1$s</string>
+    <string name="firewall_status_excluded">utelatt fra DNS og brannmur</string>
+    <string name="firewall_status_whitelisted">omgår universelle brannmursregler</string>
+    <string name="firewall_card_text_inactive">Skru på brannmursmodus.</string>
+    <string name="relative_time_today">I dag</string>
+    <string name="relative_time_yesterday">I går</string>
+    <string name="settings_http_proxy_error_text1">Portområde skal være fra 1024–65535</string>
+    <string name="settings_theme_dialog_themes_1">Satt av systemet</string>
+    <string name="firewall_status_unknown">ukjent</string>
+    <string name="apps_card_ips_count">%1$s IP- og portregler</string>
+    <string name="private_dns_dialog_positive">Gå til innstillinger</string>
+    <string name="private_dns_dialog_negative">Avslå</string>
+    <string name="univ_firewall_dialog_message">Fortsett ved å slette denne regelen og la ethvert program koble til denne IP-en\?</string>
+    <string name="download_update_dialog_trylater_title">Kan ikke oppdatere akkurat nå</string>
+    <string name="download_update_dialog_trylater_message">Oppdateringen kan ikke kjøres akkurat nå. Prøv igjen senere.</string>
+    <string name="settings_app_notification_a13_heading">Programmerknad</string>
+    <string name="firewall_mode_notification_title">Beskyttet. Tilkoblet brannmur.</string>
+    <string name="univ_firewall_no_ip_message">Fant ingen IP-er. Trykk på oppføringer i nettverkslogg-skjermen for å blokkere individuelle IP-adresser.</string>
+    <string name="orbot_none_desc">Ingen av ovennevnte.</string>
+    <string name="pause_mode_notification_title">Pauset. Blokkerte programmer vil forbli bak brannmur.</string>
+    <string name="firewall_status_blocked">blokkert</string>
+    <string name="settings_proxy_header">mellomtjener</string>
+    <string name="settings_check_update_heading">Se etter nye programversjoner</string>
+    <string name="firewall_status_allow">tillatt</string>
 </resources>
