@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:layout_scrollFlags="scroll|enterAlways">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ImageView
+            android:id="@+id/info_rules_dialog_cancel_img"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="end"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <TextView
+            android:id="@+id/info_rules_dialog_rules_desc"
+            style="@style/Widget.AppCompat.TextView.SpinnerItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="5dp"
+            android:padding="10dp"
+            android:text="@string/fapps_info_dialog_message"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="?attr/primaryLightColorText"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="@string/fapps_info_unmetered_msg"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:drawableStartCompat="@drawable/ic_firewall_wifi_on_grey" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="@string/fapps_info_metered_msg"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:drawableStartCompat="@drawable/ic_firewall_data_on_grey" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="@string/fapps_info_bypass_msg"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:drawableStartCompat="@drawable/ic_firewall_bypass_off" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="@string/fapps_info_exclude_msg"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:drawableStartCompat="@drawable/ic_firewall_exclude_off" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="@string/fapps_info_isolate_msg"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:drawableStartCompat="@drawable/ic_firewall_lockdown_off" />
+
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

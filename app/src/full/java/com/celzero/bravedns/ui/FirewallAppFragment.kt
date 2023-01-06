@@ -19,6 +19,7 @@ import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -73,6 +74,15 @@ class FirewallAppFragment :
 
         private const val REFRESH_TIMEOUT: Long = 4000
         private const val QUERY_TEXT_TIMEOUT: Long = 600
+    }
+
+    // enum class for bulk ui update
+    enum class BlockType {
+        UNMETER,
+        METER,
+        BYPASS,
+        LOCKDOWN,
+        EXCLUDE
     }
 
     enum class TopLevelFilter(val id: Int) {
@@ -181,7 +191,8 @@ class FirewallAppFragment :
 
     private fun initObserver() {
         filters.observe(this.viewLifecycleOwner) {
-            resetFirewallIcons()
+            // update the ui based on the filter
+            resetFirewallIcons(BlockType.UNMETER)
 
             if (it == null) return@observe
 
@@ -216,6 +227,7 @@ class FirewallAppFragment :
                     )
                 )
         }
+        b.firewallAppLabelTv.isSelected = true
     }
 
     override fun onDetach() {
@@ -271,68 +283,171 @@ class FirewallAppFragment :
         }
 
         b.ffaToggleAllWifi.setOnClickListener {
-            showUpdateUnmeteredForBulkDialog(getBulkTagUnmetered())
+            showBulkRulesUpdateDialog(
+                getBulkActionDialogTitle(BlockType.UNMETER),
+                getBulkActionDialogMessage(BlockType.UNMETER),
+                BlockType.UNMETER
+            )
         }
 
         b.ffaToggleAllMobileData.setOnClickListener {
-            showUpdateMeteredForBulkDialog(getBulkTagMetered())
+            showBulkRulesUpdateDialog(
+                getBulkActionDialogTitle(BlockType.METER),
+                getBulkActionDialogMessage(BlockType.METER),
+                BlockType.METER
+            )
+        }
+
+        b.ffaToggleAllLockdown.setOnClickListener {
+            showBulkRulesUpdateDialog(
+                getBulkActionDialogTitle(BlockType.LOCKDOWN),
+                getBulkActionDialogMessage(BlockType.LOCKDOWN),
+                BlockType.LOCKDOWN
+            )
+        }
+
+        b.ffaToggleAllBypass.setOnClickListener {
+            showBulkRulesUpdateDialog(
+                getBulkActionDialogTitle(BlockType.BYPASS),
+                getBulkActionDialogMessage(BlockType.BYPASS),
+                BlockType.BYPASS
+            )
+        }
+
+        b.ffaToggleAllExclude.setOnClickListener {
+            showBulkRulesUpdateDialog(
+                getBulkActionDialogTitle(BlockType.EXCLUDE),
+                getBulkActionDialogMessage(BlockType.EXCLUDE),
+                BlockType.EXCLUDE
+            )
         }
 
         b.ffaAppInfoIcon.setOnClickListener { showInfoDialog() }
     }
 
-    private fun showUpdateUnmeteredForBulkDialog(isBlock: Boolean) {
-        val builder = AlertDialog.Builder(requireContext())
-        if (isBlock) {
-            builder.setTitle(R.string.fapps_unmetered_block_dialog_title)
-            builder.setMessage(R.string.fapps_unmetered_block_dialog_message)
-        } else {
-            builder.setTitle(R.string.fapps_unmetered_unblock_dialog_title)
-            builder.setMessage(R.string.fapps_unmetered_unblock_dialog_message)
+    private fun getBulkActionDialogTitle(type: BlockType): String {
+        return when (type) {
+            BlockType.UNMETER -> {
+                if (isInitTag(b.ffaToggleAllWifi)) {
+                    getString(R.string.fapps_unmetered_block_dialog_title)
+                } else {
+                    getString(R.string.fapps_unmetered_unblock_dialog_title)
+                }
+            }
+            BlockType.METER -> {
+                if (isInitTag(b.ffaToggleAllMobileData)) {
+                    getString(R.string.fapps_metered_block_dialog_title)
+                } else {
+                    getString(R.string.fapps_metered_unblock_dialog_title)
+                }
+            }
+            BlockType.LOCKDOWN -> {
+                if (isInitTag(b.ffaToggleAllLockdown)) {
+                    getString(R.string.fapps_lockdown_block_dialog_title)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_title)
+                }
+            }
+            BlockType.BYPASS -> {
+                if (isInitTag(b.ffaToggleAllBypass)) {
+                    getString(R.string.fapps_bypass_block_dialog_title)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_title)
+                }
+            }
+            BlockType.EXCLUDE -> {
+                if (isInitTag(b.ffaToggleAllExclude)) {
+                    getString(R.string.fapps_exclude_block_dialog_title)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_title)
+                }
+            }
         }
+    }
 
-        builder.setPositiveButton(getString(R.string.fapps_unmetered_positive)) { _, _ ->
-            updateUnmeteredBulk()
+    private fun getBulkActionDialogMessage(type: BlockType): String {
+        return when (type) {
+            BlockType.UNMETER -> {
+                if (isInitTag(b.ffaToggleAllWifi)) {
+                    getString(R.string.fapps_unmetered_block_dialog_message)
+                } else {
+                    getString(R.string.fapps_unmetered_unblock_dialog_message)
+                }
+            }
+            BlockType.METER -> {
+                if (isInitTag(b.ffaToggleAllMobileData)) {
+                    getString(R.string.fapps_metered_block_dialog_message)
+                } else {
+                    getString(R.string.fapps_metered_unblock_dialog_message)
+                }
+            }
+            BlockType.LOCKDOWN -> {
+                if (isInitTag(b.ffaToggleAllLockdown)) {
+                    getString(R.string.fapps_lockdown_block_dialog_message)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_message)
+                }
+            }
+            BlockType.BYPASS -> {
+                if (isInitTag(b.ffaToggleAllBypass)) {
+                    getString(R.string.fapps_bypass_block_dialog_message)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_message)
+                }
+            }
+            BlockType.EXCLUDE -> {
+                if (isInitTag(b.ffaToggleAllExclude)) {
+                    getString(R.string.fapps_exclude_block_dialog_message)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_message)
+                }
+            }
         }
+    }
 
-        builder.setNegativeButton(getString(R.string.fapps_unmetered_negative)) { _, _ ->
-            // no-op
-        }
+    private fun showBulkRulesUpdateDialog(title: String, message: String, type: BlockType) {
+        val builder =
+            AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(getString(R.string.fapps_unmetered_positive)) { _, _ ->
+                    updateBulkRules(type)
+                }
+                .setNegativeButton(getString(R.string.fapps_unmetered_negative)) { _, _ -> }
+                .setCancelable(true)
 
-        builder.setCancelable(true)
         builder.create().show()
     }
 
-    private fun showUpdateMeteredForBulkDialog(isBlock: Boolean) {
-        val builder = AlertDialog.Builder(requireContext())
-        if (isBlock) {
-            builder.setTitle(R.string.fapps_metered_block_dialog_title)
-            builder.setMessage(R.string.fapps_metered_block_dialog_message)
-        } else {
-            builder.setTitle(R.string.fapps_metered_unblock_dialog_title)
-            builder.setMessage(R.string.fapps_metered_unblock_dialog_message)
+    private fun updateBulkRules(type: BlockType) {
+        when (type) {
+            BlockType.UNMETER -> {
+                updateUnmeteredBulk()
+            }
+            BlockType.METER -> {
+                updateMeteredBulk()
+            }
+            BlockType.LOCKDOWN -> {
+                updateLockdownBulk()
+            }
+            BlockType.BYPASS -> {
+                updateBypassBulk()
+            }
+            BlockType.EXCLUDE -> {
+                updateExcludedBulk()
+            }
         }
-        builder.setPositiveButton(getString(R.string.fapps_metered_positive)) { _, _ ->
-            updateMeteredBulk()
-        }
-
-        builder.setNegativeButton(getString(R.string.fapps_metered_negative)) { _, _ ->
-            // no-op
-        }
-
-        builder.setCancelable(true)
-        builder.create().show()
     }
 
     private fun showInfoDialog() {
+        val li = requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(getString(R.string.fapps_info_dialog_title))
-        builder.setMessage(getString(R.string.fapps_info_dialog_message))
+            .setView(view)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }
-
-        builder.setCancelable(false)
+        builder.setCancelable(true)
         builder.create().show()
     }
 
@@ -434,43 +549,109 @@ class FirewallAppFragment :
         chip.chipIcon?.colorFilter = colorFilter
     }
 
-    private fun resetFirewallIcons() {
-        b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
-        b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
+    private fun resetFirewallIcons(type: BlockType) {
+        // reset all icons to default state based on selection
+        when (type) {
+            BlockType.UNMETER -> {
+                b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
+                b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
+                b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
+                b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+            }
+            BlockType.METER -> {
+                b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
+                b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
+                b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
+                b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+            }
+            BlockType.LOCKDOWN -> {
+                b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
+                b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
+                b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
+                b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
+            }
+            BlockType.BYPASS -> {
+                b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
+                b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
+                b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
+                b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+            }
+            BlockType.EXCLUDE -> {
+                b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
+                b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
+                b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
+                b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+            }
+        }
     }
 
     private fun updateMeteredBulk() {
-        if (getBulkTagMetered()) {
+        if (isInitTag(b.ffaToggleAllMobileData)) {
             b.ffaToggleAllMobileData.tag = 1
             b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_off)
             io { appInfoViewModel.updateMeteredStatus(true) }
-            return
+        } else {
+            b.ffaToggleAllMobileData.tag = 0
+            b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on)
+            io { appInfoViewModel.updateMeteredStatus(false) }
         }
-
-        b.ffaToggleAllMobileData.tag = 0
-        b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on)
-        io { appInfoViewModel.updateMeteredStatus(false) }
+        resetFirewallIcons(BlockType.METER)
     }
 
     private fun updateUnmeteredBulk() {
-        if (getBulkTagUnmetered()) {
+        if (isInitTag(b.ffaToggleAllWifi)) {
             b.ffaToggleAllWifi.tag = 1
             b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_off)
             io { appInfoViewModel.updateUnmeteredStatus(true) }
-            return
+        } else {
+            b.ffaToggleAllWifi.tag = 0
+            b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on)
+            io { appInfoViewModel.updateUnmeteredStatus(false) }
         }
-
-        b.ffaToggleAllWifi.tag = 0
-        b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on)
-        io { appInfoViewModel.updateUnmeteredStatus(false) }
+        resetFirewallIcons(BlockType.UNMETER)
     }
 
-    private fun getBulkTagUnmetered(): Boolean {
-        return b.ffaToggleAllWifi.tag == 0
+    private fun updateBypassBulk() {
+        if (isInitTag(b.ffaToggleAllBypass)) {
+            b.ffaToggleAllBypass.tag = 1
+            b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_on)
+            io { appInfoViewModel.updateBypassStatus(true) }
+        } else {
+            b.ffaToggleAllBypass.tag = 0
+            b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
+            io { appInfoViewModel.updateBypassStatus(false) }
+        }
+        resetFirewallIcons(BlockType.BYPASS)
     }
 
-    private fun getBulkTagMetered(): Boolean {
-        return b.ffaToggleAllMobileData.tag == 0
+    private fun updateExcludedBulk() {
+        if (isInitTag(b.ffaToggleAllExclude)) {
+            b.ffaToggleAllExclude.tag = 1
+            b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_on)
+            io { appInfoViewModel.updateExcludeStatus(true) }
+        } else {
+            b.ffaToggleAllExclude.tag = 0
+            b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
+            io { appInfoViewModel.updateExcludeStatus(false) }
+        }
+        resetFirewallIcons(BlockType.EXCLUDE)
+    }
+
+    private fun updateLockdownBulk() {
+        if (isInitTag(b.ffaToggleAllLockdown)) {
+            b.ffaToggleAllLockdown.tag = 1
+            b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_on)
+            io { appInfoViewModel.updateLockdownStatus(true) }
+        } else {
+            b.ffaToggleAllLockdown.tag = 0
+            b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+            io { appInfoViewModel.updateLockdownStatus(false) }
+        }
+        resetFirewallIcons(BlockType.LOCKDOWN)
+    }
+
+    private fun isInitTag(view: View): Boolean {
+        return view.tag.equals("0") || view.tag == 0
     }
 
     private fun initView() {
