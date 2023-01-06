@@ -76,7 +76,6 @@ class CustomIpActivity :
 
         b.cipSearchView.setOnQueryTextListener(this)
         observeCustomRules()
-        updateHintUi()
         setupRecyclerView()
         setupClickListeners()
 
@@ -101,18 +100,6 @@ class CustomIpActivity :
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
-    }
-
-    // now both the universal and app rules are shown in same ui, update the universal and
-    // app specific hints. bypass universal/app rules is one such example
-    private fun updateHintUi() {
-        if (uid == UID_EVERYBODY) {
-            b.cipBypassHint.text = getString(R.string.ci_bypass_universal_desc)
-            b.cipBypassHintInitial.text = getString(R.string.ci_bypass_universal_initial)
-        } else {
-            b.cipBypassHint.text = getString(R.string.ci_bypass_app_desc)
-            b.cipBypassHintInitial.text = getString(R.string.ci_bypass_app_initial)
-        }
     }
 
     private fun observeCustomRules() {

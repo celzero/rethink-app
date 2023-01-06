@@ -47,9 +47,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layoutDirection="rtl"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:padding="5dp" />
+                android:minWidth="0dp"
+                android:minHeight="0dp" />
 
             <TextView
                 android:id="@+id/crp_label_tv"
@@ -69,6 +68,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/crp_label_tv"
                 android:layout_alignParentStart="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="7dp"
                 android:layout_toEndOf="@+id/crp_check_box"
                 android:background="@android:color/transparent">
 

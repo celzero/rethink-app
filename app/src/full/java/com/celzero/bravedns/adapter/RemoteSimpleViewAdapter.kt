@@ -72,7 +72,6 @@ class RemoteSimpleViewAdapter(val context: Context) :
     }
 
     override fun onBindViewHolder(holder: RethinkSimpleViewHolder, position: Int) {
-        Log.d("TEST","TEST Local value $position, ${getItem(position)}")
         val map: RemoteBlocklistPacksMap = getItem(position) ?: return
         holder.update(map, position)
     }

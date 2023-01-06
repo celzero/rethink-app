@@ -106,87 +106,13 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:id="@+id/cip_status_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/cip_search_container"
-                android:gravity="center"
-                android:padding="5dp">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/rectangle_border_background"
-                    android:gravity="center"
-                    android:minWidth="25dp"
-                    android:padding="5dp"
-                    android:text="@string/ci_blocked_initial"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:padding="5dp"
-                    android:text="@string/ci_blocked_desc"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/cip_bypass_hint_initial"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/rectangle_border_background"
-                    android:gravity="center"
-                    android:minWidth="25dp"
-                    android:padding="5dp"
-                    android:text="@string/ci_bypass_universal_initial"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/cip_bypass_hint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:padding="5dp"
-                    android:text="@string/ci_bypass_universal_desc"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/rectangle_border_background"
-                    android:gravity="center"
-                    android:minWidth="25dp"
-                    android:padding="5dp"
-                    android:text="@string/ci_no_rule_initial"
-                    android:textSize="@dimen/default_font_text_view" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/ci_no_rule_desc"
-                    android:textSize="@dimen/default_font_text_view" />
-
-            </LinearLayout>
-
-            <View
-                android:id="@+id/cip_border"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_below="@id/cip_status_desc"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="?attr/border" />
-
 
             <TextView
                 android:id="@+id/cip_no_rules_set_txt"
                 style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/cip_border"
+                android:layout_below="@id/cip_search_container"
                 android:layout_marginTop="5dp"
                 android:gravity="center"
                 android:paddingStart="20dp"
@@ -200,7 +126,7 @@
                 android:id="@+id/cip_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/cip_border"
+                android:layout_below="@id/cip_search_container"
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="2dp"
@@ -226,4 +152,5 @@
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
