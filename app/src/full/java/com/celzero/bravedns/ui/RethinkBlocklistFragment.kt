@@ -643,8 +643,8 @@ class RethinkBlocklistFragment :
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
         localBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
-            val l = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) }
-            localSimpleViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, l)
+            val l = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) && it1.pack.isNotEmpty() }
+            localSimpleViewAdapter?.submitData(viewLifecycleOwner.lifecycle, l)
         }
         b.lbSimpleRecyclerPacks.adapter = localSimpleViewAdapter
     }
@@ -655,8 +655,8 @@ class RethinkBlocklistFragment :
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
         remoteBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
-            val r = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) }
-            remoteSimpleViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, r)
+            val r = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) && it1.pack.isNotEmpty() }
+            remoteSimpleViewAdapter?.submitData(viewLifecycleOwner.lifecycle, r)
         }
         b.lbSimpleRecyclerPacks.adapter = remoteSimpleViewAdapter
     }
