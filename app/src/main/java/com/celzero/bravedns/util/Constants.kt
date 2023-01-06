@@ -260,5 +260,8 @@ class Constants {
         // The UID used to be generic uid used to block IP addresses which are intended to
         // block for all the applications.
         const val UID_EVERYBODY = -1000
+
+        // to handle the "dead" packs
+        const val DEAD_PACK = "dead"
     }
 }

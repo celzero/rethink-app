@@ -250,6 +250,10 @@ object FirewallManager : KoinComponent {
         var appInfosLiveData: MutableLiveData<Collection<AppInfo>> = MutableLiveData()
     }
 
+    init {
+        io { loadAppFirewallRules() }
+    }
+
     data class AppInfoTuple(val uid: Int, var packageName: String)
 
     @Volatile private var isFirewallRulesLoaded: Boolean = false
@@ -260,16 +264,20 @@ object FirewallManager : KoinComponent {
 
     fun isUidSystemApp(uid: Int): Boolean {
         lock.read {
-            return ImmutableList.copyOf(appInfos.get(uid)).any { it.isSystemApp }
+            return appInfos.get(uid).any { it.isSystemApp }
         }
     }
 
     fun getTotalApps(): Int {
-        return getAppInfos().count()
+        lock.read {
+            return appInfos.values().count()
+        }
     }
 
     fun getPackageNames(): Set<AppInfoTuple> {
-        return getAppInfos().map { AppInfoTuple(it.uid, it.packageInfo) }.toHashSet()
+        lock.read {
+            return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }.toHashSet()
+        }
     }
 
     fun deletePackagesFromCache(packagesToDelete: Set<AppInfoTuple>) {
@@ -277,7 +285,7 @@ object FirewallManager : KoinComponent {
             packagesToDelete.forEach { tuple ->
                 appInfos
                     .get(tuple.uid)
-                    .filter { tuple.packageName == it.packageInfo }
+                    .filter { tuple.packageName == it.packageName }
                     .forEach { ai -> appInfos.remove(tuple.uid, ai) }
             }
         }
@@ -288,12 +296,16 @@ object FirewallManager : KoinComponent {
     }
 
     fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
-        return getAppInfos().filter { it.firewallStatus != FirewallStatus.BLOCK.id }
+        lock.read {
+            return appInfos.values().filter { it.firewallStatus != FirewallStatus.BLOCK.id }
+        }
     }
 
     // TODO: Use the package-manager API instead
     fun isOrbotInstalled(): Boolean {
-        return getAppInfos().any { it.packageInfo == OrbotHelper.ORBOT_PACKAGE_NAME }
+        lock.read {
+            return appInfos.values().any { it.packageName == OrbotHelper.ORBOT_PACKAGE_NAME }
+        }
     }
 
     fun hasUid(uid: Int): Boolean {
@@ -332,25 +344,30 @@ object FirewallManager : KoinComponent {
     }
 
     fun getExcludedApps(): MutableSet<String> {
-        return getAppInfos()
-            .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
-            .map { it.packageInfo }
-            .toMutableSet()
+        lock.read {
+            return appInfos
+                .values()
+                .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
+                .map { it.packageName }
+                .toMutableSet()
+        }
     }
 
     fun getPackageNameByAppName(appName: String): String? {
-        return getAppInfos().firstOrNull { it.appName == appName }?.packageInfo
+        lock.read {
+            return appInfos.values().firstOrNull { it.appName == appName }?.packageName
+        }
     }
 
     fun getAppNamesByUid(uid: Int): List<String> {
         lock.read {
-            return ImmutableList.copyOf(appInfos.get(uid)).map { it.appName }
+            return appInfos.get(uid).map { it.appName }
         }
     }
 
     fun getPackageNamesByUid(uid: Int): List<String> {
         lock.read {
-            return ImmutableList.copyOf(appInfos.get(uid)).map { it.packageInfo }
+            return appInfos.get(uid).map { it.packageName }
         }
     }
 
@@ -360,25 +377,26 @@ object FirewallManager : KoinComponent {
 
     fun getAppNameByUid(uid: Int): String? {
         lock.read {
-            return ImmutableList.copyOf(appInfos.get(uid)).firstOrNull()?.appName
+            return appInfos.get(uid).firstOrNull()?.appName
         }
     }
 
     fun getAppInfoByPackage(packageName: String?): AppInfo? {
         if (packageName.isNullOrBlank()) return null
-
-        return getAppInfos().firstOrNull { it.packageInfo == packageName }
+        lock.read {
+            return appInfos.values().firstOrNull { it.packageName == packageName }
+        }
     }
 
     fun getAppInfoByUid(uid: Int): AppInfo? {
         lock.read {
-            return ImmutableList.copyOf(appInfos.get(uid)).firstOrNull()
+            return appInfos.get(uid).firstOrNull()
         }
     }
 
     fun getPackageNameByUid(uid: Int): String? {
         lock.read {
-            return ImmutableList.copyOf(appInfos.get(uid)).firstOrNull()?.packageInfo
+            return appInfos.get(uid).firstOrNull()?.packageName
         }
     }
 

@@ -41,8 +41,7 @@ class RethinkDnsEndpoint {
     }
 
     override fun hashCode(): Int {
-        var result = 0
-        result += result * 31 + this.name.hashCode()
+        var result = this.name.hashCode()
         result += result * 31 + this.url.hashCode()
         result += result * 31 + this.uid.hashCode()
         return result

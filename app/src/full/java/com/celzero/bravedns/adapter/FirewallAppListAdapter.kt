@@ -42,9 +42,6 @@ import com.celzero.bravedns.ui.AppInfoActivity
 import com.celzero.bravedns.ui.AppInfoActivity.Companion.UID_INTENT_NAME
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter(
@@ -66,7 +63,7 @@ class FirewallAppListAdapter(
                     oldConnection: AppInfo,
                     newConnection: AppInfo
                 ): Boolean {
-                    return (oldConnection.packageInfo == newConnection.packageInfo &&
+                    return (oldConnection.packageName == newConnection.packageName &&
                         oldConnection.firewallStatus == newConnection.firewallStatus &&
                         oldConnection.metered == newConnection.metered)
                 }
@@ -99,7 +96,7 @@ class FirewallAppListAdapter(
             b.firewallAppLabelTv.text = appInfo.appName
             b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
 
-            displayIcon(getIcon(context, appInfo.packageInfo, appInfo.appName), b.firewallAppIconIv)
+            displayIcon(getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
             displayConnectionStatus(appStatus, connStatus)
             showAppHint(b.firewallAppStatusIndicator, appInfo)
         }
@@ -366,7 +363,7 @@ class FirewallAppListAdapter(
 
             val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
 
-            builderSingle.setIcon(R.drawable.ic_firewall_block)
+            builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
             val count = packageList.count()
             builderSingle.setTitle(
                 context.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())

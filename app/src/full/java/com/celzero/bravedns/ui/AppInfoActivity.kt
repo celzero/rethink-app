@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -36,9 +37,6 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ConnectionTrackerRepository
@@ -46,6 +44,9 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.ActivityAppDetailsBinding
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.glide.GlideApp
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
@@ -109,14 +110,20 @@ class AppInfoActivity :
 
     private fun observeNetworkLogSize() {
         networkLogsViewModel.getConnectionsCount(uid).observe(this) {
+            if (it == null) return@observe
+
             b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count, it.toString())
             if (it == 0) {
                 b.aadConnDetailDesc.text = getString(R.string.ada_ip_connection_count_zero)
                 b.aadConnDetailRecycler.visibility = View.GONE
                 b.aadConnDetailEmptyTxt.visibility = View.VISIBLE
                 b.aadConnDetailSearchLl.visibility = View.GONE
-                toggleFirewallUiState(firewallUiState)
-                toggleIpConnectionsState(ipListUiState)
+
+                // toggle the state only when the firewall rules are not visible
+                if (firewallUiState) {
+                    toggleFirewallUiState(firewallUiState)
+                    toggleNetworkLogState(ipListUiState)
+                }
             } else {
                 b.aadConnDetailRecycler.visibility = View.VISIBLE
                 b.aadConnDetailEmptyTxt.visibility = View.GONE
@@ -149,13 +156,13 @@ class AppInfoActivity :
         // updateDnsDetails()
 
         displayIcon(
-            Utilities.getIcon(this, appInfo.packageInfo, appInfo.appName),
+            Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
             b.aadAppDetailIcon
         )
 
         showNetworkLogsIfAny(appInfo.uid)
         toggleFirewallUiState(firewallUiState)
-        toggleIpConnectionsState(ipListUiState)
+        toggleNetworkLogState(ipListUiState)
     }
 
     private fun openCustomIpScreen() {
@@ -208,7 +215,7 @@ class AppInfoActivity :
                 enableAppExcludedUi()
             }
             FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
-                enableAppWhitelistedUi()
+                enableAppBypassedUi()
             }
             FirewallManager.FirewallStatus.LOCKDOWN -> {
                 disableFirewallStatusUi()
@@ -225,7 +232,7 @@ class AppInfoActivity :
         b.aadConnDetailSearch.setOnQueryTextListener(this)
 
         b.aadAppInfoIcon.setOnClickListener {
-            Utilities.openAndroidAppInfo(this, appInfo.packageInfo)
+            Utilities.openAndroidAppInfo(this, appInfo.packageName)
         }
 
         b.aadAppSettingsBlock.setOnClickListener {
@@ -309,9 +316,9 @@ class AppInfoActivity :
             )
         }
 
-        b.aadConnDetailIndicator.setOnClickListener { toggleIpConnectionsState(ipListUiState) }
+        b.aadConnDetailIndicator.setOnClickListener { toggleNetworkLogState(ipListUiState) }
 
-        b.aadConnDetailRl.setOnClickListener { toggleIpConnectionsState(ipListUiState) }
+        b.aadConnDetailRl.setOnClickListener { toggleNetworkLogState(ipListUiState) }
 
         b.aadAapFirewallIndicator.setOnClickListener { toggleFirewallUiState(firewallUiState) }
 
@@ -477,7 +484,7 @@ class AppInfoActivity :
         networkLogsViewModel.setFilter("")
     }
 
-    private fun toggleIpConnectionsState(state: Boolean) {
+    private fun toggleNetworkLogState(state: Boolean) {
         ipListUiState = !state
 
         if (state) {
@@ -505,11 +512,11 @@ class AppInfoActivity :
         }
     }
 
-    private fun enableAppWhitelistedUi() {
+    private fun enableAppBypassedUi() {
         setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
-        setDrawable(R.drawable.ic_firewall_whitelist_on, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_bypass_on, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
@@ -518,19 +525,19 @@ class AppInfoActivity :
         setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
-        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_on, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
 
     private fun disableWhitelistExcludeUi() {
-        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
 
     private fun disableFirewallStatusUi() {
-        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
@@ -541,7 +548,7 @@ class AppInfoActivity :
         setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
-        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_on, b.aadAppSettingsLockdown)
     }
@@ -550,7 +557,7 @@ class AppInfoActivity :
         setDrawable(R.drawable.ic_firewall_allow, b.aadAppSettingsBlock)
         setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
-        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsLockdown)
     }
@@ -572,7 +579,7 @@ class AppInfoActivity :
             }
         }
         setDrawable(R.drawable.ic_firewall_block, b.aadAppSettingsBlock)
-        setDrawable(R.drawable.ic_firewall_whitelist_off, b.aadAppSettingsWhitelist)
+        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsWhitelist)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
     }
 
@@ -722,7 +729,7 @@ class AppInfoActivity :
 
         val builderSingle: AlertDialog.Builder = AlertDialog.Builder(this)
 
-        builderSingle.setIcon(R.drawable.ic_firewall_block)
+        builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()
         builderSingle.setTitle(
             this.getString(R.string.ctbs_block_other_apps, appInfo.appName, count.toString())

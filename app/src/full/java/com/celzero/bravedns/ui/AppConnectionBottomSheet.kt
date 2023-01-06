@@ -23,8 +23,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
@@ -136,7 +136,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.BLOCK,
                 getString(R.string.bsac_block_toast, ipAddress)
             )
@@ -146,7 +145,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.NONE,
                 getString(R.string.bsac_unblock_toast, ipAddress)
             )
@@ -156,7 +154,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
                 getString(R.string.bsac_whitelist_toast, ipAddress)
             )
@@ -166,7 +163,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.NONE,
                 getString(R.string.bsac_whitelist_remove_toast, ipAddress)
             )
@@ -176,11 +172,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun applyRule(
         uid: Int,
         ipAddress: String,
-        port: Int,
         status: IpRulesManager.IpRuleStatus,
         toastMsg: String
     ) {
-        io { IpRulesManager.addIpRule(uid, ipAddress, port, status) }
+        // set port number as UNSPECIFIED_PORT for all the rules applied from this screen
+        io { IpRulesManager.addIpRule(uid, ipAddress, UNSPECIFIED_PORT, status) }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()
     }

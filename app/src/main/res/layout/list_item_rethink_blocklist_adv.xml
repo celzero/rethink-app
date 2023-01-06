@@ -69,10 +69,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/crp_label_tv"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="5dp"
                 android:layout_toEndOf="@+id/crp_check_box"
-                android:background="@android:color/transparent"
-                android:padding="5dp">
+                android:background="@android:color/transparent">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/crp_desc_group_tv"

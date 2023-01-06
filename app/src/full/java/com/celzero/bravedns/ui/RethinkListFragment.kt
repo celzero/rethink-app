@@ -15,12 +15,12 @@
  */
 package com.celzero.bravedns.ui
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -38,7 +38,6 @@ import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
-import com.celzero.bravedns.databinding.DialogSetRethinkBinding
 import com.celzero.bravedns.databinding.FragmentRethinkListBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
@@ -56,14 +55,14 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip
+import java.net.MalformedURLException
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.net.MalformedURLException
-import java.net.URL
 
 class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private val b by viewBinding(FragmentRethinkListBinding::bind)
@@ -273,66 +272,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         } else {
             RETHINK_BASE_URL_SKY
         }
-    }
-
-    /**
-     * Shows dialog for custom DNS endpoint configuration If entered DNS end point is valid, then
-     * the DNS queries are forwarded to that end point else, it will revert back to default end
-     * point
-     */
-    private fun showAddCustomDohDialog(stamp: String, count: Int) {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(getString(R.string.cd_custom_doh_dialog_title))
-        val dialogBinding = DialogSetRethinkBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.window?.attributes = lp
-
-        dialogBinding.dialogCustomUrlConfigureBtn.visibility = View.GONE
-        dialogBinding.dialogCustomUrlEditText.append(getRethinkBaseUrl() + stamp)
-
-        dialogBinding.dialogCustomNameEditText.setText(
-            getString(R.string.rt_rethink_dns),
-            TextView.BufferType.EDITABLE
-        )
-
-        // fetch the count from repository and increment by 1 to show the
-        // next doh name in the dialog
-        io {
-            val nextIndex = appConfig.getRethinkCount().plus(1).toString()
-            uiCtx {
-                val name = getString(R.string.rethink_dns_txt, nextIndex)
-                dialogBinding.dialogCustomNameEditText.setText(name, TextView.BufferType.EDITABLE)
-            }
-        }
-
-        dialogBinding.dialogCustomUrlOkBtn.setOnClickListener {
-            val url = dialogBinding.dialogCustomUrlEditText.text.toString()
-            val name = dialogBinding.dialogCustomNameEditText.text.toString()
-
-            if (checkUrl(url)) {
-                insertRethinkEndpoint(name, url, count)
-                dialog.dismiss()
-            } else {
-                dialogBinding.dialogCustomUrlFailureText.text =
-                    resources.getString(R.string.custom_url_error_invalid_url)
-                dialogBinding.dialogCustomUrlFailureText.visibility = View.VISIBLE
-                dialogBinding.dialogCustomUrlCancelBtn.visibility = View.VISIBLE
-                dialogBinding.dialogCustomUrlOkBtn.visibility = View.VISIBLE
-                dialogBinding.dialogCustomUrlLoading.visibility = View.INVISIBLE
-            }
-        }
-
-        dialogBinding.dialogCustomUrlCancelBtn.setOnClickListener { dialog.dismiss() }
-        dialog.show()
     }
 
     private fun initObservers() {

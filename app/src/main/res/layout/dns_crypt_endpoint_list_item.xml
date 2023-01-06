@@ -29,7 +29,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif"
-                android:text="Dummy Label"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -39,7 +38,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif"
-                android:text="Dummy Label"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 

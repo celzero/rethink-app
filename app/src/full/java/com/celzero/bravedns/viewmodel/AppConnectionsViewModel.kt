@@ -1,6 +1,5 @@
 package com.celzero.bravedns.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.celzero.bravedns.data.AppConnection
@@ -11,7 +10,6 @@ class AppConnectionsViewModel(private val connectionTrackerDAO: ConnectionTracke
     ViewModel() {
     private var filter: MutableLiveData<String> = MutableLiveData()
     private var uid: Int = Constants.MISSING_UID
-
 
     init {
         filter.value = ""

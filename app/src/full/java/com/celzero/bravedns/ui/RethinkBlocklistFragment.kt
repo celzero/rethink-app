@@ -29,6 +29,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.filter
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -51,6 +52,7 @@ import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_B
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_URL
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.DEAD_PACK
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -641,7 +643,8 @@ class RethinkBlocklistFragment :
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
         localBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
-            localSimpleViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+            val l = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) }
+            localSimpleViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, l)
         }
         b.lbSimpleRecyclerPacks.adapter = localSimpleViewAdapter
     }
@@ -652,7 +655,8 @@ class RethinkBlocklistFragment :
         b.lbSimpleRecyclerPacks.layoutManager = layoutManager
 
         remoteBlocklistPacksMapViewModel.simpleTags.observe(viewLifecycleOwner) {
-            remoteSimpleViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
+            val r = it.filter { it1 -> !it1.pack.contains(DEAD_PACK) }
+            remoteSimpleViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, r)
         }
         b.lbSimpleRecyclerPacks.adapter = remoteSimpleViewAdapter
     }

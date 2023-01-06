@@ -102,6 +102,10 @@ object IpRulesManager : KoinComponent {
         }
     }
 
+    init {
+        loadIpRules()
+    }
+
     // returns CustomIp object based on uid and IP address
     private suspend fun getObj(uid: Int, ipAddress: String, port: Int): CustomIp? {
         return customIpRepository.getCustomIpDetail(uid, ipAddress, port)

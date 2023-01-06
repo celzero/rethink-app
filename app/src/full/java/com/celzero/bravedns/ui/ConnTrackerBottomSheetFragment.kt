@@ -327,7 +327,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             }
 
         b.bsConnIpRuleSpinner.adapter =
-            FirewallStatusSpinnerAdapter(requireContext(), IpRulesManager.IpRuleStatus.getLabel())
+            FirewallStatusSpinnerAdapter(requireContext(), IpRulesManager.IpRuleStatus.getLabel(requireContext()))
         b.bsConnIpRuleSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -342,7 +342,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
                     // no need to apply rule, prev selection and current selection are same
                     if (
-                        IpRulesManager.hasRule(
+                        IpRulesManager.isIpRuleAvailable(
                             ipDetails!!.uid,
                             ipDetails!!.ipAddress,
                             ipDetails!!.port
@@ -400,7 +400,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun updateIpRulesUi(uid: Int, ipAddress: String, port: Int) {
-        b.bsConnIpRuleSpinner.setSelection(IpRulesManager.hasRule(uid, ipAddress, port).id)
+        b.bsConnIpRuleSpinner.setSelection(IpRulesManager.isIpRuleAvailable(uid, ipAddress, port).id)
     }
 
     private fun showFirewallRulesDialog(blockedRule: String?) {
@@ -486,7 +486,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val builderSingle: android.app.AlertDialog.Builder =
             android.app.AlertDialog.Builder(requireContext())
 
-        builderSingle.setIcon(R.drawable.ic_firewall_block)
+        builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()
         builderSingle.setTitle(
             this.getString(R.string.ctbs_block_other_apps, getAppName(), count.toString())
