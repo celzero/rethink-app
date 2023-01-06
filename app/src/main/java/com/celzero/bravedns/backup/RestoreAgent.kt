@@ -22,24 +22,30 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
+import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
+import com.celzero.bravedns.backup.BackupHelper.Companion.VERSION
 import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.stopVpn
 import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
 import com.celzero.bravedns.database.AppDatabase
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.database.LogDatabase
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
+import java.io.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.*
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams), KoinComponent {
 
+    private val logDatabase by inject<LogDatabase>()
     private val appDatabase by inject<AppDatabase>()
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         const val TAG = "RestoreAgent"
@@ -80,6 +86,17 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 // proceed
             }
 
+            if (!validateMetadata(tempDir.path)) {
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "invalid meta-data or metadata not found. maybe earlier version backup"
+                )
+                return false
+            } else {
+                Log.i(LOG_TAG_BACKUP_RESTORE, "metadata file validation complete")
+                // no-op; proceed
+            }
+
             // copy SharedPreferences file to its directory,
             // if shared pref copy is succeeds then proceed to database restore else
             // return failed
@@ -87,7 +104,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 Log.w(LOG_TAG_BACKUP_RESTORE, "failed to restore shared pref, return failure")
                 return false
             } else {
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "shared pref restored to the temp dir")
+                Log.i(LOG_TAG_BACKUP_RESTORE, "shared pref restored to the temp dir")
                 // proceed
             }
 
@@ -96,21 +113,12 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
                 Log.w(LOG_TAG_BACKUP_RESTORE, "failed to restore database, return failure")
                 return false
             } else {
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "database restored to the temp dir")
+                Log.i(LOG_TAG_BACKUP_RESTORE, "database restored to the temp dir")
                 // proceed
             }
 
-            // open the database if its not open
-            if (!appDatabase.isOpen) {
-                Log.i(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "database is not open, perform writableDatabase operation"
-                )
-                appDatabase.openHelper.writableDatabase
-                // appDatabase.rebuildDatabase(context)
-            } else {
-                // no-op
-            }
+            // open log database if its not open
+            handleDatabaseInit()
 
             return true
         } catch (e: Exception) {
@@ -122,6 +130,30 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             return false
         } finally {
             inputStream?.close()
+        }
+    }
+
+    private fun handleDatabaseInit() {
+        // get writable database for logs
+        if (!logDatabase.isOpen) {
+            Log.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "log database is not open, perform writableDatabase operation"
+            )
+            logDatabase.openHelper.writableDatabase
+        } else {
+            // no-op
+        }
+
+        // get writable database for app
+        if (!appDatabase.isOpen) {
+            Log.i(
+                LOG_TAG_BACKUP_RESTORE,
+                "app database is not open, perform writableDatabase operation"
+            )
+            appDatabase.openHelper.writableDatabase
+        } else {
+            // no-op
         }
     }
 
@@ -167,12 +199,55 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     private fun checkPoint() {
         Log.i(LOG_TAG_BACKUP_RESTORE, "database checkpoint() during restore process")
         appDatabase.checkPoint()
+        logDatabase.checkPoint()
         return
+    }
+
+    private fun validateMetadata(tempDirectory: String?): Boolean {
+        val file = File(tempDirectory, METADATA_FILENAME)
+        var stream: InputStream? = null
+        return try {
+            stream = file.inputStream()
+            val metadata = stream.bufferedReader().use { it.readText() }
+            isVersionSupported(metadata)
+        } catch (ignored: Exception) {
+            Log.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "error while restoring metadata, reason? ${ignored.message}",
+                ignored
+            )
+            false
+        } finally {
+            try {
+                stream?.close()
+            } catch (ignored: IOException) {
+                Log.e(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "error while restoring metadata, reason? ${ignored.message}",
+                    ignored
+                )
+            }
+        }
+    }
+
+    private fun isVersionSupported(metadata: String): Boolean {
+        try {
+            if (!metadata.contains(VERSION)) return false
+
+            val versionDetails = metadata.split("|")
+            if (versionDetails[0].isEmpty()) return false
+
+            // backup version should be equal to current version (as this version 19) contains
+            // database split up, so backup prior to 24 will not be considered
+            return versionDetails[0].split(":")[1].toInt() == persistentState.appVersion
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_BACKUP_RESTORE, "error while reading metadata, reason? ${e.message}", e)
+            return false
+        }
     }
 
     private fun restoreSharedPreferencesFromFile(tempDirectory: String?): Boolean {
         var input: ObjectInputStream? = null
-        context.filesDir
         val prefsBackupFile = File(tempDirectory, SHARED_PREFS_BACKUP_FILE_NAME)
         val currentSharedPreferences: SharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(context)

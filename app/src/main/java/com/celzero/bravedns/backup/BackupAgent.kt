@@ -17,27 +17,35 @@ package com.celzero.bravedns.backup
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageInfo
 import android.net.Uri
+import android.os.SystemClock
 import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.backup.BackupHelper.Companion.CREATED_TIME
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
+import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
+import com.celzero.bravedns.backup.BackupHelper.Companion.PACKAGE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.TEMP_ZIP_FILE_NAME
+import com.celzero.bravedns.backup.BackupHelper.Companion.VERSION
 import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.copyWithStream
-import org.koin.core.component.KoinComponent
 import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
@@ -45,6 +53,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams), KoinComponent {
 
     var filesToZip: MutableList<File> = ArrayList()
+    private val persistentState by inject<PersistentState>()
 
     companion object {
         const val TAG = "BackupExport"
@@ -109,6 +118,8 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 return false
             }
 
+            createMetaData(tempDir)
+
             return zipAndCopyToDestination(tempDir, backupFileUri)
         } catch (e: Exception) {
             Log.e(
@@ -122,6 +133,33 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 deleteResidue(file)
             }
         }
+    }
+
+    private fun createMetaData(backupDir: File) {
+        var writer: FileWriter? = null
+        val metadata = backupMetadata()
+        try {
+            val metadataFile = File(backupDir, METADATA_FILENAME)
+            writer = FileWriter(metadataFile)
+            writer.append(metadata)
+            writer.flush()
+            writer.close()
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_BACKUP_RESTORE, "exception during shared pref backup, ${e.message}", e)
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.flush()
+                    writer.close()
+                }
+            } catch (ignored: IOException) {
+                // no-op
+            }
+        }
+    }
+
+    private fun backupMetadata(): String {
+        return "$VERSION:${persistentState.appVersion}|$PACKAGE_NAME:${context.packageName}|$CREATED_TIME:${SystemClock.elapsedRealtime()}"
     }
 
     private fun zipAndCopyToDestination(tempDir: File, destUri: Uri): Boolean {
