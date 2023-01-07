@@ -71,7 +71,7 @@ object IpRulesManager : KoinComponent {
             return this.id == BLOCK.id
         }
 
-        fun byPassAppRules(): Boolean {
+        fun trustIp(): Boolean {
             return this.id == TRUST.id
         }
 
@@ -159,10 +159,10 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    fun byPassAppRules(customIp: CustomIp) {
+    fun trustIpRules(customIp: CustomIp) {
         Log.i(
             LOG_TAG_FIREWALL,
-            "IP Rules, by-pass app rules, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
+            "IP Rules, trust ip, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
         )
         io {
             customIp.status = IpRuleStatus.TRUST.id
