@@ -137,7 +137,6 @@
     <string name="settings_enable_logs">Salva connessioni sul registro</string>
     <string name="app_mode_choose">Scegli modalità</string>
     <string name="whats_dialog_title">Novità della versione v053l</string>
-    <string name="whats_new_version_name">🌎🕊 Giornata mondiale dello studente (15 ottobre) 🕊🌎</string>
     <string name="connection_http3">HTTP/3</string>
     <string name="settings_ip_network_heading">Scegli la versione IP</string>
     <string name="settings_ip_network_desc">Scegli tra le versioni dell\'Internet Protocol.</string>

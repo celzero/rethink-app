@@ -338,7 +338,6 @@
     <string name="settings_enable_logs_desc">Хранить логи DNS и брандмауэра локально на устройстве.</string>
     <string name="settings_enable_logs">Включить логгирование на устройстве</string>
     <string name="whats_dialog_title">Что нового в v053l</string>
-    <string name="whats_new_version_name">🌎🕊 Всемирный день студента (15 октября) 🕊🌎</string>
     <string name="relative_time_today">Сегодня</string>
     <string name="relative_time_yesterday">Вчера</string>
     <string name="app_mode_choose">Выбор режима</string>

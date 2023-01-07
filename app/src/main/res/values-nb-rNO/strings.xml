@@ -178,7 +178,6 @@
     <string name="univ_ip_delete_dialog_positive">Slett alle</string>
     <string name="univ_ip_delete_toast_success">Slettet alle IP-regler.</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
-    <string name="whats_new_version_name">🌎🕊 Verdens studentdag (15 okt) 🕊🌎</string>
     <string name="univ_delete_firewall_dialog_title">Slett alle IP-regler\?</string>
     <string name="error_loading_log_file">Kunne ikke laste inn loggfil</string>
     <string name="cd_custom_doh_dialog_title">Egendefinert tjener-nettadresse</string>

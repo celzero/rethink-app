@@ -77,7 +77,6 @@
     <string name="app_mode_dns_firewall">DNS e Firewall (predefinido)</string>
     <string name="info_dialog_copy_toast_msg">Endereço IP copiado.</string>
     <string name="info_dialog_rethink_toast_msg">Copiado como URL de DNS sobre HTTPS RDNS+</string>
-    <string name="whats_new_version_name">🌎🕊 Dia Mundial do Estudante (15 Out) 🕊🌎</string>
     <string name="settings_enable_logs_desc">Armazenar os registos DNS e Firewall localmente no dispositivo.</string>
     <string name="settings_theme_heading">Aparência</string>
     <string name="settings_http_proxy_error_text3">O nome do host está vazio</string>

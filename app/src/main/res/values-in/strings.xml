@@ -306,7 +306,6 @@
     <string name="dc_check_update_desc">Cek pembaharuan daftar blokir setiap <i>tiga</i> hari</string>
     <string name="rt_dialog_message">Apakah Anda ingin menerapkan daftar-daftar blokir yang baru saja diatur\?</string>
     <string name="settings_allow_bypass_heading">Ijinkan Pintasan</string>
-    <string name="whats_new_version_name">🌎🕊 Hari Pelajar Sedunia (15 Oct) 🕊🌎</string>
     <string name="firewall_status_blocked">terblokir</string>
     <string name="ct_filter_parent_allowed">Diijinkan</string>
     <string name="dns_filter_parent_blocked">Terblokir</string>

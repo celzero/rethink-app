@@ -68,7 +68,6 @@
     <string name="settings_enable_logs">啓用本地日誌</string>
     <string name="whats_dialog_title">v053l 嘅新內容</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
-    <string name="whats_new_version_name">🌎🕊 世界學生日（10 月 15 號） 🕊🌎</string>
     <string name="orbot_http">HTTP 代理</string>
     <string name="whats_new_version_update">&lt;b&gt;打破語言隔閡！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 重新支援 Android 6。&lt;br/&gt; 2. 全新 RDNS+ 介面。&lt;br/&gt; 3. 全新防火牆同網絡引擎。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：超過 15 種語言嘅翻譯。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：自適應圖示。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：喺分應用網絡日誌入面顯示網域。&lt;br/&gt; 7. 修復通知喺 Android 13 上消失嘅問題。&lt;br/&gt; 8. 修復異常工作嘅 Orbot DNS 支援。&lt;br/&gt; 9. 應用程式區而家可以喺僅 DNS 模式入面訪問。&lt;br/&gt;10. 對內建下載管理器嘅一啲重大改進。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
     <string name="cd_doh_dialog_heading">加 DNS over HTTPS</string>

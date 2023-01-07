@@ -485,7 +485,6 @@
     <string name="local_blocklist_download_desc">هل تريد تنزيل قوائم الحظر (حوالي 60 ميجابايت) لاستخدام هذه الميزة؟</string>
     <string name="download_update_dialog_message_ok">أنت بالفعل على أحدث إصدار.</string>
     <string name="search_firewall_network_log"><font size="12"> بحث في التطبيقات وعناوين IP والمجالات </font></string>
-    <string name="whats_new_version_name">🌎🕊 يوم الطالب العالمي (15 أكتوبر) 🕊🌎</string>
     <string name="orbot_install_dialog_neutral">موقع الكتروني</string>
     <string name="settings_orbot_header">أوربوت ❯</string>
     <string name="settings_network_all_networks_desc">عند التمكين ، تستخدم RethinkDNS جميع الشبكات المتاحة للاتصال بالإنترنت. إذا لم يكن كذلك ، فإنه يستخدم أي شبكة يعتبرها <i> نشطة </i> بواسطة Android.</string>

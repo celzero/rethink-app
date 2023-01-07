@@ -102,7 +102,6 @@
     <string name="settings_enable_logs_desc">Sla DNS- en firewall-logs lokaal op het apparaat op.</string>
     <string name="app_mode_choose">Kies de modus</string>
     <string name="whats_dialog_title">Nieuw in v053k</string>
-    <string name="whats_new_version_name">🌎🕊 Wereldstudentendag (15 oktober) 🕊🌎</string>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
     <string name="app_name_rethink">Rethink</string>

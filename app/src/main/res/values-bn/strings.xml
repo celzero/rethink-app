@@ -181,7 +181,6 @@
     <string name="dns_act_configure_tab">কনফিগার</string>
     <string name="app_mode_firewall">ফায়ারওয়াল</string>
     <string name="info_dialog_copy_toast_msg">আইপি ঠিকানা কপি করা হয়েছে।</string>
-    <string name="whats_new_version_name">🌎🕊 বিশ্ব ছাত্র দিবস (১৫ অক্টোবর) 🕊🌎</string>
     <string name="settings_orbot_header">অরবট ❯</string>
     <string name="settings_https_disabled_error">অরবোটের সাথে সংযুক্ত। চালিয়ে যেতে এটি বন্ধ করুন।</string>
     <string name="settings_socks_forwarding_default_desc">SOCKS5 এন্ডপয়েন্টে কানেকশন ফরোয়ার্ড করুন।</string>

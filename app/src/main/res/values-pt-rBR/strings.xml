@@ -848,7 +848,6 @@
     <string name="brbs_restore_dialog_failure_title">Falha na restauração</string>
     <string name="brbs_backup_complete_toast">Backup concluído</string>
     <string name="brbs_restore_no_uri_toast">Falha na restauração; tentar novamente</string>
-    <string name="whats_new_version_name">🌎🕊 Dia Mundial dos Estudantes (15 out) 🕊🌎</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="settings_app_notification_a13_heading">Notificação do app</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>

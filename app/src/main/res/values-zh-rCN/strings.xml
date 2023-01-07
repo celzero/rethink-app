@@ -655,7 +655,6 @@
     <string name="configure_dns_connection_name">已连接至 %1$s</string>
     <string name="search_custom_domains"><font size="12">搜索域名</font></string>
     <string name="app_mode_wireguard">VPN</string>
-    <string name="whats_new_version_name">🌎🕊 世界学生日（十月十五日） 🕊🌎</string>
     <string name="orbot_install_dialog_negative">忽略</string>
     <string name="settings_general_header">一般设置</string>
     <string name="settings_check_update_desc">每周一次自动检查应用是否有可用更新。</string>

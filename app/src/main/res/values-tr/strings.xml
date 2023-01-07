@@ -683,7 +683,6 @@
     <string name="local_blocklist_download_desc">Bu özelliği kullanmak için blok listelerini (yaklaşık 60MB) indireyim mi\?</string>
     <string name="http_proxy_dialog_desc">HTTP(S) Proxy ayarları uygulamalar için yalnızca bir ipucudur, ancak bunu kullanabilir veya kullanmayabilirler; ancak Chrome ve Firefox gibi tarayıcılar bunları kullanır. HTTP(S) proxy kullanan uygulamalar hem Güvenlik Duvarı hem de DNS kurallarını atlayacaktır.</string>
     <string name="dc_other_dns_heading">tür</string>
-    <string name="whats_new_version_name">🌎🕊 Dünya Öğrenci Günü (15 Ekim) 🕊🌎</string>
     <string name="settings_allow_bypass_desc">İsteyen uygulamaların RethinkDNS güvenlik duvarını isteğe bağlı olarak atlamasına izin verin. Zoom ve WhatsApp gibi bazı sesli/görüntülü konferans uygulamalarının düzgün çalışması için isteğe bağlı bir baypas gerekebilir.</string>
     <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz\?</string>
     <string name="download_update_dialog_message_ok">Zaten en son sürümü kullanıyorsunuz.</string>
