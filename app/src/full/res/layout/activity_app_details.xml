@@ -187,7 +187,7 @@
                         android:weightSum="1">
 
                         <TextView
-                            android:id="@+id/aad_app_settings_lockdown"
+                            android:id="@+id/aad_app_settings_isolate"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
@@ -203,7 +203,7 @@
 
 
                         <TextView
-                            android:id="@+id/aad_app_settings_whitelist"
+                            android:id="@+id/aad_app_settings_bypass_univ"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"

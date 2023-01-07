@@ -311,7 +311,7 @@ class CustomIpAdapter(private val context: Context) :
         }
 
         private fun byPassAppRule(customIp: CustomIp) {
-            IpRulesManager.byPassAppRules(customIp)
+            IpRulesManager.trustIpRules(customIp)
         }
 
         private fun blockIp(customIp: CustomIp) {
