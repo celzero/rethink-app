@@ -16,7 +16,6 @@
 package com.celzero.bravedns.database
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -51,7 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "bravedns.db"
-        private const val DATABASE_PATH = "database/rethink_v12.db"
+        private const val DATABASE_PATH = "database/rethink_v16.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
 
         // setJournalMode() is added as part of issue #344
@@ -553,6 +552,9 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     database.execSQL(
                         "CREATE TABLE 'RemoteBlocklistPacksMap' ( 'pack' TEXT NOT NULL, 'level' INTEGER NOT NULL DEFAULT 0, 'blocklistIds' TEXT NOT NULL, 'group' TEXT NOT NULL, PRIMARY KEY (pack, level)) "
+                    )
+                    database.execSQL(
+                        "UPDATE RethinkDnsEndpoint set url = case when url = 'https://max.rethinkdns.com/1:IAAgAA=='  then 'https://max.rethinkdns.com/rec' else 'https://sky.rethinkdns.com/rec' end where name = 'RDNS Default' and isCustom = 0"
                     )
                 }
 
