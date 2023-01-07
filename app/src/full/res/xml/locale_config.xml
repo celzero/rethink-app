@@ -6,10 +6,13 @@
     <locale android:name="zh-TW" /> <!-- Chinese (Traditional) -->
     <locale android:name="zh-HK" /> <!-- Chinese (Hong Kong) -->
     <locale android:name="fr" /> <!-- French (France) -->
+    <locale android:name="in" /> <!-- Indonesian -->
     <locale android:name="it" /> <!-- Italian -->
     <locale android:name="pt-BR" /> <!-- Portuguese (Brazil) -->
     <locale android:name="pt-PT" /> <!-- Portuguese (Portugal) -->
     <locale android:name="es" /> <!-- Spanish (Spain) -->
+    <locale android:name="ru" /> <!-- Russian -->
+    <locale android:name="tr" /> <!-- Turkish -->
 
     <!--
     below has the whole list of languages with the locale name, the locale added above are the
