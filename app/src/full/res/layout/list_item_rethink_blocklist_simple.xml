@@ -90,7 +90,7 @@
                 android:ellipsize="end"
                 android:padding="5dp"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/small_font_subheading_text" />
+                android:textSize="@dimen/large_font_text_view" />
 
 
         </RelativeLayout>
