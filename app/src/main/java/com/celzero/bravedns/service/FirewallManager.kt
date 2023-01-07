@@ -74,7 +74,7 @@ object FirewallManager : KoinComponent {
         BLOCK(1),
         BYPASS_UNIVERSAL(2),
         EXCLUDE(3),
-        LOCKDOWN(4),
+        ISOLATE(4),
         UNTRACKED(5);
 
         fun getLabelId(): Int {
@@ -91,8 +91,8 @@ object FirewallManager : KoinComponent {
                 EXCLUDE -> {
                     R.string.exclude
                 }
-                LOCKDOWN -> {
-                    R.string.lockdown
+                ISOLATE -> {
+                    R.string.isolate
                 }
                 UNTRACKED -> {
                     R.string.untracked
@@ -121,8 +121,8 @@ object FirewallManager : KoinComponent {
                     EXCLUDE.id -> {
                         EXCLUDE
                     }
-                    LOCKDOWN.id -> {
-                        LOCKDOWN
+                    ISOLATE.id -> {
+                        ISOLATE
                     }
                     else -> {
                         UNTRACKED
@@ -151,7 +151,7 @@ object FirewallManager : KoinComponent {
                         EXCLUDE
                     }
                     6 -> {
-                        LOCKDOWN
+                        ISOLATE
                     }
                     else -> {
                         ALLOW
@@ -168,8 +168,8 @@ object FirewallManager : KoinComponent {
             return this == EXCLUDE
         }
 
-        fun lockdown(): Boolean {
-            return this == LOCKDOWN
+        fun isolate(): Boolean {
+            return this == ISOLATE
         }
 
         fun allowed(): Boolean {
@@ -323,7 +323,7 @@ object FirewallManager : KoinComponent {
             FirewallStatus.ALLOW.id -> FirewallStatus.ALLOW
             FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
             FirewallStatus.UNTRACKED.id -> FirewallStatus.UNTRACKED
-            FirewallStatus.LOCKDOWN.id -> FirewallStatus.LOCKDOWN
+            FirewallStatus.ISOLATE.id -> FirewallStatus.ISOLATE
             else -> FirewallStatus.UNTRACKED
         }
     }

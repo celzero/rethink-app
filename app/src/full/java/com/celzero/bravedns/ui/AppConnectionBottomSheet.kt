@@ -103,7 +103,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                 // no-op, bypass universal rules don't apply in app specific list
             }
-            IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> showByPassAppRulesUi()
+            IpRulesManager.IpRuleStatus.TRUST -> showByPassAppRulesUi()
             IpRulesManager.IpRuleStatus.BLOCK -> showButtonForStatusBlock()
         }
     }
@@ -154,8 +154,8 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
-                getString(R.string.bsac_whitelist_toast, ipAddress)
+                IpRulesManager.IpRuleStatus.TRUST,
+                getString(R.string.bsac_trust_toast, ipAddress)
             )
         }
 
@@ -164,7 +164,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
                 uid,
                 ipAddress,
                 IpRulesManager.IpRuleStatus.NONE,
-                getString(R.string.bsac_whitelist_remove_toast, ipAddress)
+                getString(R.string.bsac_distrust_toast, ipAddress)
             )
         }
     }

@@ -175,7 +175,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         val appStatus =
             if (lockdown) {
                 AppState(
-                    FirewallManager.FirewallStatus.LOCKDOWN,
+                    FirewallManager.FirewallStatus.ISOLATE,
                     FirewallManager.ConnectionStatus.BOTH
                 )
             } else {

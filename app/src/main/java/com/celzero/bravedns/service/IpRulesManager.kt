@@ -64,7 +64,7 @@ object IpRulesManager : KoinComponent {
     enum class IpRuleStatus(val id: Int) {
         NONE(0),
         BLOCK(1),
-        BYPASS_APP_RULES(2),
+        TRUST(2),
         BYPASS_UNIVERSAL(3);
 
         fun isBlocked(): Boolean {
@@ -72,7 +72,7 @@ object IpRulesManager : KoinComponent {
         }
 
         fun byPassAppRules(): Boolean {
-            return this.id == BYPASS_APP_RULES.id
+            return this.id == TRUST.id
         }
 
         fun noRule(): Boolean {
@@ -86,7 +86,7 @@ object IpRulesManager : KoinComponent {
                 return arrayOf(
                     context.getString(R.string.ci_no_rule),
                     context.getString(R.string.ci_block),
-                    context.getString(R.string.ci_bypass_app_rule)
+                    context.getString(R.string.ci_trust_rule)
                 )
             }
 
@@ -94,7 +94,7 @@ object IpRulesManager : KoinComponent {
                 return when (id) {
                     NONE.id -> NONE
                     BLOCK.id -> BLOCK
-                    BYPASS_APP_RULES.id -> BYPASS_APP_RULES
+                    TRUST.id -> TRUST
                     BYPASS_UNIVERSAL.id -> BYPASS_UNIVERSAL
                     else -> NONE
                 }
@@ -165,7 +165,7 @@ object IpRulesManager : KoinComponent {
             "IP Rules, by-pass app rules, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
         )
         io {
-            customIp.status = IpRuleStatus.BYPASS_APP_RULES.id
+            customIp.status = IpRuleStatus.TRUST.id
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()

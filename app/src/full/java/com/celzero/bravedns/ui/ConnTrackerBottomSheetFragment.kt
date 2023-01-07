@@ -390,7 +390,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             FirewallManager.FirewallStatus.EXCLUDE -> {
                 b.bsConnFirewallSpinner.setSelection(5, true)
             }
-            FirewallManager.FirewallStatus.LOCKDOWN -> {
+            FirewallManager.FirewallStatus.ISOLATE -> {
                 b.bsConnFirewallSpinner.setSelection(6, true)
             }
             else -> {

@@ -196,7 +196,7 @@
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
                             android:padding="5dp"
-                            android:text="@string/ada_app_lockdown"
+                            android:text="@string/ada_app_isolate"
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_lockdown_off" />
@@ -212,7 +212,7 @@
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
                             android:padding="5dp"
-                            android:text="@string/ada_app_whitelist"
+                            android:text="@string/ada_app_bypass_univ"
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_bypass_off" />

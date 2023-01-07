@@ -24,7 +24,7 @@
     <string name="settings_dns_proxy_dialog_password">كلمة المرور</string>
     <string name="settings_notification_desc1">إيقاف مؤقت / إيقاف (افتراضي)</string>
     <string name="hsf_blocklist_chip_text">%1$s قوائم الحظر</string>
-    <string name="ada_app_whitelist">تجاوز عالمي</string>
+    <string name="ada_app_bypass_univ">تجاوز عالمي</string>
     <string name="rt_list_adv_btn_txt">المتقدمة</string>
     <string name="dns_crypt_relay_remove_dialog_message">احذف مرحل DNSCrypt من التكوين المحفوظ.</string>
     <string name="orbot_install_dialog_title">تثبيت Orbot؟</string>
@@ -65,7 +65,7 @@
     <string name="accessibility_service_description">يستخدم RethinkDNS خدمة إمكانية الوصول لاكتشاف تطبيقات الخلفية وحمايتها. لا يقوم RethinkDNS بجمع أو بيع أي معلومات.</string>
     <string name="cd_custom_doh_dialog_title">عنوان URL مخصص للخادم</string>
     <string name="ada_ip_connection_count_zero">0 عنوان IP</string>
-    <string name="bsac_whitelist_toast">تجاوز قواعد التطبيق لعنوان IP هذا %1$s</string>
+    <string name="bsac_trust_toast">تجاوز قواعد التطبيق لعنوان IP هذا %1$s</string>
     <string name="rethink_max_desc">أكثر من 50 موقعًا ؛ أكثر خصوصية محلل تكراري يعمل على fly.io</string>
     <string name="orbot_status_arg_3">DNS و TCP</string>
     <string name="firewall_status_allow">مسموح</string>
@@ -86,7 +86,7 @@
     <string name="rt_re_download">إعادة تنزيل قوائم الحظر</string>
     <string name="orbot_stop_dialog_neutral">تغيير DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
-    <string name="bsac_whitelist_remove_toast">تم إزالة تجاوز لـ IP هذا %1$s</string>
+    <string name="bsac_distrust_toast">تم إزالة تجاوز لـ IP هذا %1$s</string>
     <string name="rbl_privacy">الخصوصية</string>
     <string name="cd_add_dialog_show_btn">تبين</string>
     <string name="about_app">تطبيق</string>
@@ -122,7 +122,7 @@
     <string name="settings_http_proxy_error_text2">المنفذ غير صالح</string>
     <string name="settings_vpn_heading">vpn</string>
     <string name="about_settings_app_info">معلومات التطبيق</string>
-    <string name="lockdown">إغلاق</string>
+    <string name="isolate">إغلاق</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">تم تمكين نظام dns الخصوصي</string>
     <string name="ctbs_dialog_negative_btn">العودة</string>
     <string name="cd_blocked_txt">تم حجبه</string>
@@ -386,7 +386,7 @@
     <string name="contributors_dialog_title">المؤلفين</string>
     <string name="dns_btm_resolved_crypt">تم حل <u> بشكل مجهول </u> %1$s بواسطة %2$s</string>
     <string name="dns_proxy_positive_btn">إضافة</string>
-    <string name="fapps_firewall_filter_lockdown">إغلاق</string>
+    <string name="fapps_firewall_filter_isolate">إغلاق</string>
     <string name="settings_local_blocklist_dialog_positive">تنزيل</string>
     <string name="settings_local_blocklist_dialog_negative">إلغاء</string>
     <string name="other_dns_list_tab1">DoH</string>
@@ -471,14 +471,14 @@
     <string name="dns_connected">متصّل</string>
     <string name="dns_proxy_negative_btn">إلغاء</string>
     <string name="rules_load_failure_heading">ملحوظة</string>
-    <string name="firewall_rule_bypass_apprule_ip">تجاوز IP (التطبيق)</string>
+    <string name="firewall_rule_trusted_ip">تجاوز IP (التطبيق)</string>
     <string name="firewall_rule_foreground">التطبيق ليس قيد الاستخدام</string>
     <string name="notif_channel_desc_vpn_notification">أبلغ عندما يكون RethinkDNS نشطًا ويعمل في الخلفية</string>
     <string name="category_name_installed">التطبيقات المثبتة</string>
     <string name="ci_dialog_error_invalid_ip">عنوان IP أو الشبكة الفرعية أو المنفذ غير صالح.</string>
     <string name="ada_ip_rules_title">قواعد الملكية الفكرية لهذا التطبيق</string>
-    <string name="bsac_bypass_app_rules">تجاوز قواعد التطبيق</string>
-    <string name="bsac_go_pass_app_rules">إزالة الالتفافية</string>
+    <string name="bsac_trust">تجاوز قواعد التطبيق</string>
+    <string name="bsac_distrust">إزالة الالتفافية</string>
     <string name="rt_apply_btn">طبّق</string>
     <string name="brbs_restore_dialog_failure_negative">إلغاء</string>
     <string name="dns_act_configure_tab">الضبط</string>
@@ -537,7 +537,7 @@
     <string name="univ_ip_delete_toast_success">تم حذف جميع قواعد IP.</string>
     <string name="fapps_firewall_filter_allowed">مسموح</string>
     <string name="accessibility_failure_toast">توقفت خدمة إمكانية الوصول RethinkDNS أو تعطلت. لم يعد يحظر التطبيقات التي تعمل في الخلفية.</string>
-    <string name="firewall_rule_lockdown">تأمين (التطبيق)</string>
+    <string name="firewall_rule_isolate">تأمين (التطبيق)</string>
     <string name="firewall_rule_block_app_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
     <string name="new_app_bulk_notification_title">انتباه</string>
     <string name="cd_add_dialog_sample_4">%1$s https: // %2$s</string>
@@ -686,14 +686,14 @@
     <string name="firewall_rule_device_lock_desc">تم حظر هذا الاتصال بسبب قفل جهاز <i> </i> في ذلك الوقت. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="firewall_rule_unknown_desc">تم جدار حماية هذا الاتصال لأنه تعذر تحديد التطبيق المصدر <i> </i>. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">اتصال نظام أسماء النطاقات هذا تم توكيله وإعادة توجيه إلى نقطة نهاية نظام أسماء النطاقات المفضلة لدى المستخدم.&lt;br/&gt;&lt;br/&gt; للتغيير وقف &lt;i&gt; منع تسرب نظام أسماء النطاقات&lt;/i&gt; من شاشة تكوين نظام أسماء النطاقات&lt;i&gt;.</string>
-    <string name="firewall_rule_lockdown_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم اتصال تطبيق <i> </i> هذا بخلاف <i> عناوين IP التي تم تجاوزها </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
+    <string name="firewall_rule_isolate_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم اتصال تطبيق <i> </i> هذا بخلاف <i> عناوين IP التي تم تجاوزها </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">تم السماح بهذا الاتصال لأن التطبيق المصدر <i> </i> مضبوط على <i> تجاوز قواعد جدار الحماية العامة </i>. <br/> <br/> للتغيير انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">تم السماح بهذا الاتصال لأن تهيئة <i>Tor-as-a-proxy بنقرة واحدة</i> من خلال Orbot كانت جارية.</string>
     <string name="firewall_rule_block_http_desc">تم حظر هذا الاتصال لأنه من المحتمل أنه استخدم <i> HTTP غير آمن </i>. <br/> <br/> للتغيير انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="new_app_notification_action_toast_allow">الاتصال بالشبكة مسموح به للتطبيق</string>
     <string name="notif_dialog_pause_dialog_message">التطبيق في حالة الإيقاف المؤقت ، استأنف للمتابعة</string>
     <string name="notif_dialog_pause_dialog_positive">إستئناف</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين عنوان IP الوجهة <i> </i> لتجاوز جميع القواعد الخاصة بالتطبيق. <br/> <br/> للتغيير ، انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين عنوان IP الوجهة <i> </i> لتجاوز جميع القواعد الخاصة بالتطبيق. <br/> <br/> للتغيير ، انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">تم حظر هذا الاتصال لأن التطبيق المصدر <i> </i> تجاوز DNS المفضل للمستخدم <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="firewall_rule_global_lockdown_desc">تم حظر هذا الاتصال بسبب تعيين القفل العام. <br/> <br/> للتغيير انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="firewall_rule_block_udp_ntp_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم هذا الاتصال <i> UDP </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
@@ -706,7 +706,7 @@
     <string name="ada_firewall_status">هذا التطبيق <b> <i> %1$s </i> </b>.</string>
     <string name="ada_ip_connection_count">متصل بـ %1$s عنوان (عناوين) IP</string>
     <string name="ada_app_status_block_wifi">محظور على شبكات (wifi) غير المحسوبة</string>
-    <string name="ada_app_status_lockdown">في وضع القفل</string>
+    <string name="ada_app_status_isolate">في وضع القفل</string>
     <string name="rt_edit_dialog_positive">تحرير</string>
     <string name="rt_cancel_download">إلغاء</string>
     <string name="rt_chip_update_available">تحديث متوفر</string>
@@ -716,7 +716,7 @@
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
 \n%2$s</string>
-    <string name="firewall_status_lockdown">إغلاق</string>
+    <string name="firewall_status_isolate">إغلاق</string>
     <string name="app_name_small_case">إعادة التفكير</string>
     <string name="about_title_desc">كشف ومنع التهديدات الأمنية للشبكة</string>
     <string name="bypass_universal">تجاوز كلي</string>
@@ -859,7 +859,7 @@
     <string name="no_browser_error">لا يمكن فتح صفحة الويب من المتصفح.</string>
     <string name="firewall_rule_block_univ_ip">IP / منفذ (عالمي)</string>
     <string name="ada_firewall_title">قواعد جدار الحماية لهذا التطبيق</string>
-    <string name="ada_app_lockdown">إغلاق</string>
+    <string name="ada_app_isolate">إغلاق</string>
     <string name="notif_download_cancel_content">تم إلغاء التنزيل.</string>
     <string name="rt_filter_parent_all">الكل</string>
     <string name="rt_filter_parent_selected">المحدد</string>
@@ -876,8 +876,8 @@
     <string name="private_dns_dialog_positive">اذهب للاعدادات</string>
     <string name="private_dns_dialog_negative">انصرف</string>
     <string name="private_dns_error">تعذر تشغيل شاشة DNS الخاصة.</string>
-    <string name="ci_bypass_app_initial">BA</string>
-    <string name="ci_bypass_app_txt">تجاوز قواعد التطبيق</string>
+    <string name="ci_trust_initial">BA</string>
+    <string name="ci_trust_txt">تجاوز قواعد التطبيق</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">امسح جميع السجلات المتعلقة بهذا التطبيق.</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">واصل</string>
     <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">إلغاء</string>

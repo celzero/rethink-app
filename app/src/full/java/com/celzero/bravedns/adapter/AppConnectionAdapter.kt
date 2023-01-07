@@ -33,7 +33,6 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
 
@@ -163,8 +162,8 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
-                    b.acdFlag.text = context.getString(R.string.ci_bypass_app_initial)
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    b.acdFlag.text = context.getString(R.string.ci_trust_initial)
                 }
             }
 
@@ -178,8 +177,8 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             return when (id) {
                 IpRulesManager.IpRuleStatus.NONE -> {
                     ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextPositive),
-                        fetchColor(context, R.attr.chipBgColorPositive)
+                        fetchColor(context, R.attr.chipTextNeutral),
+                        fetchColor(context, R.attr.chipBgColorNeutral)
                     )
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
@@ -190,14 +189,14 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextNeutral),
-                        fetchColor(context, R.attr.chipBgColorNeutral)
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
                     )
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
+                IpRulesManager.IpRuleStatus.TRUST -> {
                     ToggleBtnUi(
-                        fetchColor(context, R.attr.chipTextNeutral),
-                        fetchColor(context, R.attr.chipBgColorNeutral)
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
                     )
                 }
             }

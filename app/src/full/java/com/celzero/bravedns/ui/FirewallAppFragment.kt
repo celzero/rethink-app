@@ -134,7 +134,7 @@ class FirewallAppFragment :
                 BYPASS_UNIVERSAL ->
                     context.getString(R.string.fapps_firewall_filter_bypass_universal)
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
-                LOCKDOWN -> context.getString(R.string.fapps_firewall_filter_lockdown)
+                LOCKDOWN -> context.getString(R.string.fapps_firewall_filter_isolate)
             }
         }
 
@@ -343,7 +343,7 @@ class FirewallAppFragment :
             }
             BlockType.LOCKDOWN -> {
                 if (isInitTag(b.ffaToggleAllLockdown)) {
-                    getString(R.string.fapps_lockdown_block_dialog_title)
+                    getString(R.string.fapps_isolate_block_dialog_title)
                 } else {
                     getString(R.string.fapps_unblock_dialog_title)
                 }
@@ -383,7 +383,7 @@ class FirewallAppFragment :
             }
             BlockType.LOCKDOWN -> {
                 if (isInitTag(b.ffaToggleAllLockdown)) {
-                    getString(R.string.fapps_lockdown_block_dialog_message)
+                    getString(R.string.fapps_isolate_block_dialog_message)
                 } else {
                     getString(R.string.fapps_unblock_dialog_message)
                 }
@@ -495,7 +495,7 @@ class FirewallAppFragment :
         val lockdown =
             makeFirewallChip(
                 FirewallFilter.LOCKDOWN.id,
-                getString(R.string.fapps_firewall_filter_lockdown),
+                getString(R.string.fapps_firewall_filter_isolate),
                 false
             )
 

@@ -22,7 +22,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -217,7 +216,7 @@ class AppInfoActivity :
             FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                 enableAppBypassedUi()
             }
-            FirewallManager.FirewallStatus.LOCKDOWN -> {
+            FirewallManager.FirewallStatus.ISOLATE -> {
                 disableFirewallStatusUi()
                 enableLockdownUi()
             }
@@ -302,7 +301,7 @@ class AppInfoActivity :
         }
 
         b.aadAppSettingsLockdown.setOnClickListener {
-            if (appStatus == FirewallManager.FirewallStatus.LOCKDOWN) {
+            if (appStatus == FirewallManager.FirewallStatus.ISOLATE) {
                 updateFirewallStatus(
                     FirewallManager.FirewallStatus.ALLOW,
                     FirewallManager.ConnectionStatus.BOTH
@@ -311,7 +310,7 @@ class AppInfoActivity :
             }
 
             updateFirewallStatus(
-                FirewallManager.FirewallStatus.LOCKDOWN,
+                FirewallManager.FirewallStatus.ISOLATE,
                 FirewallManager.ConnectionStatus.BOTH
             )
         }
@@ -604,7 +603,7 @@ class AppInfoActivity :
                     else -> getString(R.string.ada_app_status_block)
                 }
             }
-            FirewallManager.FirewallStatus.LOCKDOWN -> getString(R.string.ada_app_status_lockdown)
+            FirewallManager.FirewallStatus.ISOLATE -> getString(R.string.ada_app_status_isolate)
             FirewallManager.FirewallStatus.UNTRACKED -> getString(R.string.ada_app_status_unknown)
         }
     }

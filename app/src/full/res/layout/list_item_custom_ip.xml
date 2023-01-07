@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:minWidth="5dp"
             android:tag="2"
-            android:text="@string/ci_bypass_app_rule"
+            android:text="@string/ci_trust_rule"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/small_font_subheading_text" />
 
