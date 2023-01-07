@@ -24,6 +24,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
 import android.provider.Settings
@@ -34,6 +35,7 @@ import android.view.WindowManager
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricManager
@@ -579,7 +581,27 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             val locale = languages.getOrDefault(item, "en-US")
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(locale))
         }
+        alertBuilder.setNeutralButton(getString(R.string.settings_locale_dialog_neutral)) {
+            dialog,
+            _ ->
+            dialog.dismiss()
+            openActionViewIntent(getString(R.string.about_translate_link).toUri())
+        }
         alertBuilder.create().show()
+    }
+
+    private fun openActionViewIntent(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.intent_launch_error, intent.data),
+                Toast.LENGTH_SHORT
+            )
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
+        }
     }
 
     // read the list of supported languages from locale_config.xml
@@ -1174,6 +1196,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun isNotificationPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             requireContext(),
