@@ -16,6 +16,8 @@
 package com.celzero.bravedns.database
 
 import android.content.Context
+import android.database.Cursor
+import android.database.sqlite.SQLiteException
 import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
@@ -87,12 +89,16 @@ abstract class LogDatabase : RoomDatabase() {
                 database.execSQL("delete from main.$TABLE_NAME_DNS_LOGS")
                 database.execSQL("delete from main.$TABLE_NAME_CONN_TRACKER")
                 // insert Dns and network logs to the new database tables
-                database.execSQL(
-                    "INSERT INTO main.$TABLE_NAME_DNS_LOGS SELECT * FROM tempDb.$TABLE_NAME_PREVIOUS_DNS"
-                )
-                database.execSQL(
-                    "INSERT INTO main.$TABLE_NAME_CONN_TRACKER SELECT * FROM tempDb.$TABLE_NAME_CONN_TRACKER"
-                )
+                if (tableExists(database, "tempDb.$TABLE_NAME_PREVIOUS_DNS")) {
+                    database.execSQL(
+                        "INSERT INTO main.$TABLE_NAME_DNS_LOGS SELECT * FROM tempDb.$TABLE_NAME_PREVIOUS_DNS"
+                    )
+                }
+                if (tableExists(database, "tempDb.$TABLE_NAME_CONN_TRACKER")) {
+                    database.execSQL(
+                        "INSERT INTO main.$TABLE_NAME_CONN_TRACKER SELECT * FROM tempDb.$TABLE_NAME_CONN_TRACKER"
+                    )
+                }
                 database.execSQL("DROP TABLE IF EXISTS tempDb.$TABLE_NAME_PREVIOUS_DNS")
                 database.execSQL("DROP TABLE IF EXISTS tempDb.$TABLE_NAME_CONN_TRACKER")
                 database.enableWriteAheadLogging()
@@ -102,6 +108,22 @@ abstract class LogDatabase : RoomDatabase() {
                     "error migrating from v1to2 on log db: ${ignored.message}",
                     ignored
                 )
+            }
+        }
+
+        private fun tableExists(db: SupportSQLiteDatabase, table: String): Boolean {
+            var cursor: Cursor? = null
+            return try {
+                cursor = db.query("SELECT * FROM $table LIMIT 1")
+                cursor.moveToFirst()
+                // in the table if it exists, otherwise it will return -1
+                cursor.getInt(0) > 0
+            } catch (Exp: SQLiteException) {
+                // Something went wrong with SQLite. Return false.
+                false
+            } finally {
+                // close the cursor
+                cursor?.close()
             }
         }
     }
