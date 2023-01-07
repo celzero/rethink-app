@@ -385,7 +385,9 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
+        builder.color = ContextCompat.getColor(context,
+            Utilities.getAccentColor(persistentState.theme)
+        )
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show
         // there.
@@ -462,7 +464,9 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
+        builder.color = ContextCompat.getColor(context,
+            Utilities.getAccentColor(persistentState.theme)
+        )
 
         val openIntent1 =
             makeNewAppVpnIntent(

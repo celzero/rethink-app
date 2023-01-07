@@ -397,7 +397,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 .setContentText(contentText)
             builder.setProgress(100, 0, false)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-            builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
+            builder.color = ContextCompat.getColor(context,
+                Utilities.getAccentColor(persistentState.theme)
+            )
 
             // Secret notifications are not shown on the lock screen.  No need for this app to show
             // there.

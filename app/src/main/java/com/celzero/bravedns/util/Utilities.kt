@@ -17,7 +17,6 @@ package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
@@ -49,11 +48,11 @@ import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_HEADLESS
@@ -318,19 +317,6 @@ class Utilities {
 
         fun isValidPort(port: Int): Boolean {
             return port in 65535 downTo 0
-        }
-
-        fun getThemeAccent(context: Context): Int {
-            return if (isDarkSystemTheme(context)) {
-                R.color.accentGoodBlack
-            } else {
-                R.color.accentBadLight
-            }
-        }
-
-        private fun isDarkSystemTheme(context: Context): Boolean {
-            return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-                Configuration.UI_MODE_NIGHT_YES
         }
 
         fun openVpnProfile(context: Context) {
@@ -729,6 +715,15 @@ class Utilities {
             return CharMatcher.`is`('.').trimTrailingFrom(s)
         }
 
+        fun getAccentColor(appTheme: Int): Int {
+            return when (appTheme) {
+                Themes.SYSTEM_DEFAULT.id -> R.color.accentGoodBlack
+                Themes.DARK.id -> R.color.accentGoodBlack
+                Themes.LIGHT.id -> R.color.accentGoodLight
+                else -> R.color.accentGood
+            }
+        }
+
         fun fetchColor(context: Context, attr: Int): Int {
             val typedValue = TypedValue()
             val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attr))
@@ -763,15 +758,10 @@ class Utilities {
                     R.attr.accentGood
                 } else if (attr == R.color.accentBad) {
                     R.attr.accentBad
-                }else {
+                } else {
                     R.attr.chipBgColorPositive
                 }
-            val typedValue = TypedValue()
-            val a: TypedArray =
-                context.obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
-            val color = a.getColor(0, 0)
-            a.recycle()
-            return color
+            return fetchColor(context, attributeFetch)
         }
 
         // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
