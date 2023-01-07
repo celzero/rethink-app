@@ -292,7 +292,7 @@
 \nপোর্ট নম্বর: %3$s</string>
     <string name="dns_proxy_app">অ্যাপ</string>
     <string name="dns_proxy_positive_btn">যোগ করুন</string>
-    <string name="lockdown">তালাবদ্ধ</string>
+    <string name="isolate">তালাবদ্ধ</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">অপেক্ষা</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">সুরক্ষিত</string>
     <string name="dns_mode_info_explanation_new">ডিএনএস অনুরোধগুলি মনিটর করুন, ব্লক করুন এবং এনক্রিপ্ট করুন।</string>
@@ -370,7 +370,7 @@
     <string name="settings_check_update_heading">অ্যাপ আপডেটের জন্য চেক করুন</string>
     <string name="settings_http_proxy_error_text2">অবৈধ পোর্ট</string>
     <string name="settings_dns_proxy_dialog_port_number">পোর্ট নাম্বার</string>
-    <string name="firewall_status_lockdown">তালাবদ্ধ</string>
+    <string name="firewall_status_isolate">তালাবদ্ধ</string>
     <string name="hsf_start_btn_state">শুরু</string>
     <string name="hsf_uptime">(%1$s থেকে সক্রিয়; প্রোটোস: %2$s)</string>
     <string name="hsf_proxy_chip_text">প্রক্সি সক্রিয়</string>
@@ -596,7 +596,7 @@
 \n</string>
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ada_ip_rules_title">এই অ্যাপের জন্য আইপি নিয়ম</string>
-    <string name="bsac_whitelist_remove_toast">এই IP %1$s এর জন্য বাইপাস সরানো হয়েছে</string>
+    <string name="bsac_distrust_toast">এই IP %1$s এর জন্য বাইপাস সরানো হয়েছে</string>
     <string name="bsdl_domain_rule_allow">অনুমতি</string>
     <string name="network_dns">সিস্টেম DNS</string>
     <string name="bsrf_apply_filter">প্রয়োগ করুন</string>
@@ -626,8 +626,8 @@
     <string name="cd_whitelist_txt">হোয়াইটলিস্ট</string>
     <string name="cd_no_rule_txt">কোন নিয়ম নেই</string>
     <string name="ci_dialog_edittext_hint">আইপি ঠিকানা, সাবনেট বা পোর্ট</string>
-    <string name="ada_app_whitelist">বাইপাস ইউনিভার্সাল</string>
-    <string name="bsac_go_pass_app_rules">বাইপাস সরান</string>
+    <string name="ada_app_bypass_univ">বাইপাস ইউনিভার্সাল</string>
+    <string name="bsac_distrust">বাইপাস সরান</string>
     <string name="brbs_restore_title">পুনঃস্থাপন</string>
     <string name="brbs_backup_dialog_failure_title">ব্যাকআপ ব্যর্থ হয়েছে</string>
     <string name="brbs_backup_dialog_failure_negative">খারিজ</string>
@@ -641,7 +641,7 @@
     <string name="notif_dialog_pause_dialog_message">বিরতি অবস্থায় আবেদন, চালিয়ে যেতে পুনরায় শুরু করুন</string>
     <string name="cd_remove_dialog_positive">মুছুন</string>
     <string name="bsac_block">অবরোধ</string>
-    <string name="bsac_whitelist_toast">এই IP %1$s এর জন্য অ্যাপের নিয়মগুলি বাইপাস করা</string>
+    <string name="bsac_trust_toast">এই IP %1$s এর জন্য অ্যাপের নিয়মগুলি বাইপাস করা</string>
     <string name="rt_cancel_download">বাতিল</string>
     <string name="rt_apply_btn">প্রয়োগ করুন</string>
     <string name="brbs_backup_dialog_message">একটি ফাইলে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ ব্যাক আপ করে। এটি VPN পুনরায় চালু করবে।</string>
@@ -687,7 +687,7 @@
     <string name="firewall_rule_univ_block_metered">মিটারযুক্ত (সর্বজনীন)</string>
     <string name="firewall_rule_new_app_desc">এই অ্যাপটি <i>প্রথম</i> বারের জন্য সংযোগ তৈরি করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="firewall_rule_block_app_mobile_desc"><i>Metered</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।</string>
-    <string name="firewall_rule_lockdown_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_isolate_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
     <string name="firewall_rule_block_http_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷</string>
     <string name="notif_channel_vpn_failure">নিষ্ক্রিয় VPN</string>
     <string name="notif_channel_download">সতর্কতা ডাউনলোড করুন</string>
@@ -707,7 +707,7 @@
     <string name="ci_dialog_added_success">আইপি তালিকায় যোগ করা হয়েছে</string>
     <string name="ci_no_rule">কোন নিয়ম নেই</string>
     <string name="ada_noapp_dialog_title">অ্যাপের তথ্য পাওয়া যায়নি</string>
-    <string name="ada_app_status_lockdown">লকডাউন মোডে আছে</string>
+    <string name="ada_app_status_isolate">লকডাউন মোডে আছে</string>
     <string name="notif_download_success_content">ডাউনলোড সফল হয়েছে।</string>
     <string name="rt_list_adv_btn_txt">উন্নত</string>
     <string name="rethink_sky_desc">280+ অবস্থান; উচ্চ আপটাইম; স্টাব রিজলভার ক্লাউডফ্লেয়ার ডটকমে চলছে</string>
@@ -753,7 +753,7 @@
     <string name="category_name_installed">ইনস্টল করা অ্যাপস</string>
     <string name="ci_blocked_initial">নীল</string>
     <string name="ci_blocked_txt">Blocked</string>
-    <string name="bsac_bypass_app_rules">বাইপাস অ্যাপের নিয়ম</string>
+    <string name="bsac_trust">বাইপাস অ্যাপের নিয়ম</string>
     <string name="notif_download_failure_content">নামাতে ব্যার্থ. আবার চেষ্টা করুন.</string>
     <string name="rt_download_desc">এই বৈশিষ্ট্যটি ব্যবহার করতে ব্লকলিস্ট ডাউনলোড করুন (প্রায় 60MB)।</string>
     <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s
@@ -793,7 +793,7 @@
     <string name="rt_cancel_btn">বাতিল</string>
     <string name="brbs_restore_dialog_title">ব্যাকআপ পুনরুদ্ধার</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 প্রক্সি</string>
-    <string name="firewall_rule_lockdown">লকডাউন (অ্যাপ)</string>
+    <string name="firewall_rule_isolate">লকডাউন (অ্যাপ)</string>
     <string name="firewall_rule_unknown">উৎস অজানা</string>
     <string name="firewall_rule_exempt_app_bypass_univ">বাইপাস অ্যাপ</string>
     <string name="firewall_rule_unknown_desc">এই সংযোগটি ফায়ারওয়াল করা হয়েছে কারণ <i>সোর্স অ্যাপ</i> নির্ধারণ করা যায়নি।</string>
@@ -805,9 +805,9 @@
     <string name="brbs_backup_dialog_failure_message">ব্যাকআপ করা যায়নি। আবার চেষ্টা করুন\?</string>
     <string name="orbot_toast_parameter">টর-এ-এ-প্রক্সি</string>
     <string name="update_complete_action_snack">আবার শুরু</string>
-    <string name="firewall_rule_bypass_apprule_ip">বাইপাসড আইপি (অ্যাপ)</string>
+    <string name="firewall_rule_trusted_ip">বাইপাসড আইপি (অ্যাপ)</string>
     <string name="firewall_rule_block_ip_univ_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
+    <string name="firewall_rule_trusted_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
     <string name="notif_channel_desc_vpn_failure">Android বা অন্য VPN অ্যাপ দ্বারা RethinkDNS বন্ধ করা হলে জানান</string>
     <string name="cd_dialog_header">কাস্টম ডোমেন(গুলি)</string>
     <string name="lbbs_heading">185+ ব্লকলিস্ট কনফিগার করুন</string>
@@ -821,7 +821,7 @@
     <string name="fapps_firewall_filter_allowed">অনুমোদিত</string>
     <string name="fapps_firewall_filter_blocked">Blocked</string>
     <string name="fapps_firewall_filter_excluded">ছাঁটা</string>
-    <string name="fapps_firewall_filter_lockdown">তালাবদ্ধ</string>
+    <string name="fapps_firewall_filter_isolate">তালাবদ্ধ</string>
     <string name="fapps_unmetered_unblock_dialog_title">আনমিটারে অনুমতি দিন</string>
     <string name="fapps_unmetered_unblock_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপগুলির জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগের অনুমতি দেবেন\?</string>
     <string name="fapps_unmetered_negative">বাতিল</string>

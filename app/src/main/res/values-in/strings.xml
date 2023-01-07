@@ -601,7 +601,7 @@
     <string name="bsac_title_desc">Aturan-aturan yang diterapkan hanya pada app ini.</string>
     <string name="dns_crypt_relay_error_toast">Tidak ada resolver yang dipilih</string>
     <string name="dns_select_toast">Minimal satu resolver harus terpilih.</string>
-    <string name="bsac_bypass_app_rules">Pintaskan aturan-aturan app</string>
+    <string name="bsac_trust">Pintaskan aturan-aturan app</string>
     <string name="ada_app_status_whitelist">akan memintas aturan-aturan universal firewall</string>
     <string name="settings_http_proxy_error_text3">Nama host tidak terisi</string>
     <string name="ct_delete_logs_positive_btn">Hapus catatan-catatan</string>
@@ -618,13 +618,13 @@
     <string name="settings_all_networks_dialog_positive_btn">Tetap aktifkan</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
     <string name="dns_crypt_url_remove_dialog_message">Menghapus resolver DNSCrypt dari konfigurasi tersimpan.</string>
-    <string name="lockdown">kunci</string>
+    <string name="isolate">kunci</string>
     <string name="univ_firewall_rule_9">Blokir jaringan yang dihitung (selular)</string>
     <string name="hsf_pause_vpn_failure">Tidak dapat menjeda: RethinkDNS tidak aktif</string>
     <string name="pause_mode_notification_title">Dijeda! App-app terblokir akan tetap ter-firewall.</string>
     <string name="dns_btm_record_type">Jenis permintaan: %1$s</string>
     <string name="dns_crypt_url_remove_success">Resolver DNSCrypt telah terhapus.</string>
-    <string name="firewall_status_lockdown">kunci</string>
+    <string name="firewall_status_isolate">kunci</string>
     <string name="fapps_metered_block_dialog_title">Blokir yang dihitung</string>
     <string name="ada_app_status_block_md">apakah jaringan-jaringan yang dihitung (selular) telah diblokir</string>
     <string name="cd_dns_crypt_dialog_heading">Menambah Resolver atau Relay DNSCrypt</string>
@@ -635,12 +635,12 @@
     <string name="ada_app_unmetered">Tak dihitung</string>
     <string name="firewall_rule_block_unmetered">Tak dihitung (WiFi)</string>
     <string name="firewall_status_block_metered">jaringan-jaringan yang dihitung (selular) telah diblokir</string>
-    <string name="firewall_rule_bypass_apprule_ip">IP terpintaskan (App)</string>
+    <string name="firewall_rule_trusted_ip">IP terpintaskan (App)</string>
     <string name="brbs_backup_dialog_title">Buat cadangan</string>
     <string name="cd_dns_crypt_title">resolver-resolver</string>
     <string name="firewall_rule_univ_block_metered">Dihitung (Universal)</string>
     <string name="fapps_unmetered_block_dialog_title">Blokir yang tak dihitung</string>
-    <string name="ada_app_status_lockdown">dalam mode terkunci</string>
+    <string name="ada_app_status_isolate">dalam mode terkunci</string>
     <string name="firewall_rule_block_metered">Dihitung (Selular)</string>
     <string name="settings_notification_dialog_option_1">"
 \nJeda / Hentikan (bawaan):
@@ -652,7 +652,7 @@
     <string name="fapps_lockdown_hint">Vpn dalam mode terkunci. Firewall akan mematuhi aturan-aturan Dihitung / Tak Dihitung.</string>
     <string name="dns_crypt_connection_failure">Gagal terkoneksi dengan peladen DNSCrypt.</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s pe-resolver</string>
-    <string name="fapps_firewall_filter_lockdown">Kunci</string>
+    <string name="fapps_firewall_filter_isolate">Kunci</string>
     <string name="ada_app_metered">Dihitung</string>
     <string name="settings_custom_downloader_heading">Gunakan pengunduh bawaan app</string>
     <string name="bsdl_blocked_desc">%1$s telah terblokir %2$s</string>
@@ -685,7 +685,7 @@
 \n
 \n2. Pengaturan <i>Gunakan semua jaringan yang tersedia</i> sedang aktif.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Sebuah aturan firewall pengguna memblokir <i>app</i>\tini ketika mencoba terkoneksi dengan jaringan <i>Tak Dihitung</i>.<br/><br/> Masuklah ke tab <i>Semua App</i> untuk mengubahnya.</string>
-    <string name="bsac_whitelist_toast">Pintaskan aturan-aturan app untuk IP %1$s ini</string>
+    <string name="bsac_trust_toast">Pintaskan aturan-aturan app untuk IP %1$s ini</string>
     <string name="pause_title_desc">sedang rehat…</string>
     <string name="whats_new_version_update"><b>Usaha maximal</b>
 \n

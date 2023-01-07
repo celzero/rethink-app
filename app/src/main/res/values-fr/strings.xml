@@ -14,7 +14,7 @@
     <string name="slide_1_desc">RethinkDNS est un logiciel open source soutenu par le programme Mozilla Builders MVP.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">bloquer</string>
-    <string name="lockdown">confinement</string>
+    <string name="isolate">confinement</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Appuyer pour changer le paramétrage de protection</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Attention : RethinkDNS a été désactivé</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">en erreur</string>
@@ -205,7 +205,7 @@
 \n%2$s avec exception(s)
 \n%3$s exclue(s)
 \n%4$s confinée(s)</string>
-    <string name="firewall_status_lockdown">confinée</string>
+    <string name="firewall_status_isolate">confinée</string>
     <string name="firewall_card_text_inactive">Activez le mode pare-feu.</string>
     <string name="dns_card_latency_active">Latence : %1$sms</string>
     <string name="apps_card_ips_count">%1$s règle(s) IP &amp; port</string>
@@ -249,7 +249,7 @@
     <string name="firewall_rule_block_ip_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination</i>.<br/><br/> Pour la modifier, allez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles du pare-feu global.<br/><br/>Pour modifier cela, allez dans <i>Règles IP</i> dans l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_unknown_desc">Cette connexion a été bloquée par un pare-feu car <i>l’application source</i> n’a pas pu être déterminée.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles spécifiques de l’application.<br/><br/> Pour modifier cela, allez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles spécifiques de l’application.<br/><br/> Pour modifier cela, allez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">Cette connexion a été autorisée parce que <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i> .</string>
     <string name="bsdl_domain_rule_allow">autoriser</string>
     <string name="lbbs_download">Mettre à jour les listes de blocage</string>
@@ -284,7 +284,7 @@
     <string name="settings_allow_bypass_heading">Autoriser le contournement</string>
     <string name="ada_network_log_title">journal du réseau pour cette application</string>
     <string name="settings_http_proxy_error_text2">Port invalide</string>
-    <string name="bsac_go_pass_app_rules">Supprimer l’exception</string>
+    <string name="bsac_distrust">Supprimer l’exception</string>
     <string name="dns_info_positive">Valider</string>
     <string name="firewall_status_blocked">bloquée</string>
     <string name="settings_https_disabled_error">Connecté via Orbot. Désactivez-le pour continuer.</string>
@@ -457,7 +457,7 @@
     <string name="firewall_rule_device_lock">Appareil verrouillé</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Cette connexion a été autorisée car la configuration <i>en un clic Tor-as-a-proxy</i> via Orbot était en cours.</string>
     <string name="ada_app_dns_settings">Paramètres DNS</string>
-    <string name="bsac_bypass_app_rules">Exception aux règles de l’appli</string>
+    <string name="bsac_trust">Exception aux règles de l’appli</string>
     <string name="bsac_unblock_toast">Débloqué %1$s pour cette application</string>
     <string name="rbl_security">Sécurité</string>
     <string name="rt_download">Télécharger les listes de blocage</string>
@@ -492,11 +492,11 @@
     <string name="firewall_rule_block_metered">Avec abonnement (Mobile, Appli)</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
     <string name="settings_local_blocklist_dialog_positive">Télécharger</string>
-    <string name="firewall_rule_lockdown_desc">Une règle de pare-feu définie par l’utilisateur a bloqué la connexion de cette <i>application</i> à des adresses IP autres qu’avec <i>exceptions</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
+    <string name="firewall_rule_isolate_desc">Une règle de pare-feu définie par l’utilisateur a bloqué la connexion de cette <i>application</i> à des adresses IP autres qu’avec <i>exceptions</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
     <string name="category_name_others">Autre</string>
     <string name="cd_dialog_header">Domaine(s) personnalisé(s)</string>
     <string name="ci_block">bloquer</string>
-    <string name="ada_app_whitelist">Exception globale</string>
+    <string name="ada_app_bypass_univ">Exception globale</string>
     <string name="bsdl_blocked_desc">bloqué %1$s par %2$s</string>
     <string name="dc_dns_proxy">Proxy DNS</string>
     <string name="lbbs_configure">Paramétrer</string>
@@ -528,7 +528,7 @@
     <string name="cd_add_dialog_sample_3">%1$s https://%2$s
 \n</string>
     <string name="ada_firewall_status">Cette application <b><i>%1$s</i></b>.</string>
-    <string name="bsac_whitelist_toast">Ajout d’une exception pour l’IP %1$s</string>
+    <string name="bsac_trust_toast">Ajout d’une exception pour l’IP %1$s</string>
     <string name="bsdl_domain_rule_block">bloquer</string>
     <string name="brbs_restore_dialog_failure_positive">Retenter la restauration</string>
     <string name="brbs_restore_complete_toast">Restauration terminée, redémarrage de l’application…</string>
@@ -588,7 +588,7 @@
     <string name="firewall_rule_block_ip_univ_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination / le port</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Cette connexion a été bloquée car <i>l’application source</i> contournait le DNS spécifié par l’utilisateur.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="category_name_non_app_sys">Services système</string>
-    <string name="bsac_whitelist_remove_toast">Retrait de l’exception pour l’IP %1$s</string>
+    <string name="bsac_distrust_toast">Retrait de l’exception pour l’IP %1$s</string>
     <string name="rt_dialog_negative">Annuler</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="brbs_backup_dialog_positive">Sauvegarder</string>
@@ -681,7 +681,7 @@
     <string name="dns_proxy_dialog_message_no_app">Adresse IP : %1$s
 \n
 \nNuméro de port : %2$s</string>
-    <string name="fapps_firewall_filter_lockdown">Confinées</string>
+    <string name="fapps_firewall_filter_isolate">Confinées</string>
     <string name="accessibility_failure_toast">Le service d’accessibilité RethinkDNS s’est arrêté ou a planté. Il ne bloque plus les applications en arrière-plan.</string>
     <string name="firewall_rule_no_rule">Aucune règle</string>
     <string name="firewall_rule_new_app_desc">Cette application a établi la connexion pour la <i>première fois</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
@@ -695,7 +695,7 @@
     <string name="bsrf_clear_filter">Effacer</string>
     <string name="brbs_backup_dialog_failure_message">Impossible de sauvegarder. Essayez à nouveau \?</string>
     <string name="settings_custom_downloader_heading">Télécharger directement dans l’application</string>
-    <string name="firewall_rule_lockdown">Confinée (Appli)</string>
+    <string name="firewall_rule_isolate">Confinée (Appli)</string>
     <string name="search_rethinkplus_file_tag"><font size="12">Recherche de listes de blocage</font></string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="settings_http_proxy_hostname">Nom d’hôte</string>
@@ -809,7 +809,7 @@
     <string name="dns_delete_negative">Annuler</string>
     <string name="update_complete_action_snack">REDÉMARRER</string>
     <string name="pause_text">en pause</string>
-    <string name="firewall_rule_bypass_apprule_ip">IP avec exception (Appli)</string>
+    <string name="firewall_rule_trusted_ip">IP avec exception (Appli)</string>
     <string name="firewall_rule_device_lock_desc">Cette connexion était protégée par un pare-feu car <i>l’appareil était verrouillé</i> à ce moment-là.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="dc_dns_leaks_heading">Empêcher les fuites DNS</string>
     <string name="new_app_notification_content">RethinkDNS a bloqué l’application récemment installée, %1$s.</string>
@@ -818,7 +818,7 @@
     <string name="ci_dialog_edittext_hint">Adresse IP, sous-réseau ou port</string>
     <string name="ci_no_rule">aucune règle</string>
     <string name="ada_app_status_allow">est autorisée</string>
-    <string name="ada_app_status_lockdown">est confinée</string>
+    <string name="ada_app_status_isolate">est confinée</string>
     <string name="rt_dialog_neutral">Continuer</string>
     <string name="rt_cancel_download">Annuler</string>
     <string name="lbbs_search">Recherche de domaines dans les listes de blocage</string>
@@ -868,7 +868,7 @@
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="firewall_rule_block_univ_ip">IP / Port (Global)</string>
     <string name="ada_firewall_title">règles de pare-feu pour cette appli</string>
-    <string name="ada_app_lockdown">Confinement</string>
+    <string name="ada_app_isolate">Confinement</string>
     <string name="rt_filter_parent_all">Toutes</string>
     <string name="rt_filter_parent_selected">Sélectionnées</string>
     <string name="rt_filter_hint">Affichage de <u>toutes</u> les listes de blocage</string>
@@ -878,7 +878,7 @@
 \nPour utiliser le DNS de Rethink, allez dans les paramètres d’Android et désactivez le \"DNS privé\".</string>
     <string name="private_dns_dialog_positive">Aller dans les paramètres d’Android</string>
     <string name="private_dns_dialog_negative">Ignorer</string>
-    <string name="ci_bypass_app_txt">Exception aux règles de l’appli</string>
+    <string name="ci_trust_txt">Exception aux règles de l’appli</string>
     <string name="ada_app_firewall">Pare-feu</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Effacer les journaux</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Effacer les journaux de cette application.</string>
@@ -887,7 +887,7 @@
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Bloquer les contenus piratés et pour adultes, les jeux d’argent et les rencontres en ligne, ainsi que les médias sociaux.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Bloquer les traceurs d’attention, les logiciels espions et alarmiciels.</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Bloquer les logiciels malveillants, les rançongiciels, les hameçonneurs et autres menaces.</string>
-    <string name="ci_bypass_app_initial">EA</string>
+    <string name="ci_trust_initial">EA</string>
     <string name="private_dns_error">Impossible de charger l’écran DNS privé.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s listes de blocage</string>
 </resources>

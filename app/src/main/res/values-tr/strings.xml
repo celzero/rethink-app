@@ -25,7 +25,7 @@
     <string name="about_title_desc">Ağ güvenliği tehditlerini tespit edin ve engelleyin</string>
     <string name="block">engelle</string>
     <string name="bypass_universal">genel olarak atla</string>
-    <string name="lockdown">kilitle</string>
+    <string name="isolate">kilitle</string>
     <string name="slide_2_title">Hoş Geldiniz</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="exclude">hariç tut</string>
@@ -128,7 +128,7 @@
     <string name="dns_info_neutral">Kopyala</string>
     <string name="dns_proxy_port">Liman Numarası</string>
     <string name="fapps_firewall_filter_blocked">Engellenen</string>
-    <string name="fapps_firewall_filter_lockdown">Kilitlenme</string>
+    <string name="fapps_firewall_filter_isolate">Kilitlenme</string>
     <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi\?</string>
     <string name="network_log_app_name_unknown">Bilinmeyen</string>
     <string name="firewall_rule_block_metered">Ölçülü (Mobil)</string>
@@ -204,7 +204,7 @@
 \nDNS / DNS + Güvenlik Duvarı:
 \nPil tasarrufu sağlayan DNS modu ile normal DNS + Güvenlik Duvarı modu arasında hızlıca geçiş yapmak için iki düğme gösterir."</string>
     <string name="ci_no_rule_txt">Kural Yok</string>
-    <string name="bsac_go_pass_app_rules">Bypass\'ı Kaldır</string>
+    <string name="bsac_distrust">Bypass\'ı Kaldır</string>
     <string name="dc_local_block_disabled">Devre Dışı</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="brbs_backup_title">Yedekle</string>
@@ -229,7 +229,7 @@
     <string name="settings_local_blocklist_version">Sürüm: %1$s</string>
     <string name="hs_btm_sheet_lock_down">VPN <i>kilitlendiğinde modlar değiştirilemiyor</i>. <u> VPN ayarlarını düzenlemek için dokunun</u>.</string>
     <string name="firewall_rule_block_unmetered">Ölçümsüz (WiFi)</string>
-    <string name="firewall_rule_lockdown_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamasının</i> <i> atlanan IP\'ler</i> dışındaki IP\'lere bağlanmasını engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
+    <string name="firewall_rule_isolate_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamasının</i> <i> atlanan IP\'ler</i> dışındaki IP\'lere bağlanmasını engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
     <string name="cd_filter_allowed">İzin veriliyor</string>
     <string name="ci_dialog_title">IP / Port Kuralı Ekle</string>
     <string name="ci_block">engelle</string>
@@ -265,7 +265,7 @@
     <string name="fapps_filter_filter_heading">Tür</string>
     <string name="fapps_lockdown_hint">Vpn kilitleme modunda. Güvenlik Duvarı Ölçülü / Ölçüsüz kurallarına uymayacaktır.</string>
     <string name="network_log_app_name_unnamed">İsimsiz (%1$s)</string>
-    <string name="firewall_rule_lockdown">Lockdown (Uygulama)</string>
+    <string name="firewall_rule_isolate">Lockdown (Uygulama)</string>
     <string name="notif_channel_vpn_failure">Etkin Olmayan VPN</string>
     <string name="notif_channel_desc_vpn_notification">RethinkDNS aktif olduğunda ve arka planda çalıştığında bilgilendirin</string>
     <string name="ci_bypass_universal_txt">Bypass Evrensel</string>
@@ -299,7 +299,7 @@
     <string name="fapps_firewall_filter_excluded">Hariç tutulan</string>
     <string name="dns_crypt_connection_failure">DNSCrypt sunucusuna bağlanırken hata oluştu.</string>
     <string name="dns_proxy_connection_failure">DNS Proxy sunucusuna bağlanırken hata oluştu.</string>
-    <string name="firewall_rule_bypass_apprule_ip">Bypass Edilen IP (Uygulama)</string>
+    <string name="firewall_rule_trusted_ip">Bypass Edilen IP (Uygulama)</string>
     <string name="new_app_notification_action_toast_deny">Uygulama için ağ bağlantısı reddedildi</string>
     <string name="notif_dialog_pause_dialog_message">Uygulama duraklama durumunda, devam etmek için devam edin</string>
     <string name="cd_add_dialog_show_btn">göster</string>
@@ -562,7 +562,7 @@
     <string name="settings_dns_proxy_dialog_negative_btn">iptal</string>
     <string name="settings_theme_dialog_title">Görünüm</string>
     <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)</string>
-    <string name="firewall_status_lockdown">kilitle</string>
+    <string name="firewall_status_isolate">kilitle</string>
     <string name="hsf_vpn_dialog_positive">Devam Et</string>
     <string name="dc_custom_block_desc">Çok yakında</string>
     <string name="about_website">rethinkdns.com adresini ziyaret edin</string>
@@ -731,7 +731,7 @@
     <string name="ct_filter_parent_blocked">Engellenen</string>
     <string name="ct_delete_logs_positive_btn">Günlükleri sil</string>
     <string name="cd_dialog_error_invalid_tld">Geçersiz Üst düzey alan adı.</string>
-    <string name="bsac_whitelist_remove_toast">Bu IP için bypass kaldırıldı %1$s</string>
+    <string name="bsac_distrust_toast">Bu IP için bypass kaldırıldı %1$s</string>
     <string name="rbl_privacy">Gizlilik</string>
     <string name="rt_dialog_message">Yeni yapılandırılmış blok listelerini uygulamak istiyor musunuz\?</string>
     <string name="cd_doh_dialog_resolver_url">Çözümleyici URL\'si</string>
@@ -790,7 +790,7 @@
     <string name="firewall_rule_block_http_desc">Bu bağlantı engellendi çünkü muhtemelen <i>güvensiz HTTP</i> kullanıyordu.<br/><br/> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
     <string name="firewall_rule_new_app_desc">Bu uygulama <i>ilk</i> kez bağlantı kurdu.<br/><br/> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
     <string name="firewall_rule_block_app_mobile_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Metered</i> ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">Bu bağlantıya izin verildi çünkü <i>hedef IP</i> uygulamaya özel tüm kuralları atlayacak şekilde ayarlandı.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
+    <string name="firewall_rule_trusted_ip_desc">Bu bağlantıya izin verildi çünkü <i>hedef IP</i> uygulamaya özel tüm kuralları atlayacak şekilde ayarlandı.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
     <string name="bsdl_domain_rule_norule">kural yok</string>
     <string name="cd_blocked_txt">Engellenen</string>
     <string name="cd_no_rule_initial">K</string>
@@ -809,9 +809,9 @@
     <string name="cd_add_dialog_sample_3">%1$s https://%2$s
 \n</string>
     <string name="ada_app_status_whitelist">evrensel güvenlik duvarı kurallarını atlayacaktır</string>
-    <string name="ada_app_status_lockdown">kilitleme modunda</string>
+    <string name="ada_app_status_isolate">kilitleme modunda</string>
     <string name="ada_app_status_unknown">bilinmiyor</string>
-    <string name="ada_app_whitelist">Bypass Evrensel</string>
+    <string name="ada_app_bypass_univ">Bypass Evrensel</string>
     <string name="ada_app_exclude">Dışarıda tut</string>
     <string name="bsac_title_desc">Kurallar sadece bu uygulama için geçerlidir.</string>
     <string name="bsac_unblock_toast">Bu uygulama için engelsiz %1$s</string>
@@ -825,7 +825,7 @@
     <string name="bsdl_blocked_desc">%1$s tarafından engellendi %2$s</string>
     <string name="bsdl_domain_rule_block">engelle</string>
     <string name="notif_download_success_content">Başarılı indir.</string>
-    <string name="bsac_whitelist_toast">Bu IP için uygulama kurallarını atlama %1$s</string>
+    <string name="bsac_trust_toast">Bu IP için uygulama kurallarını atlama %1$s</string>
     <string name="rbl_security">Güvenlik</string>
     <string name="univ_ip_delete_individual_toast">%1$s silindi.</string>
     <string name="ada_ip_no_connection">Bu uygulama için ağ kaydı yok.</string>
@@ -839,7 +839,7 @@
     <string name="notif_download_content_title">Cihaz Üzerinde Engelleme Listesi indir</string>
     <string name="rbl_parental_control">Ebeveyn Kontrolü</string>
     <string name="ctbs_block_other_apps">%1$s için uygulanan kurallar %2$s diğer uygulamalar için de geçerli olacaktır</string>
-    <string name="bsac_bypass_app_rules">Uygulama kurallarını atlayın</string>
+    <string name="bsac_trust">Uygulama kurallarını atlayın</string>
     <string name="notif_download_failure_content">İndirme başarısız oldu. Tekrar deneyin.</string>
     <string name="rt_dialog_title">Değişiklikleri Kaydet</string>
     <string name="rt_dialog_positive">Uygula</string>
@@ -867,7 +867,7 @@
     <string name="intent_launch_error">Sayım başlatılmadı %1$s</string>
     <string name="no_browser_error">Tarayıcıdan web sayfası açılamıyor.</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
-    <string name="ada_app_lockdown">Kilitlenme</string>
+    <string name="ada_app_isolate">Kilitlenme</string>
     <string name="firewall_rule_block_univ_ip">IP / Bağlantı Noktası (Evrensel)</string>
     <string name="rt_filter_desc"><u>%1$s</u> engelleme listesi gösteriliyor</string>
     <string name="rt_filter_desc_subgroups">Grup: %2$s ve alt grup: %3$s içindeki <u>%1$s</u> engelleme listesi gösteriliyor</string>

@@ -13,7 +13,7 @@
     <string name="slide_1_title">Código livre e aberto</string>
     <string name="slide_1_desc">O RethinkDNS é um programa de código aberto apoiado pelo programa Mozilla Builders MVP.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: RethinkDNS foi desativado</string>
-    <string name="lockdown">confinamento</string>
+    <string name="isolate">confinamento</string>
     <string name="exclude">excluir</string>
     <string name="accessibility_service_label">Rethink DNS</string>
     <string name="pause_mode_notification_title">Pausado! Firewall continua a bloquear aplicações.</string>
@@ -132,7 +132,7 @@
     <string name="firewall_status_excluded">excluída do dns e firewall</string>
     <string name="firewall_card_text_inactive">Ativar o modo firewall.</string>
     <string name="hsf_start_dialog_message">Está a um passo de distância do Android seguro e protegido: veja instantaneamente a atividade da rede, bloqueie sites, IPs e aplicações suspeitas.</string>
-    <string name="firewall_status_lockdown">confinada</string>
+    <string name="firewall_status_isolate">confinada</string>
     <string name="hsf_dns_logs_chip_text">Registos de DNS</string>
     <string name="firewall_status_block_metered">bloqueada em redes limitadas (móveis)</string>
     <string name="hsf_stop_btn_state">parar</string>
@@ -485,10 +485,10 @@
     <string name="rt_download">Descarregar listas de bloqueio</string>
     <string name="ci_dialog_desc">Permitir (contornar) ou bloquear endereço IP, sub-rede IP (intervalo), porta. Exemplo: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
     <string name="ada_app_status_whitelist">irá ignorar as regras de firewall universal</string>
-    <string name="ada_app_whitelist">Contorno universal</string>
+    <string name="ada_app_bypass_univ">Contorno universal</string>
     <string name="ada_ip_no_connection">Não há registos de rede para esta aplicação.</string>
     <string name="ada_app_status_allow">é permitida</string>
-    <string name="bsac_whitelist_remove_toast">Ignorar das regras da aplicação removido para o IP %1$s</string>
+    <string name="bsac_distrust_toast">Ignorar das regras da aplicação removido para o IP %1$s</string>
     <string name="bsdl_domain_heading">Regra de domínio</string>
     <string name="notif_download_content_text">A descarregar…</string>
     <string name="bsdl_blocked_desc">%1$s bloqueado por %2$s</string>
@@ -526,7 +526,7 @@
     <string name="dns_info_neutral">Copiar</string>
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede limitada (móvel) para aplicações <i>na lista</i>\?</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">Esta conexão foi permitida porque o <i>IP de destino</i> está configurado para contornar (ignorar) todas as regras específicas da aplicação.<br/><br/> Para alterar, vá ao ecrã <i>Firewall específico da aplicação</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Esta conexão foi permitida porque o <i>IP de destino</i> está configurado para contornar (ignorar) todas as regras específicas da aplicação.<br/><br/> Para alterar, vá ao ecrã <i>Firewall específico da aplicação</i>.</string>
     <string name="dns_proxy_dialog_message">Nome da aplicação: %1$s
 \n
 \nEndereço IP: %2$s
@@ -552,7 +552,7 @@
     <string name="settings_local_blocklist_dialog_negative">Cancelar</string>
     <string name="pause_desc">Nota: as %1$s aplicações bloqueadas continuarão a ser protegidas por firewall.</string>
     <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i> ao tentar conectar-se a uma rede <i>limitada</i>.<br/><br/> Para alterar, vá ao separador <i>Todas as aplicações</i>.</string>
-    <string name="firewall_rule_bypass_apprule_ip">IP contornado (aplicação)</string>
+    <string name="firewall_rule_trusted_ip">IP contornado (aplicação)</string>
     <string name="firewall_rule_new_app_desc">Esta aplicação fez uma conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, vá ao separador <i>Universal</i>.</string>
     <string name="firewall_rule_block_udp_ntp_desc">Uma regra de firewall definida pelo utilizador bloqueou esta conexão <i>UDP</i>.<br/><br/> Para alterar, vá ao separador <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Esta conexão foi permitida porque o &lt;i&gt;IP de destino&lt;/i&gt; está configurado para contornar (ignorar) todas as regras de firewall universal.&lt;br/&gt;&lt;br/&gt; Para alterar vá a &lt;i&gt;Regras de IP&lt;i&gt; no separador &lt;i&gt;Universal&lt;/i&gt;.</string>
@@ -651,7 +651,7 @@
     <string name="fapps_firewall_filter_blocked">Bloqueadas</string>
     <string name="fapps_firewall_filter_bypass_universal">Contornadas</string>
     <string name="fapps_firewall_filter_excluded">Excluídas</string>
-    <string name="fapps_firewall_filter_lockdown">Confinadas</string>
+    <string name="fapps_firewall_filter_isolate">Confinadas</string>
     <string name="fapps_info_dialog_positive_btn">OK</string>
     <string name="fapps_unmetered_unblock_dialog_title">Permitir em redes ilimitadas</string>
     <string name="fapps_unmetered_block_dialog_title">Bloquear em redes ilimitadas</string>
@@ -692,7 +692,7 @@
     <string name="firewall_rule_block_unmetered">Ilimitada (Wi-Fi)</string>
     <string name="firewall_rule_block_metered">Limitada (móvel)</string>
     <string name="firewall_rule_univ_block_metered">Limitada (universal)</string>
-    <string name="firewall_rule_lockdown">Confinada (aplicação)</string>
+    <string name="firewall_rule_isolate">Confinada (aplicação)</string>
     <string name="firewall_rule_block_app_new_install">Nova aplicação</string>
     <string name="firewall_rule_block_app_exception">Erro</string>
     <string name="firewall_rule_block_ip">IP / porta (aplicação)</string>
@@ -709,7 +709,7 @@
     <string name="firewall_rule_no_rule_desc">Nenhuma regra de firewall correspondeu a esta conexão.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i> ao tentar conectar-se a uma rede <i>ilimitada</i>.<br/><br/> Para alterar, vá ao separador <i>Todas as aplicações</i>.</string>
     <string name="firewall_rule_block_app_univ_mobile_desc">Uma regra de firewall universal definida pelo utilizador bloqueou esta <i>aplicação</i> ao tentar conectar-se a uma rede <i>limitada</i> (móvel).<br/><br/> Para alterar, vá ao separador <i>Universal</i>.</string>
-    <string name="firewall_rule_lockdown_desc">Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i> ao tentar conectar-se a outros <i>IPs não contornados</i>.<br/><br/> Para alterar, vá ao separador <i>Todas as aplicações</i>.</string>
+    <string name="firewall_rule_isolate_desc">Uma regra de firewall definida pelo utilizador bloqueou esta <i>aplicação</i> ao tentar conectar-se a outros <i>IPs não contornados</i>.<br/><br/> Para alterar, vá ao separador <i>Todas as aplicações</i>.</string>
     <string name="firewall_rule_block_ip_desc">Uma regra de firewall definida pelo utilizador bloqueou o <i>IP de destino</i>.<br/><br/> Para alterar, vá ao ecrã <i>Firewall específico da aplicação</i>.</string>
     <string name="firewall_rule_unknown_desc">Esta conexão foi protegida por firewall porque não foi possível determinar a <i>aplicação de origem</i>.<br/><br/> Para alterar este comportamento, vá ao separador <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta conexão foi permitida porque a configuração do <i>Tor-como-proxy com um clique</i> via Orbot estava a decorrer.</string>
@@ -783,7 +783,7 @@
     <string name="ada_app_status_block_wifi">está bloqueada em redes ilimitadas (wifi)</string>
     <string name="ada_app_status_block_md">está bloqueada em redes limitadas (móveis)</string>
     <string name="ada_app_status_exclude">está excluída do dns e firewall</string>
-    <string name="ada_app_status_lockdown">está no modo confinado</string>
+    <string name="ada_app_status_isolate">está no modo confinado</string>
     <string name="ada_app_status_unknown">é desconhecida</string>
     <string name="ada_ip_block_count">Regras de IP: %1$s</string>
     <string name="ada_firewall_title">regras de firewall para esta aplicação</string>
@@ -791,16 +791,16 @@
     <string name="ada_network_log_title">registo de rede para esta aplicação</string>
     <string name="ada_app_metered">Rede limitada</string>
     <string name="ada_app_exclude">Excluída</string>
-    <string name="ada_app_lockdown">Confinada</string>
+    <string name="ada_app_isolate">Confinada</string>
     <string name="ada_app_dns_settings">Configurações de DNS</string>
     <string name="bsac_title_desc">As regras aplicam-se apenas a esta aplicação.</string>
     <string name="bsac_unblock">Desbloquear</string>
     <string name="bsac_block">Bloquear</string>
-    <string name="bsac_bypass_app_rules">Ignorar regras da aplicação</string>
-    <string name="bsac_go_pass_app_rules">Remover ignorar das regras</string>
+    <string name="bsac_trust">Ignorar regras da aplicação</string>
+    <string name="bsac_distrust">Remover ignorar das regras</string>
     <string name="bsac_block_toast">A bloquear %1$s nesta aplicação</string>
     <string name="bsac_unblock_toast">A desbloquear %1$s nesta aplicação</string>
-    <string name="bsac_whitelist_toast">A ignorar as regras da aplicação para o IP %1$s</string>
+    <string name="bsac_trust_toast">A ignorar as regras da aplicação para o IP %1$s</string>
     <string name="bsdl_domain_desc">Clique abaixo para permitir ou bloquear pedidos do DNS</string>
     <string name="bsdl_domain_rule_allow">permitir</string>
     <string name="bsdl_domain_rule_block">bloquear</string>
@@ -878,8 +878,8 @@
 \n
 \nPara usar o DNS do Rethink, vá às configurações do Android e desative a opção \"DNS privado\".</string>
     <string name="private_dns_dialog_negative">Cancelar</string>
-    <string name="ci_bypass_app_initial">CA</string>
-    <string name="ci_bypass_app_txt">Regras de contorno de aplicação</string>
+    <string name="ci_trust_initial">CA</string>
+    <string name="ci_trust_txt">Regras de contorno de aplicação</string>
     <string name="ada_app_firewall">Firewall</string>
     <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">Cancelar</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Bloquear sites com conteúdo adulto, pirataria, jogos de azar, encontros online e redes sociais.</string>

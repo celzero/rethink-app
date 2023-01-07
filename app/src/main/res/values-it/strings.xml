@@ -36,7 +36,7 @@
     <string name="allow">consenti</string>
     <string name="bypass_universal">aggira regole universali</string>
     <string name="exclude">escludi</string>
-    <string name="lockdown">isolamento</string>
+    <string name="isolate">isolamento</string>
     <string name="untracked">non tracciato</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Attenzione: RethinkDNS è stato disattivato</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tocca per modificare l\'impostazione di protezione</string>
@@ -315,7 +315,7 @@
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_x_sign">❌</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è stato impostato per aggirare tutte le regole specifiche all\'app.<br/><br/> Per modificare, vai alla schermata <i>del firewall specifica per l\'app</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è stato impostato per aggirare tutte le regole specifiche all\'app.<br/><br/> Per modificare, vai alla schermata <i>del firewall specifica per l\'app</i>.</string>
     <string name="notif_dialog_pause_dialog_title">App in pausa!</string>
     <string name="notif_channel_desc_proxy_failure">Ti avvisa su errori e anomalie del Proxy</string>
     <string name="notif_channel_desc_vpn_notification">Ti informa quando RethinkDNS è attivo e in esecuzione in background</string>
@@ -325,7 +325,7 @@
     <string name="bsdl_domain_heading">Regola di dominio</string>
     <string name="ada_app_unmetered">Non a consumo</string>
     <string name="ada_app_metered">A consumo</string>
-    <string name="bsac_whitelist_remove_toast">Rimosso aggiramento delle regole per questo IP %1$s</string>
+    <string name="bsac_distrust_toast">Rimosso aggiramento delle regole per questo IP %1$s</string>
     <string name="bsdl_blocked_desc">bloccato %1$s da %2$s</string>
     <string name="bsdl_domain_rule_norule">nessuna regola</string>
     <string name="network_dns">DNS del sistema</string>
@@ -394,7 +394,7 @@
 \n"</string>
     <string name="settings_selected_theme">Tema corrente: %1$s</string>
     <string name="apps_icon_content_desc">Icona dell\'app</string>
-    <string name="firewall_status_lockdown">quarantena</string>
+    <string name="firewall_status_isolate">quarantena</string>
     <string name="firewall_status_block_unmetered">bloccata sulle reti non a consumo (wifi)</string>
     <string name="firewall_status_block_metered">bloccata sulle reti a consumo (dati mobili)</string>
     <string name="firewall_status_unknown">sconosciuto</string>
@@ -604,7 +604,7 @@
     <string name="fapps_firewall_filter_blocked">Bloccate</string>
     <string name="fapps_firewall_filter_bypass_universal">Aggirano il firewall</string>
     <string name="fapps_firewall_filter_excluded">Escluse</string>
-    <string name="fapps_firewall_filter_lockdown">Quarantena</string>
+    <string name="fapps_firewall_filter_isolate">Quarantena</string>
     <string name="fapps_info_dialog_message">Impedisci alle app di connettersi a Internet. Limitare l\'accesso a Internet aiuta a prevenire l\'uso eccessivo dei dati e a risparmiare batteria.
 \n
 \nLe regole del firewall A Consumo (Mobile) / Non a Consumo (WiFi) non saranno rispettate quando:
@@ -657,11 +657,11 @@
     <string name="firewall_rule_block_unmetered">Non a consumo (WiFi)</string>
     <string name="firewall_rule_block_metered">A consumo (dati mobili)</string>
     <string name="firewall_rule_univ_block_metered">A consumo (Universale)</string>
-    <string name="firewall_rule_lockdown">Quarantena (App)</string>
+    <string name="firewall_rule_isolate">Quarantena (App)</string>
     <string name="firewall_rule_block_app_new_install">Nuova app</string>
     <string name="firewall_rule_block_app_exception">Errore</string>
     <string name="firewall_rule_block_ip">IP / Porta (App)</string>
-    <string name="firewall_rule_bypass_apprule_ip">IP che aggira il firewall (App)</string>
+    <string name="firewall_rule_trusted_ip">IP che aggira il firewall (App)</string>
     <string name="firewall_rule_bypass_universal_ip">IP che aggira il firewall</string>
     <string name="firewall_rule_device_lock">Dispositivo bloccato</string>
     <string name="firewall_rule_foreground">App non-in-uso</string>
@@ -678,7 +678,7 @@
     <string name="firewall_rule_new_app_desc">Quest\'app si è connessa per la <i>prima</i> volta.<br/><br/> Per modificare vai a <i>Regole Universali</i>.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>Non a consumo</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
     <string name="firewall_rule_block_app_mobile_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
-    <string name="firewall_rule_lockdown_desc">Una regola del firewall impostata dall\'utente consente a quest\'<i>app</i> di connettersi solo a <i>IP che aggirano il firewall</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
+    <string name="firewall_rule_isolate_desc">Una regola del firewall impostata dall\'utente consente a quest\'<i>app</i> di connettersi solo a <i>IP che aggirano il firewall</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
     <string name="firewall_rule_block_app_univ_mobile_desc">Una regola universale del firewall impostata dall\'utente ha bloccato quest\'<i>app</i> dal connettersi alla rete <i>A consumo (dati mobili)</i>.<br/><br/> Per modificarla, vai a <i>Tutte le app</i>.</string>
     <string name="firewall_rule_block_ip_univ_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP / Porta di destinazione</i>.<br/><br/> Per modificarla, vai a <i>Regole Universali</i>.</string>
     <string name="firewall_rule_block_ip_desc">Una regola del firewall impostata dall\'utente ha bloccato quest\'<i>IP di destinazione</i>.<br/><br/> Per modificarla, vai a alla <i>schermata dell\'app specifica nel Firewall</i>.</string>
@@ -780,22 +780,22 @@
     <string name="ada_app_status_block_md">è bloccata su reti a consumo (dati mobili)</string>
     <string name="ada_app_status_whitelist">aggirerà le regole universali del firewall</string>
     <string name="ada_app_status_exclude">è esclusa dal DNS e dal firewall</string>
-    <string name="ada_app_status_lockdown">è in quarantena</string>
+    <string name="ada_app_status_isolate">è in quarantena</string>
     <string name="ada_app_status_unknown">è sconosciuta</string>
     <string name="ada_ip_block_count">%1$s regole/a IP</string>
     <string name="ada_ip_rules_title">regole IP per quest\'app</string>
     <string name="ada_network_log_title">registro di rete per quest\'app</string>
-    <string name="ada_app_whitelist">Aggira regole Universali</string>
+    <string name="ada_app_bypass_univ">Aggira regole Universali</string>
     <string name="ada_app_exclude">Escludi</string>
     <string name="ada_app_dns_settings">Impostazioni DNS</string>
     <string name="bsac_title_desc">Le regole si applicano solo a quest\'app.</string>
     <string name="bsac_unblock">Sblocca</string>
     <string name="bsac_block">Blocca</string>
-    <string name="bsac_bypass_app_rules">Aggira regole app</string>
-    <string name="bsac_go_pass_app_rules">Rimuovi aggiramento</string>
+    <string name="bsac_trust">Aggira regole app</string>
+    <string name="bsac_distrust">Rimuovi aggiramento</string>
     <string name="bsac_block_toast">%1$s bloccato per quest\'app</string>
     <string name="bsac_unblock_toast">%1$s sbloccato per quest\'app</string>
-    <string name="bsac_whitelist_toast">Regole dell\'app aggirate per questo IP %1$s</string>
+    <string name="bsac_trust_toast">Regole dell\'app aggirate per questo IP %1$s</string>
     <string name="bsdl_domain_desc">Clicca qui sotto per consentire o bloccare le richieste DNS</string>
     <string name="bsdl_domain_rule_block">blocca</string>
     <string name="notif_download_content_title">Scaricamento liste dei filtri su dispositivo</string>
@@ -868,10 +868,10 @@
     <string name="intent_launch_error">Impossibile avviare %1$s</string>
     <string name="no_browser_error">Impossibile aprire pagina web da browser.</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (universale)</string>
-    <string name="ci_bypass_app_txt">Aggira regole app</string>
+    <string name="ci_trust_txt">Aggira regole app</string>
     <string name="ada_app_firewall">Firewall</string>
     <string name="ada_firewall_title">regole firewall per questa app</string>
-    <string name="ada_app_lockdown">Quarantena</string>
+    <string name="ada_app_isolate">Quarantena</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Procedi</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Elimina registri</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Elimina tutti i registri relativi a questa applicazione.</string>
@@ -889,5 +889,5 @@
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
-    <string name="ci_bypass_app_initial">AA</string>
+    <string name="ci_trust_initial">AA</string>
 </resources>

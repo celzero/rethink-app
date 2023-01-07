@@ -51,7 +51,7 @@
     <string name="rdns_plus">RDNS Plus</string>
     <string name="dns_explanation_dns_connected">Подключен к RethinkDNS</string>
     <string name="about_settings">система</string>
-    <string name="lockdown">карантин</string>
+    <string name="isolate">карантин</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Предупреждение: RethinkDNS был деактивирован</string>
     <string name="notification_action_dns_firewall_mode">DNS + Брандмауэр</string>
     <string name="settings_theme_heading">Внешний вид</string>
@@ -151,7 +151,7 @@
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="firewall_status_blocked">заблокирован</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
-    <string name="firewall_status_lockdown">карантин</string>
+    <string name="firewall_status_isolate">карантин</string>
     <string name="settings_selected_ip_desc">%1$s</string>
     <string name="hsf_vpn_dialog_negative">Отмена</string>
     <string name="firewall_card_status_inactive">Отключено</string>
@@ -384,8 +384,8 @@
     <string name="firewall_rule_block_app_univ_mobile_desc">Установленное пользователем правило универсального брандмауэра блокировало это <i>приложение</i> при попытке подключения в сети <i>Metered</i> (Mobile).<br/><br/> Для изменения перейдите на вкладку <i>Universal</i>.</string>
     <string name="hs_btm_sheet_lock_down">Невозможно изменить режим, когда VPN <i>заблокирован</i>. Нажмите, чтобы <u>отредактировать настройки VPN</u>.</string>
     <string name="firewall_rule_univ_block_metered">Дозированная (универсальная)</string>
-    <string name="firewall_rule_lockdown">Lockdown (приложение)</string>
-    <string name="firewall_rule_bypass_apprule_ip">Обход IP (приложение)</string>
+    <string name="firewall_rule_isolate">Lockdown (приложение)</string>
+    <string name="firewall_rule_trusted_ip">Обход IP (приложение)</string>
     <string name="firewall_rule_block_univ_ip">IP / Порт (универсальный)</string>
     <string name="firewall_rule_block_app_unmetered_desc">Установленное пользователем правило брандмауэра блокировало это <i>приложение</i> при попытке подключения в сети <i>Unmetered</i>.<br/><br/> Для изменения перейдите на вкладку <i>All Apps</i>.</string>
     <string name="firewall_rule_bypass_universal_ip">Обходной IP-адрес</string>
@@ -395,11 +395,11 @@
     <string name="firewall_rule_block_http">Небезопасный HTTP</string>
     <string name="firewall_rule_block_app_desc">Установленное пользователем правило брандмауэра заблокировало это <i>приложение</i>.<br/><br/> Для изменения перейдите на вкладку <i>All Apps</i>.</string>
     <string name="firewall_rule_new_app_desc">Это приложение установило соединение в <i>первый</i> раз.<br/><br/> Для изменения перейдите на вкладку <i>Universal</i>.</string>
-    <string name="firewall_rule_lockdown_desc">Установленное пользователем правило брандмауэра блокировало это <i>приложение</i>, подключаясь к другим, кроме <i>обойденным IP-адресам</i>.<br/><br/> Для изменения перейдите на вкладку <i>All Apps</i>.</string>
+    <string name="firewall_rule_isolate_desc">Установленное пользователем правило брандмауэра блокировало это <i>приложение</i>, подключаясь к другим, кроме <i>обойденным IP-адресам</i>.<br/><br/> Для изменения перейдите на вкладку <i>All Apps</i>.</string>
     <string name="firewall_rule_block_ip_univ_desc">Установленное пользователем правило брандмауэра заблокировало <i>IP/порт назначения</i>.<br/><br/> Для изменения перейдите на вкладку <i>Universal</i>.</string>
     <string name="firewall_rule_block_ip_desc">Установленное пользователем правило брандмауэра заблокировало <i>IP-адрес назначения</i>.<br/><br/> Для изменения перейдите к экрану <i>App-specific Firewall</i>.</string>
     <string name="firewall_rule_unknown_desc">Это соединение было заблокировано, поскольку <i>источник приложения</i> не может быть определен.<br/><br/> Чтобы изменить это поведение, перейдите на вкладку <i>Universal</i>.</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">Это соединение было разрешено, потому что IP-адрес назначения <i/> настроен на обход всех правил, специфичных для приложения.<br/><br/> Для изменения перейдите на экран <i>App-specific Firewall</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Это соединение было разрешено, потому что IP-адрес назначения <i/> настроен на обход всех правил, специфичных для приложения.<br/><br/> Для изменения перейдите на экран <i>App-specific Firewall</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Это соединение было разрешено, потому что &lt;i&gt;IP-адрес назначения&lt;/i&gt; настроен на обход всех универсальных правил брандмауэра.&lt;br/&gt;&lt;br/&gt; Для изменения перейдите в &lt;i&gt;IP Rules&lt;i&gt; на вкладке &lt;i&gt;Universal&lt;/i&gt;.</string>
     <string name="firewall_rule_device_lock_desc">Это соединение было заблокировано, поскольку <i>устройство было заблокировано</i> в то время.<br/><br/> Чтобы изменить это поведение, перейдите на вкладку <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">Это соединение было разрешено, потому что <i>приложение-источник</i> настроено на <i>обход универсальных</i> правил брандмауэра.<br/><br/> Для изменения перейдите на экран <i>App-specific Firewall</i>.</string>
@@ -450,11 +450,11 @@
     <string name="ada_app_status_block_md">блокируется в сетях с дозированной оплатой (мобильная связь)</string>
     <string name="ada_ip_no_connection">В этом приложении нет журналов сети.</string>
     <string name="ada_app_status_exclude">исключен из dns и брандмауэра</string>
-    <string name="ada_app_status_lockdown">находится в режиме блокировки</string>
+    <string name="ada_app_status_isolate">находится в режиме блокировки</string>
     <string name="network_dns">Системный DNS</string>
     <string name="notif_download_failure_content">Загрузка не удалась. Попробуйте еще раз.</string>
     <string name="bsac_unblock">Разблокировать</string>
-    <string name="bsac_bypass_app_rules">Обходить правила приложений</string>
+    <string name="bsac_trust">Обходить правила приложений</string>
     <string name="bsdl_domain_rule_norule">нет правил</string>
     <string name="notif_download_content_title">Загрузка блок-листа на устройстве</string>
     <string name="notif_download_content_text">Загрузка продолжается…</string>
@@ -567,7 +567,7 @@
     <string name="univ_accessibility_dialog_positive">Разрешить</string>
     <string name="dns_select_toast">Необходимо выбрать как минимум один резольвер.</string>
     <string name="dns_proxy_ip_address">IP-адрес</string>
-    <string name="fapps_firewall_filter_lockdown">Блокировка</string>
+    <string name="fapps_firewall_filter_isolate">Блокировка</string>
     <string name="fapps_unmetered_block_dialog_title">Блокировка при бездоговорном режиме</string>
     <string name="fapps_unmetered_unblock_dialog_message">Разрешить подключения в сети без учета тарифов (WiFi) для приложений <i>, перечисленных в списке</i>\?</string>
     <string name="fapps_metered_block_dialog_title">Блок на дозированном</string>
@@ -611,15 +611,15 @@
     <string name="ada_network_log_title">сетевой журнал для этого приложения</string>
     <string name="ada_app_metered">Счетчик</string>
     <string name="ada_app_unmetered">Безлимитная</string>
-    <string name="ada_app_whitelist">Байпас универсальный</string>
+    <string name="ada_app_bypass_univ">Байпас универсальный</string>
     <string name="ada_app_exclude">Убрать</string>
-    <string name="ada_app_lockdown">Блокировка</string>
+    <string name="ada_app_isolate">Блокировка</string>
     <string name="ada_app_dns_settings">Настройки DNS</string>
     <string name="bsac_block">Заблокировать</string>
-    <string name="bsac_go_pass_app_rules">Удалить байпас</string>
+    <string name="bsac_distrust">Удалить байпас</string>
     <string name="bsac_block_toast">Блокировка %1$s для этого приложения</string>
-    <string name="bsac_whitelist_toast">Обход правил приложений для этого IP %1$s</string>
-    <string name="bsac_whitelist_remove_toast">Удален обход для этого IP %1$s</string>
+    <string name="bsac_trust_toast">Обход правил приложений для этого IP %1$s</string>
+    <string name="bsac_distrust_toast">Удален обход для этого IP %1$s</string>
     <string name="notif_download_success_content">Скачать успешно.</string>
     <string name="rbl_privacy">Приватность</string>
     <string name="rbl_security">Охрана</string>
