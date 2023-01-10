@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
@@ -33,6 +34,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DefaultItemAnimator
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
@@ -162,6 +164,11 @@ class AppInfoActivity :
         showNetworkLogsIfAny(appInfo.uid)
         toggleFirewallUiState(firewallUiState)
         toggleNetworkLogState(ipListUiState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        b.aadConnDetailRecycler.adapter?.notifyDataSetChanged()
     }
 
     private fun openCustomIpScreen() {
@@ -481,6 +488,9 @@ class AppInfoActivity :
         }
         b.aadConnDetailRecycler.isNestedScrollingEnabled = false
         b.aadConnDetailRecycler.adapter = recyclerAdapter
+        val itemAnimator = DefaultItemAnimator()
+        itemAnimator.changeDuration = 1500
+        b.aadConnDetailRecycler.itemAnimator = itemAnimator
         networkLogsViewModel.setFilter("")
     }
 

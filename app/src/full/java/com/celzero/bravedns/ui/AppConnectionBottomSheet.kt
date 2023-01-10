@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -45,6 +47,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
+    // listener to inform dataset change to the adapter
+    private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
+    private var adapter: AppConnectionAdapter? = null
+    private var position: Int = -1
+
     override fun getTheme(): Int =
         getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
@@ -63,6 +70,15 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
+    }
+
+    interface OnBottomSheetDialogFragmentDismiss {
+        fun notifyDataset(position: Int)
+    }
+
+    fun dismissListener(aca: AppConnectionAdapter?, pos: Int) {
+        adapter = aca
+        position = pos
     }
 
     override fun onCreateView(
@@ -86,6 +102,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         port = arguments?.getInt(PORT) ?: UNSPECIFIED_PORT
         val status = arguments?.getInt(IPRULESTATUS) ?: IpRulesManager.IpRuleStatus.NONE.id
         ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(status)
+        dismissListener = adapter
 
         initView()
         initializeClickListeners()
@@ -118,17 +135,17 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private fun showButtonForStatusBlock() {
         b.bsacUnblock.visibility = View.VISIBLE
-        b.bsacBypassAppRules.visibility = View.VISIBLE
+        b.bsacTrustIp.visibility = View.VISIBLE
     }
 
     private fun showByPassAppRulesUi() {
         b.bsacBlock.visibility = View.VISIBLE
-        b.bsacGopassAppRules.visibility = View.VISIBLE
+        b.bsacDistrustIp.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusNone() {
         b.bsacBlock.visibility = View.VISIBLE
-        b.bsacBypassAppRules.visibility = View.VISIBLE
+        b.bsacTrustIp.visibility = View.VISIBLE
     }
 
     private fun initializeClickListeners() {
@@ -150,7 +167,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             )
         }
 
-        b.bsacBypassAppRules.setOnClickListener {
+        b.bsacTrustIp.setOnClickListener {
             applyRule(
                 uid,
                 ipAddress,
@@ -159,7 +176,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             )
         }
 
-        b.bsacGopassAppRules.setOnClickListener {
+        b.bsacDistrustIp.setOnClickListener {
             applyRule(
                 uid,
                 ipAddress,
@@ -179,6 +196,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         io { IpRulesManager.addIpRule(uid, ipAddress, UNSPECIFIED_PORT, status) }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        dismissListener?.notifyDataset(position)
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -39,7 +39,8 @@ import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingComm
 class AppConnectionAdapter(val context: Context, val uid: Int) :
     PagingDataAdapter<AppConnection, AppConnectionAdapter.ConnectionDetailsViewHolder>(
         DIFF_CALLBACK
-    ) {
+    ),
+    AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -118,6 +119,7 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             bundle.putInt(AppConnectionBottomSheet.PORT, Constants.UNSPECIFIED_PORT)
             bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
             bottomSheetFragment.arguments = bundle
+            bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -201,5 +203,9 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
                 }
             }
         }
+    }
+
+    override fun notifyDataset(position: Int) {
+        this.notifyItemChanged(position)
     }
 }
