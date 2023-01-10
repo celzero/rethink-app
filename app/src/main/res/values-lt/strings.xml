@@ -206,7 +206,6 @@
     <string name="hsf_start_dialog_positive">Paleisti</string>
     <string name="hsf_start_dialog_negative">Atsisakyti</string>
     <string name="hsf_proxy_chip_text">Įgaliotasis serveris aktyvus</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">Naudojamas RDNS</string>
     <string name="hsf_blocklist_chip_text_no_data">Įgalinti RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS žurnalai</string>
     <string name="hsf_network_logs_chip_text">Tinklo žurnalai</string>
@@ -609,7 +608,6 @@
 \n
 \nRethinkDNS nerenka jokios informacijos ir jokiu būdu nešnipinėja jūsų.</string>
     <string name="hsf_start_dialog_message">Iki saugaus ir patikimo Android liko vienas žingsnis: akimirksniu peržiūrėkite tinklo veiklą, blokuokite svetaines, IP adresus ir blogai besielgiančias programėles.</string>
-    <string name="hsf_blocklist_chip_text">Sukonfigūruoti %1$s blokavimo sąrašai</string>
     <string name="hsf_proxy_chip_removed_toast">Įgaliotasis serveris pašalintas</string>
     <string name="dc_dns_leaks_heading">Užkirsti kelią DNS nutekėjimui</string>
     <string name="hsf_whats_new_chip_text">Kas naujo</string>

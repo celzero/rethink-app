@@ -165,7 +165,6 @@
     <string name="firewall_status_allow">অনুমোদিত</string>
     <string name="hsf_start_dialog_positive">শুরু</string>
     <string name="hsf_start_dialog_negative">খারিজ</string>
-    <string name="hsf_blocklist_chip_text">%1$s ব্লকলিস্ট কনফিগার করা হয়েছে</string>
     <string name="about_web">লিঙ্ক</string>
     <string name="about_settings_notification">বিজ্ঞপ্তি সেটিংস</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
@@ -394,7 +393,6 @@
     <string name="settings_dns_proxy_dialog_positive_btn">সেট</string>
     <string name="settings_theme_dialog_themes_3">কাল</string>
     <string name="firewall_status_block_unmetered">মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কগুলিতে অবরুদ্ধ</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">ব্যবহারে পুনর্বিবেচনা করুন</string>
     <string name="hsf_whats_new_remove_text">বন্ধ…</string>
     <string name="dc_other_settings_heading">উন্নত</string>
     <string name="about_join_telegram">Telegram</string>

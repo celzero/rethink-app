@@ -538,7 +538,6 @@
     <string name="hsf_start_dialog_negative">Descartar</string>
     <string name="hsf_whats_new_chip_text">Novedades</string>
     <string name="hsf_proxy_chip_text">Proxy activo</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS en uso</string>
     <string name="hsf_pause_lockdown_failure">No se puede pausar: RethinkDNS está en modo de aislamiento</string>
     <string name="hsf_blocklist_chip_text_no_data">Activar RethinkDNS+</string>
     <string name="hsf_dns_logs_chip_text">Registros DNS</string>
@@ -740,7 +739,6 @@
     <string name="show_logs_disabled_dns_message">El registro de solicitudes DNS ha sido desactivado. Para volver a activarlo, vaya a <i>Ajustes</i> y habilite <i>Activar el registro en el dispositivo.</i></string>
     <string name="orbot_bs_status_3">Reenviando %1$s a Orbot, Proxy HTTP también configurado.</string>
     <string name="settings_dns_proxy_dialog_app">Aplicación</string>
-    <string name="hsf_blocklist_chip_text">%1$s listas de bloqueo configuradas</string>
     <string name="dns_logs_lifetime_queries">Duración de las consultas: %1$s</string>
     <string name="settings_socks5_heading">Configurar el proxy SOCKS5</string>
     <string name="settings_socks5_desc">Reenvía las conexiones al punto de acceso SOCKS5.</string>

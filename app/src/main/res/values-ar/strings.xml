@@ -23,7 +23,6 @@
     <string name="new_app_notification_action_deny">استمر فى الحجز</string>
     <string name="settings_dns_proxy_dialog_password">كلمة المرور</string>
     <string name="settings_notification_desc1">إيقاف مؤقت / إيقاف (افتراضي)</string>
-    <string name="hsf_blocklist_chip_text">%1$s قوائم الحظر</string>
     <string name="ada_app_bypass_univ">تجاوز عالمي</string>
     <string name="rt_list_adv_btn_txt">المتقدمة</string>
     <string name="dns_crypt_relay_remove_dialog_message">احذف مرحل DNSCrypt من التكوين المحفوظ.</string>
@@ -416,7 +415,6 @@
     <string name="orbot_install_dialog_message">يجلب Orbot ميزات ووظائف Tor إلى Android.</string>
     <string name="settings_orbot_heading">إعداد Orbot</string>
     <string name="settings_notification_desc3">لا شيء</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS قيد الاستخدام</string>
     <string name="hsf_chip_appearance">الموضوع: %1$s</string>
     <string name="dc_custom_block_heading">السماح بالمجالات الفردية أو رفضها</string>
     <string name="about_bug_no_log_dialog_positive_btn">أرسل بريد الكتروني</string>

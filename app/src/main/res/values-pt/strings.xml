@@ -259,8 +259,6 @@
     <string name="hsf_start_dialog_negative">Ignorar</string>
     <string name="hsf_whats_new_chip_text">Novidades</string>
     <string name="hsf_proxy_chip_text">Proxy ativo</string>
-    <string name="hsf_blocklist_chip_text">%1$s listas de bloqueio</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS utilizado</string>
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_network_logs_chip_text">Registos de rede</string>
     <string name="hsf_exclude_error">Não é possível excluir no modo de VPN bloqueado</string>

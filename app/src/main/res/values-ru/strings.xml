@@ -685,8 +685,6 @@
     <string name="hsf_vpn_prepare_failure">Либо отсутствует разрешение VPN, либо другое приложение находится в режиме постоянного VPN.</string>
     <string name="hsf_start_dialog_message">Вы в одном шаге от безопасного и надежного Android: мгновенный просмотр сетевой активности, блокировка веб-сайтов, IP-адресов и приложений с плохим поведением.</string>
     <string name="hsf_proxy_chip_text">Прокси активен</string>
-    <string name="hsf_blocklist_chip_text">%1$s блок-листов</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS в использовании</string>
     <string name="hsf_blocklist_chip_text_no_data">Включить RethinkDNS+</string>
     <string name="hsf_network_logs_chip_text">Сетевые журналы</string>
     <string name="hsf_exclude_error">Исключение невозможно в режиме блокировки VPN</string>

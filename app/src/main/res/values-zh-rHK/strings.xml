@@ -348,8 +348,6 @@
     <string name="hsf_start_dialog_negative">忽略</string>
     <string name="hsf_whats_new_chip_text">新內容</string>
     <string name="hsf_proxy_chip_text">啓用咗代理</string>
-    <string name="hsf_blocklist_chip_text">%1$s 份攔截清單</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">用緊 RDNS</string>
     <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS 日誌</string>
     <string name="hsf_network_logs_chip_text">網絡日誌</string>

@@ -365,7 +365,6 @@
     <string name="notif_channel_download">Nedlastningsvarler</string>
     <string name="category_name_non_app_sys">Systemtjenester</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Slett DNSCrypt-utleder\?</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">Rethink i bruk</string>
     <string name="orbot_none">Ingen (forvalg)</string>
     <string name="dns_proxy_dialog_message_no_app">IP: %1$s
 \n
@@ -596,7 +595,6 @@
     <string name="dc_check_update_desc">Se etter endringer i svartelister hver <i>tredje</i> dag</string>
     <string name="cd_dns_crypt_resolver_heading">Utleder</string>
     <string name="dc_block_heading">Regler</string>
-    <string name="hsf_blocklist_chip_text">%1$s svartelister satt opp</string>
     <string name="firewall_rule_block_metered">Kvotebasert (mobilnett)</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>

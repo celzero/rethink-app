@@ -378,7 +378,6 @@
     <string name="settings_orbot_heading">Orbot Kurulumu</string>
     <string name="settings_dns_proxy_dialog_app_desc">Seçilen uygulama, sizin adınıza bağlantıları proxy\'lemesine izin vermek için VPN\'den hariç tutulacaktır.</string>
     <string name="firewall_card_text_inactive">Güvenlik duvarı modunu etkinleştirin.</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS kullanımda</string>
     <string name="about_bug_no_log_dialog_negative_btn">İptal</string>
     <string name="about_settings_vpn_profile">VPN Profili</string>
     <string name="cd_dns_crypt_resolver_heading">Çözümleyici</string>
@@ -592,7 +591,6 @@
     <string name="settings_theme_dialog_themes_1">Sistem tarafından ayarlanır</string>
     <string name="settings_ip_text_ipv46">Otomatik</string>
     <string name="settings_notification_desc3">Hiçbiri</string>
-    <string name="hsf_blocklist_chip_text">%1$s blok listeleri yapılandırıldı</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy kaldırıldı</string>
     <string name="dns_logs_blocked_queries">Engellenen sorgular: %1$s</string>
     <string name="dc_block_heading">kurallar</string>

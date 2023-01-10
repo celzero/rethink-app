@@ -324,7 +324,6 @@
     <string name="settings_theme_dialog_title">外观</string>
     <string name="settings_notification_dialog_title">选择通知操作</string>
     <string name="firewall_card_status_inactive">已禁用</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS 使用中</string>
     <string name="hsf_pause_vpn_failure">无法暂停： RethinkDNS 未启用</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_check_update_heading">提示屏蔽名单更新</string>
@@ -748,7 +747,6 @@
     <string name="hsf_start_dialog_message">您距安全的 Android 系统仅有一步之遥：即时查看网络活动，拦截网站、 IP 与不听话的应用。</string>
     <string name="app_info_error">无法打开应用信息。</string>
     <string name="doh_custom_url_remove_dialog_title">是否删除 DNS 端点？</string>
-    <string name="hsf_blocklist_chip_text">%1$s 个屏蔽名单</string>
     <string name="cd_custom_doh_dialog_title">自定义服务器 URL</string>
     <string name="dns_crypt_relay_remove_dialog_title">是否删除此 DNSCrypt 中继？</string>
     <string name="show_logs_disabled_network_message">连接日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>

@@ -504,13 +504,11 @@
     <string name="firewall_rule_block_ip">IP / Port</string>
     <string name="ada_noapp_dialog_title">Info app tidak ditemukan</string>
     <string name="ci_dialog_title">Menambah Aturan IP / Port</string>
-    <string name="hsf_blocklist_chip_text">%1$s daftar-daftar blokir telah diatur</string>
     <string name="local_blocklist_redownload_desc">Daftar-daftar blokir di perangkat telah dalam versi terbaru v%1$s.</string>
     <string name="accessibility_service_description">RethinkDNS menggunakan layanan aksesibilitas untuk mendeteksi dan mem-firewall aplikasi-aplikasi latar belakang. RethinkDNS tidak mengumpulkan atau menjual informasi apapun.</string>
     <string name="orbot_socks5">Proksi hanya-TCP</string>
     <string name="settings_theme_dialog_themes_1">Diatur Sistem</string>
     <string name="settings_notification_heading">Pilih tindakan atas notifikasi</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RethinkDNS sedang digunakan</string>
     <string name="univ_firewall_rule_8">Blokir lalulintas port 80 (HTTP tak aman)</string>
     <string name="rbl_security">Keamanan</string>
     <string name="rt_apply_btn">Terapkan</string>

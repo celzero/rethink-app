@@ -549,8 +549,6 @@
     <string name="hsf_start_dialog_positive">啓動</string>
     <string name="hsf_start_dialog_negative">忽略</string>
     <string name="hsf_whats_new_chip_text">新內容</string>
-    <string name="hsf_blocklist_chip_text">%1$s 個攔截清單</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS 使用中</string>
     <string name="settings_notification_dialog_title">選擇通知行爲</string>
     <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS 日誌</string>

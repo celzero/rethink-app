@@ -421,8 +421,6 @@
     <string name="hsf_start_dialog_negative">Chiudi</string>
     <string name="hsf_whats_new_chip_text">Cosa c\'è di nuovo</string>
     <string name="hsf_proxy_chip_text">Proxy attivo</string>
-    <string name="hsf_blocklist_chip_text">%1$s liste filtri</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in uso</string>
     <string name="hsf_blocklist_chip_text_no_data">Attiva RDNS+</string>
     <string name="hsf_dns_logs_chip_text">Registro DNS</string>
     <string name="hsf_network_logs_chip_text">Registro di rete</string>

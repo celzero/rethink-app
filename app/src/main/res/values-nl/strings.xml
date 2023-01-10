@@ -286,7 +286,6 @@
     <string name="hsf_proxy_chip_remove_text">Aan het stoppen…</string>
     <string name="hsf_pause_vpn_failure">Kan niet pauzeren: RethinkDNS niet actief</string>
     <string name="hsf_proxy_chip_text">Proxy actief</string>
-    <string name="hsf_blocklist_chip_text">%1$s blocklists geconfigureerd</string>
     <string name="dc_block_heading">regels</string>
     <string name="dc_custom_dns_radio">Andere DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
@@ -446,7 +445,6 @@
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_start_dialog_message">U bent één stap verwijderd van veilig en beveiligd Android: zie onmiddellijk netwerkactiviteit, blokkeer websites, IP\'s en apps die zich slecht gedragen.</string>
     <string name="hsf_whats_new_chip_text">Wat is er nieuw</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in gebruik</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ inschakelen</string>
     <string name="hsf_dns_logs_chip_text">DNS-logboeken</string>
     <string name="hsf_network_logs_chip_text">Netwerk logs</string>

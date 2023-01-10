@@ -216,12 +216,10 @@
     <string name="hsf_start_dialog_message">Vous n’êtes qu’à un pas d’un Android sûr et sécurisé : Voyez instantanément l’activité du réseau, bloquez les sites web, les IP et les applications qui se comportent mal.</string>
     <string name="hsf_start_dialog_negative">Ignorer</string>
     <string name="hsf_whats_new_chip_text">Quoi de neuf</string>
-    <string name="hsf_blocklist_chip_text">%1$s listes de blocage</string>
     <string name="hsf_proxy_chip_text">Proxy actif</string>
     <string name="hsf_exclude_error">Exclusion impossible en mode confinement VPN</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy supprimé</string>
     <string name="hsf_whats_new_remove_text">Fermeture…</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS en cours d’utilisation</string>
     <string name="hsf_dns_logs_chip_text">Journaux DNS</string>
     <string name="hsf_proxy_chip_remove_text">Arrêt…</string>
     <string name="hsf_blocklist_updating_text">Activation…</string>

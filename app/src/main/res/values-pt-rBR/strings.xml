@@ -515,8 +515,6 @@
     <string name="firewall_status_block_unmetered">bloqueado em redes de banda larga (wifi)</string>
     <string name="hsf_start_dialog_positive">Começar</string>
     <string name="hsf_start_dialog_negative">Descartar</string>
-    <string name="hsf_blocklist_chip_text">%1$s listas de bloqueio configuradas</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS em uso</string>
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_dns_logs_chip_text">Registros de DNS</string>
     <string name="hsf_network_logs_chip_text">Registros da rede</string>
