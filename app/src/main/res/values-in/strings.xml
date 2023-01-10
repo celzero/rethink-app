@@ -10,7 +10,7 @@
     <string name="app_mode_wireguard">VPN</string>
     <string name="settings_enable_logs_desc">Menyimpan riwayat DNS dan Firewall secara lokal pada perangkat.</string>
     <string name="orbot">Orbot</string>
-    <string name="settings_orbot_heading">Atur Orbot</string>
+    <string name="settings_orbot_heading">Setel Orbot</string>
     <string name="always_on_dialog_positive">Berhenti</string>
     <string name="search_firewall_all_apps"><font size="12">Cari aplikasi berdasarkan uid, nama</font></string>
     <string name="settings_vpn_heading">vpn</string>
@@ -25,18 +25,18 @@
     <string name="finish">Selesai</string>
     <string name="app_mode_dns">DNS</string>
     <string name="orbot_stop_dialog_message">RethinkDNS berhenti meneruskan koneksi ke Orbot, tapi mungkin Orbot masih berjalan di latar belakang.</string>
-    <string name="settings_orbot_install_desc">Ketuk di sini untuk menginstal Orbot</string>
+    <string name="settings_orbot_install_desc">Ketuk di sini untuk memasang Orbot</string>
     <string name="app_name_rethink">Rethink</string>
     <string name="dns_act_log">Riwayat</string>
     <string name="download_update_dialog_trylater_title">Tidak dapat memperbaharui saat ini</string>
     <string name="settings_ip_network_heading">Pilih versi IP</string>
-    <string name="orbot_install_dialog_title">Instal Orbot\?</string>
+    <string name="orbot_install_dialog_title">Pasang Orbot\?</string>
     <string name="app_mode_firewall">Firewall</string>
     <string name="accessibility_service_label">RethinkDNS</string>
     <string name="always_on_dialog_heading">Matikan VPN Selalu-Menyala</string>
     <string name="configure_dns_connected_doh_status">DNS melalui HTTPS (DoH)</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
-    <string name="settings_orbot_desc">Orbot dalam mode tanpa-vpn dengan HTTPS/SOCKS5.</string>
+    <string name="settings_orbot_desc">Orbot menggunakan HTTPS/SOCKS5 dalam mode non-VPN.</string>
     <string name="always_on_dialog_stop_heading">VPN Selalu-Menyala</string>
     <string name="univ_firewall_dialog_title">Hapus aturan IP\?</string>
     <string name="connection_http3">HTTP3</string>
@@ -60,8 +60,8 @@
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
 \n%2$s</string>
-    <string name="orbot_install_dialog_positive">Instal</string>
-    <string name="settings_socks5_disabled_error">Sedang terhubung ke Orbot. Matikan untuk melanjutkan.</string>
+    <string name="orbot_install_dialog_positive">Pasang</string>
+    <string name="settings_socks5_disabled_error">Terhubung ke Orbot. Silahkan tutup dulu.</string>
     <string name="download_update_dialog_failure_title">Terjadi kesalahan!</string>
     <string name="always_on_dialog_stop_message">Rethink diatur sebagai VPN Selalu-Menyala. Apakah Anda yakin untuk menghentikan Rethink\?</string>
     <string name="univ_firewall_dialog_message">Jika aturan ini dihapus, IP ini dapat terhubung app manapun. Apakah Anda ingin melanjutkan\?</string>
@@ -261,7 +261,7 @@
     <string name="rt_download_desc">Unduh daftar blokir (sekitar 60MB) untuk menggunakan fitur ini.</string>
     <string name="about_github">Berkontribusi di GitHub</string>
     <string name="alert_permission_accessibility">Perijinan - Aksesibilitas</string>
-    <string name="settings_http_proxy_error_text2">Port tidak valid</string>
+    <string name="settings_http_proxy_error_text2">Port tidak sah</string>
     <string name="firewall_card_status_active">%1$s app</string>
     <string name="settings_socks5_dialog_hint_ip">Alamat IP</string>
     <string name="univ_firewall_rule_1">Blokir semua app ketika perangkat dikunci</string>
@@ -305,7 +305,7 @@
     <string name="univ_accessibility_dialog_negative">Tolak</string>
     <string name="brbs_backup_dialog_negative">Batal</string>
     <string name="dns_proxy_toast_parameter">Proksi DNS</string>
-    <string name="orbot_title">Orbot dan Proksi-proksi</string>
+    <string name="orbot_title">Orbot dan Proksi</string>
     <string name="ci_no_rule_desc">- Tanpa Aturan</string>
     <string name="settings_local_blocklist_in_use">%1$s daftar-daftar blokir sedang digunakan</string>
     <string name="dc_check_update_desc">Cek pembaharuan daftar blokir setiap <i>tiga</i> hari</string>
@@ -343,7 +343,7 @@
     <string name="fapps_filter_parent_all">Semua</string>
     <string name="dns_proxy_remove_dialog_message">Menghapus Proksi DNS dari konfigurasi tersimpan.</string>
     <string name="hsf_proxy_chip_text">Proksi aktif</string>
-    <string name="orbot_http_desc">Merekonendasikan app-app menggunakan proksi HTTP Orbot.</string>
+    <string name="orbot_http_desc">Merekomendasikan agar aplikasi menggunakan proksi HTTP Orbot.</string>
     <string name="dns_proxy_remove_success">Proksi DNS telah dihapus.</string>
     <string name="settings_notification_desc3">Tidak ada</string>
     <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
@@ -357,7 +357,7 @@
     <string name="cd_toast_added">Domain berhasil ditambahkan</string>
     <string name="cd_dialog_error_invalid_tld">Domain Tingkat Teratas tidak valid.</string>
     <string name="settings_network_all_networks">Gunakan semua jaringan yang tersedia (eksperimental)</string>
-    <string name="settings_socks_forwarding_default_desc">Meneruskan koneksi-koneksi ke titik-akhir SOCKS5.</string>
+    <string name="settings_socks_forwarding_default_desc">Meneruskan koneksi ke titik akhir SOCKS5.</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (bawaan)</string>
     <string name="ct_filter_parent_all">Semua</string>
     <string name="fapps_filter_categories_heading">Kategori</string>
@@ -377,7 +377,7 @@
     <string name="apps_info_title">Aplikasi</string>
     <string name="search_dns_logs"><font size="12">Mencari nama-nama domain atau IP</font></string>
     <string name="bsdl_domain_heading">Aturan domain</string>
-    <string name="settings_https_disabled_error">Terhubung dengan Orbot. Matikan untuk melanjutkan.</string>
+    <string name="settings_https_disabled_error">Terhubung ke Orbot. Silahkan tutup dulu.</string>
     <string name="settings_theme_dialog_themes_2">Terang</string>
     <string name="about_app_update_check">Cek pembaharuan aplikasi</string>
     <string name="univ_delete_firewall_dialog_title">Hapus semua aturan IP\?</string>
@@ -486,7 +486,7 @@
 \n</string>
     <string name="settings_http_proxy_error_text4">Koneksi ke host gagal. Coba lagi.</string>
     <string name="new_app_notification_content">RethinkDNS memblokir app yang baru saja diinstal, %1$s.</string>
-    <string name="firewall_status_whitelisted">memintas aturan-aturan universal firewall</string>
+    <string name="firewall_status_whitelisted">Aturan firewall universal dilewati (di-bypass)</string>
     <string name="vpn_profile_error">Tidak dapat meluncurkan profil VPN.</string>
     <string name="settings_socks_forwarding_desc">Meneruskan ke %1$s:%2$s, %3$s</string>
     <string name="refresh_complete">Sinkronisasi ulang daftar aplikasi selesai.</string>
@@ -517,7 +517,7 @@
     <string name="accessibility_service_description">RethinkDNS menggunakan layanan aksesibilitas untuk mendeteksi dan mem-firewall aplikasi-aplikasi latar belakang. RethinkDNS tidak mengumpulkan atau menjual informasi apapun.</string>
     <string name="orbot_socks5">Proksi hanya-TCP</string>
     <string name="settings_theme_dialog_themes_1">Diatur Sistem</string>
-    <string name="settings_notification_heading">Pilih tindakan atas notifikasi</string>
+    <string name="settings_notification_heading">Pilih notifikasi</string>
     <string name="hsf_blocklist_chip_text_no_blocklist">RDNS sedang digunakan</string>
     <string name="univ_firewall_rule_8">Blokir lalulintas port 80 (HTTP tak aman)</string>
     <string name="rbl_security">Keamanan</string>
@@ -568,7 +568,7 @@
     <string name="dns_proxy_negative_btn">Batal</string>
     <string name="ci_block">blokir</string>
     <string name="ci_delete">hapus</string>
-    <string name="orbot_bs_status_3">Meneruskan %1$s ke Orbot, Proksi HTTP pun telah diatur.</string>
+    <string name="orbot_bs_status_3">Meneruskan %1$s ke Orbot, Proksi HTTP telah diatur.</string>
     <string name="status_protected_with_http">terproteksi dengan proksi http</string>
     <string name="settings_proxy_header">proksi</string>
     <string name="dns_proxy_dialog_message">Nama app: %1$s
@@ -598,7 +598,7 @@
     <string name="info_dialog_rethink_toast_msg">Disalin sebagai URL RDNS+ DNS-melalui-HTTPS</string>
     <string name="configure_dns_connected_dns_proxy_status">Proksi DNS</string>
     <string name="dns_query_latency">%1$s mili-detik</string>
-    <string name="settings_orbot_disabled_error">Matikan proksi HTTP(S) dan/atau proksi SOCKS5 untuk melanjutkan pengaturan Tor-sebagai-proksi.</string>
+    <string name="settings_orbot_disabled_error">Matikan proksi HTTP(S) dan/atau proksi SOCKS5 untuk melanjutkan penyetelan Tor-sebagai-proksi.</string>
     <string name="dns_btm_latency_ms">%1$s mili-detik</string>
     <string name="orbot_install_dialog_message">Orbot membawa fitur-fitur dan fungsionalitas Tor ke Android.</string>
     <string name="notif_channel_desc_vpn_notification">Informasikan ketika RethinkDNS sedang aktif dan bekerja di latar belakang</string>
@@ -641,7 +641,7 @@
     <string name="rt_chip_update_available">Pembaharuan tersedia</string>
     <string name="ada_app_unmetered">Tak Terukur</string>
     <string name="firewall_rule_block_unmetered">Tak Terukur (WiFi)</string>
-    <string name="firewall_status_block_metered">Diblokir pada jaringan (Data Seluler) yang terukur</string>
+    <string name="firewall_status_block_metered">Diblokir pada jaringan yang terukur (Data Seluler)</string>
     <string name="firewall_rule_bypass_apprule_ip">IP yang dipintaskan/di-bypass (Aplikasi)</string>
     <string name="brbs_backup_dialog_title">Buat cadangan</string>
     <string name="cd_dns_crypt_title">server penyelesai</string>
@@ -651,8 +651,8 @@
     <string name="ci_bypass_universal_desc">- Memintas (Mem-bypass) secara universal</string>
     <string name="firewall_rule_block_metered">Terukur (Data Selular)</string>
     <string name="settings_notification_dialog_option_1">"
-\nJeda / Berhenti (default):
-\nMenampilkan dua tombol untuk menjeda atau menghentikan RethinkDNS dengan cepat."</string>
+\nJeda / Hentikan (bawaan):
+\nMenampilkan dua tombol, untuk menjeda atau menghentikan RethinkDNS dengan cepat."</string>
     <string name="hsf_proxy_chip_removed_toast">Proksi dihapus</string>
     <string name="firewall_rule_global_lockdown">Penguncian penuh</string>
     <string name="cd_dns_crypt_dialog_title">Tambahkan Penyelesai (Resolver) atau Jembatan-Penghubung (Relay) DNSCrypt</string>
@@ -665,7 +665,7 @@
     <string name="settings_custom_downloader_heading">Gunakan pengunduh bawaan aplikasi</string>
     <string name="bsdl_blocked_desc">%1$s telah terblokir %2$s</string>
     <string name="notification_action_stop_vpn">HENTIKAN</string>
-    <string name="firewall_status_block_unmetered">Diblokir pada jaringan (WiFi) yang tidak terukur</string>
+    <string name="firewall_status_block_unmetered">Diblokir pada jaringan yang tidak terukur (WiFi)</string>
     <string name="pause_text">terjeda</string>
     <string name="error_loading_log_file">Gagal memuat berkas catatan</string>
     <string name="dns_btm_resolved_doh">%1$s telah diselesaikan oleh %2$s</string>
@@ -680,14 +680,14 @@
 \n
 \nApakah Anda ingin melanjutkan\?</string>
     <string name="brbs_backup_desc">Cadangkan pengaturan-pengaturan app, jaringan dan catatan-catatan dns</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Aturan firewall universal yang diterapkan \"Pengguna\" memblokir <i>apliaksi</i> ini ketika mencoba terhubung dengan jaringan <i>Terukur</i> (Data Selular).<br/><br/> Masuklah ke tab <i>Universal</i> untuk mengubahnya.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Aturan firewall universal yang diterapkan \"Pengguna\" memblokir <i>aplikasi</i> ini ketika mencoba terhubung ke jaringan <i>Terukur</i> (Data Selular).<br/><br/> Masuklah ke tab <i>Universal</i> untuk mengubahnya.</string>
     <string name="hsf_exclude_error">Pengecualian tidak dimungkinkan dalam mode penguncian penuh VPN</string>
     <string name="firewall_rule_block_app_mobile_desc">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>aplikasi</i> ini ketika mencoba terhubung dengan jaringan yang <i>Terukur</i>.<br/><br/> Untuk mengubahnya, buka tab <i>Semua Aplikasi</i>.</string>
     <string name="slide_1_desc">RethinkDNS adalah peranti lunak dengan sumber terbuka yang didukung oleh program MVP Mozilla Builders.</string>
     <string name="bsct_block">Blokir, pintaskan, kecualikan, kunci penuh<u>aplikasi ini</u></string>
     <string name="fapps_info_dialog_message">Memblokir koneksi app-app ke jaringan. Membatasi akses ke jaringan membantu mencegah pemakaian data yang tanpa dasar, sekaligus menghemat baterai.
 \n
-\nAturan-aturan firewall Terukur (Selular) / Tak Terukur (WiFi) tidak akan dipatuhi jika:
+\nAturan-aturan firewall Terukur (Data Selular) / Tak Terukur (WiFi) tidak akan dipatuhi jika:
 \n
 \n1. VPN dalam mode terkunci penuh (misal, <i>Blokir koneksi-koneksi tanpa VPN</i> sedang aktif).
 \n
@@ -715,7 +715,7 @@
     <string name="firewall_rule_bypass_universal_ip">IP yang dipintaskan/di-bypass</string>
     <string name="local_blocklist_redownload">Terbaru!</string>
     <string name="contributors_dialog_title">Para pencipta</string>
-    <string name="settings_import_export_desc">Mencadangkan atau memulihkan data dan pengaturan-pengaturan app secara manual.</string>
+    <string name="settings_import_export_desc">Mencadangkan atau memulihkan data dan pengaturan aplikasi secara manual.</string>
     <string name="cd_whitelist_txt">Daftar putih</string>
     <string name="brbs_restore_dialog_positive">Pulihkan</string>
     <string name="brbs_restore_dialog_title">Pulihkan cadangan</string>
@@ -793,7 +793,7 @@
     <string name="about_app_contributors">Para pengembang</string>
     <string name="download_update_dialog_failure_message">Entah server kami sedang down atau koneksi tidak dapat dibuat. Silakan coba lagi setelah beberapa saat.</string>
     <string name="settings_lock_down_mode_desc">Tidak dapat mengizinkan pintasan, atau mengatur proksi ketika VPN berjalan dalam mode penguncian penuh. <u>Buka pengaturan VPN</u>.</string>
-    <string name="orbot_bs_status_4">Penyiapan Tor-sebagai-Proksi (Orbot) sekali klik.</string>
+    <string name="orbot_bs_status_4">Menyetel Tor-sebagai-Proksi (Orbot) sekali klik.</string>
     <string name="univ_firewall_no_ip_message">Tidak ada IP yang ditemukan. Ketuk entri pada layar Network Log untuk memblokir alamat IP individual.</string>
     <string name="settings_http_proxy_dialog_title">URL Server Khusus</string>
     <string name="settings_network_all_networks_desc">Bila diaktifkan, RethinkDNS menggunakan semua jaringan yang tersedia untuk terhubung ke Internet. Jika tidak, aplikasi RethinkDNS akan menggunakan jaringan mana pun yang dianggap <i>aktif</i> oleh Android.</string>
@@ -803,11 +803,11 @@
     <string name="about_mail_bugreport_subject">[RethinkDns]: Laporan bug</string>
     <string name="settings_ptrans_heading">Paksa keluar IPv4</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
-    <string name="orbot_explanation">Orbot adalah aplikasi proksi gratis yang memungkinkan aplikasi lain supaya internet menjadi tempat yang<u>lebih aman</u>.
-\nOrbot menggunakan<u>Tor</u> untuk mengenkripsi lalu lintas internet anda yang juga membantu <u>melewati penyensoran</u>dan sebagai bentuk pertahanan diri dari berbagai bentuk<u>pengawasan jaringan</u> yang bisa membahayakan kebebasan pribadi dan privasi.
-\n<u>Proksi TCP</u>: RethinkDNS meneruskan koneksi TCP ke Orbot ke semua aplikasi, kecuali aplikasi yang dikecualikan.
-\n<u>Proksi HTTP</u>: RethinkDNS<i>menyiapkan</i>Proksi HTTP, tetapi tidak memaksa aplikasi untuk menggunakannya. Biasanya, digunakan oleh browser seperti Chrome dan Firefox. Aplikasi yang menggunakan proksi HTTP(S) akan mengabaikan aturan Firewall dan DNS.</string>
-    <string name="settings_autostart_bootup_heading">Mulai otomatis saat dinyalakan (eksperimental)</string>
+    <string name="orbot_explanation">Orbot adalah aplikasi proksi gratis yang memungkinkan sambungan internet pada aplikasi menjadi tempat yang<u>lebih aman</u>.
+\nOrbot menggunakan<u>Tor</u> untuk mengenkripsi lalu lintas internet anda, juga membantu <u>melewati penyensoran</u>dan sebagai bentuk pertahanan diri dari berbagai macam<u>pengawasan jaringan</u> yang bisa membahayakan kebebasan pribadi dan privasi.
+\n<u>Proksi TCP</u>: RethinkDNS meneruskan koneksi TCP semua aplikasi menuju Orbot, kecuali aplikasi yang dikecualikan.
+\n<u>Proksi HTTP</u>: RethinkDNS<i>menyiapkan</i>Proksi HTTP, tetapi tidak memaksa semua aplikasi untuk menggunakannya. Biasanya, digunakan oleh browser seperti Chrome dan Firefox. Aplikasi yang menggunakan proksi HTTP(S) akan mengabaikan aturan Firewall dan DNS.</string>
+    <string name="settings_autostart_bootup_heading">Mulai otomatis saat device dinyalakan (eksperimental)</string>
     <string name="settings_app_list_default_app">Tidak ada</string>
     <string name="settings_autostart_bootup_desc">Pada saat perangkat dihidupkan, RethinkDNS akan memulai sendiri jika sebelumnya aplikasi ini tidak dimatikan.</string>
     <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Bimbingan orang tua</string>
@@ -821,7 +821,7 @@
     <string name="orbot_none_desc">Tidak satu pun dari yang di atas.</string>
     <string name="show_logs_disabled_dns_message">Pencatatan permintaan DNS telah dinonaktifkan. Untuk mengaktifkan kembali, pergi ke<i>Pengaturan</i> dan nyalakan <i>Aktifkan logging di perangkat.</i></string>
     <string name="show_logs_disabled_network_message">Pencatatan koneksi telah dinonaktifkan. Untuk mengaktifkan kembali, pergi ke<i>Pengaturan</i> dan nyalakan <i>Aktifkan logging di perangkat.</i></string>
-    <string name="settings_custom_downloader_desc">Jika dinonaktifkan, <i>Download Manager</i> bawaan Android akan digunakan.</string>
+    <string name="settings_custom_downloader_desc">Jika dinonaktifkan, <i>Manajer Unduhan</i> bawaan Android akan digunakan.</string>
     <string name="settings_theme_dialog_themes_4">Hitam Pekat</string>
     <string name="dns_card_latency_active">Latensi: %1$sms</string>
     <string name="hsf_uptime">(aktif sejak %1$s; protokol: %2$s)</string>
@@ -898,7 +898,7 @@
     <string name="accessibility_failure_toast">Layanan aksesibilitas RethinkDNS telah berhenti atau crash. Tidak lagi memblokir aplikasi di latar belakang.</string>
     <string name="firewall_rule_foreground_desc">Sambungan ini sudah diterapkan aturan firewall dikarenakan sumber aplikasi ini <i>tidak berada di latar depan</i>.<br/><br/> Untuk mengubah setingan ini, buka tab <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">Koneksi DNS ini dialihkan dan diteruskan ke titik akhir DNS yang dipilih pengguna.<br/><br/> Untuk mengubah, menonaktifkan<i>Mencegah kebocoran DNS</i> dari DNS <i>konfigurasi</i> layar.</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc">Sambungan ini diizinkan karena pengaturan <i>sekali-klik Tor-sebagai-proksi</i> melalui Orbot sedang berlangsung.</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc">Sambungan ini diizinkan karena penyetelan <i>Tor-sebagai-proksi sekali klik</i> melalui Orbot sedang berlangsung.</string>
     <string name="cd_blocked_initial">B</string>
     <string name="contributors_list">&lt;i&gt;Rethink Open Source Project&lt;/i&gt; berutang keberadaannya kepada para sukarelawan ini yang mencurahkan waktu berjam-jam yang tak terhitung jumlahnya untuk pengembangannya.&lt;br/&gt; &lt;br/&gt;🛡️ Aplikasi Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Mesin jaringan &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
 </resources>
