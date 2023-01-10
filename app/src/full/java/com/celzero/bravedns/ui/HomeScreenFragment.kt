@@ -98,7 +98,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         initializeClickListeners()
         observeVpnState()
         observeChipStates()
-        updateConfigureDnsChip(appConfig.getRemoteBlocklistCount())
+        updateConfigureDnsChip()
     }
 
     private fun initializeValues() {
@@ -162,11 +162,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun observeChipStates() {
         persistentState.remoteBlocklistCount.observe(viewLifecycleOwner) {
-            updateConfigureDnsChip(it)
+            updateConfigureDnsChip()
         }
     }
 
-    private fun updateConfigureDnsChip(count: Int) {
+    private fun updateConfigureDnsChip() {
         if (!isVpnActivated) {
             b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_chip_text_no_data)
             return
@@ -177,12 +177,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        b.fhsDnsConfigureChip.text =
-            if (count > 0) {
-                getString(R.string.hsf_blocklist_chip_text, count.toString())
-            } else {
-                getString(R.string.hsf_blocklist_chip_text_no_blocklist)
-            }
+        // now RDNS default do not have number of blocklists, so instead of showing the blocklist
+        // count, show the connected RDNS name. eg., RDNS Default, RDNS Plus
+        b.fhsDnsConfigureChip.text = persistentState.connectedDnsName
     }
 
     private fun canShowChips(): Boolean {
@@ -417,7 +414,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateCardsUi()
             handleQuickSettingsChips()
             syncDnsStatus()
-            updateConfigureDnsChip(0)
+            updateConfigureDnsChip()
         }
 
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
@@ -531,7 +528,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
             b.fhsCardDnsConnectedDns.text = it
-            updateConfigureDnsChip(appConfig.getRemoteBlocklistCount())
+            updateConfigureDnsChip()
         }
     }
 
