@@ -348,7 +348,7 @@
     <string name="settings_allow_bypass_heading">Разрешить обход</string>
     <string name="settings_ip_network_desc">Выбор между версиями протокола Интернета.</string>
     <string name="settings_socks5_heading">Настройка прокси-сервера SOCKS5</string>
-    <string name="whats_new_version_update">&lt;b&gt;Максимум усилий&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Представлен более приватный резолвер Rethink, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Пометка IPv6 как экспериментального; переключение на IPv4 по умолчанию.&lt;br/&gt; 3. &lt;i&gt;Новая функция&lt;/i&gt;: Резервное копирование и восстановление настроек приложений.&lt;br/&gt; 4. &lt;i&gt;Новая функция&lt;/i&gt;: Режим блокировки приложений.&lt;br/&gt; 5. &lt;i&gt;Новая функция&lt;/i&gt;: Универсальный режим блокировки.&lt;br/&gt; 6. &lt;i&gt;Новая функция&lt;/i&gt;: Применять правила брандмауэра по номерам портов.&lt;br/&gt; 7. &lt;i&gt;Новая возможность&lt;/i&gt;: Применять правила брандмауэра в пакетах.&lt;br/&gt; 8. Небольшое обновление пользовательского интерфейса.&lt;br/&gt; 9. Другие исправления памяти и сбоев.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Помощь в переводе этого приложения&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Полиглотический!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Повторная поддержка Android 6.&lt;br/&gt; 2. Весь новый пользовательский интерфейс RDNS+.&lt;br/&gt; 3. Все новые брандмауэры и сетевой движок.&lt;br/&gt; 4. &lt;i&gt;Новая функция&lt;/i&gt;: Переводы на более чем 15 языков.&lt;br/&gt; 5. &lt;i&gt;Новая функция&lt;/i&gt;: Адаптивные иконки.&lt;br/&gt; 6. &lt;i&gt;Новая функция&lt;/i&gt;: отображение доменных имен в сетевых журналах каждого приложения.&lt;br/&gt; 7. Исправьте отсутствующие уведомления на Android 13.&lt;br/&gt; 8. Исправлено неправильное поведение интеграции Orbot DNS.&lt;br/&gt; 9. Экран приложений теперь доступен в режиме только DNS.&lt;br/&gt; 10. Основные улучшения во встроенном менеджере загрузок.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Help перевести это приложение&lt;/a&gt;</string>
     <string name="fapps_info_dialog_message">Блокируйте подключение приложений к Интернету. Ограничение доступа к Интернету помогает предотвратить необоснованное использование данных, а также экономить заряд батареи.
 \n
 \nПравила брандмауэра в тарифицируемых (мобильная сеть) / нетарицифируемых (WiFi)сетях не будут соблюдаться, если::
@@ -882,4 +882,8 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Блокировка вредоносного ПО, фишинга, программ-вымогателей, криптософта и прочих угроз.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Блокировка вредоносного ПО, привлекающего внимание, программ шпионов и программ-страшилок.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s списки блокировок</string>
+    <string name="private_dns_error">Не удалось запустить частный экран DNS.</string>
+    <string name="ci_bypass_app_txt">Обход правил приложения</string>
+    <string name="ada_app_firewall">Брандмауэр</string>
+    <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Очистить логи</string>
 </resources>

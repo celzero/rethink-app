@@ -77,7 +77,7 @@
     <string name="about_website">Visite rethinkdns.com</string>
     <string name="about_faq">Ver perguntas frequentes</string>
     <string name="about_app">app</string>
-    <string name="about_settings_app_info">Detalhes do app</string>
+    <string name="about_settings_app_info">Detalhes do aplicativo</string>
     <string name="about_settings">sistema</string>
     <string name="about_whats_new">Novidades em %1$s</string>
     <string name="about_settings_vpn_profile">Perfil de VPN</string>
@@ -385,7 +385,7 @@
     <string name="settings_enable_logs_desc">Armazene os registros do DNS e Firewall localmente no dispositivo.</string>
     <string name="settings_enable_logs">Ativar registros no dispositivo</string>
     <string name="app_mode_choose">Escolha o modo</string>
-    <string name="whats_dialog_title">Novidades em v053k</string>
+    <string name="whats_dialog_title">O que há de novo na versão v053l</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_desc">Escolha entre as versões do Protocolos de internet.</string>
     <string name="settings_ptrans_heading">Forçar IPv4 egress</string>
@@ -454,7 +454,7 @@
     <string name="settings_http_proxy_toast_success">Proxy de HTTP está definido</string>
     <string name="settings_http_proxy_hostname">Nome do host</string>
     <string name="settings_http_proxy_port">Porta</string>
-    <string name="settings_dns_proxy_dialog_header">Definir proxy de SOCKS5 (TCP)</string>
+    <string name="settings_dns_proxy_dialog_header">Definir proxy SOCKS5 (TCP)</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Nome do host</string>
     <string name="settings_dns_proxy_dialog_app_desc">O app selecionado será excluído da VPN para permitir que ele faça conexões proxy por sua própria conta.</string>
@@ -523,7 +523,7 @@
     <string name="hsf_pause_lockdown_failure">Não é possível pausar: RethinkDNS no modo restrito</string>
     <string name="dns_logs_lifetime_queries">Consultas desde começou: %1$s</string>
     <string name="dns_logs_blocked_queries">Consultas bloqueadas: %1$s</string>
-    <string name="dc_dns_website_desc">Obtém ícones de sites via <i>duckduckgo.com</i>. Consome até 350 MB de espaço no disco</string>
+    <string name="dc_dns_website_desc">Obter ícones através de <i>nextdns.com</i> e <i>duckduckgo.com</i>. Consome mais de 350mb de espaço em disco</string>
     <string name="dc_dns_leaks_desc">Quando ativado, RethinkDNS captura todos pacotes na porta 53 e os encaminha para um endpoint de DNS definido pelo usuário</string>
     <string name="dc_check_update_heading">Avisar sobre atualizações das listas de bloqueio</string>
     <string name="dc_check_update_desc">Verifique por atualizações da lista de bloqueio a cada <i>três</i> dias</string>
@@ -852,7 +852,7 @@
     <string name="relative_time_today">Hoje</string>
     <string name="relative_time_yesterday">Ontem</string>
     <string name="settings_app_notification_a13_desc">Ativar permissão de notificação para o app</string>
-    <string name="about_privacy_policy">Política de privacidade</string>
+    <string name="about_privacy_policy">Ler a Política de Privacidade</string>
     <string name="hsf_notification_permission_failure">Ativar permissão de notificação em Configurações</string>
     <string name="about_app_translate">Traduzir</string>
     <string name="rt_filter_parent_selected">Selecionado</string>
@@ -867,6 +867,13 @@
     <string name="rt_filter_parent_all">Tudo</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / porta (universal)</string>
-    <string name="whats_new_version_update">&lt;b&gt;Esforço máximo&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Apresentando Rethink app um resolvedor mais privado, &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Selecione IPv6 como experimental; altere para IPv4 por padrão.&lt;br/&gt; 3. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Backup e restauração de configurações do app.&lt;br/&gt; 4. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Modo restrito do app.&lt;br /&gt; 5. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Modo restrito universal.&lt;br/&gt; 6. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Aplicação de regras do firewall para portas específicas.&lt;br/&gt; 7. &lt;i&gt; Nova funcionalidade&lt;/i&gt;: Aplicação de regras do firewall em massa.&lt;br/&gt; 8. Pequena mudança na interface do usuário.&lt;br/&gt; 9. Correções de problemas com memória e outras falhas.&lt;br/&gt;&lt;br/&gt; &lt;a href=https: //hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Ajude a traduzir este app&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Poliglótico!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Suporte retomado ao Android 6.&lt;br/&gt; 2. Nova interface.&lt;br/&gt; 3. Firewall e configurações de rede repaginados.&lt;br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: Traduções em mais de 15 idiomas.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: Ícones adaptativos.&lt;br/&gt; 6. &lt;i&gt;Novo recurso:&lt;/i&gt;: Nomes de domínio exibidos nos registros de rede por cada aplicativo.&lt;br/&gt; 7. Corrigida a falha na exibição de notificações no Android 13.&lt;br/&gt; 8. Corrigida a falha de integração com o Orbot.&lt;br/&gt; 9. Tela dos apps agora está disponível no modo somente DNS.&lt;br/&gt; 10. Melhorias no gerenciador de downloads integrado.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Ajude a traduzir este app&lt;/a&gt;</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
+    <string name="private_dns_dialog_heading">Desativar o DNS Privado</string>
+    <string name="private_dns_dialog_desc">As configurações do Rethink DNS são substituídas pelo DNS Privado do Android.
+\n 
+\nPara usar um servidor no Rethink DNS, vá até as configurações do Android e desative o DNS Privado.</string>
+    <string name="private_dns_error">Não foi possível iniciar a tela do DNS Privado.</string>
+    <string name="private_dns_dialog_positive">Vá para Configurações</string>
+    <string name="private_dns_dialog_negative">Dispensar</string>
 </resources>
