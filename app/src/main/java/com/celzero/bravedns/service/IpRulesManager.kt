@@ -115,7 +115,7 @@ object IpRulesManager : KoinComponent {
         return customIpRepository.getCustomIpsLiveData()
     }
 
-    fun removeFirewallRules(uid: Int, ipAddress: String, port: Int) {
+    fun removeIpRule(uid: Int, ipAddress: String, port: Int) {
         Log.i(LOG_TAG_FIREWALL, "IP Rules, remove/delete rule for ip: $ipAddress for uid: $uid")
         if (ipAddress.isEmpty()) {
             return
@@ -153,6 +153,7 @@ object IpRulesManager : KoinComponent {
         )
         io {
             customIp.status = IpRuleStatus.BYPASS_UNIVERSAL.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -166,6 +167,7 @@ object IpRulesManager : KoinComponent {
         )
         io {
             customIp.status = IpRuleStatus.TRUST.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -179,6 +181,7 @@ object IpRulesManager : KoinComponent {
         )
         io {
             customIp.status = IpRuleStatus.NONE.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -218,6 +221,7 @@ object IpRulesManager : KoinComponent {
         )
         io {
             customIp.status = IpRuleStatus.BLOCK.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -325,6 +329,9 @@ object IpRulesManager : KoinComponent {
     fun deleteIpRulesByUid(uid: Int) {
         io {
             customIpRepository.deleteIpRulesByUid(uid)
+            appIpRules = appIpRules.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
+            wildCards = wildCards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
+            ipRulesLookupCache.invalidateAll()
         }
     }
 
@@ -426,7 +433,7 @@ object IpRulesManager : KoinComponent {
     private fun subnetMatch(uid: Int, hostName: HostName): IpRuleStatus {
         // TODO: subnet precedence should be taken care of.
         // TODO: IP/16 and IP/24 is added to the rule.
-        wildCards.keys.forEach { w  ->
+        wildCards.keys.forEach { w ->
             val wc = w.hostName
             if (wc.address.contains(hostName.address)) {
                 val rule = wildCards[w]

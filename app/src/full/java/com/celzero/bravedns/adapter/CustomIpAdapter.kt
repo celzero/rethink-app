@@ -17,6 +17,8 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.text.format.DateUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,7 +77,12 @@ class CustomIpAdapter(private val context: Context) :
         private lateinit var customIp: CustomIp
         fun update(ci: CustomIp) {
             customIp = ci
-            b.customIpLabelTv.text = "${customIp.ipAddress}:${customIp.port}"
+            b.customIpLabelTv.text =
+                context.getString(
+                    R.string.ci_ip_label,
+                    customIp.ipAddress,
+                    customIp.port.toString()
+                )
             b.customIpToggleGroup.tag = 1
             val status = findSelectedIpRule(customIp.status) ?: return
 
@@ -280,23 +287,57 @@ class CustomIpAdapter(private val context: Context) :
         }
 
         private fun updateStatusUi(status: IpRulesManager.IpRuleStatus) {
+            val now = System.currentTimeMillis()
+            val uptime = System.currentTimeMillis() - customIp.modifiedDateTime
+            // returns a string describing 'time' as a time relative to 'now'
+            val time =
+                DateUtils.getRelativeTimeSpanString(
+                    now - uptime,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE
+                )
+            Log.d(
+                "TEST",
+                "TEST: now: $now, ${Utilities.humanReadableTime(now)}, ${customIp.modifiedDateTime}, ${Utilities.humanReadableTime(customIp.modifiedDateTime)}, $time"
+            )
             when (status) {
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     b.customIpStatusIcon.text =
                         context.getString(R.string.ci_bypass_universal_initial)
-                    b.customIpStatusTv.text = context.getString(R.string.ci_bypass_universal_txt)
+                    b.customIpStatusTv.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            context.getString(R.string.ci_bypass_universal_txt),
+                            time
+                        )
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     b.customIpStatusIcon.text = context.getString(R.string.ci_blocked_initial)
-                    b.customIpStatusTv.text = context.getString(R.string.ci_blocked_txt)
+                    b.customIpStatusTv.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            context.getString(R.string.ci_blocked_txt),
+                            time
+                        )
                 }
                 IpRulesManager.IpRuleStatus.NONE -> {
                     b.customIpStatusIcon.text = context.getString(R.string.ci_no_rule_initial)
-                    b.customIpStatusTv.text = context.getString(R.string.ci_no_rule_txt)
+                    b.customIpStatusTv.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            context.getString(R.string.ci_no_rule_txt),
+                            time
+                        )
                 }
                 IpRulesManager.IpRuleStatus.TRUST -> {
                     b.customIpStatusIcon.text = context.getString(R.string.ci_trust_initial)
-                    b.customIpStatusTv.text = context.getString(R.string.ci_trust_txt)
+                    b.customIpStatusTv.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            context.getString(R.string.ci_trust_txt),
+                            time
+                        )
                 }
             }
 
@@ -330,7 +371,7 @@ class CustomIpAdapter(private val context: Context) :
             builder.setPositiveButton(
                 context.getString(R.string.univ_ip_delete_individual_positive)
             ) { _, _ ->
-                IpRulesManager.removeFirewallRules(customIp.uid, customIp.ipAddress, customIp.port)
+                IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port)
                 Toast.makeText(
                         context,
                         context.getString(
