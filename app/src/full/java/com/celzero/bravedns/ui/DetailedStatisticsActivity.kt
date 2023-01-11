@@ -58,7 +58,7 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
 
         val recyclerAdapter = SummaryStatisticsAdapter(this, persistentState, appConfig, type)
 
-        get(type).observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
+        handleStatType(type).observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
 
         // remove the view if there is no data
         recyclerAdapter.addLoadStateListener {
@@ -73,27 +73,33 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
         b.dsaRecycler.adapter = recyclerAdapter
     }
 
-    private fun get(
+    private fun handleStatType(
         type: SummaryStatisticsFragment.SummaryStatisticsType
     ): LiveData<PagingData<AppConnection>> {
         viewModel.setData(type)
         return when (type) {
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
+                b.dsaTitle.text = getString(R.string.ssv_app_network_activity_heading)
                 viewModel.getAllAllowedAppNetworkActivity
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
+                b.dsaTitle.text = getString(R.string.ssv_app_blocked_heading)
                 viewModel.getAllBlockedAppNetworkActivity
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                b.dsaTitle.text = getString(R.string.ssv_most_contacted_domain_heading)
                 viewModel.getAllContactedDomains
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
+                b.dsaTitle.text = getString(R.string.ssv_most_blocked_domain_heading)
                 viewModel.getAllBlockedDomains
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
+                b.dsaTitle.text = getString(R.string.ssv_most_contacted_ips_heading)
                 viewModel.getAllContactedIps
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                b.dsaTitle.text = getString(R.string.ssv_most_blocked_ips_heading)
                 viewModel.getAllBlockedIps
             }
         }
