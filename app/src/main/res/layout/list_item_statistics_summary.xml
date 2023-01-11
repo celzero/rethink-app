@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/background"
-    android:minHeight="50dp"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -13,6 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
+        android:minHeight="50dp"
+        android:background="?android:attr/selectableItemBackground"
         android:animateLayoutChanges="true">
 
         <LinearLayout
@@ -115,6 +116,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0.75dp"
-        android:layout_marginTop="3dp"
+        android:paddingTop="3dp"
         android:background="?attr/divider" />
 </LinearLayout>

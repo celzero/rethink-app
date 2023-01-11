@@ -3,13 +3,13 @@
     android:id="@+id/acd_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="50dp"
     android:background="?android:attr/selectableItemBackground"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="50dp"
         android:animateLayoutChanges="true">
 
         <TextView
