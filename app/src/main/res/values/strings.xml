@@ -286,19 +286,17 @@
     <string name="app_mode_choose">Choose mode</string>
 
     <string name="whats_dialog_title">What\'s new in v053m</string>
-    <string name="whats_new_version_name">🌎&#128330; World Student\'s Day (15 Oct) &#128330;🌎</string>
-    <string name="whats_new_version_update"><![CDATA[<b>Polyglottic!</b><br/><br/>
-        1. Re-support Android 6.<br/>
-        2. All new RDNS+ UI.<br/>
-        3. All new firewall and network engine.<br/>
-        4. <i>New feature</i>: Translations in 15+ languages.<br/>
-        5. <i>New feature</i>: Adaptive icons.<br/>
-        6. <i>New feature</i>: Show domain names in per app network logs.<br/>
-        7. Fix missing notifications on Android 13.<br/>
-        8. Fix misbehaving Orbot DNS integration.<br/>
-        9. Apps screen now accessible in DNS-only mode.<br/>
-        10. Major improvements to built-in Download Manager.<br/><br/>
-        <a href="https://hosted.weblate.org/projects/rethink-dns-firewall/app/">Help translate this app</a>]]>
+    <string name="whats_new_version_update"><![CDATA[<b>RA Fisher!</b><br/><br/>
+        1. <i>New feature</i>: All new Statistics screen.<br/>
+        2. <i>New feature</i>: Secure this app using screen lock.<br/>
+        3. <i>New feature</i>: Choose your preferred language from app settings.<br/>
+        4. <i>New feature</i>: RDNS+ <i>Simple</i> view shows well-curated lists only.<br/>
+        5. Rename: <i>App lockdown</i> mode is now <i>Isolate</i> mode.<br/>
+        6. Rename: <i>Bypass app rules</i> is now called <i>Trust</i> IP.<br/>
+        7. Fix crash when Rethink is installed in a Work Profile.<br/>
+        8. Now deleting app-specific rules when the app is uninstalled.<br/>
+        9. And other minor UI changes and bug fixes.<br/><br/>
+        <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 
     <string name="connection_http3">HTTP3</string>
@@ -472,12 +470,13 @@
     <string name="settings_notification_dialog_option_2">\nDNS / DNS + Firewall:\nShows two buttons to quickly switch between the battery-saver DNS mode and the regular DNS + Firewall mode.</string>
     <string name="settings_notification_dialog_option_3">\nNone:\nShows no button.\n</string>
 
-    <string name="settings_locale_heading">Language</string>
+    <string name="settings_locale_heading">Change Language</string>
     <string name="settings_locale_desc">Choose your preferred language</string>
     <string name="settings_locale_dialog_title">Choose your preferred language</string>
+    <string name="settings_locale_dialog_neutral">Help translate this app</string>
 
-    <string name="settings_biometeric_heading">Biometric Authentication</string>
-    <string name="settings_biometric_desc">Enable / Disable biometric authentication</string>
+    <string name="settings_biometeric_heading">Enable app lock</string>
+    <string name="settings_biometric_desc">Secure this app using your screen lock</string>
 
     <string name="settings_selected_theme">Current theme: %1$s</string>
 
@@ -541,8 +540,6 @@
 
     <string name="hsf_whats_new_chip_text">What\'s new</string>
     <string name="hsf_proxy_chip_text">Proxy active</string>
-    <string name="hsf_blocklist_chip_text">%1$s blocklists</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in-use</string>
     <string name="hsf_blocklist_chip_text_no_data">Enable RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS logs</string>
     <string name="hsf_network_logs_chip_text">Network logs</string>
@@ -899,16 +896,16 @@
     <string name="fapps_metered_unblock_dialog_message">Allow connections on metered (mobile) network for <i>listed</i> apps?</string>
 
     <string name="fapps_bypass_block_dialog_title">Bypass apps</string>
-    <string name="fapps_bypass_block_dialog_message">Bypass below <i>listed</i> apps?</string>
+    <string name="fapps_bypass_block_dialog_message">Bypass Universal firewall rules for <i>listed</i> apps?</string>
 
     <string name="fapps_unblock_dialog_title">Allow apps</string>
     <string name="fapps_unblock_dialog_message">Allow connections for <i>listed</i> apps?</string>
 
     <string name="fapps_exclude_block_dialog_title">Exclude apps</string>
-    <string name="fapps_exclude_block_dialog_message">Exclude the <i>listed</i> apps from VPN?</string>
+    <string name="fapps_exclude_block_dialog_message">Exclude <i>listed</i> apps from DNS and Firewall?</string>
 
     <string name="fapps_isolate_block_dialog_title">Isolate apps</string>
-    <string name="fapps_isolate_block_dialog_message">Apply Isolate for <i>listed</i> apps?</string>
+    <string name="fapps_isolate_block_dialog_message">Isolate <i>listed</i> apps?</string>
 
     <string name="fapps_lockdown_hint">Vpn is in lockdown mode. Firewall will not honour Metered / Unmetered rules.</string>
     <string name="fapps_all_network_hint"><u>Use all networks</u> is enabled. Firewall will not honour Metered / Unmetered rules.</string>
@@ -1101,7 +1098,7 @@
 
     <!-- custom IP -->
     <string name="ci_dialog_title">Add IP / Port Rule</string>
-    <string name="ci_dialog_desc">Allow (bypass) or block IP address, IP subnet (range), Port. Example: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
+    <string name="ci_dialog_desc">Allow (bypass) or block IP address, IP subnet (range), Port. Example: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ci_dialog_edittext_hint">IP address, subnet or port</string>
     <string name="ci_dialog_error_invalid_ip">Invalid IP address, subnet or port.</string>
 
@@ -1128,6 +1125,8 @@
     <string name='ci_bypass_universal'>Bypass Universal</string>
     <string name="ci_trust_rule">Trust</string>
     <string name="ci_delete">delete</string>
+    <string name="ci_desc" translatable="false">%1$s %2$s</string>
+    <string name="ci_ip_label" translatable="false">%1$s:%2$s</string>
 
     <!-- app info -->
     <string name="ada_noapp_dialog_title">App Info not found</string>
@@ -1315,5 +1314,6 @@
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">most contacted ips</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">most blocked ips</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Start Rethink to proceed</string>
+    <string name="ssv_see_more">See more…</string>
 
 </resources>
