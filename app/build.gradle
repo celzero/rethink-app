@@ -129,7 +129,7 @@ dependencies {
     // For liveData implementation
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
 
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
