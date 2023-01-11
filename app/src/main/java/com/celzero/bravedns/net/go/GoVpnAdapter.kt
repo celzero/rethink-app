@@ -21,6 +21,7 @@ import android.content.res.Resources
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.Companion.dnscryptRelaysToRemove
@@ -28,7 +29,6 @@ import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEFAULT_DOH_URL
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG

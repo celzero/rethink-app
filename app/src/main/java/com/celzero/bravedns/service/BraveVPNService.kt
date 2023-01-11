@@ -59,7 +59,6 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIB
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.getAccentColor
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
@@ -73,16 +72,16 @@ import inet.ipaddr.IPAddressString
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Blocker
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Blocker
 
 class BraveVPNService :
     VpnService(),

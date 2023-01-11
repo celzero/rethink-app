@@ -16,7 +16,6 @@
 package com.celzero.bravedns.database
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
 import android.util.Log
@@ -26,8 +25,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.celzero.bravedns.database.LogDatabase.Companion.isFreshInstall
-import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 
 @Database(entities = [ConnectionTracker::class, DnsLog::class], version = 2, exportSchema = false)
@@ -63,7 +60,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addCallback(roomCallback)
                 .build()
         }
-        
+
         private val roomCallback: Callback =
             object : Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {

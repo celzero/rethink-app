@@ -71,6 +71,8 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
+import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -79,8 +81,6 @@ import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
-import kotlinx.coroutines.launch
-import xdns.Xdns
 
 class Utilities {
 

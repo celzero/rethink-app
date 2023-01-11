@@ -46,15 +46,15 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isNonApp
 import com.google.common.collect.Sets
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 
 class RefreshDatabase
 internal constructor(
@@ -385,9 +385,8 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context,
-            Utilities.getAccentColor(persistentState.theme)
-        )
+        builder.color =
+            ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show
         // there.
@@ -464,9 +463,8 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context,
-            Utilities.getAccentColor(persistentState.theme)
-        )
+        builder.color =
+            ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
 
         val openIntent1 =
             makeNewAppVpnIntent(

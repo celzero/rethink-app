@@ -16,15 +16,14 @@
 package com.celzero.bravedns.data
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
@@ -212,7 +211,6 @@ internal constructor(
         fun isSystemDns(): Boolean {
             return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
         }
-
     }
 
     enum class TunProxyMode(val mode: Long) {

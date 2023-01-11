@@ -16,7 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
 @Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
 class AppInfo {

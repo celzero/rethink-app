@@ -24,7 +24,6 @@ import android.os.IBinder
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.PrepareVpnActivity
 
 @RequiresApi(api = Build.VERSION_CODES.N)

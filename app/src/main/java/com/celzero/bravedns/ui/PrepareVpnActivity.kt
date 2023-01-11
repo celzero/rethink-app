@@ -25,12 +25,11 @@ class PrepareVpnActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) {
-                VpnController.start(this)
+                if (it.resultCode == RESULT_OK) {
+                    VpnController.start(this)
+                }
+                finish()
             }
-            finish()
-        }.launch(
-            VpnService.prepare(this)
-        )
+            .launch(VpnService.prepare(this))
     }
 }

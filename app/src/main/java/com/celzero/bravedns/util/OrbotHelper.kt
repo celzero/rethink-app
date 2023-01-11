@@ -42,8 +42,8 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 
 /**
  * One-click Orbot setup.

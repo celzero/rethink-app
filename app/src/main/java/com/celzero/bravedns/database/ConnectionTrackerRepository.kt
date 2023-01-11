@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.database
 
-import com.celzero.bravedns.data.AppConnection
-
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
     suspend fun insert(connectionTracker: ConnectionTracker) {
