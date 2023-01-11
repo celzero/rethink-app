@@ -629,9 +629,7 @@
     <string name="hsf_whats_new_chip_text">Was gibt es Neues</string>
     <string name="hsf_start_dialog_message">Sie sind einen Schritt von einem sicheren Android entfernt: Kontrollieren Sie Netzwerkaktivitäten, blockieren Sie Webseiten, IP-Adressen oder Apps mit unerwünschten Verhaltensweisen.</string>
     <string name="hsf_proxy_chip_text">Proxy aktiviert</string>
-    <string name="hsf_blocklist_chip_text">%1$s Sperrlisten</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ aktivieren</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS aktiviert</string>
     <string name="hsf_dns_logs_chip_text">DNS Logs</string>
     <string name="hsf_network_logs_chip_text">Netzwerk Logs</string>
     <string name="hsf_exclude_error">Ausschließen im VPN-Lockdown-Modus nicht möglich</string>
@@ -878,8 +876,6 @@
     <string name="fapps_metered_block_dialog_message">Blockieren Sie Verbindungen im gebührenpflichtigen (mobilen) Netz für die auf <i>aufgeführten</i> Apps\?</string>
     <string name="fapps_metered_unblock_dialog_title">Erlaubt im kostenpflichtigen</string>
     <string name="fapps_metered_unblock_dialog_message">Erlauben Sie Verbindungen im gebührenpflichtigen (mobilen) Netz für <i>gelistete Anwendungen</i>\?</string>
-    <string name="fapps_metered_positive">Übernehmen</string>
-    <string name="fapps_metered_negative">Abbrechen</string>
     <string name="rules_load_failure_desc">Keine Firewall-Regeln gefunden</string>
     <string name="rules_load_failure_reload">neu laden</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 Proxy</string>

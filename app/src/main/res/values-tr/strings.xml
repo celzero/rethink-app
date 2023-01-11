@@ -876,9 +876,6 @@
     <string name="private_dns_dialog_positive">Ayarlara git</string>
     <string name="private_dns_dialog_negative">Yok say</string>
     <string name="private_dns_error">Özel dns ekranı başlatılamadı.</string>
-    <string name="ci_bypass_app_txt">Uygulama kurallarını atlayın</string>
-    <string name="ci_bypass_app_desc">- Uygulama kurallarını atlar</string>
-    <string name="ci_bypass_app_initial">UA</string>
     <string name="ada_app_firewall">Güvenlik Duvarı</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Günlükleri temizleyin</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Bu uygulamayla ilgili tüm günlükleri temizleyin.</string>
