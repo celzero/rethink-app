@@ -30,6 +30,7 @@ data class FileTag(
     var urls: List<String>,
     val show: Int,
     var pack: List<String> = arrayListOf(),
+    var level: List<Int>? = arrayListOf(),
     val entries: Int,
     var simpleTagId: Int = INVALID_SIMPLE_TAG_ID,
     var isSelected: Boolean = false

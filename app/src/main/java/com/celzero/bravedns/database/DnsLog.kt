@@ -16,16 +16,15 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Utilities
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Entity(tableName = "DNSLogs")
+@Entity(tableName = "DnsLogs", indices = [Index(value = arrayOf("queryStr"), unique = false)])
 class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0

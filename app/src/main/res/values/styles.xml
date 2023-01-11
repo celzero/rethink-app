@@ -60,6 +60,8 @@
         <item name="selectedCardBg">@color/selectedCardBg</item>
 
         <item name="chipBackgroundColor">@color/chipBackgroundColor</item>
+        <item name="chipBgColorNeutral">@color/chipBgNeutral</item>
+        <item name="chipTextNeutral">@color/chipTextNeutral</item>
         <item name="chipBgColorPositive">@color/chipBgPositive</item>
         <item name="chipTextPositive">@color/chipTextPositive</item>
         <item name="chipBgColorNegative">@color/chipBgNegative</item>
@@ -129,6 +131,8 @@
         <item name="chipTextPositive">@color/chipTextPositiveLight</item>
         <item name="chipBgColorNegative">@color/chipBgNegativeLight</item>
         <item name="chipTextNegative">@color/chipTextNegativeLight</item>
+        <item name="chipBgColorNeutral">@color/chipBgNeutralLight</item>
+        <item name="chipTextNeutral">@color/chipTextNeutralLight</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalLight</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightLight</item>
 
@@ -196,6 +200,8 @@
         <item name="chipTextPositive">@color/chipTextPositiveBlack</item>
         <item name="chipBgColorNegative">@color/chipBgNegativeBlack</item>
         <item name="chipTextNegative">@color/chipTextNegativeBlack</item>
+        <item name="chipBgColorNeutral">@color/chipBgNeutralBlack</item>
+        <item name="chipTextNeutral">@color/chipTextNeutralBlack</item>
         <item name="chipColorBgNormal">@color/chipColorBgNormalBlack</item>
         <item name="chipColorBgHighlight">@color/chipColorBgHighlightBlack</item>
 

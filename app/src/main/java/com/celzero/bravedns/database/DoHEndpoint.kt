@@ -39,8 +39,7 @@ class DoHEndpoint {
     }
 
     override fun hashCode(): Int {
-        var result = 0
-        result += result * 31 + this.dohURL.hashCode()
+        var result = this.dohURL.hashCode()
         result += result * 31 + this.isSelected.hashCode()
         return result
     }

@@ -32,16 +32,17 @@ import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities.Companion.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
+import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
 
 class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentDnsLogsBinding::bind)
@@ -56,7 +57,13 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private val persistentState by inject<PersistentState>()
 
     companion object {
-        fun newInstance() = DnsLogFragment()
+        fun newInstance(param: String): DnsLogFragment {
+            val args = Bundle()
+            args.putString(Constants.SEARCH_QUERY, param)
+            val fragment = DnsLogFragment()
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     enum class DnsLogFilter(val id: Int) {
@@ -69,6 +76,11 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeDnsStats()
+        if (arguments != null) {
+            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
+            b.queryListSearch.setQuery(query, true)
+        }
+
     }
 
     private fun initView() {

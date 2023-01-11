@@ -1,6 +1,6 @@
 plugins {
-  // to download blocklists for the headless variant
-  id "de.undercouch.download" version "5.3.0"
+    // to download blocklists for the headless variant
+    id "de.undercouch.download" version "5.3.0"
 }
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -45,17 +45,12 @@ android {
         jvmTarget = "11"
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 23 // for version name 053l
-        versionName "053l"
+        versionCode 24 // for version name 053m
+        versionName "053m"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -122,7 +117,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
 
     fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    fullImplementation 'androidx.appcompat:appcompat:1.5.1'
+    fullImplementation 'androidx.appcompat:appcompat:1.7.0-alpha01'
     fullImplementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -134,7 +129,7 @@ dependencies {
     // For liveData implementation
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
 
-    implementation 'com.google.code.gson:gson:2.9.1'
+    implementation 'com.google.code.gson:gson:2.10'
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -148,9 +143,9 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation "androidx.fragment:fragment-ktx:1.5.4"
+    fullImplementation 'androidx.fragment:fragment-ktx:1.5.5'
     implementation 'com.google.android.material:material:1.7.0'
-    fullImplementation "androidx.viewpager2:viewpager2:1.0.0"
+    fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     fullImplementation 'com.squareup.okhttp3:okhttp:4.10.0'
     fullImplementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0'
@@ -194,7 +189,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 
-    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
+    leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+
+    fullImplementation 'androidx.biometric:biometric:1.1.0'
 
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
 }
@@ -209,10 +206,10 @@ task downloadBlocklists(type: Download) {
     // from the final segment of url's path
     // github.com/michel-kraemer/gradle-download-task/blob/64d1ce32/src/main/java/de/undercouch/gradle/tasks/download/DownloadAction.java#L731
     def sources = [
-      'https://dl.rethinkdns.com/blocklists/filetag.json',
-      'https://dl.rethinkdns.com/basicconfig/basicconfig.json',
-      'https://dl.rethinkdns.com/rank/rd.txt',
-      'https://dl.rethinkdns.com/trie/td.txt',
+            'https://dl.rethinkdns.com/blocklists/filetag.json',
+            'https://dl.rethinkdns.com/basicconfig/basicconfig.json',
+            'https://dl.rethinkdns.com/rank/rd.txt',
+            'https://dl.rethinkdns.com/trie/td.txt',
     ]
     src(sources)
     dest assetsDir

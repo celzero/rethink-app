@@ -17,14 +17,12 @@ package com.celzero.bravedns.util
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
@@ -49,11 +47,11 @@ import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_HEADLESS
@@ -73,6 +71,8 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
+import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -81,8 +81,6 @@ import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
-import kotlinx.coroutines.launch
-import xdns.Xdns
 
 class Utilities {
 
@@ -320,19 +318,6 @@ class Utilities {
             return port in 65535 downTo 0
         }
 
-        fun getThemeAccent(context: Context): Int {
-            return if (isDarkSystemTheme(context)) {
-                R.color.accentGoodBlack
-            } else {
-                R.color.accentBadLight
-            }
-        }
-
-        private fun isDarkSystemTheme(context: Context): Boolean {
-            return context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-                Configuration.UI_MODE_NIGHT_YES
-        }
-
         fun openVpnProfile(context: Context) {
             try {
                 val intent =
@@ -402,6 +387,38 @@ class Utilities {
                 Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
             }
             return metadata
+        }
+
+        fun isFreshInstall(context: Context): Boolean {
+            try {
+                with(
+                    if (isAtleastT()) {
+                        context.packageManager.getPackageInfo(
+                            context.packageName,
+                            PackageManager.PackageInfoFlags.of(
+                                PackageManager.GET_META_DATA.toLong()
+                            )
+                        )
+                    } else {
+                        context.packageManager.getPackageInfo(
+                            context.packageName,
+                            PackageManager.GET_META_DATA
+                        )
+                    }
+                ) {
+                    return firstInstallTime == lastUpdateTime
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                // assign value as true as the package name not found, should not be the
+                // case but some devices seems to return package not found immediately
+                // after install
+                Log.w(
+                    LOG_TAG_APP_DB,
+                    "Application not available ${context.packageName}" + e.message,
+                    e
+                )
+                return true
+            }
         }
 
         fun copy(from: String, to: String): Boolean {
@@ -729,6 +746,16 @@ class Utilities {
             return CharMatcher.`is`('.').trimTrailingFrom(s)
         }
 
+        fun getAccentColor(appTheme: Int): Int {
+            return when (appTheme) {
+                Themes.SYSTEM_DEFAULT.id -> R.color.accentGoodBlack
+                Themes.DARK.id -> R.color.accentGood
+                Themes.LIGHT.id -> R.color.accentGoodLight
+                Themes.TRUE_BLACK.id -> R.color.accentGoodBlack
+                else -> R.color.accentGoodBlack
+            }
+        }
+
         fun fetchColor(context: Context, attr: Int): Int {
             val typedValue = TypedValue()
             val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attr))
@@ -761,15 +788,12 @@ class Utilities {
                     R.attr.defaultToggleBtnTxt
                 } else if (attr == R.color.accentGood) {
                     R.attr.accentGood
+                } else if (attr == R.color.accentBad) {
+                    R.attr.accentBad
                 } else {
                     R.attr.chipBgColorPositive
                 }
-            val typedValue = TypedValue()
-            val a: TypedArray =
-                context.obtainStyledAttributes(typedValue.data, intArrayOf(attributeFetch))
-            val color = a.getColor(0, 0)
-            a.recycle()
-            return color
+            return fetchColor(context, attributeFetch)
         }
 
         // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619

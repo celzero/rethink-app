@@ -10,16 +10,6 @@
         android:padding="15dp">
 
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="14dp"
-            android:text="@string/whats_new_version_name"
-            android:textColor="?attr/primaryTextColor"
-            android:visibility="gone"
-            android:textSize="@dimen/heading_font_text_view"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/desc"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -48,9 +48,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getAllDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsLogDAO.getDnsLogsByName("%$filter%")
-            }
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getDnsLogsByName("%$filter%") }
             .liveData
             .cachedIn(viewModelScope)
     }

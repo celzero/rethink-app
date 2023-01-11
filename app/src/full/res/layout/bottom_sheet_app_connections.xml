@@ -60,31 +60,31 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/bsac_bypass_app_rules"
+        android:id="@+id/bsac_trust_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="@string/bsac_bypass_app_rules"
-        app:drawableEndCompat="@drawable/ic_bypass"
+        android:text="@string/bsac_trust"
+        app:drawableEndCompat="@drawable/ic_trust_ip"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
 
 
     <TextView
-        android:id="@+id/bsac_gopass_app_rules"
+        android:id="@+id/bsac_distrust_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="@string/bsac_go_pass_app_rules"
+        android:text="@string/bsac_distrust"
         android:textColor="?attr/primaryTextColor"
-        app:drawableEndCompat="@drawable/ic_bypass"
+        app:drawableEndCompat="@drawable/ic_trust_ip"
         android:textSize="@dimen/extra_large_font_text_view"
         android:visibility="gone" />
 

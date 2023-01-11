@@ -24,6 +24,8 @@
     <attr name="chipTextPositive" format="reference" />
     <attr name="chipBgColorNegative" format="reference" />
     <attr name="chipTextNegative" format="reference" />
+    <attr name="chipTextNeutral" format="reference" />
+    <attr name="chipBgColorNeutral" format="reference" />
     <attr name="chipColorBgNormal" format="reference" />
     <attr name="chipColorBgHighlight" format="reference" />
     <attr name="controlActivated" format="reference" />

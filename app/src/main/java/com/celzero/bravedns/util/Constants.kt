@@ -124,8 +124,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v053l)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1669931764879
+        // default filetag.json for remote blocklist (stored in assets folder) (v053m)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1672610161204
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"
@@ -160,6 +160,9 @@ class Constants {
 
         // constants used as part of intent to load the viewpager's screen
         const val VIEW_PAGER_SCREEN_TO_LOAD = "view_pager_screen"
+
+        // constants used as part of intent to load the search query
+        const val SEARCH_QUERY = "search_query"
 
         // default custom http proxy port number
         const val HTTP_PROXY_PORT = "8118"
@@ -257,5 +260,8 @@ class Constants {
         // The UID used to be generic uid used to block IP addresses which are intended to
         // block for all the applications.
         const val UID_EVERYBODY = -1000
+
+        // to handle the "dead" packs
+        const val DEAD_PACK = "dead"
     }
 }

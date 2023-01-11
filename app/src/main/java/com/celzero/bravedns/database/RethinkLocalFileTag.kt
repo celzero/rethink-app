@@ -30,6 +30,7 @@ class RethinkLocalFileTag {
     var show: Int = 0
     var entries: Int = 0
     var pack: List<String>? = arrayListOf()
+    var level: List<Int>? = arrayListOf()
     var simpleTagId: Int = INVALID_SIMPLE_TAG_ID
     var isSelected: Boolean = false
 
@@ -54,6 +55,7 @@ class RethinkLocalFileTag {
         group: String,
         subg: String,
         pack: List<String>?,
+        level: List<Int>?,
         url: List<String>,
         show: Int,
         entries: Int,
@@ -69,6 +71,7 @@ class RethinkLocalFileTag {
         this.show = show
         this.entries = entries
         this.pack = pack
+        this.level = level
         this.simpleTagId = simpleTagId
         this.isSelected = isSelected
     }
@@ -119,6 +122,7 @@ class RethinkLocalFileTag {
             group,
             subg,
             pack,
+            level,
             url,
             show,
             entries,

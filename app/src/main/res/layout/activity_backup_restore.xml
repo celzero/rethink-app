@@ -108,8 +108,7 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="5dp"
                 android:padding="5dp"
-                android:src="@drawable/ic_right_arrow_white"
-                android:text="" />
+                android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -178,8 +177,7 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="5dp"
                 android:padding="5dp"
-                android:src="@drawable/ic_right_arrow_white"
-                android:text="" />
+                android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
 
         <androidx.appcompat.widget.AppCompatTextView

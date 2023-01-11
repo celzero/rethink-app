@@ -342,6 +342,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun enableBlocklistUi() {
         b.lbbsEnable.text = getString(R.string.lbbs_enabled)
+        b.lbbsEnable.setTextColor(Utilities.fetchToggleBtnColors(requireContext(), R.color.accentGood))
         b.lbbsHeading.text =
             getString(
                 R.string.settings_local_blocklist_in_use,
@@ -360,6 +361,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun disableBlocklistUi() {
         b.lbbsEnable.text = getString(R.string.lbbs_enable)
+        b.lbbsEnable.setTextColor(Utilities.fetchToggleBtnColors(requireContext(), R.color.accentBad))
         b.lbbsHeading.text = getString(R.string.lbbs_heading)
         setDrawable(R.drawable.ic_cross, b.lbbsEnable)
 

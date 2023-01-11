@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 RethinkDNS and its authors
+ * Copyright 2023 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,18 +26,19 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.database.RethinkRemoteFileTag
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class RethinkRemoteAdvancedViewAdapter(val context: Context) :
+class RemoteAdvancedViewAdapter(val context: Context) :
     PagingDataAdapter<
-        RethinkRemoteFileTag, RethinkRemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder
+        RethinkRemoteFileTag, RemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder
     >(DIFF_CALLBACK) {
 
     companion object {
@@ -104,11 +106,42 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
             } else {
                 b.crpDescGroupTv.text = filetag.subg
             }
-            b.crpDescEntriesTv.text =
-                context.getString(R.string.dc_entries, filetag.entries.toString())
+            setEntries(filetag)
 
             b.crpCheckBox.isChecked = filetag.isSelected
             setCardBackground(filetag.isSelected)
+        }
+
+        private fun setEntries(filetag: RethinkRemoteFileTag) {
+            b.crpDescEntriesTv.text =
+                context.getString(R.string.dc_entries, filetag.entries.toString())
+
+            if (filetag.level.isNullOrEmpty()) return
+
+            val level = filetag.level?.get(0) ?: return
+            when (level) {
+                0 -> {
+                    val color = fetchColor(context, R.attr.chipTextPositive)
+                    val bgColor = fetchColor(context, R.attr.chipBgColorPositive)
+                    b.crpDescEntriesTv.setTextColor(color)
+                    b.crpDescEntriesTv.chipBackgroundColor = ColorStateList.valueOf(bgColor)
+                }
+                1 -> {
+                    val color = fetchColor(context, R.attr.chipTextNeutral)
+                    val bgColor = fetchColor(context, R.attr.chipBgColorNeutral)
+                    b.crpDescEntriesTv.setTextColor(color)
+                    b.crpDescEntriesTv.chipBackgroundColor = ColorStateList.valueOf(bgColor)
+                }
+                2 -> {
+                    val color = fetchColor(context, R.attr.chipTextNegative)
+                    val bgColor = fetchColor(context, R.attr.chipBgColorNegative)
+                    b.crpDescEntriesTv.setTextColor(color)
+                    b.crpDescEntriesTv.chipBackgroundColor = ColorStateList.valueOf(bgColor)
+                }
+                else -> {
+                    /* no-op */
+                }
+            }
         }
 
         private fun setCardBackground(isSelected: Boolean) {
@@ -130,13 +163,7 @@ class RethinkRemoteAdvancedViewAdapter(val context: Context) :
                 filetag.isSelected = selected
                 RethinkBlocklistManager.updateFiletagRemote(filetag)
                 val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                val stamp =
-                    RethinkBlocklistManager.getStamp(
-                        context,
-                        list,
-                        RethinkBlocklistManager.RethinkBlocklistType.REMOTE
-                    )
-                RethinkBlocklistFragment.modifiedStamp = stamp
+                RethinkBlocklistFragment.updateFileTagList(list)
             }
         }
 

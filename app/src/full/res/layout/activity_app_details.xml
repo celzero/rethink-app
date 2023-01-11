@@ -77,15 +77,11 @@
         </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            app:cardUseCompatPadding="true"
             app:cardCornerRadius="16dp"
-            app:cardElevation="16dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -191,7 +187,7 @@
                         android:weightSum="1">
 
                         <TextView
-                            android:id="@+id/aad_app_settings_lockdown"
+                            android:id="@+id/aad_app_settings_isolate"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
@@ -200,14 +196,14 @@
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
                             android:padding="5dp"
-                            android:text="@string/ada_app_lockdown"
+                            android:text="@string/ada_app_isolate"
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_lockdown_off" />
 
 
                         <TextView
-                            android:id="@+id/aad_app_settings_whitelist"
+                            android:id="@+id/aad_app_settings_bypass_univ"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
@@ -216,10 +212,10 @@
                             android:fontFamily="sans-serif-medium"
                             android:gravity="center"
                             android:padding="5dp"
-                            android:text="@string/ada_app_whitelist"
+                            android:text="@string/ada_app_bypass_univ"
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
-                            app:drawableTopCompat="@drawable/ic_whitelist" />
+                            app:drawableTopCompat="@drawable/ic_firewall_bypass_off" />
 
                         <TextView
                             android:id="@+id/aad_app_settings_exclude"
@@ -234,7 +230,7 @@
                             android:text="@string/ada_app_exclude"
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
-                            app:drawableTopCompat="@drawable/ic_exclude" />
+                            app:drawableTopCompat="@drawable/ic_firewall_exclude_off" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -312,9 +308,9 @@
             android:id="@+id/aad_ip_block_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            app:cardUseCompatPadding="true"
             app:cardCornerRadius="16dp"
-            app:cardElevation="16dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -385,9 +381,9 @@
             android:id="@+id/aad_conn_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="16dp">
+            app:cardUseCompatPadding="true"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"

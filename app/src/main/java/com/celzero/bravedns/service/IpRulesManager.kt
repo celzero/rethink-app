@@ -15,8 +15,10 @@ limitations under the License.
 */
 package com.celzero.bravedns.service
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.util.Constants
@@ -44,15 +46,15 @@ object IpRulesManager : KoinComponent {
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
-    private var appIpRules: MutableMap<HostName, CustomIp> = hashMapOf()
-    private var wildCards: MutableMap<HostName, CustomIp> = hashMapOf()
+    private var appIpRules: MutableMap<CacheKey, CustomIp> = hashMapOf()
+    private var wildCards: MutableMap<CacheKey, CustomIp> = hashMapOf()
+
+    // key-value object for ip look-up
+    data class CacheKey(val hostName: HostName, val uid: Int)
 
     // stores the response for the look-up request from the BraveVpnService
-    private val ipRulesLookupCache: Cache<HostName, IpCache> =
+    private val ipRulesLookupCache: Cache<CacheKey, IpRuleStatus> =
         CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
-
-    // stores the data object in ip response look-up cache
-    data class IpCache(val uid: Int, val status: IpRuleStatus)
 
     enum class IPRuleType(val id: Int) {
         IPV4(0),
@@ -62,15 +64,15 @@ object IpRulesManager : KoinComponent {
     enum class IpRuleStatus(val id: Int) {
         NONE(0),
         BLOCK(1),
-        BYPASS_APP_RULES(2),
+        TRUST(2),
         BYPASS_UNIVERSAL(3);
 
         fun isBlocked(): Boolean {
             return this.id == BLOCK.id
         }
 
-        fun byPassAppRules(): Boolean {
-            return this.id == BYPASS_APP_RULES.id
+        fun trustIp(): Boolean {
+            return this.id == TRUST.id
         }
 
         fun noRule(): Boolean {
@@ -80,20 +82,28 @@ object IpRulesManager : KoinComponent {
         companion object {
 
             // labels for spinner / toggle ui
-            fun getLabel(): Array<String> {
-                return arrayOf("No Rule", "Block", "Bypass App Rules")
+            fun getLabel(context: Context): Array<String> {
+                return arrayOf(
+                    context.getString(R.string.ci_no_rule),
+                    context.getString(R.string.ci_block),
+                    context.getString(R.string.ci_trust_rule)
+                )
             }
 
             fun getStatus(id: Int): IpRuleStatus {
                 return when (id) {
                     NONE.id -> NONE
                     BLOCK.id -> BLOCK
+                    TRUST.id -> TRUST
                     BYPASS_UNIVERSAL.id -> BYPASS_UNIVERSAL
-                    BYPASS_APP_RULES.id -> BYPASS_APP_RULES
                     else -> NONE
                 }
             }
         }
+    }
+
+    init {
+        loadIpRules()
     }
 
     // returns CustomIp object based on uid and IP address
@@ -105,7 +115,7 @@ object IpRulesManager : KoinComponent {
         return customIpRepository.getCustomIpsLiveData()
     }
 
-    fun removeFirewallRules(uid: Int, ipAddress: String, port: Int) {
+    fun removeIpRule(uid: Int, ipAddress: String, port: Int) {
         Log.i(LOG_TAG_FIREWALL, "IP Rules, remove/delete rule for ip: $ipAddress for uid: $uid")
         if (ipAddress.isEmpty()) {
             return
@@ -113,7 +123,7 @@ object IpRulesManager : KoinComponent {
 
         io {
             val customIp = getObj(uid, ipAddress, port)
-            customIpRepository.deleteIPRulesForUID(uid, ipAddress, port)
+            customIpRepository.deleteIpRules(uid, ipAddress, port)
 
             if (customIp == null) return@io
 
@@ -143,19 +153,21 @@ object IpRulesManager : KoinComponent {
         )
         io {
             customIp.status = IpRuleStatus.BYPASS_UNIVERSAL.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
         }
     }
 
-    fun byPassAppRules(customIp: CustomIp) {
+    fun trustIpRules(customIp: CustomIp) {
         Log.i(
             LOG_TAG_FIREWALL,
-            "IP Rules, by-pass app rules, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
+            "IP Rules, trust ip, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
         )
         io {
-            customIp.status = IpRuleStatus.BYPASS_APP_RULES.id
+            customIp.status = IpRuleStatus.TRUST.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -169,6 +181,7 @@ object IpRulesManager : KoinComponent {
         )
         io {
             customIp.status = IpRuleStatus.NONE.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -181,10 +194,10 @@ object IpRulesManager : KoinComponent {
                 ip.getCustomIpAddress().address.isMultiple ||
                     ip.getCustomIpAddress().address.isAnyLocal
             ) {
-                wildCards[ip.getCustomIpAddress()] = ip
+                wildCards[CacheKey(ip.getCustomIpAddress(), ip.uid)] = ip
                 return
             }
-            appIpRules[ip.getCustomIpAddress()] = ip
+            appIpRules[CacheKey(ip.getCustomIpAddress(), ip.uid)] = ip
         }
     }
 
@@ -194,10 +207,10 @@ object IpRulesManager : KoinComponent {
                 ip.getCustomIpAddress().address.isMultiple ||
                     ip.getCustomIpAddress().address.isAnyLocal
             ) {
-                wildCards.remove(ip.getCustomIpAddress())
+                wildCards.remove(CacheKey(ip.getCustomIpAddress(), ip.uid))
                 return
             }
-            appIpRules.remove(ip.getCustomIpAddress())
+            appIpRules.remove(CacheKey(ip.getCustomIpAddress(), ip.uid))
         }
     }
 
@@ -208,6 +221,7 @@ object IpRulesManager : KoinComponent {
         )
         io {
             customIp.status = IpRuleStatus.BLOCK.id
+            customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
             ipRulesLookupCache.invalidateAll()
@@ -223,21 +237,19 @@ object IpRulesManager : KoinComponent {
             }
 
         // check if the ip address is already available in the cache
-        ipRulesLookupCache.getIfPresent(ip)?.let {
+        val cacheKey = CacheKey(ip, uid)
+        ipRulesLookupCache.getIfPresent(cacheKey)?.let {
             // return only if both ip and app(uid) matches
-            if (uid == it.uid) {
-                return it.status
-            } else {
-                // no-op, continue
-            }
+            return it
         }
 
-        if (appIpRules.contains(ip)) {
-            val customIp = appIpRules[ip]
+        val key = CacheKey(ip, uid)
+        if (appIpRules.contains(key)) {
+            val customIp = appIpRules[key]
 
             if (customIp?.uid == uid) {
                 val status = IpRuleStatus.getStatus(customIp.status)
-                ipRulesLookupCache.put(ip, IpCache(customIp.uid, status))
+                ipRulesLookupCache.put(CacheKey(ip, uid), status)
                 return status
             }
         }
@@ -246,13 +258,13 @@ object IpRulesManager : KoinComponent {
 
         // status is not NONE, return the obtained status
         if (status != IpRuleStatus.NONE) {
-            ipRulesLookupCache.put(ip, IpCache(uid, status))
+            ipRulesLookupCache.put(CacheKey(ip, uid), status)
             return status
         }
 
         // no need to carry out below checks if ip is not IPv6
         if (!IpManager.isIpV6(ip.address) && !isIpv6ToV4FilterRequired()) {
-            ipRulesLookupCache.put(ip, IpCache(uid, status))
+            ipRulesLookupCache.put(CacheKey(ip, uid), status)
             return status
         }
 
@@ -266,7 +278,7 @@ object IpRulesManager : KoinComponent {
             status = hasRule(uid, ipv4.toNormalizedString(), ip.port)
             // status is not NONE, return the obtained status
             if (status != IpRuleStatus.NONE) {
-                ipRulesLookupCache.put(ip, IpCache(uid, status))
+                ipRulesLookupCache.put(CacheKey(ip, uid), status)
                 return status
             }
         } else {
@@ -277,8 +289,28 @@ object IpRulesManager : KoinComponent {
             status = hasRule(uid, ip.address.toNormalizedString(), null)
         }
 
-        ipRulesLookupCache.put(ip, IpCache(uid, status))
+        ipRulesLookupCache.put(CacheKey(ip, uid), status)
         return status
+    }
+
+    fun isIpRuleAvailable(uid: Int, ipString: String, port: Int?): IpRuleStatus {
+        val ip =
+            if (port == null) {
+                HostName(ipString)
+            } else {
+                HostName(IPAddressString(ipString).address, port)
+            }
+
+        val key = CacheKey(ip, uid)
+        if (appIpRules.contains(key)) {
+            val customIp = appIpRules[key]
+
+            if (customIp?.uid == uid) {
+                return IpRuleStatus.getStatus(customIp.status)
+            }
+        }
+
+        return IpRuleStatus.NONE
     }
 
     private fun isIpv6ToV4FilterRequired(): Boolean {
@@ -290,6 +322,16 @@ object IpRulesManager : KoinComponent {
             customIpRepository.deleteAllIPRulesUniversal()
             appIpRules.clear()
             wildCards.clear()
+            ipRulesLookupCache.invalidateAll()
+        }
+    }
+
+    fun deleteIpRulesByUid(uid: Int) {
+        io {
+            customIpRepository.deleteIpRulesByUid(uid)
+            appIpRules = appIpRules.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
+            wildCards = wildCards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
+            ipRulesLookupCache.invalidateAll()
         }
     }
 
@@ -301,10 +343,10 @@ object IpRulesManager : KoinComponent {
                     it.getCustomIpAddress().address.isMultiple ||
                         it.getCustomIpAddress().address.isAnyLocal
                 ) {
-                    wildCards[it.getCustomIpAddress()] = it
-                    return@forEach
+                    wildCards[CacheKey(it.getCustomIpAddress(), it.uid)] = it
+                } else {
+                    appIpRules[CacheKey(it.getCustomIpAddress(), it.uid)] = it
                 }
-                appIpRules[it.getCustomIpAddress()] = it
             }
         }
     }
@@ -391,9 +433,10 @@ object IpRulesManager : KoinComponent {
     private fun subnetMatch(uid: Int, hostName: HostName): IpRuleStatus {
         // TODO: subnet precedence should be taken care of.
         // TODO: IP/16 and IP/24 is added to the rule.
-        wildCards.keys.forEach { wc ->
+        wildCards.keys.forEach { w ->
+            val wc = w.hostName
             if (wc.address.contains(hostName.address)) {
-                val rule = wildCards[wc]
+                val rule = wildCards[w]
                 if (rule?.uid == uid && (wc.port == null || wc.port == hostName.port)) {
                     return IpRuleStatus.getStatus(rule.status)
                 } else {
@@ -403,7 +446,7 @@ object IpRulesManager : KoinComponent {
                 wc.address.isAnyLocal && wc.address.ipVersion == hostName.address.ipVersion
             ) {
                 // case where the default (0.0.0.0 / [::]) is treated as wildcard
-                val rule = wildCards[wc]
+                val rule = wildCards[w]
                 if (uid == rule?.uid && wc.port == hostName.port) {
                     return IpRuleStatus.getStatus(rule.status)
                 } else {

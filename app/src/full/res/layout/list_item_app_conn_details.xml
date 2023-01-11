@@ -3,29 +3,27 @@
     android:id="@+id/acd_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="50dp"
+    android:background="?android:attr/selectableItemBackground"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="50dp"
         android:animateLayoutChanges="true">
 
         <TextView
             android:id="@+id/acd_flag"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_gravity="center"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:ellipsize="none"
+            android:background="@drawable/rectangle_border_background"
             android:gravity="center"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textSize="26sp" />
+            android:minWidth="25dp"
+            android:padding="5dp"
+            android:textSize="@dimen/default_font_text_view" />
 
         <TextView
             android:id="@+id/acd_count"
@@ -36,7 +34,6 @@
             android:background="@drawable/drawable_purple_gradient"
             android:fontFamily="sans-serif-light"
             android:gravity="center"
-            android:layout_marginStart="5dp"
             android:maxWidth="40dp"
             android:minWidth="40dp"
             android:padding="5dp"
@@ -92,7 +89,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            android:alpha="0.5"
+            android:alpha="0.3"
             android:padding="5dp"
             android:src="@drawable/ic_arrow_down_small" />
 

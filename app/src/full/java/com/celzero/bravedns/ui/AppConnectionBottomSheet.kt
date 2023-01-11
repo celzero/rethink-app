@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,8 +24,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
@@ -45,6 +47,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private val persistentState by inject<PersistentState>()
 
+    // listener to inform dataset change to the adapter
+    private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
+    private var adapter: AppConnectionAdapter? = null
+    private var position: Int = -1
+
     override fun getTheme(): Int =
         getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
 
@@ -63,6 +70,15 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
+    }
+
+    interface OnBottomSheetDialogFragmentDismiss {
+        fun notifyDataset(position: Int)
+    }
+
+    fun dismissListener(aca: AppConnectionAdapter?, pos: Int) {
+        adapter = aca
+        position = pos
     }
 
     override fun onCreateView(
@@ -86,6 +102,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         port = arguments?.getInt(PORT) ?: UNSPECIFIED_PORT
         val status = arguments?.getInt(IPRULESTATUS) ?: IpRulesManager.IpRuleStatus.NONE.id
         ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(status)
+        dismissListener = adapter
 
         initView()
         initializeClickListeners()
@@ -103,7 +120,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                 // no-op, bypass universal rules don't apply in app specific list
             }
-            IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> showByPassAppRulesUi()
+            IpRulesManager.IpRuleStatus.TRUST -> showByPassAppRulesUi()
             IpRulesManager.IpRuleStatus.BLOCK -> showButtonForStatusBlock()
         }
     }
@@ -118,17 +135,17 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private fun showButtonForStatusBlock() {
         b.bsacUnblock.visibility = View.VISIBLE
-        b.bsacBypassAppRules.visibility = View.VISIBLE
+        b.bsacTrustIp.visibility = View.VISIBLE
     }
 
     private fun showByPassAppRulesUi() {
         b.bsacBlock.visibility = View.VISIBLE
-        b.bsacGopassAppRules.visibility = View.VISIBLE
+        b.bsacDistrustIp.visibility = View.VISIBLE
     }
 
     private fun showButtonsForStatusNone() {
         b.bsacBlock.visibility = View.VISIBLE
-        b.bsacBypassAppRules.visibility = View.VISIBLE
+        b.bsacTrustIp.visibility = View.VISIBLE
     }
 
     private fun initializeClickListeners() {
@@ -136,7 +153,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.BLOCK,
                 getString(R.string.bsac_block_toast, ipAddress)
             )
@@ -146,29 +162,26 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.NONE,
                 getString(R.string.bsac_unblock_toast, ipAddress)
             )
         }
 
-        b.bsacBypassAppRules.setOnClickListener {
+        b.bsacTrustIp.setOnClickListener {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
-                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES,
-                getString(R.string.bsac_whitelist_toast, ipAddress)
+                IpRulesManager.IpRuleStatus.TRUST,
+                getString(R.string.bsac_trust_toast, ipAddress)
             )
         }
 
-        b.bsacGopassAppRules.setOnClickListener {
+        b.bsacDistrustIp.setOnClickListener {
             applyRule(
                 uid,
                 ipAddress,
-                UNSPECIFIED_PORT,
                 IpRulesManager.IpRuleStatus.NONE,
-                getString(R.string.bsac_whitelist_remove_toast, ipAddress)
+                getString(R.string.bsac_distrust_toast, ipAddress)
             )
         }
     }
@@ -176,13 +189,18 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun applyRule(
         uid: Int,
         ipAddress: String,
-        port: Int,
         status: IpRulesManager.IpRuleStatus,
         toastMsg: String
     ) {
-        io { IpRulesManager.addIpRule(uid, ipAddress, port, status) }
+        // set port number as UNSPECIFIED_PORT for all the rules applied from this screen
+        io { IpRulesManager.addIpRule(uid, ipAddress, UNSPECIFIED_PORT, status) }
         Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
         this.dismiss()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        dismissListener?.notifyDataset(position)
     }
 
     private fun io(f: suspend () -> Unit) {

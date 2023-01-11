@@ -102,7 +102,6 @@
     <string name="settings_enable_logs_desc">Sla DNS- en firewall-logs lokaal op het apparaat op.</string>
     <string name="app_mode_choose">Kies de modus</string>
     <string name="whats_dialog_title">Nieuw in v053k</string>
-    <string name="whats_new_version_name">🌎🕊 Wereldstudentendag (15 oktober) 🕊🌎</string>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
     <string name="app_name_rethink">Rethink</string>
@@ -287,7 +286,6 @@
     <string name="hsf_proxy_chip_remove_text">Aan het stoppen…</string>
     <string name="hsf_pause_vpn_failure">Kan niet pauzeren: RethinkDNS niet actief</string>
     <string name="hsf_proxy_chip_text">Proxy actief</string>
-    <string name="hsf_blocklist_chip_text">%1$s blocklists geconfigureerd</string>
     <string name="dc_block_heading">regels</string>
     <string name="dc_custom_dns_radio">Andere DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
@@ -364,8 +362,6 @@
     <string name="fapps_firewall_filter_allowed">Toegestaan</string>
     <string name="rules_load_failure_reload">herladen</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
-    <string name="fapps_metered_positive">Pas Toe</string>
-    <string name="fapps_metered_negative">Annuleren</string>
     <string name="unicode_x_sign">❌</string>
     <string name="fav_icon">fav_icon</string>
     <string name="network_log_app_name_unknown">Onbekend</string>
@@ -393,10 +389,10 @@
     <string name="firewall_rule_block_http">Onveilige HTTP</string>
     <string name="firewall_rule_new_app_desc">Deze app maakte verbinding voor de <i>eerste keer</i>.<br/><br/> Om te veranderen ga naar <i>Universele</i> tab.</string>
     <string name="dc_dns_leaks_desc">Indien ingeschakeld, vangt RethinkDNS alle pakketten op poort 53 op en stuurt deze door naar een door de gebruiker ingesteld DNS eindpunt</string>
-    <string name="firewall_rule_lockdown_desc">Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i> door verbinding te maken met andere dan <i>omzeilde IP\'s</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.</string>
+    <string name="firewall_rule_isolate_desc">Een door de gebruiker ingestelde firewallregel blokkeerde deze <i>app</i> door verbinding te maken met andere dan <i>omzeilde IP\'s</i>.<br/><br/> Om te wijzigen ga naar <i>All Apps</i> tab.</string>
     <string name="firewall_rule_global_lockdown_desc">Deze verbinding is geblokkeerd omdat universele lockdown is ingesteld.<br/><br/> Om dit te veranderen ga naar <i>tabblad Universal</i>.</string>
-    <string name="ada_app_status_lockdown">staat in lockdown modus</string>
-    <string name="ada_app_lockdown">Lockdown</string>
+    <string name="ada_app_status_isolate">staat in lockdown modus</string>
+    <string name="ada_app_isolate">Lockdown</string>
     <string name="settings_orbot_notification_content">Fout bij het starten van Tor-as-a-Proxy. Open de Orbot-app om deze handmatig te starten.</string>
     <string name="always_on_dialog_positive_btn">Open Instellingen</string>
     <string name="univ_firewall_no_ip_message">Geen IP\'s gevonden. Tik op vermeldingen in het netwerklogboekscherm om afzonderlijke IP-adressen te blokkeren.</string>
@@ -416,7 +412,7 @@
     <string name="slide_1_desc">RethinkDNS is een open source software ondersteund door het Mozilla Builders MVP programma.</string>
     <string name="allow">laat toe</string>
     <string name="untracked">ongetraceerd</string>
-    <string name="lockdown">lockdown</string>
+    <string name="isolate">lockdown</string>
     <string name="pause_mode_notification_title">Gepauzeerd! Geblokkeerde apps blijven geblokkeerd.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">wachtend op</string>
     <string name="status_protected_with_tor">beschermd met tor</string>
@@ -426,7 +422,7 @@
     <string name="settings_theme_dialog_title">Vormgeving</string>
     <string name="settings_theme_dialog_themes_2">Licht</string>
     <string name="settings_notification_dialog_title">Notificatieactie kiezen</string>
-    <string name="firewall_status_lockdown">lockdown</string>
+    <string name="firewall_status_isolate">lockdown</string>
     <string name="firewall_status_block_metered">geblokkeerd op gedoseerde (mobiele) netwerken</string>
     <string name="firewall_status_blocked">geblokkeerd</string>
     <string name="firewall_card_status_inactive">Uitgeschakeld</string>
@@ -449,7 +445,6 @@
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_start_dialog_message">U bent één stap verwijderd van veilig en beveiligd Android: zie onmiddellijk netwerkactiviteit, blokkeer websites, IP\'s en apps die zich slecht gedragen.</string>
     <string name="hsf_whats_new_chip_text">Wat is er nieuw</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS in gebruik</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ inschakelen</string>
     <string name="hsf_dns_logs_chip_text">DNS-logboeken</string>
     <string name="hsf_network_logs_chip_text">Netwerk logs</string>
@@ -522,8 +517,7 @@
     <string name="fapps_firewall_filter_blocked">Geblokkeerd</string>
     <string name="fapps_firewall_filter_bypass_universal">Omzeild</string>
     <string name="fapps_firewall_filter_excluded">Uitgesloten</string>
-    <string name="fapps_info_dialog_title">Informatie</string>
-    <string name="fapps_firewall_filter_lockdown">lockdown</string>
+    <string name="fapps_firewall_filter_isolate">lockdown</string>
     <string name="fapps_unmetered_positive">Pas Toe</string>
     <string name="fapps_unmetered_negative">Annuleren</string>
     <string name="fapps_firewall_filter_desc">Het tonen van <u>%1$s</u> %2$s apps</string>
@@ -543,8 +537,8 @@
     <string name="other_dns_list_tab1">DoH</string>
     <string name="firewall_rule_block_app_new_install">Nieuwe app</string>
     <string name="firewall_rule_block_app_exception">Fout</string>
-    <string name="firewall_rule_lockdown">Lockdown (App)</string>
-    <string name="firewall_rule_bypass_apprule_ip">Omzeilde IP (App)</string>
+    <string name="firewall_rule_isolate">Lockdown (App)</string>
+    <string name="firewall_rule_trusted_ip">Omzeilde IP (App)</string>
     <string name="firewall_rule_bypass_universal_ip">Omzeild IP</string>
     <string name="firewall_rule_unknown">Bron Onbekend</string>
     <string name="firewall_rule_block_dns_bypass">DNS omzeild</string>

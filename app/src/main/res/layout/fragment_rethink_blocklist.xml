@@ -56,13 +56,6 @@
             android:orientation="vertical"
             android:visibility="visible">
 
-            <ProgressBar
-                android:id="@+id/lb_simple_progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="visible" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lb_simple_recycler_packs"
                 android:layout_width="match_parent"
@@ -78,7 +71,7 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/lb_adv_search_cv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -135,7 +128,7 @@
                         app:selectionRequired="true"
                         app:singleSelection="true" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/lb_advanced_filter_label_tv"

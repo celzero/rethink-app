@@ -17,7 +17,6 @@ package com.celzero.bravedns.database
 
 import android.util.Log
 import androidx.room.Entity
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
@@ -56,8 +55,7 @@ class CustomIp {
     }
 
     override fun hashCode(): Int {
-        var result = 0
-        result += result * 31 + this.uid.hashCode()
+        var result = this.uid.hashCode()
         result += result * 31 + this.ipAddress.hashCode()
         return result
     }

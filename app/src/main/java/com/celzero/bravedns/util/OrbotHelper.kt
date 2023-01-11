@@ -28,17 +28,16 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.Companion.getBroadcastPendingIntent
-import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
@@ -134,11 +133,12 @@ class OrbotHelper(
             intent.data = Uri.parse(ORBOT_MARKET_URI)
 
             val pm = context.packageManager
-            val resInfos = if (isAtleastT()) {
-                pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
-            } else {
-                pm.queryIntentActivities(intent, 0)
-            }
+            val resInfos =
+                if (isAtleastT()) {
+                    pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
+                } else {
+                    pm.queryIntentActivities(intent, 0)
+                }
 
             var foundPackageName: String? = null
             for (r in resInfos) {
@@ -287,7 +287,8 @@ class OrbotHelper(
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context, getThemeAccent(context))
+        builder.color =
+            ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
         val openIntent = getOrbotOpenIntent()
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(

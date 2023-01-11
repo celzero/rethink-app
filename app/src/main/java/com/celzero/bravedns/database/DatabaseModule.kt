@@ -21,14 +21,15 @@ import org.koin.dsl.module
 object DatabaseModule {
     private val databaseModule = module {
         single { AppDatabase.buildDatabase(androidContext()) }
+        single { LogDatabase.buildDatabase(androidContext()) }
         single { RefreshDatabase(androidContext(), get(), get(), get()) }
     }
     private val daoModule = module {
         single { get<AppDatabase>().appInfoDAO() }
-        single { get<AppDatabase>().connectionTrackerDAO() }
+        single { get<LogDatabase>().connectionTrackerDAO() }
         single { get<AppDatabase>().dnsCryptEndpointDAO() }
         single { get<AppDatabase>().dnsCryptRelayEndpointDAO() }
-        single { get<AppDatabase>().dnsLogDAO() }
+        single { get<LogDatabase>().dnsLogDAO() }
         single { get<AppDatabase>().dnsProxyEndpointDAO() }
         single { get<AppDatabase>().dohEndpointsDAO() }
         single { get<AppDatabase>().proxyEndpointDAO() }
@@ -37,13 +38,15 @@ object DatabaseModule {
         single { get<AppDatabase>().rethinkEndpointDao() }
         single { get<AppDatabase>().rethinkLocalFileTagDao() }
         single { get<AppDatabase>().rethinkRemoteFileTagDao() }
+        single { get<AppDatabase>().remoteBlocklistPacksMapDao() }
+        single { get<AppDatabase>().localBlocklistPacksMapDao() }
     }
     private val repositoryModule = module {
         single { get<AppDatabase>().appInfoRepository() }
-        single { get<AppDatabase>().connectionTrackerRepository() }
+        single { get<LogDatabase>().connectionTrackerRepository() }
         single { get<AppDatabase>().dnsCryptEndpointRepository() }
         single { get<AppDatabase>().dnsCryptRelayEndpointRepository() }
-        single { get<AppDatabase>().dnsLogRepository() }
+        single { get<LogDatabase>().dnsLogRepository() }
         single { get<AppDatabase>().dnsProxyEndpointRepository() }
         single { get<AppDatabase>().dohEndpointRepository() }
         single { get<AppDatabase>().proxyEndpointRepository() }
@@ -52,6 +55,8 @@ object DatabaseModule {
         single { get<AppDatabase>().rethinkEndpointRepository() }
         single { get<AppDatabase>().rethinkRemoteFileTagRepository() }
         single { get<AppDatabase>().rethinkLocalFileTagRepository() }
+        single { get<AppDatabase>().remoteBlocklistPacksMapRepository() }
+        single { get<AppDatabase>().localBlocklistPacksMapRepository() }
     }
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)

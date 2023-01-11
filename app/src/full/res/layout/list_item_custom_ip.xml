@@ -37,7 +37,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif"
-                android:text="asdasd"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -47,7 +46,6 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif"
-                android:text="whitelisted"
                 android:textSize="@dimen/small_font_subheading_text" />
 
         </LinearLayout>
@@ -118,7 +116,7 @@
             android:layout_height="wrap_content"
             android:minWidth="5dp"
             android:tag="2"
-            android:text="@string/ci_bypass_app_txt"
+            android:text="@string/ci_trust_rule"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/small_font_subheading_text" />
 

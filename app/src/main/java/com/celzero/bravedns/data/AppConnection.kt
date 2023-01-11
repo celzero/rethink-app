@@ -16,9 +16,11 @@
 package com.celzero.bravedns.data
 
 data class AppConnection(
+    val uid: Int,
     val ipAddress: String,
     val port: Int,
     val count: Int,
     val flag: String,
+    val blocked: Boolean,
     val dnsQuery: String?
 )

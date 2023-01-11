@@ -47,7 +47,6 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
         private val failedFavIconUrls: Cache<String, Boolean> =
             CacheBuilder.newBuilder().maximumSize(CACHE_BUILDER_MAX_SIZE).build()
 
-
         fun getDomainUrlFromFdqnDuckduckgo(url: String): String {
             // Convert an FQDN like "www.example.co.uk." to an eTLD + 1 like "example.co.uk".
             val domainUrl = Utilities.getETldPlus1(url).toString()
@@ -85,7 +84,6 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
             // no-op
         }
     }
-
 
     private fun fetchFromNextDns(url: String) {
         val subUrl = constructFavIcoUrlNextDns(url)

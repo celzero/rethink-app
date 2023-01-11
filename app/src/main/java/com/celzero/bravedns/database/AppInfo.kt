@@ -16,13 +16,10 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(tableName = "AppInfo")
+@Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
 class AppInfo {
-    // packageInfo is infact a packageName which is wrongly named.
-    // Renaming involves migration.
-    @PrimaryKey var packageInfo: String = ""
+    var packageName: String = ""
     var appName: String = ""
     var uid: Int = 0
     var isSystemApp: Boolean = false
@@ -36,11 +33,11 @@ class AppInfo {
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false
-        if (packageInfo != other.packageInfo) return false
+        if (packageName != other.packageName) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return this.packageInfo.hashCode()
+        return this.packageName.hashCode()
     }
 }

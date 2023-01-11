@@ -69,5 +69,4 @@ class CustomDomain {
     fun isBlocked(): Boolean {
         return this.status == DomainRulesManager.DomainStatus.BLOCK.id
     }
-
 }

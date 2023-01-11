@@ -256,22 +256,6 @@
                     app:chipIcon="@drawable/ic_whats_new" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_proxy_chip"
-                    style="@style/Chip.HomeScreen.Entry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hsf_proxy_chip_text"
-                    app:chipIcon="@drawable/ic_socks5" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_dns_configure_chip"
-                    style="@style/Chip.HomeScreen.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hsf_blocklist_chip_text"
-                    app:chipIcon="@drawable/ic_local_blocklist" />
-
-                <com.google.android.material.chip.Chip
                     android:id="@+id/fhs_dns_logs_chip"
                     style="@style/Chip.HomeScreen.Action"
                     android:layout_width="wrap_content"
@@ -286,6 +270,22 @@
                     android:layout_height="wrap_content"
                     android:text="@string/hsf_network_logs_chip_text"
                     app:chipIcon="@drawable/ic_logs" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_proxy_chip"
+                    style="@style/Chip.HomeScreen.Entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hsf_proxy_chip_text"
+                    app:chipIcon="@drawable/ic_socks5" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_dns_configure_chip"
+                    style="@style/Chip.HomeScreen.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hsf_blocklist_chip_text_no_data"
+                    app:chipIcon="@drawable/ic_local_blocklist" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/fhs_theme_chip"

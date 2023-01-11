@@ -31,12 +31,13 @@ import androidx.annotation.GuardedBy
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
@@ -45,15 +46,15 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isNonApp
 import com.google.common.collect.Sets
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 
 class RefreshDatabase
 internal constructor(
@@ -140,6 +141,7 @@ internal constructor(
                         .toHashSet()
 
                 FirewallManager.deletePackagesFromCache(packagesToDelete)
+                removeRulesRelatedToDeletedPackages(packagesToDelete)
 
                 Log.i(LOG_TAG_APP_DB, "remove: $packagesToDelete; insert: $packagesToAdd")
 
@@ -153,6 +155,12 @@ internal constructor(
                 withContext(NonCancellable) { refreshMutex.write { isRefreshInProgress = false } }
             }
         }
+    }
+
+    private suspend fun removeRulesRelatedToDeletedPackages(
+        packagesToDelete: Set<FirewallManager.AppInfoTuple>
+    ) {
+        packagesToDelete.forEach { IpRulesManager.deleteIpRulesByUid(it.uid) }
     }
 
     private suspend fun refreshNonApps(
@@ -277,7 +285,7 @@ internal constructor(
             }
 
         appInfo.appName = appName
-        appInfo.packageInfo = "no_package_$uid"
+        appInfo.packageName = "no_package_$uid"
         appInfo.appCategory = context.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
 
         appInfo.uid = uid
@@ -297,7 +305,7 @@ internal constructor(
 
         entry.appName = appName
 
-        entry.packageInfo = appInfo.packageName
+        entry.packageName = appInfo.packageName
         entry.uid = appInfo.uid
         entry.isSystemApp = isSystemApp
 
@@ -377,7 +385,8 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
+        builder.color =
+            ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show
         // there.
@@ -454,7 +463,8 @@ internal constructor(
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(context, Utilities.getThemeAccent(context))
+        builder.color =
+            ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
 
         val openIntent1 =
             makeNewAppVpnIntent(

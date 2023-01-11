@@ -2,9 +2,9 @@ package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.FirewallAppFragment
 import com.celzero.bravedns.util.Constants
 
@@ -35,6 +35,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
     private fun getAppInfo(searchString: String): LiveData<PagingData<AppInfo>> {
         return when (topLevelFilter) {
+            // get the app info based on the filter
             FirewallAppFragment.TopLevelFilter.ALL -> {
                 allApps(searchString)
             }
@@ -95,6 +96,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
+    // apply the firewall rules to the filtered apps
     fun updateUnmeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
 
@@ -106,18 +108,103 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             }
     }
 
+    fun updateMeteredStatus(blocked: Boolean) {
+        val appList = getFilteredApps()
+
+        appList
+            .distinctBy { it.uid }
+            .forEach {
+                val appStatus = getAppStateForMobileData(blocked, it.firewallStatus, it.metered)
+                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
+            }
+    }
+
+    fun updateBypassStatus(bypass: Boolean) {
+        val appList = getFilteredApps()
+        // update the bypass status for the filtered apps
+        // if the app is already in the bypass list, remove it
+        // else add it to the bypass list
+        val appStatus =
+            if (bypass) {
+                AppState(
+                    FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            } else {
+                AppState(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            }
+        appList
+            .distinctBy { it.uid }
+            .forEach {
+                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
+            }
+    }
+
+    fun updateExcludeStatus(exclude: Boolean) {
+        val appList = getFilteredApps()
+        // update the exclude status for the filtered apps
+        // if the app is already in the exclude list, remove it
+        // else add it to the exclude list
+        val appStatus =
+            if (exclude) {
+                AppState(
+                    FirewallManager.FirewallStatus.EXCLUDE,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            } else {
+                AppState(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            }
+        appList
+            .distinctBy { it.uid }
+            .forEach {
+                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
+            }
+    }
+
+    fun updateLockdownStatus(lockdown: Boolean) {
+        val appList = getFilteredApps()
+        // update the lockdown status for the filtered apps
+        // if the app is already in the lockdown list, remove it
+        // else add it to the lockdown list
+        val appStatus =
+            if (lockdown) {
+                AppState(
+                    FirewallManager.FirewallStatus.ISOLATE,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            } else {
+                AppState(
+                    FirewallManager.FirewallStatus.ALLOW,
+                    FirewallManager.ConnectionStatus.BOTH
+                )
+            }
+
+        appList
+            .distinctBy { it.uid }
+            .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
+    }
+
     private fun getAppStateForWifi(blocked: Boolean, firewall: Int, metered: Int): AppState {
         val state: AppState
 
+        // if the app is already blocked, then unblock it
         if (firewall == FirewallManager.FirewallStatus.BLOCK.id) {
             state =
                 if (blocked) {
                     if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
+
                         AppState(
                             FirewallManager.FirewallStatus.BLOCK,
                             FirewallManager.ConnectionStatus.WIFI
                         )
                     } else {
+                        // if the app is already blocked on mobile data, then block it on both
                         AppState(
                             FirewallManager.FirewallStatus.BLOCK,
                             FirewallManager.ConnectionStatus.BOTH
@@ -136,7 +223,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         )
                     }
                 }
-        } else {
+        } else { // if the app is not blocked, then block it
             state =
                 if (blocked) {
                     AppState(
@@ -144,6 +231,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                         FirewallManager.ConnectionStatus.WIFI
                     )
                 } else {
+                    // if the app is already allowed on mobile data, then allow it on both
                     AppState(
                         FirewallManager.FirewallStatus.ALLOW,
                         FirewallManager.ConnectionStatus.BOTH
@@ -158,17 +246,6 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         val fid: FirewallManager.FirewallStatus,
         val cid: FirewallManager.ConnectionStatus
     )
-
-    fun updateMeteredStatus(blocked: Boolean) {
-        val appList = getFilteredApps()
-
-        appList
-            .distinctBy { it.uid }
-            .forEach {
-                val appStatus = getAppStateForMobileData(blocked, it.firewallStatus, it.metered)
-                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
-            }
-    }
 
     private fun getAppStateForMobileData(blocked: Boolean, firewall: Int, metered: Int): AppState {
         if (blocked) {

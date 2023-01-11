@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,18 +27,20 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
 
 class AppConnectionAdapter(val context: Context, val uid: Int) :
     PagingDataAdapter<AppConnection, AppConnectionAdapter.ConnectionDetailsViewHolder>(
         DIFF_CALLBACK
-    ) {
+    ),
+    AppConnectionBottomSheet.OnBottomSheetDialogFragmentDismiss {
 
     companion object {
         private val DIFF_CALLBACK =
@@ -56,6 +59,9 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
     }
 
     private lateinit var adapter: AppConnectionAdapter
+
+    // ui component to update/toggle the buttons
+    data class ToggleBtnUi(val txtColor: Int, val bgColor: Int)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -89,19 +95,16 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
 
         private fun setupClickListeners(appConn: AppConnection) {
             b.acdContainer.setOnClickListener {
-                val status = IpRulesManager.hasRule(uid, appConn.ipAddress, Constants.UNSPECIFIED_PORT)
+                // no need to send port number for the app info screen
+                val status = IpRulesManager.isIpRuleAvailable(uid, appConn.ipAddress, null)
                 // open bottom sheet for options
-                openBottomSheet(appConn.ipAddress, Constants.UNSPECIFIED_PORT, status)
+                openBottomSheet(appConn.ipAddress, status)
             }
         }
 
-        private fun openBottomSheet(
-            ipAddress: String,
-            port: Int,
-            ipRuleStatus: IpRulesManager.IpRuleStatus
-        ) {
+        private fun openBottomSheet(ipAddress: String, ipRuleStatus: IpRulesManager.IpRuleStatus) {
             if (context !is AppCompatActivity) {
-                Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottomsheet")
+                Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottom sheet")
                 return
             }
 
@@ -113,9 +116,10 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
-            bundle.putInt(AppConnectionBottomSheet.PORT, port)
+            bundle.putInt(AppConnectionBottomSheet.PORT, Constants.UNSPECIFIED_PORT)
             bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
             bottomSheetFragment.arguments = bundle
+            bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
 
@@ -128,6 +132,13 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
                     appConnection.ipAddress,
                     appConnection.port.toString()
                 )
+            val ipRuleStatus =
+                IpRulesManager.isIpRuleAvailable(
+                    uid,
+                    appConnection.ipAddress,
+                    null // don't check for port as adding rule from this screen port is null
+                )
+            updateStatusUi(ipRuleStatus)
             if (!appConnection.dnsQuery.isNullOrEmpty()) {
                 b.acdDomainName.visibility = View.VISIBLE
                 b.acdDomainName.text = beautifyDomainString(appConnection.dnsQuery)
@@ -141,5 +152,60 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             // add space after all the commas
             return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
+
+        private fun updateStatusUi(status: IpRulesManager.IpRuleStatus) {
+            when (status) {
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
+                }
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
+                }
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    b.acdFlag.text = context.getString(R.string.ci_trust_initial)
+                }
+            }
+
+            // returns the text and background color for the button
+            val t = getToggleBtnUiParams(status)
+            b.acdFlag.setTextColor(t.txtColor)
+            b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
+        }
+
+        private fun getToggleBtnUiParams(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
+            return when (id) {
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    ToggleBtnUi(
+                        fetchColor(context, R.attr.chipTextNeutral),
+                        fetchColor(context, R.attr.chipBgColorNeutral)
+                    )
+                }
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    ToggleBtnUi(
+                        fetchColor(context, R.attr.chipTextNegative),
+                        fetchColor(context, R.attr.chipBgColorNegative)
+                    )
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    ToggleBtnUi(
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
+                    )
+                }
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    ToggleBtnUi(
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
+                    )
+                }
+            }
+        }
+    }
+
+    override fun notifyDataset(position: Int) {
+        this.notifyItemChanged(position)
     }
 }

@@ -165,7 +165,6 @@
     <string name="firewall_status_allow">অনুমোদিত</string>
     <string name="hsf_start_dialog_positive">শুরু</string>
     <string name="hsf_start_dialog_negative">খারিজ</string>
-    <string name="hsf_blocklist_chip_text">%1$s ব্লকলিস্ট কনফিগার করা হয়েছে</string>
     <string name="about_web">লিঙ্ক</string>
     <string name="about_settings_notification">বিজ্ঞপ্তি সেটিংস</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
@@ -181,7 +180,6 @@
     <string name="dns_act_configure_tab">কনফিগার</string>
     <string name="app_mode_firewall">ফায়ারওয়াল</string>
     <string name="info_dialog_copy_toast_msg">আইপি ঠিকানা কপি করা হয়েছে।</string>
-    <string name="whats_new_version_name">🌎🕊 বিশ্ব ছাত্র দিবস (১৫ অক্টোবর) 🕊🌎</string>
     <string name="settings_orbot_header">অরবট ❯</string>
     <string name="settings_https_disabled_error">অরবোটের সাথে সংযুক্ত। চালিয়ে যেতে এটি বন্ধ করুন।</string>
     <string name="settings_socks_forwarding_default_desc">SOCKS5 এন্ডপয়েন্টে কানেকশন ফরোয়ার্ড করুন।</string>
@@ -292,7 +290,7 @@
 \nপোর্ট নম্বর: %3$s</string>
     <string name="dns_proxy_app">অ্যাপ</string>
     <string name="dns_proxy_positive_btn">যোগ করুন</string>
-    <string name="lockdown">তালাবদ্ধ</string>
+    <string name="isolate">তালাবদ্ধ</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">অপেক্ষা</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">সুরক্ষিত</string>
     <string name="dns_mode_info_explanation_new">ডিএনএস অনুরোধগুলি মনিটর করুন, ব্লক করুন এবং এনক্রিপ্ট করুন।</string>
@@ -370,7 +368,7 @@
     <string name="settings_check_update_heading">অ্যাপ আপডেটের জন্য চেক করুন</string>
     <string name="settings_http_proxy_error_text2">অবৈধ পোর্ট</string>
     <string name="settings_dns_proxy_dialog_port_number">পোর্ট নাম্বার</string>
-    <string name="firewall_status_lockdown">তালাবদ্ধ</string>
+    <string name="firewall_status_isolate">তালাবদ্ধ</string>
     <string name="hsf_start_btn_state">শুরু</string>
     <string name="hsf_uptime">(%1$s থেকে সক্রিয়; প্রোটোস: %2$s)</string>
     <string name="hsf_proxy_chip_text">প্রক্সি সক্রিয়</string>
@@ -395,7 +393,6 @@
     <string name="settings_dns_proxy_dialog_positive_btn">সেট</string>
     <string name="settings_theme_dialog_themes_3">কাল</string>
     <string name="firewall_status_block_unmetered">মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কগুলিতে অবরুদ্ধ</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">ব্যবহারে পুনর্বিবেচনা করুন</string>
     <string name="hsf_whats_new_remove_text">বন্ধ…</string>
     <string name="dc_other_settings_heading">উন্নত</string>
     <string name="about_join_telegram">Telegram</string>
@@ -595,9 +592,8 @@
     <string name="cd_add_dialog_sample_3">%1$s https://%2$s
 \n</string>
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
-    <string name="ci_bypass_universal_desc">- বাইপাস সার্বজনীন</string>
     <string name="ada_ip_rules_title">এই অ্যাপের জন্য আইপি নিয়ম</string>
-    <string name="bsac_whitelist_remove_toast">এই IP %1$s এর জন্য বাইপাস সরানো হয়েছে</string>
+    <string name="bsac_distrust_toast">এই IP %1$s এর জন্য বাইপাস সরানো হয়েছে</string>
     <string name="bsdl_domain_rule_allow">অনুমতি</string>
     <string name="network_dns">সিস্টেম DNS</string>
     <string name="bsrf_apply_filter">প্রয়োগ করুন</string>
@@ -627,8 +623,8 @@
     <string name="cd_whitelist_txt">হোয়াইটলিস্ট</string>
     <string name="cd_no_rule_txt">কোন নিয়ম নেই</string>
     <string name="ci_dialog_edittext_hint">আইপি ঠিকানা, সাবনেট বা পোর্ট</string>
-    <string name="ada_app_whitelist">বাইপাস ইউনিভার্সাল</string>
-    <string name="bsac_go_pass_app_rules">বাইপাস সরান</string>
+    <string name="ada_app_bypass_univ">বাইপাস ইউনিভার্সাল</string>
+    <string name="bsac_distrust">বাইপাস সরান</string>
     <string name="brbs_restore_title">পুনঃস্থাপন</string>
     <string name="brbs_backup_dialog_failure_title">ব্যাকআপ ব্যর্থ হয়েছে</string>
     <string name="brbs_backup_dialog_failure_negative">খারিজ</string>
@@ -642,10 +638,9 @@
     <string name="notif_dialog_pause_dialog_message">বিরতি অবস্থায় আবেদন, চালিয়ে যেতে পুনরায় শুরু করুন</string>
     <string name="cd_remove_dialog_positive">মুছুন</string>
     <string name="bsac_block">অবরোধ</string>
-    <string name="bsac_whitelist_toast">এই IP %1$s এর জন্য অ্যাপের নিয়মগুলি বাইপাস করা</string>
+    <string name="bsac_trust_toast">এই IP %1$s এর জন্য অ্যাপের নিয়মগুলি বাইপাস করা</string>
     <string name="rt_cancel_download">বাতিল</string>
     <string name="rt_apply_btn">প্রয়োগ করুন</string>
-    <string name="bsrf_group_heading">গ্রুপ</string>
     <string name="brbs_backup_dialog_message">একটি ফাইলে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ ব্যাক আপ করে। এটি VPN পুনরায় চালু করবে।</string>
     <string name="other_dns_list_tab2">ডিএনস্ক্রিপ্ট</string>
     <string name="firewall_rule_block_udp_ntp">UDP অবরুদ্ধ</string>
@@ -689,7 +684,7 @@
     <string name="firewall_rule_univ_block_metered">মিটারযুক্ত (সর্বজনীন)</string>
     <string name="firewall_rule_new_app_desc">এই অ্যাপটি <i>প্রথম</i> বারের জন্য সংযোগ তৈরি করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="firewall_rule_block_app_mobile_desc"><i>Metered</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।</string>
-    <string name="firewall_rule_lockdown_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
+    <string name="firewall_rule_isolate_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i>কে <i>বাইপাস করা IPs</i> ব্যতীত অন্যের সাথে সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>সমস্ত অ্যাপস</i> ট্যাবে যান।</string>
     <string name="firewall_rule_block_http_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷</string>
     <string name="notif_channel_vpn_failure">নিষ্ক্রিয় VPN</string>
     <string name="notif_channel_download">সতর্কতা ডাউনলোড করুন</string>
@@ -709,7 +704,7 @@
     <string name="ci_dialog_added_success">আইপি তালিকায় যোগ করা হয়েছে</string>
     <string name="ci_no_rule">কোন নিয়ম নেই</string>
     <string name="ada_noapp_dialog_title">অ্যাপের তথ্য পাওয়া যায়নি</string>
-    <string name="ada_app_status_lockdown">লকডাউন মোডে আছে</string>
+    <string name="ada_app_status_isolate">লকডাউন মোডে আছে</string>
     <string name="notif_download_success_content">ডাউনলোড সফল হয়েছে।</string>
     <string name="rt_list_adv_btn_txt">উন্নত</string>
     <string name="rethink_sky_desc">280+ অবস্থান; উচ্চ আপটাইম; স্টাব রিজলভার ক্লাউডফ্লেয়ার ডটকমে চলছে</string>
@@ -737,7 +732,6 @@
     <string name="ci_no_rules_text">কোনো সার্বজনীন আইপি ব্লক বা বাইপাস নিয়ম পাওয়া যায়নি।</string>
     <string name="ada_app_status_block_md">মিটারযুক্ত (মোবাইল) নেটওয়ার্কগুলিতে অবরুদ্ধ</string>
     <string name="notif_download_content_text">ডাউনলোড চলছে…</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="lbbs_enabled">সক্ষম করা হয়েছে</string>
     <string name="lbbs_redownload">ব্লকলিস্ট পুনরায় ডাউনলোড করুন</string>
     <string name="dns_proxy_connection_failure_lockdown">লকডাউন মোডে %2$s-এর জন্য %1$s বাদ দিলে ইন্টারনেট সংযোগ সমস্যা হতে পারে।</string>
@@ -747,19 +741,16 @@
     <string name="notif_dialog_pause_dialog_negative">বাতিল</string>
     <string name="notif_channel_desc_firewall_alerts">ফায়ারওয়াল ত্রুটি এবং অসঙ্গতির বিষয়ে সতর্কতা</string>
     <string name="ci_dialog_error_invalid_ip">অবৈধ IP ঠিকানা, সাবনেট বা পোর্ট।</string>
-    <string name="ci_blocked_desc">- অবরুদ্ধ</string>
-    <string name="ci_no_rule_desc">- কোন নিয়ম নেই</string>
     <string name="notif_download_content_title">অন-ডিভাইস ব্লকলিস্ট ডাউনলোড</string>
     <string name="rt_dialog_neutral">Continue</string>
     <string name="rt_download">ব্লকলিস্ট ডাউনলোড করুন</string>
-    <string name="rethink_dns_txt">রিথিঙ্কডিএনএস %1$s</string>
     <string name="dc_doh">HTTPS এর উপর Dns</string>
     <string name="brbs_backup_dialog_negative">বাতিল</string>
     <string name="new_app_bulk_notification_content">RethinkDNS ব্লক করেছে %1$s নতুন অ্যাপ। দেখতে বা পরিবর্তন করতে আলতো চাপুন।</string>
     <string name="category_name_installed">ইনস্টল করা অ্যাপস</string>
     <string name="ci_blocked_initial">নীল</string>
     <string name="ci_blocked_txt">Blocked</string>
-    <string name="bsac_bypass_app_rules">বাইপাস অ্যাপের নিয়ম</string>
+    <string name="bsac_trust">বাইপাস অ্যাপের নিয়ম</string>
     <string name="notif_download_failure_content">নামাতে ব্যার্থ. আবার চেষ্টা করুন.</string>
     <string name="rt_download_desc">এই বৈশিষ্ট্যটি ব্যবহার করতে ব্লকলিস্ট ডাউনলোড করুন (প্রায় 60MB)।</string>
     <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s
@@ -771,7 +762,7 @@
     <string name="new_app_notification_title">অ্যাকশন প্রয়োজন</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_blocked_txt">Blocked</string>
-    <string name="ci_header">আইপি এবং পোর্টের নিয়ম</string>
+    <string name="ci_header">আইপি এবং পোর্টের নিয়ম: %1$s</string>
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
     <string name="ada_app_metered">মিটারযুক্ত</string>
@@ -799,7 +790,7 @@
     <string name="rt_cancel_btn">বাতিল</string>
     <string name="brbs_restore_dialog_title">ব্যাকআপ পুনরুদ্ধার</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 প্রক্সি</string>
-    <string name="firewall_rule_lockdown">লকডাউন (অ্যাপ)</string>
+    <string name="firewall_rule_isolate">লকডাউন (অ্যাপ)</string>
     <string name="firewall_rule_unknown">উৎস অজানা</string>
     <string name="firewall_rule_exempt_app_bypass_univ">বাইপাস অ্যাপ</string>
     <string name="firewall_rule_unknown_desc">এই সংযোগটি ফায়ারওয়াল করা হয়েছে কারণ <i>সোর্স অ্যাপ</i> নির্ধারণ করা যায়নি।</string>
@@ -811,9 +802,9 @@
     <string name="brbs_backup_dialog_failure_message">ব্যাকআপ করা যায়নি। আবার চেষ্টা করুন\?</string>
     <string name="orbot_toast_parameter">টর-এ-এ-প্রক্সি</string>
     <string name="update_complete_action_snack">আবার শুরু</string>
-    <string name="firewall_rule_bypass_apprule_ip">বাইপাসড আইপি (অ্যাপ)</string>
+    <string name="firewall_rule_trusted_ip">বাইপাসড আইপি (অ্যাপ)</string>
     <string name="firewall_rule_block_ip_univ_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
+    <string name="firewall_rule_trusted_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
     <string name="notif_channel_desc_vpn_failure">Android বা অন্য VPN অ্যাপ দ্বারা RethinkDNS বন্ধ করা হলে জানান</string>
     <string name="cd_dialog_header">কাস্টম ডোমেন(গুলি)</string>
     <string name="lbbs_heading">185+ ব্লকলিস্ট কনফিগার করুন</string>
@@ -821,15 +812,13 @@
     <string name="brbs_backup_complete_toast">ব্যাকআপ সম্পন্ন</string>
     <string name="fapps_unmetered_positive">প্রয়োগ করুন</string>
     <string name="fapps_firewall_filter_all">All</string>
-    <string name="fapps_metered_positive">প্রয়োগ করুন</string>
     <string name="fapps_firewall_filter_hint">তালিকাভুক্ত অ্যাপে আনমিটারড/মিটারড নিয়ম প্রয়োগ করুন</string>
     <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s অ্যাপ দেখানো হচ্ছে</string>
-    <string name="fapps_info_dialog_title">তথ্য</string>
     <string name="fapps_info_dialog_positive_btn">ঠিক আছে</string>
     <string name="fapps_firewall_filter_allowed">অনুমোদিত</string>
     <string name="fapps_firewall_filter_blocked">Blocked</string>
     <string name="fapps_firewall_filter_excluded">ছাঁটা</string>
-    <string name="fapps_firewall_filter_lockdown">তালাবদ্ধ</string>
+    <string name="fapps_firewall_filter_isolate">তালাবদ্ধ</string>
     <string name="fapps_unmetered_unblock_dialog_title">আনমিটারে অনুমতি দিন</string>
     <string name="fapps_unmetered_unblock_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপগুলির জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগের অনুমতি দেবেন\?</string>
     <string name="fapps_unmetered_negative">বাতিল</string>
@@ -842,7 +831,6 @@
     <string name="fapps_firewall_filter_bypass_universal">বাইপাস</string>
     <string name="fapps_unmetered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগ ব্লক করবেন\?</string>
     <string name="fapps_metered_block_dialog_title">মিটারে ব্লক</string>
-    <string name="fapps_metered_negative">বাতিল</string>
     <string name="fapps_lockdown_hint">Vpn লকডাউন মোডে আছে। ফায়ারওয়াল মিটারড / আনমিটারড নিয়ম মেনে চলবে না।</string>
     <string name="fapps_firewall_filter_desc_category">বিভাগে দেখানো হচ্ছে <u>%1$s</u> %2$s অ্যাপগুলি: %3$s</string>
     <string name="fav_icon">fav_icon</string>

@@ -33,10 +33,10 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.databinding.ActivityCustomIpBinding
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.CustomLinearLayoutManager
@@ -72,11 +72,10 @@ class CustomIpActivity :
 
         uid = intent.getIntExtra(INTENT_UID, UID_EVERYBODY)
 
-        b.customDialogHeading.text = "${getString(R.string.ci_header)}: ${getAppName()}"
+        b.customDialogHeading.text = getString(R.string.ci_header, getAppName())
 
         b.cipSearchView.setOnQueryTextListener(this)
         observeCustomRules()
-        updateHintUi()
         setupRecyclerView()
         setupClickListeners()
 
@@ -101,18 +100,6 @@ class CustomIpActivity :
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
-    }
-
-    // now both the universal and app rules are shown in same ui, update the universal and
-    // app specific hints. bypass universal/app rules is one such example
-    private fun updateHintUi() {
-        if (uid == UID_EVERYBODY) {
-            b.cipBypassHint.text = getString(R.string.ci_bypass_universal_desc)
-            b.cipBypassHintInitial.text = getString(R.string.ci_bypass_universal_initial)
-        } else {
-            b.cipBypassHint.text = getString(R.string.ci_bypass_app_desc)
-            b.cipBypassHintInitial.text = getString(R.string.ci_bypass_app_initial)
-        }
     }
 
     private fun observeCustomRules() {
@@ -254,7 +241,7 @@ class CustomIpActivity :
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
-            IpRulesManager.clearAllIpRules()
+            IpRulesManager.deleteIpRulesByUid(uid)
             Utilities.showToastUiCentered(
                 this,
                 getString(R.string.univ_ip_delete_toast_success),

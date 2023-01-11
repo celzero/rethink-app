@@ -26,7 +26,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:text="Dummy Label"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
@@ -35,7 +34,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:text="Dummy Label"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 
@@ -50,8 +48,7 @@
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/dns_proxy_list_check_image"
             android:padding="10dp"
-            android:src="@drawable/ic_fab_uninstall"
-            android:text="delete" />
+            android:src="@drawable/ic_fab_uninstall" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/dns_proxy_list_check_image"

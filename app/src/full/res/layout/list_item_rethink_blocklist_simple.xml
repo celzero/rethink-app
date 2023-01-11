@@ -17,8 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingTop="5dp"
             android:paddingStart="5dp"
+            android:paddingTop="5dp"
             android:paddingEnd="5dp"
             android:textColor="?attr/accentBad"
             android:textSize="@dimen/heading_font_text_view"
@@ -28,11 +28,11 @@
             android:id="@+id/crp_blocktype_desc_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:alpha="0.75"
             android:gravity="center"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
             android:paddingBottom="5dp"
-            android:alpha="0.75"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view" />
 
@@ -46,6 +46,13 @@
         app:cardBackgroundColor="?attr/background"
         app:cardCornerRadius="2dp"
         app:cardElevation="2dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/crp_level_indicator"
+            android:layout_width="2.5dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:background="@color/colorGreen_A400" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -66,7 +73,6 @@
                 android:id="@+id/crp_label_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/crp_check_box"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/crp_check_box"
                 android:ellipsize="end"
@@ -80,11 +86,11 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/crp_label_tv"
                 android:layout_alignParentStart="true"
+                android:alpha="0.75"
                 android:ellipsize="end"
                 android:padding="5dp"
-                android:alpha="0.75"
                 android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/small_font_subheading_text" />
+                android:textSize="@dimen/large_font_text_view" />
 
 
         </RelativeLayout>

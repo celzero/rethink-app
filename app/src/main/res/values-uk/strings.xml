@@ -12,7 +12,7 @@
     <string name="slide_1_desc">RethinkDNS - це ПЗ з відкритим вихідним кодом, яке підтримується програмою Mozilla Builders MVP.</string>
     <string name="block">блокувати</string>
     <string name="exclude">виключити</string>
-    <string name="lockdown">карантин</string>
+    <string name="isolate">карантин</string>
     <string name="untracked">не відстежуваний</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Попередження: RethinkDNS було деактивовано</string>
     <string name="dns_mode_notification_title">Захищено! Підключено до Швидкого та Безпечного DNS.</string>

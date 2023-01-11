@@ -9,6 +9,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:localeConfig="@xml/locale_config"
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppThemeInitial"
@@ -67,6 +68,9 @@
             android:name=".ui.AppDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.DetailedStatisticsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
@@ -85,6 +89,15 @@
         <receiver
             android:name=".receiver.NotificationActionReceiver"
             android:label="@string/app_name" />
+
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
 
         <service
             android:name=".util.BackgroundAccessibilityService"

@@ -178,7 +178,6 @@
     <string name="univ_ip_delete_dialog_positive">Slett alle</string>
     <string name="univ_ip_delete_toast_success">Slettet alle IP-regler.</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
-    <string name="whats_new_version_name">🌎🕊 Verdens studentdag (15 okt) 🕊🌎</string>
     <string name="univ_delete_firewall_dialog_title">Slett alle IP-regler\?</string>
     <string name="error_loading_log_file">Kunne ikke laste inn loggfil</string>
     <string name="cd_custom_doh_dialog_title">Egendefinert tjener-nettadresse</string>
@@ -300,7 +299,6 @@
     <string name="about_settings">System</string>
     <string name="settings_notification_dialog_title">Velg merknadshandling</string>
     <string name="dns_proxy_ip_address">IP</string>
-    <string name="fapps_metered_positive">Bruk</string>
     <string name="settings_local_blocklist_dialog_negative">Avbryt</string>
     <string name="settings_local_blocklist_version">Versjon v%1$s</string>
     <string name="firewall_rule_block_dns_bypass">DNS omgått</string>
@@ -334,7 +332,7 @@
     <string name="fapps_filter_categories_heading">Kategorier</string>
     <string name="fapps_filter_clear_btn">Tøm</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="ci_header">IP og portregler</string>
+    <string name="ci_header">IP og portregler: %1$s</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">Ikke beskyttet</string>
     <string name="cd_dns_proxy_mode_internal">Intern</string>
     <string name="coming_soon_toast">Kommer snart</string>
@@ -355,7 +353,6 @@
     <string name="hsf_start_btn_state">Start</string>
     <string name="hsf_start_dialog_header">Start %1$s</string>
     <string name="hsf_proxy_chip_text">Mellomtjener aktiv</string>
-    <string name="fapps_metered_negative">Avbryt</string>
     <string name="dns_crypt_connection_failure">Kunne ikke koble til DNSCrypt-tjener.</string>
     <string name="notif_channel_vpn_failure">Inaktiv VPN</string>
     <string name="cd_dialog_header">Egendefinert(e) domene(r)</string>
@@ -368,7 +365,6 @@
     <string name="notif_channel_download">Nedlastningsvarler</string>
     <string name="category_name_non_app_sys">Systemtjenester</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Slett DNSCrypt-utleder\?</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">Rethink i bruk</string>
     <string name="orbot_none">Ingen (forvalg)</string>
     <string name="dns_proxy_dialog_message_no_app">IP: %1$s
 \n
@@ -390,7 +386,6 @@
     <string name="vpn_profile_error">Kunne ikke igangsette VPN-profil.</string>
     <string name="dns_filter_parent_allowed">Tillatt</string>
     <string name="dns_proxy_negative_btn">Avbryt</string>
-    <string name="fapps_info_dialog_title">Info</string>
     <string name="fapps_unmetered_positive">Bruk</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Advarsel: Rethink har blitt avslått</string>
     <string name="dc_custom_block_heading">Tillat eller nekt individuelle domener</string>
@@ -448,7 +443,6 @@
     <string name="settings_socks_forwarding_default_desc">Videresend tilkoblinger til SOCKS5-endepunkt.</string>
     <string name="dns_btm_record_type">Spørringstype: %1$s</string>
     <string name="univ_accessibility_crash_dialog_positive">Åpne innstillingene</string>
-    <string name="ci_blocked_desc">- Blokkert</string>
     <string name="ada_app_dns_settings">DNS-innstillinger</string>
     <string name="rt_dialog_neutral">Fortsett</string>
     <string name="cd_dialog_positive_btn">Legg til</string>
@@ -514,11 +508,10 @@
     <string name="rt_apply_btn">Bruk</string>
     <string name="firewall_act_universal_tab">Universell</string>
     <string name="orbot_install_dialog_message">Orbot gir Tor-rutingsfunksjonalitet.</string>
-    <string name="fapps_firewall_filter_lockdown">Nedlåst</string>
+    <string name="fapps_firewall_filter_isolate">Nedlåst</string>
     <string name="notif_channel_vpn_notification">Aktiv VPN</string>
     <string name="rt_cancel_download">Avbryt</string>
     <string name="rt_cancel_btn">Avbryt</string>
-    <string name="bsrf_group_heading">Gruppe</string>
     <string name="dc_doh">DNS over HTTPS</string>
     <string name="brbs_backup_title">Sikkerhetskopiering</string>
     <string name="brbs_restore_dialog_negative">Avbryt</string>
@@ -602,7 +595,6 @@
     <string name="dc_check_update_desc">Se etter endringer i svartelister hver <i>tredje</i> dag</string>
     <string name="cd_dns_crypt_resolver_heading">Utleder</string>
     <string name="dc_block_heading">Regler</string>
-    <string name="hsf_blocklist_chip_text">%1$s svartelister satt opp</string>
     <string name="firewall_rule_block_metered">Kvotebasert (mobilnett)</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>

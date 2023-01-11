@@ -32,6 +32,7 @@ import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
@@ -57,7 +58,13 @@ class ConnectionTrackerFragment :
     private val persistentState by inject<PersistentState>()
 
     companion object {
-        fun newInstance() = ConnectionTrackerFragment()
+        fun newInstance(param: String): ConnectionTrackerFragment {
+            val args = Bundle()
+            args.putString(Constants.SEARCH_QUERY, param)
+            val fragment = ConnectionTrackerFragment()
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     enum class TopLevelFilter(val id: Int) {
@@ -69,6 +76,10 @@ class ConnectionTrackerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        if (arguments != null) {
+            val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
+            b.connectionSearch.setQuery(query, true)
+        }
     }
 
     private fun initView() {

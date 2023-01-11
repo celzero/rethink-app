@@ -47,34 +47,34 @@ interface RethinkLocalFileTagDao {
     fun updateSelectedTag(value: Int, isSelected: Int)
 
     @Query(
-        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected  from RethinkLocalFileTag"
+        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, level, simpleTagId, isSelected  from RethinkLocalFileTag"
     )
     fun getAllTags(): List<FileTag>
 
-    @Query("select * from RethinkLocalFileTag order by `group`")
+    @Query(
+        "select * from RethinkLocalFileTag where case when isSelected = 1 then pack like '%%' else pack not like '%\"dead\"%' end order by `group`"
+    )
     fun getLocalFileTags(): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
-        "select * from RethinkLocalFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkLocalFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
     fun getLocalFileTags(
         query: String,
         selected: Set<Int>,
-        group: Set<String>,
         subg: Set<String>
     ): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
-        "select * from RethinkLocalFileTag where isSelected in (:selected) and entries > 0 and `group` in (:group) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkLocalFileTag where isSelected in (:selected) and (vname like :query or `group` like :query or subg like :query) order by `group`"
     )
     fun getLocalFileTagsGroup(
         query: String,
-        selected: Set<Int>,
-        group: Set<String>
+        selected: Set<Int>
     ): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
-        "select * from RethinkLocalFileTag where isSelected in (:selected) and entries > 0 and  subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkLocalFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) and case when isSelected = 1 then pack like '%%' else pack not like '%\"dead\"%' end order by `group`"
     )
     fun getLocalFileTagsSubg(
         query: String,
@@ -83,7 +83,7 @@ interface RethinkLocalFileTagDao {
     ): PagingSource<Int, RethinkLocalFileTag>
 
     @Query(
-        "select * from RethinkLocalFileTag where isSelected in (:selected) and entries > 0 and (vname like :input or `group` like :input or subg like :input) order by `group`"
+        "select * from RethinkLocalFileTag where isSelected in (:selected) and (vname like :input or `group` like :input or subg like :input) and case when isSelected = 1 then pack like '%%' else pack not like '%\"dead\"%' end order by `group`"
     )
     fun getLocalFileTagsWithFilter(
         input: String,
@@ -93,7 +93,7 @@ interface RethinkLocalFileTagDao {
     @Query("Update RethinkLocalFileTag set isSelected = 0") fun clearSelectedTags()
 
     @Query(
-        "select  value, uname, vname, `group`, subg, url as urls, show, entries, pack, simpleTagId, isSelected from RethinkLocalFileTag"
+        "select  value, uname, vname, `group`, subg, url as urls, show, entries, pack, level, simpleTagId, isSelected from RethinkLocalFileTag"
     )
     fun fileTags(): List<FileTag>
 

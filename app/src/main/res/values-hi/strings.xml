@@ -23,7 +23,7 @@
     <string name="allow">अनुमति दें</string>
     <string name="block">ब्लॉक करें</string>
     <string name="bypass_universal">बाईपास सार्वभौमिक</string>
-    <string name="lockdown">लॉकडाउन</string>
+    <string name="isolate">लॉकडाउन</string>
     <string name="untracked">ट्रैक न किए गए</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">चेतावनी: रीथिंकडीएनएस निष्क्रिय कर दिया गया है</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">सुरक्षा सेटिंग बदलने के लिए टैप करें</string>

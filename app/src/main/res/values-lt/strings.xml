@@ -96,7 +96,6 @@
     <string name="settings_enable_logs">Įgalinti registravimą įrenginyje</string>
     <string name="app_mode_choose">Pasirinkti režimą</string>
     <string name="whats_dialog_title">Kas naujo v053l</string>
-    <string name="whats_new_version_name">🌎🕊 Pasaulinė studentų diena (spalio 15 d.) 🕊🌎</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_heading">Pasirinkti IP versiją</string>
     <string name="settings_ip_network_desc">Pasirinkti vieną iš interneto protokolo versijų.</string>
@@ -184,7 +183,7 @@
     <string name="settings_protocol_translation_dns_inactive">Norėdami įjungti šį nustatymą, perjunkite į DNS / DNS + ugniasienės režimą</string>
     <string name="apps_icon_content_desc">Programėlės ikona</string>
     <string name="firewall_status_allow">leidžiama</string>
-    <string name="firewall_status_lockdown">visiškas užrakinimas</string>
+    <string name="firewall_status_isolate">visiškas užrakinimas</string>
     <string name="firewall_status_whitelisted">apeinamos universaliosios ugniasienės taisyklės</string>
     <string name="firewall_status_block_unmetered">užblokuota nematuojamuose (wifi) tinkluose</string>
     <string name="firewall_status_block_metered">užblokuota matuojamuose (mobiliuosiuose) tinkluose</string>
@@ -207,7 +206,6 @@
     <string name="hsf_start_dialog_positive">Paleisti</string>
     <string name="hsf_start_dialog_negative">Atsisakyti</string>
     <string name="hsf_proxy_chip_text">Įgaliotasis serveris aktyvus</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">Naudojamas RDNS</string>
     <string name="hsf_blocklist_chip_text_no_data">Įgalinti RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS žurnalai</string>
     <string name="hsf_network_logs_chip_text">Tinklo žurnalai</string>
@@ -329,8 +327,7 @@
     <string name="fapps_firewall_filter_all">Visi</string>
     <string name="fapps_firewall_filter_allowed">Leidžiama</string>
     <string name="fapps_firewall_filter_blocked">Užblokuota</string>
-    <string name="fapps_firewall_filter_lockdown">Visiškas užrakinimas</string>
-    <string name="fapps_info_dialog_title">Informacija</string>
+    <string name="fapps_firewall_filter_isolate">Visiškas užrakinimas</string>
     <string name="fapps_info_dialog_positive_btn">Gerai</string>
     <string name="fapps_unmetered_block_dialog_message">Blokuoti prisijungimus nematuojamame (WiFi) tinkle <i>išvardytoms</i> programėlėms\?</string>
     <string name="fapps_unmetered_unblock_dialog_message">Leisti prisijungimus nematuojamame (WiFi) tinkle <i>išvardytoms</i> programėlėms\?</string>
@@ -339,7 +336,6 @@
     <string name="fapps_metered_block_dialog_message">Blokuoti prisijungimus matuojamame (mobiliajame) tinkle <i>išvardytoms</i> programėlėms\?</string>
     <string name="fapps_metered_unblock_dialog_title">Leisti matuojamuose</string>
     <string name="fapps_metered_block_dialog_title">Blokuoti matuojamuose</string>
-    <string name="fapps_metered_positive">Taikyti</string>
     <string name="fapps_firewall_filter_hint">Taikyti nematuojamų / matuojamų tinklų taisykles išvardytoms programėlėms</string>
     <string name="fapps_firewall_filter_desc">Rodomos <u>%1$s</u> %2$s programėlės</string>
     <string name="fapps_unmetered_unblock_dialog_title">Leisti nematuojamuose tinkluose</string>
@@ -373,7 +369,7 @@
     <string name="firewall_rule_no_rule">Jokios taisyklės</string>
     <string name="firewall_rule_block_metered">Matuojami (mobilieji)</string>
     <string name="firewall_rule_univ_block_metered">Matuojamas (universalus)</string>
-    <string name="firewall_rule_lockdown">Visiškas užrakinimas(programėlė)</string>
+    <string name="firewall_rule_isolate">Visiškas užrakinimas(programėlė)</string>
     <string name="firewall_rule_block_app_new_install">Nauja programėlė</string>
     <string name="firewall_rule_block_app_exception">Klaida</string>
     <string name="firewall_rule_block_ip">IP / prievadas (programėlei)</string>
@@ -428,7 +424,7 @@
     <string name="ci_dialog_edittext_hint">IP adresas, potinklis arba prievadas</string>
     <string name="ci_dialog_error_invalid_ip">Netinkamas IP adresas, potinklis arba prievadas.</string>
     <string name="ci_dialog_added_success">IP įtrauktas į sąrašą</string>
-    <string name="ci_header">IP ir prievado taisyklės</string>
+    <string name="ci_header">IP ir prievado taisyklės: %1$s</string>
     <string name="ci_no_rules_text">Nerasta jokių universaliųjų IP blokavimo ar apėjimo taisyklių.</string>
     <string name="ci_bypass_universal_initial">AU</string>
     <string name="ci_blocked_txt">Užblokuota</string>
@@ -445,8 +441,8 @@
     <string name="bsac_title_desc">Taisyklės taikomos tik šiai programėlei.</string>
     <string name="bsac_unblock">Atblokuoti</string>
     <string name="bsac_block">Blokuoti</string>
-    <string name="bsac_bypass_app_rules">Apeiti programėlės taisykles</string>
-    <string name="bsac_go_pass_app_rules">Pašalinti apėjimą</string>
+    <string name="bsac_trust">Apeiti programėlės taisykles</string>
+    <string name="bsac_distrust">Pašalinti apėjimą</string>
     <string name="bsdl_domain_heading">Domeno taisyklė</string>
     <string name="bsdl_domain_desc">Spustelėkite žemiau, kad leistumėte arba blokuotumėte DNS užklausą</string>
     <string name="rt_dialog_negative">Atšaukti</string>
@@ -456,7 +452,6 @@
     <string name="rt_cancel_btn">Atšaukti</string>
     <string name="rt_apply_btn">Taikyti</string>
     <string name="rt_download_desc">Atsisiųsti blokavimo sąrašus (apie 60 MB), kad galėtumėte naudotis šia funkcija.</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_sky_btn">⛅ Dangus</string>
     <string name="bsrf_apply_filter">Taikyti</string>
     <string name="bsrf_clear_filter">Išvalyti</string>
@@ -613,7 +608,6 @@
 \n
 \nRethinkDNS nerenka jokios informacijos ir jokiu būdu nešnipinėja jūsų.</string>
     <string name="hsf_start_dialog_message">Iki saugaus ir patikimo Android liko vienas žingsnis: akimirksniu peržiūrėkite tinklo veiklą, blokuokite svetaines, IP adresus ir blogai besielgiančias programėles.</string>
-    <string name="hsf_blocklist_chip_text">Sukonfigūruoti %1$s blokavimo sąrašai</string>
     <string name="hsf_proxy_chip_removed_toast">Įgaliotasis serveris pašalintas</string>
     <string name="dc_dns_leaks_heading">Užkirsti kelią DNS nutekėjimui</string>
     <string name="hsf_whats_new_chip_text">Kas naujo</string>
@@ -667,7 +661,6 @@
     <string name="cd_dialog_positive_btn">pridėti</string>
     <string name="cd_doh_dialog_heading">Pridėti DNS per HTTPS</string>
     <string name="dns_btm_record_type">Užklausos tipas: %1$s</string>
-    <string name="fapps_metered_negative">Atšaukti</string>
     <string name="cd_dialog_negative_btn">atšaukti</string>
     <string name="dns_filter_parent_all">Visi</string>
     <string name="dns_filter_parent_blocked">Užblokuota</string>
@@ -721,8 +714,8 @@
     <string name="firewall_rule_unknown">Šaltinis nežinomas</string>
     <string name="firewall_rule_foreground">Programėlė nenaudojama</string>
     <string name="firewall_rule_block_app_univ_mobile_desc">Naudotojo nustatyta universali ugniasienės taisyklė užblokavo šią <i>programėlę</i>, kai buvo bandoma prisijungti prie <i>Matuojamo</i> (mobiliojo) tinklo.<br/><br/> Norėdami pakeisti, eikite į <i>Universaliosios</i> skirtuką.</string>
-    <string name="firewall_rule_lockdown_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i> prisijungiant prie kitų nei <i>apeinamų IP adresų</i>.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">Šis ryšys buvo leidžiamas, nes <i>paskirties IP</i> nustatytas apeiti visas konkrečiai programėlei taikomas taisykles.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.</string>
+    <string name="firewall_rule_isolate_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo šią <i>programėlę</i> prisijungiant prie kitų nei <i>apeinamų IP adresų</i>.<br/><br/> Norėdami pakeisti, eikite į skirtuką <i>Visos programėlės</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Šis ryšys buvo leidžiamas, nes <i>paskirties IP</i> nustatytas apeiti visas konkrečiai programėlei taikomas taisykles.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Šis ryšys buvo leidžiamas, nes &lt;i&gt;paskirties IP&lt;/i&gt; nustatytas apeiti visas universalias ugniasienės taisykles.&lt;br/&gt;&lt;br/&gt; Norėdami pakeisti, eikite į &lt;i&gt;IP taisyklės&lt;i&gt; &lt;i&gt;Universaliosios&lt;/i&gt; skirtuką.</string>
     <string name="cd_remove_dialog_negative">Atšaukti</string>
     <string name="firewall_rule_block_ip_desc">Naudotojo nustatyta ugniasienės taisyklė užblokavo <i>paskirties IP</i>.<br/><br/> Norėdami pakeisti, eikite į <i>konkrečios programėlės ugniasienės</i> langą.</string>
@@ -756,10 +749,8 @@
     <string name="category_name_installed">Įdiegtos programėlės</string>
     <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
 \n</string>
-    <string name="ci_blocked_desc">- Užblokuota</string>
     <string name="rt_dialog_message">Ar norite taikyti naujai sukonfigūruotus blokavimo sąrašus\?</string>
     <string name="ci_no_rule_initial">N</string>
-    <string name="ci_no_rule_desc">- Nėra taisyklės</string>
     <string name="ci_block">blokuoti</string>
     <string name="ci_no_rule_txt">Nėra taisyklės</string>
     <string name="ci_no_rule">nėra taisyklės</string>
@@ -772,7 +763,6 @@
     <string name="rt_download">Atsisiųsti blokavimo sąrašus</string>
     <string name="ada_ip_no_connection">Nėra šios programėlės tinklo žurnalų.</string>
     <string name="rbl_parental_control">Tėvų kontrolė</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">Išsaugoti pakeitimus</string>
     <string name="notif_download_failure_content">Atsisiųsti nepavyko. Bandykite dar kartą.</string>
     <string name="bsdl_domain_rule_block">blokuoti</string>
@@ -784,7 +774,7 @@
     <string name="rt_chip_check_update">Tikrinti, ar yra atnaujinimų</string>
     <string name="brbs_restore_complete_toast">Atkūrimas baigtas, iš naujo paleidžiama programėlė…</string>
     <string name="bsdl_domain_rule_allow">leisti</string>
-    <string name="ada_app_status_lockdown">yra visiško užrakinimo režime</string>
+    <string name="ada_app_status_isolate">yra visiško užrakinimo režime</string>
     <string name="ada_app_status_unknown">yra nežinoma</string>
     <string name="ada_ip_block_count">%1$s IP taisyklė (-ės)</string>
     <string name="ada_app_metered">Matuojami</string>
@@ -800,7 +790,7 @@
     <string name="pause_title_desc">snaudžiama…</string>
     <string name="settings_title_desc">Itin pritaikoma DNS bei ugniasienė</string>
     <string name="bypass_universal">apeiti universaliąsias</string>
-    <string name="lockdown">visiškas užrakinimas</string>
+    <string name="isolate">visiškas užrakinimas</string>
     <string name="notification_action_resume_vpn">TĘSTI</string>
     <string name="bsct_block_app">Blokuoti, leisti apeiti <u>šį IP</u> <u>šiai programėlei</u></string>
     <string name="bsct_block">Blokuoti, leisti apeiti, išskirti, visiškai užrakinti <u>šią programėlę</u></string>
@@ -820,7 +810,6 @@
     <string name="settings_dns_proxy_dialog_hostname">Pagrindinio kompiuterio vardas</string>
     <string name="settings_dns_proxy_dialog_app_desc">Pasirinkta programėlė bus išskirta iš VPN, kad ji galėtų prisijungti prie įgaliotojo serverio jūsų vardu.</string>
     <string name="settings_socks_forwarding_default_desc">Peradresuoti ryšius į SOCKS5 galinį punktą.</string>
-    <string name="bsrf_group_heading">Grupė</string>
     <string name="bsrf_sub_group_heading">Pogrupis</string>
     <string name="bsct_conn_block_desc">%1$s užblokuota pagal %2$s</string>
     <string name="bsct_conn_block_desc_device">%1$s užblokuotas įrenginyje</string>
@@ -838,29 +827,27 @@
     <string name="fapps_firewall_filter_bypass_universal">Apeinama</string>
     <string name="fapps_firewall_filter_excluded">Išskirta</string>
     <string name="dns_proxy_connection_failure_lockdown">Išskiriama %1$s skirtą %2$s visiško užrakinimo režime, tai gali sukelti interneto ryšio problemų.</string>
-    <string name="firewall_rule_bypass_apprule_ip">Apeinamas IP (programėlė)</string>
+    <string name="firewall_rule_trusted_ip">Apeinamas IP (programėlė)</string>
     <string name="firewall_rule_bypass_universal_ip">Apeinamas IP</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Apeinanti programėlė</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS per įgaliotąjį serverį</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">Šis DNS ryšys buvo atliktas naudojant įgaliotąjį serverį ir persiųstas į naudotojo pageidaujamą DNS galinį punktą.<br/><br/> Norėdami pakeisti, išjunkite <i>Užkirsti kelią DNS nutekėjimui</i> DNS <i>Konfigūravimas</i> ekrane.</string>
     <string name="notif_dialog_pause_dialog_message">Programėlė pristabdyta, kad atnaujintumėte, pasirinkite tęsti</string>
     <string name="ci_bypass_universal_txt">Apeiti universaliąsias</string>
-    <string name="ci_bypass_universal_desc">- Apeina universaliąsias</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ada_app_status_exclude">yra išskiriama DNS ir ugniasienėje</string>
     <string name="ada_app_exclude">Išskirti</string>
     <string name="ci_bypass_universal">apeiti universaliąsias</string>
     <string name="ada_app_unmetered">Nematuojami</string>
-    <string name="ada_app_whitelist">Apeiti universaliąsias</string>
+    <string name="ada_app_bypass_univ">Apeiti universaliąsias</string>
     <string name="bsac_block_toast">%1$s blokuojamas šiais programėlei</string>
     <string name="bsac_unblock_toast">%1$s atblokuotas šiais programėlei</string>
-    <string name="bsac_whitelist_toast">Apeinamos programėlės taisyklės šiam IP %1$s</string>
-    <string name="bsac_whitelist_remove_toast">Pašalintas apėjimas šiam IP %1$s</string>
+    <string name="bsac_trust_toast">Apeinamos programėlės taisyklės šiam IP %1$s</string>
+    <string name="bsac_distrust_toast">Pašalintas apėjimas šiam IP %1$s</string>
     <string name="bsdl_blocked_desc">%1$s užblokuota pagal %2$s</string>
     <string name="rethink_sky_desc">Daugiau nei 280 vietų; geresnis veikimo laikas; stub sprendiklis veikia cloudflare.com</string>
     <string name="rethink_max_desc">Daugiau nei 50 vietovių; daugiau privatumo; rekursyvus sprendiklis veikia fly.io</string>
     <string name="rt_filter_desc">Rodomi <u>%1$s</u> blokavimo sąrašai</string>
-    <string name="rt_filter_desc_groups">Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s</string>
     <string name="rt_filter_desc_subgroups">Rodomi <u>%1$s</u> blokavimo sąrašai grupėje: %2$s ir pogrupyje: %3$s</string>
     <string name="hsf_notification_permission_failure">Įjunkite pranešimų leidimą nustatymų ekrane</string>
     <string name="about_privacy_policy">Privatumo politika</string>
@@ -872,7 +859,7 @@
     <string name="no_browser_error">Nepavyksta atidaryti tinklalapio iš naršyklės.</string>
     <string name="firewall_rule_block_univ_ip">IP / prievadas (universali)</string>
     <string name="ada_firewall_title">ugniasienės taisyklės šiai programėlei</string>
-    <string name="ada_app_lockdown">Visiškas užrakinimas</string>
+    <string name="ada_app_isolate">Visiškas užrakinimas</string>
     <string name="notif_download_cancel_content">Atsisiuntimas atšauktas.</string>
     <string name="rt_filter_parent_all">Visi</string>
     <string name="rt_filter_parent_selected">Pasirinkti</string>

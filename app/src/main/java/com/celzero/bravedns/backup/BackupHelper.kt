@@ -46,6 +46,9 @@ class BackupHelper {
         // backup shared pref file name
         const val SHARED_PREFS_BACKUP_FILE_NAME = "shared_prefs_backup.txt"
 
+        // metadata file name
+        const val METADATA_FILENAME = "rethink_backup.txt"
+
         // data builder uri string for restore worker
         const val DATA_BUILDER_RESTORE_URI = "restoreFileUri"
 
@@ -57,6 +60,14 @@ class BackupHelper {
 
         // intent scheme
         const val INTENT_SCHEME = "content"
+
+        // metadata constants
+        // version
+        const val VERSION = "version"
+        // package name
+        const val PACKAGE_NAME = "package"
+        // time when the backup  is taken
+        const val CREATED_TIME = "createdTs"
 
         fun getTempDir(context: Context): File {
             // temp dir (files/RethinkDns/)

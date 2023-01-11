@@ -36,7 +36,7 @@
                 android:layout_below="@id/custom_dialog_heading"
                 android:visibility="visible">
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cdf_search_container"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
                             app:selectionRequired="true"
                             app:singleSelection="true" />
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView

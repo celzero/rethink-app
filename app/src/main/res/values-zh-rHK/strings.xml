@@ -68,7 +68,6 @@
     <string name="settings_enable_logs">啓用本地日誌</string>
     <string name="whats_dialog_title">v053l 嘅新內容</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
-    <string name="whats_new_version_name">🌎🕊 世界學生日（10 月 15 號） 🕊🌎</string>
     <string name="orbot_http">HTTP 代理</string>
     <string name="whats_new_version_update">&lt;b&gt;打破語言隔閡！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 重新支援 Android 6。&lt;br/&gt; 2. 全新 RDNS+ 介面。&lt;br/&gt; 3. 全新防火牆同網絡引擎。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：超過 15 種語言嘅翻譯。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：自適應圖示。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：喺分應用網絡日誌入面顯示網域。&lt;br/&gt; 7. 修復通知喺 Android 13 上消失嘅問題。&lt;br/&gt; 8. 修復異常工作嘅 Orbot DNS 支援。&lt;br/&gt; 9. 應用程式區而家可以喺僅 DNS 模式入面訪問。&lt;br/&gt;10. 對內建下載管理器嘅一啲重大改進。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
     <string name="cd_doh_dialog_heading">加 DNS over HTTPS</string>
@@ -97,7 +96,7 @@
     <string name="ada_network_log_title">呢個 app 嘅網絡日誌</string>
     <string name="ada_app_metered">收費嘅網絡</string>
     <string name="ada_app_exclude">排除</string>
-    <string name="bsac_whitelist_remove_toast">移除咗針對呢個 IP %1$s 嘅繞行</string>
+    <string name="bsac_distrust_toast">移除咗針對呢個 IP %1$s 嘅繞行</string>
     <string name="rethink_sky_desc">超過 280 個地方；更長嘅在線時間；喺 cloudflare.com 上面行嘅中間解析服務</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
     <string name="app_name">RethinkDNS</string>
@@ -349,8 +348,6 @@
     <string name="hsf_start_dialog_negative">忽略</string>
     <string name="hsf_whats_new_chip_text">新內容</string>
     <string name="hsf_proxy_chip_text">啓用咗代理</string>
-    <string name="hsf_blocklist_chip_text">%1$s 份攔截清單</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">用緊 RDNS</string>
     <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
     <string name="hsf_dns_logs_chip_text">DNS 日誌</string>
     <string name="hsf_network_logs_chip_text">網絡日誌</string>
@@ -372,7 +369,7 @@
     <string name="dc_local_block_heading">本地攔截清單</string>
     <string name="dc_local_block_desc_1">喺超過 185 條攔截清單之中揀。㩒一下呢度下載或者配置攔截清單。</string>
     <string name="dc_custom_block_desc">就嚟推出</string>
-    <string name="dc_dns_website_desc">由 <i>nextdns.com</i> 同 <i>duckduckgo.com</i> 拎網站圖示。大約佔用 350 MB 磁碟空間</string>
+    <string name="dc_dns_website_desc">由 <i>nextdns.io</i> 同 <i>duckduckgo.com</i> 拎網站圖示。大約佔用 350 MB 磁碟空間</string>
     <string name="dc_dns_leaks_heading">防止 DNS 洩漏</string>
     <string name="dc_dns_leaks_desc">如果啓用，RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
     <string name="dc_check_update_heading">提示攔截清單更新</string>
@@ -525,7 +522,6 @@
     <string name="fapps_filter_clear_btn">清除</string>
     <string name="fapps_filter_parent_all">全部</string>
     <string name="fapps_filter_parent_installed">裝咗嘅</string>
-    <string name="fapps_info_dialog_title">資料</string>
     <string name="fapps_filter_filter_heading">類型</string>
     <string name="fapps_filter_categories_heading">類別</string>
     <string name="fapps_filter_apply_btn">套用</string>
@@ -546,8 +542,6 @@
     <string name="fapps_metered_block_dialog_title">喺收費嘅網絡攔截</string>
     <string name="fapps_metered_block_dialog_message">係咪喺收費嘅網絡（流動數據）攔截<i>呢度列出嘅</i>應用程式？</string>
     <string name="fapps_metered_unblock_dialog_message">係咪喺收費嘅網絡（流動數據）放行<i>呢度列出嘅</i>應用程式？</string>
-    <string name="fapps_metered_positive">套用</string>
-    <string name="fapps_metered_negative">取消</string>
     <string name="fapps_lockdown_hint">VPN 正處於閉關模式。防火牆將唔會遵守收費／唔收費規則。</string>
     <string name="fapps_all_network_hint"><u>用所有用得嘅網絡</u>開咗。防火牆將唔會遵守收費／唔收費規則。</string>
     <string name="fapps_firewall_filter_hint">喺列出嘅應用程式使用唔收費／收費規則</string>
@@ -592,11 +586,11 @@
     <string name="firewall_rule_block_unmetered">唔收費嘅網絡（WiFi）</string>
     <string name="firewall_rule_block_metered">收費嘅網絡（流動數據）</string>
     <string name="firewall_rule_univ_block_metered">收費嘅網絡（全局）</string>
-    <string name="firewall_rule_lockdown">閉關模式（應用程式）</string>
+    <string name="firewall_rule_isolate">閉關模式（應用程式）</string>
     <string name="firewall_rule_block_app_new_install">新 App</string>
     <string name="firewall_rule_block_app_exception">錯誤</string>
     <string name="firewall_rule_block_ip">IP / 埠（App）</string>
-    <string name="firewall_rule_bypass_apprule_ip">已繞行 IP （應用程式）</string>
+    <string name="firewall_rule_trusted_ip">已繞行 IP （應用程式）</string>
     <string name="firewall_rule_unknown">未知來源</string>
     <string name="firewall_rule_block_udp_ntp">攔截咗 UDP</string>
     <string name="firewall_rule_block_dns_bypass">繞過咗 DNS</string>
@@ -653,12 +647,11 @@
     <string name="ci_dialog_edittext_hint">IP 地址、子網或者埠</string>
     <string name="ci_dialog_error_invalid_ip">冇效嘅 IP 地址、子網或者埠。</string>
     <string name="ci_dialog_added_success">已經將 IP 加咗入清單</string>
-    <string name="ci_header">IP 同埠規則</string>
+    <string name="ci_header">IP 同埠規則: %1$s</string>
     <string name="ci_no_rules_text">搵唔到 IP 或者埠規則。</string>
     <string name="ci_bypass_universal_initial">繞</string>
     <string name="ci_no_rule_initial">冇</string>
     <string name="ci_no_rule_txt">冇規則</string>
-    <string name="ci_no_rule_desc">- 冇規則</string>
     <string name="ci_no_rule">冇規則</string>
     <string name="ci_delete">刪除</string>
     <string name="ada_noapp_dialog_title">搵唔到應用程式資訊</string>
@@ -670,18 +663,18 @@
     <string name="ada_ip_no_connection">呢個 app 冇網絡日誌。</string>
     <string name="ada_app_status_whitelist">將會繞過全局防火牆規則</string>
     <string name="ada_app_status_exclude">已排除喺 DNS 同防火牆外</string>
-    <string name="ada_app_status_lockdown">喺閉關模式入面</string>
+    <string name="ada_app_status_isolate">喺閉關模式入面</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="ada_app_dns_settings">DNS 設定</string>
     <string name="bsac_title_desc">呢條規則淨係適用於呢個 app。</string>
     <string name="bsac_unblock">解封</string>
-    <string name="bsac_bypass_app_rules">繞行應用規則</string>
-    <string name="bsac_go_pass_app_rules">移除繞行</string>
+    <string name="bsac_trust">繞行應用規則</string>
+    <string name="bsac_distrust">移除繞行</string>
     <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
     <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
     <string name="bsdl_domain_heading">網域規則</string>
     <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
-    <string name="bsac_whitelist_toast">針對呢個 IP %1$s 嘅繞行應用規則</string>
+    <string name="bsac_trust_toast">針對呢個 IP %1$s 嘅繞行應用規則</string>
     <string name="bsdl_blocked_desc">由 %2$s 攔截咗 %1$s</string>
     <string name="bsdl_domain_rule_norule">冇規則</string>
     <string name="bsdl_domain_rule_allow">放行</string>
@@ -693,7 +686,6 @@
     <string name="rbl_parental_control">家長控制</string>
     <string name="rbl_privacy">私隱</string>
     <string name="rbl_security">安全</string>
-    <string name="rt_rethink_dns">RethinkDNS</string>
     <string name="rt_dialog_title">儲存更改</string>
     <string name="rt_dialog_message">您是係咪要套用新配置嘅攔截清單？</string>
     <string name="rt_dialog_positive">套用</string>
@@ -711,11 +703,9 @@
     <string name="rt_cancel_btn">取消</string>
     <string name="rt_apply_btn">套用</string>
     <string name="rt_download_desc">請下載攔截清單（大約 60 MB）嚟用呢個功能。</string>
-    <string name="rethink_dns_txt">RethinkDNS %1$s</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rethink_max_desc">超過 50 個地方；更私密；喺 fly.io 上面行嘅遞歸解析服務</string>
-    <string name="bsrf_group_heading">分組</string>
     <string name="bsrf_sub_group_heading">子分組</string>
     <string name="bsrf_apply_filter">套用</string>
     <string name="bsrf_clear_filter">套用</string>
@@ -763,7 +753,7 @@
     <string name="slide_1_desc">RethinkDNS 係一款受到 Mozilla Builders MVP 計劃資助同支持嘅開放原始碼軟件。</string>
     <string name="bypass_universal">無條件放行</string>
     <string name="exclude">排除</string>
-    <string name="lockdown">閉關</string>
+    <string name="isolate">閉關</string>
     <string name="untracked">未追蹤</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">㩒一下呢度改防護設定</string>
     <string name="brave_dns_connect_mode_change_firewall">揀模式。</string>
@@ -802,7 +792,7 @@
     <string name="orbot_install_activity_error">似乎出咗啲問題，請等陣再試過</string>
     <string name="firewall_status_allow">放行咗</string>
     <string name="firewall_status_excluded">排除咗喺 DNS 同防火牆之外</string>
-    <string name="firewall_status_lockdown">閉關咗</string>
+    <string name="firewall_status_isolate">閉關咗</string>
     <string name="firewall_status_whitelisted">繞過咗全局防火牆規則</string>
     <string name="firewall_status_block_unmetered">阻止咗連接唔收費嘅網絡（WiFi）</string>
     <string name="firewall_status_block_metered">阻止咗連接收費嘅網絡（流動數據）</string>
@@ -818,16 +808,16 @@
     <string name="fapps_firewall_filter_blocked">攔截咗</string>
     <string name="fapps_firewall_filter_bypass_universal">繞行咗</string>
     <string name="fapps_firewall_filter_excluded">排除咗</string>
-    <string name="fapps_firewall_filter_lockdown">閉關咗</string>
+    <string name="fapps_firewall_filter_isolate">閉關咗</string>
     <string name="firewall_rule_block_app_desc">一條用戶定義嘅防火牆規則攔截咗呢個 <i>App</i>。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
     <string name="firewall_rule_new_app_desc">呢個 App <i>第一次</i>嘗試連線。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
     <string name="firewall_rule_block_app_unmetered_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>唔收費嘅網絡</i>嘅時候將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
     <string name="firewall_rule_block_app_mobile_desc">一條用戶定義嘅防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>嘅時候將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
     <string name="firewall_rule_block_app_univ_mobile_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>收費嘅網絡</i>（流動數據）時將佢攔截咗。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
-    <string name="firewall_rule_lockdown_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>已繞行 IP</i> 以外嘅地址時時將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
+    <string name="firewall_rule_isolate_desc">一條用戶定義嘅全局防火牆規則喺呢個 <i>App</i> 嘗試連線去<i>已繞行 IP</i> 以外嘅地址時時將佢攔截咗。<br/><br/>如果要改，請去<i>所有應用程式</i>選項卡。</string>
     <string name="firewall_rule_block_ip_univ_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP / 埠</i>。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
     <string name="firewall_rule_block_ip_desc">一條用戶定義嘅全局防火牆規則攔截咗呢個<i>目標 IP</i>。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
-    <string name="firewall_rule_bypass_app_rules_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有分應用規則而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_trusted_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有分應用規則而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
     <string name="firewall_rule_bypass_universal_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有全局規則而被放行。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
     <string name="cd_dialog_desc">比一個自訂嘅 URL（網域）或者通配符嚟放行或者攔截，例如 *.test.com 或者 test.com/test</string>
     <string name="cd_whitelist_initial">放</string>
@@ -835,17 +825,15 @@
     <string name="cd_blocked_initial">攔</string>
     <string name="cd_blocked_txt">攔截</string>
     <string name="ci_bypass_universal_txt">無條件放行</string>
-    <string name="ci_bypass_universal_desc">- 無條件放行</string>
     <string name="ci_blocked_initial">攔</string>
     <string name="ci_blocked_txt">攔截</string>
-    <string name="ci_blocked_desc">- 攔截</string>
     <string name="ci_block">攔截</string>
     <string name="ci_bypass_universal">無條件放行</string>
     <string name="ada_app_status_allow">放行咗</string>
     <string name="ada_app_status_block">攔截咗</string>
     <string name="ada_app_status_block_wifi">已經喺唔收費嘅網絡（WiFi）攔截咗</string>
     <string name="ada_app_status_block_md">已經喺收費嘅網絡（流動數據）攔截咗</string>
-    <string name="ada_app_whitelist">無條件放行</string>
+    <string name="ada_app_bypass_univ">無條件放行</string>
     <string name="bsac_block">攔截</string>
     <string name="notif_download_failure_content">下載失敗。請再試過。</string>
     <string name="brbs_restore_no_uri_toast">恢復失敗；請再試過</string>
@@ -863,12 +851,11 @@
     <string name="rt_filter_desc">顯示緊 <u>%1$s</u> 份攔截清單</string>
     <string name="rt_filter_desc_subgroups">顯示緊 %2$s 分組同埋子分組 %3$s 入面嘅 <u>%1$s</u> 份攔截清單</string>
     <string name="firewall_rule_block_univ_ip">IP / 埠（全局）</string>
-    <string name="ada_app_lockdown">閉關</string>
+    <string name="ada_app_isolate">閉關</string>
     <string name="notif_download_cancel_content">下載取消咗。</string>
     <string name="rt_filter_parent_all">全部</string>
     <string name="rt_filter_parent_selected">揀咗嘅</string>
     <string name="rt_filter_hint">顯示緊<u>所有</u>攔截清單</string>
-    <string name="rt_filter_desc_groups">顯示緊 %2$s 分組入面嘅 <u>%1$s</u> 份攔截清單</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="relative_time_today">今日</string>
     <string name="relative_time_yesterday">尋日</string>
@@ -889,7 +876,7 @@
     <string name="private_dns_dialog_positive">去設定</string>
     <string name="private_dns_dialog_negative">忽略</string>
     <string name="private_dns_error">開唔到私人 DNS 區。</string>
-    <string name="ci_bypass_app_txt">放行應用程式規則</string>
+    <string name="ci_trust_txt">放行應用程式規則</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日誌</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">繼續</string>
     <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">取消</string>
@@ -898,7 +885,6 @@
 \n
 \n要用 Rethink 嘅 DNS，請去 Android 設定度熄咗「私人 DNS」佢。</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">攔截惡意軟件、勒索軟件、加密軟件、釣魚同其他威脅。</string>
-    <string name="ci_bypass_app_initial">繞應</string>
-    <string name="ci_bypass_app_desc">- 繞過應用程式規則</string>
+    <string name="ci_trust_initial">繞應</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">攔截吸睛軟件、間諜軟件同恐嚇軟件。</string>
 </resources>

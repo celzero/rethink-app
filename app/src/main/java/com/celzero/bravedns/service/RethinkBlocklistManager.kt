@@ -20,23 +20,22 @@ import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.data.FileTagDeserializer
-import com.celzero.bravedns.database.RethinkLocalFileTag
-import com.celzero.bravedns.database.RethinkLocalFileTagRepository
-import com.celzero.bravedns.database.RethinkRemoteFileTag
-import com.celzero.bravedns.database.RethinkRemoteFileTagRepository
+import com.celzero.bravedns.database.*
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.BraveDNS
 import dnsx.Dnsx
-import java.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 
@@ -44,19 +43,20 @@ object RethinkBlocklistManager : KoinComponent {
     private var braveDnsRemote: BraveDNS? = null
 
     private val remoteFileTagRepository by inject<RethinkRemoteFileTagRepository>()
+    private val remoteBlocklistPacksMapRepository by inject<RemoteBlocklistPacksMapRepository>()
     private val localFileTagRepository by inject<RethinkLocalFileTagRepository>()
+    private val localBlocklistPacksMapRepository by inject<LocalBlocklistPacksMapRepository>()
     private val persistentState by inject<PersistentState>()
 
     private const val EMPTY_SUBGROUP = "others"
 
-    data class SimpleViewPacksTag(
-        val name: String,
-        val desc: String,
-        val tags: MutableList<Int>,
-        val group: String
-    )
+    private const val PARENTAL_CONTROL_TAG = "ParentalControl"
+    private const val SECURITY_TAG = "Security"
+    private const val PRIVACY_TAG = "Privacy"
 
     data class RethinkBlockType(val name: String, val label: Int, val desc: Int)
+
+    data class PacksMappingKey(val pack: String, val level: Int)
 
     enum class RethinkBlocklistType {
         LOCAL,
@@ -92,52 +92,15 @@ object RethinkBlocklistManager : KoinComponent {
         }
     }
 
-    suspend fun getSimpleViewPacksTags(type: RethinkBlocklistType): List<SimpleViewPacksTag> {
-        val fileTags =
-            if (type.isRemote()) {
-                remoteFileTagRepository.fileTags()
-            } else {
-                localFileTagRepository.fileTags()
-            }
-
-        val uniquePacks: MutableSet<String> = mutableSetOf()
-        fileTags.forEach {
-            if (it.pack.isEmpty()) return@forEach
-
-            it.pack.let { it1 -> uniquePacks.addAll(it1) }
-        }
-
-        uniquePacks.removeIf { it.isEmpty() }
-        val packs: MutableList<SimpleViewPacksTag> = mutableListOf()
-
-        uniquePacks.forEach { p ->
-            val tags: MutableList<Int> = mutableListOf()
-            var group = ""
-            var count = 0
-            fileTags.forEach {
-                if (it.pack.contains(p)) {
-                    group = it.group
-                    tags.add(it.value)
-                    count++
-                }
-            }
-            val pack = SimpleViewPacksTag(p, count.toString(), tags, group)
-            packs.add(pack)
-        }
-        packs.sortBy { it.group }
-
-        return packs
-    }
-
     // TODO: move this strings to strings.xml
     val PARENTAL_CONTROL =
         RethinkBlockType(
-            "ParentalControl",
+            PARENTAL_CONTROL_TAG,
             R.string.rbl_parental_control,
             R.string.rbl_parental_control_desc
         )
-    val SECURITY = RethinkBlockType("Security", R.string.rbl_privacy, R.string.rbl_security_desc)
-    val PRIVACY = RethinkBlockType("Privacy", R.string.rbl_security, R.string.rbl_privacy_desc)
+    val SECURITY = RethinkBlockType(SECURITY_TAG, R.string.rbl_security, R.string.rbl_security_desc)
+    val PRIVACY = RethinkBlockType(PRIVACY_TAG, R.string.rbl_privacy, R.string.rbl_privacy_desc)
 
     // read and parse the json file, either remote or local blocklist
     // returns the parsed FileTag list, on error return empty array list
@@ -151,6 +114,7 @@ object RethinkBlocklistManager : KoinComponent {
     }
 
     private suspend fun readLocalJson(context: Context, timestamp: Long): Boolean {
+        val packsBlocklistMapping: Multimap<PacksMappingKey, Int> = HashMultimap.create()
         try {
             val dbFileTagLocal: MutableList<RethinkLocalFileTag> = mutableListOf()
             val dir =
@@ -179,6 +143,21 @@ object RethinkBlocklistManager : KoinComponent {
                 t.group = t.group.lowercase()
                 val l = getRethinkLocalObj(t)
 
+                if (l.pack?.isNotEmpty() == true) {
+                    l.pack?.forEachIndexed { index, s ->
+                        // if the pack is empty or level is empty, then skip
+                        if (s.isEmpty() || l.level == null || l.level?.isEmpty() == true) {
+                            l.level = arrayListOf()
+                            packsBlocklistMapping.put(PacksMappingKey(s, 0), l.value)
+                            return@forEachIndexed
+                        }
+                        packsBlocklistMapping.put(
+                            PacksMappingKey(s, l.level?.elementAt(index)!!),
+                            l.value
+                        )
+                    }
+                }
+
                 dbFileTagLocal.add(l)
             }
             val selectedTags = localFileTagRepository.getSelectedTags()
@@ -189,6 +168,18 @@ object RethinkBlocklistManager : KoinComponent {
             localFileTagRepository.deleteAll()
             localFileTagRepository.insertAll(dbFileTagLocal.toList())
             localFileTagRepository.updateTags(selectedTags.toSet(), 1)
+            localBlocklistPacksMapRepository.deleteAll()
+            // insert the packs and level mapping in the database
+            localBlocklistPacksMapRepository.insertAll(
+                packsBlocklistMapping.keySet().map { key ->
+                    LocalBlocklistPacksMap(
+                        key.pack,
+                        key.level,
+                        packsBlocklistMapping.get(key).toList(),
+                        dbFileTagLocal.first { it.pack?.contains(key.pack) == true }.group
+                    )
+                }
+            )
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Local blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
@@ -203,6 +194,7 @@ object RethinkBlocklistManager : KoinComponent {
 
     private suspend fun readRemoteJson(context: Context, timestamp: Long): Boolean {
         try {
+            val packsBlocklistMapping: Multimap<PacksMappingKey, Int> = HashMultimap.create()
             val dbFileTagRemote: MutableList<RethinkRemoteFileTag> = mutableListOf()
 
             val dir =
@@ -213,7 +205,8 @@ object RethinkBlocklistManager : KoinComponent {
                 )
 
             val file = Utilities.blocklistFile(dir, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return false
-            // register typeadapter to enable custom deserialization of the FileTag object.
+
+            // register type-adapter to enable custom deserialization of the FileTag object.
             // see FileTag.kt for more info (FileTagDeserializer)
             val gson =
                 GsonBuilder()
@@ -230,7 +223,27 @@ object RethinkBlocklistManager : KoinComponent {
                 }
                 t.group = t.group.lowercase()
                 val r = getRethinkRemoteObj(t)
+
+                if (r.pack?.isNotEmpty() == true) {
+                    r.pack?.forEachIndexed { index, s ->
+                        // if the pack is empty or the level is null, skip the entry
+                        if (s.isEmpty() || r.level == null || r.level?.isEmpty() == true) {
+                            r.level = arrayListOf()
+                            packsBlocklistMapping.put(PacksMappingKey(s, 0), r.value)
+                            return@forEachIndexed
+                        }
+                        packsBlocklistMapping.put(
+                            PacksMappingKey(s, r.level?.elementAt(index)!!),
+                            r.value
+                        )
+                    }
+                }
                 dbFileTagRemote.add(r)
+                // if (DEBUG) Log.d(LoggerConstants.LOG_TAG_DNS, "Remote file tag: $r")
+                Log.i(
+                    LoggerConstants.LOG_TAG_DNS,
+                    "Remote file tag: ${r.group}, ${r.pack}, ${r.simpleTagId}, ${r.level}, ${r.value}, ${r.entries}, ${r.isSelected}, ${r.show}, ${r.subg}, ${r.uname}, ${r.url}, ${r.vname}"
+                )
             }
             val selectedTags = remoteFileTagRepository.getSelectedTags()
             // edge case: found a residual block list entry still available in the database
@@ -240,6 +253,18 @@ object RethinkBlocklistManager : KoinComponent {
             remoteFileTagRepository.deleteAll()
             remoteFileTagRepository.insertAll(dbFileTagRemote.toList())
             remoteFileTagRepository.updateTags(selectedTags.toSet(), 1)
+            // insert the packs and level mapping in the database
+            remoteBlocklistPacksMapRepository.deleteAll()
+            remoteBlocklistPacksMapRepository.insertAll(
+                packsBlocklistMapping.keySet().map { key ->
+                    RemoteBlocklistPacksMap(
+                        key.pack,
+                        key.level,
+                        packsBlocklistMapping.get(key).toList(),
+                        dbFileTagRemote.first { it.pack?.contains(key.pack) == true }.group
+                    )
+                }
+            )
             Log.i(LoggerConstants.LOG_TAG_DNS, "New Remote blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
@@ -260,6 +285,7 @@ object RethinkBlocklistManager : KoinComponent {
             t.group,
             t.subg,
             t.pack,
+            t.level,
             t.urls,
             t.show,
             t.entries,
@@ -276,6 +302,7 @@ object RethinkBlocklistManager : KoinComponent {
             t.group,
             t.subg,
             t.pack,
+            t.level,
             t.urls,
             t.show,
             t.entries,
@@ -313,8 +340,7 @@ object RethinkBlocklistManager : KoinComponent {
     }
 
     suspend fun clearTagsSelectionLocal() {
-        // FIXME: removed below code for testing, add it back
-        // localFileTagRepository.clearSelectedTags()
+        localFileTagRepository.clearSelectedTags()
     }
 
     fun getStamp(context: Context, fileValues: Set<Int>, type: RethinkBlocklistType): String {
@@ -355,12 +381,11 @@ object RethinkBlocklistManager : KoinComponent {
     private fun convertCsvToList(csv: String?): Set<Int> {
         if (csv == null) return setOf()
 
-        val regex = "\\s*,\\s*".toRegex()
-        return csv.split(regex).map { it.toInt() }.toSet()
+        return csv.split(",").map { it.toInt() }.toSet()
     }
 
-    private fun convertListToCsv(csv: Set<Int>): String {
-        return csv.joinToString(",")
+    private fun convertListToCsv(s: Set<Int>): String {
+        return s.joinToString(",")
     }
 
     private fun getBraveDnsRemote(context: Context, timestamp: Long): BraveDNS? {

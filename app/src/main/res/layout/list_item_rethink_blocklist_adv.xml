@@ -37,8 +37,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
-            android:padding="5dp">
+            android:background="@android:color/transparent">
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/crp_check_box"
@@ -47,9 +46,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layoutDirection="rtl"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:padding="5dp" />
+                android:minWidth="0dp"
+                android:minHeight="0dp" />
 
             <TextView
                 android:id="@+id/crp_label_tv"
@@ -59,9 +57,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/crp_check_box"
                 android:ellipsize="end"
-                android:padding="5dp"
-                android:layout_marginStart="10dp"
-                android:text="Dummy Label"
+                android:padding="3dp"
+                android:layout_marginStart="13dp"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
@@ -70,31 +67,31 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/crp_label_tv"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="3dp"
                 android:layout_toEndOf="@+id/crp_check_box"
-                android:background="@android:color/transparent"
-                android:padding="5dp">
+                android:background="@android:color/transparent">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/crp_desc_group_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
-                    android:alpha="0.75"
+                    android:alpha="0.6"
                     android:ellipsize="end"
                     android:paddingStart="10dp"
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
-                    android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <com.google.android.material.chip.Chip
                     android:id="@+id/crp_desc_entries_tv"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.75"
+                    android:alpha="0.6"
                     android:background="@drawable/rectangle_border_background"
                     android:ellipsize="end"
                     android:padding="5dp"
@@ -102,7 +99,6 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
-                    android:text="Dummy Package"
                     android:textColor="?attr/primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>

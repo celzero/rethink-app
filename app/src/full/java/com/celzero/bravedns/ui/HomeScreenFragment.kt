@@ -30,6 +30,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.VpnService
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -48,6 +49,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.RethinkDnsEndpoint
+import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -96,7 +98,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         initializeClickListeners()
         observeVpnState()
         observeChipStates()
-        updateConfigureDnsChip(appConfig.getRemoteBlocklistCount())
+        updateConfigureDnsChip()
     }
 
     private fun initializeValues() {
@@ -160,11 +162,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun observeChipStates() {
         persistentState.remoteBlocklistCount.observe(viewLifecycleOwner) {
-            updateConfigureDnsChip(it)
+            updateConfigureDnsChip()
         }
     }
 
-    private fun updateConfigureDnsChip(count: Int) {
+    private fun updateConfigureDnsChip() {
         if (!isVpnActivated) {
             b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_chip_text_no_data)
             return
@@ -175,12 +177,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        b.fhsDnsConfigureChip.text =
-            if (count > 0) {
-                getString(R.string.hsf_blocklist_chip_text, count.toString())
-            } else {
-                getString(R.string.hsf_blocklist_chip_text_no_blocklist)
-            }
+        // now RDNS default do not have number of blocklists, so instead of showing the blocklist
+        // count, show the connected RDNS name. eg., RDNS Default, RDNS Plus
+        b.fhsDnsConfigureChip.text = persistentState.connectedDnsName
     }
 
     private fun canShowChips(): Boolean {
@@ -226,7 +225,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsDnsConfigureChip.setOnClickListener {
             b.fhsDnsConfigureChip.text = getString(R.string.hsf_blocklist_updating_text)
             io {
-                kotlinx.coroutines.delay(1500)
                 val plusEndpoint = appConfig.getRethinkPlusEndpoint()
                 val stamp = getRemoteBlocklistStamp(plusEndpoint.url)
 
@@ -269,7 +267,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             persistentState.showWhatsNewChip = false
             b.fhsWhatsNewChip.text = getString(R.string.hsf_whats_new_remove_text)
             delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
-                b.fhsWhatsNewChip.visibility = View.GONE
+                if (isAdded) {
+                    b.fhsWhatsNewChip.visibility = View.GONE
+                }
             }
         }
 
@@ -304,6 +304,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsProxyChip.text = getString(R.string.hsf_proxy_chip_remove_text)
         syncDnsStatus()
         delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
+            if (!isAdded) return@delay
+
             b.fhsProxyChip.visibility = View.GONE
             b.fhsProxyChip.isEnabled = true
             showToastUiCentered(
@@ -412,7 +414,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             updateCardsUi()
             handleQuickSettingsChips()
             syncDnsStatus()
-            updateConfigureDnsChip(0)
+            updateConfigureDnsChip()
         }
 
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
@@ -447,23 +449,26 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun showNewFeaturesDialog() {
-        val inflater: LayoutInflater = LayoutInflater.from(requireContext())
-        val view: View = inflater.inflate(R.layout.dialog_whatsnew, null)
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setView(view).setTitle(getString(R.string.whats_dialog_title))
-
-        builder.setPositiveButton(getString(R.string.about_dialog_positive_button)) {
-            dialogInterface,
-            _ ->
-            dialogInterface.dismiss()
-        }
-
-        builder.setNeutralButton(getString(R.string.about_dialog_neutral_button)) { _, _ ->
-            sendEmailIntent(requireContext())
-        }
-
-        builder.setCancelable(false)
-        builder.create().show()
+        val binding =
+            DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
+        binding.desc.movementMethod = LinkMovementMethod.getInstance()
+        binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+        AlertDialog.Builder(requireContext())
+            .setView(binding.root)
+            .setTitle(getString(R.string.whats_dialog_title))
+            .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
+                dialogInterface,
+                _ ->
+                dialogInterface.dismiss()
+            }
+            .setNeutralButton(getString(R.string.about_dialog_neutral_button)) {
+                _: DialogInterface,
+                _: Int ->
+                sendEmailIntent(requireContext())
+            }
+            .setCancelable(true)
+            .create()
+            .show()
     }
 
     private fun enableFirewallCardIfNeeded() {
@@ -523,7 +528,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
             b.fhsCardDnsConnectedDns.text = it
-            updateConfigureDnsChip(appConfig.getRemoteBlocklistCount())
+            updateConfigureDnsChip()
         }
     }
 
@@ -567,9 +572,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     copy.filter { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
                     }
-                val lockdownApps =
+                val isolateApps =
                     copy.filter { a ->
-                        a.firewallStatus == FirewallManager.FirewallStatus.LOCKDOWN.id
+                        a.firewallStatus == FirewallManager.FirewallStatus.ISOLATE.id
                     }
                 b.fhsCardAppsStatus.text =
                     getString(R.string.firewall_card_status_active, copy.count().toString())
@@ -579,7 +584,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         blockedApps.count().toString(),
                         whiteListApps.count().toString(),
                         excludedApps.count().toString(),
-                        lockdownApps.count().toString()
+                        isolateApps.count().toString()
                     )
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
@@ -823,20 +828,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.hsf_start_dialog_positive) { _, _ ->
             handleMainScreenBtnClickEvent()
-            delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
-                if (isVpnActivated) {
-                    openBottomSheet()
-                    showToastUiCentered(
-                        requireContext(),
-                        resources
-                            .getText(R.string.brave_dns_connect_mode_change_dns)
-                            .toString()
-                            .replaceFirstChar {
-                                if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                            },
-                        Toast.LENGTH_SHORT
-                    )
-                }
+            if (isVpnActivated) {
+                openBottomSheet()
+                showToastUiCentered(
+                    requireContext(),
+                    resources
+                        .getText(R.string.brave_dns_connect_mode_change_dns)
+                        .toString()
+                        .replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+                        },
+                    Toast.LENGTH_SHORT
+                )
             }
         }
 

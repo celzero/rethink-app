@@ -39,6 +39,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.IPDetails
@@ -50,7 +51,6 @@ import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -59,7 +59,7 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIB
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.getThemeAccent
+import com.celzero.bravedns.util.Utilities.Companion.getAccentColor
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
@@ -72,16 +72,16 @@ import inet.ipaddr.IPAddressString
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Blocker
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Blocker
 
 class BraveVPNService :
     VpnService(),
@@ -343,13 +343,12 @@ class BraveVPNService :
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     return FirewallRuleset.RULE2
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
-                    // case: if the global lockdown is enabled, don't allow the bypassed ips
-                    // unless the app is set to bypass universal or lockdown
-                    // honor app rules over universal rules: here app is in lockdown state and the
-                    // ips should be allowed.
-                    if (canAllowConnection(appStatus)) {
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    // trust ip will taken into account only if the app is in isolate mode
+                    if (appStatus.isolate()) {
                         return FirewallRuleset.RULE2B
+                    } else {
+                        // no-op; pass-through
                     }
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
@@ -361,8 +360,8 @@ class BraveVPNService :
                 }
             }
 
-            // lockdown mode
-            if (appStatus.lockdown()) {
+            // isolate mode
+            if (appStatus.isolate()) {
                 return FirewallRuleset.RULE1G
             }
 
@@ -388,7 +387,7 @@ class BraveVPNService :
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     return FirewallRuleset.RULE2C
                 }
-                IpRulesManager.IpRuleStatus.BYPASS_APP_RULES -> {
+                IpRulesManager.IpRuleStatus.TRUST -> {
                     // no-op; pass-through
                 }
                 IpRulesManager.IpRuleStatus.NONE -> {
@@ -433,10 +432,6 @@ class BraveVPNService :
         }
 
         return FirewallRuleset.RULE0
-    }
-
-    private fun canAllowConnection(appStatus: FirewallManager.FirewallStatus): Boolean {
-        return !(universalLockdown() && (appStatus.bypassUniversal() || appStatus.lockdown()))
     }
 
     private fun universalLockdown(): Boolean {
@@ -729,7 +724,7 @@ class BraveVPNService :
             .setContentText(contentText)
 
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(this, getThemeAccent(this))
+        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
 
         // Secret notifications are not shown on the lock screen.  No need for this app to show
         // there.
@@ -800,7 +795,7 @@ class BraveVPNService :
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-        builder.color = ContextCompat.getColor(this, getThemeAccent(this))
+        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
         val openIntent =
             makeVpnIntent(NOTIF_ID_LOAD_RULES_FAIL, Constants.NOTIF_ACTION_RULES_FAILURE)
         val notificationAction: NotificationCompat.Action =
@@ -897,7 +892,7 @@ class BraveVPNService :
                     LOG_TAG_VPN,
                     "app is in pause state, exclude all the non firewalled apps, size: ${nonFirewalledApps.count()}"
                 )
-                nonFirewalledApps.forEach { builder.addDisallowedApplication(it.packageInfo) }
+                nonFirewalledApps.forEach { builder.addDisallowedApplication(it.packageName) }
                 builder = builder.addDisallowedApplication(this.packageName)
                 return builder
             }
@@ -1020,7 +1015,7 @@ class BraveVPNService :
                             .filter {
                                 it.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
                             }
-                            .map(AppInfo::packageInfo)
+                            .map(AppInfo::packageName)
                             .toSet()
                 }
 
@@ -1097,7 +1092,7 @@ class BraveVPNService :
                 LOG_TAG_VPN,
                 "notification action type:  ${persistentState.notificationActionType}"
             )
-        builder.color = ContextCompat.getColor(this, getThemeAccent(this))
+        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
         when (
             NotificationActionType.getNotificationActionType(persistentState.notificationActionType)
         ) {
@@ -1484,7 +1479,7 @@ class BraveVPNService :
             } catch (e: SecurityException) {
                 Log.e(LOG_TAG_VPN, "Error updating tile service, package does not match", e)
             } catch (
-                e: IllegalStateException) { // if the user of the context is not the current user
+                e: IllegalArgumentException) { // if the user of the context is not the current user
                 Log.e(LOG_TAG_VPN, "Error updating tile service, invalid user context", e)
             }
         }

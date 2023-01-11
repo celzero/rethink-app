@@ -37,6 +37,7 @@ import org.koin.android.ext.android.inject
 class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val b by viewBinding(ActivityFirewallBinding::bind)
     private var fragmentIndex = 0
+    private var searchParam = ""
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
@@ -54,6 +55,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
+        searchParam = intent.getStringExtra(Constants.SEARCH_QUERY) ?: ""
         init()
     }
 
@@ -69,7 +71,7 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
                 override fun createFragment(position: Int): Fragment {
                     return when (position) {
                         Tabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
-                        Tabs.LOGS.screen -> ConnectionTrackerFragment.newInstance()
+                        Tabs.LOGS.screen -> ConnectionTrackerFragment.newInstance(searchParam)
                         else -> UniversalFirewallFragment.newInstance()
                     }
                 }

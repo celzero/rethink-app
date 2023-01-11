@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background">
+
+    <LinearLayout
+        android:id="@+id/dsa_title_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/TextAppearance.Heading.HomeScreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.5"
+            android:paddingStart="7dp"
+            android:paddingEnd="7dp"
+            android:text="@string/app_name_small_case" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dsa_title"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
+            android:padding="10dp"
+            android:text="@string/ssv_app_network_activity_heading"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_large_font_text_view" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/dsa_no_data_rl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/dsa_title_header"
+        android:visibility="gone">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/custom_dialog_no_rules_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"
+            android:text="@string/blocklist_update_check_failure"
+            android:textAlignment="center"
+            android:textSize="@dimen/heading_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/custom_dialog_no_rules_text"
+            android:src="@drawable/illustrations_no_record" />
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dsa_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/dsa_title_header"
+        android:layout_alignParentBottom="true"
+        android:nestedScrollingEnabled="false" />
+
+</RelativeLayout>
+
