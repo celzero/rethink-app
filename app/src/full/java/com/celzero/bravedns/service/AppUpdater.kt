@@ -39,7 +39,12 @@ interface AppUpdater {
     enum class InstallStatus {
         DOWNLOADED,
         FAILED,
-        INSTALLED
+        INSTALLED,
+        CANCELED,
+        DOWNLOADING,
+        INSTALLING,
+        PENDING,
+        UNKNOWN
     }
 
     enum class InstallSource {
