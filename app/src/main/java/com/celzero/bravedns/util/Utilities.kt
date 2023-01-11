@@ -23,7 +23,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
@@ -388,6 +387,38 @@ class Utilities {
                 Log.w(LOG_TAG_APP_DB, "Application not available $pi" + e.message, e)
             }
             return metadata
+        }
+
+        fun isFreshInstall(context: Context): Boolean {
+            try {
+                with(
+                    if (isAtleastT()) {
+                        context.packageManager.getPackageInfo(
+                            context.packageName,
+                            PackageManager.PackageInfoFlags.of(
+                                PackageManager.GET_META_DATA.toLong()
+                            )
+                        )
+                    } else {
+                        context.packageManager.getPackageInfo(
+                            context.packageName,
+                            PackageManager.GET_META_DATA
+                        )
+                    }
+                ) {
+                    return firstInstallTime == lastUpdateTime
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                // assign value as true as the package name not found, should not be the
+                // case but some devices seems to return package not found immediately
+                // after install
+                Log.w(
+                    LOG_TAG_APP_DB,
+                    "Application not available ${context.packageName}" + e.message,
+                    e
+                )
+                return true
+            }
         }
 
         fun copy(from: String, to: String): Boolean {

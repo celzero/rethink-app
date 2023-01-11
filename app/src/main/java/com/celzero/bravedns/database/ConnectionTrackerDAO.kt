@@ -44,12 +44,12 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select uid as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as dnsQuery from ConnectionTracker where uid = :uid group by ipAddress, flag order by count desc"
+        "select uid as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as dnsQuery from ConnectionTracker where uid = :uid group by ipAddress order by count desc"
     )
     fun getLogsForApp(uid: Int): PagingSource<Int, AppConnection>
 
     @Query(
-        "select uid as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as dnsQuery from ConnectionTracker where uid = :uid and ipAddress like :ipAddress group by ipAddress, flag order by count desc"
+        "select uid as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, GROUP_CONCAT(DISTINCT dnsQuery) as dnsQuery from ConnectionTracker where uid = :uid and ipAddress like :ipAddress group by ipAddress order by count desc"
     )
     fun getLogsForAppFiltered(uid: Int, ipAddress: String): PagingSource<Int, AppConnection>
 
@@ -89,9 +89,19 @@ interface ConnectionTrackerDAO {
     fun getAllowedAppNetworkActivity(): PagingSource<Int, AppConnection>
 
     @Query(
+        "select uid as uid, '' as ipAddress, 0 as port, count(uid) as count, 0 as flag, 0 as blocked, '' as dnsQuery from ConnectionTracker where isBlocked = 0 group by uid order by count desc"
+    )
+    fun getAllAllowedAppNetworkActivity(): PagingSource<Int, AppConnection>
+
+    @Query(
         "select uid as uid, '' as ipAddress, 0 as port, count(uid) as count, 0 as flag, 1 as blocked, '' as dnsQuery from ConnectionTracker where isBlocked = 1 group by uid order by count desc LIMIT 7"
     )
     fun getBlockedAppNetworkActivity(): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select uid as uid, '' as ipAddress, 0 as port, count(uid) as count, 0 as flag, 1 as blocked, '' as dnsQuery from ConnectionTracker where isBlocked = 1 group by uid order by count desc"
+    )
+    fun getAllBlockedAppNetworkActivity(): PagingSource<Int, AppConnection>
 
     @Query(
         "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, '' as dnsQuery from ConnectionTracker where isBlocked = 0 group by ipAddress, flag order by count desc LIMIT 7"
@@ -99,9 +109,19 @@ interface ConnectionTrackerDAO {
     fun getMostContactedIps(): PagingSource<Int, AppConnection>
 
     @Query(
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, '' as dnsQuery from ConnectionTracker where isBlocked = 0 group by ipAddress, flag order by count desc"
+    )
+    fun getAllContactedIps(): PagingSource<Int, AppConnection>
+
+    @Query(
         "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 1 as blocked, '' as dnsQuery from ConnectionTracker where isBlocked = 1 group by ipAddress, flag order by count desc LIMIT 7"
     )
     fun getMostBlockedIps(): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 1 as blocked, '' as dnsQuery from ConnectionTracker where isBlocked = 1 group by ipAddress, flag order by count desc"
+    )
+    fun getAllBlockedIps(): PagingSource<Int, AppConnection>
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

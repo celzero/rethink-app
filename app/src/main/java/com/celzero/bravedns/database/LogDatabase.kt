@@ -16,6 +16,7 @@
 package com.celzero.bravedns.database
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.database.sqlite.SQLiteException
 import android.util.Log
@@ -25,6 +26,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.celzero.bravedns.database.LogDatabase.Companion.isFreshInstall
+import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Utilities
 
 @Database(entities = [ConnectionTracker::class, DnsLog::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
@@ -37,7 +41,8 @@ abstract class LogDatabase : RoomDatabase() {
         // previous table name for dns logs
         private const val TABLE_NAME_PREVIOUS_DNS = "DNSLogs"
         private const val TABLE_NAME_CONN_TRACKER = "ConnectionTracker"
-        private var rethinkDnsDbPath = ""
+        var rethinkDnsDbPath = ""
+        var isFreshInstall = true
 
         // setJournalMode() is added as part of issue #344
         // modified the journal mode from TRUNCATE to AUTOMATIC.
@@ -46,6 +51,9 @@ abstract class LogDatabase : RoomDatabase() {
         // https://developer.android.com/reference/android/arch/persistence/room/RoomDatabase.JournalMode#automatic
         fun buildDatabase(context: Context): LogDatabase {
             rethinkDnsDbPath = context.getDatabasePath(AppDatabase.DATABASE_NAME).toString()
+            // assign var isFreshInstall to true if its new install
+            isFreshInstall = Utilities.isFreshInstall(context)
+
             return Room.databaseBuilder(
                     context.applicationContext,
                     LogDatabase::class.java,
@@ -55,24 +63,29 @@ abstract class LogDatabase : RoomDatabase() {
                 .addCallback(roomCallback)
                 .build()
         }
-
+        
         private val roomCallback: Callback =
             object : Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
+                    if (isFreshInstall) return
                     populateDatabase(db)
                 }
             }
 
         private fun populateDatabase(database: SupportSQLiteDatabase) {
             try {
-                database.execSQL("DROP TABLE IF EXISTS ConnectionTracker")
-                database.execSQL("DROP TABLE IF EXISTS DnsLogs")
                 database.execSQL(
-                    "CREATE TABLE 'ConnectionTracker' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'dnsQuery' TEXT DEFAULT '', 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )"
+                    "CREATE TABLE IF NOT EXISTS 'ConnectionTracker' ('id' INTEGER NOT NULL,'appName' TEXT DEFAULT '' NOT NULL, 'uid' INTEGER NOT NULL, 'ipAddress' TEXT DEFAULT ''  NOT NULL, 'port' INTEGER NOT NULL, 'protocol' INTEGER NOT NULL,'isBlocked' INTEGER NOT NULL, 'blockedByRule' TEXT DEFAULT '' NOT NULL, 'flag' TEXT  DEFAULT '' NOT NULL, 'dnsQuery' TEXT DEFAULT '', 'timeStamp' INTEGER NOT NULL,PRIMARY KEY (id)  )"
                 )
                 database.execSQL(
-                    "CREATE TABLE 'DnsLogs' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'queryStr' TEXT NOT NULL, 'time' INTEGER NOT NULL, 'flag' TEXT NOT NULL, 'resolver' TEXT NOT NULL, 'latency' INTEGER NOT NULL, 'typeName' TEXT NOT NULL, 'isBlocked' INTEGER NOT NULL, 'blockLists' LONGTEXT NOT NULL,  'serverIP' TEXT NOT NULL, 'relayIP' TEXT NOT NULL, 'responseTime' INTEGER NOT NULL, 'response' TEXT NOT NULL, 'status' TEXT NOT NULL,'dnsType' INTEGER NOT NULL, 'responseIps' TEXT NOT NULL) "
+                    "CREATE TABLE IF NOT EXISTS 'DnsLogs' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'queryStr' TEXT NOT NULL, 'time' INTEGER NOT NULL, 'flag' TEXT NOT NULL, 'resolver' TEXT NOT NULL, 'latency' INTEGER NOT NULL, 'typeName' TEXT NOT NULL, 'isBlocked' INTEGER NOT NULL, 'blockLists' LONGTEXT NOT NULL,  'serverIP' TEXT NOT NULL, 'relayIP' TEXT NOT NULL, 'responseTime' INTEGER NOT NULL, 'response' TEXT NOT NULL, 'status' TEXT NOT NULL,'dnsType' INTEGER NOT NULL, 'responseIps' TEXT NOT NULL) "
+                )
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_dnslogs_querystr ON  DnsLogs(queryStr)"
+                )
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_connectiontracker_ipaddress ON  ConnectionTracker(ipAddress)"
                 )
 
                 // to avoid the exception, the transaction should be ended before the
@@ -88,19 +101,22 @@ abstract class LogDatabase : RoomDatabase() {
                 // delete logs from main database
                 database.execSQL("delete from main.$TABLE_NAME_DNS_LOGS")
                 database.execSQL("delete from main.$TABLE_NAME_CONN_TRACKER")
-                // insert Dns and network logs to the new database tables
-                if (tableExists(database, "tempDb.$TABLE_NAME_PREVIOUS_DNS")) {
-                    database.execSQL(
-                        "INSERT INTO main.$TABLE_NAME_DNS_LOGS SELECT * FROM tempDb.$TABLE_NAME_PREVIOUS_DNS"
-                    )
+                // no need to proceed if the table does not exist
+                if (!tableExists(database, "tempDb.$TABLE_NAME_PREVIOUS_DNS")) {
+                    database.execSQL("DETACH DATABASE tempDb")
+                    database.enableWriteAheadLogging()
+                    return
                 }
+
+                // insert Dns and network logs to the new database tables
+                database.execSQL(
+                    "INSERT INTO main.$TABLE_NAME_DNS_LOGS SELECT * FROM tempDb.$TABLE_NAME_PREVIOUS_DNS"
+                )
                 if (tableExists(database, "tempDb.$TABLE_NAME_CONN_TRACKER")) {
                     database.execSQL(
                         "INSERT INTO main.$TABLE_NAME_CONN_TRACKER SELECT * FROM tempDb.$TABLE_NAME_CONN_TRACKER"
                     )
                 }
-                database.execSQL("DROP TABLE IF EXISTS tempDb.$TABLE_NAME_PREVIOUS_DNS")
-                database.execSQL("DROP TABLE IF EXISTS tempDb.$TABLE_NAME_CONN_TRACKER")
                 database.enableWriteAheadLogging()
             } catch (ignored: Exception) {
                 Log.e(
@@ -118,8 +134,8 @@ abstract class LogDatabase : RoomDatabase() {
                 cursor.moveToFirst()
                 // in the table if it exists, otherwise it will return -1
                 cursor.getInt(0) > 0
-            } catch (Exp: SQLiteException) {
-                // Something went wrong with SQLite. Return false.
+            } catch (e: SQLiteException) {
+                // return false if the table does not exist
                 false
             } finally {
                 // close the cursor
