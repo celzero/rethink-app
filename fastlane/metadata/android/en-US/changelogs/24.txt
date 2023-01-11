@@ -1,0 +1,10 @@
+** v053m: RA Fisher! ** 
+1. New feature: All new Statistics screen.
+2. New feature: Secure this app using screen lock.
+3. New feature: Choose your preferred language from app settings.
+4. New feature: RDNS+ Simple view shows well-curated lists only.
+5. Rename: App lockdown mode is now Isolate mode.
+6. Rename: Bypass app rules is now called Trust IP.
+7. Fix crash when Rethink is installed in a Work Profile.
+8. Now deleting app-specific rules when the app is uninstalled.
+9. And other minor UI changes and bug fixes.
