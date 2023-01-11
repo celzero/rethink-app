@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -28,7 +27,6 @@ import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -42,13 +40,28 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private var isVpnActive: Boolean = false
 
-    enum class SummaryStatisticsType {
-        MOST_CONNECTED_APPS,
-        MOST_BLOCKED_APPS,
-        MOST_CONTACTED_DOMAINS,
-        MOST_BLOCKED_DOMAINS,
-        MOST_CONTACTED_IPS,
-        MOST_BLOCKED_IPS
+    enum class SummaryStatisticsType(val tid: Int) {
+        MOST_CONNECTED_APPS(0),
+        MOST_BLOCKED_APPS(1),
+        MOST_CONTACTED_DOMAINS(2),
+        MOST_BLOCKED_DOMAINS(3),
+        MOST_CONTACTED_IPS(4),
+        MOST_BLOCKED_IPS(5);
+
+        companion object {
+            fun getType(t: Int): SummaryStatisticsType {
+                return when (t) {
+                    MOST_CONNECTED_APPS.tid -> MOST_CONNECTED_APPS
+                    MOST_BLOCKED_APPS.tid -> MOST_BLOCKED_APPS
+                    MOST_CONTACTED_DOMAINS.tid -> MOST_CONTACTED_DOMAINS
+                    MOST_BLOCKED_DOMAINS.tid -> MOST_BLOCKED_DOMAINS
+                    MOST_CONTACTED_IPS.tid -> MOST_CONTACTED_IPS
+                    MOST_BLOCKED_IPS.tid -> MOST_BLOCKED_IPS
+                    // make most contacted apps as default
+                    else -> MOST_CONNECTED_APPS
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,62 +81,32 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initClickListeners() {
-        b.fssAppInfoChip.setOnClickListener { openAppInfoScreen() }
-        b.fssAppInfoChipSecond.setOnClickListener { openAppInfoScreen() }
+        b.fssAppInfoChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONNECTED_APPS)
+        }
+        b.fssAppInfoChipSecond.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_APPS)
+        }
 
-        b.fssDnsLogsChip.setOnClickListener { openDnsLogsScreen() }
-        b.fssDnsLogsChipSecond.setOnClickListener { openDnsLogsScreen() }
+        b.fssDnsLogsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_DOMAINS)
+        }
+        b.fssDnsLogsChipSecond.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_DOMAINS)
+        }
 
-        b.fssNetworkLogsChip.setOnClickListener { openNetworkLogsScreen() }
-        b.fssNetworkLogsChipSecond.setOnClickListener { openNetworkLogsScreen() }
+        b.fssNetworkLogsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_IPS)
+        }
+        b.fssNetworkLogsChipSecond.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_IPS)
+        }
     }
 
-    private fun openAppInfoScreen() {
-        val intent = Intent(requireContext(), AppDetailActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+    private fun openDetailedStatsUi(type: SummaryStatisticsType) {
+        val intent = Intent(requireContext(), DetailedStatisticsActivity::class.java)
+        intent.putExtra(DetailedStatisticsActivity.INTENT_TYPE, type.tid)
         startActivity(intent)
-    }
-
-    private fun openDnsLogsScreen() {
-        if (!isVpnActive) {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                getString(R.string.ssv_toast_start_rethink),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        if (appConfig.getBraveMode().isDnsActive()) {
-            startActivity(isDns = true, DnsDetailActivity.Tabs.LOGS.screen)
-        } else {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                getString(R.string.dns_card_latency_inactive),
-                Toast.LENGTH_SHORT
-            )
-        }
-    }
-
-    private fun openNetworkLogsScreen() {
-        if (!isVpnActive) {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                getString(R.string.ssv_toast_start_rethink),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        if (appConfig.getBraveMode().isFirewallActive()) {
-            startActivity(isDns = false, FirewallActivity.Tabs.LOGS.screen)
-        } else {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                getString(R.string.firewall_card_text_inactive),
-                Toast.LENGTH_SHORT
-            )
-        }
     }
 
     private fun observeAppStart() {
@@ -210,7 +193,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS
             )
 
-        viewModel.getMostContactedDomain.observe(viewLifecycleOwner) {
+        viewModel.getMostContactedDomains.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
@@ -240,7 +223,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                 SummaryStatisticsType.MOST_BLOCKED_DOMAINS
             )
 
-        viewModel.getMostBlockedDomain.observe(viewLifecycleOwner) {
+        viewModel.getMostBlockedDomains.observe(viewLifecycleOwner) {
             recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
 
@@ -313,16 +296,5 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val pixels = (420 * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
-    }
-
-    private fun startActivity(isDns: Boolean, screenToLoad: Int) {
-        val intent =
-            when (isDns) {
-                true -> Intent(requireContext(), DnsDetailActivity::class.java)
-                false -> Intent(requireContext(), FirewallActivity::class.java)
-            }
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
-        startActivity(intent)
     }
 }

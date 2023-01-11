@@ -68,6 +68,9 @@
             android:name=".ui.AppDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.DetailedStatisticsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"

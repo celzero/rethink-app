@@ -23,12 +23,12 @@
 
             <ImageView
                 android:id="@+id/ss_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="start|center_vertical"
                 android:contentDescription="@string/fav_icon"
-                android:minWidth="40dp"
-                android:padding="10dp"
+                android:minWidth="32dp"
+                android:layout_margin="5dp"
                 android:src="@android:color/transparent"
                 android:visibility="gone" />
 

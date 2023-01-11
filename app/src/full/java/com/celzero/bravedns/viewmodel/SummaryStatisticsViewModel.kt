@@ -59,7 +59,7 @@ class SummaryStatisticsViewModel(
                 .cachedIn(viewModelScope)
         }
 
-    val getMostContactedDomain =
+    val getMostContactedDomains =
         Transformations.switchMap(domains) { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     dnsLogDAO.getMostContactedDomains()
@@ -68,7 +68,7 @@ class SummaryStatisticsViewModel(
                 .cachedIn(viewModelScope)
         }
 
-    val getMostBlockedDomain =
+    val getMostBlockedDomains =
         Transformations.switchMap(domains) { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getMostBlockedDomains() }
                 .liveData
