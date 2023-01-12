@@ -598,7 +598,7 @@
     <string name="bsac_title_desc">Aturan-aturan yang diterapkan hanya pada app ini.</string>
     <string name="dns_crypt_relay_error_toast">Tidak ada server penyelesai yang dipilih</string>
     <string name="dns_select_toast">Minimal satu server penyelesai (resolver) harus dipilih.</string>
-    <string name="ada_app_status_whitelist">akan mengabaikan (Bypass) aturan firewall universal</string>
+    <string name="ada_app_status_whitelist">akan memintas aturan-aturan universal firewall</string>
     <string name="settings_http_proxy_error_text3">Nama host tidak terisi</string>
     <string name="ct_delete_logs_positive_btn">Hapus riwayat</string>
     <string name="notif_dialog_pause_dialog_negative">Singkirkan</string>
@@ -636,6 +636,7 @@
     <string name="cd_dns_crypt_title">server penyelesai</string>
     <string name="firewall_rule_univ_block_metered">Terukur (Universal)</string>
     <string name="fapps_unmetered_block_dialog_title">Blokir jaringan yang tidak terukur</string>
+    <string name="ci_bypass_universal_desc">- Memintas (Mem-bypass) secara universal</string>
     <string name="firewall_rule_block_metered">Terukur (Data Selular)</string>
     <string name="settings_notification_dialog_option_1">"
 \nJeda / Hentikan (bawaan):
