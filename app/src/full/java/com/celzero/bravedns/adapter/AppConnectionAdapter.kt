@@ -139,9 +139,9 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
                     null // don't check for port as adding rule from this screen port is null
                 )
             updateStatusUi(ipRuleStatus)
-            if (!appConnection.dnsQuery.isNullOrEmpty()) {
+            if (!appConnection.appOrDnsName.isNullOrEmpty()) {
                 b.acdDomainName.visibility = View.VISIBLE
-                b.acdDomainName.text = beautifyDomainString(appConnection.dnsQuery)
+                b.acdDomainName.text = beautifyDomainString(appConnection.appOrDnsName)
             } else {
                 b.acdDomainName.visibility = View.GONE
             }

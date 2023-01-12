@@ -125,9 +125,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
-            val currentAppLocales: LocaleList =
-                requireContext().getSystemService(LocaleManager::class.java).applicationLocales
-            b.settingsLocaleDesc.text = currentAppLocales[0].displayName
+            val currentAppLocales: LocaleList = requireContext().getSystemService(LocaleManager::class.java).applicationLocales
+            b.settingsLocaleDesc.text = currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
         } else {
             b.settingsLocaleDesc.text =
                 AppCompatDelegate.getApplicationLocales().get(0)?.displayName

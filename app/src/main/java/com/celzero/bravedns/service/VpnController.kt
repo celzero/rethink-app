@@ -22,6 +22,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import com.celzero.bravedns.R
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
@@ -210,5 +211,23 @@ object VpnController : KoinComponent {
             // no-op
         }
         return protoString
+    }
+
+    fun netType(): String {
+        // using firewall_status_unknown from strings.xml as a place holder to show network
+        // type as Unknown.
+        var t = braveVpnService?.getString(R.string.firewall_status_unknown) ?: ""
+        if (braveVpnService == null) {
+            return t
+        }
+
+        t = if (braveVpnService?.underlyingNetworks?.isActiveNetworkMetered == true) {
+            braveVpnService?.getString(R.string.ada_app_metered).toString()
+        } else {
+            // the network type is shown as unmetered even when rethink cannot determine
+            // the underlying network / no underlying network
+            braveVpnService?.getString(R.string.ada_app_unmetered).toString()
+        }
+        return t
     }
 }

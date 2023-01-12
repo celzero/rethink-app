@@ -22,5 +22,5 @@ data class AppConnection(
     val count: Int,
     val flag: String,
     val blocked: Boolean,
-    val dnsQuery: String?
+    val appOrDnsName: String?
 )

@@ -44,6 +44,7 @@ class SummaryStatisticsViewModel(
     val getAllowedAppNetworkActivity =
         Transformations.switchMap(networkActivity) { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    // use dnsQuery as appName
                     connectionTrackerDAO.getAllowedAppNetworkActivity()
                 }
                 .liveData
@@ -53,6 +54,7 @@ class SummaryStatisticsViewModel(
     val getBlockedAppNetworkActivity =
         Transformations.switchMap(networkActivity) { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    // use dnsQuery as appName
                     connectionTrackerDAO.getBlockedAppNetworkActivity()
                 }
                 .liveData
