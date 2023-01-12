@@ -71,8 +71,8 @@
     <string name="conn_track_clear_logs_message">Dabei werden nur die Netzwerkprotokolle, nicht aber die Firewall-Regeln gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchten Sie fortfahren\?</string>
     <string name="dns_query_clear_logs_title">Alle DNS-Protokolle löschen\?</string>
     <string name="dns_query_clear_logs_message">Dadurch werden die DNS-Protokolle auf dem Gerät gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchten Sie fortfahren\?</string>
-    <string name="bsct_block_app">Blockieren, Umgehen <u>diese IP</u> für <u>diese App</u></string>
-    <string name="bsct_block">Blockieren, umgehen, ausschließen, sperren <u>diese Anwendung</u></string>
+    <string name="bsct_block_app">Blockieren, <u>dieser IP</u> für <u>diese App</u> vertrauen</string>
+    <string name="bsct_block"><u>Diese App</u> blockieren, umgehen, ausschließen, isolieren</string>
     <string name="bsct_conn_block_desc">blockiert %1$s durch %2$s</string>
     <string name="bsct_conn_desc_blocked">blockiert am %1$s %2$s</string>
     <string name="always_on_dialog_negative_btn">Abbrechen</string>
@@ -168,7 +168,7 @@
     <string name="search_custom_domains"><font size="12">Domänennamen suchen</font></string>
     <string name="search_rethinkplus_file_tag"><font size="12">Suche in Blocklisten</font></string>
     <string name="app_mode_choose">Modus wählen</string>
-    <string name="whats_dialog_title">Was ist neu in v053l</string>
+    <string name="whats_dialog_title">Was ist neu in v053n</string>
     <string name="whats_new_version_update"><b>Maximale Anstrengung</b>
 \n
 \n 1. Einführung eines privateren Rethink-Resolvers, <i>Max</i>.
@@ -252,7 +252,7 @@
     <string name="orbot_http">HTTP Proxy</string>
     <string name="orbot_bs_status_1">Weiterleitung von %1$s Verbindungen an Orbot.</string>
     <string name="settings_orbot_notification_heading">Erforderliche Maßnahmen</string>
-    <string name="isolate">alles blockiert</string>
+    <string name="isolate">isolieren</string>
     <string name="always_on_dialog_neutral">Einstellungen</string>
     <string name="settings_app_notification_a13_heading">App-Benachrichtigung</string>
     <string name="settings_theme_heading">Erscheinungsbild</string>
@@ -291,7 +291,7 @@
     <string name="firewall_rule_block_unmetered">Ungezählt (Wlan)</string>
     <string name="firewall_rule_block_metered">Gemessen (Mobil)</string>
     <string name="firewall_rule_univ_block_metered">Gemessen (Universell)</string>
-    <string name="firewall_rule_isolate">totale Sperrung (App)</string>
+    <string name="firewall_rule_isolate">Isolieren</string>
     <string name="firewall_rule_block_app_new_install">Neue App</string>
     <string name="firewall_rule_block_app_exception">Fehler</string>
     <string name="firewall_rule_block_dns_bypass">DNS umgangen</string>
@@ -357,7 +357,7 @@
     <string name="coming_soon_toast">demnächst</string>
     <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn VPN <i>gesperrt ist</i>. Tippen Sie auf <u>, um die VPN-Einstellungen zu bearbeiten</u>.</string>
     <string name="firewall_rule_block_ip">IP/ Port (App)</string>
-    <string name="firewall_rule_trusted_ip">Umgangene IP (App)</string>
+    <string name="firewall_rule_trusted_ip">Vertrauenswürdige IP</string>
     <string name="firewall_rule_bypass_universal_ip">Umgangene IP</string>
     <string name="firewall_rule_foreground">Nicht genutzte App</string>
     <string name="firewall_rule_unknown">Quelle Unbekannt</string>
@@ -414,18 +414,18 @@
     <string name="ci_dialog_edittext_hint">IP-Adresse, Subnetz oder Port</string>
     <string name="ci_dialog_error_invalid_ip">Ungültige IP-Adresse, Subnetz oder Port.</string>
     <string name="ci_dialog_added_success">IP der Liste hinzugefügt</string>
-    <string name="ci_header">IP- und Port-Regeln</string>
+    <string name="ci_header">IP- &amp; Port-Regeln: %1$s</string>
     <string name="ci_no_rules_text">Keine universellen IP-Blockierungs- oder Umgehungsregeln gefunden.</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">universelle Umgehung</string>
     <string name="ci_no_rule_initial">N</string>
-    <string name="ci_bypass_universal">universelle Umgehung</string>
-    <string name="ada_noapp_dialog_title">App Info nicht gefunden</string>
+    <string name="ci_bypass_universal">Universelle Umgehung</string>
+    <string name="ada_noapp_dialog_title">Keine solche App</string>
     <string name="ci_no_rule_txt">Keine Regel</string>
-    <string name="ci_no_rule">keine Regel</string>
-    <string name="ci_block">Block</string>
+    <string name="ci_no_rule">Keine Regel</string>
+    <string name="ci_block">Blockieren</string>
     <string name="ci_delete">löschen</string>
-    <string name="ada_noapp_dialog_message">Es wurden keine Anwendungsinformationen für die angegebene Anwendung gefunden.</string>
+    <string name="ada_noapp_dialog_message">App-Informationen fehlen. Vielleicht wurde diese App deinstalliert\?</string>
     <string name="ada_noapp_dialog_positive">OK</string>
     <string name="ada_firewall_status">Diese App <b><i>%1$s</i> </b> .</string>
     <string name="ada_ip_connection_count">Verbunden mit %1$s IP-Adresse(n)</string>
@@ -434,12 +434,12 @@
     <string name="ada_ip_no_connection">Keine Netzwerkprotokolle für diese Anwendung.</string>
     <string name="ada_app_status_block">ist blockiert</string>
     <string name="ada_app_status_block_wifi">wird in nicht gebührenpflichtigen Netzwerken (Wlan) blockiert</string>
-    <string name="ada_app_status_isolate">ist im totalen Blockmodus</string>
+    <string name="ada_app_status_isolate">ist isoliert; nur vertrauenswürdige IPs erlaubt</string>
     <string name="ada_app_status_unknown">ist unbekannt</string>
     <string name="ada_app_status_whitelist">umgeht die universellen Firewall-Regeln</string>
     <string name="bsac_unblock_toast">Ungesperrt %1$s für diese App</string>
-    <string name="bsac_distrust_toast">Umgehung für diese IP entfernt %1$s</string>
-    <string name="bsac_trust_toast">Umgehung der Anwendungsregeln für diese IP %1$s</string>
+    <string name="bsac_distrust_toast">%1$s für diese App nicht vertrauen</string>
+    <string name="bsac_trust_toast">%1$s für diese App vertrauen</string>
     <string name="bsdl_domain_heading">Domänenregel</string>
     <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Elterliche Kontrolle</string>
     <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines">Datenschutz</string>
@@ -508,7 +508,7 @@
     <string name="ada_ip_rules_title">IP-Regeln für diese Anwendung</string>
     <string name="ada_app_firewall">Firewall</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Fortfahren</string>
-    <string name="bsac_trust">Umgehen von App-Regeln</string>
+    <string name="bsac_trust">Vertrauen</string>
     <string name="bsdl_domain_desc">Klicken Sie unten, um die DNS-Abfrage zuzulassen oder zu blockieren</string>
     <string name="bsdl_blocked_desc">blockiert %1$s durch %2$s</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperren Sie Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating, sowie soziale Medien.</string>
@@ -524,7 +524,7 @@
     <string name="alert_firewall_accessibility_regrant_explanation">Der RethinkDNS- VPN Dienst wurde angehalten oder ist abgestürzt. <i><b>Gehen Sie zu Einstellungen und erzwingen Sie das Anhalten</b></i> RethinkDNS und starten Sie es erneut, um die Funktion <i>Sperrung aller nicht genutzten Anwendungen</i> zu verwenden.
 \n
 \nRethinkDNS verwendet den Eingabehilfedienst, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht in Gebrauch sind (im Hintergrund).</string>
-    <string name="firewall_status_isolate">totale Sperrung</string>
+    <string name="firewall_status_isolate">isoliert</string>
     <string name="firewall_status_excluded">von DNS und Firewall ausgeschlossen</string>
     <string name="firewall_status_whitelisted">umgeht die universellen Firewall-Regeln</string>
     <string name="firewall_rule_global_lockdown_desc">Diese Verbindung wurde blockiert, weil die universelle Sperre eingestellt ist.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
@@ -551,8 +551,8 @@
     <string name="cd_whitelist_txt">Positivliste</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_blocked_txt">Blockiert</string>
-    <string name="ci_trust_initial">BA</string>
-    <string name="ci_trust_txt">Umgehen von App-Regeln</string>
+    <string name="ci_trust_initial">T</string>
+    <string name="ci_trust_txt">Vertrauenswürdig</string>
     <string name="ci_blocked_txt">Blockiert</string>
     <string name="ada_app_status_block_md">ist in gebührenpflichtigen (mobilen) Netzen gesperrt</string>
     <string name="ada_ip_block_count">%1$s IP-Regel(n)</string>
@@ -561,14 +561,14 @@
     <string name="ada_app_unmetered">Nicht gemessen</string>
     <string name="ada_app_bypass_univ">Universelle Umgehung</string>
     <string name="ada_app_exclude">Ausblenden</string>
-    <string name="ada_app_isolate">totale Sperrung</string>
+    <string name="ada_app_isolate">Isolieren</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Protokolle löschen</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Löschen Sie alle Protokolle, die sich auf diese Anwendung beziehen.</string>
     <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">Abbrechen</string>
     <string name="bsac_title_desc">Die Regeln gelten nur für diese App.</string>
     <string name="bsac_unblock">Entsperren</string>
     <string name="bsac_block">Sperren</string>
-    <string name="bsac_distrust">Umgehung entfernen</string>
+    <string name="bsac_distrust">Nicht vertrauen</string>
     <string name="bsac_block_toast">Sperrung von %1$s für diese Anwendung</string>
     <string name="bsdl_domain_rule_norule">keine Regel</string>
     <string name="bsdl_domain_rule_allow">erlauben</string>
@@ -601,7 +601,7 @@
     <string name="firewall_card_text_active">%1$s blockiert
 \n%2$s umgangen
 \n%3$s ausgeschlossen
-\n%4$s totale Sperre</string>
+\n%4$s isoliert</string>
     <string name="firewall_card_text_inactive">Aktivieren Sie den Firewall-Modus.</string>
     <string name="dns_card_latency_active">Latenzzeit: %1$sms</string>
     <string name="dns_card_connected_status_failure">Deaktiviert</string>
@@ -621,7 +621,7 @@
     <string name="apps_card_ips_count">%1$s IP- und Port-Regeln</string>
     <string name="hsf_start_btn_state">Start</string>
     <string name="hsf_stop_btn_state">Stopp</string>
-    <string name="hsf_uptime">(aktiv seit %1$s; Prototypen: %2$s)</string>
+    <string name="hsf_uptime">(aktiv %1$s; Prototypen: %2$s; Typ: %3$s)</string>
     <string name="hsf_downtime">(inaktiv seit %1$s)</string>
     <string name="hsf_start_dialog_header">%1$s starten</string>
     <string name="hsf_start_dialog_positive">Start</string>
@@ -697,7 +697,7 @@
     <string name="dns_btm_sheet_chip">+%1$s andere IPs</string>
     <string name="dc_custom_block_desc">Demnächst verfügbar</string>
     <string name="dc_dns_website_heading">Zeige Website Icon in DNS-Logs (experimentell)</string>
-    <string name="dc_dns_website_desc">Zieht Website Icons von <i> nextdns.com</i> und <i>duckduckgo.com</i>. Benötigt bis zu 350 MB Speicherplatz</string>
+    <string name="dc_dns_website_desc">Ruft Webseitensymbole von <i>nextdns.io</i> und <i>duckduckgo.com</i> ab. Verbraucht bis zu 350 MB Speicherplatz</string>
     <string name="dc_dns_leaks_heading">Verhindere DNS Lecks</string>
     <string name="dc_dns_leaks_desc">Wenn aktiviert, fängt RethinkDNS alle Pakete an Port 53 ab und leitet sie an einen vom Benutzer festgelegten DNS-Endpunkt weiter</string>
     <string name="dc_check_update_desc">Prüfen Sie einmal in <i>drei</i> Tagen auf Aktualisierungen der Blocklisten</string>
@@ -787,7 +787,7 @@
     <string name="contributors_list">Das &lt;i&gt;Rethink Open Source Project&lt;/i&gt; verdankt seine Existenz den Freiwilligen die zahllose Stunden in die Entwicklung der APP gesteckt haben.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="dc_custom_dns_radio">Andere DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
-    <string name="dc_entries">%1$s Einträge 🔗</string>
+    <string name="dc_entries">%1$s Einträge »</string>
     <string name="dc_local_block_desc_1">Wählen Sie aus über 185 Blocklisten. Klicken Sie hier um Blocklisten herunterzuladen oder zu konfigurieren.</string>
     <string name="dc_local_block_heading">Geräteinterne Sperrlisten</string>
     <string name="intent_launch_error">Zählung nicht gestartet %1$s</string>
@@ -809,7 +809,7 @@
     <string name="fapps_unmetered_unblock_dialog_message">Erlauben Sie Verbindungen in einem nicht gebührenpflichtigen (WiFi-)Netzwerk für die auf <i>aufgelisteten Anwendungen</i>\?</string>
     <string name="fapps_unmetered_negative">Abbrechen</string>
     <string name="fapps_metered_block_dialog_title">Sperre bei kostenpflichtigen</string>
-    <string name="fapps_firewall_filter_hint">Verwenden von kostenfreien / gebührenpflichtigen Regeln für aufgelistete Anwendungen</string>
+    <string name="fapps_firewall_filter_hint">Regeln auf aufgelistete Apps anwenden</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="unicode_x_sign">❌</string>
@@ -840,7 +840,7 @@
     <string name="dc_other_settings_heading">Fortgeschritten</string>
     <string name="dc_custom_block_heading">Erlaube oder verbiete individuelle Domains</string>
     <string name="dc_check_update_heading">Aufforderung zur Aktualisierung der Blockliste</string>
-    <string name="univ_view_blocked_ip_desc">Ändern Sie Blockier- oder Umleitungs- IP-/Port-Regeln.</string>
+    <string name="univ_view_blocked_ip_desc">Blockierte oder vertrauenswürdige IP-/Port-Regeln ändern.</string>
     <string name="univ_ip_delete_individual_negative">Abbrechen</string>
     <string name="univ_ip_delete_individual_toast">%1$s gelöscht.</string>
     <string name="univ_ip_delete_dialog_positive">Alle löschen</string>
@@ -884,4 +884,43 @@
     <string name="settings_local_blocklist_version">Version: V%1$s</string>
     <string name="firewall_rule_exempt_orbot_setup">Orbot-Einrichtung</string>
     <string name="firewall_rule_block_http">Unsicheres HTTP</string>
+    <string name="title_statistics">Statistiken</string>
+    <string name="settings_locale_heading">Sprache ändern</string>
+    <string name="settings_locale_dialog_neutral">Helfen Sie mit, diese App zu übersetzen</string>
+    <string name="settings_biometeric_heading">App-Sperre aktivieren</string>
+    <string name="settings_biometric_desc">Sichern Sie diese App mit Ihrer Bildschirmsperre</string>
+    <string name="hs_biometeric_feature_not_supported">Die biometrische Authentifizierung wird auf diesem Gerät nicht unterstützt oder ist deaktiviert</string>
+    <string name="hs_biometeric_error">Fehler bei der biometrischen Authentifizierung</string>
+    <string name="fapps_firewall_filter_bypass_universal">Umgangen</string>
+    <string name="fapps_firewall_filter_isolate">Isoliert</string>
+    <string name="fapps_info_exclude_msg">Sowohl von DNS + Firewall ausschließen.</string>
+    <string name="fapps_bypass_block_dialog_title">Apps umgehen</string>
+    <string name="fapps_unblock_dialog_message">Verbindungen für <i>aufgelistete</i> Apps erlauben\?</string>
+    <string name="fapps_exclude_block_dialog_title">Apps ausschließen</string>
+    <string name="fapps_isolate_block_dialog_title">Apps isolieren</string>
+    <string name="fapps_isolate_block_dialog_message"><i>Aufgelistete</i> Apps isolieren\?</string>
+    <string name="fapps_exclude_block_dialog_message"><i>Aufgelistete</i> Apps von DNS und Firewall ausschließen\?</string>
+    <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s Apps werden angezeigt</string>
+    <string name="fapps_firewall_filter_desc_category"><u>%1$s</u> %2$s Apps in Kategorien werden angezeigt: %3$s</string>
+    <string name="unicode_warning_sign">⚠</string>
+    <string name="ci_trust_rule">Vertrauen</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">meistblockierte Apps</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">meisterlaubte Apps</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">meistkontaktierte IPs</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">meistblockierte IPs</string>
+    <string name="ssv_see_more">alle anzeigen</string>
+    <string name="fapps_bypass_block_dialog_message">Universelle Firewall-Regeln für <i>aufgelistete</i> Apps umgehen\?</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">meistkontaktierte Domains</string>
+    <string name="settings_locale_desc">Wählen Sie Ihre bevorzugte Sprache</string>
+    <string name="settings_locale_dialog_title">Wählen Sie Ihre bevorzugte Sprache</string>
+    <string name="hs_biometeric_title">Rethink entsperren</string>
+    <string name="hs_biometeric_desc">Biometrische Authentifizierung zum Entsperren von RethinkDNS verwenden</string>
+    <string name="hs_biometeric_failed">Biometrische Authentifizierung fehlgeschlagen</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">meistblockierte Domains</string>
+    <string name="fapps_unblock_dialog_title">Anwendungen zulassen</string>
+    <string name="fapps_info_isolate_msg">Alle außer vertrauenswürdigen IPs blockieren.</string>
+    <string name="fapps_info_bypass_msg">Universelle Firewall-Regeln umgehen.</string>
+    <string name="dns_proxy_app">App</string>
+    <string name="fapps_filter_filter_heading">Typ</string>
+    <string name="copy_clipboard_label">URL</string>
 </resources>
