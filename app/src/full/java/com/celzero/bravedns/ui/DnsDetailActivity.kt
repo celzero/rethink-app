@@ -38,8 +38,8 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
-        LOGS(0),
-        CONFIGURE(1);
+        LOGS(1),
+        CONFIGURE(0);
 
         companion object {
             fun getCount(): Int {
@@ -51,7 +51,8 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
+        fragmentIndex =
+            intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, Tabs.CONFIGURE.screen)
         searchParam = intent.getStringExtra(Constants.SEARCH_QUERY) ?: ""
         init()
     }
@@ -62,8 +63,8 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
             object : FragmentStateAdapter(this) {
                 override fun createFragment(position: Int): Fragment {
                     return when (position) {
-                        Tabs.LOGS.screen -> DnsLogFragment.newInstance(searchParam)
                         Tabs.CONFIGURE.screen -> DnsConfigureFragment.newInstance()
+                        Tabs.LOGS.screen -> DnsLogFragment.newInstance(searchParam)
                         else -> DnsConfigureFragment.newInstance()
                     }
                 }
@@ -76,8 +77,8 @@ class DnsDetailActivity : AppCompatActivity(R.layout.activity_dns_detail) {
         TabLayoutMediator(b.dnsDetailActTabLayout, b.dnsDetailActViewpager) { tab, position ->
                 tab.text =
                     when (position) {
-                        Tabs.LOGS.screen -> getString(R.string.dns_act_log)
                         Tabs.CONFIGURE.screen -> getString(R.string.dns_act_configure_tab)
+                        Tabs.LOGS.screen -> getString(R.string.dns_act_log)
                         else -> getString(R.string.dns_act_configure_tab)
                     }
             }
