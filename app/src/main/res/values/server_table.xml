@@ -1,39 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string-array name="urls">
-    <item>@string/url0</item>
-    <item>@string/url1</item>
-    <item>@string/url2</item>
-    <item>@string/url3</item>
-    <item>@string/url4</item>
-    <item>@string/url5</item>
-    <item>@string/url6</item>
-    <item>@string/url7</item>
-    <item>@string/url8</item>
-    <item>@string/url9</item>
-    <item>@string/url10</item>
-    <item>@string/url11</item>
-    <item>@string/url12</item>
-    <item>@string/url13</item>
-    <item>@string/url14</item>
-    <item>@string/url15</item>
-  </string-array>
+    <string-array name="urls">
+        <item>@string/url0</item>
+    </string-array>
     <string-array name="ips">
-    <item>@string/ips0</item>
-    <item>@string/ips1</item>
-    <item>@string/ips2</item>
-    <item>@string/ips3</item>
-    <item>@string/ips4</item>
-    <item>@string/ips5</item>
-    <item>@string/ips6</item>
-    <item>@string/ips7</item>
-    <item>@string/ips8</item>
-    <item>@string/ips9</item>
-    <item>@string/ips10</item>
-    <item>@string/ips11</item>
-    <item>@string/ips12</item>
-    <item>@string/ips13</item>
-    <item>@string/ips14</item>
-    <item>@string/ips15</item>
-  </string-array>
+        <item>@string/ips0</item>
+    </string-array>
 </resources>
