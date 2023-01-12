@@ -171,7 +171,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         val ipv4Net: Set<Network>,
         val ipv6Net: Set<Network>,
         val useActive: Boolean,
-        var `isActiveNetworkMetered`: Boolean,
+        var isActiveNetworkMetered: Boolean,
         var lastUpdated: Long
     )
 
