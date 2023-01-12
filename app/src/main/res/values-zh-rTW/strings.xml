@@ -22,7 +22,7 @@
     <string name="bypass_universal">無條件放行</string>
     <string name="exclude">排除</string>
     <string name="untracked">未追蹤</string>
-    <string name="isolate">閉關</string>
+    <string name="isolate">隔離</string>
     <string name="pause_mode_notification_title">已暫停！被攔截的程式將仍被拒絕訪問網路。</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">等待中</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">失敗</string>
@@ -55,8 +55,8 @@
     <string name="dns_query_clear_logs_title">是否刪除所有 DNS 日誌？</string>
     <string name="dns_query_clear_logs_message">這會刪除所有在裝置上儲存的 DNS 日誌。此行爲不可逆。請問您是否想要繼續？</string>
     <string name="bsct_app_info">應用資訊</string>
-    <string name="bsct_block_app">針對<u>此應用</u>攔截、放行<u/>此 IP</string>
-    <string name="bsct_block">針對<u>此應用</u>攔截、放行、排除或閉關</string>
+    <string name="bsct_block_app">對<u>此應用</u>攔截、信任<u>此 IP</u></string>
+    <string name="bsct_block">針對<u>此應用</u>攔截、放行、排除或隔離</string>
     <string name="bsct_conn_block_desc_device">本地攔截 %1$s</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
     <string name="bsct_conn_desc_blocked">%2$s 攔截 %1$s</string>
@@ -119,7 +119,7 @@
     <string name="info_dialog_url_copy_toast_msg">已複製 URL</string>
     <string name="info_dialog_rethink_toast_msg">已作爲 RDNS+ DNS-over-HTTPS URL 複製</string>
     <string name="settings_enable_logs_desc">於本地儲存 DNS 與防火牆日誌。</string>
-    <string name="whats_dialog_title">v053l 的新內容</string>
+    <string name="whats_dialog_title">v053m 的新內容</string>
     <string name="settings_ip_network_desc">在不同互聯網協定版本中選擇。</string>
     <string name="settings_ptrans_heading">強制 IPv4 出站</string>
     <string name="settings_ptrans_desc">於本地將出站的 IPv6 流量轉換爲 IPv4 流量。在您連線至僅有 IPv4 的網路時使用。</string>
@@ -517,7 +517,7 @@
     <string name="settings_protocol_translation_dns_inactive">切換至 DNS 或 DNS + 防火牆模式以啓用此設定</string>
     <string name="apps_icon_content_desc">應用圖示</string>
     <string name="firewall_status_excluded">已排除在 DNS 與防火牆外</string>
-    <string name="firewall_status_isolate">已閉關</string>
+    <string name="firewall_status_isolate">已隔離</string>
     <string name="firewall_status_whitelisted">已繞過全局防火牆規則</string>
     <string name="firewall_status_block_unmetered">已阻止連線非計費（ WiFi ）網路</string>
     <string name="firewall_status_block_metered">已阻止連線計費（行動數據）網路</string>
@@ -527,9 +527,9 @@
     <string name="firewall_card_status_inactive">已禁用</string>
     <string name="firewall_card_status_active">%1$s 個應用</string>
     <string name="firewall_card_text_active">攔截 %1$s
-\n繞過 %2$s
+\n繞行 %2$s
 \n排除 %3$s
-\n閉關 %4$s</string>
+\n隔離 %4$s</string>
     <string name="firewall_card_text_inactive">啓用防火牆模式。</string>
     <string name="dns_card_connected_status_failure">已禁用</string>
     <string name="dns_card_latency_active">延遲： %1$sms</string>
@@ -567,7 +567,7 @@
     <string name="dc_other_dns_heading">類型</string>
     <string name="dc_other_settings_heading">進階</string>
     <string name="dc_custom_dns_radio">其他 DNS</string>
-    <string name="dc_entries">%1$s 條目 🔗</string>
+    <string name="dc_entries">%1$s 條目 »</string>
     <string name="dc_local_block_heading">本地攔截清單</string>
     <string name="dc_local_block_desc_1">於逾 185 條攔截清單中選擇。輕觸此處以下載或配置攔截清單。</string>
     <string name="dc_custom_block_heading">放行或攔截個別網域</string>
@@ -703,7 +703,7 @@
     <string name="univ_firewall_rule_9">攔截於計費網路（行動數據）</string>
     <string name="univ_firewall_rule_10">除繞行應用及 IP 外全部攔截</string>
     <string name="univ_view_blocked_ip">IP 與埠規則</string>
-    <string name="univ_view_blocked_ip_desc">修改攔截或繞行的 IP / 埠規則。</string>
+    <string name="univ_view_blocked_ip_desc">修改攔截或信任的 IP / 埠規則。</string>
     <string name="univ_ip_delete_individual_positive">刪除</string>
     <string name="univ_ip_delete_individual_negative">取消</string>
     <string name="univ_ip_delete_individual_toast">已刪除 %1$s 。</string>
@@ -755,14 +755,8 @@
     <string name="fapps_firewall_filter_blocked">已攔截</string>
     <string name="fapps_firewall_filter_bypass_universal">已繞行</string>
     <string name="fapps_firewall_filter_excluded">已排除</string>
-    <string name="fapps_firewall_filter_isolate">已閉關</string>
-    <string name="fapps_info_dialog_message">阻止應用連線互聯網。限制訪問互聯網有助於避免不必要的數據使用，也有助於節電。
-\n
-\n計費（行動數據）/非計費（ WiFi ）防火牆規則將不會在下述情形遵守：
-\n
-\n1. VPN 處於閉關模式（如當<i>攔截未經 VPN 的連線</i>被啓用時）。
-\n
-\n2. <i>使用所有可用網路</i>設定項被啓用時。</string>
+    <string name="fapps_firewall_filter_isolate">已隔離</string>
+    <string name="fapps_info_dialog_message">阻止應用連線互聯網。限制訪問互聯網有助於避免不必要的數據使用，也有助於節電。</string>
     <string name="fapps_info_dialog_positive_btn">瞭解</string>
     <string name="fapps_unmetered_unblock_dialog_title">於非計費網路放行</string>
     <string name="fapps_unmetered_block_dialog_title">於非計費網路攔截</string>
@@ -776,7 +770,7 @@
     <string name="fapps_metered_unblock_dialog_message">是否於計費網路放行<i>所列出的</i>應用？</string>
     <string name="fapps_lockdown_hint">VPN 正處於閉關模式。防火牆將不會遵守計費 / 非計費規則。</string>
     <string name="fapps_all_network_hint"><u>使用所有可用網路</u>已啓用。防火牆將不會遵守計費 / 非計費規則。</string>
-    <string name="fapps_firewall_filter_hint">於已列出的應用應用非計費 / 計費規則</string>
+    <string name="fapps_firewall_filter_hint">對已列出的應用程式應用規則</string>
     <string name="fapps_firewall_filter_desc">顯示 <u>%1$s</u> %2$s 個應用</string>
     <string name="fapps_firewall_filter_desc_category">正顯示 <u>%1$s</u> %2$s 個應用於分類：%3$s</string>
     <string name="unicode_warning_sign">⚠</string>
@@ -817,11 +811,11 @@
     <string name="firewall_rule_block_unmetered">非計費網路（ WiFi ）</string>
     <string name="firewall_rule_block_metered">計費網路（行動數據）</string>
     <string name="firewall_rule_univ_block_metered">計費網路（全局）</string>
-    <string name="firewall_rule_isolate">閉關模式（應用）</string>
+    <string name="firewall_rule_isolate">隔離模式</string>
     <string name="firewall_rule_block_app_new_install">新應用</string>
     <string name="firewall_rule_block_app_exception">錯誤</string>
     <string name="firewall_rule_block_ip">IP / 埠（應用）</string>
-    <string name="firewall_rule_trusted_ip">已繞行 IP （應用）</string>
+    <string name="firewall_rule_trusted_ip">已信任 IP</string>
     <string name="firewall_rule_bypass_universal_ip">已繞行 IP</string>
     <string name="firewall_rule_device_lock">裝置已鎖定</string>
     <string name="firewall_rule_foreground">應用未使用</string>
@@ -887,4 +881,29 @@
     <string name="private_dns_error">無法打開私人 DNS 區。</string>
     <string name="private_dns_dialog_heading">關閉私人 DNS</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s 個攔截清單</string>
+    <string name="settings_locale_desc">選擇您傾向使用的語言</string>
+    <string name="settings_locale_dialog_title">選擇您傾向使用的語言</string>
+    <string name="hs_biometeric_desc">使用生物識別驗證解鎖 RethinkDNS</string>
+    <string name="hs_biometeric_failed">生物識別認證失敗</string>
+    <string name="fapps_info_unmetered_msg">於非計費網路（ WiFi ）放行/攔截。</string>
+    <string name="fapps_info_exclude_msg">於 DNS 與防火牆中排除。</string>
+    <string name="fapps_info_isolate_msg">除信任 IP 外一概攔截。</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">攔截最多的應用</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">連線最多的網域</string>
+    <string name="ssv_see_more">查看更多…</string>
+    <string name="title_statistics">統計</string>
+    <string name="settings_locale_heading">變更語言</string>
+    <string name="settings_locale_dialog_neutral">協助翻譯此應用</string>
+    <string name="settings_biometeric_heading">啟用應用鎖</string>
+    <string name="settings_biometric_desc">使用熒幕鎖保護此應用</string>
+    <string name="hs_biometeric_title">解鎖 Rethink</string>
+    <string name="hs_biometeric_feature_not_supported">此裝置不支持或已禁用生物識別驗證</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">啟動 Rethink 以繼續</string>
+    <string name="hs_biometeric_error">生物識別認證出錯</string>
+    <string name="fapps_info_bypass_msg">繞過全局防火牆規則。</string>
+    <string name="fapps_info_metered_msg">於計費網路（行動數據）放行/攔截。</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">放行最多的應用</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">攔截最多的網域</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">連線最多的 IP</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">攔截最多的 IP</string>
 </resources>
