@@ -227,7 +227,6 @@
     <string name="about_mail_bugreport_text">Kirimkan email ke : hello@celzero.com</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_filter_allowed">Diizinkan</string>
-    <string name="fapps_info_dialog_title">Info</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="new_app_bulk_notification_title">Perhatian</string>
     <string name="about_settings">sistem</string>
@@ -510,7 +509,6 @@
     <string name="orbot_socks5">Proksi hanya-TCP</string>
     <string name="settings_theme_dialog_themes_1">Diatur Sistem</string>
     <string name="settings_notification_heading">Pilih notifikasi</string>
-    <string name="hsf_blocklist_chip_text_no_blocklist">RDNS sedang digunakan</string>
     <string name="univ_firewall_rule_8">Blokir lalu lintas di port 80 (HTTP tidak aman)</string>
     <string name="rbl_security">Keamanan</string>
     <string name="rt_apply_btn">Terapkan</string>
@@ -600,7 +598,6 @@
     <string name="bsac_title_desc">Aturan-aturan yang diterapkan hanya pada app ini.</string>
     <string name="dns_crypt_relay_error_toast">Tidak ada server penyelesai yang dipilih</string>
     <string name="dns_select_toast">Minimal satu server penyelesai (resolver) harus dipilih.</string>
-    <string name="bsac_bypass_app_rules">Pintaskan aturan-aturan app</string>
     <string name="ada_app_status_whitelist">akan memintas aturan-aturan universal firewall</string>
     <string name="settings_http_proxy_error_text3">Nama host tidak terisi</string>
     <string name="ct_delete_logs_positive_btn">Hapus riwayat</string>
@@ -639,7 +636,6 @@
     <string name="cd_dns_crypt_title">server penyelesai</string>
     <string name="firewall_rule_univ_block_metered">Terukur (Universal)</string>
     <string name="fapps_unmetered_block_dialog_title">Blokir jaringan yang tidak terukur</string>
-    <string name="ada_app_status_lockdown">dalam mode terkunci penuh</string>
     <string name="ci_bypass_universal_desc">- Memintas (Mem-bypass) secara universal</string>
     <string name="firewall_rule_block_metered">Terukur (Data Selular)</string>
     <string name="settings_notification_dialog_option_1">"
@@ -652,7 +648,6 @@
     <string name="fapps_lockdown_hint">Vpn dalam mode terkunci penuh. Firewall akan mematuhi aturan Terukur / tidak Terukur.</string>
     <string name="dns_crypt_connection_failure">Gagal terhubung ke server DNSCrypt.</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s penyelesai</string>
-    <string name="fapps_firewall_filter_lockdown">Penguncian Penuh</string>
     <string name="ada_app_metered">Terukur</string>
     <string name="settings_custom_downloader_heading">Gunakan pengunduh bawaan aplikasi</string>
     <string name="bsdl_blocked_desc">%1$s telah terblokir %2$s</string>
