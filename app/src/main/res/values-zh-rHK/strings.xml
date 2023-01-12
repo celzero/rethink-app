@@ -66,7 +66,7 @@
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">防火牆</string>
     <string name="settings_enable_logs">啓用本地日誌</string>
-    <string name="whats_dialog_title">v053m 嘅新內容</string>
+    <string name="whats_dialog_title">v053n 嘅新內容</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
     <string name="orbot_http">HTTP 代理</string>
     <string name="whats_new_version_update">&lt;b&gt;打破語言隔閡！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 重新支援 Android 6。&lt;br/&gt; 2. 全新 RDNS+ 介面。&lt;br/&gt; 3. 全新防火牆同網絡引擎。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：超過 15 種語言嘅翻譯。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：自適應圖示。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：喺分應用網絡日誌入面顯示網域。&lt;br/&gt; 7. 修復通知喺 Android 13 上消失嘅問題。&lt;br/&gt; 8. 修復異常工作嘅 Orbot DNS 支援。&lt;br/&gt; 9. 應用程式區而家可以喺僅 DNS 模式入面訪問。&lt;br/&gt;10. 對內建下載管理器嘅一啲重大改進。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
@@ -889,7 +889,7 @@
     <string name="hs_biometeric_desc">用生物認證解鎖 RethinkDNS</string>
     <string name="hs_biometeric_failed">生物認證失敗</string>
     <string name="hs_biometeric_error">生物認證錯誤</string>
-    <string name="fapps_info_metered_msg">喺收錢嘅網絡（流動數據）放行／攔截</string>
+    <string name="fapps_info_metered_msg">喺收錢嘅網絡（流動數據）放行／攔截。</string>
     <string name="fapps_info_bypass_msg">繞過全局防火牆規則。</string>
     <string name="fapps_info_isolate_msg">除信任嘅 IP 之外一律攔截。</string>
     <string name="fapps_unblock_dialog_title">准許應用程式</string>
@@ -901,7 +901,7 @@
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">啓動 Rethink 以繼續</string>
     <string name="ssv_see_more">睇多啲…</string>
     <string name="fapps_unblock_dialog_message">對<i>列出嘅</i>應用程式准許連接？</string>
-    <string name="fapps_info_unmetered_msg">喺唔收錢嘅網絡（WiFi）放行／攔截</string>
+    <string name="fapps_info_unmetered_msg">喺唔收錢嘅網絡（WiFi）放行／攔截。</string>
     <string name="title_statistics">統計</string>
     <string name="hs_biometeric_title">解鎖 Rethink</string>
     <string name="fapps_bypass_block_dialog_title">繞行應用程式</string>
