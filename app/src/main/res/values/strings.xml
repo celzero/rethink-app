@@ -1314,6 +1314,6 @@
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">most contacted ips</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">most blocked ips</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Start Rethink to proceed</string>
-    <string name="ssv_see_more">See more…</string>
+    <string name="ssv_see_more">show all</string>
 
 </resources>
