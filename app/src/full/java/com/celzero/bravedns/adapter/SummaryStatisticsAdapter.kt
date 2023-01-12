@@ -155,7 +155,7 @@ class SummaryStatisticsAdapter(
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     itemBinding.ssFlag.text = appConnection.flag
-                    val query = appConnection.dnsQuery?.dropLast(1)
+                    val query = appConnection.appOrDnsName?.dropLast(1)
                     if (query == null) {
                         hideFavIcon()
                         showFlag()
@@ -163,10 +163,7 @@ class SummaryStatisticsAdapter(
                     }
 
                     // no need to check in glide cache if the value is available in failed cache
-                    if (
-                        FavIconDownloader.isUrlAvailableInFailedCache(query) !=
-                            null
-                    ) {
+                    if (FavIconDownloader.isUrlAvailableInFailedCache(query) != null) {
                         hideFavIcon()
                         showFlag()
                     } else {
@@ -199,20 +196,18 @@ class SummaryStatisticsAdapter(
         private fun setName(appConnection: AppConnection) {
             when (type) {
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                    val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
-                    itemBinding.ssName.text = appInfo?.appName
+                    itemBinding.ssName.text = getAppName(appConnection)
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                    val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
-                    itemBinding.ssName.text = appInfo?.appName
+                    itemBinding.ssName.text = getAppName(appConnection)
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     // remove the trailing dot
-                    itemBinding.ssName.text = appConnection.dnsQuery?.dropLast(1)
+                    itemBinding.ssName.text = appConnection.appOrDnsName?.dropLast(1)
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     // remove the trailing dot
-                    itemBinding.ssName.text = appConnection.dnsQuery?.dropLast(1)
+                    itemBinding.ssName.text = appConnection.appOrDnsName?.dropLast(1)
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                     itemBinding.ssName.text = appConnection.ipAddress
@@ -220,6 +215,22 @@ class SummaryStatisticsAdapter(
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
                     itemBinding.ssName.text = appConnection.ipAddress
                 }
+            }
+        }
+
+        private fun getAppName(appConnection: AppConnection): String? {
+            return if (appConnection.appOrDnsName.isNullOrEmpty()) {
+                val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                if (appInfo?.appName.isNullOrEmpty()) {
+                    context.getString(
+                        R.string.network_log_app_name_unnamed,
+                        "($appConnection.uid)"
+                    )
+                } else {
+                    appInfo?.appName
+                }
+            } else {
+                appConnection.appOrDnsName
             }
         }
 
@@ -286,7 +297,7 @@ class SummaryStatisticsAdapter(
                 startActivity(
                     isDns = true,
                     DnsDetailActivity.Tabs.LOGS.screen,
-                    appConnection.dnsQuery
+                    appConnection.appOrDnsName
                 )
             } else {
                 Utilities.showToastUiCentered(
