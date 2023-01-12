@@ -285,7 +285,7 @@
 
     <string name="app_mode_choose">Choose mode</string>
 
-    <string name="whats_dialog_title">What\'s new in v053m</string>
+    <string name="whats_dialog_title">What\'s new in v053n</string>
     <string name="whats_new_version_update"><![CDATA[<b>RA Fisher!</b><br/><br/>
         1. <i>New feature</i>: All new Statistics screen.<br/>
         2. <i>New feature</i>: Secure this app using screen lock.<br/>
@@ -1129,8 +1129,8 @@
     <string name="ci_ip_label" translatable="false">%1$s:%2$s</string>
 
     <!-- app info -->
-    <string name="ada_noapp_dialog_title">App Info not found</string>
-    <string name="ada_noapp_dialog_message">App information for the specified application is not found.</string>
+    <string name="ada_noapp_dialog_title">No such app</string>
+    <string name="ada_noapp_dialog_message">App information missing. Perhaps this app was uninstalled?</string>
     <string name="ada_noapp_dialog_positive">Okay</string>
 
     <string name="ada_firewall_status"><![CDATA[This app <b><i>%1$s</i></b>.]]></string>
