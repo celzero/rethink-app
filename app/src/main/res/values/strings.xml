@@ -521,7 +521,7 @@
     <string name="hsf_start_btn_state">start</string>
     <string name="hsf_stop_btn_state">stop</string>
 
-    <string name="hsf_uptime">(active since %1$s; protos: %2$s)</string>
+    <string name="hsf_uptime">(active %1$s; protos: %2$s; type: %3$s)</string>
     <string name="hsf_downtime">(inactive since %1$s)</string>
 
     <string name="hsf_vpn_dialog_header">Attention!</string>
