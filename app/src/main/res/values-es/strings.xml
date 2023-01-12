@@ -130,13 +130,13 @@
     <string name="accessibility_service_description">RethinkDNS utiliza el servicio de accesibilidad para detectar y bloquear aplicaciones en segundo plano. RethinkDNS no recopila ni vende ninguna información.</string>
     <string name="finish">Finalizar</string>
     <string name="slide_2_desc">RethinkDNS es la forma más fácil de supervisar la actividad de la red, evitar la censura de Internet y controlar las aplicaciones de su dispositivo Android.</string>
-    <string name="slide_1_title">Gratis y de código abierto</string>
+    <string name="slide_1_title">Código libre y abierto</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">permitir</string>
     <string name="block">bloquear</string>
     <string name="exclude">excluir</string>
-    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Pulse para cambiar los ajustes de protección</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Pulse para cambiar los ajustes de la protección</string>
     <string name="dns_mode_notification_title">¡Protegido! Conectado a un DNS rápido y seguro.</string>
     <string name="pause_mode_notification_title">¡Pausado! Las aplicaciones bloqueadas seguirán siendo controladas.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">esperando</string>
@@ -148,12 +148,12 @@
     <string name="status_protected_with_tor_private_dns">protegido con tor y dns privado</string>
     <string name="status_protected_with_private_dns">protegido con dns privado</string>
     <string name="status_protected_with_proxy_private_dns">protegido con proxy y dns privado</string>
-    <string name="status_protected_with_socks5_private_dns">protegido con proxy socks5 y dns privado</string>
+    <string name="status_protected_with_socks5_private_dns">protegido con socks5 y dns privado</string>
     <string name="status_protected_with_http_private_dns">protegido con proxy http y dns privado</string>
     <string name="status_protected_with_socks5">protegido con proxy socks</string>
     <string name="status_protected_with_http">protegido con proxy http</string>
     <string name="status_protected_with_proxy">protegido con proxy</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns privado activado</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">el dns privado está activado</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">no protegido</string>
     <string name="dns_explanation_dns_connected">Conectado a RethinkDNS</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Conectado a RethinkDNS y al cortafuegos</string>
@@ -492,7 +492,7 @@
     <string name="settings_enable_logs_desc">Almacenar los registros de DNS y Cortafuegos localmente en el dispositivo.</string>
     <string name="settings_enable_logs">Activar el registro en el dispositivo</string>
     <string name="app_mode_choose">Elija el modo</string>
-    <string name="whats_dialog_title">Novedades de la versión v053m</string>
+    <string name="whats_dialog_title">Novedades en la v053n</string>
     <string name="settings_app_notification_a13_desc">Habilita el permiso de notificación para la aplicación</string>
     <string name="settings_theme_heading">Apariencia</string>
     <string name="settings_theme_desc">Tema oscuro/claro</string>
@@ -526,7 +526,7 @@
     <string name="apps_card_ips_count">%1$s Reglas de IP y puerto</string>
     <string name="hsf_start_btn_state">iniciar</string>
     <string name="hsf_stop_btn_state">parar</string>
-    <string name="hsf_uptime">(activo desde %1$s; protos: %2$s)</string>
+    <string name="hsf_uptime">(activo %1$s; protos: %2$s; tipo: %3$s)</string>
     <string name="hsf_vpn_dialog_header">¡Atención!</string>
     <string name="hsf_vpn_dialog_positive">Proceder</string>
     <string name="hsf_vpn_dialog_negative">Cancelar</string>
@@ -663,8 +663,8 @@
     <string name="ada_app_bypass_univ">Omisión global</string>
     <string name="ci_block">Bloquear</string>
     <string name="ci_delete">borrar</string>
-    <string name="ada_noapp_dialog_title">Información de la aplicación no encontrada</string>
-    <string name="ada_noapp_dialog_message">No se encuentra la información de la aplicación especificada.</string>
+    <string name="ada_noapp_dialog_title">No existe la aplicación</string>
+    <string name="ada_noapp_dialog_message">Falta información sobre la aplicación. ¿Quizá se ha desinstalado esta aplicación\?</string>
     <string name="ada_noapp_dialog_positive">Bien</string>
     <string name="ada_firewall_title">reglas de cortafuegos para esta aplicación</string>
     <string name="ada_ip_rules_title">reglas ip para esta aplicación</string>
@@ -753,7 +753,7 @@
     <string name="orbot_http_desc">Recomienda que las aplicaciones utilicen el proxy HTTP de Orbot.</string>
     <string name="orbot_app_issue">No se puede lanzar Orbot. ¿Está instalado\?</string>
     <string name="orbot_stop_dialog_negative">Detener Orbot</string>
-    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">fallido</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">fallando</string>
     <string name="orbot_stop_dialog_dns_message">RethinkDNS está configurado para reenviar las consultas DNS a Orbot. Cámbielo según sea necesario.</string>
     <string name="orbot_install_dialog_title">¿Instalar Orbot\?</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Advertencia: RethinkDNS ha sido desactivado</string>
@@ -776,7 +776,7 @@
     <string name="settings_autostart_bootup_desc">Al encender el dispositivo, inicia RethinkDNS si estaba funcionando antes de apagar.</string>
     <string name="settings_check_update_desc">Comprueba automáticamente las actualizaciones de la aplicación una vez a la semana.</string>
     <string name="settings_https_desc">Esta configuración es sólo una recomendación y es posible que las aplicaciones la ignoren. Las aplicaciones que utilicen el proxy HTTP(S) omitirán las reglas del Cortafuegos y del DNS.</string>
-    <string name="status_dns_error">error dns</string>
+    <string name="status_dns_error">error de dns</string>
     <string name="settings_socks5_disabled_error">Conectado a Orbot. apague para continuar.</string>
     <string name="settings_orbot_notification_heading">Acción requerida</string>
     <string name="settings_orbot_notification_content">Fallo al iniciar Tor-como-un-Proxy. Abra la aplicación Orbot para iniciarla manualmente.</string>
@@ -797,9 +797,9 @@
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
 \n%2$s</string>
-    <string name="settings_title_desc">Un DNS y Firewall altamente personalizable</string>
+    <string name="settings_title_desc">Un DNS y Cortafuegos altamente personalizables</string>
     <string name="skip">Omitir</string>
-    <string name="status_app_error">error en la app</string>
+    <string name="status_app_error">error de la aplicación</string>
     <string name="orbot_socks5">Proxy sólo TCP</string>
     <string name="orbot_none_desc">Ninguna de las anteriores.</string>
     <string name="orbot_status_arg_3">DNS y TCP</string>
@@ -825,7 +825,7 @@
     <string name="settings_ip_dialog_ipv6">IPv6 (en pruebas)</string>
     <string name="search_universal_ips"><font size="12">Buscar IPs</font></string>
     <string name="title_about">Acerca de</string>
-    <string name="about_title_desc">Detectar y bloquear las amenazas de seguridad en la red</string>
+    <string name="about_title_desc">Detectar y bloquear las amenazas a la seguridad de red</string>
     <string name="slide_2_title">Bienvenido</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
@@ -872,7 +872,7 @@
     <string name="dns_proxy_remove_dialog_message">Borra el Proxy DNS de la configuración guardada.</string>
     <string name="download_update_dialog_message">Una nueva versión de la aplicación está disponible para su descarga en el sitio web. ¿Quiere continuar\?</string>
     <string name="download_update_dialog_failure_message">O bien nuestros servidores están caídos o no se ha podido establecer la conexión. Por favor, inténtelo de nuevo mas tarde.</string>
-    <string name="contributors_list">El proyecto &lt;i&gt;Rethink Open Source&lt;/i&gt; debe su existencia a estos voluntarios que dedican innumerables horas a su desarrollo.&lt;br/&gt; &lt;br/&gt;🛡️ Aplicación Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Motor de red &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Mods de la comunidad &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">El proyecto de código abierto &lt;i&gt;Rethink&lt;/i&gt; debe su existencia a estos voluntarios que dedican innumerables horas a su desarrollo.&lt;br/&gt; &lt;br/&gt;🛡️ Aplicación Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Motor de red &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Solucionadores &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Mods comunitarios &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traducciones &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Iconos &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Servidores del proyecto &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="fapps_info_dialog_message">Bloquea las aplicaciones para que no se conecten a Internet. Limitando el acceso a Internet se evita el uso de datos injustificado y se ahorra batería.</string>
     <string name="firewall_rule_device_lock_desc">Esta conexión estaba bloqueada porque el <i>dispositivo estaba bloqueado</i> en ese momento.<br/><br/> Para cambiar este comportamiento vaya a la pestaña <i>Global</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Esta conexión se ha permitido porque la <i>IP destino</i> está configurada para omitir todas las reglas del cortafuegos global.<br/><br/> Para cambiarla vaya a <i>Reglas IP</i> en la pestaña <i>Global</i>.</string>
