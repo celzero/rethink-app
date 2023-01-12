@@ -973,11 +973,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 if (it) {
                     Log.i(LoggerConstants.LOG_TAG_UI, "User accepted notification permission")
-                    showToastUiCentered(
-                        requireContext(),
-                        "User accepted the permission",
-                        Toast.LENGTH_SHORT
-                    )
                 } else {
                     persistentState.shouldRequestNotificationPermission = false
                     Log.w(LoggerConstants.LOG_TAG_UI, "User rejected notification permission")

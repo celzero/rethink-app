@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -103,7 +104,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
-        if (persistentState.firstTimeLaunch) {
+        // do not launch on board activity when app is running on TV
+        if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
             launchOnboardActivity()
             return
         }
@@ -132,6 +134,16 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         if (persistentState.biometricAuth) {
             biometricPrompt()
+        }
+    }
+
+    // check if app running on TV
+    private fun isAppRunningOnTv(): Boolean {
+        return try {
+            val uiModeManager: UiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+            uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
+        } catch (ignored: Exception) {
+            false
         }
     }
 

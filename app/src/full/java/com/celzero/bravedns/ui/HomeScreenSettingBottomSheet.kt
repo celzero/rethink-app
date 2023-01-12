@@ -212,6 +212,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     private fun updateUptime() {
         val uptimeMs = VpnController.uptimeMs()
         val protocols = VpnController.protocols()
+        val netType = VpnController.netType()
         val now = System.currentTimeMillis()
         // returns a string describing 'time' as a time relative to 'now'
         val t =
@@ -228,7 +229,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
                 getString(R.string.hsf_downtime, t)
             } else {
                 b.bsHomeScreenAppUptime.visibility = View.VISIBLE
-                getString(R.string.hsf_uptime, t, protocols)
+                getString(R.string.hsf_uptime, t, protocols, netType)
             }
     }
 

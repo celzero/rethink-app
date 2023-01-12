@@ -368,7 +368,7 @@
             android:alpha="0.75"
             android:gravity="center"
             android:textColor="?attr/primaryTextColor"
-            android:textSize="@dimen/default_font_text_view" />
+            android:textSize="@dimen/small_font_text_view" />
 
     </RelativeLayout>
 

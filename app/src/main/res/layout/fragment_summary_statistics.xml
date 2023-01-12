@@ -49,37 +49,44 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="20dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_app_network_activity_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_toStartOf="@id/fss_app_info_chip"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_app_network_activity_heading"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/extra_large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fss_app_info_chip"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_see_more"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view" />
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fss_app_network_activity_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fss_app_info_chip"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_see_more"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -91,19 +98,38 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/fss_app_info_chip_second"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_app_blocked_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_toStartOf="@id/fss_app_info_chip_second"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_app_blocked_heading"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/extra_large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fss_app_info_chip_second"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_see_more"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view" />
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fss_app_blocked_recycler_view"
@@ -111,17 +137,6 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fss_app_info_chip_second"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_see_more"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -133,20 +148,40 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_toStartOf="@id/fss_dns_logs_chip"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_most_contacted_domain_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_toStartOf="@id/fss_dns_logs_chip"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_most_contacted_domain_heading"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/extra_large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fss_dns_logs_chip"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_see_more"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view" />
+
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fss_contacted_domain_recycler_view"
@@ -154,17 +189,6 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fss_dns_logs_chip"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_see_more"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -176,21 +200,40 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_toStartOf="@id/fss_dns_logs_chip_second"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_most_blocked_domain_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_toStartOf="@id/fss_dns_logs_chip_second"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center_vertical"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_most_blocked_domain_heading"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/extra_large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fss_dns_logs_chip_second"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_see_more"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view" />
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fss_blocked_domain_recycler_view"
@@ -198,17 +241,6 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fss_dns_logs_chip_second"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_see_more"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -220,20 +252,39 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/fss_network_logs_chip"
-                android:fontFamily="sans-serif-smallcaps"
-                android:gravity="center_vertical"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_most_contacted_ips_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_toStartOf="@id/fss_network_logs_chip"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center_vertical"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_most_contacted_ips_heading"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/extra_large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fss_network_logs_chip"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_see_more"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view" />
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fss_contacted_ips_recycler_view"
@@ -241,17 +292,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fss_network_logs_chip"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_see_more"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
+
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -262,19 +303,38 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/TextAppearance.AppCompat.Subhead"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="20dp"
-                android:layout_toStartOf="@id/fss_network_logs_chip_second"
-                android:fontFamily="sans-serif-smallcaps"
-                android:lineSpacingExtra="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_most_blocked_ips_heading"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/extra_large_font_text_view" />
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_toStartOf="@id/fss_network_logs_chip_second"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_most_blocked_ips_heading"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/extra_large_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fss_network_logs_chip_second"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:text="@string/ssv_see_more"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/large_font_text_view" />
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fss_blocked_ips_recycler_view"
@@ -282,17 +342,7 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fss_network_logs_chip_second"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:padding="5dp"
-                android:text="@string/ssv_see_more"
-                android:textColor="?attr/accentGood"
-                android:textSize="@dimen/large_font_text_view" />
+
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </LinearLayout>
