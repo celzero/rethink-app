@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import android.database.Cursor
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -22,14 +23,14 @@ import androidx.sqlite.db.SupportSQLiteQuery
 @Dao
 interface AppInfoDAO {
 
-    @Update fun update(appInfo: AppInfo)
+    @Update fun update(appInfo: AppInfo): Int
 
     @Query(
         "update AppInfo set firewallStatus = :firewallStatus, metered = :connectionStatus where uid = :uid"
     )
     fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(appInfo: AppInfo)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(appInfo: AppInfo): Long
 
     @Delete fun delete(appInfo: AppInfo)
 
@@ -94,6 +95,13 @@ interface AppInfoDAO {
         "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and isSystemApp in (:appType) and firewallStatus in (:firewall) "
     )
     fun getFilteredApps(search: String, firewall: Set<Int>, appType: Set<Int>): List<AppInfo>
+
+    @Query("update AppInfo set firewallStatus = :firewall, metered = :metered where :clause")
+    fun cpUpdate(firewall: Int, metered: Int, clause: String): Int
+
+    @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetailsCursor(): Cursor
+
+    @Query("delete from AppInfo where uid = :uid") fun deleteByUid(uid: Int): Int
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

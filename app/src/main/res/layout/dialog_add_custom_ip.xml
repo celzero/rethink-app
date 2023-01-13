@@ -50,8 +50,7 @@
             android:minHeight="48dp"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view"
-            app:layout_constraintRight_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
+            app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
