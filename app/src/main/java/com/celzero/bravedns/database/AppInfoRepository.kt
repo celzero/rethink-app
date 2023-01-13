@@ -15,6 +15,8 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import android.database.Cursor
+
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     companion object {
@@ -26,8 +28,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         appInfoDAO.delete(appInfo)
     }
 
-    suspend fun insert(appInfo: AppInfo) {
-        appInfoDAO.insert(appInfo)
+    suspend fun insert(appInfo: AppInfo): Long {
+        return appInfoDAO.insert(appInfo)
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {
@@ -41,4 +43,26 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     suspend fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int) {
         appInfoDAO.updateFirewallStatusByUid(uid, firewallStatus, connectionStatus)
     }
+
+    fun cpUpdate(appInfo: AppInfo): Int {
+        return appInfoDAO.update(appInfo)
+    }
+
+    fun cpUpdate(appInfo: AppInfo, clause: String): Int {
+        // update only firewall and metered
+        return appInfoDAO.cpUpdate(appInfo.firewallStatus, appInfo.metered, clause)
+    }
+
+    fun cpInsert(appInfo: AppInfo): Long {
+        return appInfoDAO.insert(appInfo)
+    }
+
+    fun getAppsCursor(): Cursor {
+        return appInfoDAO.getAllAppDetailsCursor()
+    }
+
+    fun cpDelete(uid: Int): Int {
+        return appInfoDAO.deleteByUid(uid)
+    }
+
 }

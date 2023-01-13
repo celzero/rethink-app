@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
+import android.content.ContentValues
 import androidx.room.Entity
 
 @Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
@@ -39,5 +40,66 @@ class AppInfo {
 
     override fun hashCode(): Int {
         return this.packageName.hashCode()
+    }
+
+    constructor()
+
+    constructor(
+        packageName: String,
+        appName: String,
+        uid: Int,
+        isSystemApp: Boolean,
+        firewallStatus: Int,
+        appCategory: String,
+        wifiDataUsed: Long,
+        mobileDataUsed: Long,
+        metered: Int,
+        screenOffAllowed: Boolean,
+        backgroundAllowed: Boolean
+    ) {
+        this.packageName = packageName
+        this.appName = appName
+        this.uid = uid
+        this.isSystemApp = isSystemApp
+        this.firewallStatus = firewallStatus
+        this.appCategory = appCategory
+        this.wifiDataUsed = wifiDataUsed
+        this.mobileDataUsed = mobileDataUsed
+        this.metered = metered
+        this.screenOffAllowed = screenOffAllowed
+        this.backgroundAllowed = backgroundAllowed
+    }
+
+    fun fromContentValues(values: ContentValues?): AppInfo? {
+        if (values == null) return null
+        val a = values.valueSet()
+        a.forEach {
+            when (it.key) {
+                "packageName" -> packageName = it.value as String
+                "appName" -> appName = it.value as String
+                "uid" -> uid = it.value as Int
+                "isSystemApp" -> isSystemApp = (it.value as Int == 1)
+                "firewallStatus" -> firewallStatus = it.value as Int
+                "appCategory" -> appCategory = it.value as String
+                "wifiDataUsed" -> wifiDataUsed = it.value as Long
+                "mobileDataUsed" -> mobileDataUsed = it.value as Long
+                "metered" -> metered = it.value as Int
+                "screenOffAllowed" -> screenOffAllowed = (it.value as Int == 1)
+                "backgroundAllowed" -> backgroundAllowed = (it.value as Int == 1)
+            }
+        }
+        return AppInfo(
+            packageName,
+            appName,
+            uid,
+            isSystemApp,
+            firewallStatus,
+            appCategory,
+            wifiDataUsed,
+            mobileDataUsed,
+            metered,
+            screenOffAllowed,
+            backgroundAllowed
+        )
     }
 }

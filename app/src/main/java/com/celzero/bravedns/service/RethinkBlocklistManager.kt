@@ -33,9 +33,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.BraveDNS
 import dnsx.Dnsx
+import java.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 
@@ -341,6 +341,30 @@ object RethinkBlocklistManager : KoinComponent {
 
     suspend fun clearTagsSelectionLocal() {
         localFileTagRepository.clearSelectedTags()
+    }
+
+    fun cpSelectFileTag(context: Context, localFileTags: RethinkLocalFileTag): Int {
+        val selectedTags =
+            getTagsFromStamp(
+                    context,
+                    persistentState.localBlocklistStamp,
+                    RethinkBlocklistType.LOCAL
+                )
+                .toMutableSet()
+
+        // remove the tag from the local blocklist if it exists and current selection is 0
+        if (selectedTags.contains(localFileTags.value) && !localFileTags.isSelected) {
+            selectedTags.remove(localFileTags.value)
+        } else if (!selectedTags.contains(localFileTags.value) && localFileTags.isSelected) {
+            // only add the tag if it is not already present
+            selectedTags.add(localFileTags.value)
+        } else {
+            return 0
+        }
+
+        val stamp = getStamp(context, selectedTags, RethinkBlocklistType.LOCAL)
+        persistentState.localBlocklistStamp = stamp
+        return localFileTagRepository.contentUpdate(localFileTags)
     }
 
     fun getStamp(context: Context, fileValues: Set<Int>, type: RethinkBlocklistType): String {

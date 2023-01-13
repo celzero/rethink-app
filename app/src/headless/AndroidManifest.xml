@@ -18,8 +18,13 @@
         android:theme="@style/AppThemeInitial"
         tools:replace="android:icon, android:roundIcon">
         <provider
+            android:name=".provider.ApplicationProvider"
+            android:authorities="com.celzero.bravedns.appprovider"
+            android:exported="true"
+            android:permission="com.celzero.bravedns.contentprovider.READ_WRITE" />
+        <provider
             android:name=".provider.BlocklistProvider"
-            android:authorities="com.celzero.bravedns.contentprovider"
+            android:authorities="com.celzero.bravedns.blocklistprovider"
             android:exported="true"
             android:permission="com.celzero.bravedns.contentprovider.READ_WRITE" />
     </application>
