@@ -64,10 +64,10 @@
     <string name="settings_socks5_disabled_error">Terhubung ke Orbot. Silahkan tutup dulu.</string>
     <string name="download_update_dialog_failure_title">Terjadi kesalahan!</string>
     <string name="always_on_dialog_stop_message">Rethink diatur sebagai VPN Selalu-Menyala. Apakah Anda yakin untuk menghentikan Rethink\?</string>
-    <string name="univ_firewall_dialog_message">Jika aturan ini dihapus, IP ini dapat terhubung app manapun. Apakah Anda ingin melanjutkan\?</string>
-    <string name="download_update_dialog_message">App versi terbaru tersedia untuk diunduh dari laman. Apakah Anda ingin melanjutkan\?</string>
+    <string name="univ_firewall_dialog_message">Menghapus aturan ini akan memungkinkan aplikasi apa pun terhubung ke alamat IP ini. Apakah Anda ingin melanjutkan\?</string>
+    <string name="download_update_dialog_message">Versi baru tersedia untuk diunduh dari situs web. Apakah Anda ingin melanjutkan\?</string>
     <string name="search_universal_ips"><font size="12">Cari IP</font></string>
-    <string name="whats_dialog_title">Apa yang baru di v053m</string>
+    <string name="whats_dialog_title">Apa yang baru di v053n</string>
     <string name="settings_ip_network_desc">Pilih versi Protokol Jaringan.</string>
     <string name="orbot_stop_dialog_dns_message">RethinkDNS disiapkan untuk meneruskan permintaan DNS ke Orbot. Silahkan ubah sesuai kebutuhan.</string>
     <string name="orbot_bs_status_1">Meneruskan koneksi %1$s ke Orbot.</string>
@@ -128,7 +128,7 @@
     <string name="ct_bs_app_info_error">Informasi Aplikasi tidak ditemukan</string>
     <string name="rules_load_failure_desc">Aturan firewall tidak ditemukan</string>
     <string name="other_dns_list_tab1">DoH</string>
-    <string name="firewall_rule_block_app_new_install">App Baru</string>
+    <string name="firewall_rule_block_app_new_install">Aplikasi Baru</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_settings_app_info">Informasi Aplikasi</string>
     <string name="hsf_stop_btn_state">berhenti</string>
@@ -152,7 +152,7 @@
     <string name="cd_sample_unicode_valid">✅</string>
     <string name="rules_load_failure_reload">muat ulang</string>
     <string name="settings_local_blocklist_dialog_negative">Batal</string>
-    <string name="pause_desc">Catatan: %1$s app terblokir akan tetap ter-firewall.</string>
+    <string name="pause_desc">Catatan: %1$s aplikasi yang diblokir akan terus diblokir.</string>
     <string name="cd_dialog_negative_btn">batal</string>
     <string name="hsf_whats_new_remove_text">Menutup…</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
@@ -171,7 +171,7 @@
     <string name="build__flavor_website">laman</string>
     <string name="cd_remove_dialog_positive">Hapus</string>
     <string name="fapps_unmetered_positive">Terapkan</string>
-    <string name="firewall_rule_block_app">App Terblokir</string>
+    <string name="firewall_rule_block_app">Aplikasi Diblokir</string>
     <string name="firewall_rule_block_udp_ntp">UDP Terblokir</string>
     <string name="firewall_rule_exempt_orbot_setup">Pengaturan Orbot</string>
     <string name="notif_dialog_pause_dialog_neutral">Tampilkan</string>
@@ -346,7 +346,7 @@
     <string name="bsac_unblock_toast">Membuka blokiran %1$s untuk aplikasi ini</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="app_info_error">Tidak dapat membuka informasi Aplikasi.</string>
-    <string name="ctbs_block_other_apps">Aturan-aturan yang diterapkan untuk %1$s akan dapat diterapkan pula pada %2$s app lain</string>
+    <string name="ctbs_block_other_apps">Aturan yang diterapkan ke %1$s juga akan diterapkan ke %2$s aplikasi lainnya</string>
     <string name="settings_notification_desc">Tombol-tombol tindakan untuk ditampilkan di notifikasi RethinkDNS: %1$s</string>
     <string name="cd_toast_added">Domain berhasil ditambahkan</string>
     <string name="cd_dialog_error_invalid_tld">Domain Tingkat Teratas tidak valid.</string>
@@ -399,11 +399,11 @@
     <string name="ada_ip_rules_title">aturan-aturan ip untuk app ini</string>
     <string name="firewall_rule_block_udp_ntp_desc">Aturan firewall yang ditetapkan \"Pengguna\" memblokir koneksi<i>UDP</i>.<br/><br/> Untuk mengubahnya kunjungi tab<i>Universal</i>.</string>
     <string name="rt_chip_check_update">Cek pembaharuan</string>
-    <string name="firewall_mode_info_explanation_new">Memantau aktivitas jaringan dan mem-firewall app atau alamat IP manapun.</string>
+    <string name="firewall_mode_info_explanation_new">Pantau aktivitas jaringan dan blokir aplikasi atau alamat IP apa pun.</string>
     <string name="settings_all_networks_dialog_title">Perhatian!</string>
     <string name="settings_check_update_desc">Cek pembaharuan aplikasi secara otomatis per minggu.</string>
     <string name="settings_ip_dialog_ipv46">Otomatis (eksperimental)</string>
-    <string name="bsct_conn_desc_allowed">diizinkan di %1$s %2$s</string>
+    <string name="bsct_conn_desc_allowed">diizinkan pada %1$s %2$s</string>
     <string name="univ_firewall_rule_5">Blokir lalu lintas yang melewati DNS</string>
     <string name="hsf_start_dialog_negative">Tutup</string>
     <string name="ct_delete_logs_negative_btn">Batal</string>
@@ -414,9 +414,9 @@
     <string name="apps_card_ips_count">%1$s aturan IP &amp; Port</string>
     <string name="dns_connected_rethink_plus">Terkoneksi. %1$s daftar-daftar blokir sedang digunakan</string>
     <string name="fapps_firewall_filter_desc_category">Menampilkan <u>%1$s</u> %2$s aplikasi dalam kategori: %3$s</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Layanan aksesibilitas RethinkDNS terhenti atau mengalami kegagalan. <i><b>Masuk ke Pengaturan dan Hentikan Secara Paksa</b></i> RethinkDNS dan memulai lagi untuk digunakan<i>Blokir app apapun yang sedang tidak digunakan</i>fitur.
+    <string name="alert_firewall_accessibility_regrant_explanation">Layanan aksesibilitas RethinkDNS terhenti atau mengalami kegagalan. <i><b>Masuk ke Pengaturan dan Hentikan Paksa</b></i> RethinkDNS dan mulai ulang untuk menggunakan fitur<i>Blokir aplikasi apapun yang tidak digunakan</i>.
 \n
-\nRethinkDNS menggunakan layanan aksesibilitas untuk melacak app mana yang sedang digunakan (latar depan) versus yang tidak (latar belakang).</string>
+\nRethinkDNS menggunakan layanan aksesibilitas untuk mengawasi aplikasi yang sedang digunakan di (latar depan) dan aplikasi yang tidak digunakan (latar belakang).</string>
     <string name="firewall_act_universal_tab">Universal</string>
     <string name="cd_dialog_error_invalid_domain">URL (domain) tidak valid.</string>
     <string name="settings_socks5_dialog_hint_username">Nama pengguna (tidak wajib)</string>
@@ -460,7 +460,7 @@
     <string name="settings_check_update_heading">Cek pembaharuan aplikasi</string>
     <string name="settings_http_proxy_error_text1">Port harus dalam rentang 1024–65535</string>
     <string name="collecting_logs_progress_text">Menangkap…</string>
-    <string name="ctbs_app_info_not_available_toast">Halaman pengaturan app tidak ditemukan</string>
+    <string name="ctbs_app_info_not_available_toast">Halaman setelan aplikasi tidak ditemukan</string>
     <string name="dns_btm_sheet_chip_allowed">Diizinkan</string>
     <string name="univ_firewall_rule_3">Blokir aplikasi yang tidak dikenal sumbernya</string>
     <string name="univ_firewall_rule_4">Blokir UDP kecuali DNS dan NTP</string>
@@ -506,7 +506,7 @@
     <string name="ci_dialog_title">Menambah Aturan IP / Port</string>
     <string name="local_blocklist_redownload_desc">Daftar blokir di perangkat sudah dalam versi terbaru v%1$s.</string>
     <string name="accessibility_service_description">RethinkDNS menggunakan layanan aksesibilitas untuk mendeteksi dan mem-firewall aplikasi-aplikasi latar belakang. RethinkDNS tidak mengumpulkan atau menjual informasi apapun.</string>
-    <string name="orbot_socks5">Proksi hanya-TCP</string>
+    <string name="orbot_socks5">Proksi Khusus TCP</string>
     <string name="settings_theme_dialog_themes_1">Diatur Sistem</string>
     <string name="settings_notification_heading">Pilih notifikasi</string>
     <string name="univ_firewall_rule_8">Blokir lalu lintas di port 80 (HTTP tidak aman)</string>
@@ -524,7 +524,7 @@
     <string name="ada_app_status_block">diblokir</string>
     <string name="ada_app_status_unknown">tidak diketahui</string>
     <string name="ada_ip_connection_count_zero">0 alamat IP</string>
-    <string name="ctbs_app_other_apps">%1$s + %2$s app lainnya</string>
+    <string name="ctbs_app_other_apps">%1$s + %2$s aplikasi lainnya</string>
     <string name="dc_local_block_heading">Daftar blokir di perangkat</string>
     <string name="custom_url_error_invalid_url">URL tidak valid</string>
     <string name="dc_custom_block_heading">Izinkan atau blokir nama domain individual</string>
@@ -545,9 +545,9 @@
     <string name="brbs_backup_dialog_failure_message">Tidak dapat mencadangkan. Coba lagi\?</string>
     <string name="rt_re_download">Unduh ulang daftar-daftar blokir</string>
     <string name="download_update_dialog_message_success">Daftar blokir berhasil terunduh.</string>
-    <string name="alert_firewall_accessibility_explanation">RethinkDNS menggunakan layanan aksesibilitas untuk melacak app mana yang sedang digunakan (latar depan) versus yang tidak (latar belakang).
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS menggunakan layanan aksesibilitas untuk melacak aplikasi yang sedang digunakan (latar depan) dan aplikasi yang tidak digunakan (latar belakang)
 \n
-\nRethinkDNS tidak mengumpulkan informasi apapun atau megintai Anda dengan cara apapun.</string>
+\nRethinkDNS tidak mengumpulkan data apa pun dan tidak memata-matai Anda dengan cara apa pun.</string>
     <string name="doh_custom_url_remove_success">Titik-akhir telah terhapus.</string>
     <string name="settings_orbot_notification_action">Buka Orbot</string>
     <string name="settings_socks5_dialog_hint_password">Kata sandi (tidak wajib)</string>
@@ -593,7 +593,7 @@
     <string name="orbot_install_dialog_message">Orbot membawa fitur-fitur dan fungsionalitas Tor ke Android.</string>
     <string name="notif_channel_desc_vpn_notification">Informasikan ketika RethinkDNS sedang aktif dan bekerja di latar belakang</string>
     <string name="settings_orbot_notification_content">Gagal menjalankan Tor-sebagai-Proksi. Buka aplikasi Orbot untuk menjalankannya secara manual.</string>
-    <string name="ada_noapp_dialog_message">Informasi aplikasi yang secara spesifik dipilih tidak ditemukan.</string>
+    <string name="ada_noapp_dialog_message">Informasi aplikasi tidak ada. Mungkin, aplikasi sudah di hapus \'uninstall\' \?</string>
     <string name="ci_no_rules_text">Tidak ada aturan IP atau Port yang ditemukan.</string>
     <string name="bsac_title_desc">Aturan-aturan yang diterapkan hanya pada app ini.</string>
     <string name="dns_crypt_relay_error_toast">Tidak ada server penyelesai yang dipilih</string>
@@ -603,7 +603,7 @@
     <string name="ct_delete_logs_positive_btn">Hapus riwayat</string>
     <string name="notif_dialog_pause_dialog_negative">Singkirkan</string>
     <string name="ada_app_status_block_wifi">Diblokir pada jaringan yang tidak terukur (WiFi)</string>
-    <string name="notif_dialog_pause_dialog_title">App terjeda!</string>
+    <string name="notif_dialog_pause_dialog_title">Aplikasi Dijeda!</string>
     <string name="hsf_pause_lockdown_failure">Tidak dapat dijeda: RethinkDNS dalam mode penguncian penuh</string>
     <string name="about_dialog_positive_button">Ayo Jalankan</string>
     <string name="fapps_metered_unblock_dialog_title">Izinkan koneksi pada jaringan yang terukur</string>
@@ -675,7 +675,7 @@
     <string name="firewall_rule_block_app_unmetered_desc">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>aplikasi</i> ini ketika mencoba terhubung dengan jaringan yang <i>Tak Terukur</i>.<br/><br/> Untuk mengubahnya, buka tab <i>Semua Aplikasi</i>.</string>
     <string name="bsac_trust_toast">Percayai %1$s untuk aplikasi ini</string>
     <string name="pause_title_desc">sedang rehat…</string>
-    <string name="whats_new_version_update">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Fitur baru&lt;/i&gt;: Pembaruan semua tampilan statistik.&lt;br/&gt; 2. &lt;i&gt;Fitur baru&lt;/i&gt;: Amankan aplikasi ini menggunakan pengunci layar.&lt;br/&gt; 3. &lt;i&gt;Fitur baru&lt;/i&gt;: Pilih bahasa pilihan Anda dari pengaturan aplikasi.&lt;br/&gt; 4. &lt;i&gt;Fitur baru&lt;/i&gt;: RDNS+ &lt;i&gt;yang lebih simpel&lt;/i&gt; hanya menampilkan daftar yang dikurasi dengan baik&lt;br/&gt; 5. Ganti nama: mode &lt;i&gt;Penguncian penuh aplikasi&lt;/i&gt; sekarang menjadi mode &lt;i&gt;Isolasi&lt;/i&gt;.&lt;br/&gt; 6. Ganti nama: &lt;i&gt;Aturan Pintasan \"Bypass\" aplikasi&lt;/i&gt; sekarang menjadi &lt;i&gt;Percayai&lt;/i&gt; IP.&lt;br/&gt; 7. Memperbaiki kecelakaan disaat Rethink dipasang di profil kerja&lt;br/&gt; 8. Sekarang, menghapus otomatis aturan khusus aplikasi disaat aplikasi tersebut sudah dihapus.&lt;br/&gt; 9. Dan perubahan UI kecil lainnya dan perbaikan bug.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Bantu kami terjemahkan aplikasi ini&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Fitur baru&lt;/i&gt;: Semua tampilan baru: statistik.&lt;br/&gt; 2. &lt;i&gt;Fitur baru&lt;/i&gt;: Amankan aplikasi ini menggunakan pengunci layar.&lt;br/&gt; 3. &lt;i&gt;Fitur baru&lt;/i&gt;: Pilih bahasa pilihan Anda dari pengaturan aplikasi.&lt;br/&gt; 4. &lt;i&gt;Fitur baru&lt;/i&gt;: RDNS+ &lt;i&gt;yang lebih simpel&lt;/i&gt; hanya menampilkan daftar yang dikurasi dengan baik&lt;br/&gt; 5. Ganti nama: mode &lt;i&gt;Penguncian penuh aplikasi&lt;/i&gt; sekarang menjadi mode &lt;i&gt;Isolasi&lt;/i&gt;.&lt;br/&gt; 6. Ganti nama: &lt;i&gt;Aturan Pintasan \"Bypass\" aplikasi&lt;/i&gt; sekarang menjadi &lt;i&gt;Percayai&lt;/i&gt; IP.&lt;br/&gt; 7. Memperbaiki kecelakaan disaat Rethink dipasang di profil kerja&lt;br/&gt; 8. Sekarang, menghapus otomatis aturan khusus aplikasi disaat aplikasi tersebut sudah dihapus.&lt;br/&gt; 9. Dan perubahan UI kecil lainnya dan perbaikan bug.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Bantu kami terjemahkan aplikasi ini&lt;/a&gt;</string>
     <string name="brbs_restore_dialog_failure_positive">Ulangi Pemulihan</string>
     <string name="brbs_restore_complete_toast">Pemulihan selesai, memulai ulang app…</string>
     <string name="settings_import_export_heading">Pencadangan &amp; Pemulihan</string>
@@ -686,7 +686,7 @@
     <string name="brbs_restore_no_uri_toast">Pemulihan gagal, coba lagi</string>
     <string name="brbs_restore_dialog_failure_message">Tidak dapat memulihkan. Coba lagi\?</string>
     <string name="brbs_restore_title">Pemulihan</string>
-    <string name="notif_channel_proxy_failure">Peringatan-peringatan Proksi</string>
+    <string name="notif_channel_proxy_failure">Peringatan Proksi</string>
     <string name="brbs_title">Pencadangan &amp; pemulihan</string>
     <string name="firewall_card_text_active">%1$s diblokir
 \n%2$s dipintaskan
@@ -803,7 +803,7 @@
     <string name="settings_custom_downloader_desc">Jika dinonaktifkan, <i>Manajer Unduhan</i> bawaan Android akan digunakan.</string>
     <string name="settings_theme_dialog_themes_4">Hitam Pekat</string>
     <string name="dns_card_latency_active">Latensi: %1$sms</string>
-    <string name="hsf_uptime">(aktif sejak %1$s; protokol: %2$s)</string>
+    <string name="hsf_uptime">(aktif %1$s; protokol: %2$s; tipe: %3$s)</string>
     <string name="about_bug_report">Laporkan Bug</string>
     <string name="dc_other_settings_heading">lanjutan</string>
     <string name="dc_entries">%1$s entri »</string>
