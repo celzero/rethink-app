@@ -310,13 +310,11 @@ class RethinkBlocklistFragment :
         b.lbBlocklistApplyBtn.setOnClickListener {
             // update rethink stamp
             setStamp(modifiedStamp)
-            clearSelectedTags()
             requireActivity().finish()
         }
 
         b.lbBlocklistCancelBtn.setOnClickListener {
             // close the activity associated with the fragment
-            clearSelectedTags()
             requireActivity().finish()
         }
 
@@ -400,16 +398,6 @@ class RethinkBlocklistFragment :
                     "Download latest version to update the blocklists",
                     Toast.LENGTH_SHORT
                 )
-            }
-        }
-    }
-
-    private fun clearSelectedTags() {
-        io {
-            if (type.isRemote()) {
-                RethinkBlocklistManager.clearTagsSelectionRemote()
-            } else {
-                RethinkBlocklistManager.clearTagsSelectionLocal()
             }
         }
     }

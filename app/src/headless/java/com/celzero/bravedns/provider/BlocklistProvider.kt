@@ -24,6 +24,7 @@ import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.database.RethinkLocalFileTagRepository
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_PROVIDER
 import org.koin.android.ext.android.inject
 
@@ -31,10 +32,9 @@ class BlocklistProvider : ContentProvider() {
 
     private val localFileTagRepository by inject<RethinkLocalFileTagRepository>()
     private val persistentState by inject<PersistentState>()
-    private val appDatabase by inject<AppDatabase>()
 
     companion object {
-        private const val AUTHORITY = "com.celzero.bravedns.contentprovider"
+        private const val AUTHORITY = "com.celzero.bravedns.blocklistprovider"
         private const val URI_DNS = "vnd.android.cursor.dir/$AUTHORITY.blocklists"
 
         // blocklists: Uri.parse("content://$AUTHORITY/blocklists")
@@ -59,7 +59,7 @@ class BlocklistProvider : ContentProvider() {
 
         private const val BLOCKLIST_TABLE = "RethinkLocalFileTag"
 
-        private const val RESOLVER_PACKAGE_NAME = "com.celzero.contentresolversample"
+        private const val RESOLVER_PACKAGE_NAME = "com.celzero.interop"
     }
 
     override fun onCreate(): Boolean {
@@ -199,8 +199,7 @@ class BlocklistProvider : ContentProvider() {
         // selection, selectionArgs)
         val context = context ?: return 0
         val localFileTags = RethinkLocalFileTag().fromContentValues(values) ?: return 0
-        // TODO: Update the stamp here
-        val count = localFileTagRepository.contentUpdate(localFileTags)
+        val count = RethinkBlocklistManager.cpSelectFileTag(context, localFileTags)
         context.contentResolver?.notifyChange(uri, null)
         return count
     }
@@ -219,7 +218,7 @@ class BlocklistProvider : ContentProvider() {
 
         // check the calling package
         if (callingPackage != RESOLVER_PACKAGE_NAME) {
-            Log.e(LOG_PROVIDER, "request received from unknown package: $callingPackage")
+            Log.e(LOG_PROVIDER, "request received from unknown package: $callingPackage, $RESOLVER_PACKAGE_NAME")
             return false
         }
 
