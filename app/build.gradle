@@ -106,7 +106,7 @@ android {
 
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    def room_version = "2.4.3"
+    def room_version = "2.5.0"
     def paging_version = "3.1.1"
 
     implementation "com.google.guava:guava:31.1-jre"
