@@ -55,14 +55,3 @@ jobs:
               -F document=@"$apk_path"
             rm "$apk_path"
           done
-
-      - name: Update the runtime dependencies report
-        run: |
-          ./gradlew app:dependencies --configuration websiteReleaseRuntimeClasspath | grep -e '--- ' > app/runtime-dependencies-report.txt
-
-      - name: Add and commit the report
-        uses: EndBug/add-and-commit@2d7c2e89fcb436f8e139cc80813bd030bdd40c4b
-        with:
-          default_author: github_actions
-          message: 'Update the runtime dependencies report'
-          add: app/*.txt
