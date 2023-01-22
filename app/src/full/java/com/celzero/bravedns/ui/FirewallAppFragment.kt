@@ -26,6 +26,7 @@ import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -440,13 +441,15 @@ class FirewallAppFragment :
     }
 
     private fun showInfoDialog() {
-        val li = requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val li =
+            requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
-        val builder = AlertDialog.Builder(requireContext())
-            .setView(view)
+        val builder = AlertDialog.Builder(requireContext()).setView(view)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }
+        val v = view.findViewById<AppCompatImageView>(R.id.info_rules_dialog_cancel_img)
+        v.setOnClickListener { builder.create().dismiss() }
         builder.setCancelable(true)
         builder.create().show()
     }
