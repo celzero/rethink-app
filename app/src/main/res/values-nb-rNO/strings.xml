@@ -326,7 +326,7 @@
     <string name="dns_filter_parent_blocked">Blokkert</string>
     <string name="fapps_filter_parent_all">Alle</string>
     <string name="firewall_rule_no_rule">Ingen regel</string>
-    <string name="cd_whitelist_txt">Hvitliste</string>
+    <string name="cd_bypass_txt">Hvitliste</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">Venter</string>
     <string name="dns_btm_sheet_chip_allowed">Tillatt</string>
     <string name="fapps_filter_categories_heading">Kategorier</string>

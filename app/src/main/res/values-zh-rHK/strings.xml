@@ -814,8 +814,8 @@
     <string name="firewall_rule_trusted_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有分應用規則而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
     <string name="firewall_rule_bypass_universal_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有全局規則而被放行。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
     <string name="cd_dialog_desc">比一個自訂嘅 URL（網域）或者通配符嚟放行或者攔截，例如 *.test.com 或者 test.com/test</string>
-    <string name="cd_whitelist_initial">放</string>
-    <string name="cd_whitelist_txt">放行</string>
+    <string name="cd_bypass_initial">放</string>
+    <string name="cd_bypass_txt">放行</string>
     <string name="cd_blocked_initial">攔</string>
     <string name="cd_blocked_txt">攔截</string>
     <string name="ci_bypass_universal_txt">無條件放行</string>

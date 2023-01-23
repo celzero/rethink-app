@@ -723,7 +723,7 @@
     <string name="cd_remove_dialog_title">Supprimer le domaine \?</string>
     <string name="cd_filter_allowed">Autorisé</string>
     <string name="ci_no_rules_text">Aucune règle IP ou port n’a été trouvée.</string>
-    <string name="cd_whitelist_initial">LB</string>
+    <string name="cd_bypass_initial">LB</string>
     <string name="ada_app_status_whitelist">contournera les règles du pare-feu global</string>
     <string name="rt_list_adv_btn_txt">avancé</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
@@ -842,7 +842,7 @@
     <string name="settings_local_blocklist_in_use">%1$s listes de blocage en cours d’utilisation</string>
     <string name="settings_local_blocklist_version">Version : v%1$s</string>
     <string name="cd_add_dialog_show_btn">afficher</string>
-    <string name="cd_whitelist_txt">Liste blanche</string>
+    <string name="cd_bypass_txt">Liste blanche</string>
     <string name="ada_app_exclude">Exclure</string>
     <string name="bsdl_domain_rule_norule">sans règle</string>
     <string name="brbs_backup_dialog_failure_title">Échec de la sauvegarde</string>

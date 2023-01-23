@@ -696,7 +696,7 @@
     <string name="local_blocklist_redownload">Terbaru!</string>
     <string name="contributors_dialog_title">Pengarang</string>
     <string name="settings_import_export_desc">Mencadangkan atau memulihkan data dan pengaturan aplikasi secara manual.</string>
-    <string name="cd_whitelist_txt">Daftar putih</string>
+    <string name="cd_bypass_txt">Daftar putih</string>
     <string name="brbs_restore_dialog_positive">Pulihkan</string>
     <string name="brbs_restore_dialog_title">Pulihkan cadangan</string>
     <string name="brbs_restore_dialog_failure_title">Pemulihan gagal</string>
@@ -829,7 +829,7 @@
     <string name="firewall_rule_block_dns_bypass_desc">Sambungan ini diblokir dikarenakan <i>sumber aplikasi</i> tersebut telah memintaskan DNS pilihan pengguna.<br/><br/> Untuk mengubah setingan ini, buka tab <i>Universal</i>.</string>
     <string name="cd_dialog_desc">URL khusus (domain) atau wild card untuk mengizinkan atau memblokir. misalnya, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Memasukkan %1$s</string>
-    <string name="cd_whitelist_initial">W</string>
+    <string name="cd_bypass_initial">W</string>
     <string name="cd_dialog_error_invalid_wildcard">Wildcard tidak valid.</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_initial">N</string>

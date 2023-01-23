@@ -620,7 +620,7 @@
     <string name="build__flavor_website">ওয়েবসাইট</string>
     <string name="cd_filter_blocked">Blocked</string>
     <string name="cd_dialog_desc">কাস্টম URL(ডোমেন) বা ওয়াইল্ড কার্ড হয় অনুমতি দিতে বা ব্লক করতে। যেমন, *.test.com, test.com/test</string>
-    <string name="cd_whitelist_txt">হোয়াইটলিস্ট</string>
+    <string name="cd_bypass_txt">হোয়াইটলিস্ট</string>
     <string name="cd_no_rule_txt">কোন নিয়ম নেই</string>
     <string name="ci_dialog_edittext_hint">আইপি ঠিকানা, সাবনেট বা পোর্ট</string>
     <string name="ada_app_bypass_univ">বাইপাস ইউনিভার্সাল</string>
@@ -688,7 +688,7 @@
     <string name="firewall_rule_block_http_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷</string>
     <string name="notif_channel_vpn_failure">নিষ্ক্রিয় VPN</string>
     <string name="notif_channel_download">সতর্কতা ডাউনলোড করুন</string>
-    <string name="cd_whitelist_initial">ডব্লিউ</string>
+    <string name="cd_bypass_initial">ডব্লিউ</string>
     <string name="ci_no_rule_initial">এন</string>
     <string name="ci_block">ব্লক</string>
     <string name="ada_ip_connection_count">%1$s আইপি ঠিকানা(গুলি) এর সাথে সংযুক্ত</string>

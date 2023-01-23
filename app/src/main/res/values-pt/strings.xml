@@ -476,7 +476,7 @@
     <string name="cd_toast_deleted">Domínio removido da lista personalizada</string>
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="cd_dialog_error_invalid_domain">URL (domínio) inválido.</string>
-    <string name="cd_whitelist_initial">P</string>
+    <string name="cd_bypass_initial">P</string>
     <string name="rbl_parental_control">Controlo parental</string>
     <string name="rt_download">Descarregar listas de bloqueio</string>
     <string name="ci_dialog_desc">Permitir (contornar) ou bloquear endereço IP, sub-rede IP (intervalo), porta. Exemplo: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
@@ -742,7 +742,7 @@
     <string name="cd_dialog_edittext_hint">Digite %1$s</string>
     <string name="cd_dialog_error_invalid_tld">Domínio de nível superior inválido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Caractere curinga inválido.</string>
-    <string name="cd_whitelist_txt">Lista de permissões</string>
+    <string name="cd_bypass_txt">Lista de permissões</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_blocked_txt">Bloqueado</string>
     <string name="cd_no_rule_initial">S</string>

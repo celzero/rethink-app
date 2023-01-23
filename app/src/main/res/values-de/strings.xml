@@ -407,7 +407,7 @@
     <string name="cd_dialog_error_invalid_domain">Ungültige URL(Domain).</string>
     <string name="cd_dialog_title">Domäne hinzufügen</string>
     <string name="cd_dialog_error_invalid_tld">Ungültige Domäne oberster Stufe.</string>
-    <string name="cd_whitelist_initial">W</string>
+    <string name="cd_bypass_initial">W</string>
     <string name="cd_dialog_desc">Benutzerdefinierte URL(Domäne) oder Platzhalter, um entweder zuzulassen oder zu blockieren. z.B. *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Eingabe %1$s</string>
     <string name="ci_dialog_title">IP-/Port-Regel hinzufügen</string>
@@ -548,7 +548,7 @@
     <string name="cd_remove_dialog_positive">Löschen</string>
     <string name="cd_remove_dialog_negative">Abbrechen</string>
     <string name="cd_dialog_error_invalid_wildcard">Ungültiger Platzhalter.</string>
-    <string name="cd_whitelist_txt">Positivliste</string>
+    <string name="cd_bypass_txt">Positivliste</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_blocked_txt">Blockiert</string>
     <string name="ci_trust_initial">T</string>

@@ -172,7 +172,7 @@
     <string name="dns_proxy_connection_failure_lockdown">Kilitleme modunda %2$s için %1$s adresinin hariç tutulması İnternet bağlantısı sorunlarına neden olabilir.</string>
     <string name="firewall_rule_block_app">Uygulama Engellendi</string>
     <string name="cd_toast_added">Alan adı başarıyla eklendi</string>
-    <string name="cd_whitelist_txt">Beyaz Liste</string>
+    <string name="cd_bypass_txt">Beyaz Liste</string>
     <string name="rt_dialog_neutral">Devam Et</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="brbs_backup_dialog_title">Yedek alın</string>
@@ -749,7 +749,7 @@
     <string name="cd_remove_dialog_title">Etki alanı silinsin mi\?</string>
     <string name="firewall_rule_bypass_universal_ip">Bypass edilen IP</string>
     <string name="cd_dialog_error_invalid_domain">Geçersiz URL (alan adı).</string>
-    <string name="cd_whitelist_initial">B</string>
+    <string name="cd_bypass_initial">B</string>
     <string name="cd_blocked_initial">Si</string>
     <string name="ci_dialog_desc">IP adresine, IP alt ağına (aralık), Bağlantı Noktasına izin verin (bypass) veya engelleyin. Örnek: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
     <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s

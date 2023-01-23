@@ -642,8 +642,8 @@
     <string name="cd_dialog_error_invalid_domain">URL(dominio) inválido.</string>
     <string name="cd_dialog_error_invalid_tld">Dominio de nivel superior inválido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Comodín inválido.</string>
-    <string name="cd_whitelist_initial">W</string>
-    <string name="cd_whitelist_txt">Lista blanca</string>
+    <string name="cd_bypass_initial">W</string>
+    <string name="cd_bypass_txt">Lista blanca</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_blocked_txt">Bloqueado</string>
     <string name="cd_no_rule_initial">N</string>

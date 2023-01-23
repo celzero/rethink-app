@@ -220,7 +220,7 @@
     <string name="notif_dialog_pause_dialog_neutral">عرض</string>
     <string name="notif_channel_desc_vpn_failure">أبلغ عندما يتم إيقاف RethinkDNS بواسطة Android أو بواسطة تطبيق VPN آخر</string>
     <string name="cd_remove_dialog_message">احذف المجال من التكوين المحفوظ.</string>
-    <string name="cd_whitelist_txt">القائمة البيضاء</string>
+    <string name="cd_bypass_txt">القائمة البيضاء</string>
     <string name="ci_blocked_txt">تم حجبه</string>
     <string name="ada_app_exclude">استثن</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
@@ -366,7 +366,7 @@
     <string name="new_app_notification_title">الإجراء مطلوب</string>
     <string name="notif_channel_desc_proxy_failure">تنبيه بشأن أخطاء الوكيل والشذوذ</string>
     <string name="cd_dialog_edittext_hint">أدخل %1$s</string>
-    <string name="cd_whitelist_initial">غ</string>
+    <string name="cd_bypass_initial">غ</string>
     <string name="network_dns">نظام DNS</string>
     <string name="brbs_backup_dialog_title">خذ نسخة احتياطية</string>
     <string name="exclude">استثني</string>

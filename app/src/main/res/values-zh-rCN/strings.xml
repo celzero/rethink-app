@@ -381,7 +381,7 @@
     <string name="notif_channel_download">下载警报</string>
     <string name="category_name_installed">已安装程序</string>
     <string name="cd_sample_unicode_valid">✅</string>
-    <string name="cd_whitelist_txt">放行</string>
+    <string name="cd_bypass_txt">放行</string>
     <string name="ada_app_status_block_wifi">已于非收费网络（ WiFi ）拦截</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="bsac_distrust">移除绕行</string>
@@ -454,7 +454,7 @@
     <string name="firewall_rule_block_dns_bypass_desc">此连接因<i>原始应用</i>绕过了用户设置的 DNS 而被拦截。<br/><br/>若需变更此行为，请移步<i>全局</i>选项卡。</string>
     <string name="notif_channel_desc_proxy_failure">在代理错误或异常时提醒我</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_whitelist_initial">放</string>
+    <string name="cd_bypass_initial">放</string>
     <string name="ci_dialog_added_success">已将 IP 加入列表</string>
     <string name="ci_no_rule_txt">无规则</string>
     <string name="ada_app_metered">收费网络</string>

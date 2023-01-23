@@ -311,8 +311,8 @@
     <string name="notif_dialog_pause_dialog_title">應用已暫停！</string>
     <string name="notif_dialog_pause_dialog_positive">恢復</string>
     <string name="notif_channel_desc_proxy_failure">在代理錯誤或異常時提醒我</string>
-    <string name="cd_whitelist_initial">放</string>
-    <string name="cd_whitelist_txt">放行</string>
+    <string name="cd_bypass_initial">放</string>
+    <string name="cd_bypass_txt">放行</string>
     <string name="ada_ip_connection_count_zero">0 個 IP 位址</string>
     <string name="ada_app_status_exclude">已排除於 DNS 與防火牆外</string>
     <string name="notif_download_content_title">下載本地攔截清單</string>

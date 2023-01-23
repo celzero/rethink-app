@@ -737,8 +737,8 @@
     <string name="cd_dialog_error_invalid_domain">URL (dominio) non valido.</string>
     <string name="cd_dialog_error_invalid_tld">Dominio di primo livello non valido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Wildcard non valida.</string>
-    <string name="cd_whitelist_initial">C</string>
-    <string name="cd_whitelist_txt">Lista consentiti</string>
+    <string name="cd_bypass_initial">C</string>
+    <string name="cd_bypass_txt">Lista consentiti</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_blocked_txt">Bloccati</string>
     <string name="cd_no_rule_initial">N</string>

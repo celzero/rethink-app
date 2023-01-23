@@ -413,8 +413,8 @@
     <string name="cd_dialog_error_invalid_domain">Netinkamas URL (domenas).</string>
     <string name="cd_dialog_error_invalid_tld">Netinkamas aukščiausio lygio domenas.</string>
     <string name="cd_dialog_error_invalid_wildcard">Netinkamas pakaitos simbolis.</string>
-    <string name="cd_whitelist_initial">L</string>
-    <string name="cd_whitelist_txt">Leidžiamų sąrašas</string>
+    <string name="cd_bypass_initial">L</string>
+    <string name="cd_bypass_txt">Leidžiamų sąrašas</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_blocked_txt">Užblokuota</string>
     <string name="cd_no_rule_initial">N</string>
