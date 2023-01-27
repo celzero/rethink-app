@@ -1,4 +1,4 @@
-name: Nightly Build
+name: Nightly
 
 on:
   workflow_dispatch: # to be able to run it manually
