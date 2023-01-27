@@ -97,6 +97,7 @@ android {
         viewBinding true
     }
 
+    //TODO: resolve linter issues and re-enable abortOnError
     lintOptions {
         abortOnError false
     }
