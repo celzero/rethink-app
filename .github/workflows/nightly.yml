@@ -43,7 +43,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build and send apks to telegram
-        if: ${{ secrets.TELEGRAM_CHAT_ID != '' && secrets.SCHEDULED_BUILD_VARIANT != '' }}
+        if: ${{ secrets.TELEGRAM_CHAT_ID && secrets.SCHEDULED_BUILD_VARIANT }}
         run: |
           for TASK in ${{ secrets.SCHEDULED_BUILD_VARIANT }}; do
             ./gradlew $TASK
