@@ -179,13 +179,13 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private fun remakeFilterChipsUi() {
         b.filterChipGroup.removeAllViews()
 
-        val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.dns_filter_parent_all), true)
+        val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed =
-            makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.dns_filter_parent_allowed), false)
+            makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
             makeChip(
                 ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
-                getString(R.string.dns_filter_parent_blocked),
+                getString(R.string.lbl_blocked),
                 false
             )
 
@@ -253,7 +253,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 dnsLogRepository.clearAllData()
             }
         }
-        builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ -> }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
         builder.create().show()
     }
 

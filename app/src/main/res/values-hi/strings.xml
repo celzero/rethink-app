@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">रीथिंकडीएनएस</string>
     <string name="app_name_small_case">रीथिंक</string>
-    <string name="app_name_rethink">रीथिंक</string>
     <string name="title_about">एप के बारे में</string>
     <string name="title_settings">सेटिंग्स</string>
     <string name="pause_title_desc">एक झपकी लेते हुए…</string>
@@ -10,7 +9,6 @@
     <string name="about_title_desc">नेटवर्क सुरक्षा खतरों का पता लगाएं और उन्हें ब्लॉक करें</string>
     <string name="txt_home">मुख्यपृष्ठ</string>
     <string name="accessibility_service_description">रीथिंकडीएनएस पृष्ठभूमि अनुप्रयोगों का पता लगाने और फ़ायरवॉल करने के लिए पहुँच सेवा का उपयोग करता है। रीथिंकडीएनएस कोई जानकारी एकत्र या बेचता नहीं है।</string>
-    <string name="accessibility_service_label">रीथिंकडीएनएस</string>
     <string name="next">अगला</string>
     <string name="skip">छोड़ें</string>
     <string name="finish">पूर्ण करें</string>

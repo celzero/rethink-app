@@ -119,7 +119,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
             _ ->
             openRethinkAppInfo(this)
         }
-        builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) {
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) {
             _,
             _ ->
             finish()

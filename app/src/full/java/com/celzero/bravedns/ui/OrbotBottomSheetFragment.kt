@@ -376,7 +376,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
 
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.orbot_stop_dialog_positive)) {
+        builder.setPositiveButton(getString(R.string.lbl_dismiss)) {
             dialogInterface,
             _ ->
             dialogInterface.dismiss()

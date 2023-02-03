@@ -484,7 +484,7 @@ internal constructor(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.new_app_notification_action_allow),
+                context.resources.getString(R.string.allow),
                 openIntent1
             )
         val notificationAction2: NotificationCompat.Action =

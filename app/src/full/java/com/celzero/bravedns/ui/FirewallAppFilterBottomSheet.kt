@@ -119,7 +119,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         val all =
             makeParentChip(
                 FirewallAppFragment.TopLevelFilter.ALL.id,
-                getString(R.string.fapps_filter_parent_all),
+                getString(R.string.lbl_all),
                 true
             )
         val allowed =

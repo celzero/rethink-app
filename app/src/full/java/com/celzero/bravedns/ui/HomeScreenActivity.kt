@@ -111,6 +111,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
         updateNewVersion()
 
+        persistentState.enableDnsAlg = true
+
         if (savedInstanceState == null) {
             homeScreenFragment = HomeScreenFragment()
             supportFragmentManager
@@ -252,7 +254,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             observeRestoreWorker()
         }
 
-        builder.setNegativeButton(getString(R.string.brbs_restore_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
             // no-op
         }
 

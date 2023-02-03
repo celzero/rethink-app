@@ -925,7 +925,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             dialog.dismiss()
         }
 
-        builder.setNegativeButton(getString(R.string.settings_all_networks_dialog_negative_btn)) {
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) {
             dialog,
             _ ->
             b.settingsActivityAllNetworkSwitch.isChecked = false
@@ -944,7 +944,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
             handleOrbotInstall()
         }
-        builder.setNegativeButton(getString(R.string.orbot_install_dialog_negative)) { dialog, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { dialog, _ ->
             dialog.dismiss()
         }
         builder.setNeutralButton(getString(R.string.orbot_install_dialog_neutral)) { _, _ ->

@@ -8,7 +8,6 @@
     <string name="settings_dns_proxy_dialog_port_number">Número da porta</string>
     <string name="settings_dns_proxy_dialog_positive_btn">definir</string>
     <string name="settings_theme_dialog_themes_2">Claro</string>
-    <string name="settings_dns_proxy_dialog_negative_btn">cancelar</string>
     <string name="settings_socks5_dialog_hint_password">Senha (opcional)</string>
     <string name="settings_theme_dialog_themes_1">Definido pelo Sistema</string>
     <string name="settings_theme_dialog_themes_3">Escuro</string>
@@ -52,7 +51,6 @@
     <string name="dc_other_dns_heading">tipo</string>
     <string name="dc_custom_dns_radio">Outro DNS</string>
     <string name="about_mail_to_string">para:</string>
-    <string name="hsf_vpn_dialog_negative">Cancelar</string>
     <string name="hsf_start_dialog_message">Você está a um passo de ter um Android seguro e protegido: veja instantaneamente atividade da rede, bloqueie sites, IPs e apps suspeitos.</string>
     <string name="hsf_proxy_chip_text">Proxy ativo</string>
     <string name="hsf_whats_new_chip_text">Novidades</string>
@@ -85,17 +83,13 @@
     <string name="about_mail_bugreport_share_title">Selecione provedor de e-mail</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="dns_btm_sheet_chip">+%1$s Outros IPs</string>
-    <string name="dns_filter_parent_all">Tudo</string>
-    <string name="dns_btm_sheet_chip_allowed">Permitidos</string>
     <string name="dns_btm_resolved_doh">resolvido %1$s por %2$s</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
     <string name="hs_download_positive_default">ok</string>
     <string name="dns_btm_resolved_doh_no_server">resolvido %1$s</string>
     <string name="dns_btm_record_type">Tipo de consulta: %1$s</string>
     <string name="univ_firewall_rule_10">Bloqueie tudo, exceto apps e IPs ignorados</string>
-    <string name="univ_ip_delete_dialog_negative">Cancelar</string>
     <string name="univ_delete_firewall_dialog_message">Ao excluir estas regras você permitirá a qualquer app conectar-se aos IPs atualmente bloqueados.</string>
-    <string name="dns_delete_negative">Cancelar</string>
     <string name="dns_info_positive">Ok</string>
     <string name="fapps_filter_filter_heading">Tipo</string>
     <string name="fapps_filter_clear_btn">Limpar</string>
@@ -105,12 +99,8 @@
     <string name="dns_proxy_dialog_header_dns">Adicionar proxy de DNS</string>
     <string name="fapps_firewall_filter_excluded">Excluído</string>
     <string name="dns_proxy_app">App</string>
-    <string name="fapps_filter_apply_btn">Aplicar</string>
-    <string name="fapps_filter_parent_all">Todas</string>
     <string name="fapps_info_dialog_positive_btn">Ok</string>
-    <string name="fapps_unmetered_positive">Aplicar</string>
     <string name="fapps_metered_block_dialog_title">Bloqueie em redes com franquia de dados</string>
-    <string name="fapps_unmetered_negative">Cancelar</string>
     <string name="network_log_app_name_unknown">Desconhecido</string>
     <string name="cd_dns_proxy_error_text_1">Endereço IP inválido</string>
     <string name="cd_dns_proxy_error_text_3">Porta inválida</string>
@@ -151,17 +141,11 @@
     <string name="copy_clipboard_label">URL</string>
     <string name="category_name_sys_apps">Apps do sistema</string>
     <string name="category_name_others">Outros</string>
-    <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
-\n</string>
     <string name="notif_channel_desc_vpn_notification">Informe quando RethinkDNS está ativo e funcionando em segundo plano</string>
     <string name="notif_channel_desc_proxy_failure">Alerte sobre erros e anomalias de Proxy</string>
     <string name="notif_channel_desc_firewall_alerts">Alerte sobre erros e anomalias de Firewall</string>
     <string name="cd_remove_dialog_message">Apagar domínio da configuração salva.</string>
-    <string name="cd_add_dialog_show_btn">mostrar</string>
-    <string name="cd_sample_unicode_valid">✅</string>
     <string name="cd_remove_dialog_positive">Apagar</string>
-    <string name="cd_remove_dialog_negative">Cancelar</string>
-    <string name="cd_sample_unicode_invalid">❌</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_block_wifi">está bloqueado em redes de banda larga (wifi)</string>
@@ -169,36 +153,26 @@
     <string name="ada_ip_no_connection">Nenhum registro da rede para este app.</string>
     <string name="ada_app_status_block_md">está bloqueado em redes com franquia de dados (móvel)</string>
     <string name="ada_app_status_whitelist">contornará as regras universais do firewall</string>
-    <string name="bsdl_domain_desc">Toque abaixo para permitir ou bloquear a consulta de DNS</string>
-    <string name="bsdl_domain_rule_block">bloquear</string>
-    <string name="bsdl_domain_rule_allow">permitir</string>
     <string name="notif_download_content_title">Download da lista de bloqueio no dispositivo</string>
-    <string name="rt_dialog_negative">Cancelar</string>
     <string name="rt_download_start">Baixando listas de bloqueio…</string>
     <string name="rt_dialog_neutral">Continuar</string>
     <string name="rt_chip_check_update">Verifique atualizações</string>
     <string name="rt_re_download">Baixe novamente as listas de bloqueio</string>
     <string name="rt_list_simple_btn_txt">simples</string>
-    <string name="rt_apply_btn">Aplicar</string>
-    <string name="bsdl_domain_heading">Regra de domínio</string>
     <string name="rt_edit_dialog_positive">Editar</string>
     <string name="rt_download">Baixar listas de bloqueio</string>
     <string name="rt_chip_update_available">Atualização disponível</string>
     <string name="rt_list_adv_btn_txt">avançado</string>
-    <string name="rt_cancel_download">Cancelar</string>
-    <string name="rt_cancel_btn">Cancelar</string>
     <string name="lbbs_redownload">Baixar novamente listas de bloqueio</string>
     <string name="lbbs_download">Atualizar listas de bloqueio</string>
     <string name="brbs_backup_dialog_message">Faz backup de configurações do app, rede e registros de dns no arquivo. Isto reiniciará a VPN.</string>
     <string name="brbs_backup_dialog_failure_title">Backup falhou</string>
     <string name="brbs_restore_dialog_failure_message">Não foi possível restaurar. Tente novamente\?</string>
     <string name="brbs_restore_dialog_failure_positive">Repetir restauração</string>
-    <string name="brbs_restore_dialog_failure_negative">Descartar</string>
     <string name="brbs_restore_complete_toast">Restauração concluída, reiniciando o app…</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">bloquear</string>
     <string name="status_no_internet">sem internet</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="title_about">Sobre</string>
     <string name="app_name">RethinkDNS</string>
     <string name="title_settings">Configurações</string>
@@ -219,7 +193,6 @@
     <string name="show_logs_disabled_dns_message">Registro de solicitações do DNS foi desativado. Para reativar, vá para <i>Configurações</i> e toque no <i>Ativar registros no dispositivo.</i></string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvedores</string>
     <string name="bsct_conn_desc_allowed">permitido em %1$s %2$s</string>
-    <string name="always_on_dialog_negative_btn">Cancelar</string>
     <string name="http_proxy_dialog_desc">As configurações de proxy HTTP(S) dão apenas uma dica para os apps, mas podem ou não ser usadas; no entanto, navegadores como Chrome e Firefox as usam. Os aplicativos que usam o proxy HTTP(S) contornarão as regras do Firewall e do DNS.</string>
     <string name="download_update_dialog_trylater_title">Não é possível atualizar agora</string>
     <string name="search_universal_ips"><font size="12">Buscar IPs</font></string>
@@ -271,7 +244,6 @@
     <string name="settings_title_desc">DNS e Firewall altamente personalizável</string>
     <string name="about_title_desc">Detecte e bloqueie as ameaças à segurança da rede</string>
     <string name="txt_home">Início</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">Avançar</string>
     <string name="skip">Pular</string>
     <string name="finish">Concluir</string>
@@ -333,14 +305,12 @@
     <string name="always_on_dialog_positive_btn">Vá para Configurações</string>
     <string name="always_on_dialog_stop_message">A VPN sempre ligada está ativada para Rethink app. Tem certeza que quer parar Rethink mesmo assim\?</string>
     <string name="always_on_dialog_positive">Parar</string>
-    <string name="always_on_dialog_negative">Cancelar</string>
     <string name="always_on_dialog_neutral">Configurações</string>
     <string name="firewall_act_universal_tab">Universal</string>
     <string name="firewall_act_network_monitor_tab">Registros da rede</string>
     <string name="dns_act_configure_tab">Configurar</string>
     <string name="univ_firewall_dialog_title">Apagar a regra do IP\?</string>
     <string name="univ_firewall_dialog_message">Ao apagar esta regra você permitiria a qualquer aplicativo conexão com este IP. Você quer continuar\?</string>
-    <string name="univ_firewall_no_ip_message">Nenhum IP encontrado. Toque em entradas na tela com Registros da rede para bloquear endereços IP individuais.</string>
     <string name="doh_custom_url_remove_dialog_title">Apagar endpoint do DoH\?</string>
     <string name="doh_custom_url_remove_dialog_message">Apagar DNS sobre Https endpoint da configuração salva.</string>
     <string name="doh_custom_url_remove_success">Endpoint apagado.</string>
@@ -413,12 +383,10 @@
     <string name="orbot_stop_dialog_message">RethinkDNS parou de encaminhar conexões ao Orbot, mas o Orbot pode estar funcionando em segundo plano.</string>
     <string name="orbot_stop_dialog_dns_message">RethinkDNS está configurado para encaminhar as consultas do DNS ao Orbot. Altere conforme necessário.</string>
     <string name="orbot_stop_dialog_negative">Parar Orbot</string>
-    <string name="orbot_stop_dialog_positive">Descartar</string>
     <string name="orbot_title">Orbot e Proxies</string>
     <string name="orbot_install_dialog_title">Instalar Orbot\?</string>
     <string name="orbot_install_dialog_message">Orbot traz os recursos e funcionalidades do Tor para o Android.</string>
     <string name="orbot_install_dialog_positive">Instalar</string>
-    <string name="orbot_install_dialog_negative">Descartar</string>
     <string name="orbot_install_dialog_neutral">site</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
@@ -439,7 +407,6 @@
 \nVocê quer continuar\?</string>
     <string name="settings_all_networks_dialog_positive_btn">Ativar de qualquer modo</string>
     <string name="settings_network_all_networks">Usar todas as redes disponíveis (experimental)</string>
-    <string name="settings_all_networks_dialog_negative_btn">Cancelar</string>
     <string name="settings_check_update_heading">Verifique se há atualizações do app</string>
     <string name="settings_check_update_desc">Verifique automaticamente as atualizações do app uma vez por semana.</string>
     <string name="settings_custom_downloader_heading">Use downloader do app</string>
@@ -493,13 +460,11 @@
     <string name="firewall_status_block_metered">bloqueado em redes com franquia de dados (móvel)</string>
     <string name="firewall_status_blocked">bloqueado</string>
     <string name="firewall_status_unknown">desconhecido</string>
-    <string name="firewall_card_status_inactive">Desativado</string>
     <string name="firewall_card_text_active">%1$s bloqueado
 \n%2$s contornado
 \n%3$s excluído
 \n%4$s restrito</string>
     <string name="firewall_card_text_inactive">Ative modo de firewall.</string>
-    <string name="dns_card_connected_status_failure">Desativado</string>
     <string name="dns_card_latency_active">Latência: %1$sms</string>
     <string name="dns_card_latency_inactive">Ative modo DNS.</string>
     <string name="apps_card_ips_count">%1$s regras IP/portas</string>
@@ -514,7 +479,6 @@
     <string name="hsf_start_dialog_header">Iniciar %1$s</string>
     <string name="firewall_status_block_unmetered">bloqueado em redes de banda larga (wifi)</string>
     <string name="hsf_start_dialog_positive">Começar</string>
-    <string name="hsf_start_dialog_negative">Descartar</string>
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_dns_logs_chip_text">Registros de DNS</string>
     <string name="hsf_network_logs_chip_text">Registros da rede</string>
@@ -534,11 +498,9 @@
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report">Relat. de prob.</string>
     <string name="about_bug_report_dialog_positive_btn">Enviar email</string>
-    <string name="about_bug_report_dialog_negative_btn">Cancelar</string>
     <string name="about_bug_no_log_dialog_title">Relatório de problemas</string>
     <string name="about_bug_no_log_dialog_message">Não foi possível obter os registros de falhas. Deseja relatar manualmente seu problema\?</string>
     <string name="about_bug_no_log_dialog_positive_btn">Enviar email</string>
-    <string name="about_bug_no_log_dialog_negative_btn">Cancelar</string>
     <string name="dc_dns_leaks_heading">Impedir vazamentos do DNS</string>
     <string name="about_docs">Leia docs</string>
     <string name="about_connect">contato</string>
@@ -566,32 +528,22 @@
     <string name="cd_dns_crypt_dialog_stamp">Selo</string>
     <string name="cd_dns_crypt_dialog_desc">Descrição (opcional)</string>
     <string name="cd_dialog_positive_btn">adicionar</string>
-    <string name="cd_dialog_negative_btn">Cancelar</string>
     <string name="cd_dns_crypt_error_text_1">Selo não pode estar vazio</string>
     <string name="cd_doh_dialog_heading">Adicionar DNS sobre HTTPS</string>
     <string name="cd_doh_dialog_resolver_name">Nome do resolvedor</string>
     <string name="cd_doh_dialog_resolver_url">URL do resolvedor</string>
     <string name="cd_dnscrypt_relay_heading">Relays</string>
-    <string name="cd_dnscrypt_relay_dismiss_btn">Descartar</string>
     <string name="ct_delete_logs_positive_btn">Apagar registros</string>
-    <string name="ct_delete_logs_negative_btn">Cancelar</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_filter_parent_all">Tudo</string>
-    <string name="ct_filter_parent_allowed">Permitido</string>
-    <string name="ct_filter_parent_blocked">Bloqueado</string>
     <string name="ctbs_app_info_not_available_toast">Página da configurações do app não encontrada</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s outro(s) app(s)</string>
     <string name="ctbs_block_other_apps">Regras aplicadas para %1$s também serão aplicadas para %2$s outros apps</string>
     <string name="ctbs_proceed_positive_text">Continuar</string>
     <string name="ctbs_dialog_negative_btn">Voltar</string>
     <string name="dns_log_dialog_positive">Apagar registros</string>
-    <string name="dns_log_dialog_negative">Cancelar</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s lista(s) de bloqueio&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_chip_blocked">Bloqueados</string>
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
-    <string name="dns_filter_parent_allowed">Permitido</string>
-    <string name="dns_filter_parent_blocked">Bloqueados</string>
     <string name="dns_btm_resolved_crypt">resolvido <u>de forma anônima</u> %1$s por %2$s</string>
     <string name="hs_download_positive_play_store">Concluir a atualização</string>
     <string name="hs_download_positive_website">Visite o site</string>
@@ -608,13 +560,11 @@
     <string name="univ_view_blocked_ip">regras de ip e porta</string>
     <string name="univ_view_blocked_ip_desc">Modifique regras de IP/Portas bloqueadas ou contornadas.</string>
     <string name="univ_ip_delete_individual_positive">Apagar</string>
-    <string name="univ_ip_delete_individual_negative">Cancelar</string>
     <string name="univ_ip_delete_individual_toast">%1$s apagado.</string>
     <string name="univ_ip_delete_dialog_positive">Apagar tudo</string>
     <string name="univ_delete_firewall_dialog_title">Apagar todas as regras de IP\?</string>
     <string name="univ_ip_delete_toast_success">Apagadas todas as regras de IP.</string>
     <string name="univ_accessibility_crash_dialog_positive">Vá para configurações</string>
-    <string name="univ_accessibility_crash_dialog_negative">Cancelar</string>
     <string name="univ_accessibility_dialog_positive">Conceder</string>
     <string name="univ_accessibility_dialog_negative">Recusar</string>
     <string name="dns_connected_rethink_plus">Conectado. %1$s listas de bloqueio em uso</string>
@@ -636,13 +586,9 @@
 \nNúmero da porta: %3$s</string>
     <string name="dns_proxy_port">Número da porta</string>
     <string name="dns_proxy_ip_address">Endereço do IP</string>
-    <string name="dns_proxy_negative_btn">Cancelar</string>
     <string name="dns_proxy_positive_btn">adicionar</string>
     <string name="fapps_filter_parent_installed">Instalada</string>
     <string name="fapps_filter_parent_system">Sistema</string>
-    <string name="fapps_firewall_filter_all">Tudo</string>
-    <string name="fapps_firewall_filter_allowed">Permitido</string>
-    <string name="fapps_firewall_filter_blocked">Bloqueado</string>
     <string name="fapps_firewall_filter_bypass_universal">Contornado</string>
     <string name="fapps_firewall_filter_isolate">Restrito</string>
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede com franquia de dados (móvel) para apps <i>listados</i>\?</string>
@@ -670,7 +616,6 @@
     <string name="dns_proxy_toast_parameter">Proxy de DNS</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio em uso</string>
     <string name="settings_local_blocklist_dialog_positive">Baixar</string>
-    <string name="settings_local_blocklist_dialog_negative">Cancelar</string>
     <string name="settings_local_blocklist_version">Versão: v%1$s</string>
     <string name="accessibility_notification_title">Ação requerida</string>
     <string name="accessibility_notification_content">O serviço de acessibilidade do RethinkDNS parou ou travou. Não bloqueia mais apps em segundo plano. Toque para reativar.</string>
@@ -711,7 +656,6 @@
     <string name="new_app_bulk_notification_content">RethinkDNS bloqueou %1$s novos apps. Toque para ver ou modificar.</string>
     <string name="new_app_notification_title">Ação requerida</string>
     <string name="new_app_notification_content">RethinkDNS bloqueou o app %1$s, recentemente instalado.</string>
-    <string name="new_app_notification_action_allow">Permitir</string>
     <string name="new_app_notification_action_deny">Continue bloqueando</string>
     <string name="new_app_notification_action_toast_deny">Conexão da rede negada para este app</string>
     <string name="notif_dialog_pause_dialog_title">App pausado!</string>
@@ -729,18 +673,10 @@
     <string name="build__flavor_website">site</string>
     <string name="build__flavor_play_store">play</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_dialog_header">Domínios personalizados</string>
+    <string name="cd_dialog_header">Domínios personalizados: %1$s</string>
     <string name="cd_toast_deleted">Domínio removido da lista personalizada</string>
     <string name="cd_toast_added">Domínio adicionado com sucesso</string>
     <string name="cd_remove_dialog_title">Apagar domínio\?</string>
-    <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s
-\n</string>
-    <string name="cd_add_dialog_sample_3">%1$s https://%2$s
-\n</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
-    <string name="cd_filter_all">Tudo</string>
-    <string name="cd_filter_allowed">Permitido</string>
-    <string name="cd_filter_blocked">Bloqueado</string>
     <string name="cd_dialog_title">Adicionar domínio</string>
     <string name="cd_dialog_desc">URL(domínio) personalizada ou wildcard para permitir ou bloquear. p.ex., *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Digite %1$s</string>
@@ -750,7 +686,6 @@
     <string name="cd_bypass_initial">W</string>
     <string name="cd_bypass_txt">Lista de permitidos</string>
     <string name="cd_blocked_initial">B</string>
-    <string name="cd_blocked_txt">Bloqueado</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="cd_no_rule_txt">Nenhuma regra</string>
     <string name="ci_dialog_title">Adicionar regra de IP / Porta</string>
@@ -762,7 +697,6 @@
     <string name="ci_no_rules_text">Nenhuma regra universal de bloqueio ou contorno de IP encontrada.</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">Autorização universal</string>
-    <string name="ci_blocked_txt">Bloqueado</string>
     <string name="ci_no_rule_txt">Nenhuma regra</string>
     <string name="ci_no_rule">nenhuma regra</string>
     <string name="ci_block">bloquear</string>
@@ -778,8 +712,6 @@
     <string name="ada_app_status_exclude">está excluído do dns e firewall</string>
     <string name="ada_app_status_isolate">está no modo restrito</string>
     <string name="ada_app_status_unknown">é desconhecido</string>
-    <string name="ada_ip_block_count">Regras de IP: %1$s</string>
-    <string name="ada_ip_rules_title">regras de ip para este app</string>
     <string name="ada_network_log_title">registro da rede para este app</string>
     <string name="ada_app_metered">Franquia de dados</string>
     <string name="ada_app_unmetered">Banda larga</string>
@@ -796,7 +728,6 @@
     <string name="bsac_trust_toast">Contornando as regras do app para este IP %1$s</string>
     <string name="bsac_distrust_toast">Foi removida a autorização para este IP %1$s</string>
     <string name="bsdl_blocked_desc">bloqueado %1$s por %2$s</string>
-    <string name="bsdl_domain_rule_norule">nenhuma regra</string>
     <string name="network_dns">DNS do sistema</string>
     <string name="notif_download_content_text">Download em andamento…</string>
     <string name="notif_download_failure_content">Download falhou. Tente novamente.</string>
@@ -806,22 +737,18 @@
     <string name="rbl_security">Segurança</string>
     <string name="rt_dialog_title">Salvar alterações</string>
     <string name="rt_dialog_message">Deseja aplicar listas de bloqueio recém configuradas\?</string>
-    <string name="rt_dialog_positive">Aplicar</string>
     <string name="rt_download_desc">Baixe listas de bloqueio (cerca de 60 MB) para usar esta funcionalidade.</string>
     <string name="radio_sky_btn">⛅ Céu</string>
     <string name="radio_max_btn">🪂 Máx</string>
     <string name="rethink_sky_desc">mais de 280 localizações; melhor tempo operacional; resolvedor stub rodando em cloudflare.com</string>
     <string name="rethink_max_desc">50+ localizações; mais privado; resolvedor recursivo rodando em fly.io</string>
     <string name="bsrf_sub_group_heading">Subgrupo</string>
-    <string name="bsrf_apply_filter">Aplicar</string>
     <string name="bsrf_clear_filter">Limpar</string>
     <string name="dc_local_block_enabled">Ativado</string>
-    <string name="dc_local_block_disabled">Desativado</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
     <string name="dc_doh">Dns sobre HTTPS</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="dc_dns_proxy">Proxy DNS</string>
-    <string name="lbbs_enable">Desativado</string>
     <string name="lbbs_enabled">Ativado</string>
     <string name="lbbs_configure">Configurar</string>
     <string name="lbbs_copy">Copiar como URL RDNS+</string>
@@ -835,14 +762,11 @@
     <string name="brbs_restore_desc">Restaurar do arquivo com backup</string>
     <string name="brbs_backup_dialog_title">Fazer backup</string>
     <string name="brbs_backup_dialog_positive">Backup</string>
-    <string name="brbs_backup_dialog_negative">Cancelar</string>
     <string name="brbs_restore_dialog_title">Restaurar backup</string>
     <string name="brbs_restore_dialog_message">Restaurar configurações do app, rede e registros de dns do arquivo com backup. Isto reiniciará o app.</string>
     <string name="brbs_restore_dialog_positive">Restaurar</string>
-    <string name="brbs_restore_dialog_negative">Cancelar</string>
     <string name="brbs_backup_dialog_failure_message">Não foi possível fazer um backup. Tente novamente\?</string>
     <string name="brbs_backup_dialog_failure_positive">Fazer de novo backup</string>
-    <string name="brbs_backup_dialog_failure_negative">Descartar</string>
     <string name="brbs_restore_dialog_failure_title">Falha na restauração</string>
     <string name="brbs_backup_complete_toast">Backup concluído</string>
     <string name="brbs_restore_no_uri_toast">Falha na restauração; tentar novamente</string>
@@ -864,7 +788,6 @@
     <string name="rt_filter_desc">Mostrando <u>%1$s</u> listas de bloqueio</string>
     <string name="rt_filter_desc_subgroups">Mostrando <u>%1$s</u> listas de bloqueio no grupo: %2$s e subgrupo: %3$s</string>
     <string name="notif_download_cancel_content">Download cancelado.</string>
-    <string name="rt_filter_parent_all">Tudo</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / porta (universal)</string>
     <string name="whats_new_version_update">&lt;b&gt;Poliglótico!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Suporte retomado ao Android 6.&lt;br/&gt; 2. Nova interface.&lt;br/&gt; 3. Firewall e configurações de rede repaginados.&lt;br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: Traduções em mais de 15 idiomas.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: Ícones adaptativos.&lt;br/&gt; 6. &lt;i&gt;Novo recurso:&lt;/i&gt;: Nomes de domínio exibidos nos registros de rede por cada aplicativo.&lt;br/&gt; 7. Corrigida a falha na exibição de notificações no Android 13.&lt;br/&gt; 8. Corrigida a falha de integração com o Orbot.&lt;br/&gt; 9. Tela dos apps agora está disponível no modo somente DNS.&lt;br/&gt; 10. Melhorias no gerenciador de downloads integrado.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Ajude a traduzir este app&lt;/a&gt;</string>
@@ -875,5 +798,4 @@
 \nPara usar um servidor no Rethink DNS, vá até as configurações do Android e desative o DNS Privado.</string>
     <string name="private_dns_error">Não foi possível iniciar a tela do DNS Privado.</string>
     <string name="private_dns_dialog_positive">Vá para Configurações</string>
-    <string name="private_dns_dialog_negative">Dispensar</string>
 </resources>

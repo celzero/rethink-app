@@ -182,7 +182,7 @@ class DnsProxyEndpointAdapter(
             deleteProxyEndpoint(dnsProxyEndpoint.id)
         }
 
-        builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ -> }
+        builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ -> }
         builder.create().show()
     }
 

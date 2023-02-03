@@ -76,11 +76,9 @@
     <string name="settings_vpn_heading">vpn</string>
     <string name="connection_http3">HTTP3</string>
     <string name="always_on_dialog_heading">VPN altijd aan uitschakelen</string>
-    <string name="always_on_dialog_negative_btn">Annuleren</string>
     <string name="always_on_dialog_stop_heading">Altijd VPN</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS draait VPN in <i>Lockdown</i> mode. Stoppen zou resulteren in verlies van internet connectiviteit op dit gebruikers profiel. Wil je toch doorgaan\?</string>
     <string name="always_on_dialog_positive">Stop</string>
-    <string name="always_on_dialog_negative">Annuleren</string>
     <string name="always_on_dialog_neutral">Instellingen</string>
     <string name="dns_act_log">Logboeken</string>
     <string name="univ_firewall_dialog_title">IP-regel verwijderen\?</string>
@@ -104,11 +102,9 @@
     <string name="whats_dialog_title">Nieuw in v053k</string>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="title_settings">Instellingen</string>
     <string name="pause_title_desc">een dutje doen…</string>
     <string name="about_title_desc">Detecteer en blokkeer netwerkbeveiligingsbedreigingen</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">Volgende</string>
     <string name="skip">Overslaan</string>
     <string name="slide_1_title">Gratis en open source</string>
@@ -145,7 +141,6 @@
     <string name="orbot_install_dialog_title">Orbot installeren\?</string>
     <string name="orbot_install_dialog_message">Orbot brengt de functies en functionaliteit van Tor naar Android.</string>
     <string name="orbot_install_dialog_positive">Installeren</string>
-    <string name="orbot_install_dialog_negative">Negeren</string>
     <string name="orbot_install_dialog_neutral">website</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
@@ -158,7 +153,6 @@
     <string name="settings_network_all_networks">Alle beschikbare netwerken gebruiken (experimenteel)</string>
     <string name="settings_all_networks_dialog_title">Attentie!</string>
     <string name="settings_all_networks_dialog_positive_btn">Toch inschakelen</string>
-    <string name="settings_all_networks_dialog_negative_btn">Annuleren</string>
     <string name="settings_check_update_heading">Controleren op app-updates</string>
     <string name="settings_check_update_desc">Automatisch controleren op app-updates eenmaal per week.</string>
     <string name="settings_custom_downloader_heading">Gebruik in-app downloader</string>
@@ -171,7 +165,6 @@
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostnaam</string>
     <string name="settings_dns_proxy_dialog_port_number">Poortnummer</string>
-    <string name="settings_dns_proxy_dialog_negative_btn">annuleren</string>
     <string name="settings_socks_forwarding_desc">Doorsturen naar %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_desc_no_app">Doorsturen naar %1$s:%2$s</string>
     <string name="settings_socks_forwarding_default_desc">Verbindingen doorsturen naar SOCKS5 eindpunt.</string>
@@ -236,7 +229,6 @@
 \n%2$s</string>
     <string name="orbot_stop_dialog_negative">Stop Orbot</string>
     <string name="orbot_stop_dialog_neutral">DNS wijzigen</string>
-    <string name="orbot_stop_dialog_positive">Negeren</string>
     <string name="app_mode_firewall">Firewall</string>
     <string name="settings_title_desc">Een zeer aanpasbare DNS en Firewall</string>
     <string name="app_mode_dns_firewall">DNS en firewall (standaard)</string>
@@ -282,7 +274,6 @@
     <string name="dc_entries">%1$s inzendingen 🔗</string>
     <string name="dc_dns_leaks_heading">DNS-lekken voorkomen</string>
     <string name="hsf_start_dialog_positive">Begin</string>
-    <string name="hsf_start_dialog_negative">Negeren</string>
     <string name="hsf_proxy_chip_remove_text">Aan het stoppen…</string>
     <string name="hsf_pause_vpn_failure">Kan niet pauzeren: RethinkDNS niet actief</string>
     <string name="hsf_proxy_chip_text">Proxy actief</string>
@@ -298,7 +289,6 @@
     <string name="about_app">app</string>
     <string name="about_settings">systeem</string>
     <string name="about_bravedns_whoarewe">RethinkDNS is een gratis en open-source project, geleid door ex-ingenieurs van Amazon, IBM en Scientific Games.</string>
-    <string name="about_bug_no_log_dialog_negative_btn">Annuleren</string>
     <string name="about_privacy_policy">Privacybeleid</string>
     <string name="about_settings_app_info">App-informatie</string>
     <string name="about_settings_vpn_profile">VPN-profiel</string>
@@ -329,28 +319,21 @@
     <string name="dns_btm_resolved_crypt">opgelost <u>anoniem</u> %1$s door %2$s</string>
     <string name="ctbs_proceed_positive_text">Doorgaan</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_chip_allowed">Toegestaan</string>
-    <string name="dns_btm_sheet_chip_blocked">Geblokkeerd</string>
     <string name="dns_btm_sheet_chip_no_answer">Geen antwoord</string>
-    <string name="dns_filter_parent_blocked">Geblokkeerd</string>
     <string name="hs_download_positive_default">ok</string>
     <string name="hs_download_positive_play_store">Volledige update</string>
     <string name="hs_download_positive_website">Website openen</string>
     <string name="univ_firewall_rule_2">Blokkeer elke app die niet in gebruik is</string>
     <string name="univ_firewall_rule_6">Nieuw geïnstalleerde apps standaard blokkeren</string>
-    <string name="univ_ip_delete_individual_negative">Annuleren</string>
     <string name="univ_ip_delete_toast_success">Alle IP-regels verwijderd.</string>
     <string name="univ_accessibility_dialog_negative">Weigeren</string>
     <string name="dns_crypt_relay_error_toast">Geen resolver geselecteerd</string>
     <string name="dns_proxy_ip_address">IP-adres</string>
     <string name="univ_firewall_rule_8">Poort 80 (onveilig HTTP-verkeer) blokkeren</string>
-    <string name="univ_ip_delete_dialog_negative">Annuleren</string>
     <string name="univ_delete_firewall_dialog_message">Door deze regels te verwijderen, zou elke toepassing verbinding kunnen maken met de momenteel geblokkeerde IP\'s.</string>
-    <string name="univ_accessibility_crash_dialog_negative">Annuleren</string>
     <string name="dns_connected">Verbonden</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_port">Poortnummer</string>
-    <string name="fapps_filter_parent_all">Alle</string>
     <string name="dns_proxy_dialog_message">App naam: %1$s
 \n
 \nIP-adres: %2$s
@@ -358,8 +341,6 @@
 \nPoortnummer: %3$s</string>
     <string name="fapps_firewall_filter_desc_category">Toont <u>%1$s</u> %2$s apps in categorieën: %3$s</string>
     <string name="fapps_filter_clear_btn">Wissen</string>
-    <string name="fapps_firewall_filter_all">Alle</string>
-    <string name="fapps_firewall_filter_allowed">Toegestaan</string>
     <string name="rules_load_failure_reload">herladen</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
     <string name="unicode_x_sign">❌</string>
@@ -395,7 +376,6 @@
     <string name="ada_app_isolate">Lockdown</string>
     <string name="settings_orbot_notification_content">Fout bij het starten van Tor-as-a-Proxy. Open de Orbot-app om deze handmatig te starten.</string>
     <string name="always_on_dialog_positive_btn">Open Instellingen</string>
-    <string name="univ_firewall_no_ip_message">Geen IP\'s gevonden. Tik op vermeldingen in het netwerklogboekscherm om afzonderlijke IP-adressen te blokkeren.</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt-resolver verwijderen\?</string>
     <string name="dns_crypt_url_remove_dialog_message">Verwijder de DNSCrypt-oplosser uit de opgeslagen configuratie.</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt-resolver verwijderd.</string>
@@ -425,9 +405,7 @@
     <string name="firewall_status_isolate">lockdown</string>
     <string name="firewall_status_block_metered">geblokkeerd op gedoseerde (mobiele) netwerken</string>
     <string name="firewall_status_blocked">geblokkeerd</string>
-    <string name="firewall_card_status_inactive">Uitgeschakeld</string>
     <string name="firewall_card_text_inactive">Firewall-modus inschakelen.</string>
-    <string name="dns_card_connected_status_failure">Uitgeschakeld</string>
     <string name="dns_card_latency_inactive">DNS-modus inschakelen.</string>
     <string name="hsf_start_btn_state">start</string>
     <string name="hsf_stop_btn_state">stoppen</string>
@@ -439,7 +417,6 @@
 \n%3$s uitgesloten
 \n%4$s lockdown</string>
     <string name="hsf_vpn_dialog_positive">Doorgaan</string>
-    <string name="hsf_vpn_dialog_negative">Annuleren</string>
     <string name="hsf_vpn_prepare_failure">Of de VPN toestemming ontbreekt, of een andere app staat in Always-on VPN mode.</string>
     <string name="hsf_notification_permission_failure">Meldingstoestemming inschakelen vanuit het instellingenscherm</string>
     <string name="hsf_start_dialog_header">Start %1$s</string>
@@ -460,7 +437,6 @@
     <string name="about_bug_report_desc">e-mail crash logs</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report_dialog_positive_btn">Verzend e-mail</string>
-    <string name="about_bug_report_dialog_negative_btn">Annuleren</string>
     <string name="about_bug_no_log_dialog_message">Kon geen crash logs ophalen. Wilt u uw bug handmatig rapporteren\?</string>
     <string name="about_bug_no_log_dialog_positive_btn">Verzend e-mail</string>
     <string name="about_web">links</string>
@@ -481,8 +457,6 @@
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="about_version">v%1$s</string>
     <string name="vpn_profile_error">Kon VPN profiel niet starten.</string>
-    <string name="dns_filter_parent_all">Alle</string>
-    <string name="dns_filter_parent_allowed">Toegestaan</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
     <string name="hs_download_negative_default">Herinner me later</string>
     <string name="univ_firewall_rule_3">Blokkeren wanneer bron-app onbekend is</string>
@@ -498,7 +472,6 @@
     <string name="univ_accessibility_crash_dialog_positive">Ga naar instellingen</string>
     <string name="dns_connected_no_count">Verbonden</string>
     <string name="dns_delete_positive">Verwijderen</string>
-    <string name="dns_delete_negative">Annuleren</string>
     <string name="dns_info_neutral">Kopieëren</string>
     <string name="dns_select_toast">Er moet ten minste één resolver worden geselecteerd.</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
@@ -508,18 +481,13 @@
     <string name="dns_query_latency">%1$sms</string>
     <string name="dns_proxy_dialog_header_dns">DNS-proxy toevoegen</string>
     <string name="dns_proxy_app">App</string>
-    <string name="dns_proxy_negative_btn">Annuleren</string>
     <string name="dns_proxy_positive_btn">toevoegen</string>
     <string name="fapps_filter_categories_heading">Categorieën</string>
-    <string name="fapps_filter_apply_btn">Pas Toe</string>
     <string name="fapps_filter_parent_installed">Geïnstalleerd</string>
     <string name="fapps_filter_parent_system">Systeem</string>
-    <string name="fapps_firewall_filter_blocked">Geblokkeerd</string>
     <string name="fapps_firewall_filter_bypass_universal">Omzeild</string>
     <string name="fapps_firewall_filter_excluded">Uitgesloten</string>
     <string name="fapps_firewall_filter_isolate">lockdown</string>
-    <string name="fapps_unmetered_positive">Pas Toe</string>
-    <string name="fapps_unmetered_negative">Annuleren</string>
     <string name="fapps_firewall_filter_desc">Het tonen van <u>%1$s</u> %2$s apps</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
@@ -532,7 +500,6 @@
     <string name="copy_clipboard_label">URL</string>
     <string name="update_complete_action_snack">HERSTARTEN</string>
     <string name="settings_local_blocklist_dialog_positive">Download</string>
-    <string name="settings_local_blocklist_dialog_negative">Annuleren</string>
     <string name="accessibility_notification_title">Vereiste actie</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="firewall_rule_block_app_new_install">Nieuwe app</string>
@@ -564,19 +531,12 @@
     <string name="cd_dns_crypt_dialog_stamp">Stempel</string>
     <string name="cd_dns_crypt_dialog_desc">Beschrijving (optioneel)</string>
     <string name="cd_dialog_positive_btn">toevoegen</string>
-    <string name="cd_dialog_negative_btn">annuleren</string>
     <string name="cd_dns_crypt_error_text_1">Stempel kan niet leeg zijn</string>
-    <string name="cd_dnscrypt_relay_dismiss_btn">Negeren</string>
     <string name="ct_delete_logs_positive_btn">Logboeken verwijderen</string>
-    <string name="ct_delete_logs_negative_btn">Annuleren</string>
-    <string name="ct_filter_parent_all">Alle</string>
-    <string name="ct_filter_parent_allowed">Toegestaan</string>
-    <string name="ct_filter_parent_blocked">Geblokkeerd</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s andere app(s)</string>
     <string name="ctbs_block_other_apps">De regels voor %1$s gelden ook voor %2$s andere apps</string>
     <string name="ctbs_dialog_negative_btn">Ga Terug</string>
     <string name="dns_log_dialog_positive">Logboeken verwijderen</string>
     <string name="cd_dnscrypt_relay_heading">Relays</string>
-    <string name="dns_log_dialog_negative">Annuleren</string>
 </resources>

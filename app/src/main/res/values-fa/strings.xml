@@ -8,7 +8,6 @@
     <string name="firewall_rules">قوانین شبکه</string>
     <string name="orbot_install_dialog_title">Orbot نصب شود؟</string>
     <string name="pause_mode_notification_title">متوقف شد! برنامه های مسدود شده همچنان فایروال می شوند.</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="orbot_install_dialog_message">Orbot ویژگی ها و عملکرد Tor را به اندروید می آورد.</string>
     <string name="pause_text">متوقف شده</string>
     <string name="app_name">RethinkDNS</string>
@@ -38,7 +37,6 @@
     <string name="dns_mode_info_title">DNS</string>
     <string name="app_name_small_case">rethink</string>
     <string name="firewall_mode_info_title">فایروال</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="status_protected_with_tor_private_dns">محافظت شده با tor و dns خصوصی</string>
     <string name="block">مسدود کردن</string>
     <string name="firewall_mode_info_explanation_new">نظارت بر فعالیت شبکه و فایروال هر برنامه یا آدرس IP.</string>

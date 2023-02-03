@@ -73,26 +73,16 @@
     <string name="cd_doh_dialog_heading">加 DNS over HTTPS</string>
     <string name="cd_doh_dialog_resolver_url">解析服務 URL</string>
     <string name="cd_dnscrypt_relay_heading">中繼</string>
-    <string name="cd_dnscrypt_relay_dismiss_btn">忽略</string>
     <string name="contributors_list">&lt;i&gt;Rethink 開放原始碼專案&lt;/i&gt;嘅存在歸功於呢啲喺佢嘅開發工作上傾瀉大量時間嘅志願者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 應用程式 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 網絡引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服務 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社羣協管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位置資料庫 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻譯 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 圖標 &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 構建伺服器 &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="dns_info_neutral">複製</string>
     <string name="dns_info_positive">確認</string>
     <string name="fapps_filter_parent_system">系統</string>
-    <string name="fapps_firewall_filter_all">全部</string>
     <string name="firewall_rule_bypass_universal_ip">已繞行 IP</string>
     <string name="firewall_rule_device_lock">裝置已鎖定</string>
     <string name="firewall_rule_foreground">應用程式未使用</string>
-    <string name="cd_remove_dialog_negative">取消</string>
     <string name="cd_remove_dialog_positive">刪除</string>
-    <string name="cd_add_dialog_show_btn">顯示</string>
-    <string name="cd_sample_unicode_invalid">❌</string>
-    <string name="cd_sample_unicode_valid">✅</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
-    <string name="cd_filter_all">全部</string>
     <string name="cd_dialog_title">加網域</string>
     <string name="ada_app_unmetered">唔收費嘅網絡</string>
-    <string name="ada_ip_block_count">%1$s 個 IP 規則</string>
-    <string name="ada_ip_rules_title">呢個 app 嘅 IP 規則</string>
     <string name="ada_network_log_title">呢個 app 嘅網絡日誌</string>
     <string name="ada_app_metered">收費嘅網絡</string>
     <string name="ada_app_exclude">排除</string>
@@ -101,13 +91,11 @@
     <string name="dc_rethink_dns">Rethink DNS</string>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="title_about">關於</string>
     <string name="title_settings">設定</string>
     <string name="settings_title_desc">一款可以高度自訂嘅 DNS 同防火牆軟件</string>
     <string name="about_title_desc">偵測同攔截網絡威脅，保護您嘅安全</string>
     <string name="txt_home">首頁</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">下一步</string>
     <string name="finish">搞掂</string>
     <string name="slide_2_title">歡迎</string>
@@ -158,9 +146,7 @@
     <string name="bsct_app_info">應用程式資訊</string>
     <string name="always_on_dialog_heading">禁用永久連線 VPN</string>
     <string name="always_on_dialog_positive_btn">去設定</string>
-    <string name="always_on_dialog_negative_btn">取消</string>
     <string name="always_on_dialog_stop_heading">永久連線 VPN</string>
-    <string name="always_on_dialog_negative">取消</string>
     <string name="always_on_dialog_neutral">設定</string>
     <string name="firewall_act_universal_tab">通用</string>
     <string name="firewall_act_network_monitor_tab">網絡日誌</string>
@@ -168,7 +154,6 @@
     <string name="dns_act_log">日誌</string>
     <string name="univ_firewall_dialog_title">係咪刪除 IP 規則？</string>
     <string name="univ_firewall_dialog_message">丟咗呢條規則將會容許任何嘅 app 連去呢個 IP 地址。您係咪要繼續？</string>
-    <string name="univ_firewall_no_ip_message">搵唔到任何 IP 地址。㩒一下網絡日誌區入面的請求項嚟逐個攔截 IP 地址。</string>
     <string name="doh_custom_url_remove_dialog_title">係咪刪除 DNS 端點？</string>
     <string name="doh_custom_url_remove_dialog_message">喺儲存咗嘅配置入面刪除呢個 DNS over HTTPS 端點。</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">係咪刪除 DNSCrypt 解析服務？</string>
@@ -236,12 +221,10 @@
     <string name="orbot_stop_dialog_dns_message">已經將 RethinkDNS 設定咗做將 DNS 請求轉發去 Orbot。請按需更改。</string>
     <string name="orbot_stop_dialog_negative">停止 Orbot</string>
     <string name="orbot_stop_dialog_neutral">更改 DNS</string>
-    <string name="orbot_stop_dialog_positive">忽略</string>
     <string name="orbot_title">Orbot 同代理</string>
     <string name="orbot_install_dialog_title">係咪安裝 Orbot？</string>
     <string name="orbot_install_dialog_message">Orbot 會將 Tor 嘅特性同功能帶入去 Android 度。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
-    <string name="orbot_install_dialog_negative">忽略</string>
     <string name="orbot_install_dialog_neutral">網站</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
@@ -266,7 +249,6 @@
 \n
 \n您係咪要繼續？</string>
     <string name="settings_all_networks_dialog_positive_btn">仍要啓用</string>
-    <string name="settings_all_networks_dialog_negative_btn">取消</string>
     <string name="settings_check_update_heading">檢查應用程式更新</string>
     <string name="settings_check_update_desc">每個禮拜自動檢查一次有冇更新。</string>
     <string name="settings_custom_downloader_heading">用 app 入面嘅下載器</string>
@@ -287,7 +269,6 @@
     <string name="settings_dns_proxy_dialog_username">帳號</string>
     <string name="settings_dns_proxy_dialog_password">密碼</string>
     <string name="settings_dns_proxy_dialog_positive_btn">設定</string>
-    <string name="settings_dns_proxy_dialog_negative_btn">取消</string>
     <string name="settings_dns_proxy_dialog_app_desc">揀咗的 app 會被排除喺 VPN 之外，比佢爲你轉發連線。</string>
     <string name="settings_app_list_default_app">冇 app</string>
     <string name="settings_socks_forwarding_desc">轉發緊去 %1$s:%2$s，%3$s</string>
@@ -340,12 +321,10 @@
     <string name="hsf_downtime">（由 %1$s 開始停用）</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
     <string name="hsf_vpn_dialog_positive">繼續</string>
-    <string name="hsf_vpn_dialog_negative">取消</string>
     <string name="hsf_vpn_prepare_failure">可能係冇咗 VPN 權限，亦都可能係某個 app 正處於永久連線 VPN 模式中。</string>
     <string name="hsf_start_dialog_header">啓動 %1$s</string>
     <string name="hsf_start_dialog_message">您距離安全嘅 Android 系統只有一步之遙：即時查看網絡活動，攔截網站、IP 同唔聽話嘅 app。</string>
     <string name="hsf_start_dialog_positive">啓動</string>
-    <string name="hsf_start_dialog_negative">忽略</string>
     <string name="hsf_whats_new_chip_text">新內容</string>
     <string name="hsf_proxy_chip_text">啓用咗代理</string>
     <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
@@ -378,10 +357,8 @@
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report">漏洞報告</string>
     <string name="about_bug_report_dialog_positive_btn">發送電郵</string>
-    <string name="about_bug_report_dialog_negative_btn">取消</string>
     <string name="about_bug_no_log_dialog_title">漏洞報告</string>
     <string name="about_bug_no_log_dialog_positive_btn">發送電郵</string>
-    <string name="about_bug_no_log_dialog_negative_btn">取消</string>
     <string name="about_web">連結</string>
     <string name="about_website">訪問 rethinkdns.com</string>
     <string name="about_github">喺 GitHub 貢獻</string>
@@ -443,24 +420,19 @@
     <string name="cd_dns_crypt_dialog_stamp">印戳</string>
     <string name="cd_dns_crypt_dialog_desc">說明（可選）</string>
     <string name="cd_dialog_positive_btn">添加</string>
-    <string name="cd_dialog_negative_btn">取消</string>
     <string name="cd_dns_crypt_error_text_1">印戳唔可以係空</string>
     <string name="cd_doh_dialog_resolver_name">解析服務名稱</string>
     <string name="ct_delete_logs_positive_btn">刪除日誌</string>
-    <string name="ct_delete_logs_negative_btn">取消</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_filter_parent_all">全部</string>
     <string name="ctbs_app_info_not_available_toast">搵唔到程式設定頁</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s 個其他應用程式</string>
     <string name="ctbs_block_other_apps">應用喺 %1$s 嘅規則亦會應用喺其他 %2$s 個應用程式</string>
     <string name="ctbs_proceed_positive_text">繼續</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
-    <string name="dns_log_dialog_negative">取消</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;：%2$s 份攔截清單&lt;/h3&gt;%3$s。&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip">+%1$s 個其他 IP</string>
-    <string name="dns_filter_parent_all">全部</string>
     <string name="dns_btm_resolved_crypt">%1$s 由 %2$s <u>匿名</u>解析</string>
     <string name="dns_btm_resolved_doh">%1$s 由 %2$s 解析</string>
     <string name="dns_btm_resolved_doh_no_server">解析咗 %1$s</string>
@@ -483,22 +455,18 @@
     <string name="univ_view_blocked_ip">IP 同埠規則</string>
     <string name="univ_view_blocked_ip_desc">修改攔截或者信任嘅 IP / 埠規則。</string>
     <string name="univ_ip_delete_individual_positive">刪除</string>
-    <string name="univ_ip_delete_individual_negative">取消</string>
     <string name="univ_ip_delete_individual_toast">丟咗 %1$s。</string>
     <string name="univ_ip_delete_dialog_positive">全部刪除</string>
-    <string name="univ_ip_delete_dialog_negative">取消</string>
     <string name="univ_ip_delete_toast_success">已經丟哂所有 IP 規則。</string>
     <string name="univ_delete_firewall_dialog_title">係咪丟哂所有 IP 規則？</string>
     <string name="univ_delete_firewall_dialog_message">刪除呢啲規則將允許任何應用程式連線去呢啲而家被攔截咗嘅 IP。</string>
     <string name="univ_accessibility_crash_dialog_positive">去設定</string>
-    <string name="univ_accessibility_crash_dialog_negative">取消</string>
     <string name="univ_accessibility_dialog_positive">准許</string>
     <string name="univ_accessibility_dialog_negative">拒絕</string>
     <string name="dns_connected_rethink_plus">連咗線。用緊 %1$s 份攔截清單</string>
     <string name="dns_connected_no_count">連咗線</string>
     <string name="dns_connected">連咗線</string>
     <string name="dns_delete_positive">刪除</string>
-    <string name="dns_delete_negative">取消</string>
     <string name="dns_select_toast">要至少揀一個解析服務。</string>
     <string name="dns_crypt_relay_error_toast">未揀解析服務</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
@@ -517,22 +485,17 @@
     <string name="dns_proxy_app">應用程式</string>
     <string name="dns_proxy_ip_address">IP 地址</string>
     <string name="dns_proxy_port">埠</string>
-    <string name="dns_proxy_negative_btn">取消</string>
     <string name="dns_proxy_positive_btn">添加</string>
     <string name="fapps_filter_clear_btn">清除</string>
-    <string name="fapps_filter_parent_all">全部</string>
     <string name="fapps_filter_parent_installed">裝咗嘅</string>
     <string name="fapps_filter_filter_heading">類型</string>
     <string name="fapps_filter_categories_heading">類別</string>
-    <string name="fapps_filter_apply_btn">套用</string>
     <string name="fapps_info_dialog_message">阻止應用程式上網。限制訪問互聯網有助於避免不必要嘅數據使用，亦都有助於慳電。</string>
     <string name="fapps_info_dialog_positive_btn">瞭解</string>
     <string name="fapps_unmetered_unblock_dialog_title">喺唔收費嘅網絡放行</string>
     <string name="fapps_unmetered_block_dialog_title">喺唔收費嘅網絡攔截</string>
-    <string name="fapps_unmetered_positive">套用</string>
     <string name="fapps_unmetered_block_dialog_message">係咪喺唔收費嘅網絡（WiFi）攔截<i>呢度列出嘅</i>應用程式？</string>
     <string name="fapps_unmetered_unblock_dialog_message">係咪喺唔收費嘅網絡（WiFi）放行<i>呢度列出嘅</i>應用程式？</string>
-    <string name="fapps_unmetered_negative">取消</string>
     <string name="fapps_metered_block_dialog_title">喺收費嘅網絡攔截</string>
     <string name="fapps_metered_block_dialog_message">係咪喺收費嘅網絡（流動數據）攔截<i>呢度列出嘅</i>應用程式？</string>
     <string name="fapps_metered_unblock_dialog_message">係咪喺收費嘅網絡（流動數據）放行<i>呢度列出嘅</i>應用程式？</string>
@@ -563,7 +526,6 @@
     <string name="update_complete_action_snack">重啓</string>
     <string name="settings_local_blocklist_in_use">用緊 %1$s 份攔截清單</string>
     <string name="settings_local_blocklist_dialog_positive">下載</string>
-    <string name="settings_local_blocklist_dialog_negative">取消</string>
     <string name="settings_local_blocklist_version">版本：v%1$s</string>
     <string name="accessibility_notification_title">要做嘢</string>
     <string name="accessibility_notification_content">RethinkDNS 嘅無障礙服務停咗或者 hang 咗。而家唔再攔截背景應用。㩒一下重新啓用。</string>
@@ -620,16 +582,10 @@
     <string name="category_name_non_app_sys">系統服務</string>
     <string name="category_name_installed">已安裝程式</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_dialog_header">fdroid</string>
+    <string name="cd_dialog_header">fdroid: %1$s</string>
     <string name="cd_toast_deleted">網域已經從自訂清單入面丟咗</string>
     <string name="cd_toast_added">加咗網域</string>
     <string name="cd_remove_dialog_title">係咪刪除網域？</string>
-    <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
-\n</string>
-    <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s
-\n</string>
-    <string name="cd_add_dialog_sample_3">%1$s https://%2$s
-\n</string>
     <string name="cd_dialog_edittext_hint">輸入 %1$s</string>
     <string name="cd_dialog_error_invalid_domain">冇效嘅 URL（網域）。</string>
     <string name="cd_dialog_error_invalid_tld">冇效嘅頂級網域。</string>
@@ -666,13 +622,8 @@
     <string name="bsac_distrust">移除繞行</string>
     <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
     <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
-    <string name="bsdl_domain_heading">網域規則</string>
-    <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
     <string name="bsac_trust_toast">針對呢個 IP %1$s 嘅繞行應用規則</string>
     <string name="bsdl_blocked_desc">由 %2$s 攔截咗 %1$s</string>
-    <string name="bsdl_domain_rule_norule">冇規則</string>
-    <string name="bsdl_domain_rule_allow">放行</string>
-    <string name="bsdl_domain_rule_block">攔截</string>
     <string name="network_dns">系統 DNS</string>
     <string name="notif_download_content_title">下載本地攔截清單</string>
     <string name="notif_download_content_text">下載緊……</string>
@@ -682,33 +633,25 @@
     <string name="rbl_security">安全</string>
     <string name="rt_dialog_title">儲存更改</string>
     <string name="rt_dialog_message">您是係咪要套用新配置嘅攔截清單？</string>
-    <string name="rt_dialog_positive">套用</string>
-    <string name="rt_dialog_negative">取消</string>
     <string name="rt_dialog_neutral">繼續</string>
     <string name="rt_edit_dialog_positive">編輯</string>
     <string name="rt_download_start">下載緊攔截清單……</string>
     <string name="rt_download">下載攔截清單</string>
-    <string name="rt_cancel_download">取消</string>
     <string name="rt_chip_update_available">有更新</string>
     <string name="rt_chip_check_update">檢查更新</string>
     <string name="rt_re_download">重新下載攔截清單</string>
     <string name="rt_list_simple_btn_txt">簡單</string>
     <string name="rt_list_adv_btn_txt">進階</string>
-    <string name="rt_cancel_btn">取消</string>
-    <string name="rt_apply_btn">套用</string>
     <string name="rt_download_desc">請下載攔截清單（大約 60 MB）嚟用呢個功能。</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="rethink_max_desc">超過 50 個地方；更私密；喺 fly.io 上面行嘅遞歸解析服務</string>
     <string name="bsrf_sub_group_heading">子分組</string>
-    <string name="bsrf_apply_filter">套用</string>
     <string name="bsrf_clear_filter">套用</string>
     <string name="dc_local_block_enabled">已啓用</string>
-    <string name="dc_local_block_disabled">已停用</string>
     <string name="dc_doh">Dns over HTTPS</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="dc_dns_proxy">DNS 代理</string>
-    <string name="lbbs_enable">已停用</string>
     <string name="lbbs_enabled">已啓用</string>
     <string name="lbbs_configure">配置</string>
     <string name="lbbs_copy">複製做 RDNS+ URL</string>
@@ -725,20 +668,16 @@
     <string name="brbs_backup_dialog_title">執行備份</string>
     <string name="brbs_backup_dialog_message">將應用程式設定、網絡日誌同 DNS 日誌備份到一個檔案入面。咁做會重啓 VPN。</string>
     <string name="brbs_backup_dialog_positive">備份</string>
-    <string name="brbs_backup_dialog_negative">取消</string>
     <string name="brbs_restore_dialog_title">恢復備份</string>
     <string name="brbs_restore_dialog_message">喺一個備份檔案入面恢復應用程式設定、網絡日誌同 DNS 日誌。這將重啓應用程式。</string>
     <string name="brbs_restore_dialog_positive">恢復</string>
-    <string name="brbs_restore_dialog_negative">取消</string>
     <string name="brbs_backup_dialog_failure_title">備份失敗</string>
     <string name="brbs_backup_dialog_failure_message">而家備份唔到。要唔要試多次？</string>
     <string name="brbs_backup_dialog_failure_positive">重新備份</string>
-    <string name="brbs_backup_dialog_failure_negative">忽略</string>
     <string name="brbs_restore_dialog_failure_title">恢復失敗</string>
     <string name="brbs_restore_dialog_failure_message">而家恢復唔到。要唔要試多次？</string>
     <string name="brbs_backup_complete_toast">備份完</string>
     <string name="brbs_restore_dialog_failure_positive">重新恢復</string>
-    <string name="brbs_restore_dialog_failure_negative">忽略</string>
     <string name="brbs_restore_complete_toast">恢復完，重啓緊 app……</string>
     <string name="cd_remove_dialog_message">喺儲存咗嘅配置入面刪除呢個網域。</string>
     <string name="pause_title_desc">瞌陣先…</string>
@@ -758,15 +697,10 @@
     <string name="app_mode_choose">揀模式</string>
     <string name="dc_custom_block_heading">放行或攔截個別網域</string>
     <string name="about_bravedns_explantion">RethinkDNS 係而家喺 Android 裝置度最易用嘅監測網絡活動、繞過互聯網審查同攔截應用程式嘅防火牆軟件。</string>
-    <string name="ct_filter_parent_allowed">放行</string>
-    <string name="ct_filter_parent_blocked">攔截</string>
-    <string name="new_app_notification_action_allow">放行</string>
     <string name="new_app_notification_action_toast_allow">放行應用程式網絡連線</string>
     <string name="new_app_notification_action_toast_deny">攔截應用程式網絡連線</string>
     <string name="notif_dialog_pause_dialog_title">應用程式暫停咗！</string>
     <string name="notif_dialog_pause_dialog_message">應用程式已被暫停，要繼續請恢復先</string>
-    <string name="cd_filter_allowed">放行</string>
-    <string name="cd_filter_blocked">攔截</string>
     <string name="skip">跳過</string>
     <string name="allow">放行</string>
     <string name="block">攔截</string>
@@ -791,15 +725,7 @@
     <string name="firewall_status_block_unmetered">阻止咗連接唔收費嘅網絡（WiFi）</string>
     <string name="firewall_status_block_metered">阻止咗連接收費嘅網絡（流動數據）</string>
     <string name="firewall_status_blocked">攔截咗</string>
-    <string name="firewall_card_status_inactive">禁用咗</string>
-    <string name="dns_card_connected_status_failure">禁用咗</string>
-    <string name="dns_btm_sheet_chip_allowed">放行咗</string>
-    <string name="dns_btm_sheet_chip_blocked">攔截咗</string>
     <string name="dns_btm_sheet_chip_no_answer">冇回應</string>
-    <string name="dns_filter_parent_allowed">放行咗</string>
-    <string name="dns_filter_parent_blocked">攔截咗</string>
-    <string name="fapps_firewall_filter_allowed">放行咗</string>
-    <string name="fapps_firewall_filter_blocked">攔截咗</string>
     <string name="fapps_firewall_filter_bypass_universal">繞行咗</string>
     <string name="fapps_firewall_filter_excluded">排除咗</string>
     <string name="fapps_firewall_filter_isolate">隔離咗</string>
@@ -817,10 +743,8 @@
     <string name="cd_bypass_initial">放</string>
     <string name="cd_bypass_txt">放行</string>
     <string name="cd_blocked_initial">攔</string>
-    <string name="cd_blocked_txt">攔截</string>
     <string name="ci_bypass_universal_txt">無條件放行</string>
     <string name="ci_blocked_initial">攔</string>
-    <string name="ci_blocked_txt">攔截</string>
     <string name="ci_block">攔截</string>
     <string name="ci_bypass_universal">無條件放行</string>
     <string name="ada_app_status_allow">放行咗</string>
@@ -847,7 +771,6 @@
     <string name="firewall_rule_block_univ_ip">IP / 埠（全局）</string>
     <string name="ada_app_isolate">閉關</string>
     <string name="notif_download_cancel_content">下載取消咗。</string>
-    <string name="rt_filter_parent_all">全部</string>
     <string name="rt_filter_parent_selected">揀咗嘅</string>
     <string name="rt_filter_hint">顯示緊<u>所有</u>攔截清單</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
@@ -868,12 +791,10 @@
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s 份攔截清單</string>
     <string name="private_dns_dialog_heading">熄私人 DNS</string>
     <string name="private_dns_dialog_positive">去設定</string>
-    <string name="private_dns_dialog_negative">忽略</string>
     <string name="private_dns_error">開唔到私人 DNS 區。</string>
     <string name="ci_trust_txt">放行應用程式規則</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日誌</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">繼續</string>
-    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">取消</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">攔截成人、盜版內容，線上賭博、約會同社交媒體。</string>
     <string name="private_dns_dialog_desc">Rethink 嘅 DNS 設定被 Android 嘅私人 DNS 冚咗。
 \n

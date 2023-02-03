@@ -243,7 +243,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             _ ->
             downloadLocalBlocklist(isRedownload)
         }
-        builder.setNegativeButton(getString(R.string.settings_local_blocklist_dialog_negative)) {
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) {
             dialog,
             _ ->
             dialog.dismiss()
@@ -360,7 +360,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun disableBlocklistUi() {
-        b.lbbsEnable.text = getString(R.string.lbbs_enable)
+        b.lbbsEnable.text = getString(R.string.lbl_disabled)
         b.lbbsEnable.setTextColor(Utilities.fetchToggleBtnColors(requireContext(), R.color.accentBad))
         b.lbbsHeading.text = getString(R.string.lbbs_heading)
         setDrawable(R.drawable.ic_cross, b.lbbsEnable)

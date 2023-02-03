@@ -63,7 +63,6 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
         // remove the view if there is no data
         recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                Log.d("TEST","TEST: Count: ${recyclerAdapter.itemCount}")
                 if (recyclerAdapter.itemCount < 1) {
                     b.dsaRecycler.visibility = View.GONE
                     b.dsaNoDataRl.visibility = View.VISIBLE

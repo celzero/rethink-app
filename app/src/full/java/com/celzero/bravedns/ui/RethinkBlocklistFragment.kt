@@ -407,14 +407,14 @@ class RethinkBlocklistFragment :
         builder.setTitle(getString(R.string.rt_dialog_title))
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.rt_dialog_positive)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
             setStamp(modifiedStamp)
             requireActivity().finish()
         }
         builder.setNeutralButton(getString(R.string.rt_dialog_neutral)) { _, _ ->
             // no-op
         }
-        builder.setNegativeButton(getString(R.string.rt_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
             requireActivity().finish()
         }
         builder.create().show()
@@ -655,7 +655,7 @@ class RethinkBlocklistFragment :
         val all =
             makeChip(
                 BlocklistSelectionFilter.ALL.id,
-                getString(R.string.rt_filter_parent_all),
+                getString(R.string.lbl_all),
                 true
             )
         val selected =

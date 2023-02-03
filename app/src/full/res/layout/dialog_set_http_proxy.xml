@@ -118,7 +118,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
-        android:text="@string/settings_dns_proxy_dialog_negative_btn"
+        android:text="@string/lbl_cancel"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_http_proxy_ok_btn"
