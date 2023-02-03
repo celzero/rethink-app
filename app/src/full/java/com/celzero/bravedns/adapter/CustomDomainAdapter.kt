@@ -17,6 +17,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,9 +27,9 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.google.android.material.button.MaterialButton
@@ -79,17 +80,23 @@ class CustomDomainAdapter(val context: Context) :
         fun update(cd: CustomDomain) {
             this.customDomain = cd
             b.customDomainLabelTv.text = customDomain.domain
+            b.customDomainToggleGroup.tag = 1
 
-            // whether to show the toggle group
-            toggleActionsUi()
             // update toggle group button based on the status
             updateToggleGroup(customDomain.status)
+            // whether to show the toggle group or not
+            toggleActionsUi()
             // update status in desc and status flag (N/B/W)
-            updateStatusUi(DomainRulesManager.DomainStatus.getStatus(customDomain.status))
+            updateStatusUi(
+                DomainRulesManager.Status.getStatus(customDomain.status),
+                customDomain.modifiedTs
+            )
 
             b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
 
             b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
+
+            b.customDomainContainer.setOnClickListener { toggleActionsUi() }
         }
 
         private fun updateToggleGroup(id: Int) {
@@ -98,17 +105,20 @@ class CustomDomainAdapter(val context: Context) :
             val t = toggleBtnUi(fid)
 
             when (id) {
-                DomainRulesManager.DomainStatus.NONE.id -> {
+                DomainRulesManager.Status.NONE.id -> {
+                    b.customDomainToggleGroup.check(b.customDomainTgNoRule.id)
                     selectToggleBtnUi(b.customDomainTgNoRule, t)
                     unselectToggleBtnUi(b.customDomainTgBlock)
                     unselectToggleBtnUi(b.customDomainTgWhitelist)
                 }
-                DomainRulesManager.DomainStatus.BLOCK.id -> {
+                DomainRulesManager.Status.BLOCK.id -> {
+                    b.customDomainToggleGroup.check(b.customDomainTgBlock.id)
                     selectToggleBtnUi(b.customDomainTgBlock, t)
                     unselectToggleBtnUi(b.customDomainTgNoRule)
                     unselectToggleBtnUi(b.customDomainTgWhitelist)
                 }
-                DomainRulesManager.DomainStatus.WHITELIST.id -> {
+                DomainRulesManager.Status.TRUST.id -> {
+                    b.customDomainToggleGroup.check(b.customDomainTgWhitelist.id)
                     selectToggleBtnUi(b.customDomainTgWhitelist, t)
                     unselectToggleBtnUi(b.customDomainTgBlock)
                     unselectToggleBtnUi(b.customDomainTgNoRule)
@@ -117,61 +127,67 @@ class CustomDomainAdapter(val context: Context) :
         }
 
         private val domainRulesGroupListener =
-            MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
+            MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
                 val b: MaterialButton = b.customDomainToggleGroup.findViewById(checkedId)
-                if (isChecked) {
-                    val statusId = findSelectedRuleByTag(getTag(b.tag))
-                    // delete button
-                    if (statusId == null) {
-                        showDialogForDelete(customDomain)
-                        return@OnButtonCheckedListener
-                    }
 
+                val statusId = findSelectedRuleByTag(getTag(b.tag))
+                // delete button
+                if (statusId == null && isChecked) {
+                    group.clearChecked()
+                    showDialogForDelete(customDomain)
+                    return@OnButtonCheckedListener
+                }
+
+                // invalid selection
+                if (statusId == null) {
+                    return@OnButtonCheckedListener
+                }
+
+                if (isChecked) {
                     val t = toggleBtnUi(statusId)
                     // update toggle button
                     selectToggleBtnUi(b, t)
                     // update status in desc and status flag (N/B/W)
-                    updateStatusUi(statusId)
+                    updateStatusUi(statusId, customDomain.modifiedTs)
                     // change status based on selected btn
                     changeDomainStatus(statusId)
-                    return@OnButtonCheckedListener
+                } else {
+                    unselectToggleBtnUi(b)
                 }
-
-                unselectToggleBtnUi(b)
             }
 
-        private fun changeDomainStatus(id: DomainRulesManager.DomainStatus) {
+        private fun changeDomainStatus(id: DomainRulesManager.Status) {
             when (id) {
-                DomainRulesManager.DomainStatus.NONE -> {
+                DomainRulesManager.Status.NONE -> {
                     noRule(customDomain)
                 }
-                DomainRulesManager.DomainStatus.BLOCK -> {
+                DomainRulesManager.Status.BLOCK -> {
                     block(customDomain)
                 }
-                DomainRulesManager.DomainStatus.WHITELIST -> {
+                DomainRulesManager.Status.TRUST -> {
                     whitelist(customDomain)
                 }
             }
         }
 
-        private fun toggleBtnUi(id: DomainRulesManager.DomainStatus): ToggleBtnUi {
+        private fun toggleBtnUi(id: DomainRulesManager.Status): ToggleBtnUi {
             return when (id) {
-                DomainRulesManager.DomainStatus.NONE -> {
+                DomainRulesManager.Status.NONE -> {
                     ToggleBtnUi(
-                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnTxt),
-                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
+                        Utilities.fetchColor(context, R.attr.chipTextNeutral),
+                        Utilities.fetchColor(context, R.attr.chipBgColorNeutral)
                     )
                 }
-                DomainRulesManager.DomainStatus.BLOCK -> {
+                DomainRulesManager.Status.BLOCK -> {
                     ToggleBtnUi(
-                        fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt),
-                        fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnBg)
+                        Utilities.fetchColor(context, R.attr.chipTextNegative),
+                        Utilities.fetchColor(context, R.attr.chipBgColorNegative)
                     )
                 }
-                DomainRulesManager.DomainStatus.WHITELIST -> {
+                DomainRulesManager.Status.TRUST -> {
                     ToggleBtnUi(
-                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt),
-                        fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnBg)
+                        Utilities.fetchColor(context, R.attr.chipTextPositive),
+                        Utilities.fetchColor(context, R.attr.chipBgColorPositive)
                     )
                 }
             }
@@ -194,16 +210,16 @@ class CustomDomainAdapter(val context: Context) :
             return tag.toString().toIntOrNull() ?: 0
         }
 
-        private fun findSelectedRuleByTag(ruleId: Int): DomainRulesManager.DomainStatus? {
+        private fun findSelectedRuleByTag(ruleId: Int): DomainRulesManager.Status? {
             return when (ruleId) {
-                DomainRulesManager.DomainStatus.NONE.id -> {
-                    DomainRulesManager.DomainStatus.NONE
+                DomainRulesManager.Status.NONE.id -> {
+                    DomainRulesManager.Status.NONE
                 }
-                DomainRulesManager.DomainStatus.WHITELIST.id -> {
-                    DomainRulesManager.DomainStatus.WHITELIST
+                DomainRulesManager.Status.TRUST.id -> {
+                    DomainRulesManager.Status.TRUST
                 }
-                DomainRulesManager.DomainStatus.BLOCK.id -> {
-                    DomainRulesManager.DomainStatus.BLOCK
+                DomainRulesManager.Status.BLOCK.id -> {
+                    DomainRulesManager.Status.BLOCK
                 }
                 else -> {
                     null
@@ -222,21 +238,51 @@ class CustomDomainAdapter(val context: Context) :
             b.customDomainToggleGroup.visibility = View.GONE
         }
 
-        private fun updateStatusUi(status: DomainRulesManager.DomainStatus) {
+        private fun updateStatusUi(status: DomainRulesManager.Status, modifiedTs: Long) {
+            val now = System.currentTimeMillis()
+            val uptime = System.currentTimeMillis() - modifiedTs
+            // returns a string describing 'time' as a time relative to 'now'
+            val time =
+                DateUtils.getRelativeTimeSpanString(
+                    now - uptime,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE
+                )
             when (status) {
-                DomainRulesManager.DomainStatus.WHITELIST -> {
-                    b.customDomainStatusIcon.text = context.getString(R.string.cd_whitelist_initial)
-                    b.customDomainStatusTv.text = context.getString(R.string.cd_whitelist_txt)
+                DomainRulesManager.Status.TRUST -> {
+                    b.customDomainStatusIcon.text = context.getString(R.string.ci_trust_initial)
+                    b.customDomainStatusTv.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            context.getString(R.string.ci_trust_rule),
+                            time
+                        )
                 }
-                DomainRulesManager.DomainStatus.BLOCK -> {
+                DomainRulesManager.Status.BLOCK -> {
                     b.customDomainStatusIcon.text = context.getString(R.string.cd_blocked_initial)
-                    b.customDomainStatusTv.text = context.getString(R.string.cd_blocked_txt)
+                    b.customDomainStatusTv.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            context.getString(R.string.lbl_blocked),
+                            time
+                        )
                 }
-                DomainRulesManager.DomainStatus.NONE -> {
+                DomainRulesManager.Status.NONE -> {
                     b.customDomainStatusIcon.text = context.getString(R.string.cd_no_rule_initial)
-                    b.customDomainStatusTv.text = context.getString(R.string.cd_no_rule_txt)
+                    b.customDomainStatusTv.text =
+                        context.getString(
+                            R.string.ci_desc,
+                            context.getString(R.string.cd_no_rule_txt),
+                            time
+                        )
                 }
             }
+
+            // update the background color and text color of the status icon
+            val t = toggleBtnUi(status)
+            b.customDomainStatusIcon.setTextColor(t.txtColor)
+            b.customDomainStatusIcon.backgroundTintList = ColorStateList.valueOf(t.bgColor)
         }
 
         private fun whitelist(cd: CustomDomain) {
@@ -266,8 +312,7 @@ class CustomDomainAdapter(val context: Context) :
                 )
             }
 
-            builder.setNegativeButton(context.getString(R.string.cd_remove_dialog_negative)) { _, _
-                ->
+            builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
                 // no-op
             }
             builder.create().show()

@@ -16,12 +16,10 @@
 package com.celzero.bravedns.ui
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
@@ -35,19 +33,17 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import com.celzero.bravedns.viewmodel.CustomDomainViewModel
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.concurrent.TimeUnit
 
 class DnsConfigureFragment :
     Fragment(R.layout.fragment_dns_configure),
@@ -56,8 +52,6 @@ class DnsConfigureFragment :
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
-
-    private val customDomainViewModel: CustomDomainViewModel by viewModel()
 
     companion object {
         fun newInstance() = DnsConfigureFragment()
@@ -87,6 +81,8 @@ class DnsConfigureFragment :
         b.dcCheckUpdateSwitch.isChecked = persistentState.periodicallyCheckBlocklistUpdate
         // use custom download manager
         b.dcDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
+        // enable per-app domain rules (dns alg)
+        b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
 
         b.connectedStatusTitle.text = getConnectedDnsType()
     }
@@ -111,7 +107,7 @@ class DnsConfigureFragment :
         }
 
         b.dcLocalBlocklistCount.setTextColor(fetchColor(requireContext(), R.attr.accentBad))
-        b.dcLocalBlocklistCount.text = getString(R.string.dc_local_block_disabled)
+        b.dcLocalBlocklistCount.text = getString(R.string.lbl_disabled)
     }
 
     private fun initObservers() {
@@ -123,7 +119,9 @@ class DnsConfigureFragment :
     private fun observeAppState() {
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
             if (it == BraveVPNService.State.PAUSED) {
-                startActivity(context?.let { it1 -> Intent().setClass(it1, PauseActivity::class.java) })
+                startActivity(
+                    context?.let { it1 -> Intent().setClass(it1, PauseActivity::class.java) }
+                )
             }
         }
 
@@ -247,10 +245,8 @@ class DnsConfigureFragment :
     private fun initClickListeners() {
 
         b.dcCustomDomainRl.setOnClickListener {
-            Utilities.showToastUiCentered(requireContext(), "Coming soon", Toast.LENGTH_SHORT)
-            // fixme: enable the below code when the custom allow/blocklist is enabled
-            /*enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcCustomDomainRl)
-            openCustomDomainDialog()*/
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcCustomDomainRl)
+            openCustomDomainDialog()
         }
 
         b.dcLocalBlocklistRl.setOnClickListener { openLocalBlocklist() }
@@ -260,6 +256,13 @@ class DnsConfigureFragment :
         b.dcCheckUpdateRl.setOnClickListener {
             b.dcCheckUpdateSwitch.isChecked = !b.dcCheckUpdateSwitch.isChecked
         }
+
+        b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
+            persistentState.enableDnsAlg = enabled
+        }
+
+        b.dcAlgRl.setOnClickListener { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
 
         b.dcCheckUpdateSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             persistentState.periodicallyCheckBlocklistUpdate = enabled
@@ -367,16 +370,10 @@ class DnsConfigureFragment :
     }
 
     private fun openCustomDomainDialog() {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-
-        val customDialog = CustomDomainDialog(requireActivity(), customDomainViewModel, themeId)
-        customDialog.setCanceledOnTouchOutside(false)
-        customDialog.show()
-    }
-
-    private fun isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            Configuration.UI_MODE_NIGHT_YES
+        val intent = Intent(requireContext(), CustomDomainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra(INTENT_UID, Constants.UID_EVERYBODY)
+        startActivity(intent)
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

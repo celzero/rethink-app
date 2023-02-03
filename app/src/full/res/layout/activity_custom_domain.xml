@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/cda_heading"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:focusable="true"
+            android:padding="5dp"
+            android:text="@string/cd_dialog_header"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/extra_large_font_text_view" />
+
+        <RelativeLayout
+            android:id="@+id/cda_no_rules_rl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/cda_heading"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/cda_no_rules_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="30dp"
+                android:padding="10dp"
+                android:text="@string/cd_no_rules_text"
+                android:textAlignment="center"
+                android:textSize="@dimen/heading_font_text_view" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cda_no_rules_text"
+                android:src="@drawable/illustrations_no_record" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/cda_show_rules_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cda_heading"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <requestFocus />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cda_search_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:elevation="4dp"
+                android:visibility="visible"
+                app:cardCornerRadius="16dp">
+
+                <LinearLayout
+                    android:id="@+id/cda_search_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/cda_search_view"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:layout_weight="0.9"
+                        android:focusable="false"
+                        android:fontFamily="sans-serif"
+                        android:isScrollContainer="true"
+                        app:iconifiedByDefault="false"
+                        app:queryHint="@string/search_universal_ips" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/cda_search_delete_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_weight="0.10"
+                        android:padding="7dp"
+                        android:src="@drawable/ic_delete" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/cda_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/cda_show_rules_rl" />
+
+
+    </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/cda_add_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:padding="10dp"
+        android:src="@drawable/ic_fab_without_border"
+        app:fabSize="mini"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

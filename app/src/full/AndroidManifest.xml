@@ -62,6 +62,9 @@
             android:name=".ui.CustomIpActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.CustomDomainActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.ConfigureRethinkBasicActivity"
             android:finishOnTaskLaunch="true" />
         <activity
@@ -102,7 +105,7 @@
         <service
             android:name=".util.BackgroundAccessibilityService"
             android:exported="true"
-            android:label="@string/accessibility_service_label"
+            android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />

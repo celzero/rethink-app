@@ -72,18 +72,6 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/dacd_sample_text"
-        style="@style/TextAppearance.AppCompat.Body1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:padding="5dp"
-        android:textColor="?attr/secondaryTextColor"
-        android:textSize="@dimen/large_font_text_view"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/dacd_input_layout" />
-
-    <TextView
         android:id="@+id/dacd_failure_text"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"
@@ -94,7 +82,7 @@
         android:textColor="@color/colorRed_A400"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/dacd_sample_text" />
+        app:layout_constraintTop_toBottomOf="@id/dacd_input_layout" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dacd_add_btn"
@@ -103,19 +91,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:text="@string/cd_dialog_positive_btn"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/dacd_show_btn"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/cd_add_dialog_show_btn"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
@@ -128,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:text="@string/cd_dialog_negative_btn"
+        android:text="@string/lbl_cancel"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dacd_add_btn"

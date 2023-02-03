@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             android:minWidth="5dp"
             android:tag="0"
-            android:text="no rule"
+            android:text="@string/ci_no_rule"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/small_font_subheading_text" />
 
@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:minWidth="5dp"
             android:tag="1"
-            android:text="block"
+            android:text="@string/ci_block"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/small_font_subheading_text" />
 
@@ -105,7 +105,7 @@
             android:layout_height="wrap_content"
             android:minWidth="5dp"
             android:tag="2"
-            android:text="whitelist"
+            android:text="@string/ci_trust_rule"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/small_font_subheading_text" />
 
