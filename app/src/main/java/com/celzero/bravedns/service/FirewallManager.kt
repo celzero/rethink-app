@@ -34,6 +34,7 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Multimap
+import dnsx.Conn
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -65,56 +66,21 @@ object FirewallManager : KoinComponent {
 
     // Below are the firewall rule set
     // app-status | connection-status |  Rule
-    // allowed    |    BOTH           |  allow
-    // blocked    |    wifi           |  WiFi-data-block
-    // blocked    |    mobile         |  mobile-data-block
-    // blocked    |    both           |  block
+    // none       |    ALLOW          |  allow
+    // none       |    BOTH           |  block
+    // none       |    wifi           |  WiFi-data-block
+    // none       |    mobile         |  mobile-data-block
     enum class FirewallStatus(val id: Int) {
-        ALLOW(0),
-        BLOCK(1),
         BYPASS_UNIVERSAL(2),
         EXCLUDE(3),
         ISOLATE(4),
-        UNTRACKED(5);
-
-        fun getLabelId(): Int {
-            return when (this) {
-                ALLOW -> {
-                    R.string.allow
-                }
-                BLOCK -> {
-                    R.string.block
-                }
-                BYPASS_UNIVERSAL -> {
-                    R.string.bypass_universal
-                }
-                EXCLUDE -> {
-                    R.string.exclude
-                }
-                ISOLATE -> {
-                    R.string.isolate
-                }
-                UNTRACKED -> {
-                    R.string.untracked
-                }
-            }
-        }
+        NONE(5),
+        UNTRACKED(6);
 
         companion object {
 
-            // labels for spinner / toggle ui
-            fun getLabel(context: Context): Array<String> {
-                return context.resources.getStringArray(R.array.firewall_rules)
-            }
-
             fun getStatus(id: Int): FirewallStatus {
                 return when (id) {
-                    ALLOW.id -> {
-                        ALLOW
-                    }
-                    BLOCK.id -> {
-                        BLOCK
-                    }
                     BYPASS_UNIVERSAL.id -> {
                         BYPASS_UNIVERSAL
                     }
@@ -125,7 +91,7 @@ object FirewallManager : KoinComponent {
                         ISOLATE
                     }
                     else -> {
-                        UNTRACKED
+                        NONE
                     }
                 }
             }
@@ -133,16 +99,16 @@ object FirewallManager : KoinComponent {
             fun getStatusByLabel(id: Int): FirewallStatus {
                 return when (id) {
                     0 -> {
-                        ALLOW
+                        NONE
                     }
                     1 -> {
-                        BLOCK
+                        NONE
                     }
                     2 -> {
-                        BLOCK
+                        NONE
                     }
                     3 -> {
-                        BLOCK
+                        NONE
                     }
                     4 -> {
                         BYPASS_UNIVERSAL
@@ -154,7 +120,7 @@ object FirewallManager : KoinComponent {
                         ISOLATE
                     }
                     else -> {
-                        ALLOW
+                        NONE
                     }
                 }
             }
@@ -172,14 +138,6 @@ object FirewallManager : KoinComponent {
             return this == ISOLATE
         }
 
-        fun allowed(): Boolean {
-            return this == ALLOW
-        }
-
-        fun blocked(): Boolean {
-            return this == BLOCK
-        }
-
         fun isUntracked(): Boolean {
             return this == UNTRACKED
         }
@@ -187,44 +145,49 @@ object FirewallManager : KoinComponent {
 
     enum class ConnectionStatus(val id: Int) {
         BOTH(0),
-        WIFI(1),
-        MOBILE_DATA(2);
+        UNMETERED(1),
+        METERED(2),
+        ALLOW(3);
 
         fun mobileData(): Boolean {
-            return this == MOBILE_DATA
+            return this == METERED
         }
 
         fun wifi(): Boolean {
-            return this == WIFI
+            return this == UNMETERED
         }
 
-        fun both(): Boolean {
+        fun blocked(): Boolean {
             return this == BOTH
+        }
+
+        fun allow(): Boolean {
+            return this == ALLOW
         }
 
         companion object {
             fun getStatusByLabel(id: Int): ConnectionStatus {
                 return when (id) {
                     0 -> {
-                        BOTH
+                        ALLOW
                     }
                     1 -> {
                         BOTH
                     }
                     2 -> {
-                        WIFI
+                        UNMETERED
                     }
                     3 -> {
-                        MOBILE_DATA
+                        METERED
                     }
                     4 -> {
-                        BOTH
+                        ALLOW
                     }
                     5 -> {
-                        BOTH
+                        ALLOW
                     }
                     else -> {
-                        BOTH
+                        ALLOW
                     }
                 }
             }
@@ -259,7 +222,7 @@ object FirewallManager : KoinComponent {
     @Volatile private var isFirewallRulesLoaded: Boolean = false
 
     fun isUidFirewalled(uid: Int): Boolean {
-        return appStatus(uid) == FirewallStatus.BLOCK
+        return connectionStatus(uid) != ConnectionStatus.ALLOW
     }
 
     fun isUidSystemApp(uid: Int): Boolean {
@@ -297,7 +260,7 @@ object FirewallManager : KoinComponent {
 
     fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
         lock.read {
-            return appInfos.values().filter { it.firewallStatus != FirewallStatus.BLOCK.id }
+            return appInfos.values().filter { it.connectionStatus == ConnectionStatus.ALLOW.id }
         }
     }
 
@@ -315,27 +278,25 @@ object FirewallManager : KoinComponent {
     }
 
     fun appStatus(uid: Int): FirewallStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.UNTRACKED
+        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.NONE
 
         return when (appInfo.firewallStatus) {
             FirewallStatus.BYPASS_UNIVERSAL.id -> FirewallStatus.BYPASS_UNIVERSAL
-            FirewallStatus.BLOCK.id -> FirewallStatus.BLOCK
-            FirewallStatus.ALLOW.id -> FirewallStatus.ALLOW
             FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
-            FirewallStatus.UNTRACKED.id -> FirewallStatus.UNTRACKED
+            FirewallStatus.NONE.id -> FirewallStatus.NONE
             FirewallStatus.ISOLATE.id -> FirewallStatus.ISOLATE
-            else -> FirewallStatus.UNTRACKED
+            else -> FirewallStatus.NONE
         }
     }
 
     fun connectionStatus(uid: Int): ConnectionStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return ConnectionStatus.BOTH
-
-        return when (appInfo.metered) {
-            ConnectionStatus.MOBILE_DATA.id -> ConnectionStatus.MOBILE_DATA
-            ConnectionStatus.WIFI.id -> ConnectionStatus.WIFI
+        val appInfo = getAppInfoByUid(uid) ?: return ConnectionStatus.ALLOW
+        return when (appInfo.connectionStatus) {
+            ConnectionStatus.METERED.id -> ConnectionStatus.METERED
+            ConnectionStatus.UNMETERED.id -> ConnectionStatus.UNMETERED
             ConnectionStatus.BOTH.id -> ConnectionStatus.BOTH
-            else -> ConnectionStatus.BOTH
+            ConnectionStatus.ALLOW.id -> ConnectionStatus.ALLOW
+            else -> ConnectionStatus.ALLOW
         }
     }
 
@@ -426,7 +387,7 @@ object FirewallManager : KoinComponent {
         lock.write {
             appInfos.get(uid).forEach {
                 it.firewallStatus = firewallStatus.id
-                it.metered = connectionStatus.id
+                it.connectionStatus = connectionStatus.id
             }
         }
         informObservers()
@@ -495,13 +456,13 @@ object FirewallManager : KoinComponent {
         return locked && isForeground
     }
 
-    fun updateFirewalledApps(uid: Int, firewallStatus: FirewallStatus) {
+    fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
         io {
-            invalidateFirewallStatus(uid, firewallStatus, ConnectionStatus.BOTH)
+            invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
             appInfoRepository.updateFirewallStatusByUid(
                 uid,
-                firewallStatus.id,
-                ConnectionStatus.BOTH.id
+                FirewallStatus.NONE.id,
+                connectionStatus.id
             )
         }
     }
@@ -530,6 +491,36 @@ object FirewallManager : KoinComponent {
     private fun informObservers() {
         val v = getAppInfos()
         v.let { appInfosLiveData.postValue(v) }
+    }
+
+    // labels for spinner / toggle ui
+    fun getLabel(context: Context): Array<String> {
+        return context.resources.getStringArray(R.array.firewall_rules)
+    }
+
+    fun getLabelForStatus(firewallStatus: FirewallStatus, connectionStatus: ConnectionStatus): Int {
+        return when (firewallStatus) {
+            FirewallStatus.NONE -> {
+                when (connectionStatus) {
+                    ConnectionStatus.BOTH -> R.string.block
+                    ConnectionStatus.METERED -> R.string.block
+                    ConnectionStatus.UNMETERED -> R.string.block
+                    ConnectionStatus.ALLOW -> R.string.allow
+                }
+            }
+            FirewallStatus.BYPASS_UNIVERSAL -> {
+                R.string.bypass_universal
+            }
+            FirewallStatus.EXCLUDE -> {
+                R.string.exclude
+            }
+            FirewallStatus.ISOLATE -> {
+                R.string.isolate
+            }
+            FirewallStatus.UNTRACKED -> {
+                R.string.untracked
+            }
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

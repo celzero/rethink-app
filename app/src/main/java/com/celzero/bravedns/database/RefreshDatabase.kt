@@ -50,8 +50,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.collections.HashSet
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
@@ -290,7 +292,8 @@ internal constructor(
 
         appInfo.uid = uid
         if (persistentState.blockNewlyInstalledApp) {
-            appInfo.firewallStatus = FirewallManager.FirewallStatus.BLOCK.id
+            appInfo.firewallStatus = FirewallManager.FirewallStatus.NONE.id
+            appInfo.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         }
 
         FirewallManager.persistAppInfo(appInfo)
@@ -312,7 +315,8 @@ internal constructor(
         // default value of apps internet permission is true, when the universal firewall
         // parameter (blockNewlyInstalledApp is true) firewall the app
         if (persistentState.blockNewlyInstalledApp) {
-            entry.firewallStatus = FirewallManager.FirewallStatus.BLOCK.id
+            entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
+            entry.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         }
 
         entry.appCategory = determineAppCategory(appInfo)
@@ -484,7 +488,8 @@ internal constructor(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.allow),
+                context.resources.getString(R.string.allow)
+                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
                 openIntent1
             )
         val notificationAction2: NotificationCompat.Action =

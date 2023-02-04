@@ -24,10 +24,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.TypedArray
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import android.graphics.drawable.GradientDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.VpnService
@@ -565,7 +563,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // creating a copy of the received value in a synchronized block.
                 synchronized(it) { copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList() }
                 val blockedApps =
-                    copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+                    copy.filter { a -> a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id }
                 val whiteListApps =
                     copy.filter { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id

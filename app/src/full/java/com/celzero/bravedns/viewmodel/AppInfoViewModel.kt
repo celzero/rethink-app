@@ -103,7 +103,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         appList
             .distinctBy { it.uid }
             .forEach {
-                val appStatus = getAppStateForWifi(blocked, it.firewallStatus, it.metered)
+                val connStatus = FirewallManager.connectionStatus(it.uid)
+                val appStatus = getAppStateForWifi(blocked, connStatus)
                 FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
             }
     }
@@ -114,7 +115,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         appList
             .distinctBy { it.uid }
             .forEach {
-                val appStatus = getAppStateForMobileData(blocked, it.firewallStatus, it.metered)
+                val connStatus = FirewallManager.connectionStatus(it.uid)
+                val appStatus = getAppStateForMobileData(blocked, connStatus)
                 FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
             }
     }
@@ -128,19 +130,17 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             if (bypass) {
                 AppState(
                     FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
-                    FirewallManager.ConnectionStatus.BOTH
+                    FirewallManager.ConnectionStatus.ALLOW
                 )
             } else {
                 AppState(
-                    FirewallManager.FirewallStatus.ALLOW,
-                    FirewallManager.ConnectionStatus.BOTH
+                    FirewallManager.FirewallStatus.NONE,
+                    FirewallManager.ConnectionStatus.ALLOW
                 )
             }
         appList
             .distinctBy { it.uid }
-            .forEach {
-                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
-            }
+            .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
     fun updateExcludeStatus(exclude: Boolean) {
@@ -152,19 +152,17 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             if (exclude) {
                 AppState(
                     FirewallManager.FirewallStatus.EXCLUDE,
-                    FirewallManager.ConnectionStatus.BOTH
+                    FirewallManager.ConnectionStatus.ALLOW
                 )
             } else {
                 AppState(
-                    FirewallManager.FirewallStatus.ALLOW,
-                    FirewallManager.ConnectionStatus.BOTH
+                    FirewallManager.FirewallStatus.NONE,
+                    FirewallManager.ConnectionStatus.ALLOW
                 )
             }
         appList
             .distinctBy { it.uid }
-            .forEach {
-                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
-            }
+            .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
     fun updateLockdownStatus(lockdown: Boolean) {
@@ -176,12 +174,12 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             if (lockdown) {
                 AppState(
                     FirewallManager.FirewallStatus.ISOLATE,
-                    FirewallManager.ConnectionStatus.BOTH
+                    FirewallManager.ConnectionStatus.ALLOW
                 )
             } else {
                 AppState(
-                    FirewallManager.FirewallStatus.ALLOW,
-                    FirewallManager.ConnectionStatus.BOTH
+                    FirewallManager.FirewallStatus.NONE,
+                    FirewallManager.ConnectionStatus.ALLOW
                 )
             }
 
@@ -190,56 +188,65 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
-    private fun getAppStateForWifi(blocked: Boolean, firewall: Int, metered: Int): AppState {
-        val state: AppState
-
-        // if the app is already blocked, then unblock it
-        if (firewall == FirewallManager.FirewallStatus.BLOCK.id) {
-            state =
-                if (blocked) {
-                    if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
-
-                        AppState(
-                            FirewallManager.FirewallStatus.BLOCK,
-                            FirewallManager.ConnectionStatus.WIFI
-                        )
-                    } else {
-                        // if the app is already blocked on mobile data, then block it on both
-                        AppState(
-                            FirewallManager.FirewallStatus.BLOCK,
-                            FirewallManager.ConnectionStatus.BOTH
-                        )
-                    }
-                } else {
-                    if (metered == FirewallManager.ConnectionStatus.WIFI.id) {
-                        AppState(
-                            FirewallManager.FirewallStatus.ALLOW,
-                            FirewallManager.ConnectionStatus.BOTH
-                        )
-                    } else {
-                        AppState(
-                            FirewallManager.FirewallStatus.BLOCK,
-                            FirewallManager.ConnectionStatus.MOBILE_DATA
-                        )
-                    }
-                }
-        } else { // if the app is not blocked, then block it
-            state =
-                if (blocked) {
+    private fun getAppStateForWifi(
+        blocked: Boolean,
+        connStatus: FirewallManager.ConnectionStatus
+    ): AppState {
+        if (blocked) {
+            return when (connStatus) {
+                FirewallManager.ConnectionStatus.ALLOW -> {
                     AppState(
-                        FirewallManager.FirewallStatus.BLOCK,
-                        FirewallManager.ConnectionStatus.WIFI
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.UNMETERED
                     )
-                } else {
-                    // if the app is already allowed on mobile data, then allow it on both
+                }
+                FirewallManager.ConnectionStatus.UNMETERED -> {
                     AppState(
-                        FirewallManager.FirewallStatus.ALLOW,
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.UNMETERED
+                    )
+                }
+                FirewallManager.ConnectionStatus.METERED -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
                         FirewallManager.ConnectionStatus.BOTH
                     )
                 }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.BOTH
+                    )
+                }
+            }
+        } else {
+            return when (connStatus) {
+                FirewallManager.ConnectionStatus.ALLOW -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
+                FirewallManager.ConnectionStatus.UNMETERED -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
+                FirewallManager.ConnectionStatus.METERED -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.METERED
+                    )
+                }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.METERED
+                    )
+                }
+            }
         }
-
-        return state
     }
 
     data class AppState(
@@ -247,26 +254,61 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         val cid: FirewallManager.ConnectionStatus
     )
 
-    private fun getAppStateForMobileData(blocked: Boolean, firewall: Int, metered: Int): AppState {
+    private fun getAppStateForMobileData(blocked: Boolean, connStatus: FirewallManager.ConnectionStatus): AppState {
         if (blocked) {
-            val fid = FirewallManager.FirewallStatus.BLOCK
-            var cid = FirewallManager.ConnectionStatus.BOTH
-            if (metered == FirewallManager.ConnectionStatus.MOBILE_DATA.id) {
-                cid = FirewallManager.ConnectionStatus.MOBILE_DATA
-            } else if (firewall != FirewallManager.FirewallStatus.BLOCK.id) {
-                cid = FirewallManager.ConnectionStatus.MOBILE_DATA
+            return when (connStatus) {
+                FirewallManager.ConnectionStatus.ALLOW -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.METERED
+                    )
+                }
+                FirewallManager.ConnectionStatus.UNMETERED -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.BOTH
+                    )
+                }
+                FirewallManager.ConnectionStatus.METERED -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.METERED
+                    )
+                }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.BOTH
+                    )
+                }
             }
-            return AppState(fid, cid)
         } else {
-            var fid = FirewallManager.FirewallStatus.ALLOW
-            var cid = FirewallManager.ConnectionStatus.BOTH
-            if (firewall != FirewallManager.FirewallStatus.BLOCK.id) {
-                cid = FirewallManager.ConnectionStatus.BOTH
-            } else if (metered != FirewallManager.ConnectionStatus.MOBILE_DATA.id) {
-                fid = FirewallManager.FirewallStatus.BLOCK
-                cid = FirewallManager.ConnectionStatus.WIFI
+            return when (connStatus) {
+                FirewallManager.ConnectionStatus.ALLOW -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
+                FirewallManager.ConnectionStatus.UNMETERED -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.UNMETERED
+                    )
+                }
+                FirewallManager.ConnectionStatus.METERED -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.ALLOW
+                    )
+                }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    AppState(
+                        FirewallManager.FirewallStatus.NONE,
+                        FirewallManager.ConnectionStatus.UNMETERED
+                    )
+                }
             }
-            return AppState(fid, cid)
         }
     }
 

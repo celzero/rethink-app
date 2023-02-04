@@ -26,7 +26,7 @@ interface AppInfoDAO {
     @Update fun update(appInfo: AppInfo): Int
 
     @Query(
-        "update AppInfo set firewallStatus = :firewallStatus, metered = :connectionStatus where uid = :uid"
+        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid"
     )
     fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int)
 
@@ -96,8 +96,8 @@ interface AppInfoDAO {
     )
     fun getFilteredApps(search: String, firewall: Set<Int>, appType: Set<Int>): List<AppInfo>
 
-    @Query("update AppInfo set firewallStatus = :firewall, metered = :metered where :clause")
-    fun cpUpdate(firewall: Int, metered: Int, clause: String): Int
+    @Query("update AppInfo set firewallStatus = :firewall, connectionStatus = :connectionStatus where :clause")
+    fun cpUpdate(firewall: Int, connectionStatus: Int, clause: String): Int
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetailsCursor(): Cursor
 

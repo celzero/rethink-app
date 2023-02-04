@@ -16,6 +16,7 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import android.database.Cursor
+import android.util.Log
 
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
@@ -50,7 +51,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     fun cpUpdate(appInfo: AppInfo, clause: String): Int {
         // update only firewall and metered
-        return appInfoDAO.cpUpdate(appInfo.firewallStatus, appInfo.metered, clause)
+        return appInfoDAO.cpUpdate(appInfo.firewallStatus, appInfo.connectionStatus, clause)
     }
 
     fun cpInsert(appInfo: AppInfo): Long {
