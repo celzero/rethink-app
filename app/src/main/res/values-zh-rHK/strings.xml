@@ -69,7 +69,7 @@
     <string name="whats_dialog_title">v053n 嘅新內容</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
     <string name="orbot_http">HTTP 代理</string>
-    <string name="whats_new_version_update">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新功能&lt;/i&gt;: 所有新的統計屏幕。&lt;br/&gt; 2. &lt;i&gt;新功能&lt;/i&gt;：使用屏幕鎖定保護此應用程序。&lt;br/&gt; 3. &lt;i&gt;新功能&lt;/i&gt;：從應用程序設置中選擇您喜歡的語言。&lt;br/&gt; 4. &lt;i&gt;新功能&lt;/i&gt;: 域名+ &lt;i&gt;Simple&lt;/i&gt; 視圖只顯示精心策劃的列表。&lt;br/&gt; 5.重命名：&lt;i&gt;應用鎖定&lt;/i&gt; 模式是現在 &lt;i&gt;封鎖&lt;/i&gt; 模式。&lt;br/&gt; 6.重命名： &lt;i&gt;繞過應用程序規則&lt;/i&gt; 現在被稱爲 &lt;i&gt;信任&lt;/i&gt; IP.&lt;br/&gt;7. 修複在工作配置文件中安裝 Rethink 時崩潰的問題。&lt;br/&gt; 8. 現在在卸載應用程序時刪除應用程序特定的規則。&lt;br/&gt; 9. 以及其他較小的 UI 更改和錯誤修複。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫助翻譯此應用&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;打破語言隔閡！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. 重新支援 Android 6。&lt;br/&gt; 2. 全新 RDNS+ 介面。&lt;br/&gt; 3. 全新防火牆同網絡引擎。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：超過 15 種語言嘅翻譯。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：自適應圖示。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：喺分應用網絡日誌入面顯示網域。&lt;br/&gt; 7. 修復通知喺 Android 13 上消失嘅問題。&lt;br/&gt; 8. 修復異常工作嘅 Orbot DNS 支援。&lt;br/&gt; 9. 應用程式區而家可以喺僅 DNS 模式入面訪問。&lt;br/&gt;10. 對內建下載管理器嘅一啲重大改進。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
     <string name="cd_doh_dialog_heading">加 DNS over HTTPS</string>
     <string name="cd_doh_dialog_resolver_url">解析服務 URL</string>
     <string name="cd_dnscrypt_relay_heading">中繼</string>
@@ -317,7 +317,7 @@
     <string name="apps_card_ips_count">%1$s IP 同埠規則</string>
     <string name="hsf_start_btn_state">啓動</string>
     <string name="hsf_stop_btn_state">停止</string>
-    <string name="hsf_uptime">(啓動 %1$s; 協議: %2$s; 類型: %3$s)</string>
+    <string name="hsf_uptime">（由 %1$s 開始啓動；協定：%2$s；類型：%3$s）</string>
     <string name="hsf_downtime">（由 %1$s 開始停用）</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
     <string name="hsf_vpn_dialog_positive">繼續</string>
@@ -601,8 +601,8 @@
     <string name="ci_no_rule_txt">冇規則</string>
     <string name="ci_no_rule">冇規則</string>
     <string name="ci_delete">刪除</string>
-    <string name="ada_noapp_dialog_title">未找到該類應用信息</string>
-    <string name="ada_noapp_dialog_message">缺少應用程序信息，也許呢個應用程序被卸載咗？</string>
+    <string name="ada_noapp_dialog_title">搵唔到應用程式資訊</string>
+    <string name="ada_noapp_dialog_message">搵唔到你講嗰隻 app 嘅資訊。</string>
     <string name="ada_noapp_dialog_positive">確認</string>
     <string name="ada_firewall_status">呢個 app <b><i>%1$s</i></b>。</string>
     <string name="ada_ip_connection_count">已連線至 %1$s 個 IP 地址</string>
