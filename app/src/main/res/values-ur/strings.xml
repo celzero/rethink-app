@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ریتھینک ڈی این ایس</string>
+    <string name="title_about">کے بارے میں</string>
+    <string name="title_settings">ترتیبات</string>
+    <string name="title_statistics">اعدادوشمار</string>
+    <string name="rethink_plus">ریتھینک ڈی این ایس پلس</string>
+    <string name="allow">اجازت دیں</string>
+    <string name="block">بلاک</string>
+    <string name="bypass_universal">‭بائی پاس یونیورسل</string>
+    <string name="exclude">خارج</string>
+    <string name="isolate">الگ تھلگ</string>
+    <string name="untracked">ٹریک نہیں کیا گیا</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">انتباہ:ریتھینک ڈی این ایس کو غیر فعال کر دیا گیا ہے</string>
+    <string name="app_name_small_case">ریتھینک</string>
+    <string name="slide_1_title">مفت اور اوپن سورس</string>
+    <string name="app_name_rethink">ریتھینک</string>
+    <string name="pause_title_desc">جھپکی لینا…</string>
+    <string name="settings_title_desc">ایک انتہائی حسب ضرورت DNS اور فائر وال</string>
+    <string name="about_title_desc">نیٹ ورک سیکیورٹی خطرات کا پتہ لگائیں اور بلاک کریں</string>
+    <string name="txt_home">گھر</string>
+    <string name="slide_2_title">خوش آمدید</string>
+    <string name="slide_2_desc">ریتھینک ڈی این ایس نیٹ ورک کی سرگرمیوں کی نگرانی کرنے، انٹرنیٹ سنسرشپ کو نظرانداز کرنے، اور آپ کے Android ڈیوائس پر فائر وال ایپس کا سب سے آسان طریقہ ہے۔</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">انتظار</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">گرنا</string>
+    <string name="accessibility_service_description">ریتھینک ڈی این ایس پس منظر کی ایپلی کیشنز کا پتہ لگانے اور فائر وال کرنے کے لیے قابل رسائی سروس کا استعمال کرتا ہے۔ ریتھینک ڈی این ایس کوئی معلومات اکٹھا یا فروخت نہیں کرتا ہے۔</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">تحفظ کی ترتیب کو تبدیل کرنے کے لیے تھپتھپائیں</string>
+    <string name="dns_mode_notification_title">محفوظ! تیز اور محفوظ ڈی این ایس سے منسلک ہے۔</string>
+    <string name="pause_mode_notification_title">روک دیا گیا! سدود ایپس کو فائر وال کیا جاتا رہے گا۔</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">محفوظ</string>
+    <string name="status_protected_with_tor">ٹور کے ساتھ محفوظ</string>
+    <string name="accessibility_service_label">ریتھینک ڈی این ایس</string>
+    <string name="next">Next</string>
+    <string name="finish">ختم کرنا</string>
+    <string name="slide_1_desc">ریتھینک ڈی این ایس ایک اوپن سورس سافٹ ویئر ہے جسے Mozilla Builders MVP پروگرام کی حمایت حاصل ہے۔</string>
+    <string name="firewall_mode_notification_title">محفوظ! فائر وال سے منسلک ہے۔</string>
+    <string name="skip">چھوڑ دو</string>
+    <string name="status_app_error">ایپ کی خرابی</string>
+    <string name="status_no_internet">انٹرنیٹ نہیں</string>
+    <string name="status_protected_with_private_dns">‍</string>
+</resources>
