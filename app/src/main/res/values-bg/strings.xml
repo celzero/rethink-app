@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RethinkDNS</string>
+    <string name="app_name_rethink">Rethink</string>
+    <string name="settings_title_desc">DNS и Firewall с много възможности за персонализиране</string>
+    <string name="accessibility_service_description">RethinkDNS използва услугата за достъпност при засичането и блокирането на приложенията на заден план. RethinkDNS не събира или продава никаква информация.</string>
+    <string name="slide_2_desc">RethinkDNS е най-лесният начин да наблюдавате мрежовата активност, да заобиколите интернет цензурата и приложенията за защитна стена на вашето устройство с Android.</string>
+    <string name="slide_1_desc">RethinkDNS е софтуер с отворен код, поддържан от програмата Mozilla Builders MVP.</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисни за промяна на настройките за защита</string>
+    <string name="pause_mode_notification_title">На пауза! Блокираните приложения ще продължат да бъдат защитени със защитна стена.</string>
+    <string name="dns_mode_notification_title">Защитен! Свързан към Бърз и Сигурен DNS.</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">защитен</string>
+    <string name="status_no_internet">няма интернет</string>
+    <string name="status_protected_with_http_private_dns">защитен с http proxy и частен dns</string>
+    <string name="status_protected_with_socks5_private_dns">защитен със socks5 и частен dns</string>
+    <string name="dns_explanation_dns_connected">Свързан с RethinkDNS</string>
+    <string name="status_protected_with_proxy">защитен с прокси</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">не е защитен</string>
+    <string name="dns_explanation_firewall_connected">Свързан към защитната стена</string>
+    <string name="universal_firewall_explanation">Прилагайте правила за защитна стена за всички приложения въз основа на събития в устройството, например защитна стена, когато устройството е заключено или когато дадено приложение не се използва.</string>
+    <string name="notification_action_stop_vpn">STOP</string>
+    <string name="firewall_mode_info_title">Защитна стена</string>
+    <string name="alert_permission_accessibility_regrant">Необходими действия</string>
+    <string name="firewall_mode_info_explanation_new">Наблюдавайте мрежовата активност и защитната стена за всяко приложение или IP адрес.</string>
+    <string name="hybrid_mode_info_title">DNS + защитна стена</string>
+    <string name="wireguard_mode_info_explanation_new">Очаквайте скоро…</string>
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS използва услуга за достъпност, за да проследява кои приложения се използват (на преден план) спрямо тези, които не се използват (на заден план).
+\n
+\nRethinkDNS не събира никаква информация и не ви шпионира по никакъв начин.</string>
+    <string name="app_name_small_case">rethink</string>
+    <string name="title_about">За Rethink</string>
+    <string name="title_settings">Настройки</string>
+    <string name="title_statistics">Статистики</string>
+    <string name="pause_title_desc">на пауза…</string>
+    <string name="about_title_desc">Засичай и блокирай мрежови заплахи</string>
+    <string name="txt_home">Начало</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="next">След.</string>
+    <string name="skip">Пропусни</string>
+    <string name="finish">Завърши</string>
+    <string name="slide_2_title">Добре дошли</string>
+    <string name="slide_1_title">Безплатен и с отворен код</string>
+    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="rdns_plus">RDNS Plus</string>
+    <string name="allow">позволи</string>
+    <string name="block">блокирай</string>
+    <string name="bypass_universal">универсален байпас</string>
+    <string name="exclude">изключение</string>
+    <string name="isolate">изолирай</string>
+    <string name="untracked">не следи</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Внимание: RethinkDNS бе деактивиран</string>
+    <string name="firewall_mode_notification_title">Защитен! Свързан към Firewall.</string>
+    <string name="hybrid_mode_notification_title">Защитен! Свързан към DNS + Firewall.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">чакане</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">неуспешен</string>
+    <string name="status_app_error">грешка в приложението</string>
+    <string name="status_dns_error">грешка в dns</string>
+    <string name="status_dns_server_down">dns сървъра не работи</string>
+    <string name="status_protected_with_tor">защитен с tor</string>
+    <string name="status_protected_with_private_dns">защитен с частен dns</string>
+    <string name="status_protected_with_tor_private_dns">защитен с tor и частен dns</string>
+    <string name="status_protected_with_proxy_private_dns">защитен с прокси и частен dns</string>
+    <string name="status_protected_with_socks5">защитен със socks прокси</string>
+    <string name="status_protected_with_http">защитен с http прокси</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">частният dns е разрешен</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Свързан към RethinkDNS и защитна стена</string>
+    <string name="notification_action_resume_vpn">ПРОДЪЛЖИ</string>
+    <string name="notification_action_pause_vpn">ПАУЗА</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="notification_action_dns_firewall_mode">DNS + защитна стена</string>
+    <string name="dns_mode_info_title">DNS</string>
+    <string name="firewall_rules">Мрежови правила</string>
+    <string name="apps_info_title">Приложения</string>
+    <string name="dns_mode_info_explanation_new">Наблюдение, блокиране и криптиране на DNS заявки.</string>
+    <string name="dns_firewall_mode_info_explanation_new">Всичко гореизброено + заобикаляне на интернет цензурата.</string>
+    <string name="alert_permission_accessibility">Разрешение - Достъпност</string>
+</resources>
