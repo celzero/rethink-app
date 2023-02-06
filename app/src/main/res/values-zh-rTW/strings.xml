@@ -119,7 +119,7 @@
     <string name="info_dialog_url_copy_toast_msg">已複製 URL</string>
     <string name="info_dialog_rethink_toast_msg">已作爲 RDNS+ DNS-over-HTTPS URL 複製</string>
     <string name="settings_enable_logs_desc">於本地儲存 DNS 與防火牆日誌。</string>
-    <string name="whats_dialog_title">v053m 的新內容</string>
+    <string name="whats_dialog_title">v053n 的新內容</string>
     <string name="settings_ip_network_desc">在不同互聯網協定版本中選擇。</string>
     <string name="settings_ptrans_heading">強制 IPv4 出站</string>
     <string name="settings_ptrans_desc">於本地將出站的 IPv6 流量轉換爲 IPv4 流量。在您連線至僅有 IPv4 的網路時使用。</string>
@@ -187,7 +187,7 @@
 \n
 \nRethinkDNS 並不會收集任何資料，且不會以任何方式監視您。</string>
     <string name="brave_dns_connect_mode_change_dns">選擇模式。</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 的無障礙服務已停止或崩潰。爲繼續使用<i>攔截未使用應用</i>功能，<i><b>請至系統設定，強制停止並再次啓動</b></i> RethinkDNS 。
+    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 的無障礙服務已停止或崩潰。爲繼續使用<i>攔截未使用應用</i>的功能，<i><b>請至系統設定，強制停止並再次啓動</b></i> RethinkDNS 。
 \n
 \nRethinkDNS 使用無障礙服務來追蹤正在使用的應用（前景）與未使用的應用（背景）。</string>
     <string name="bsct_conn_block_desc">由 %2$s 攔截 %1$s</string>
@@ -266,14 +266,14 @@
     <string name="rt_cancel_btn">取消</string>
     <string name="brbs_title">備份與恢復</string>
     <string name="brbs_backup_complete_toast">備份完畢</string>
-    <string name="ada_noapp_dialog_message">缺少應用程序信息，也許這個應用程序被卸載了？</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc">此連線因正在進行<i>一鍵 Tor 代理</i>設定而放行。</string>
+    <string name="ada_noapp_dialog_message">未找到指定應用的資訊。此應用或許已被解除安裝。</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc">此連線因正在設定<i>一鍵 Tor 代理</i>而放行。</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_filter_all">全部</string>
     <string name="cd_filter_blocked">攔截</string>
     <string name="ci_no_rule">無規則</string>
     <string name="ci_block">攔截</string>
-    <string name="ada_app_status_isolate">正處隔離模式中；只允許受信任的IP</string>
+    <string name="ada_app_status_isolate">正處隔離模式中；僅放行信任 IP</string>
     <string name="bsac_trust_toast">信任此應用的 %1$s</string>
     <string name="rt_dialog_negative">取消</string>
     <string name="rt_cancel_download">取消</string>
@@ -344,8 +344,8 @@
     <string name="lbbs_search">於攔截清單內查找網域</string>
     <string name="brbs_restore_dialog_positive">恢復</string>
     <string name="brbs_restore_dialog_failure_negative">忽略</string>
-    <string name="ada_noapp_dialog_title">未找到該類應用信息</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">此 DNS 連線已代理並轉送至用戶選擇的 DNS 端點。<br/><br/>若需更改，請移步 DNS <i>配置</i>區，並停用<i>阻止 DNS 洩漏</i>。</string>
+    <string name="ada_noapp_dialog_title">未找到應用</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">此 DNS 連線已代理並轉送至用戶選擇的 DNS 端點。<br/><br/>若需更改，請移步 DNS <i>配置</i>區，並停用<i>防止 DNS 洩漏</i>。</string>
     <string name="notif_dialog_pause_dialog_negative">忽略</string>
     <string name="cd_remove_dialog_message">於已儲存配置中刪除此網域。</string>
     <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
@@ -426,7 +426,7 @@
     <string name="radio_max_btn">🪂 Max</string>
     <string name="brbs_backup_dialog_failure_negative">忽略</string>
     <string name="brbs_restore_dialog_failure_message">當前無法恢復。再來試一試嗎？</string>
-    <string name="firewall_rule_trusted_ip_desc">此連線因此<i>目標 IP</i> 被設定爲繞過所有分應用規則而被放行。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_trusted_ip_desc">此連線因此<i>目標 IP</i> 被設定爲信任 IP 而被放行。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
     <string name="firewall_rule_bypass_universal_ip_desc">此連線因此<i>目標 IP</i> 被設定爲繞過所有全局規則而被放行。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
     <string name="notif_channel_proxy_failure">代理警報</string>
     <string name="notif_channel_desc_vpn_failure">在 Rethink 被 Android 或其他 VPN 應用停止時提醒我</string>
@@ -537,7 +537,7 @@
     <string name="apps_card_ips_count">%1$s IP 與埠規則</string>
     <string name="hsf_start_btn_state">啓動</string>
     <string name="hsf_stop_btn_state">停止</string>
-    <string name="hsf_uptime">(啓動 %1$s; 協議: %2$s; 類型: %3$s)</string>
+    <string name="hsf_uptime">（自%1$s啓動；協定：%2$s；類型：%3$s）</string>
     <string name="hsf_downtime">（自%1$s起停用）</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
     <string name="hsf_vpn_dialog_message">RethinkDNS 需要設定本地 VPN 的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。
@@ -575,7 +575,7 @@
     <string name="dc_dns_website_heading">於 DNS 日誌中展示網站圖示（實驗性）</string>
     <string name="dc_dns_website_desc">從 <i>nextdns.io</i> 與 <i>duckduckgo.com</i> 獲取網站圖示。約佔用 350 MB 磁碟空間</string>
     <string name="dc_dns_leaks_desc">若啓用， RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
-    <string name="dc_check_update_heading">提示攔截清單更新</string>
+    <string name="dc_check_update_heading">攔截清單更新時提示</string>
     <string name="dc_check_update_desc">每<i>三</i>天檢查有無攔截清單更新</string>
     <string name="about_bravedns_explantion">RethinkDNS 是在 Android 裝置上最易使用的監測網路活動、繞過互聯網審查與攔截應用程式的防火牆軟體。</string>
     <string name="about_bravedns_whoarewe">RethinkDNS 是一項自由且開放原始碼的專案，由來自亞馬遜、 IBM 與 Scientific Games 的前工程師領導。</string>
@@ -767,7 +767,7 @@
     <string name="fapps_metered_block_dialog_title">於計費網路攔截</string>
     <string name="fapps_metered_block_dialog_message">是否於計費網路（行動數據）攔截<i>所列出的</i>應用？</string>
     <string name="fapps_metered_unblock_dialog_title">於計費網路放行</string>
-    <string name="fapps_metered_unblock_dialog_message">是否於計費網路放行<i>所列出的</i>應用？</string>
+    <string name="fapps_metered_unblock_dialog_message">是否於計費網路放行<i>已列出</i>應用？</string>
     <string name="fapps_lockdown_hint">VPN 正處於閉關模式。防火牆將不會遵守計費 / 非計費規則。</string>
     <string name="fapps_all_network_hint"><u>使用所有可用網路</u>已啓用。防火牆將不會遵守計費 / 非計費規則。</string>
     <string name="fapps_firewall_filter_hint">對已列出的應用程式應用規則</string>
@@ -843,13 +843,13 @@
     <string name="settings_notification_desc">與 RethinkDNS 的通知一同顯示的行爲按鈕：%1$s</string>
     <string name="about_privacy_policy">閱覽隱私政策</string>
     <string name="hsf_notification_permission_failure">於設定區啓用通知權限</string>
-    <string name="ada_firewall_title">應用防火牆規則</string>
+    <string name="ada_firewall_title">此應用防火牆規則</string>
     <string name="ada_app_isolate">隔離</string>
     <string name="notif_download_cancel_content">下載已取消。</string>
     <string name="rt_filter_parent_all">全部</string>
     <string name="rt_filter_parent_selected">已選擇</string>
     <string name="rt_filter_hint">正顯示<u>所有</u>攔截清單</string>
-    <string name="rt_filter_desc">正顯示 <u>%1$s</u> 個攔截清單</string>
+    <string name="rt_filter_desc">正顯示 <u>%1$s</u> 攔截清單</string>
     <string name="rt_filter_desc_subgroups">正顯示 %2$s 組與子分組 %3$s 的 <u>%1$s</u> 個攔截清單</string>
     <string name="about_app_translate">翻譯</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
@@ -863,7 +863,7 @@
     <string name="settings_app_notification_a13_desc">啓用此應用的通知權限</string>
     <string name="settings_app_notification_a13_heading">應用通知</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
-    <string name="ci_trust_initial">T</string>
+    <string name="ci_trust_initial">信</string>
     <string name="ci_trust_txt">信任</string>
     <string name="ada_app_firewall">防火牆</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日誌</string>
@@ -906,13 +906,13 @@
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">攔截最多的網域</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">連線最多的 IP</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">攔截最多的 IP</string>
-    <string name="fapps_bypass_block_dialog_title">繞過應用程序</string>
-    <string name="fapps_bypass_block_dialog_message">繞過通用防火牆規則的<i>列出</i> 應用程序？</string>
-    <string name="fapps_unblock_dialog_title">允許應用程序</string>
-    <string name="fapps_unblock_dialog_message">允許連接<i>列出</i> 應用程序？</string>
+    <string name="fapps_bypass_block_dialog_title">繞過應用</string>
+    <string name="fapps_bypass_block_dialog_message">是否對<i>已列出</i>應用繞過通用防火牆規則？</string>
+    <string name="fapps_unblock_dialog_title">放行應用</string>
+    <string name="fapps_unblock_dialog_message">是否放行<i>已列出</i>應用的連線？</string>
     <string name="fapps_exclude_block_dialog_title">排除應用</string>
-    <string name="fapps_exclude_block_dialog_message">從DNS和防火牆中排除<i>列出</i> 應用程序？</string>
-    <string name="fapps_isolate_block_dialog_title">隔離應用程序</string>
-    <string name="fapps_isolate_block_dialog_message">隔離 <i>列出</i> 應用程序？</string>
+    <string name="fapps_exclude_block_dialog_message">是否從 DNS 與防火牆中排除<i>已列出</i>應用？</string>
+    <string name="fapps_isolate_block_dialog_title">隔離應用</string>
+    <string name="fapps_isolate_block_dialog_message">是否隔離<i>已列出</i>應用？</string>
     <string name="ci_trust_rule">信任</string>
 </resources>
