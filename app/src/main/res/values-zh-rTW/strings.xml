@@ -20,7 +20,7 @@
     <string name="bypass_universal">無條件放行</string>
     <string name="exclude">排除</string>
     <string name="untracked">未追蹤</string>
-    <string name="isolate">封鎖</string>
+    <string name="isolate">隔離</string>
     <string name="pause_mode_notification_title">已暫停！被攔截的程式將仍被拒絕訪問網路。</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">等待中</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">失敗</string>
@@ -54,7 +54,7 @@
     <string name="dns_query_clear_logs_message">這會刪除所有在裝置上儲存的 DNS 日誌。此行爲不可逆。請問您是否想要繼續？</string>
     <string name="bsct_app_info">應用資訊</string>
     <string name="bsct_block_app">對<u>此應用</u>攔截、信任<u>此 IP</u></string>
-    <string name="bsct_block">針對<u>此應用</u>攔截、放行、排除或封鎖</string>
+    <string name="bsct_block">針對<u>此應用</u>攔截、放行、排除或隔離</string>
     <string name="bsct_conn_block_desc_device">本地攔截 %1$s</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
     <string name="bsct_conn_desc_blocked">%2$s 攔截 %1$s</string>
@@ -86,7 +86,7 @@
     <string name="blocklist_update_check_not_required">攔截清單已爲最新版本。</string>
     <string name="refresh_complete">應用列表已重新同步完畢。</string>
     <string name="blocklist_update_check_failure">似乎有什麼出錯了。請稍後重試！</string>
-    <string name="show_logs_disabled_dns_message">DNS 請求日志已被禁用。若您想要重新啓用，請至<i>設置</i>並打開<i>啓用本地日志</i></string>
+    <string name="show_logs_disabled_dns_message">DNS 請求日誌已被禁用。若您想要重新啓用，請至<i>設定</i>並打開<i>啓用本地日誌</i>。</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s 解析服務</string>
     <string name="http_proxy_dialog_heading">設定 HTTP(S) 代理</string>
     <string name="http_proxy_dialog_desc">HTTP(S) 代理設定僅爲對應用程式的一個提醒，它們可選擇是否使用代理；但如 Chrome 及 Firefox 等的瀏覽器則會使用代理。使用 HTTP(S) 代理的應用會同時繞過防火牆及 DNS 規則。</string>
@@ -114,7 +114,7 @@
     <string name="info_dialog_url_copy_toast_msg">已複製 URL</string>
     <string name="info_dialog_rethink_toast_msg">已作爲 RDNS+ DNS-over-HTTPS URL 複製</string>
     <string name="settings_enable_logs_desc">於本地儲存 DNS 與防火牆日誌。</string>
-    <string name="whats_dialog_title">v053n中的新增攻能</string>
+    <string name="whats_dialog_title">v053m 的新內容</string>
     <string name="settings_ip_network_desc">在不同互聯網協定版本中選擇。</string>
     <string name="settings_ptrans_heading">強制 IPv4 出站</string>
     <string name="settings_ptrans_desc">於本地將出站的 IPv6 流量轉換爲 IPv4 流量。在您連線至僅有 IPv4 的網路時使用。</string>
@@ -182,9 +182,9 @@
 \n
 \nRethinkDNS 並不會收集任何資料，且不會以任何方式監視您。</string>
     <string name="brave_dns_connect_mode_change_dns">選擇模式。</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 的無障礙服務已停止或崩潰。爲繼續使用 <i><b>轉到設置並強制停止</b></i> 並再次啓動它以使用 <i>攔截任何未使用的應用</i> 功能。
+    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 的無障礙服務已停止或崩潰。爲繼續使用<i>攔截未使用應用</i>功能，<i><b>請至系統設定，強制停止並再次啓動</b></i> RethinkDNS 。
 \n
-\nRethinkDNS 使用無障礙服務來跟蹤正在使用的應用（前台）與未使用的應用（後台）。</string>
+\nRethinkDNS 使用無障礙服務來追蹤正在使用的應用（前景）與未使用的應用（背景）。</string>
     <string name="bsct_conn_block_desc">由 %2$s 攔截 %1$s</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某應用連線至互聯網。
 \n <u>#2</u>：阻止任意應用連線至某特定 IP 。
@@ -199,7 +199,7 @@
     <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
     <string name="doh_custom_url_remove_dialog_message">於已儲存的配置中刪除此 DNS over HTTPS 端點。</string>
     <string name="dns_crypt_url_remove_dialog_message">於已儲存的配置中刪除此 DNSCrypt 解析服務。</string>
-    <string name="show_logs_disabled_network_message">連接日志已被禁用。若您想要重新啓用，請至<i>設置</i>並打開<i>啓用本地日志</i></string>
+    <string name="show_logs_disabled_network_message">連線日誌已被禁用。若您想要重新啓用，請至<i>設定</i>並打開<i>啓用本地日誌</i>。</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">DNS 代理</string>
     <string name="configure_dns_connection_name">已連線至 %1$s</string>
@@ -232,7 +232,7 @@
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>
-    <string name="whats_new_version_update">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新功能&lt;/i&gt;: 所有新的統計屏幕。&lt;br/&gt; 2. &lt;i&gt;新功能&lt;/i&gt;：使用屏幕鎖定保護此應用程序。&lt;br/&gt; 3. &lt;i&gt;新功能&lt;/i&gt;：從應用程序設置中選擇您喜歡的語言。&lt;br/&gt; 4. &lt;i&gt;新功能&lt;/i&gt;: 域名+ &lt;i&gt;Simple&lt;/i&gt; 視圖只顯示精心策劃的列表。&lt;br/&gt; 5.重命名：&lt;i&gt;應用鎖定&lt;/i&gt; 模式是現在 &lt;i&gt;封鎖&lt;/i&gt; 模式。&lt;br/&gt; 6.重命名： &lt;i&gt;繞過應用程序規則&lt;/i&gt; 現在被稱爲 &lt;i&gt;信任&lt;/i&gt; IP.&lt;br/&gt;7. 修複在工作配置文件中安裝 Rethink 時崩潰的問題。&lt;br/&gt; 8. 現在在卸載應用程序時刪除應用程序特定的規則。&lt;br/&gt; 9. 以及其他較小的 UI 更改和錯誤修複。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫助翻譯此應用&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新功能&lt;/i&gt;: 所有新的統計屏幕。&lt;br/&gt; 2. &lt;i&gt;新功能&lt;/i&gt;：使用屏幕鎖定保護此應用程序。&lt;br/&gt; 3. &lt;i&gt;新功能&lt;/i&gt;：從應用程序設置中選擇您喜歡的語言。&lt;br/&gt; 4. &lt;i&gt;新功能&lt;/i&gt;: 域名+ &lt;i&gt;Simple&lt;/i&gt; 視圖只顯示精心策劃的列表。&lt;br/&gt; 5.重命名：&lt;i&gt;應用鎖定&lt;/i&gt; 模式是現在 &lt;i&gt;隔離&lt;/i&gt; 模式。&lt;br/&gt; 6.重命名： &lt;i&gt;繞過應用程序規則&lt;/i&gt; 現在被稱爲 &lt;i&gt;信任&lt;/i&gt; IP.&lt;br/&gt;7. 修複在工作配置文件中安裝 Rethink 時崩潰的問題。&lt;br/&gt; 8. 現在在卸載應用程序時刪除應用程序特定的規則。&lt;br/&gt; 9. 以及其他較小的 UI 更改和錯誤修複。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫助翻譯此應用&lt;/a&gt;</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
@@ -259,7 +259,7 @@
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_no_rule">無規則</string>
     <string name="ci_block">攔截</string>
-    <string name="ada_app_status_isolate">正處封鎖模式中，只允許受信任的IP</string>
+    <string name="ada_app_status_isolate">正處隔離模式中；只允許受信任的IP</string>
     <string name="bsac_trust_toast">信任此應用的 %1$s</string>
     <string name="rt_dialog_negative">取消</string>
     <string name="rt_cancel_download">取消</string>
@@ -388,7 +388,7 @@
     <string name="ada_app_exclude">排除</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="brbs_restore_dialog_failure_message">當前無法恢復。再來試一試嗎？</string>
-    <string name="firewall_rule_trusted_ip_desc">此連接因此<i>目標 IP</i> 被設置爲可信IP<br/><br/>若需更改，請移步<i>分應用防火牆</i>篩選。</string>
+    <string name="firewall_rule_trusted_ip_desc">此連線因此<i>目標 IP</i> 被設定爲繞過所有分應用規則而被放行。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
     <string name="firewall_rule_bypass_universal_ip_desc">此連線因此<i>目標 IP</i> 被設定爲繞過所有全局規則而被放行。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
     <string name="notif_channel_proxy_failure">代理警報</string>
     <string name="notif_channel_desc_vpn_failure">在 Rethink 被 Android 或其他 VPN 應用停止時提醒我</string>
@@ -413,7 +413,7 @@
     <string name="rt_dialog_neutral">繼續</string>
     <string name="brbs_backup_dialog_failure_message">當前無法備份。再來試一試嗎？</string>
     <string name="new_app_notification_action_toast_deny">攔截應用網路連線</string>
-    <string name="ci_dialog_desc">允許（繞行）或攔截 IP 地址、 IP 子網（範圍）及端口。例如： 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
+    <string name="ci_dialog_desc">放行（繞行）或攔截 IP 位址、 IP 子網（範圍）及埠。例如： 10.10.10.10 、 10.1.1.* 、 10.2.2/24 、 ffff::/104 、 [::]:80 、 [10.1.0.0/16]:80 、 *.*:80</string>
     <string name="ada_app_status_block_md">已於計費網路（行動數據）攔截</string>
     <string name="bsac_unblock_toast">已爲此應用放行 %1$s</string>
     <string name="notif_download_failure_content">下載失敗。請重試。</string>
@@ -474,7 +474,7 @@
     <string name="settings_protocol_translation_dns_inactive">切換至 DNS 或 DNS + 防火牆模式以啓用此設定</string>
     <string name="apps_icon_content_desc">應用圖示</string>
     <string name="firewall_status_excluded">已排除在 DNS 與防火牆外</string>
-    <string name="firewall_status_isolate">已封鎖</string>
+    <string name="firewall_status_isolate">已隔離</string>
     <string name="firewall_status_whitelisted">已繞過全局防火牆規則</string>
     <string name="firewall_status_block_unmetered">已阻止連線非計費（ WiFi ）網路</string>
     <string name="firewall_status_block_metered">已阻止連線計費（行動數據）網路</string>
@@ -485,7 +485,7 @@
     <string name="firewall_card_text_active">攔截 %1$s
 \n繞行 %2$s
 \n排除 %3$s
-\n封鎖 %4$s</string>
+\n隔離 %4$s</string>
     <string name="firewall_card_text_inactive">啓用防火牆模式。</string>
     <string name="dns_card_latency_active">延遲： %1$sms</string>
     <string name="dns_card_latency_inactive">啓用 DNS 模式。</string>
@@ -582,7 +582,7 @@
     <string name="collecting_logs_progress_text">捕獲中……</string>
     <string name="contributors_dialog_title">作者</string>
     <string name="app_info_error">無法打開應用資訊。</string>
-    <string name="contributors_list">&lt;i&gt;Rethink 開源項目&lt;/i&gt;的存在歸功于這些在其開發工作上傾瀉大量時間的志願者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 應用程序 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 網絡引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服務 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社區協管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位置數據庫 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻譯 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 圖標 &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 構建服務器 &lt;br/&gt;&lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">&lt;i&gt;Rethink 開放原始碼專案&lt;/i&gt;的存在歸功於這些在其開發工作上傾瀉大量時間的志願者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 應用程式 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 網路引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服務 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社羣協管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位址資料庫 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻譯 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 圖標 &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 構建伺服器 &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="cd_dns_crypt_title">解析服務</string>
     <string name="cd_custom_doh_dialog_title">自訂伺服器 URL</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
@@ -684,7 +684,7 @@
     <string name="fapps_filter_parent_system">系統</string>
     <string name="fapps_firewall_filter_bypass_universal">已繞行</string>
     <string name="fapps_firewall_filter_excluded">已排除</string>
-    <string name="fapps_firewall_filter_isolate">已封鎖</string>
+    <string name="fapps_firewall_filter_isolate">已隔離</string>
     <string name="fapps_info_dialog_message">阻止應用連線互聯網。限制訪問互聯網有助於避免不必要的數據使用，也有助於節電。</string>
     <string name="fapps_info_dialog_positive_btn">瞭解</string>
     <string name="fapps_unmetered_unblock_dialog_title">於非計費網路放行</string>
@@ -736,7 +736,7 @@
     <string name="firewall_rule_block_unmetered">非計費網路（ WiFi ）</string>
     <string name="firewall_rule_block_metered">計費網路（行動數據）</string>
     <string name="firewall_rule_univ_block_metered">計費網路（全局）</string>
-    <string name="firewall_rule_isolate">封鎖模式</string>
+    <string name="firewall_rule_isolate">隔離模式</string>
     <string name="firewall_rule_block_app_new_install">新應用</string>
     <string name="firewall_rule_block_app_exception">錯誤</string>
     <string name="firewall_rule_block_ip">IP / 埠（應用）</string>
@@ -765,25 +765,25 @@
     <string name="dc_dns_leaks_heading">防止 DNS 洩漏</string>
     <string name="settings_notification_desc">與 RethinkDNS 的通知一同顯示的行爲按鈕：%1$s</string>
     <string name="about_privacy_policy">閱覽隱私政策</string>
-    <string name="hsf_notification_permission_failure">從設置屏幕啓用通知權限</string>
+    <string name="hsf_notification_permission_failure">於設定區啓用通知權限</string>
     <string name="ada_firewall_title">應用防火牆規則</string>
-    <string name="ada_app_isolate">封鎖</string>
+    <string name="ada_app_isolate">隔離</string>
     <string name="notif_download_cancel_content">下載已取消。</string>
     <string name="rt_filter_parent_selected">已選擇</string>
-    <string name="rt_filter_hint">顯示<u>所有</u>攔截清單</string>
-    <string name="rt_filter_desc">顯示 <u>%1$s</u> 個攔截清單</string>
-    <string name="rt_filter_desc_subgroups">顯示 %2$s 組與子分組 %3$s 的 <u>%1$s</u> 個攔截清單</string>
+    <string name="rt_filter_hint">正顯示<u>所有</u>攔截清單</string>
+    <string name="rt_filter_desc">正顯示 <u>%1$s</u> 個攔截清單</string>
+    <string name="rt_filter_desc_subgroups">正顯示 %2$s 組與子分組 %3$s 的 <u>%1$s</u> 個攔截清單</string>
     <string name="about_app_translate">翻譯</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
-    <string name="notification_screen_error">無法啓動應用程序的通知屏幕。</string>
+    <string name="notification_screen_error">無法打開應用通知區。</string>
     <string name="intent_launch_error">無法打開 %1$s</string>
     <string name="no_browser_error">無法於瀏覽器打開網頁。</string>
     <string name="firewall_rule_block_univ_ip">IP / 埠（全局）</string>
     <string name="relative_time_today">今天</string>
     <string name="relative_time_yesterday">昨天</string>
-    <string name="settings_app_notification_a13_desc">啓用應用程序的通知權限</string>
-    <string name="settings_app_notification_a13_heading">應用程序通知</string>
+    <string name="settings_app_notification_a13_desc">啓用此應用的通知權限</string>
+    <string name="settings_app_notification_a13_heading">應用通知</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ci_trust_initial">T</string>
     <string name="ci_trust_txt">信任</string>
@@ -792,18 +792,18 @@
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有與此應用有聯繫的日誌。</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">繼續</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">攔截成人、盜版內容，線上賭博、約會及社交媒體。</string>
-    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">攔截色情軟件、間諜軟件及恐嚇軟件。</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">攔截吸睛軟體、間諜軟體及恐嚇軟體。</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">攔截惡意軟體、勒索軟體、加密軟體、釣魚及其他威脅。</string>
     <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">取消</string>
-    <string name="private_dns_dialog_desc">Rethink 的 DNS 設置已被 Android 的私人 DNS 覆蓋。
+    <string name="private_dns_dialog_desc">Rethink 的 DNS 設定已被 Android 的私人 DNS 覆蓋。
 \n
-\n若要使用 Rethink 的 DNS ，請至 Android 設置並關閉「私人 DNS 」。</string>
+\n若要使用 Rethink 的 DNS ，請至 Android 設定並關閉「私人 DNS 」。</string>
     <string name="private_dns_dialog_positive">前往設定</string>
     <string name="private_dns_error">無法打開私人 DNS 區。</string>
     <string name="private_dns_dialog_heading">關閉私人 DNS</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s 個攔截清單</string>
-    <string name="settings_locale_desc">選擇妳喜歡的語言</string>
-    <string name="settings_locale_dialog_title">選擇妳喜歡的語言</string>
+    <string name="settings_locale_desc">選擇您傾向使用的語言</string>
+    <string name="settings_locale_dialog_title">選擇您傾向使用的語言</string>
     <string name="hs_biometeric_desc">使用生物識別驗證解鎖 RethinkDNS</string>
     <string name="hs_biometeric_failed">生物識別認證失敗</string>
     <string name="fapps_info_unmetered_msg">於非計費網路（ WiFi ）放行/攔截。</string>
@@ -813,8 +813,8 @@
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">連線最多的網域</string>
     <string name="ssv_see_more">顯示所有</string>
     <string name="title_statistics">統計</string>
-    <string name="settings_locale_heading">更換語言</string>
-    <string name="settings_locale_dialog_neutral">幫助翻譯這個應用程序</string>
+    <string name="settings_locale_heading">變更語言</string>
+    <string name="settings_locale_dialog_neutral">協助翻譯此應用</string>
     <string name="settings_biometeric_heading">啟用應用鎖</string>
     <string name="settings_biometric_desc">使用熒幕鎖保護此應用</string>
     <string name="hs_biometeric_title">解鎖 Rethink</string>
@@ -823,7 +823,7 @@
     <string name="hs_biometeric_error">生物識別認證出錯</string>
     <string name="fapps_info_bypass_msg">繞過全局防火牆規則。</string>
     <string name="fapps_info_metered_msg">於計費網路（行動數據）放行/攔截。</string>
-    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">最允許的應用程序</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">放行最多的應用</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">攔截最多的網域</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">連線最多的 IP</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">攔截最多的 IP</string>
@@ -833,7 +833,7 @@
     <string name="fapps_unblock_dialog_message">允許連接<i>列出</i> 應用程序？</string>
     <string name="fapps_exclude_block_dialog_title">排除應用</string>
     <string name="fapps_exclude_block_dialog_message">從DNS和防火牆中排除<i>列出</i> 應用程序？</string>
-    <string name="fapps_isolate_block_dialog_title">封鎖應用程序</string>
-    <string name="fapps_isolate_block_dialog_message">封鎖 <i>列出</i> 應用程序？</string>
+    <string name="fapps_isolate_block_dialog_title">隔離應用程序</string>
+    <string name="fapps_isolate_block_dialog_message">隔離 <i>列出</i> 應用程序？</string>
     <string name="ci_trust_rule">信任</string>
 </resources>
