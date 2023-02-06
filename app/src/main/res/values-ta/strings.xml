@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="exclude">விலக்கு</string>
+    <string name="isolate">தனிமைப்படுத்து</string>
+    <string name="allow">அனுமதி</string>
+    <string name="untracked">கண்காணிக்கப்படவில்லை</string>
+    <string name="title_statistics">புள்ளிவிவரங்கள்</string>
+    <string name="app_name_rethink">மறுபரிசீலனை செய்</string>
+    <string name="settings_title_desc">மிகவும் தனிப்பயனாக்கக்கூடிய டிஎன்எஸ் மற்றும் ஃபயர்வால்</string>
+    <string name="dns_mode_info_title">டிஎன்எஸ்</string>
+    <string name="always_on_dialog_negative_btn">ரத்து</string>
+    <string name="always_on_dialog_neutral">அமைப்புகள்</string>
+    <string name="app_name">"மறுபரிசீலனை  டிஎன்எஸ்"</string>
+    <string name="app_name_small_case">மறுபரிசீலனை</string>
+    <string name="title_about">எங்களை பற்றி</string>
+    <string name="title_settings">அமைப்புகள்</string>
+    <string name="pause_title_desc">சிறு தூக்கம் போடுகிறேன்…</string>
+    <string name="about_title_desc">நெட்வொர்க் பாதுகாப்பு அச்சுறுத்தல்களைக் கண்டறிந்து தடுக்கவும்</string>
+    <string name="txt_home">முகப்பு</string>
+    <string name="accessibility_service_description">"மறுபரிசீலனை டிஎன்எஸ்  ஆனது ஃபயர்வால் பின்னணி பயன்பாடுகளைக் கண்டறிந்து அணுக அணுகல் சேவையைப் பயன்படுத்துகிறது. மறுபரிசீலனை டிஎன்எஸ் எந்த தகவலையும் சேகரிக்கவோ விற்கவோ இல்லை."</string>
+    <string name="accessibility_service_label">மறுபரிசீலனை டிஎன்எஸ்</string>
+    <string name="next">அடுத்தது</string>
+    <string name="skip">தவிர்க்கவும்</string>
+    <string name="finish">முடிந்தது</string>
+    <string name="slide_2_title">வரவேற்பு வணக்கம்</string>
+    <string name="slide_2_desc">"மறுபரிசீலனை  டிஎன்எஸ் என்பது உங்கள் ஆண்ட்ராய்டு சாதனத்தில் நெட்வொர்க் செயல்பாட்டைக் கண்காணிக்கவும், இணைய தணிக்கையைத் தவிர்க்கவும் மற்றும் ஃபயர்வால் பயன்பாடுகளைக் கண்காணிக்கவும் எளிதான வழியாகும்."</string>
+    <string name="slide_1_title">இலவச மற்றும் திறந்த மூலம்</string>
+    <string name="slide_1_desc">"மறுபரிசீலனை டிஎன்எஸ் என்பது மொஸில்லா கட்டுபவர்கள்  எம்விபி திட்டத்தால் ஆதரிக்கப்படும் ஒரு திறந்த மூல மென்பொருளாகும்."</string>
+    <string name="rethink_plus">மறுபரிசீலனை டிஎன்எஸ் பிளஸ்</string>
+    <string name="alert_firewall_accessibility_explanation">மறுபரிசீலனை டிஎன்எஸ் எந்தெந்த பயன்பாடுகள் பயன்பாட்டில் உள்ளன (முன்புறம்) மற்றும் பயன்பாட்டில் இல்லாதவை (பின்னணி) ஆகியவற்றைக் கண்காணிக்க அணுகல்தன்மை சேவையைப் பயன்படுத்துகிறது.
+\n
+\nமறுபரிசீலனை டிஎன்எஸ் எந்த விதத்திலும் எந்த தகவலையும் சேகரிக்கவோ அல்லது உளவு பார்க்கவோ இல்லை.</string>
+    <string name="status_protected_with_tor">டார் மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="status_protected_with_private_dns">தனியார் டிஎன்எஸ் மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="status_protected_with_tor_private_dns">டார் &amp; பிரைவேட் டிஎன்எஸ் மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="status_protected_with_socks5_private_dns">சாக்ஸ் 5 மற்றும் தனியார் டிஎன்எஸ் மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="status_protected_with_http_private_dns">http ப்ராக்ஸி மற்றும் தனியார் டிஎன்எஸ் உடன் பாதுகாக்கப்படுகிறது</string>
+    <string name="status_protected_with_socks5">சாக்ஸ் ப்ராக்ஸி மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="status_protected_with_proxy">பதிலாள் மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">தனியார் டிஎன்எஸ் இயக்கப்பட்டது</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">பாதுகாக்கப்படவில்லை</string>
+    <string name="dns_explanation_dns_connected">RethinkDNS உடன் இணைக்கப்பட்டது</string>
+    <string name="alert_permission_accessibility">அனுமதி - அணுகல்</string>
+    <string name="notification_action_resume_vpn">தற்குறிப்பு</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">RethinkDNS மற்றும் Firewall உடன் இணைக்கப்பட்டுள்ளது</string>
+    <string name="firewall_mode_info_title">ஃபயர்வால்</string>
+    <string name="universal_firewall_explanation">சாதன நிகழ்வுகளின் அடிப்படையில் அனைத்து பயன்பாடுகளிலும் ஃபயர்வால் விதிகளைப் பயன்படுத்தவும், எடுத்துக்காட்டாக, சாதனம் பூட்டப்பட்டிருக்கும் போது அல்லது குறிப்பிட்ட பயன்பாடு பயன்பாட்டில் இல்லாதபோது ஃபயர்வால்.</string>
+    <string name="notification_action_stop_vpn">நிறுத்து</string>
+    <string name="notification_action_pause_vpn">இடைநிறுத்தம்</string>
+    <string name="notification_action_dns_firewall_mode">டிஎன்எஸ் + ஃபயர்வால்</string>
+    <string name="notification_action_dns_mode">டிஎன்எஸ்</string>
+    <string name="alert_firewall_accessibility_exception">அணுகல்தன்மை அமைப்புகளைத் திறப்பதில் தோல்வி. பின்னர் மீண்டும் முயற்சிக்கவும்!</string>
+    <string name="firewall_rules">பிணைய விதிகள்</string>
+    <string name="firewall_mode_info_explanation_new">நெட்வொர்க் செயல்பாட்டைக் கண்காணித்து, எந்தவொரு பயன்பாடு அல்லது ஐபி முகவரியையும் ஃபயர்வால் செய்யவும்.</string>
+    <string name="apps_info_title">செயலிகள்</string>
+    <string name="hybrid_mode_info_title">டிஎன்எஸ் + ஃபயர்வால்</string>
+    <string name="dns_mode_info_explanation_new">டிஎன்எஸ் கோரிக்கைகளை கண்காணிக்கவும், தடுக்கவும் மற்றும் குறியாக்கம் செய்யவும்.</string>
+    <string name="dns_firewall_mode_info_explanation_new">மேலே உள்ள அனைத்தும் + இணைய தணிக்கையைத் தவிர்க்கவும்.</string>
+    <string name="private_dns_dialog_negative">ரத்து செய்</string>
+    <string name="alert_permission_accessibility_regrant">நடவடிக்கை தேவை</string>
+    <string name="private_dns_dialog_positive">அமைப்புகளுக்குச் செல்லவும்</string>
+    <string name="default_dns_name">RDNS இயல்புநிலை</string>
+    <string name="bsct_conn_block_desc_device">சாதனத்தில் %1$s தடுக்கப்பட்டது</string>
+    <string name="always_on_dialog_heading">எப்போதும் இயங்கும் VPNஐ முடக்கு</string>
+    <string name="custom_url_error_invalid_url">சரியில்லாத URL</string>
+    <string name="bsct_conn_desc_allowed">%1$s %2$s இல் அனுமதிக்கப்படுகிறது</string>
+    <string name="always_on_dialog">இந்தச் சாதனத்தில் \"எப்போதும் இயங்கு VPN\" இயக்கப்பட்டுள்ளது. மறுசிந்தனையைத் தொடங்க, அமைப்புகள் பயன்பாட்டிற்குச் சென்று, \"எப்போதும் VPN ஆன்\" என்பதை முடக்கவும்.</string>
+    <string name="private_dns_dialog_heading">தனிப்பட்ட DNS ஐ முடக்கு</string>
+    <string name="private_dns_dialog_desc">Rethink இன் DNS அமைப்புகள் Android இன் தனியார் DNS மூலம் மேலெழுதப்படுகின்றன.
+\n
+\nRethink\'s DNS ஐப் பயன்படுத்த, Android அமைப்புகளுக்குச் சென்று \"தனியார் DNS\"ஐ முடக்கவும்.</string>
+    <string name="dns_crypt_url_remove_dialog_message">சேமிக்கப்பட்ட உள்ளமைவிலிருந்து DNSCrypt தீர்வை நீக்கவும்.</string>
+    <string name="firewall_act_network_monitor_tab">நெட்வொர்க் பதிவுகள்</string>
+    <string name="bypass_universal">உலகளாவிய பைபாஸ்</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">பாதுகாப்பு அமைப்பை மாற்ற தட்டவும்</string>
+    <string name="dns_mode_notification_title">பாதுகாக்கப்பட்டது! வேகமான மற்றும் பாதுகாப்பான டிஎன்எஸ் உடன் இணைக்கப்பட்டுள்ளது.</string>
+    <string name="status_protected_with_http">http ப்ராக்ஸி மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="firewall_mode_notification_title">பாதுகாக்கப்பட்டது! ஃபயர்வாலுடன் இணைக்கப்பட்டது.</string>
+    <string name="dns_explanation_firewall_connected">ஃபயர்வாலுடன் இணைக்கப்பட்டது</string>
+    <string name="wireguard_mode_info_explanation_new">விரைவில் வரும்.</string>
+    <string name="hybrid_mode_notification_title">பாதுகாக்கப்பட்டது! டிஎன்எஸ் + தீ சுவர் உடன் இணைக்கப்பட்டது.</string>
+    <string name="pause_mode_notification_title">இடைநிறுத்தப்பட்டது! தடுக்கப்பட்ட பயன்பாடுகள் தொடர்ந்து ஃபயர்வால் செய்யப்படும்</string>
+    <string name="status_app_error">பயன்பாட்டு பிழை</string>
+    <string name="status_no_internet">இணையம் இல்லை</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">தோல்வியுற்றது</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">பாதுகாக்கப்பட்டுள்ளது</string>
+    <string name="status_dns_error">டிஎன்எஸ் பிழை</string>
+    <string name="conn_track_clear_logs_title">அனைத்து நெட்வொர்க் பதிவுகளையும் நீக்கவா\?</string>
+    <string name="dns_query_clear_logs_message">இது சாதனத்தில் உள்ள DNS பதிவுகளை நீக்குகிறது. இந்த செயல்பாடு மீளக்கூடியது அல்ல. தொடர வேண்டுமா\?</string>
+    <string name="bsct_conn_block_desc">%2$s ஆல் %1$s தடுக்கப்பட்டது</string>
+    <string name="always_on_dialog_positive_btn">அமைப்புகளுக்குச் செல்லவும்</string>
+    <string name="conn_track_clear_logs_message">இது பிணைய பதிவுகளை மட்டுமே நீக்குகிறது ஆனால் ஃபயர்வால் விதிகளை அல்ல. இந்த செயல்பாடு மீளக்கூடியது அல்ல. தொடர வேண்டுமா\?</string>
+    <string name="dns_query_clear_logs_title">அனைத்து DNS பதிவுகளையும் நீக்கவா\?</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt தீர்வை நீக்கவா\?</string>
+    <string name="bsct_conn_desc_blocked">%1$s %2$s இல் தடுக்கப்பட்டது</string>
+    <string name="always_on_dialog_stop_message">மறுபரிசீலனை செய்ய எப்போதும் இயங்கும் VPN இயக்கப்பட்டுள்ளது. எப்படியும் மறுபரிசீலனை செய்வதை நிச்சயமாக நிறுத்த விரும்புகிறீர்களா\?</string>
+    <string name="always_on_dialog_negative">ரத்து</string>
+    <string name="dns_act_log">பதிவுகள்</string>
+    <string name="doh_custom_url_remove_dialog_title">DoH இறுதிப்புள்ளியை நீக்கவா\?</string>
+    <string name="doh_custom_url_remove_dialog_message">சேமித்த உள்ளமைவிலிருந்து Https இறுதிப் புள்ளியில் DNS ஐ நீக்கவும்.</string>
+    <string name="dns_crypt_url_remove_success">DNSCrypt தீர்வு நீக்கப்பட்டது.</string>
+    <string name="always_on_dialog_stop_heading">எப்போதும் VPN-ஆன்</string>
+    <string name="always_on_dialog_positive">நிறுத்து</string>
+    <string name="univ_firewall_no_ip_message">ஐபிகள் எதுவும் இல்லை. தனிப்பட்ட ஐபி முகவரிகளைத் தடுக்க நெட்வொர்க் பதிவுத் திரையில் உள்ளீடுகளைத் தட்டவும்.</string>
+    <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt Relay ஐ நீக்கவா\?</string>
+    <string name="dns_act_configure_tab">கட்டமைக்க</string>
+    <string name="univ_firewall_dialog_title">ஐபி விதியை நீக்கவா\?</string>
+    <string name="univ_firewall_dialog_message">இந்த விதியை நீக்கினால், எந்தவொரு ஆப்ஸையும் இந்த ஐபியுடன் இணைக்க முடியும். தொடர வேண்டுமா\?</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS அணுகல்தன்மை சேவை நிறுத்தப்பட்டது அல்லது செயலிழந்தது. <i><b>செட்டிங்ஸ் சென்று ஃபோர்ஸ் ஸ்டாப்</b></i> ரீதிங்க்டிஎன்எஸ் மற்றும் அதை மீண்டும் தொடங்கவும் <i>பயன்படுத்தாத எந்த பயன்பாட்டையும் தடு</i> அம்சம்.
+\n
+\nRethinkDNS எந்தெந்த பயன்பாடுகள் பயன்பாட்டில் உள்ளன (முன்புறம்) மற்றும் பயன்பாட்டில் இல்லாதவை (பின்னணி) ஆகியவற்றைக் கண்காணிக்க அணுகல்தன்மை சேவையைப் பயன்படுத்துகிறது.</string>
+    <string name="firewall_act_universal_tab">உலகளாவிய</string>
+    <string name="brave_dns_connect_mode_change_dns">பயன்முறையைத் தேர்ந்தெடுக்கவும்.</string>
+    <string name="bsct_app_info">பயன்பாட்டுத் தகவல்</string>
+    <string name="brave_dns_connect_mode_change_firewall">பயன்முறையைத் தேர்ந்தெடுக்கவும்.</string>
+    <string name="bsct_block_app"><u>இந்த பயன்பாட்டிற்கு</u> <u> இந்த ஐபியை</u> தடு, நம்புங்கள்</string>
+    <string name="bsct_block"><u>இந்தப் பயன்பாட்டை</u> தடு, பைபாஸ், விலக்கு, தனிமைப்படுத்து</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">எச்சரிக்கை: மறுபரிசீலனை டிஎன்எஸ் செயலிழக்கச் செய்யப்பட்டுள்ளது</string>
+    <string name="status_protected_with_proxy_private_dns">ப்ராக்ஸி மற்றும் தனியார் டிஎன்எஸ் மூலம் பாதுகாக்கப்படுகிறது</string>
+    <string name="block">தொகுதி</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">காத்திருக்கிறது</string>
+    <string name="rdns_plus">ஆர்டிஎன்எஸ் கூடுதல்</string>
+    <string name="status_dns_server_down">டிஎன்எஸ் சர்வர் செயலிழந்தது</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: ஒரு பயன்பாட்டை இணையத்துடன் இணைப்பதைத் தடுக்கிறது.
+\n <u>#2</u>: குறிப்பிட்ட ஐபியுடன் இணைக்கும் எந்தப் பயன்பாட்டையும் தடுக்கிறது.
+\n <u>#3</u>: சாதனம் பூட்டப்படும் போது அனைத்து இணைப்புகளையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்).
+\n <u>#4</u>: பயன்பாட்டில் இல்லாத எந்த பயன்பாட்டையும் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்).
+\n <u>#5</u>: மூல ஆப்ஸ் தெரியாதபோது இணைப்புகளைத் தடுக்கிறது (யுனிவர்சல் ஃபயர்வால்).
+\n <u>#6</u>: DNS (யுனிவர்சல் ஃபயர்வால்) தவிர அனைத்து UDP போக்குவரத்தையும் தடுக்கிறது.
+\n <u>#7</u>: DNS புறக்கணிக்கப்படும் போது இணைப்புகளைத் தடு (யுனிவர்சல் ஃபயர்வால்).</string>
+    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS ஆனது VPN <i>Lockdown</i> பயன்முறையில் இயங்குகிறது. இதை நிறுத்தினால், இந்த பயனர் சுயவிவரத்தில் இணைய இணைப்பு இழப்பு ஏற்படும். எப்படியும் தொடர வேண்டுமா\?</string>
+    <string name="doh_custom_url_remove_success">இறுதிப்புள்ளி நீக்கப்பட்டது.</string>
+</resources>
