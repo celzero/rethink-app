@@ -119,11 +119,22 @@ class FirewallAppFragment :
         fun getFilter(): Set<Int> {
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3, 4, 5)
-                ALLOWED -> setOf(0)
-                BLOCKED -> setOf(1)
+                ALLOWED -> setOf(5)
+                BLOCKED -> setOf(5)
                 BYPASS_UNIVERSAL -> setOf(2)
                 EXCLUDED -> setOf(3)
                 LOCKDOWN -> setOf(4)
+            }
+        }
+
+        fun getConnectionStatusFilter(): Set<Int> {
+            return when (this) {
+                ALL -> setOf(0, 1, 2, 3)
+                ALLOWED -> setOf(3)
+                BLOCKED -> setOf(0, 1, 2)
+                BYPASS_UNIVERSAL -> setOf(0, 1, 2, 3)
+                EXCLUDED -> setOf(0, 1, 2, 3)
+                LOCKDOWN -> setOf(0, 1, 2, 3)
             }
         }
 
@@ -411,9 +422,7 @@ class FirewallAppFragment :
             AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
-                    updateBulkRules(type)
-                }
+                .setPositiveButton(getString(R.string.lbl_apply)) { _, _ -> updateBulkRules(type) }
                 .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
                 .setCancelable(true)
 
@@ -465,24 +474,11 @@ class FirewallAppFragment :
     private fun remakeFirewallChipsUi() {
         b.ffaFirewallChipGroup.removeAllViews()
 
-        val none =
-            makeFirewallChip(
-                FirewallFilter.ALL.id,
-                getString(R.string.lbl_all),
-                true
-            )
+        val none = makeFirewallChip(FirewallFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed =
-            makeFirewallChip(
-                FirewallFilter.ALLOWED.id,
-                getString(R.string.lbl_allowed),
-                false
-            )
+            makeFirewallChip(FirewallFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
-            makeFirewallChip(
-                FirewallFilter.BLOCKED.id,
-                getString(R.string.lbl_blocked),
-                false
-            )
+            makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
         val bypassUniversal =
             makeFirewallChip(
                 FirewallFilter.BYPASS_UNIVERSAL.id,
