@@ -18,7 +18,6 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -86,9 +85,9 @@ class CustomIpAdapter(private val context: Context) :
             b.customIpToggleGroup.tag = 1
             val status = findSelectedIpRule(customIp.status) ?: return
 
-            // decide whether to show bypass-universal  or bypass-app rule
+            // decide whether to show bypass-universal or bypass-app rule
             showBypassUi(ci.uid)
-            // whether to show the toggle group
+            // whether to show the toggle group or not
             toggleActionsUi()
             // update toggle group button based on the status
             updateToggleGroup(status)
@@ -174,10 +173,9 @@ class CustomIpAdapter(private val context: Context) :
                     updateStatusUi(statusId)
 
                     changeIpStatus(statusId)
-                    return@OnButtonCheckedListener
+                } else {
+                    unselectToggleBtnUi(b)
                 }
-
-                unselectToggleBtnUi(b)
             }
 
         private fun changeIpStatus(id: IpRulesManager.IpRuleStatus) {
@@ -297,10 +295,6 @@ class CustomIpAdapter(private val context: Context) :
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_RELATIVE
                 )
-            Log.d(
-                "TEST",
-                "TEST: now: $now, ${Utilities.humanReadableTime(now)}, ${customIp.modifiedDateTime}, ${Utilities.humanReadableTime(customIp.modifiedDateTime)}, $time"
-            )
             when (status) {
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     b.customIpStatusIcon.text =
@@ -317,7 +311,7 @@ class CustomIpAdapter(private val context: Context) :
                     b.customIpStatusTv.text =
                         context.getString(
                             R.string.ci_desc,
-                            context.getString(R.string.ci_blocked_txt),
+                            context.getString(R.string.lbl_blocked),
                             time
                         )
                 }
@@ -383,9 +377,7 @@ class CustomIpAdapter(private val context: Context) :
                     .show()
             }
 
-            builder.setNegativeButton(
-                context.getString(R.string.univ_ip_delete_individual_negative)
-            ) { _, _ ->
+            builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
                 updateStatusUi(IpRulesManager.IpRuleStatus.getStatus(customIp.status))
             }
 
