@@ -887,4 +887,5 @@
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">مسح السجلات</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">حظر البرامج الضارة وبرامج الفدية وبرامج التشفير والمخادعين والتهديدات الأخرى.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">حظر مواقع البالغين والمحتوى المقرصن، مواقع المقامرة عبر الإنترنت والمواعدة، ووسائل التواصل الاجتماعي.</string>
+    <string name="title_statistics">احصائيات</string>
 </resources>
