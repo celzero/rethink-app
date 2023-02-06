@@ -17,7 +17,6 @@ package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpDao
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
@@ -41,12 +40,8 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
             }
         }
 
-    fun customIpSize(uid: Int): LiveData<Int> {
-        return if (uid == UID_EVERYBODY) {
-            customIpDao.getCustomIpsLiveData()
-        } else {
-            customIpDao.getAppWiseIpRulesCount(uid)
-        }
+    fun ipRulesCount(uid: Int): LiveData<Int> {
+        return customIpDao.getAppWiseIpRulesCount(uid)
     }
 
     private fun getAppWise(uid: Int, input: String?): LiveData<PagingData<CustomIp>> {

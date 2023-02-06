@@ -27,23 +27,60 @@
         android:textSize="@dimen/small_font_subheading_text"
         app:layout_constraintTop_toBottomOf="@id/dacd_url_title" />
 
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/dacd_chip_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:foregroundGravity="center"
+        app:chipSpacing="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dacd_url_desc"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/dacd_domain_chip"
+            style="@style/ThinnerChip.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:padding="2dp"
+            android:text="@string/lbl_domain"
+            android:textAlignment="center"
+            android:textSize="@dimen/default_font_text_view"
+            android:checked="true"
+            app:checkedIconTint="?attr/primaryTextColor"
+            app:chipBackgroundColor="@drawable/bg_chip_state_list"
+            app:chipIconEnabled="true"
+            app:chipIconSize="15dp"
+            app:iconStartPadding="3dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/dacd_wildcard_chip"
+            style="@style/ThinnerChip.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:padding="2dp"
+            android:text="@string/lbl_wildcard"
+            android:textAlignment="center"
+            android:textSize="@dimen/default_font_text_view"
+            android:checked="false"
+            app:checkedIconTint="?attr/primaryTextColor"
+            app:chipBackgroundColor="@drawable/bg_chip_state_list"
+            app:chipIconEnabled="true"
+            app:chipIconSize="15dp"
+            app:iconStartPadding="3dp" />
+
+    </com.google.android.material.chip.ChipGroup>
+
     <LinearLayout
         android:id="@+id/dacd_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/dacd_url_desc">
-
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/dacd_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:drawSelectorOnTop="true"
-            android:dropDownWidth="wrap_content"
-            android:padding="0dp"
-            android:spinnerMode="dropdown" />
+        app:layout_constraintTop_toBottomOf="@id/dacd_chip_group">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dacd_text_input_layout"
@@ -58,11 +95,11 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
+                android:hint="@string/cd_dialog_edittext_hint"
                 android:importantForAutofill="no"
                 android:inputType="textUri"
                 android:maxLines="2"
                 android:minHeight="48dp"
-                android:hint="@string/cd_dialog_edittext_hint"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view"
                 app:layout_constraintRight_toLeftOf="parent"

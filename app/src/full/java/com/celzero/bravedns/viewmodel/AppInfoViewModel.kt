@@ -51,13 +51,22 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun allApps(searchString: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    appInfoDAO.getAppInfos("%$searchString%", firewallFilter.getFilter())
+                    appInfoDAO.getAppInfos(
+                        "%$searchString%",
+                        firewallFilter.getFilter(),
+                        firewallFilter.getConnectionStatusFilter()
+                    )
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    appInfoDAO.getAppInfos("%$searchString%", category, firewallFilter.getFilter())
+                    appInfoDAO.getAppInfos(
+                        "%$searchString%",
+                        category,
+                        firewallFilter.getFilter(),
+                        firewallFilter.getConnectionStatusFilter()
+                    )
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -67,13 +76,22 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun installedApps(search: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    appInfoDAO.getInstalledApps("%$search%", firewallFilter.getFilter())
+                    appInfoDAO.getInstalledApps(
+                        "%$search%",
+                        firewallFilter.getFilter(),
+                        firewallFilter.getConnectionStatusFilter()
+                    )
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    appInfoDAO.getInstalledApps("%$search%", category, firewallFilter.getFilter())
+                    appInfoDAO.getInstalledApps(
+                        "%$search%",
+                        category,
+                        firewallFilter.getFilter(),
+                        firewallFilter.getConnectionStatusFilter()
+                    )
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -83,13 +101,22 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     private fun systemApps(search: String): LiveData<PagingData<AppInfo>> {
         return if (category.isEmpty()) {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    appInfoDAO.getSystemApps("%$search%", firewallFilter.getFilter())
+                    appInfoDAO.getSystemApps(
+                        "%$search%",
+                        firewallFilter.getFilter(),
+                        firewallFilter.getConnectionStatusFilter()
+                    )
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    appInfoDAO.getSystemApps("%$search%", category, firewallFilter.getFilter())
+                    appInfoDAO.getSystemApps(
+                        "%$search%",
+                        category,
+                        firewallFilter.getFilter(),
+                        firewallFilter.getConnectionStatusFilter()
+                    )
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -254,7 +281,10 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         val cid: FirewallManager.ConnectionStatus
     )
 
-    private fun getAppStateForMobileData(blocked: Boolean, connStatus: FirewallManager.ConnectionStatus): AppState {
+    private fun getAppStateForMobileData(
+        blocked: Boolean,
+        connStatus: FirewallManager.ConnectionStatus
+    ): AppState {
         if (blocked) {
             return when (connStatus) {
                 FirewallManager.ConnectionStatus.ALLOW -> {
@@ -326,9 +356,20 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
                 }
             }
         return if (category.isEmpty()) {
-            appInfoDAO.getFilteredApps("%$search%", firewallFilter.getFilter(), appType)
+            appInfoDAO.getFilteredApps(
+                "%$search%",
+                firewallFilter.getFilter(),
+                appType,
+                firewallFilter.getConnectionStatusFilter()
+            )
         } else {
-            appInfoDAO.getFilteredApps("%$search%", category, firewallFilter.getFilter(), appType)
+            appInfoDAO.getFilteredApps(
+                "%$search%",
+                category,
+                firewallFilter.getFilter(),
+                appType,
+                firewallFilter.getConnectionStatusFilter()
+            )
         }
     }
 }

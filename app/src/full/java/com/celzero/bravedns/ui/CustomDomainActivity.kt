@@ -23,8 +23,6 @@ import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -155,13 +153,39 @@ class CustomDomainActivity :
         val dBind = DialogAddCustomDomainBinding.inflate(layoutInflater)
         dialog.setContentView(dBind.root)
 
-        val types = DomainRulesManager.DomainType.getAllDomainTypes()
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
 
-        val aa: ArrayAdapter<*> =
-            ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, types)
-        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        dBind.dacdSpinner.adapter = aa
+        dBind.dacdDomainChip.setOnCheckedChangeListener { _, isSelected ->
+            if (isSelected) {
+                selectedType = DomainRulesManager.DomainType.DOMAIN
+                dBind.dacdDomainEditText.hint =
+                    resources.getString(
+                        R.string.cd_dialog_edittext_hint,
+                        getString(R.string.lbl_domain)
+                    )
+                dBind.dacdTextInputLayout.hint =
+                    resources.getString(
+                        R.string.cd_dialog_edittext_hint,
+                        getString(R.string.lbl_domain)
+                    )
+            }
+        }
+
+        dBind.dacdWildcardChip.setOnCheckedChangeListener { _, isSelected ->
+            if (isSelected) {
+                selectedType = DomainRulesManager.DomainType.WILDCARD
+                dBind.dacdDomainEditText.hint =
+                    resources.getString(
+                        R.string.cd_dialog_edittext_hint,
+                        getString(R.string.lbl_wildcard)
+                    )
+                dBind.dacdTextInputLayout.hint =
+                    resources.getString(
+                        R.string.cd_dialog_edittext_hint,
+                        getString(R.string.lbl_wildcard)
+                    )
+            }
+        }
 
         val lp = WindowManager.LayoutParams()
         lp.copyFrom(dialog.window?.attributes)
@@ -174,29 +198,9 @@ class CustomDomainActivity :
 
         dBind.dacdUrlTitle.text = getString(R.string.cd_dialog_title)
         dBind.dacdDomainEditText.hint =
-            resources.getString(R.string.cd_dialog_edittext_hint, types[0])
+            resources.getString(R.string.cd_dialog_edittext_hint, getString(R.string.lbl_domain))
         dBind.dacdTextInputLayout.hint =
-            resources.getString(R.string.cd_dialog_edittext_hint, types[0])
-
-        dBind.dacdSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // no-op
-                }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    selectedType = DomainRulesManager.DomainType.getType(position)
-                    dBind.dacdDomainEditText.hint =
-                        resources.getString(R.string.cd_dialog_edittext_hint, types[position])
-                    dBind.dacdTextInputLayout.hint =
-                        resources.getString(R.string.cd_dialog_edittext_hint, types[position])
-                }
-            }
+            resources.getString(R.string.cd_dialog_edittext_hint, getString(R.string.lbl_domain))
 
         dBind.dacdAddBtn.setOnClickListener {
             dBind.dacdFailureText.visibility = View.GONE
@@ -238,13 +242,12 @@ class CustomDomainActivity :
     private fun isWildCardEntry(url: String): Boolean {
         // ref: https://regex101.com/r/wG1nZ3/2
         // https://stackoverflow.com/questions/26302101/regular-expression-for-wildcard-domain-validation
-        // valid entries: *.test.com, test.com, abc.test.com, test.*.com
-        val pattern = Pattern.compile("^(([\\w-]+\\.)|(\\*\\.))+[\\w-]+\$")
+        // valid entries: *.test.com, test.com, abc.test.com
+        val pattern = Pattern.compile("^(([\\w\\d]+\\.)|(\\*\\.))+[\\w\\d]+\$")
         return pattern.matcher(url).find()
     }
 
     private fun insertDomain(domain: String, type: DomainRulesManager.DomainType) {
-        val uid = Constants.UID_EVERYBODY
         DomainRulesManager.block(domain, type = type, uid = uid)
         Utilities.showToastUiCentered(
             this,

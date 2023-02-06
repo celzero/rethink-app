@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/custom_dialog_heading"
+            android:id="@+id/cip_heading"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,14 +28,14 @@
             android:textSize="@dimen/extra_large_font_text_view" />
 
         <RelativeLayout
-            android:id="@+id/custom_dialog_no_rules_rl"
+            android:id="@+id/cip_no_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/custom_dialog_heading"
+            android:layout_below="@id/cip_heading"
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/custom_dialog_no_rules_text"
+                android:id="@+id/cip_no_rules_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
@@ -50,16 +50,16 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/custom_dialog_no_rules_text"
+                android:layout_below="@id/cip_no_rules_text"
                 android:src="@drawable/illustrations_no_record" />
 
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/custom_dialog_show_rules_rl"
+            android:id="@+id/cip_show_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/custom_dialog_heading"
+            android:layout_below="@id/cip_heading"
             android:orientation="vertical"
             android:visibility="visible">
 
@@ -106,22 +106,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-
-            <TextView
-                android:id="@+id/cip_no_rules_set_txt"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/cip_search_container"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:text="@string/univ_firewall_no_ip_message"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view"
-                android:visibility="invisible" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/cip_recycler"
                 android:layout_width="match_parent"
@@ -137,7 +121,7 @@
     </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/custom_dialog_add_fab"
+        android:id="@+id/cip_add_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

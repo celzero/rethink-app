@@ -137,7 +137,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private fun updateRulesUi(uid: Int, domain: String) {
         val d = domain.dropLastWhile { it == '.' }
         val status = DomainRulesManager.status(d, uid)
-        b.bsdlDomainRuleSpinner.setSelection(status.status.id)
+        b.bsdlDomainRuleSpinner.setSelection(status.id)
     }
 
     private fun displayRecordTypeChip() {

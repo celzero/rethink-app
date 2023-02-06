@@ -338,7 +338,6 @@
                         android:gravity="center"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
-                        android:text="4"
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="@dimen/heading_font_text_view"
                         android:textStyle="bold" />
@@ -349,7 +348,7 @@
                         android:layout_gravity="center"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:text="IP Rules"
+                        android:text="@string/lbl_ip_rules"
                         android:textSize="@dimen/default_font_text_view" />
 
                 </LinearLayout>
@@ -373,7 +372,6 @@
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp">
 
-
                     <TextView
                         android:id="@+id/aad_domain_block_header"
                         style="@style/TextAppearance.AppCompat.Subhead"
@@ -383,8 +381,7 @@
                         android:gravity="center"
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
-                        android:text="0"
-                        android:textColor="?attr/primaryTextColor"
+                        android:textColor="?attr/secondaryTextColor"
                         android:textSize="@dimen/heading_font_text_view"
                         android:textStyle="bold" />
 
@@ -394,7 +391,7 @@
                         android:layout_gravity="center"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:text="Domain Rules"
+                        android:text="@string/lbl_domain_rules"
                         android:textSize="@dimen/default_font_text_view" />
 
                 </LinearLayout>
