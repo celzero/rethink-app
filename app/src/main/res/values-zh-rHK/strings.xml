@@ -86,7 +86,7 @@
     <string name="ada_network_log_title">呢個 app 嘅網絡日誌</string>
     <string name="ada_app_metered">收費嘅網絡</string>
     <string name="ada_app_exclude">排除</string>
-    <string name="bsac_distrust_toast">移除咗針對呢個 IP %1$s 嘅繞行</string>
+    <string name="bsac_distrust_toast">唔信任呢個 IP 嘅 %1$s</string>
     <string name="rethink_sky_desc">超過 280 個地方；更長嘅在線時間；喺 cloudflare.com 上面行嘅中間解析服務</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
     <string name="app_name">RethinkDNS</string>
@@ -616,10 +616,12 @@
     <string name="bsac_title_desc">呢條規則淨係適用於呢個 app。</string>
     <string name="bsac_unblock">解封</string>
     <string name="bsac_trust">信任</string>
-    <string name="bsac_distrust">移除繞行</string>
+    <string name="bsac_distrust">唔信任</string>
     <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
     <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
-    <string name="bsac_trust_toast">針對呢個 IP %1$s 嘅繞行應用規則</string>
+    <string name="bsdl_domain_heading">網域規則</string>
+    <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
+    <string name="bsac_trust_toast">信任呢個 app 嘅 %1$s</string>
     <string name="bsdl_blocked_desc">由 %2$s 攔截咗 %1$s</string>
     <string name="network_dns">系統 DNS</string>
     <string name="notif_download_content_title">下載本地攔截清單</string>

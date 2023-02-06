@@ -486,9 +486,10 @@
 \n繞行 %2$s
 \n排除 %3$s
 \n隔離 %4$s</string>
-    <string name="firewall_card_text_inactive">啓用防火牆模式。</string>
+    <string name="firewall_card_text_inactive">請啓用防火牆模式。</string>
+    <string name="dns_card_connected_status_failure">已禁用</string>
     <string name="dns_card_latency_active">延遲： %1$sms</string>
-    <string name="dns_card_latency_inactive">啓用 DNS 模式。</string>
+    <string name="dns_card_latency_inactive">請啓用 DNS 模式。</string>
     <string name="apps_card_ips_count">%1$s IP 與埠規則</string>
     <string name="hsf_start_btn_state">啓動</string>
     <string name="hsf_stop_btn_state">停止</string>
@@ -802,8 +803,8 @@
     <string name="private_dns_error">無法打開私人 DNS 區。</string>
     <string name="private_dns_dialog_heading">關閉私人 DNS</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s 個攔截清單</string>
-    <string name="settings_locale_desc">選擇您傾向使用的語言</string>
-    <string name="settings_locale_dialog_title">選擇您傾向使用的語言</string>
+    <string name="settings_locale_desc">選擇您的語言</string>
+    <string name="settings_locale_dialog_title">選擇您的語言</string>
     <string name="hs_biometeric_desc">使用生物識別驗證解鎖 RethinkDNS</string>
     <string name="hs_biometeric_failed">生物識別認證失敗</string>
     <string name="fapps_info_unmetered_msg">於非計費網路（ WiFi ）放行/攔截。</string>

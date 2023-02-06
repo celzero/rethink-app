@@ -232,7 +232,7 @@
     <string name="settings_ip_dialog_ipv46">自动（实验性）</string>
     <string name="firewall_status_block_unmetered">已阻止连接非收费（ WiFi ）网络</string>
     <string name="firewall_status_blocked">已拦截</string>
-    <string name="dns_card_latency_inactive">启用 DNS 模式。</string>
+    <string name="dns_card_latency_inactive">请启用 DNS 模式。</string>
     <string name="hsf_start_dialog_positive">启动</string>
     <string name="dc_other_dns_heading">类型</string>
     <string name="dc_other_settings_heading">高级</string>
@@ -571,7 +571,7 @@
     <string name="settings_dns_proxy_dialog_app">应用</string>
     <string name="settings_socks5_dialog_hint_ip">IP 地址</string>
     <string name="firewall_status_block_metered">已阻止连接收费（移动数据）网络</string>
-    <string name="firewall_card_text_inactive">启用防火墙模式。</string>
+    <string name="firewall_card_text_inactive">请启用防火墙模式。</string>
     <string name="dc_custom_block_heading">放行或拦截个別域名</string>
     <string name="about_twitter">在 Twitter 上关注我们</string>
     <string name="slide_1_desc">RethinkDNS 是一款受 Mozilla Builders MVP 计划资助与支持的开源软件。</string>
@@ -833,8 +833,8 @@
     <string name="fapps_isolate_block_dialog_message">是否隔离<i>已列出</i>应用？</string>
     <string name="title_statistics">统计</string>
     <string name="settings_locale_heading">更改语言</string>
-    <string name="settings_locale_desc">选择你倾向使用的语言</string>
-    <string name="settings_locale_dialog_title">选择你倾向使用的语言</string>
+    <string name="settings_locale_desc">选择您的语言</string>
+    <string name="settings_locale_dialog_title">选择您的语言</string>
     <string name="settings_biometric_desc">使用屏幕锁保护此应用</string>
     <string name="settings_locale_dialog_neutral">协助翻译此应用</string>
     <string name="settings_biometeric_heading">启用应用锁</string>
