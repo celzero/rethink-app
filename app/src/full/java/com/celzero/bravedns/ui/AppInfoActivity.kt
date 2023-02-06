@@ -51,6 +51,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
+import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,7 +68,7 @@ class AppInfoActivity :
     private val connectionTrackerRepository by inject<ConnectionTrackerRepository>()
 
     private val ipRulesViewModel: CustomIpViewModel by viewModel()
-    // private val domainRulesViewModel: CustomDomainViewModel by viewModel()
+    private val domainRulesViewModel: CustomDomainViewModel by viewModel()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
 
     private var uid: Int = 0
@@ -88,7 +89,7 @@ class AppInfoActivity :
         super.onCreate(savedInstanceState)
         uid = intent.getIntExtra(UID_INTENT_NAME, INVALID_UID)
         ipRulesViewModel.setUid(uid)
-        // domainRulesViewModel.setUid(uid)
+        domainRulesViewModel.setUid(uid)
         networkLogsViewModel.setUid(uid)
         init()
         observeNetworkLogSize()
@@ -99,12 +100,12 @@ class AppInfoActivity :
     private fun observeAppRules() {
         ipRulesViewModel.ipRulesCount(uid).observe(this) {
             b.aadIpBlockHeader.text =
-                it.toString() // getString(R.string.ada_ip_block_count, it.toString())
+                it.toString()
         }
 
-        /*domainRulesViewModel.domainRulesCount(uid).observe(this) {
+        domainRulesViewModel.domainRulesCount(uid).observe(this) {
             b.aadDomainBlockHeader.text = it.toString()
-        }*/
+        }
     }
 
     private fun observeNetworkLogSize() {
@@ -240,6 +241,7 @@ class AppInfoActivity :
                         enableBlock(connectionStatus)
                     }
                 }
+                disableWhitelistExcludeUi()
             }
             FirewallManager.FirewallStatus.UNTRACKED -> {
                 // no-op
@@ -405,11 +407,11 @@ class AppInfoActivity :
     }
 
     private fun toggleMobileData(appInfo: AppInfo) {
-        // toggle mobile data: change the app status and connection status based on the current
-        // status.
-        // if Mobile Data -> allow(app status) + Mobile Data(connection status)
-        // if BOTH -> no need to change the app status, toggle connection status
-        // based on the current status
+        // toggle mobile data: change the connection status based on the current status.
+        // if allow -> none(app status) + metered(connection status)
+        // if unmetered -> none(app status) + both(connection status)
+        // if metered -> none(app status) + allow(connection status)
+        // if both -> none(app status) + unmetered(connection status)
         val cStat = when (FirewallManager.connectionStatus(appInfo.uid)) {
             FirewallManager.ConnectionStatus.METERED -> {
                 FirewallManager.ConnectionStatus.ALLOW
@@ -429,10 +431,11 @@ class AppInfoActivity :
     }
 
     private fun toggleWifi(appInfo: AppInfo) {
-        // toggle wifi: change the app status and connection status based on the current status.
-        // if Wifi -> allow(app status) + wifi(connection status)
-        // if BOTH -> no need to change the app status, toggle connection status
-        // based on the current status
+        // toggle wifi: change the connection status based on the current status.
+        // if Wifi -> none(app status) + wifi(connection status)
+        // if MOBILE DATA -> none(app status) + both(connection status)
+        // if BOTH -> none(app status) + mobile data(connection status)
+        // if ALLOW -> none(app status) + wifi(connection status)
         val cStat = when (FirewallManager.connectionStatus(appInfo.uid)) {
             FirewallManager.ConnectionStatus.UNMETERED -> {
                 FirewallManager.ConnectionStatus.ALLOW
