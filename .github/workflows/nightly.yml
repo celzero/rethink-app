@@ -20,9 +20,9 @@ jobs:
         id: check
         run: |
           if [[ $(git rev-list --after="24 hours" main) ]]; then
-            echo ::set-output name=shouldBuild::true
+            echo shouldBuild=true >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=shouldBuild::false
+            echo shouldBuild=false >> $GITHUB_OUTPUT
           fi
 
 
@@ -30,7 +30,11 @@ jobs:
     name: Generate Nightly Build
     runs-on: ubuntu-latest
     needs: evaluateChanges
-    if: ${{ needs.evaluateChanges.outputs.SHOULD_BUILD == 'true' }}
+    if: needs.evaluateChanges.outputs.SHOULD_BUILD == 'true'
+    env:
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      SCHEDULED_BUILD_VARIANT: ${{ secrets.SCHEDULED_BUILD_VARIANT }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -43,14 +47,14 @@ jobs:
           distribution: 'temurin'
 
       - name: Build and send apks to telegram
-        if: ${{ secrets.TELEGRAM_CHAT_ID && secrets.SCHEDULED_BUILD_VARIANT }}
+        if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT
         run: |
-          for TASK in ${{ secrets.SCHEDULED_BUILD_VARIANT }}; do
+          for TASK in $SCHEDULED_BUILD_VARIANT; do
             ./gradlew $TASK
             apk_path="$(find . -type f -iname *.apk)"
             echo $apk_path
-            curl https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendDocument \
-              -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
+              -F chat_id="$TELEGRAM_CHAT_ID" \
               -F "caption=Size: $(ls -l --block-size=K "$apk_path" | awk '{ print $5 }')" \
               -F parse_mode=HTML \
               -F document=@"$apk_path"
