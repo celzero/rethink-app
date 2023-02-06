@@ -12,8 +12,12 @@ jobs:
   notify:
     name: Notify via Telegram
     runs-on: ubuntu-latest
+    env: 
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
     steps:
       - name: Notify
+        if: env.TELEGRAM_CHAT_ID && env.TELEGRAM_TOKEN
         env:
           COMMITS: ${{ toJson(github.event.commits) }}
           TEMPLATE: '.[] | "<a href=\"\(.url)\">\(.id[:8])</a> • <a href=\"https://github.com/\(.author.username | @html)\">\(.author.username | @html)</a>
@@ -29,9 +33,9 @@ jobs:
           jq -R --slurp '{
             text: .,
             disable_web_page_preview: true,
-            chat_id: "${{ secrets.TELEGRAM_CHAT_ID }}",
+            chat_id: "$TELEGRAM_CHAT_ID",
             parse_mode: "HTML"
           }' | \
-          curl -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
+          curl -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage \
             -H 'Content-Type: application/json' \
             --data-binary @-
