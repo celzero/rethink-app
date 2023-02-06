@@ -60,8 +60,8 @@
     <string name="status_protected_with_proxy_private_dns">zabezpieczone przez proxy &amp; prywatnym dns</string>
     <string name="status_protected_with_socks5_private_dns">zabezpieczone przez socks5 &amp; prywatnym dns</string>
     <string name="bsct_conn_block_desc_device">zablokowane %1$s na urządzeniu</string>
-    <string name="bsct_block_app">Blokowanie, omijanie <u>tego IP</u> dla <u>tej aplikacji</u></string>
-    <string name="bsct_block">Blokuj, omijaj, wyklucz, blokuj <u>tę aplikację</u></string>
+    <string name="bsct_block_app">Blokowanie, zaufaj <u>temu adresowi IP</u> dla <u>tej aplikacji</u></string>
+    <string name="bsct_block">Blokuj, omijaj, wyklucz, izoluj <u>tę aplikację</u></string>
     <string name="bsct_conn_block_desc">zablokowany %1$s przez %2$s</string>
     <string name="bsct_conn_desc_allowed">dozwolony na %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked">zablokowany na %1$s %2$s</string>
@@ -81,4 +81,60 @@
     <string name="dns_query_clear_logs_title">Usunąć wszystkie logi DNS\?</string>
     <string name="dns_query_clear_logs_message">Powoduje to usunięcie dzienników DNS na urządzeniu. Ta operacja nie jest odwracalna. Czy chcesz kontynuować\?</string>
     <string name="bsct_app_info">Informacje o Aplikacji</string>
+    <string name="dns_mode_info_title">DNS</string>
+    <string name="notification_action_dns_mode">DNS</string>
+    <string name="always_on_dialog_positive_btn">Przejdź do ustawień</string>
+    <string name="always_on_dialog_heading">Wyłączenie zawsze włączonej sieci VPN</string>
+    <string name="always_on_dialog_negative_btn">Anuluj</string>
+    <string name="always_on_dialog_stop_heading">Zawsze włączona sieć VPN</string>
+    <string name="private_dns_dialog_heading">Wyłącz prywatny DNS</string>
+    <string name="private_dns_dialog_desc">Ustawienia DNS Rethink są nadrzędne w stosunku do prywatnych DNS Androida.
+\n
+\nAby użyć DNS Rethink przejdź do Ustawień Androida i wyłącz \"Prywatny DNS\".</string>
+    <string name="private_dns_dialog_negative">Odrzuć</string>
+    <string name="doh_custom_url_remove_success">Punkt końcowy usunięty.</string>
+    <string name="dns_crypt_url_remove_dialog_message">Usuń resolver DNSCrypt z zapisanej konfiguracji.</string>
+    <string name="doh_custom_url_remove_dialog_message">Usuń punkt końcowy DNS over Https z zapisanej konfiguracji.</string>
+    <string name="private_dns_dialog_positive">Przejdź do ustawień</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title">Usunąć resolver DNSCrypt\?</string>
+    <string name="dns_crypt_relay_remove_success">DNSCrypt Relay usunięty.</string>
+    <string name="always_on_dialog_positive">Stop</string>
+    <string name="always_on_dialog_negative">Anuluj</string>
+    <string name="univ_firewall_dialog_title">Usunąć regułę IP\?</string>
+    <string name="dns_crypt_url_remove_success">DNSCrypt resolver usunięty.</string>
+    <string name="brbs_restore_no_uri_toast">Przywracanie nie powiodło się; spróbuj ponownie</string>
+    <string name="title_statistics">Statystyki</string>
+    <string name="accessibility_service_label">RethinkDNS</string>
+    <string name="slide_2_title">Witaj</string>
+    <string name="rethink_plus">RethinkDNS Plus</string>
+    <string name="rdns_plus">RDNS Plus</string>
+    <string name="isolate">izoluj</string>
+    <string name="alert_permission_accessibility">Pozwolenie - Dostępność</string>
+    <string name="bsct_conn_rule_explanation"><u>#1</u>: Blokuje aplikację przed połączeniem się z Internetem.
+\n <u>#2</u>: Blokuje każdej aplikacji możliwość łączenia się z określonym IP.
+\n <u>#3</u>: Blokuje wszystkie połączenia, gdy urządzenie jest zablokowane (Universal Firewall).
+\n <u>#4</u>: Blokuje każdą aplikację, która nie jest używana (Universal Firewall).
+\n <u>#5</u>: Blokuje połączenia, gdy źródło aplikacji jest nieznane (Universal Firewall).
+\n <u>#6</u>: Blokuje cały ruch UDP z wyjątkiem DNS (Universal Firewall).
+\n <u>#7</u>: Blokuje połączenia, gdy DNS jest omijany (Universal Firewall).</string>
+    <string name="always_on_dialog_neutral">Ustawienia</string>
+    <string name="firewall_act_universal_tab">Uniwersalny</string>
+    <string name="firewall_act_network_monitor_tab">Logi sieciowe</string>
+    <string name="dns_act_configure_tab">Konfiguruj</string>
+    <string name="dns_act_log">Logi</string>
+    <string name="univ_firewall_dialog_message">Usunięcie tej reguły pozwoli każdej aplikacji na połączenie się z tym IP. Czy chcesz kontynuować\?</string>
+    <string name="doh_custom_url_remove_dialog_title">Usunąć punkt końcowy DoH\?</string>
+    <string name="dns_crypt_relay_remove_dialog_title">Usunąć DNSCrypt Relay\?</string>
+    <string name="dns_crypt_relay_remove_dialog_message">Usuń przekaźnik DNSCrypt z zapisanej konfiguracji.</string>
+    <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s listy blokowania</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">najbardziej dozwolone aplikacje</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">najczęściej blokowane aplikacje</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domeny, z którymi najczęściej się łączono</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">najczęściej blokowane domeny</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Uruchom Rethink, aby kontynuować</string>
+    <string name="ssv_see_more">pokaż wszystko</string>
+    <string name="app_name_small_case">rethink</string>
+    <string name="app_name_rethink">Rethink</string>
+    <string name="txt_home">Strona główna</string>
+    <string name="settings_allow_bypass_heading">Pozwól na obejście</string>
 </resources>
