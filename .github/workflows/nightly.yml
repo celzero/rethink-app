@@ -47,7 +47,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build and send apks to telegram
-        if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT
+        if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT && env.TELEGRAM_TOKEN
         run: |
           for TASK in $SCHEDULED_BUILD_VARIANT; do
             ./gradlew $TASK
