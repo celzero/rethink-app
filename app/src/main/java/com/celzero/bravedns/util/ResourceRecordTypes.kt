@@ -99,5 +99,12 @@ enum class ResourceRecordTypes(val value: Int, val desc: String) {
         fun getTypeName(value: Int): ResourceRecordTypes {
             return map[value.hashCode()] ?: UNKNOWN
         }
+
+        fun mayContainIP(value: Int): Boolean {
+            return when (value) {
+                A.value, AAAA.value, CNAME.value, HTTPS.value, SVCB.value -> true
+                else -> false
+            }
+        }
     }
 }

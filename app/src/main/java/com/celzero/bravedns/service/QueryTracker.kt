@@ -48,7 +48,7 @@ class QueryTracker(private var persistentState: PersistentState) {
 
     fun recordTransaction(transaction: Transaction) {
         // if server-ip is nil and blocklists are not empty, skip because this tx was resolved locally
-        if (TextUtils.isEmpty(transaction.serverIp) && !TextUtils.isEmpty(transaction.blocklist)) return
+        if (TextUtils.isEmpty(transaction.serverName) && !TextUtils.isEmpty(transaction.blocklist)) return
         ++numRequests
         if (numRequests % HISTORY_SIZE == 0L) {
             reinitializeQuantileEstimator()
@@ -57,7 +57,7 @@ class QueryTracker(private var persistentState: PersistentState) {
     }
 
     fun sync(transaction: Transaction?) {
-        if (transaction == null || transaction.serverIp.isEmpty() || isUnspecifiedIp(transaction.serverIp) || transaction.status != Transaction.Status.COMPLETE) {
+        if (transaction == null || transaction.serverName.isEmpty() || isUnspecifiedIp(transaction.serverName) || transaction.status != Transaction.Status.COMPLETE) {
             return
         }
         // Restore number of requests from storage, or 0 if it isn't defined yet.

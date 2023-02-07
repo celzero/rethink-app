@@ -19,18 +19,13 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
-import androidx.collection.LongSparseArray
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.net.dns.DnsPacket
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
-import com.celzero.bravedns.util.Constants.Companion.LOOPBACK_IPV6
-import com.celzero.bravedns.util.Constants.Companion.NXDOMAIN
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.IpManager
@@ -43,15 +38,14 @@ import dnsx.Dnsx
 import dnsx.Summary
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.net.InetAddress
-import java.net.ProtocolException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DnsLogTracker
 internal constructor(
@@ -68,11 +62,11 @@ internal constructor(
         // add a reasonable grace period to account for that
         // for eg: https://support.mozilla.org/en-US/questions/1213045
         private val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
+        private const val RDATA_MAX_LENGTH = 100
     }
 
     private var numRequests: Long = 0
     private var numBlockedRequests: Long = 0
-    private val goStatusMap = LongSparseArray<Transaction.Status>()
     private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
 
     init {
@@ -83,14 +77,6 @@ internal constructor(
         persistentState.dnsRequestsCountLiveData.postValue(numRequests)
         persistentState.dnsBlockedCountLiveData.postValue(numBlockedRequests)
 
-        goStatusMap.put(Dnsx.Complete, Transaction.Status.COMPLETE)
-        goStatusMap.put(Dnsx.SendFailed, Transaction.Status.SEND_FAIL)
-        goStatusMap.put(Dnsx.NoResponse, Transaction.Status.NO_RESPONSE)
-        goStatusMap.put(Dnsx.TransportError, Transaction.Status.TRANSPORT_ERROR)
-        goStatusMap.put(Dnsx.BadQuery, Transaction.Status.BAD_QUERY)
-        goStatusMap.put(Dnsx.BadResponse, Transaction.Status.BAD_RESPONSE)
-        goStatusMap.put(Dnsx.InternalError, Transaction.Status.INTERNAL_ERROR)
-
         vpnStateMap[Transaction.Status.COMPLETE] = BraveVPNService.State.WORKING
         vpnStateMap[Transaction.Status.SEND_FAIL] = BraveVPNService.State.NO_INTERNET
         vpnStateMap[Transaction.Status.NO_RESPONSE] = BraveVPNService.State.DNS_SERVER_DOWN
@@ -100,25 +86,24 @@ internal constructor(
         vpnStateMap[Transaction.Status.INTERNAL_ERROR] = BraveVPNService.State.APP_ERROR
     }
 
-    fun processOnResponse(summary: Summary): Transaction? {
-        val query: DnsPacket =
-            try {
-                DnsPacket(summary.query)
-            } catch (e: Exception) {
-                return null
-            }
+    fun processOnResponse(summary: Summary): Transaction {
         val latencyMs = (TimeUnit.SECONDS.toMillis(1L) * summary.latency).toLong()
         val nowMs = SystemClock.elapsedRealtime()
         val queryTimeMs = nowMs - latencyMs
-        val transaction = Transaction(query, queryTimeMs)
-        transaction.queryType = Transaction.QueryType.getType(summary.type)
-        transaction.response = summary.response
+        val transaction = Transaction()
+        transaction.name = summary.qName
+        transaction.type = summary.qType
+        transaction.id = summary.id
+        transaction.queryTime = queryTimeMs
+        transaction.transportType = Transaction.TransportType.getType(summary.type)
+        transaction.response = summary.rData ?: ""
+        transaction.ttl = summary.rTtl
         transaction.responseTime = latencyMs
-        transaction.serverIp = summary.server
-        transaction.status = goStatusMap[summary.status]
+        transaction.serverName = summary.server ?: ""
+        transaction.status = Transaction.Status.fromId(summary.status)
         transaction.responseCalendar = Calendar.getInstance()
-        transaction.blocklist = summary.blocklists
-        transaction.queryType = Transaction.QueryType.DOH
+        transaction.blocklist = summary.blocklists ?: ""
+        transaction.relayName = summary.relayServer ?: ""
         return transaction
     }
 
@@ -126,18 +111,18 @@ internal constructor(
         val dnsLog = DnsLog()
 
         dnsLog.blockLists = transaction.blocklist
-        if (transaction.queryType.isDnsCrypt) {
-            dnsLog.dnsType = AppConfig.DnsType.DNSCRYPT.type
-            dnsLog.relayIP = transaction.relayIp
+        dnsLog.resolverId = transaction.id
+        if (transaction.transportType.isDnsCrypt()) {
+            dnsLog.relayIP = transaction.relayName
         } else {
             // fixme: handle for DoH and Dns proxy
-            dnsLog.dnsType = transaction.queryType.ordinal
             dnsLog.relayIP = ""
         }
+        dnsLog.dnsType = transaction.transportType.ordinal
         dnsLog.latency = transaction.responseTime
         dnsLog.queryStr = transaction.name
         dnsLog.responseTime = transaction.responseTime
-        dnsLog.serverIP = transaction.serverIp
+        dnsLog.serverIP = transaction.serverName
         dnsLog.status = transaction.status.name
         dnsLog.time = transaction.responseCalendar.timeInMillis
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
@@ -146,89 +131,59 @@ internal constructor(
         } else {
             dnsLog.typeName = typeName.desc
         }
-        val serverAddress = IpManager.getIpAddress(transaction.serverIp)
+        dnsLog.resolver = transaction.serverName
 
-        if (serverAddress?.toInetAddress()?.hostAddress != null) {
-            val countryCode: String? =
-                getCountryCode(serverAddress.toInetAddress(), context) // TODO: Country code things
-            dnsLog.resolver = makeAddressPair(countryCode, transaction.serverIp)
-        } else {
-            dnsLog.resolver = transaction.serverIp
-        }
         if (transaction.status === Transaction.Status.COMPLETE) {
-            var packet: DnsPacket? = null
-            var err = ""
-            try {
-                packet = DnsPacket(transaction.response)
-            } catch (e: ProtocolException) {
-                err = e.message.toString()
-            }
-            if (packet != null) {
-                val addresses: List<InetAddress> = packet.responseAddresses
 
-                if (addresses.isNotEmpty()) {
-                    val destination = convertIpV6ToIpv4IfNeeded(addresses[0])
+            if (ResourceRecordTypes.mayContainIP(transaction.type.toInt())) {
+                val addresses = transaction.response.split(",").toTypedArray()
+                val destination = normalizeIp(addresses.getOrNull(0))
+
+                if (destination != null) {
                     val countryCode: String? = getCountryCode(destination, context)
-
-                    val inetAddress = convertIpV6ToIpv4IfNeeded(addresses[0])
-                    dnsLog.response =
-                        makeAddressPair(
-                            getCountryCode(inetAddress, context),
-                            addresses[0].hostAddress
-                        )
+                    // addresses cannot be empty if destination is not null
+                    dnsLog.response = makeAddressPair(countryCode, addresses[0])
 
                     dnsLog.responseIps =
                         addresses.joinToString(separator = ",") {
-                            val addr = convertIpV6ToIpv4IfNeeded(it)
-                            makeAddressPair(getCountryCode(addr, context), it.hostAddress)
+                            val addr = normalizeIp(it)
+                            makeAddressPair(getCountryCode(addr, context), it)
                         }
+                    dnsLog.isBlocked =
+                        destination.hostAddress == UNSPECIFIED_IP_IPV4 ||
+                            destination.hostAddress == UNSPECIFIED_IP_IPV6
 
-                    if (destination.hostAddress?.contains(UNSPECIFIED_IP_IPV4) == true) {
-                        dnsLog.isBlocked = true
-                    }
-                    if (destination.isLoopbackAddress) {
-                        dnsLog.isBlocked = true
-                    } else if (
-                        destination.hostAddress == UNSPECIFIED_IP_IPV6 ||
-                            destination.hostAddress == LOOPBACK_IPV6
-                    ) {
-                        dnsLog.isBlocked = true
-                    }
+                    dnsLog.flag = getFlagIfPresent(countryCode)
 
-                    val flag = getFlagIfPresent(countryCode)
-                    dnsLog.flag = flag
+                    // no need to add dns record to cache if the record id is Dnsx.Alg
+                    // as it is not a valid record
+                    if (transaction.id != Dnsx.Alg) {
+                        addresses.forEach {
+                            if (it.isEmpty()) return@forEach
 
-                    packet.answer.forEach { r ->
-                        val ip = r.ip ?: return@forEach
-                        // drop trailing period . from the fqdn sent in dns-answer, ie a.com. =>
-                        // a.com
-                        val dnsCacheRecord =
-                            FirewallManager.DnsCacheRecord(
-                                calculateTtl(r.ttl),
-                                transaction.name.dropLast(1),
-                                flag
-                            )
-                        ip.hostAddress?.let { ipDomainLookup.put(it, dnsCacheRecord) }
+                            val dnsCacheRecord =
+                                FirewallManager.DnsCacheRecord(
+                                    calculateTtl(transaction.ttl),
+                                    transaction.name,
+                                    dnsLog.flag
+                                )
+                            ipDomainLookup.put(it, dnsCacheRecord)
+                        }
                     }
                 } else {
-                    // fixme: for queries with empty AAAA records, we are setting as NXDOMAIN
-                    //  which needs a fix. need to check for the response's status
-                    dnsLog.response = NXDOMAIN
+                    // no ip address found
                     dnsLog.flag =
-                        context.getString(R.string.unicode_question_sign) // White question mark
+                        context.getString(R.string.unicode_question_sign) // white question mark
                 }
             } else {
-                dnsLog.response = err
-                dnsLog.flag = context.getString(R.string.unicode_warning_sign) // Warning sign
+                // make sure we don't log too much data
+                dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
+                dnsLog.flag = context.getString(R.string.unicode_check_sign) // green check mark
             }
         } else {
+            // error
             dnsLog.response = transaction.status.name
-            dnsLog.flag =
-                if (transaction.status === Transaction.Status.CANCELED) {
-                    context.getString(R.string.unicode_x_sign) // "X" mark
-                } else {
-                    context.getString(R.string.unicode_warning_sign) // Warning sign
-                }
+            dnsLog.flag = context.getString(R.string.unicode_warning_sign) // Warning sign
         }
 
         fetchFavIcon(dnsLog)
@@ -253,8 +208,6 @@ internal constructor(
         // Update the connection state.  If the transaction succeeded, then the connection is
         // working.
         // If the transaction failed, then the connection is not working.
-        // If the transaction was canceled, then we don't have any new information about the status
-        // of the connection, so we don't send an update.
         // commented the code for reporting good or bad network.
         // Connection state will be unknown if the transaction is blocked locally in that case,
         // transaction status will be set as complete. So introduced check while
@@ -262,7 +215,7 @@ internal constructor(
         if (transaction.status === Transaction.Status.COMPLETE) {
             if (isLocallyResolved(transaction)) return
             VpnController.onConnectionStateChanged(BraveVPNService.State.WORKING)
-        } else if (transaction.status !== Transaction.Status.CANCELED) {
+        } else {
             val vpnState = vpnStateMap[transaction.status] ?: BraveVPNService.State.FAILING
             VpnController.onConnectionStateChanged(vpnState)
         }
@@ -271,7 +224,7 @@ internal constructor(
     private fun isLocallyResolved(transaction: Transaction?): Boolean {
         if (transaction == null) return false
 
-        return transaction.serverIp.isEmpty()
+        return transaction.serverName.isEmpty()
     }
 
     fun updateDnsRequestCount(dnsLog: DnsLog) {
@@ -300,8 +253,11 @@ internal constructor(
         }
     }
 
-    private fun convertIpV6ToIpv4IfNeeded(ip: InetAddress): InetAddress {
-        val ipAddress: IPAddress = HostName(ip).address ?: return ip
+    private fun normalizeIp(ipstr: String?): InetAddress? {
+        if (ipstr == null) return null
+
+        val ipAddress: IPAddress = HostName(ipstr).address ?: return null
+        val ip = ipAddress.toInetAddress()
 
         // no need to check if IP is not of type IPv6
         if (!IpManager.isIpV6(ipAddress)) return ip
@@ -315,7 +271,7 @@ internal constructor(
         }
     }
 
-    private fun calculateTtl(ttl: Int): Long {
+    private fun calculateTtl(ttl: Long): Long {
         val now = System.currentTimeMillis()
 
         // on negative ttl, cache dns record for a day

@@ -16,29 +16,24 @@
  */
 package com.celzero.bravedns.net.doh
 
-import com.celzero.bravedns.net.dns.DnsPacket
 import dnsx.Dnsx
 import java.util.*
 
-class Transaction(query: DnsPacket, timestamp: Long) {
+class Transaction {
 
-    var queryTime: Long = timestamp
+    var queryTime: Long = 0L
     var name: String = ""
-    var type: Short = 0
+    var type: Long = 0
     var responseTime: Long = 0
     var status: Status = Status.START
-    var response: ByteArray = byteArrayOf()
+    var response: String = ""
     var responseCalendar: Calendar = Calendar.getInstance()
-    var serverIp: String = ""
+    var serverName: String = ""
     var blocklist: String = ""
-    var relayIp: String = ""
-    var queryType: QueryType = QueryType.DOH
-
-    init {
-        name = query.queryName
-        type = query.queryType
-        queryTime = timestamp
-    }
+    var relayName: String = ""
+    var id: String = ""
+    var ttl: Long = 0L
+    var transportType: TransportType = TransportType.DOH
 
     enum class Status(val id: Long) {
         START(Dnsx.Start),
@@ -62,7 +57,7 @@ class Transaction(query: DnsPacket, timestamp: Long) {
         }
     }
 
-    enum class QueryType(val type: String) {
+    enum class TransportType(val type: String) {
         DOH(Dnsx.DOH),
         DNS_CRYPT(Dnsx.DNSCrypt),
         DNS_PROXY(Dnsx.DNS53);
@@ -72,13 +67,13 @@ class Transaction(query: DnsPacket, timestamp: Long) {
         }
 
         companion object {
-            fun getType(type: String): QueryType {
-                when (type) {
-                    Dnsx.DOH -> return DOH
-                    Dnsx.DNSCrypt -> return DNS_CRYPT
-                    Dnsx.DNS53 -> return DNS_PROXY
+            fun getType(type: String): TransportType {
+                return when (type) {
+                    Dnsx.DOH -> DOH
+                    Dnsx.DNSCrypt -> DNS_CRYPT
+                    Dnsx.DNS53 -> DNS_PROXY
+                    else -> DOH
                 }
-                return DOH
             }
         }
     }
