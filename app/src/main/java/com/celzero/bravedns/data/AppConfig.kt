@@ -41,9 +41,9 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
+import java.net.InetAddress
 import protect.Blocker
 import settings.Settings
-import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -63,7 +63,6 @@ internal constructor(
 
     companion object {
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
-        var dnscryptRelaysToRemove: String = ""
 
         private const val PROXY_MODE_ORBOT = 10L
         private const val ORBOT_DNS = "Orbot"
@@ -123,7 +122,8 @@ internal constructor(
         val blocker: Blocker,
         val listener: Listener,
         val fakeDns: String,
-        val preferredEngine: InternetProtocol
+        val preferredEngine: InternetProtocol,
+        val mtu: Int
     )
 
     enum class BraveMode(val mode: Int) {
@@ -189,28 +189,33 @@ internal constructor(
         fun isNetworkDns(): Boolean {
             return this == NETWORK_DNS
         }
+
+        fun isValidDnsType(): Boolean {
+            return this == DOH ||
+                this == DNSCRYPT ||
+                this == DNS_PROXY ||
+                this == RETHINK_REMOTE ||
+                this == NETWORK_DNS
+        }
+
+        companion object {
+            fun getDnsType(id: Int): DnsType {
+                return when (id) {
+                    DOH.type -> DOH
+                    DNSCRYPT.type -> DNSCRYPT
+                    DNS_PROXY.type -> DNS_PROXY
+                    RETHINK_REMOTE.type -> RETHINK_REMOTE
+                    NETWORK_DNS.type -> NETWORK_DNS
+                    else -> DOH
+                }
+            }
+        }
     }
 
     enum class TunDnsMode(val mode: Long) {
         NONE(Settings.DNSModeNone),
-        DOH_IP(Settings.DNSModeIP),
-        DOH_PORT(Settings.DNSModePort),
-        DNSCRYPT_IP(Settings.DNSModeCryptIP),
-        DNSCRYPT_PORT(Settings.DNSModeCryptPort),
-        DNSPROXY_IP(Settings.DNSModeProxyIP),
-        DNSPROXY_PORT(Settings.DNSModeProxyPort);
-
-        fun isDnscrypt(): Boolean {
-            return mode == DNSCRYPT_IP.mode || mode == DNSCRYPT_PORT.mode
-        }
-
-        fun isDnsProxy(): Boolean {
-            return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
-        }
-
-        fun isSystemDns(): Boolean {
-            return mode == DNSPROXY_IP.mode || mode == DNSPROXY_PORT.mode
-        }
+        DNS_IP(Settings.DNSModeIP),
+        DNS_PORT(Settings.DNSModePort)
     }
 
     enum class TunProxyMode(val mode: Long) {
@@ -226,6 +231,7 @@ internal constructor(
         fun isTunProxySocks5(): Boolean {
             return mode == SOCKS5.mode
         }
+
     }
 
     // Provider - Custom - SOCKS5, Http proxy setup.
@@ -351,45 +357,14 @@ internal constructor(
 
     private fun determineTunDnsMode(): TunDnsMode {
         // app mode - DNS & DNS+Firewall mode
-        return when (persistentState.dnsType) {
-            DnsType.DOH.type -> {
-                if (persistentState.preventDnsLeaks) {
-                    TunDnsMode.DOH_PORT
-                } else {
-                    TunDnsMode.DOH_IP
-                }
+        return if (DnsType.getDnsType(persistentState.dnsType).isValidDnsType()) {
+            if (persistentState.preventDnsLeaks) {
+                TunDnsMode.DNS_PORT
+            } else {
+                TunDnsMode.DNS_IP
             }
-            DnsType.DNSCRYPT.type -> {
-                if (persistentState.preventDnsLeaks) {
-                    TunDnsMode.DNSCRYPT_PORT
-                } else {
-                    TunDnsMode.DNSCRYPT_IP
-                }
-            }
-            DnsType.DNS_PROXY.type -> {
-                if (persistentState.preventDnsLeaks) {
-                    TunDnsMode.DNSPROXY_PORT
-                } else {
-                    TunDnsMode.DNSPROXY_IP
-                }
-            }
-            DnsType.RETHINK_REMOTE.type -> {
-                if (persistentState.preventDnsLeaks) {
-                    TunDnsMode.DOH_PORT
-                } else {
-                    TunDnsMode.DOH_IP
-                }
-            }
-            DnsType.NETWORK_DNS.type -> {
-                if (persistentState.preventDnsLeaks) {
-                    TunDnsMode.DNSPROXY_PORT
-                } else {
-                    TunDnsMode.DNSPROXY_IP
-                }
-            }
-            else -> {
-                TunDnsMode.NONE
-            }
+        } else {
+            TunDnsMode.NONE
         }
     }
 
@@ -413,10 +388,6 @@ internal constructor(
         return doHEndpointRepository.getConnectedDoH()
     }
 
-    private suspend fun getDNSCryptServerCount(): Int {
-        return dnsCryptEndpointRepository.getConnectedCount()
-    }
-
     suspend fun getSocks5ProxyDetails(): ProxyEndpoint? {
         return proxyEndpointRepository.getConnectedProxy()
     }
@@ -426,7 +397,7 @@ internal constructor(
     }
 
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {
-        return dnsProxyEndpointRepository.getConnectedProxy()
+        return dnsProxyEndpointRepository.getSelectedProxy()
     }
 
     fun getDnscryptCountObserver(): LiveData<Int> {
@@ -446,10 +417,9 @@ internal constructor(
                 persistentState.connectedDnsName = endpoint.dohName
             }
             DnsType.DNSCRYPT -> {
-                val count = getDNSCryptServerCount()
-                val text = context.getString(R.string.configure_dns_crypt, count.toString())
-                connectedDns.postValue(text)
-                persistentState.connectedDnsName = text
+                val endpoint = getConnectedDnscryptServer()
+                connectedDns.postValue(endpoint.dnsCryptName)
+                persistentState.connectedDnsName = endpoint.dnsCryptName
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
@@ -530,7 +500,8 @@ internal constructor(
         listener: Listener,
         fakeDns: String,
         preferredEngine: InternetProtocol,
-        ptMode: ProtoTranslationMode
+        ptMode: ProtoTranslationMode,
+        mtu: Int
     ): TunnelOptions {
         return TunnelOptions(
             getDnsMode(),
@@ -540,33 +511,26 @@ internal constructor(
             blocker,
             listener,
             fakeDns,
-            preferredEngine
+            preferredEngine,
+            mtu
         )
     }
 
     // -- DNS Manager --
-    suspend fun getConnectedDnsProxyDetails(): DnsProxyEndpoint? {
-        return dnsProxyEndpointRepository.getConnectedProxy()
+    suspend fun getSelectedDnsProxyDetails(): DnsProxyEndpoint? {
+        return dnsProxyEndpointRepository.getSelectedProxy()
     }
 
-    suspend fun getDnscryptServers(): String {
-        return dnsCryptEndpointRepository.getServersToAdd()
+    suspend fun getConnectedDnscryptServer(): DnsCryptEndpoint {
+        return dnsCryptEndpointRepository.getConnectedDNSCrypt()
     }
 
     suspend fun getDnscryptRelayServers(): String {
         return dnsCryptRelayEndpointRepository.getServersToAdd()
     }
 
-    suspend fun getDnscryptServersToRemove(): String {
-        return dnsCryptEndpointRepository.getServersToRemove()
-    }
-
     suspend fun getDohCount(): Int {
         return doHEndpointRepository.getCount()
-    }
-
-    suspend fun getRethinkCount(): Int {
-        return rethinkDnsEndpointRepository.getCount()
     }
 
     suspend fun getDnsProxyCount(): Int {
@@ -579,16 +543,6 @@ internal constructor(
 
     suspend fun getDnscryptRelayCount(): Int {
         return dnsCryptRelayEndpointRepository.getCount()
-    }
-
-    suspend fun updateDnscryptLiveServers(servers: String?) {
-        // if the prev connection was not dnscrypt, then remove the connection status from database
-        if (getDnsType() != DnsType.DNSCRYPT) {
-            removeConnectionStatus()
-        }
-
-        dnsCryptEndpointRepository.updateConnectionStatus(servers)
-        onDnsChange(DnsType.DNSCRYPT)
     }
 
     suspend fun handleDoHChanges(doHEndpoint: DoHEndpoint) {
@@ -634,7 +588,7 @@ internal constructor(
     suspend fun isOrbotDns(): Boolean {
         if (!getDnsType().isDnsProxy()) return false
 
-        return dnsProxyEndpointRepository.getConnectedProxy()?.proxyName == ORBOT_DNS
+        return dnsProxyEndpointRepository.getSelectedProxy()?.proxyName == ORBOT_DNS
     }
 
     suspend fun handleDnscryptChanges(dnsCryptEndpoint: DnsCryptEndpoint) {
@@ -651,17 +605,13 @@ internal constructor(
         return dnsProxyEndpointRepository.getOrbotDnsEndpoint()
     }
 
-    suspend fun canRemoveDnscrypt(dnsCryptEndpoint: DnsCryptEndpoint): Boolean {
-        val list = dnsCryptEndpointRepository.getConnectedDNSCrypt()
-        if (list.count() == 1 && list[0].dnsCryptURL == dnsCryptEndpoint.dnsCryptURL) {
-            return false
-        }
-        return true
-    }
-
     suspend fun handleDnsrelayChanges(endpoint: DnsCryptRelayEndpoint) {
         dnsCryptRelayEndpointRepository.update(endpoint)
-        onDnsChange(DnsType.DNSCRYPT)
+        persistentState.dnscryptRelays = getDnscryptRelayServers()
+    }
+
+    suspend fun removeDnscryptRelay(stamp: String) {
+        dnsCryptRelayEndpointRepository.unselectRelay(stamp)
     }
 
     suspend fun setDefaultConnection() {
@@ -675,10 +625,6 @@ internal constructor(
 
     suspend fun getRemoteRethinkEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointRepository.getConnectedEndpoint()
-    }
-
-    fun getRemoteBlocklistCount(): Int {
-        return persistentState.getRemoteBlocklistCount()
     }
 
     suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
@@ -716,7 +662,7 @@ internal constructor(
         onDnsChange(DnsType.NETWORK_DNS)
     }
 
-    suspend fun setSystemDns(dnsServers: List<InetAddress>) {
+    suspend fun updateSystemDnsServers(dnsServers: List<InetAddress>) {
         var dnsIp: String? = null
 
         when (getInternetProtocol()) {
@@ -748,8 +694,6 @@ internal constructor(
         if (dnsIp.isNullOrEmpty()) {
             dnsIp = dnsServers[0].hostAddress
         }
-
-        dnsIp?.let { setSystemDns(it, DNS_PORT) }
     }
 
     fun getSystemDns(): SystemDns {
@@ -784,8 +728,7 @@ internal constructor(
                 rethinkDnsEndpointRepository.removeConnectionStatus()
             }
             DnsType.NETWORK_DNS -> {
-                // set the system dns object with empty ip address
-                setSystemDns("", DNS_PORT)
+                // no-op, no need to remove connection status
             }
         }
     }
@@ -832,10 +775,6 @@ internal constructor(
 
     suspend fun deleteDnscryptRelayEndpoint(id: Int) {
         dnsCryptRelayEndpointRepository.deleteDnsCryptRelayEndpoint(id)
-    }
-
-    fun canEnableDnsBypassFirewallSetting(): Boolean {
-        return getBraveMode().isDnsFirewallMode()
     }
 
     // -- Proxy Manager --

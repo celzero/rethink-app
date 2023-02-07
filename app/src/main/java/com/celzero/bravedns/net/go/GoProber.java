@@ -21,8 +21,9 @@ import android.content.Context;
 
 import com.celzero.bravedns.net.doh.Prober;
 
-import doh.Transport;
-import tun2socks.Tun2socks;
+import dnsx.Summary;
+import dnsx.Transport;
+import intra.Intra;
 
 /**
  * Implements a Probe using the Go-based DoH client.
@@ -30,6 +31,8 @@ import tun2socks.Tun2socks;
 public class GoProber extends Prober {
 
     private final Context context;
+
+    private static final String PROBER_TAG = "Prober";
 
     public GoProber(Context context) {
         this.context = context;
@@ -40,12 +43,13 @@ public class GoProber extends Prober {
         new Thread(() -> {
             String dohIPs = GoVpnAdapter.Companion.getIpString(context, url);
             try {
-                Transport transport = Tun2socks.newDoHTransport(url, dohIPs, /* clientAuth */null, /* listener */null);
+                Transport transport = Intra.newDoHTransport(PROBER_TAG, url, dohIPs, /* clientAuth */null);
                 if (transport == null) {
                     callback.onCompleted(false);
                     return;
                 }
-                byte[] response = transport.query(QUERY_DATA);
+                final Summary summary = new dnsx.Summary();
+                byte[] response = transport.query("", QUERY_DATA, summary);
                 if (response != null && response.length > 0) {
                     callback.onCompleted(true);
                     return;

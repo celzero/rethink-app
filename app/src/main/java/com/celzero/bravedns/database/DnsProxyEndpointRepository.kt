@@ -46,8 +46,8 @@ class DnsProxyEndpointRepository(private val dnsProxyEndpointDAO: DnsProxyEndpoi
         return dnsProxyEndpointDAO.getCount()
     }
 
-    suspend fun getConnectedProxy(): DnsProxyEndpoint? {
-        return dnsProxyEndpointDAO.getConnectedProxy()
+    suspend fun getSelectedProxy(): DnsProxyEndpoint? {
+        return dnsProxyEndpointDAO.getSelectedProxy()
     }
 
     suspend fun getOrbotDnsEndpoint(): DnsProxyEndpoint? {

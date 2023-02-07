@@ -137,7 +137,7 @@ class Constants {
         const val RETHINKDNS_DOMAIN = "rethinkdns.com"
 
         // default doh url
-        const val DEFAULT_DOH_URL = "https://basic.rethinkdns.com/dns-query"
+        const val DEFAULT_DOH_URL = "https://zero.rethinkdns.com/dns-query"
 
         // json object constants received as part of update check
         // FIXME: Avoid usage of these parameters, map to POJO instead
@@ -263,5 +263,8 @@ class Constants {
 
         // to handle the "dead" packs
         const val DEAD_PACK = "dead"
+
+        // intent extra name for uid
+        const val INTENT_UID = "UID"
     }
 }

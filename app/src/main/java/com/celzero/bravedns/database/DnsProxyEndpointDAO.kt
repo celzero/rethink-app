@@ -52,7 +52,7 @@ interface DnsProxyEndpointDAO {
     @Query("select count(*) from DNSProxyEndpoint") fun getCount(): Int
 
     @Query("select * from DNSProxyEndpoint where isSelected = 1")
-    fun getConnectedProxy(): DnsProxyEndpoint?
+    fun getSelectedProxy(): DnsProxyEndpoint?
 
     @Query("select * from DNSProxyEndpoint where proxyName = 'Orbot' and isCustom = 0 LIMIT 1")
     fun getOrbotDnsEndpoint(): DnsProxyEndpoint?
