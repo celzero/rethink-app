@@ -18,7 +18,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.R
-import com.celzero.bravedns.data.IPDetails
+import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.util.AndroidUidConfig
@@ -40,18 +40,18 @@ internal constructor(
     private val context: Context
 ) : KoinComponent {
 
-    suspend fun makeConnectionTracker(ipDetails: IPDetails): ConnectionTracker {
+    suspend fun makeConnectionTracker(connTrackerMetaData: ConnTrackerMetaData): ConnectionTracker {
         val connTracker = ConnectionTracker()
-        connTracker.ipAddress = ipDetails.destIP
-        connTracker.isBlocked = ipDetails.isBlocked
-        connTracker.uid = ipDetails.uid
-        connTracker.port = ipDetails.destPort
-        connTracker.protocol = ipDetails.protocol
-        connTracker.timeStamp = ipDetails.timestamp
-        connTracker.blockedByRule = ipDetails.blockedByRule
+        connTracker.ipAddress = connTrackerMetaData.destIP
+        connTracker.isBlocked = connTrackerMetaData.isBlocked
+        connTracker.uid = connTrackerMetaData.uid
+        connTracker.port = connTrackerMetaData.destPort
+        connTracker.protocol = connTrackerMetaData.protocol
+        connTracker.timeStamp = connTrackerMetaData.timestamp
+        connTracker.blockedByRule = connTrackerMetaData.blockedByRule
 
-        val serverAddress = convertIpV6ToIpv4IfNeeded(ipDetails.destIP)
-        connTracker.dnsQuery = ipDetails.query
+        val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
+        connTracker.dnsQuery = connTrackerMetaData.query
 
         val countryCode: String? = getCountryCode(serverAddress, context)
         connTracker.flag = getFlag(countryCode)
