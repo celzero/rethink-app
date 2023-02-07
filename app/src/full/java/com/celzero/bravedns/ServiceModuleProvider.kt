@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import com.celzero.bravedns.data.DataModule
 import com.celzero.bravedns.database.DatabaseModule
 import com.celzero.bravedns.download.AppDownloadManager
+import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.ServiceModule
@@ -39,7 +40,11 @@ private val orbotHelperModule = module { single { OrbotHelper(androidContext(), 
 
 private val appDownloadManagerModule = module {
     single { AppDownloadManager(androidContext(), get()) }
+}
+
+private val schedulerModule = module {
     single { WorkScheduler(androidContext()) }
+    single { ScheduleManager(androidContext()) }
 }
 
 val AppModules: List<Module> by lazy {
@@ -52,5 +57,6 @@ val AppModules: List<Module> by lazy {
         add(updaterModule)
         add(orbotHelperModule)
         add(appDownloadManagerModule)
+        add(schedulerModule)
     }
 }

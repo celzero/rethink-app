@@ -63,7 +63,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:fontFamily="sans-serif-medium"
         android:padding="10dp"
-        android:text="@string/lbbs_enable"
+        android:text="@string/lbl_disabled"
         android:textColor="?attr/primaryTextColor"
         android:textSize="@dimen/extra_large_font_text_view"
         app:drawableEndCompat="@drawable/ic_cross"
@@ -142,7 +142,6 @@
             android:id="@+id/lbbs_download"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -180,7 +179,6 @@
             android:id="@+id/lbbs_redownload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:orientation="horizontal"
             android:visibility="gone">
 

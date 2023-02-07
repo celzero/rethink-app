@@ -50,6 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -290,7 +291,8 @@ internal constructor(
 
         appInfo.uid = uid
         if (persistentState.blockNewlyInstalledApp) {
-            appInfo.firewallStatus = FirewallManager.FirewallStatus.BLOCK.id
+            appInfo.firewallStatus = FirewallManager.FirewallStatus.NONE.id
+            appInfo.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         }
 
         FirewallManager.persistAppInfo(appInfo)
@@ -309,10 +311,13 @@ internal constructor(
         entry.uid = appInfo.uid
         entry.isSystemApp = isSystemApp
 
-        // default value of apps internet permission is true, when the universal firewall
-        // parameter (blockNewlyInstalledApp is true) firewall the app
+        // do not firewall app by default, if blockNewlyInstalledApp is set to false
         if (persistentState.blockNewlyInstalledApp) {
-            entry.firewallStatus = FirewallManager.FirewallStatus.BLOCK.id
+            entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
+            entry.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
+        } else {
+            entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
+            entry.connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id
         }
 
         entry.appCategory = determineAppCategory(appInfo)
@@ -452,7 +457,7 @@ internal constructor(
             builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String = context.resources.getString(R.string.new_app_notification_title)
+        val contentTitle: String = context.resources.getString(R.string.lbl_action_required)
         val contentText: String =
             context.resources.getString(R.string.new_app_notification_content, appName)
 
@@ -484,13 +489,13 @@ internal constructor(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.new_app_notification_action_allow),
+                context.resources.getString(R.string.allow).uppercase(),
                 openIntent1
             )
         val notificationAction2: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.new_app_notification_action_deny),
+                context.resources.getString(R.string.new_app_notification_action_deny).uppercase(),
                 openIntent2
             )
         builder.addAction(notificationAction)

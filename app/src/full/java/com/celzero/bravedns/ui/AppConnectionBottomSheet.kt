@@ -58,13 +58,13 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private var uid: Int = -1
     private var ipAddress: String = ""
     private var port: Int = UNSPECIFIED_PORT
-    private var ipRuleStatus: IpRulesManager.IpRuleStatus = IpRulesManager.IpRuleStatus.NONE
+    private var rule: IpRulesManager.IpRuleStatus = IpRulesManager.IpRuleStatus.NONE
 
     companion object {
         const val UID = "UID"
-        const val IPADDRESS = "IPADDRESS"
+        const val IP_ADDRESS = "IP_ADDRESS"
         const val PORT = "PORT"
-        const val IPRULESTATUS = "IPRULESTATUS"
+        const val IP_RULE = "IP_RULE"
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -98,10 +98,10 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         uid = arguments?.getInt(UID) ?: INVALID_UID
-        ipAddress = arguments?.getString(IPADDRESS) ?: ""
+        ipAddress = arguments?.getString(IP_ADDRESS) ?: ""
         port = arguments?.getInt(PORT) ?: UNSPECIFIED_PORT
-        val status = arguments?.getInt(IPRULESTATUS) ?: IpRulesManager.IpRuleStatus.NONE.id
-        ipRuleStatus = IpRulesManager.IpRuleStatus.getStatus(status)
+        val status = arguments?.getInt(IP_RULE) ?: IpRulesManager.IpRuleStatus.NONE.id
+        rule = IpRulesManager.IpRuleStatus.getStatus(status)
         dismissListener = adapter
 
         initView()
@@ -115,7 +115,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         }
         b.bsacHeading.text = ipAddress
 
-        when (ipRuleStatus) {
+        when (rule) {
             IpRulesManager.IpRuleStatus.NONE -> showButtonsForStatusNone()
             IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                 // no-op, bypass universal rules don't apply in app specific list

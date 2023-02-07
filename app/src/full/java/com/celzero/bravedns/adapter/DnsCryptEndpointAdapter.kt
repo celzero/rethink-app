@@ -95,12 +95,10 @@ class DnsCryptEndpointAdapter(
             b.root.setOnClickListener {
                 b.dnsCryptEndpointListActionImage.isChecked =
                     !b.dnsCryptEndpointListActionImage.isChecked
-                updateDnsCryptDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
+                updateDnsCryptDetails(endpoint)
             }
 
-            b.dnsCryptEndpointListActionImage.setOnClickListener {
-                updateDnsCryptDetails(endpoint, b.dnsCryptEndpointListActionImage.isChecked)
-            }
+            b.dnsCryptEndpointListActionImage.setOnClickListener { updateDnsCryptDetails(endpoint) }
 
             b.dnsCryptEndpointListInfoImage.setOnClickListener {
                 showExplanationOnImageClick(endpoint)
@@ -149,7 +147,7 @@ class DnsCryptEndpointAdapter(
                 deleteEndpoint(id)
             }
 
-            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ -> }
+            builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ -> }
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()
@@ -186,24 +184,9 @@ class DnsCryptEndpointAdapter(
             alertDialog.show()
         }
 
-        private fun updateDnsCryptDetails(endpoint: DnsCryptEndpoint, isSelected: Boolean) {
+        private fun updateDnsCryptDetails(endpoint: DnsCryptEndpoint) {
             io {
-                if (!isSelected && !appConfig.canRemoveDnscrypt(endpoint)) {
-                    // Do not unselect the only user-selected dnscrypt endpoint, that is
-                    // when the getConnectedDnsCrypt returns a list of size 1
-                    uiCtx {
-                        Toast.makeText(
-                                context,
-                                context.getString(R.string.dns_select_toast),
-                                Toast.LENGTH_SHORT
-                            )
-                            .show()
-                        b.dnsCryptEndpointListActionImage.isChecked = true
-                    }
-                    return@io
-                }
-
-                endpoint.isSelected = isSelected
+                endpoint.isSelected = true
                 appConfig.handleDnscryptChanges(endpoint)
             }
         }

@@ -34,8 +34,8 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.LocalSimpleViewAdapter
 import com.celzero.bravedns.adapter.LocalAdvancedViewAdapter
+import com.celzero.bravedns.adapter.LocalSimpleViewAdapter
 import com.celzero.bravedns.adapter.RemoteAdvancedViewAdapter
 import com.celzero.bravedns.adapter.RemoteSimpleViewAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator.Companion.CUSTOM_DOWNLOAD
@@ -70,12 +70,12 @@ import com.celzero.bravedns.viewmodel.RethinkRemoteFileTagViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
-import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
@@ -407,14 +407,14 @@ class RethinkBlocklistFragment :
         builder.setTitle(getString(R.string.rt_dialog_title))
         builder.setMessage(getString(R.string.rt_dialog_message))
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.rt_dialog_positive)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.lbl_apply)) { _, _ ->
             setStamp(modifiedStamp)
             requireActivity().finish()
         }
         builder.setNeutralButton(getString(R.string.rt_dialog_neutral)) { _, _ ->
             // no-op
         }
-        builder.setNegativeButton(getString(R.string.rt_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
             requireActivity().finish()
         }
         builder.create().show()
@@ -652,12 +652,7 @@ class RethinkBlocklistFragment :
     private fun remakeFilterChipsUi() {
         b.filterChipGroup.removeAllViews()
 
-        val all =
-            makeChip(
-                BlocklistSelectionFilter.ALL.id,
-                getString(R.string.rt_filter_parent_all),
-                true
-            )
+        val all = makeChip(BlocklistSelectionFilter.ALL.id, getString(R.string.lbl_all), true)
         val selected =
             makeChip(
                 BlocklistSelectionFilter.SELECTED.id,

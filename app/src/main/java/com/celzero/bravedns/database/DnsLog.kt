@@ -43,6 +43,7 @@ class DnsLog {
     var status: String = ""
     var dnsType: Int = 0
     var responseIps: String = ""
+    var resolverId: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is DnsLog) return false

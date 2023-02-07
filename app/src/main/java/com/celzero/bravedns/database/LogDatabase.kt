@@ -23,11 +23,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.celzero.bravedns.util.Utilities
 
-@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 2, exportSchema = false)
+@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LogDatabase : RoomDatabase() {
 
@@ -58,6 +59,7 @@ abstract class LogDatabase : RoomDatabase() {
                 )
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addCallback(roomCallback)
+                .addMigrations(MIGRATION_2_3)
                 .build()
         }
 
@@ -139,6 +141,15 @@ abstract class LogDatabase : RoomDatabase() {
                 cursor?.close()
             }
         }
+
+        private val MIGRATION_2_3: Migration =
+            object : Migration(2, 3) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "ALTER TABLE DnsLogs add column resolverId TEXT DEFAULT '' NOT NULL"
+                    )
+                }
+            }
     }
 
     fun checkPoint() {

@@ -46,6 +46,10 @@ class DnsCryptRelayEndpointRepository(
         dnsCryptRelayEndpointDAO.removeConnectionStatus()
     }
 
+    suspend fun unselectRelay(stamp: String) {
+        dnsCryptRelayEndpointDAO.unselectRelay(stamp)
+    }
+
     suspend fun getConnectedRelays(): List<DnsCryptRelayEndpoint> {
         return dnsCryptRelayEndpointDAO.getConnectedRelays()
     }

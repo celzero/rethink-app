@@ -17,16 +17,17 @@ package com.celzero.bravedns.database
 
 import android.os.SystemClock
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.util.Constants
 
-@Entity(tableName = "CustomDomain")
+@Entity(primaryKeys = ["domain", "uid"], tableName = "CustomDomain")
 class CustomDomain {
-    @PrimaryKey var domain: String = ""
+    var domain: String = ""
+    var uid: Int = Constants.UID_EVERYBODY
     var ips: String = ""
     var status: Int = 0
     var type: Int = 0
-    var createdTs: Long = SystemClock.elapsedRealtime()
+    var modifiedTs: Long = SystemClock.elapsedRealtime()
     var deletedTs: Long = SystemClock.elapsedRealtime()
     var version: Long = getCurrentVersion()
 
@@ -42,18 +43,20 @@ class CustomDomain {
 
     constructor(
         domain: String,
+        uid: Int,
         ips: String,
         type: Int,
         status: Int,
-        createdTs: Long,
+        modifiedTs: Long,
         deletedTs: Long,
         version: Long
     ) {
         this.domain = domain.dropLastWhile { it == '.' }
+        this.uid = uid
         this.ips = ips
         this.status = status
         this.type = type
-        this.createdTs = createdTs
+        this.modifiedTs = modifiedTs
         this.deletedTs = deletedTs
         this.version = version
     }
@@ -67,6 +70,6 @@ class CustomDomain {
     }
 
     fun isBlocked(): Boolean {
-        return this.status == DomainRulesManager.DomainStatus.BLOCK.id
+        return this.status == DomainRulesManager.Status.BLOCK.id
     }
 }

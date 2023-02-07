@@ -121,27 +121,6 @@ class WorkScheduler(val context: Context) {
             )
     }
 
-    // schedule refresh-apps every REFRESH_TIME_INTERVAL_HOURS
-    fun scheduleDatabaseRefreshJob() {
-        if (isWorkScheduled(context, REFRESH_APPS_JOB_TAG)) return
-
-        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Refresh database job scheduled")
-        val refreshAppsJob =
-            PeriodicWorkRequest.Builder(
-                    RefreshAppsJob::class.java,
-                    REFRESH_TIME_INTERVAL_HOURS,
-                    TimeUnit.HOURS
-                )
-                .addTag(REFRESH_APPS_JOB_TAG)
-                .build()
-        WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork(
-                REFRESH_APPS_JOB_TAG,
-                ExistingPeriodicWorkPolicy.KEEP,
-                refreshAppsJob
-            )
-    }
-
     fun schedulePurgeConnectionsLog() {
         if (isWorkScheduled(context, PURGE_CONNECTION_LOGS_JOB_TAG)) return
 

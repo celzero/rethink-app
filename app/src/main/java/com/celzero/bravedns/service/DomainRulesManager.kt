@@ -15,14 +15,15 @@
  */
 package com.celzero.bravedns.service
 
+import android.content.Context
 import android.util.Log
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import com.google.common.net.InternetDomainName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,24 +42,36 @@ object DomainRulesManager : KoinComponent {
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
-    var domains: HashMap<String, CustomDomain> = HashMap()
-    var wildcards: HashMap<String, CustomDomain> = HashMap()
-    var tlds: HashMap<String, CustomDomain> = HashMap()
+    var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
+    var wildcards: MutableMap<CacheKey, CustomDomain> = hashMapOf()
 
     // stores all the previous response sent
-    private val domainLookupCache: Cache<String, DomainStatus> =
+    private val domainLookupCache: Cache<CacheKey, Status> =
         CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
 
-    enum class DomainStatus(val id: Int) {
+    init {
+        io { load() }
+    }
+
+    enum class Status(val id: Int) {
         NONE(0),
         BLOCK(1),
-        WHITELIST(2);
+        TRUST(2);
 
         companion object {
-            fun getStatus(statusId: Int): DomainStatus {
+
+            fun getLabel(context: Context): Array<String> {
+                return arrayOf(
+                    context.getString(R.string.ci_no_rule),
+                    context.getString(R.string.ci_block),
+                    context.getString(R.string.ci_trust_rule)
+                )
+            }
+
+            fun getStatus(statusId: Int): Status {
                 return when (statusId) {
                     NONE.id -> NONE
-                    WHITELIST.id -> WHITELIST
+                    TRUST.id -> TRUST
                     BLOCK.id -> BLOCK
                     else -> NONE
                 }
@@ -68,17 +81,11 @@ object DomainRulesManager : KoinComponent {
 
     enum class DomainType(val id: Int) {
         DOMAIN(0),
-        WILDCARD(1),
-        TLD(2);
+        WILDCARD(1);
 
         companion object {
-            fun getAllDomainTypes(): Array<String> {
-                return arrayOf("Domain", "Wildcard", "TLD")
-            }
-
             fun getType(id: Int): DomainType {
                 return when (id) {
-                    TLD.id -> TLD
                     DOMAIN.id -> DOMAIN
                     WILDCARD.id -> WILDCARD
                     else -> DOMAIN
@@ -92,140 +99,132 @@ object DomainRulesManager : KoinComponent {
     private fun updateCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                lock.write { domains[cd.domain] = cd }
-            }
-            DomainType.TLD -> {
-                lock.write { tlds[cd.domain] = cd }
+                val key = CacheKey(cd.domain, cd.uid)
+                lock.write { domains[key] = cd }
             }
             DomainType.WILDCARD -> {
-                lock.write { wildcards[cd.domain] = cd }
+                val d = constructWildCardString(cd.domain)
+                val key = CacheKey(d, cd.uid)
+                lock.write { wildcards[key] = cd }
             }
         }
         domainLookupCache.invalidateAll()
     }
 
-    fun load() {
-        val cd = customDomainsRepository.getAllCustomDomains()
-        if (cd.isEmpty()) {
+    suspend fun load() {
+        if (domains.isNotEmpty() || wildcards.isNotEmpty()) {
+            return
+        }
+
+        val customDomains = customDomainsRepository.getAllCustomDomains()
+        if (customDomains.isEmpty()) {
             Log.w(LOG_TAG_DNS, "no custom domains found in db")
             return
         }
 
-        cd.forEach { updateCache(it) }
+        customDomains.forEach { cd ->
+            when (DomainType.getType(cd.type)) {
+                DomainType.DOMAIN -> {
+                    val key = CacheKey(cd.domain, cd.uid)
+                    domains[key] = cd
+                }
+                DomainType.WILDCARD -> {
+                    val d = constructWildCardString(cd.domain)
+                    val key = CacheKey(d, cd.uid)
+                    wildcards[key] = cd
+                }
+            }
+        }
     }
 
-    data class Test(val type: String, val domain: DomainStatus)
+    data class CacheKey(val domain: String, val uid: Int)
 
-    fun status(domain: String): Test {
+    fun getDomainRule(d: String, uid: Int): Status {
+        val key = CacheKey(d, uid)
+        if (domains.contains(key)) {
+            val cd = domains[key]
+            if (cd?.uid == uid) {
+                return Status.getStatus(cd.status)
+            }
+        }
+        return Status.NONE
+    }
+
+    fun status(domain: String, uid: Int): Status {
         // return if the cache has the domain
         domainLookupCache.getIfPresent(domain)?.let {
-            return Test("Cache", DomainStatus.getStatus(it.id))
+            return Status.getStatus(it.id)
         }
 
         // check if the domain is added in custom domain list
-        when (matchesDomain(domain)) {
-            DomainStatus.WHITELIST -> {
-                updateLookupCache(domain, DomainStatus.WHITELIST)
-                return Test("Domain", DomainStatus.WHITELIST)
+        when (domainMatch(domain, uid)) {
+            Status.TRUST -> {
+                updateLookupCache(domain, uid, Status.TRUST)
+                return Status.TRUST
             }
-            DomainStatus.BLOCK -> {
-                updateLookupCache(domain, DomainStatus.BLOCK)
-                return Test("Domain", DomainStatus.BLOCK)
+            Status.BLOCK -> {
+                updateLookupCache(domain, uid, Status.BLOCK)
+                return Status.BLOCK
             }
-            DomainStatus.NONE -> {
-                // fall-through
-            }
-        }
-
-        // extract the TLD of the received domain and check with the custom tld's list
-        when (matchesTld(domain)) {
-            DomainStatus.BLOCK -> {
-                updateLookupCache(domain, DomainStatus.BLOCK)
-                return Test("TLD", DomainStatus.BLOCK)
-            }
-            DomainStatus.WHITELIST -> {
-                updateLookupCache(domain, DomainStatus.WHITELIST)
-                return Test("TLD", DomainStatus.WHITELIST)
-            }
-            DomainStatus.NONE -> {
+            Status.NONE -> {
                 // fall-through
             }
         }
 
         // check if the received domain is matching with the custom wildcard
-        val match = matchesWildcard(domain)
-        updateLookupCache(domain, match)
-        return Test("Wildcard", match)
+        val match = matchesWildcard(domain, uid)
+        updateLookupCache(domain, uid, match)
+        return match
     }
 
-    private fun matchesWildcard(recvDomain: String): DomainStatus {
+    private fun matchesWildcard(domain: String, uid: Int): Status {
         wildcards.forEach {
-            // replaces the . from the input to [\\.], as regEx will treat . as spl
-            val temp = it.key.replace(".", "[\\\\.]")
-            // add ^ and $ in the start and end
-            // replace * with .* (regEx format)
-            val w = "^" + temp.replace("*", ".*") + "$"
-            val pattern = Pattern.compile(w)
-            if (pattern.matcher(recvDomain).matches()) {
-                return DomainStatus.getStatus(it.value.status)
+            if (it.key.uid != uid) {
+                return@forEach
+            }
+
+            val pattern = Pattern.compile(it.key.domain)
+            if (pattern.matcher(domain).matches()) {
+                return Status.getStatus(it.value.status)
             }
         }
 
-        return DomainStatus.NONE
+        return Status.NONE
     }
 
-    private fun matchesTld(recvDomain: String): DomainStatus {
-        // ref:
-        // https://guava.dev/releases/snapshot-jre/api/docs/com/google/common/net/InternetDomainName.html
-        try {
-            // Returns the public suffix portion of the domain name, or null if no public suffix is
-            // present
-            val recvDomainTld = InternetDomainName.from(recvDomain).publicSuffix()
-            val domain = recvDomainTld?.let { tlds.getValue(it.toString()) }
-            return domain?.let { it -> DomainStatus.getStatus(it.status) } ?: DomainStatus.NONE
-        } catch (ignored: NoSuchElementException) {
-            // no-op
-            // exception if there is no such key in the map (tlds)
-        } catch (ignored: IllegalArgumentException) {
-            // no-op
-            // from(String) will throw IllegalArgumentException if domain is not syntactically valid
-            // some of the apps are sending queries which are not valid
-            // eg., '_sips._tcp.in.airtel.rcs.telephony.goog' from OPPO phone
-        }
-        return DomainStatus.NONE
-    }
-
-    fun matchesDomain(recvDomain: String): DomainStatus {
+    private fun domainMatch(domain: String, uid: Int): Status {
+        val key = CacheKey(domain, uid)
         val d =
-            domains.getOrElse(recvDomain) {
-                return DomainStatus.NONE
+            domains.getOrElse(key) {
+                return Status.NONE
             }
-        return DomainStatus.getStatus(d.status)
+        return Status.getStatus(d.status)
     }
 
-    private fun updateLookupCache(domain: String, status: DomainStatus) {
-        domainLookupCache.put(domain, status)
+    private fun updateLookupCache(domain: String, uid: Int, status: Status) {
+        val key = CacheKey(domain, uid)
+        domainLookupCache.put(key, status)
     }
 
     fun whitelist(cd: CustomDomain) {
         io {
-            cd.status = DomainStatus.WHITELIST.id
+            cd.status = Status.TRUST.id
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
     }
 
-    fun applyStatus(domain: String, ips: String, type: DomainType, status: DomainStatus) {
+    fun changeStatus(domain: String, uid: Int, ips: String, type: DomainType, status: Status) {
         io {
-            val cd = constructObject(domain, ips, type, status.id)
+            val cd = constructObject(domain, uid, ips, type, status.id)
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
     }
 
-    fun block(domain: String, ips: String = "", type: DomainType) {
+    fun block(domain: String, uid: Int, ips: String = "", type: DomainType) {
         io {
-            val cd = constructObject(domain, ips, type, DomainStatus.BLOCK.id)
+            val cd = constructObject(domain, uid, ips, type, Status.BLOCK.id)
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
@@ -233,7 +232,7 @@ object DomainRulesManager : KoinComponent {
 
     fun block(cd: CustomDomain) {
         io {
-            cd.status = DomainStatus.BLOCK.id
+            cd.status = Status.BLOCK.id
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
@@ -241,9 +240,16 @@ object DomainRulesManager : KoinComponent {
 
     fun noRule(cd: CustomDomain) {
         io {
-            cd.status = DomainStatus.NONE.id
+            cd.status = Status.NONE.id
             dbInsertOrUpdate(cd)
             updateCache(cd)
+        }
+    }
+
+    fun addDomainRule(d: String, status: Status, type: DomainType = DomainType.DOMAIN, uid: Int) {
+        io {
+            val cd = constructObject(d, uid, "", type, status.id)
+            dbInsertOrUpdate(cd)
         }
     }
 
@@ -262,29 +268,48 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
+    fun deleteIpRulesByUid(uid: Int) {
+        io {
+            customDomainsRepository.deleteIpRulesByUid(uid)
+            domains = domains.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
+            wildcards = wildcards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
+            domainLookupCache.invalidateAll()
+        }
+    }
+
     private fun removeFromCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                lock.write { domains.remove(cd.domain) }
-            }
-            DomainType.TLD -> {
-                lock.write { tlds.remove(cd.domain) }
+                val key = CacheKey(cd.domain, cd.uid)
+                lock.write { domains.remove(key) }
             }
             DomainType.WILDCARD -> {
-                lock.write { wildcards.remove(cd.domain) }
+                val d = constructWildCardString(cd.domain)
+                val key = CacheKey(d, cd.uid)
+                lock.write { wildcards.remove(key) }
             }
         }
         domainLookupCache.invalidateAll()
     }
 
+    private fun constructWildCardString(d: String): String {
+        // replaces the . from the input to [\\.], as regEx will treat . as spl
+        val temp = d.replace(".", "[\\\\.]")
+        // add ^ and $ in the start and end
+        // replace * with .* (regEx format)
+        return "^" + temp.replace("*", ".*") + "$"
+    }
+
     private fun constructObject(
         domain: String,
+        uid: Int,
         ips: String = "",
         type: DomainType,
         status: Int
     ): CustomDomain {
         return CustomDomain(
             domain,
+            uid,
             ips,
             type.id,
             status,

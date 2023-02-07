@@ -30,7 +30,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.AdapterView
 import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -39,29 +41,30 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.glide.GlideApp
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import java.util.*
 import org.koin.android.ext.android.inject
+import java.util.*
 
 class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -112,22 +115,29 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             return
         }
 
+        b.bsdlDomainRuleDesc.text = updateHtmlEncodedText(getString(R.string.bsdl_block_desc))
         b.dnsBlockUrl.text = transaction!!.queryStr
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = transaction!!.flag
         b.dnsBlockIpLatency.text =
             getString(R.string.dns_btm_latency_ms, transaction!!.latency.toString())
 
-        handleCustomDomainUi()
         displayFavIcon()
         displayDnsTransactionDetails()
         displayRecordTypeChip()
         setupClickListeners()
+        updateRulesUi(Constants.UID_EVERYBODY, transaction!!.queryStr)
     }
 
     private fun getResponseIp(): String {
         val ips = transaction!!.response.split(",")
         return ips[0]
+    }
+
+    private fun updateRulesUi(uid: Int, domain: String) {
+        val d = domain.dropLastWhile { it == '.' }
+        val status = DomainRulesManager.status(d, uid)
+        b.bsdlDomainRuleSpinner.setSelection(status.id)
     }
 
     private fun displayRecordTypeChip() {
@@ -145,80 +155,55 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         b.dnsRecordTypeChip.text = getString(R.string.dns_btm_record_type, transaction!!.typeName)
     }
 
-    private fun handleCustomDomainUi() {
-        if (transaction == null) {
-            Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
-            return
-        }
-
-        when (DomainRulesManager.matchesDomain(transaction!!.queryStr)) {
-            DomainRulesManager.DomainStatus.BLOCK -> {
-                b.dnsBlockToggleGroup.check(b.dnsBlockTgDeny.id)
-                enableToggleButton(b.dnsBlockTgDeny)
-            }
-            DomainRulesManager.DomainStatus.WHITELIST -> {
-                b.dnsBlockToggleGroup.check(b.dnsBlockTgAllow.id)
-                enableToggleButton(b.dnsBlockTgAllow)
-            }
-            DomainRulesManager.DomainStatus.NONE -> {
-                b.dnsBlockToggleGroup.check(b.dnsBlockTgNoRule.id)
-                enableToggleButton(b.dnsBlockTgNoRule)
-            }
-        }
-    }
-
     private fun setupClickListeners() {
-        b.dnsBlockToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
-            val btn: MaterialButton = b.dnsBlockToggleGroup.findViewById(checkedId)
-            if (!isChecked) {
-                disableToggleButton(btn)
-                return@addOnButtonCheckedListener
-            }
 
-            group.check(checkedId)
-            enableToggleButton(btn)
-            applyDnsRule(findSelectedDnsRule(getTag(btn.tag)))
-        }
+        b.bsdlDomainRuleSpinner.adapter =
+            FirewallStatusSpinnerAdapter(
+                requireContext(),
+                DomainRulesManager.Status.getLabel(requireContext())
+            )
+        b.bsdlDomainRuleSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val iv = view?.findViewById<AppCompatImageView>(R.id.spinner_icon)
+                    iv?.visibility = View.VISIBLE
+                    val status = DomainRulesManager.Status.getStatus(position)
+
+                    // no need to apply rule, if prev selection and current selection are same
+                    if (
+                        DomainRulesManager.getDomainRule(
+                            transaction!!.queryStr,
+                            Constants.UID_EVERYBODY
+                        ) == status
+                    ) {
+                        return
+                    }
+
+                    applyDnsRule(status)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
     }
 
-    private fun applyDnsRule(status: DomainRulesManager.DomainStatus) {
+    private fun applyDnsRule(status: DomainRulesManager.Status) {
         if (transaction == null) {
             Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to apply dns rules")
             return
         }
 
-        DomainRulesManager.applyStatus(
+        DomainRulesManager.changeStatus(
             transaction!!.queryStr,
+            Constants.UID_EVERYBODY,
             transaction!!.responseIps,
             DomainRulesManager.DomainType.DOMAIN,
             status
         )
-    }
-
-    private fun getTag(tag: Any): Int {
-        return tag.toString().toIntOrNull() ?: 0
-    }
-
-    private fun enableToggleButton(button: MaterialButton) {
-        button.setTextColor(fetchColor(requireContext(), R.attr.secondaryTextColor))
-    }
-
-    private fun disableToggleButton(button: MaterialButton) {
-        button.setTextColor(fetchColor(requireContext(), R.attr.primaryTextColor))
-    }
-
-    private fun findSelectedDnsRule(ruleId: Int): DomainRulesManager.DomainStatus {
-        return when (ruleId) {
-            DomainRulesManager.DomainStatus.WHITELIST.id -> {
-                DomainRulesManager.DomainStatus.WHITELIST
-            }
-            DomainRulesManager.DomainStatus.BLOCK.id -> {
-                DomainRulesManager.DomainStatus.BLOCK
-            }
-            else -> {
-                DomainRulesManager.DomainStatus.NONE
-            }
-        }
     }
 
     private fun displayDnsTransactionDetails() {
@@ -243,7 +228,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         lightenUpChip(b.dnsBlockIpsChip, true)
 
         if (transaction!!.responseIps.isEmpty()) {
-            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_allowed)
+            b.dnsBlockIpsChip.text = getString(R.string.lbl_allowed)
             return
         }
 
@@ -251,7 +236,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         val ipCount = ips.count()
 
         if (ipCount == 1) {
-            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_allowed)
+            b.dnsBlockIpsChip.text = getString(R.string.lbl_allowed)
             return
         }
 
@@ -276,7 +261,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         if (!transaction!!.hasBlocklists()) {
-            b.dnsBlockBlocklistChip.text = getString(R.string.dns_btm_sheet_chip_blocked)
+            b.dnsBlockBlocklistChip.text = getString(R.string.lbl_blocked)
             return
         }
 

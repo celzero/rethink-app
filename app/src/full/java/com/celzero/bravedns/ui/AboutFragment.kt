@@ -212,11 +212,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             ->
             sendEmailIntent(requireContext())
         }
-        builder.setNegativeButton(getString(R.string.about_bug_no_log_dialog_negative_btn)) {
-            dialog,
-            _ ->
-            dialog.dismiss()
-        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
         builder.create().show()
     }
 
@@ -431,11 +427,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             ->
             emailBugReport()
         }
-        builder.setNegativeButton(getString(R.string.about_bug_report_dialog_negative_btn)) {
-            dialog,
-            _ ->
-            dialog.dismiss()
-        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ -> dialog.dismiss() }
 
         val alert: AlertDialog = builder.create()
         alert.window?.setLayout(width, height)

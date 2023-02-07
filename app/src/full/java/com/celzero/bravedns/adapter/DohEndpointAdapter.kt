@@ -29,11 +29,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
@@ -189,7 +189,7 @@ class DohEndpointAdapter(
                 deleteEndpoint(id)
             }
 
-            builder.setNegativeButton(context.getString(R.string.dns_delete_negative)) { _, _ ->
+            builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
                 // no-op
             }
             builder.create().show()

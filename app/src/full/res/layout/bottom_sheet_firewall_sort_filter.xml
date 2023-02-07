@@ -15,35 +15,6 @@
         android:layout_marginBottom="20dp"
         android:background="?attr/border" />
 
-    <!--<androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/fs_sort_heading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:padding="10dp"
-        android:text="@string/fapps_filter_firewall_status"
-        android:textColor="?attr/secondaryTextColor"
-        android:textSize="@dimen/large_font_text_view" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/ffa_firewall_chip_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="2dp"
-        android:visibility="visible"
-        app:selectionRequired="true"
-        app:singleSelection="true" />-->
-
-   <!-- <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/border" />-->
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/fs_filter_heading"
         android:layout_width="wrap_content"
@@ -120,7 +91,7 @@
             android:minHeight="40dp"
             android:background="@drawable/rounded_corners_button_accent"
             android:padding="5dp"
-            android:text="@string/fapps_filter_apply_btn"
+            android:text="@string/lbl_apply"
             android:textColor="?attr/chipTextColor" />
     </LinearLayout>
 

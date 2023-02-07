@@ -37,12 +37,12 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities.Companion.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
-import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentDnsLogsBinding::bind)
@@ -80,7 +80,6 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
             b.queryListSearch.setQuery(query, true)
         }
-
     }
 
     private fun initView() {
@@ -179,13 +178,12 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private fun remakeFilterChipsUi() {
         b.filterChipGroup.removeAllViews()
 
-        val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.dns_filter_parent_all), true)
-        val allowed =
-            makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.dns_filter_parent_allowed), false)
+        val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.lbl_all), true)
+        val allowed = makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
             makeChip(
                 ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
-                getString(R.string.dns_filter_parent_blocked),
+                getString(R.string.lbl_blocked),
                 false
             )
 
@@ -253,7 +251,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 dnsLogRepository.clearAllData()
             }
         }
-        builder.setNegativeButton(getString(R.string.dns_log_dialog_negative)) { _, _ -> }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
         builder.create().show()
     }
 

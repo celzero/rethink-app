@@ -55,14 +55,14 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip
-import java.net.MalformedURLException
-import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.net.MalformedURLException
+import java.net.URL
 
 class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private val b by viewBinding(FragmentRethinkListBinding::bind)

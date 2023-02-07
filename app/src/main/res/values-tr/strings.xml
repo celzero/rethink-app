@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name_small_case">rethink</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="title_about">Hakkında</string>
     <string name="pause_title_desc">ara veriliyor…</string>
     <string name="settings_title_desc">Son derece özelleştirilebilir bir DNS ve güvenlik duvarı</string>
     <string name="txt_home">Ana sayfa</string>
     <string name="accessibility_service_description">RethinkDNS, arka plan uygulamalarını algılamak ve güvenlik duvarı oluşturmak için erişilebilirlik hizmetini kullanır. RethinkDNS herhangi bir bilgi toplamaz veya satmaz.</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">İleri</string>
     <string name="skip">Atla</string>
     <string name="finish">Bitir</string>
@@ -85,19 +83,16 @@
     <string name="lbbs_redownload">Blok listelerini yeniden indirin</string>
     <string name="settings_dns_proxy_dialog_username">Kullanıcı adı</string>
     <string name="univ_view_blocked_ip_desc">Engellenen veya atlanan IP / Port kurallarını değiştirin.</string>
-    <string name="dns_filter_parent_all">Tümü</string>
     <string name="settings_all_networks_dialog_positive_btn">Yine de etkinleştir</string>
     <string name="notif_channel_desc_vpn_failure">RethinkDNS Android veya başka bir VPN uygulaması tarafından durdurulduğunda bilgilendirin</string>
     <string name="settings_dns_proxy_dialog_app">Uygulama</string>
     <string name="about_email">Bize e-posta gönderin</string>
-    <string name="bsdl_domain_rule_allow">izin ver</string>
     <string name="univ_firewall_dialog_message">Bu kuralın silinmesi, herhangi bir uygulamanın bu IP\'ye bağlanmasına izin verecektir. Devam etmek istiyor musunuz\?</string>
     <string name="orbot_both_desc">Yukarıdakilerin hepsi.</string>
     <string name="settings_all_networks_dialog_title">Dikkat!</string>
     <string name="settings_custom_downloader_heading">Uygulama içi indiriciyi kullanın</string>
     <string name="settings_socks5_dialog_hint_port">Bağlantı noktası</string>
     <string name="settings_ip_dialog_title">IP sürümünü seçin</string>
-    <string name="dns_card_connected_status_failure">Devre Dışı</string>
     <string name="hsf_blocklist_updating_text">Etkinleştiriliyor…</string>
     <string name="about_connect">iletişim</string>
     <string name="about_whats_new">Yenilikler %1$s</string>
@@ -105,14 +100,12 @@
     <string name="cd_dns_crypt_dialog_heading">DNSCrypt Çözümleyici veya Aktarıcı Ekleme</string>
     <string name="univ_firewall_rule_1">Cihaz kilitliyken tüm uygulamaları engelleyin</string>
     <string name="univ_firewall_rule_7">IPv6\'da IPv4\'ü engelleyin (deneysel)</string>
-    <string name="univ_accessibility_crash_dialog_negative">İptal</string>
     <string name="fapps_unmetered_unblock_dialog_title">Ölçülmemiş olarak izin ver</string>
     <string name="coming_soon_toast">çok yakında</string>
     <string name="firewall_rule_block_app_new_install">Yeni Uygulama</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Bypass Edilen Uygulama</string>
     <string name="notif_channel_proxy_failure">Proxy Uyarıları</string>
     <string name="cd_toast_deleted">Alan adı özel listeden kaldırıldı</string>
-    <string name="rt_apply_btn">Uygula</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
     <string name="bsct_conn_desc_allowed">izin verilir %1$s %2$s</string>
     <string name="dns_act_log">Günlükler</string>
@@ -127,7 +120,6 @@
     <string name="univ_ip_delete_individual_positive">Sil</string>
     <string name="dns_info_neutral">Kopyala</string>
     <string name="dns_proxy_port">Liman Numarası</string>
-    <string name="fapps_firewall_filter_blocked">Engellenen</string>
     <string name="fapps_firewall_filter_isolate">Kilitlenme</string>
     <string name="fapps_metered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılara izin verilsin mi\?</string>
     <string name="network_log_app_name_unknown">Bilinmeyen</string>
@@ -135,15 +127,10 @@
     <string name="firewall_rule_foreground">Kullanılmayan Uygulama</string>
     <string name="firewall_rule_block_http">Güvensiz HTTP</string>
     <string name="build__flavor_play_store">Oyna</string>
-    <string name="cd_remove_dialog_negative">İptal</string>
-    <string name="rt_dialog_negative">İptal</string>
     <string name="rt_list_simple_btn_txt">basit</string>
-    <string name="bsrf_apply_filter">Uygula</string>
     <string name="dc_local_block_enabled">Etkin</string>
-    <string name="lbbs_enable">Devre Dışı</string>
     <string name="lbbs_download">Blok listelerini güncelleme</string>
     <string name="brbs_backup_dialog_positive">Yedekle</string>
-    <string name="brbs_backup_dialog_negative">İptal</string>
     <string name="alert_permission_accessibility_regrant">Eylem Gerekli</string>
     <string name="bsct_app_info">Uygulama Bilgisi</string>
     <string name="app_mode_dns">DNS</string>
@@ -161,25 +148,18 @@
     <string name="cd_dns_crypt_title">çözücüler</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="cd_dns_crypt_relay_heading">Aktarım</string>
-    <string name="cd_dialog_negative_btn">iptal</string>
-    <string name="dns_log_dialog_negative">İptal</string>
-    <string name="dns_btm_sheet_chip_blocked">Engellenen</string>
     <string name="hs_download_negative_default">Daha sonra anımsat</string>
     <string name="univ_firewall_rule_3">Kaynak uygulama bilinmediğinde engelle</string>
     <string name="univ_delete_firewall_dialog_message">Bu kuralların silinmesi, herhangi bir uygulamanın şu anda engellenen IP\'lere bağlanmasına izin verecektir.</string>
-    <string name="fapps_filter_parent_all">Tümü</string>
     <string name="fapps_unmetered_block_dialog_title">Ölçülmemiş üzerinde blok</string>
     <string name="dns_proxy_connection_failure_lockdown">Kilitleme modunda %2$s için %1$s adresinin hariç tutulması İnternet bağlantısı sorunlarına neden olabilir.</string>
     <string name="firewall_rule_block_app">Uygulama Engellendi</string>
     <string name="cd_toast_added">Alan adı başarıyla eklendi</string>
-    <string name="cd_whitelist_txt">Beyaz Liste</string>
     <string name="rt_dialog_neutral">Devam Et</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="brbs_backup_dialog_title">Yedek alın</string>
-    <string name="brbs_restore_dialog_failure_negative">Yok say</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="download_update_dialog_failure_message">Sunucularımız kapalı ya da bağlantı kurulamadı. Lütfen bir süre sonra tekrar deneyin.</string>
-    <string name="orbot_stop_dialog_positive">Yok say</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
 \n%2$s</string>
@@ -190,9 +170,6 @@
     <string name="dc_custom_block_heading">Bireysel alan adlarına izin verme veya reddetme</string>
     <string name="about_bug_report_dialog_positive_btn">E-posta gönder</string>
     <string name="contributors_dialog_title">Katkıda bulunanlar</string>
-    <string name="cd_dnscrypt_relay_dismiss_btn">Yok say</string>
-    <string name="ct_delete_logs_negative_btn">İptal</string>
-    <string name="univ_ip_delete_dialog_negative">İptal</string>
     <string name="dns_connected_rethink_plus">Bağlandı. %1$s kullanımdaki blok listeleri</string>
     <string name="rules_load_failure_reload">yeniden yükle</string>
     <string name="firewall_rule_block_ip">IP / Bağlantı Noktası (Uygulama)</string>
@@ -205,7 +182,6 @@
 \nPil tasarrufu sağlayan DNS modu ile normal DNS + Güvenlik Duvarı modu arasında hızlıca geçiş yapmak için iki düğme gösterir."</string>
     <string name="ci_no_rule_txt">Kural Yok</string>
     <string name="bsac_distrust">Bypass\'ı Kaldır</string>
-    <string name="dc_local_block_disabled">Devre Dışı</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="brbs_backup_title">Yedekle</string>
     <string name="brbs_backup_dialog_failure_message">Yedekleme yapılamadı. Tekrar deneyelim mi\?</string>
@@ -230,7 +206,6 @@
     <string name="hs_btm_sheet_lock_down">VPN <i>kilitlendiğinde modlar değiştirilemiyor</i>. <u> VPN ayarlarını düzenlemek için dokunun</u>.</string>
     <string name="firewall_rule_block_unmetered">Ölçümsüz (WiFi)</string>
     <string name="firewall_rule_isolate_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, bu <i>uygulamasının</i> <i> atlanan IP\'ler</i> dışındaki IP\'lere bağlanmasını engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
-    <string name="cd_filter_allowed">İzin veriliyor</string>
     <string name="ci_dialog_title">IP / Port Kuralı Ekle</string>
     <string name="ci_block">engelle</string>
     <string name="ada_network_log_title">bu uygulama için ağ günlüğü</string>
@@ -257,7 +232,6 @@
     <string name="log_file_not_available">Kaza raporu bulunamadı</string>
     <string name="cd_dns_proxy_error_text_3">Kapı Geçersiz</string>
     <string name="cd_dns_crypt_dialog_stamp">Pul</string>
-    <string name="ct_filter_parent_all">Tümü</string>
     <string name="dns_btm_record_type">Sorgu türü: %1$s</string>
     <string name="univ_view_blocked_ip">ip &amp; port kuralları</string>
     <string name="univ_ip_delete_toast_success">Tüm IP kuralları silindi.</string>
@@ -269,7 +243,6 @@
     <string name="notif_channel_vpn_failure">Etkin Olmayan VPN</string>
     <string name="notif_channel_desc_vpn_notification">RethinkDNS aktif olduğunda ve arka planda çalıştığında bilgilendirin</string>
     <string name="ci_bypass_universal_txt">Bypass Evrensel</string>
-    <string name="ci_blocked_txt">Engellenen</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="about_version">v%1$s</string>
@@ -302,7 +275,6 @@
     <string name="firewall_rule_trusted_ip">Bypass Edilen IP (Uygulama)</string>
     <string name="new_app_notification_action_toast_deny">Uygulama için ağ bağlantısı reddedildi</string>
     <string name="notif_dialog_pause_dialog_message">Uygulama duraklama durumunda, devam etmek için devam edin</string>
-    <string name="cd_add_dialog_show_btn">göster</string>
     <string name="settings_all_networks_dialog_message">Etkinleştirildiğinde, ölçülü (örn: Mobil) ve ölçülü olmayan (örn: Wi-Fi) uygulama güvenlik duvarı kuralları yerine getirilmeyecektir.
 \n
 \nDevam etmek istiyor musunuz\?</string>
@@ -325,7 +297,6 @@
     <string name="dns_btm_resolved_doh_no_server">çözüldü %1$s</string>
     <string name="univ_ip_delete_dialog_positive">Tümünü sil</string>
     <string name="univ_accessibility_dialog_positive">İzin ver</string>
-    <string name="fapps_firewall_filter_all">Tümü</string>
     <string name="fapps_unmetered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılara izin verilsin mi\?</string>
     <string name="fapps_all_network_hint"><u>Tüm ağları kullan</u> etkinleştirildi. Güvenlik Duvarı Ölçülü / Ölçüsüz kurallarına uymayacaktır.</string>
     <string name="settings_local_blocklist_in_use">%1$s kullanımdaki blok listeleri</string>
@@ -350,16 +321,12 @@
     <string name="cd_custom_dns_proxy_default_app">Hiç kimse</string>
     <string name="cd_dns_proxy_mode_internal">Dahili</string>
     <string name="hs_download_positive_default">tamam</string>
-    <string name="dns_select_toast">En az bir çözümleyici seçilmelidir.</string>
-    <string name="fapps_unmetered_positive">Uygula</string>
     <string name="fapps_firewall_filter_hint">Listelenen uygulamalara ölçülmemiş / ölçülmüş kurallar uygulayın</string>
     <string name="system_dns_connection_failure">Geçerli DNS sunucusu belirlenemiyor</string>
     <string name="copy_clipboard_label">Adres</string>
     <string name="accessibility_notification_title">Eylem Gerekli</string>
     <string name="new_app_bulk_notification_content">RethinkDNS %1$s yeni uygulamaları engelledi. Görüntülemek veya değiştirmek için dokunun.</string>
     <string name="notif_channel_desc_proxy_failure">Proxy hataları ve anomalileri hakkında uyarı</string>
-    <string name="cd_filter_all">Tümü</string>
-    <string name="rt_cancel_btn">İptal</string>
     <string name="rt_download_desc">Bu özelliği kullanmak için blok listelerini (yaklaşık 60MB) indirin.</string>
     <string name="brbs_restore_title">Geri Yükle</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
@@ -367,7 +334,6 @@
     <string name="brbs_restore_dialog_title">Yedeği geri yükle</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_positive_btn">ekle</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="default_dns_name">RDNS Varsayılan</string>
     <string name="dns_query_clear_logs_title">Tüm DNS kayıtları silinsin mi\?</string>
     <string name="always_on_dialog_stop_message">Rethink için her zaman açık VPN etkinleştirildi. Yine de Rethink\'i durdurmak istediğinizden emin misiniz\?</string>
@@ -378,10 +344,8 @@
     <string name="settings_orbot_heading">Orbot Kurulumu</string>
     <string name="settings_dns_proxy_dialog_app_desc">Seçilen uygulama, sizin adınıza bağlantıları proxy\'lemesine izin vermek için VPN\'den hariç tutulacaktır.</string>
     <string name="firewall_card_text_inactive">Güvenlik duvarı modunu etkinleştirin.</string>
-    <string name="about_bug_no_log_dialog_negative_btn">İptal</string>
     <string name="about_settings_vpn_profile">VPN Profili</string>
     <string name="cd_dns_crypt_resolver_heading">Çözümleyici</string>
-    <string name="dns_filter_parent_allowed">İzin veriliyor</string>
     <string name="fapps_firewall_filter_bypass_universal">Bypass edildi</string>
     <string name="fapps_metered_unblock_dialog_title">Ölçülü olarak izin ver</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 vekil</string>
@@ -390,7 +354,6 @@
     <string name="new_app_notification_action_toast_allow">Uygulama için izin verilen ağ bağlantısı</string>
     <string name="notif_channed_desc_download">Aygıt içi blok listeleri için İndirme İlerlemesi Uyarısı</string>
     <string name="ci_dialog_edittext_hint">IP adresi, alt ağ veya bağlantı noktası</string>
-    <string name="rt_cancel_download">İptal</string>
     <string name="rethink_sky_desc">280+ konum; daha yüksek çalışma süresi; cloudflare.com üzerinde çalışan saplama çözümleyici</string>
     <string name="lbbs_configure">Yapılandır</string>
     <string name="about_mail_to_string">mailto:</string>
@@ -405,27 +368,22 @@
     <string name="orbot_none">Yok (varsayılan)</string>
     <string name="settings_socks5_disabled_error">Orbot\'a bağlandı. Devam etmek için kapatın.</string>
     <string name="settings_general_header">genel</string>
-    <string name="settings_all_networks_dialog_negative_btn">İptal</string>
     <string name="apps_icon_content_desc">Uygulama Simgesi</string>
     <string name="hsf_start_dialog_positive">Başlangıç</string>
     <string name="about_bug_report_desc">e-posta çökme günlükleri</string>
     <string name="about_dialog_positive_button">Hadi gidelim</string>
     <string name="error_loading_log_file">Günlük dosyası yüklenirken hata oluştu</string>
-    <string name="ct_filter_parent_allowed">İzin veriliyor</string>
     <string name="dns_log_dialog_positive">Günlükleri sil</string>
     <string name="univ_accessibility_dialog_negative">Reddet</string>
     <string name="dns_connected_no_count">Bağlandı</string>
-    <string name="dns_proxy_negative_btn">İptal</string>
     <string name="fapps_filter_parent_system">Sistem</string>
     <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s uygulamaları gösteriliyor</string>
-    <string name="settings_local_blocklist_dialog_negative">İptal</string>
     <string name="new_app_notification_title">Eylem Gerekli</string>
     <string name="notif_channel_vpn_notification">Aktif VPN</string>
     <string name="category_name_sys_apps">Sistem Uygulamaları</string>
-    <string name="cd_dialog_header">Özel alan(lar)</string>
+    <string name="cd_dialog_header">Özel alan(lar): %1$s</string>
     <string name="rt_edit_dialog_positive">Düzenle</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
-    <string name="brbs_backup_dialog_failure_negative">Yok say</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_proxy_remove_success">DNS Proxy silindi.</string>
     <string name="download_update_dialog_failure_title">Bir şeyler yanlış gitti!</string>
@@ -440,7 +398,6 @@
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="settings_notification_desc">RethinkDNS bildirimiyle birlikte gösterilecek eylem düğmeleri: %1$s</string>
     <string name="settings_notification_dialog_title">Bildirim eylemini seçin</string>
-    <string name="firewall_card_status_inactive">Devre Dışı</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+\'ı Etkinleştir</string>
     <string name="dns_logs_lifetime_queries">Ömür boyu sorgular: %1$s</string>
     <string name="about_bravedns_toreport_text">yardim &amp; geri̇ bi̇ldi̇ri̇m</string>
@@ -465,7 +422,6 @@
     <string name="search_firewall_network_log"><font size="12">Uygulamaları, IP\'leri, alan adlarını arayın</font></string>
     <string name="app_mode_wireguard">VPN</string>
     <string name="settings_vpn_heading">vpn</string>
-    <string name="orbot_install_dialog_negative">Yok say</string>
     <string name="settings_https_disabled_error">Orbot\'a bağlandı. Devam etmek için kapatın.</string>
     <string name="settings_dns_proxy_dialog_hostname">Sunucu adı</string>
     <string name="settings_app_list_default_app">Hiç kimse</string>
@@ -474,7 +430,6 @@
     <string name="settings_notification_desc1">Duraklat / Durdur (varsayılan)</string>
     <string name="settings_protocol_translation_dns_inactive">Bu ayarı etkinleştirmek için DNS/DNS+Firewall moduna geçin</string>
     <string name="hsf_downtime">( %1$s adresinden beri aktif değil)</string>
-    <string name="hsf_start_dialog_negative">Yok say</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="dc_local_block_desc_1">185\'ten fazla engelleme listesi arasından seçim yapın. Blok listelerini indirmek veya yapılandırmak için buraya tıklayın.</string>
     <string name="about_twitter">Bizi Twitter\'da takip edin</string>
@@ -483,11 +438,9 @@
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="cd_dns_proxy_error_text_1">Geçersiz IP adresi</string>
     <string name="ctbs_app_info_not_available_toast">Uygulama ayarları sayfası bulunamadı</string>
-    <string name="fapps_firewall_filter_allowed">İzin veriliyor</string>
     <string name="fapps_metered_block_dialog_title">Ölçülen üzerinde blok</string>
     <string name="pause_desc">Not: %1$s engellenen uygulamalar güvenlik duvarına takılmaya devam edecektir.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">Bu DNS bağlantısı proxy\'lenmiş ve kullanıcı tarafından tercih edilen DNS uç noktasına iletilmiştir.<br/><br/> Devre dışı bırakmayı değiştirmek için <i>DNS sızıntılarını önle</i> DNS <i>Yapılandır</i> ekranından.</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ada_ip_connection_count">%1$s IP adres(ler)ine bağlandı</string>
     <string name="rt_re_download">Blok listelerini yeniden indirin</string>
     <string name="lbbs_enabled">Etkin</string>
@@ -518,7 +471,6 @@
     <string name="lbbs_search">Blok listelerindeki alan adlarını arama</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="radio_sky_btn">⛅ Gökyüzü</string>
-    <string name="always_on_dialog_negative">İptal</string>
     <string name="configure_dns_connected_doh_status">HTTPS üzerinden DNS</string>
     <string name="settings_enable_logs">Aygıt üzerinde günlük kaydını etkinleştirme</string>
     <string name="whats_dialog_title">v053l\'deki yenilikler</string>
@@ -535,8 +487,6 @@
     <string name="about_app_contributors">Katkıda bulunanlar</string>
     <string name="cd_custom_dns_proxy_name_default">Vekil</string>
     <string name="cd_dns_crypt_dialog_name">Ad</string>
-    <string name="dns_btm_sheet_chip_allowed">İzin veriliyor</string>
-    <string name="univ_ip_delete_individual_negative">İptal</string>
     <string name="univ_accessibility_crash_dialog_positive">Ayarlara Git</string>
     <string name="dns_proxy_name">Vekil Adı</string>
     <string name="fapps_unmetered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılar engellensin mi\?</string>
@@ -558,7 +508,6 @@
     <string name="settings_network_all_networks">Mevcut tüm ağları kullanın (deneysel)</string>
     <string name="settings_check_update_desc">Uygulama güncellemelerini haftada bir otomatik olarak kontrol edin.</string>
     <string name="settings_dns_proxy_dialog_header">SOCKS5 Vekili Ayarla</string>
-    <string name="settings_dns_proxy_dialog_negative_btn">iptal</string>
     <string name="settings_theme_dialog_title">Görünüm</string>
     <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)</string>
     <string name="firewall_status_isolate">kilitle</string>
@@ -573,7 +522,6 @@
     <string name="cd_doh_dialog_resolver_name">Çözümleyici Adı</string>
     <string name="hs_download_positive_play_store">Eksiksiz Güncelleme</string>
     <string name="univ_delete_firewall_dialog_title">Tüm IP Kuralları silinsin mi\?</string>
-    <string name="fapps_filter_apply_btn">Uygula</string>
     <string name="fapps_metered_block_dialog_message"><i>Listelenen</i> uygulamalar için kotalı (mobil) ağda bağlantılar engellensin mi\?</string>
     <string name="update_complete_action_snack">YENİDEN BAŞLAT</string>
     <string name="new_app_notification_content">RethinkDNS son yüklenen %1$s uygulamasını engelledi.</string>
@@ -596,23 +544,18 @@
     <string name="dc_block_heading">kurallar</string>
     <string name="dc_check_update_heading">Blok listesi güncellemeleri hakkında bilgi istemi</string>
     <string name="about_join_telegram">Telegram</string>
-    <string name="about_bug_report_dialog_negative_btn">İptal</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s diğer uygulama(lar)</string>
     <string name="dns_btm_sheet_chip_no_answer">Cevap Yok</string>
     <string name="univ_firewall_rule_4">DNS ve NTP dışında UDP\'yi engelleyin</string>
-    <string name="dns_delete_negative">İptal</string>
     <string name="rules_load_failure_desc">Güvenlik duvarı kuralı bulunamadı</string>
     <string name="accessibility_notification_content">RethinkDNS erişilebilirlik hizmeti durdu veya çöktü. Artık arka plandaki uygulamaları engellemiyor. Yeniden etkinleştirmek için dokunun.</string>
     <string name="firewall_rule_block_app_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>uygulamasını</i> engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
-    <string name="new_app_notification_action_allow">İzin ver</string>
     <string name="notif_dialog_pause_dialog_positive">Devam ettir</string>
     <string name="build__flavor_website">web sitesi</string>
     <string name="dc_doh">HTTPS üzerinden Dns</string>
-    <string name="brbs_restore_dialog_negative">İptal</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
     <string name="cd_dialog_positive_btn">ekle</string>
     <string name="dns_proxy_toast_parameter">DNS Proxy</string>
-    <string name="always_on_dialog_negative_btn">İptal</string>
     <string name="dns_mode_info_explanation_new">DNS isteklerini izleyin, engelleyin ve şifreleyin.</string>
     <string name="search_dns_logs"><font size="12">Alan adlarını veya IP\'leri arama</font></string>
     <string name="settings_http_proxy_dialog_title">Özel Sunucu URL\'si</string>
@@ -629,7 +572,6 @@
     <string name="firewall_rule_block_ip_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı <i>hedef IP\'sini</i> engelledi.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
     <string name="firewall_rule_block_udp_ntp_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı bu <i>UDP</i> bağlantısını engelledi.<br/><br/> Değiştirmek için <i>Evrensel</i> sekmesine gidin.</string>
     <string name="category_name_sys_components">Sistem Bileşenleri</string>
-    <string name="cd_filter_blocked">Engellenen</string>
     <string name="cd_dialog_desc">İzin vermek veya engellemek için özel URL (alan adı) veya joker karakter. örn. *.test.com, test.com/test</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="brbs_backup_desc">Uygulama ayarlarını, ağ ve dns günlüklerini yedekleme</string>
@@ -669,7 +611,6 @@
     <string name="bsct_conn_block_desc">%1$s tarafından engellendi %2$s</string>
     <string name="always_on_dialog">Bu cihazda \"Her Zaman Açık VPN\" etkinleştirilmiştir. Rethink\'i başlatmak için lütfen Ayarlar uygulamasına gidin ve \"Her Zaman Açık VPN \"i devre dışı bırakın.</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS, VPN\'i <i>Lockdown</i> modunda çalıştırıyor. Durdurulması, bu kullanıcı profilinde İnternet bağlantısının kaybına neden olur. Yine de devam etmek istiyor musunuz\?</string>
-    <string name="univ_firewall_no_ip_message">IP bulunamadı. IP adreslerini tek tek engellemek için Ağ Günlüğü ekranındaki girişlere dokunun.</string>
     <string name="dns_crypt_url_remove_dialog_message">DNSCrypt çözümleyicisini kayıtlı yapılandırmadan silin.</string>
     <string name="show_logs_disabled_network_message">Bağlantı günlüğü devre dışı bırakıldı. Yeniden etkinleştirmek için <i>Settings</i> adresine gidin ve <i>Enable on-device logging seçeneğini açın.</i></string>
     <string name="univ_firewall_dialog_title">IP Kuralı Silinsin mi\?</string>
@@ -708,9 +649,7 @@
     <string name="firewall_status_whitelisted">evrensel güvenlik duvarı kurallarını atlar</string>
     <string name="apps_card_ips_count">%1$s IP ve Port kuralları</string>
     <string name="hsf_start_btn_state">başlat</string>
-    <string name="dns_filter_parent_blocked">Engellenen</string>
     <string name="dns_btm_resolved_doh">%1$s tarafından çözüldü %2$s</string>
-    <string name="hsf_vpn_dialog_negative">İptal</string>
     <string name="hsf_vpn_dialog_message">RethinkDNS, cihazın DNS isteklerini şifrelemek, bir ağ izleyicisi uygulamak ve güvenlik duvarı kurallarını uygulamak için yerel bir VPN kurma iznine ihtiyaç duyar.
 \n
 \nRethinkDNS herhangi bir şekilde bilgi toplamaz veya sizi gözetlemez.</string>
@@ -725,9 +664,7 @@
     <string name="about_web">bağlantılar</string>
     <string name="about_bug_report">Hata raporu</string>
     <string name="collecting_logs_progress_text">Yakalanıyor…</string>
-    <string name="ct_filter_parent_blocked">Engellenen</string>
     <string name="ct_delete_logs_positive_btn">Günlükleri sil</string>
-    <string name="cd_dialog_error_invalid_tld">Geçersiz Üst düzey alan adı.</string>
     <string name="bsac_distrust_toast">Bu IP için bypass kaldırıldı %1$s</string>
     <string name="rbl_privacy">Gizlilik</string>
     <string name="rt_dialog_message">Yeni yapılandırılmış blok listelerini uygulamak istiyor musunuz\?</string>
@@ -742,18 +679,14 @@
 \n
 \nLiman numarası: %2$s</string>
     <string name="ada_app_status_block">engellendi</string>
-    <string name="ada_ip_rules_title">Bu uygulama için ip kuralları</string>
     <string name="ada_app_unmetered">Ölçülmeyen</string>
     <string name="bsac_block">Engelle</string>
     <string name="network_dns">Sistem DNS</string>
     <string name="cd_remove_dialog_title">Etki alanı silinsin mi\?</string>
     <string name="firewall_rule_bypass_universal_ip">Bypass edilen IP</string>
     <string name="cd_dialog_error_invalid_domain">Geçersiz URL (alan adı).</string>
-    <string name="cd_whitelist_initial">B</string>
     <string name="cd_blocked_initial">Si</string>
     <string name="ci_dialog_desc">IP adresine, IP alt ağına (aralık), Bağlantı Noktasına izin verin (bypass) veya engelleyin. Örnek: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
-    <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s
-\n</string>
     <string name="ada_app_status_block_wifi">ölçülmemiş (wifi) ağlarda engellenir</string>
     <string name="firewall_rule_univ_block_metered">Ölçülü (Evrensel)</string>
     <string name="firewall_rule_block_app_exception">Hata</string>
@@ -762,7 +695,6 @@
     <string name="ci_dialog_error_invalid_ip">Geçersiz IP adresi, alt ağ veya bağlantı noktası.</string>
     <string name="dns_proxy_ip_address">IP Adresi</string>
     <string name="fapps_info_dialog_positive_btn">Tamam</string>
-    <string name="fapps_unmetered_negative">İptal</string>
     <string name="update_complete_snack_message">Yeni sürüm indirildi.</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS Proxy\'li</string>
     <string name="notif_dialog_pause_dialog_neutral">Göster</string>
@@ -788,14 +720,10 @@
     <string name="firewall_rule_new_app_desc">Bu uygulama <i>ilk</i> kez bağlantı kurdu.<br/><br/> Değiştirmek için <i>Universal</i> sekmesine gidin.</string>
     <string name="firewall_rule_block_app_mobile_desc">Kullanıcı tarafından ayarlanan bir güvenlik duvarı kuralı, <i>Metered</i> ağına bağlanmaya çalışırken bu <i>uygulamasını</i> engelledi.<br/><br/> Değiştirmek için <i>Tüm Uygulamalar</i> sekmesine gidin.</string>
     <string name="firewall_rule_trusted_ip_desc">Bu bağlantıya izin verildi çünkü <i>hedef IP</i> uygulamaya özel tüm kuralları atlayacak şekilde ayarlandı.<br/><br/> Değiştirmek için <i>Uygulamaya Özel Güvenlik Duvarı</i> ekranına gidin.</string>
-    <string name="bsdl_domain_rule_norule">kural yok</string>
-    <string name="cd_blocked_txt">Engellenen</string>
     <string name="cd_no_rule_initial">K</string>
     <string name="cd_no_rule_txt">Kural Yok</string>
     <string name="ci_dialog_added_success">IP listeye eklendi</string>
     <string name="ci_no_rule_initial">K</string>
-    <string name="cd_add_dialog_sample_1">%1$s https://%2$s.%3$s
-\n</string>
     <string name="ada_app_status_allow">izin verilir</string>
     <string name="ci_no_rules_text">IP veya bağlantı noktası kuralı bulunamadı.</string>
     <string name="ci_no_rule">kural yok</string>
@@ -803,8 +731,6 @@
     <string name="ada_noapp_dialog_message">Belirtilen uygulama için uygulama bilgileri bulunamadı.</string>
     <string name="ada_firewall_status">Bu uygulama <b><i>%1$s</i> </b> .</string>
     <string name="ada_ip_connection_count_zero">0 IP adresi</string>
-    <string name="cd_add_dialog_sample_3">%1$s https://%2$s
-\n</string>
     <string name="ada_app_status_whitelist">evrensel güvenlik duvarı kurallarını atlayacaktır</string>
     <string name="ada_app_status_isolate">kilitleme modunda</string>
     <string name="ada_app_status_unknown">bilinmiyor</string>
@@ -812,15 +738,12 @@
     <string name="ada_app_exclude">Dışarıda tut</string>
     <string name="bsac_title_desc">Kurallar sadece bu uygulama için geçerlidir.</string>
     <string name="bsac_unblock_toast">Bu uygulama için engelsiz %1$s</string>
-    <string name="bsdl_domain_heading">Etki alanı kuralı</string>
-    <string name="bsdl_domain_desc">Dns sorgusuna izin vermek veya engellemek için aşağıya tıklayın</string>
     <string name="dns_proxy_dialog_message">Uygulama adı: %1$s
 \n
 \nIP adresi: %2$s
 \n
 \nLiman numarası: %3$s</string>
     <string name="bsdl_blocked_desc">%1$s tarafından engellendi %2$s</string>
-    <string name="bsdl_domain_rule_block">engelle</string>
     <string name="notif_download_success_content">Başarılı indir.</string>
     <string name="bsac_trust_toast">Bu IP için uygulama kurallarını atlama %1$s</string>
     <string name="rbl_security">Güvenlik</string>
@@ -828,7 +751,6 @@
     <string name="ada_ip_no_connection">Bu uygulama için ağ kaydı yok.</string>
     <string name="cd_dialog_edittext_hint">Girin %1$s</string>
     <string name="ada_app_status_exclude">dns ve güvenlik duvarından hariç tutulur</string>
-    <string name="ada_ip_block_count">%1$s IP kural(lar)ı</string>
     <string name="ada_app_metered">Ölçülü</string>
     <string name="ada_app_dns_settings">DNS Ayarları</string>
     <string name="bsac_unblock">Engelleme kaldır</string>
@@ -839,16 +761,12 @@
     <string name="bsac_trust">Uygulama kurallarını atlayın</string>
     <string name="notif_download_failure_content">İndirme başarısız oldu. Tekrar deneyin.</string>
     <string name="rt_dialog_title">Değişiklikleri Kaydet</string>
-    <string name="rt_dialog_positive">Uygula</string>
-    <string name="cd_sample_unicode_invalid">❌</string>
     <string name="dc_dns_proxy">DNS Vekil</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_delete">sil</string>
     <string name="ci_bypass_universal_initial">BE</string>
     <string name="other_dns_list_tab3">Dns Vekil</string>
-    <string name="cd_sample_unicode_valid">✅</string>
     <string name="ada_firewall_title">bu uygulama için güvenlik duvarı kuralları</string>
-    <string name="rt_filter_parent_all">Tümü</string>
     <string name="notif_download_cancel_content">İndirme iptal edildi.</string>
     <string name="rt_filter_parent_selected">Seçili</string>
     <string name="rt_filter_hint"><u>Tüm</u> engelleme listeleri gösteriliyor</string>
@@ -863,7 +781,6 @@
     <string name="notification_screen_error">Uygulama Bildirim ekranı başlatılamadı.</string>
     <string name="intent_launch_error">Sayım başlatılmadı %1$s</string>
     <string name="no_browser_error">Tarayıcıdan web sayfası açılamıyor.</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ada_app_isolate">Kilitlenme</string>
     <string name="firewall_rule_block_univ_ip">IP / Bağlantı Noktası (Evrensel)</string>
     <string name="rt_filter_desc"><u>%1$s</u> engelleme listesi gösteriliyor</string>
@@ -874,13 +791,11 @@
 \n
 \nRethink\'in DNS\'sini kullanmak için Android Ayarları\'na gidin ve \"Özel DNS \"yi kapatın.</string>
     <string name="private_dns_dialog_positive">Ayarlara git</string>
-    <string name="private_dns_dialog_negative">Yok say</string>
     <string name="private_dns_error">Özel dns ekranı başlatılamadı.</string>
     <string name="ada_app_firewall">Güvenlik Duvarı</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Günlükleri temizleyin</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Bu uygulamayla ilgili tüm günlükleri temizleyin.</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Devam Et</string>
-    <string name="ada_delete_logs_delete_negative" description="Appears as dialog negative button to clear the logs in app specific screen">İptal</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Yetişkinlere yönelik ve korsan içerikleri, çevrim içi kumar ve randevuları ve sosyal medyayı engelleyin.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Dikkat yazılımlarını, casus yazılımları, korkutucu yazılımları engelleyin.</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Kötü amaçlı yazılımları, fidye yazılımlarını, kripto yazılımlarını, kimlik avcılarını ve diğer tehditleri engelleyin.</string>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
@@ -53,10 +54,10 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="15dp"
                 android:padding="5dp"
-                app:chipSurfaceColor="@null"
                 android:textColor="?attr/chipTextColor"
                 android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:chipSurfaceColor="@null" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/dns_block_ips_chip"
@@ -66,10 +67,10 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="15dp"
                 android:padding="5dp"
-                app:chipSurfaceColor="@null"
                 android:textColor="?attr/chipTextColor"
                 android:textSize="@dimen/large_font_text_view"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:chipSurfaceColor="@null" />
 
         </LinearLayout>
     </RelativeLayout>
@@ -191,73 +192,39 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_blocked_desc"
             android:layout_marginLeft="2dp"
+            android:layout_marginTop="5dp"
             android:layout_marginRight="2dp"
-            android:orientation="vertical"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
             android:padding="10dp"
-            android:visibility="gone">
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:weightSum="1">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/drawable_purple_gradient"
-                android:gravity="start"
-                android:padding="7dp"
-                android:text="@string/bsdl_domain_heading"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/default_font_text_view" />
-
-            <TextView
-                android:id="@+id/bs_conn_block_conn_all_txt"
-                android:layout_width="match_parent"
+                android:id="@+id/bsdl_domain_rule_desc"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_weight="0.6"
                 android:padding="5dp"
-                android:text="@string/bsdl_domain_desc"
+                android:text="@string/bsdl_block_desc"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/dns_block_toggle_group"
-                android:layout_width="match_parent"
+            <Spinner
+                android:id="@+id/bsdl_domain_rule_spinner"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                app:checkedButton="@id/dns_block_tg_no_rule"
-                app:selectionRequired="true"
-                app:singleSelection="true">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dns_block_tg_no_rule"
-                    style="@style/toggleButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:tag="0"
-                    android:text="@string/bsdl_domain_rule_norule"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/small_font_subheading_text" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dns_block_tg_allow"
-                    style="@style/toggleButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:tag="1"
-                    android:text="@string/bsdl_domain_rule_allow"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/small_font_subheading_text" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dns_block_tg_deny"
-                    style="@style/toggleButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:tag="2"
-                    android:text="@string/bsdl_domain_rule_block"
-                    android:textColor="?attr/primaryTextColor"
-                    android:textSize="@dimen/small_font_subheading_text" />
-
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+                android:layout_gravity="center"
+                android:layout_weight="0.4"
+                android:background="@drawable/spinner_outline"
+                android:popupBackground="@drawable/spinner_outline_with_bg"
+                android:spinnerMode="dropdown"
+                tools:listitem="@layout/spinner_item_firewall_status" />
 
         </LinearLayout>
+
 
     </RelativeLayout>
 

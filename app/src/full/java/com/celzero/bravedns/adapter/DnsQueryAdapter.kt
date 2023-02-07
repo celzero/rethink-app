@@ -34,13 +34,13 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.DnsBlocklistBottomSheetFragment
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.google.gson.Gson
@@ -115,7 +115,9 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             }
 
             // no need to check in glide cache if the value is available in failed cache
-            if (FavIconDownloader.isUrlAvailableInFailedCache(dnsLog.queryStr.dropLast(1)) != null) {
+            if (
+                FavIconDownloader.isUrlAvailableInFailedCache(dnsLog.queryStr.dropLast(1)) != null
+            ) {
                 hideFavIcon()
                 showFlag()
             } else {

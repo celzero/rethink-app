@@ -177,20 +177,11 @@ class ConnectionTrackerFragment :
     private fun remakeParentFilterChipsUi() {
         b.filterChipParentGroup.removeAllViews()
 
-        val all =
-            makeParentChip(TopLevelFilter.ALL.id, getString(R.string.ct_filter_parent_all), true)
+        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed =
-            makeParentChip(
-                TopLevelFilter.ALLOWED.id,
-                getString(R.string.ct_filter_parent_allowed),
-                false
-            )
+            makeParentChip(TopLevelFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
-            makeParentChip(
-                TopLevelFilter.BLOCKED.id,
-                getString(R.string.ct_filter_parent_blocked),
-                false
-            )
+            makeParentChip(TopLevelFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
 
         b.filterChipParentGroup.addView(all)
         b.filterChipParentGroup.addView(allowed)
@@ -273,7 +264,7 @@ class ConnectionTrackerFragment :
             io { connectionTrackerRepository.clearAllData() }
         }
 
-        builder.setNegativeButton(getString(R.string.ct_delete_logs_negative_btn)) { _, _ -> }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
         builder.create().show()
     }
 

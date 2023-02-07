@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import android.content.ContentValues
 import androidx.room.Entity
+import com.celzero.bravedns.service.FirewallManager
 
 @Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
 class AppInfo {
@@ -24,11 +25,11 @@ class AppInfo {
     var appName: String = ""
     var uid: Int = 0
     var isSystemApp: Boolean = false
-    var firewallStatus: Int = 0
+    var firewallStatus: Int = FirewallManager.FirewallStatus.NONE.id
     var appCategory: String = ""
     var wifiDataUsed: Long = 0
     var mobileDataUsed: Long = 0
-    var metered: Int = 0
+    var connectionStatus: Int = FirewallManager.ConnectionStatus.ALLOW.id
     var screenOffAllowed: Boolean = false
     var backgroundAllowed: Boolean = false
 
@@ -65,7 +66,7 @@ class AppInfo {
         this.appCategory = appCategory
         this.wifiDataUsed = wifiDataUsed
         this.mobileDataUsed = mobileDataUsed
-        this.metered = metered
+        this.connectionStatus = metered
         this.screenOffAllowed = screenOffAllowed
         this.backgroundAllowed = backgroundAllowed
     }
@@ -83,7 +84,7 @@ class AppInfo {
                 "appCategory" -> appCategory = it.value as String
                 "wifiDataUsed" -> wifiDataUsed = it.value as Long
                 "mobileDataUsed" -> mobileDataUsed = it.value as Long
-                "metered" -> metered = it.value as Int
+                "connectionStatus" -> connectionStatus = it.value as Int
                 "screenOffAllowed" -> screenOffAllowed = (it.value as Int == 1)
                 "backgroundAllowed" -> backgroundAllowed = (it.value as Int == 1)
             }
@@ -97,7 +98,7 @@ class AppInfo {
             appCategory,
             wifiDataUsed,
             mobileDataUsed,
-            metered,
+            connectionStatus,
             screenOffAllowed,
             backgroundAllowed
         )

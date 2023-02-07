@@ -67,13 +67,13 @@ interface CustomIpDao {
 
     @Query("delete from CustomIp where uid = $UID_EVERYBODY") fun deleteAllIPRulesUniversal()
 
-    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY LIMIT 10000")
+    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY and isActive = 1")
     fun getBlockedConnectionsCount(): Int
 
-    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY LIMIT 10000")
+    @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY and isActive = 1")
     fun getCustomIpsLiveData(): LiveData<Int>
 
-    @Query("select count(*) from CustomIp where uid = :uid")
+    @Query("select count(*) from CustomIp where uid = :uid and isActive = 1")
     fun getAppWiseIpRulesCount(uid: Int): LiveData<Int>
 
     @Query(

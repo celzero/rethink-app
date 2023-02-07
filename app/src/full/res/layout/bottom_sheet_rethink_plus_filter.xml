@@ -69,7 +69,7 @@
             android:maxHeight="40dp"
             android:minHeight="40dp"
             android:padding="5dp"
-            android:text="@string/bsrf_apply_filter"
+            android:text="@string/lbl_apply"
             android:textColor="?attr/primaryTextColor" />
     </LinearLayout>
 

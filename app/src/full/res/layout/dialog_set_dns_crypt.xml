@@ -138,7 +138,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
-        android:text="@string/cd_dialog_negative_btn"
+        android:text="@string/lbl_cancel"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toStartOf="@id/dialog_dns_crypt_ok_btn"
         app:layout_constraintTop_toBottomOf="@id/dialog_dns_crypt_scroll" />

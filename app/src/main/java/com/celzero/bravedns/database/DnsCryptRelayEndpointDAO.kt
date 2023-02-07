@@ -52,6 +52,11 @@ interface DnsCryptRelayEndpointDAO {
     @Query("update DNSCryptRelayEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
+    @Query(
+        "update DNSCryptRelayEndpoint set isSelected = 0 where isSelected = 1 and dnsCryptRelayURL = :stamp"
+    )
+    fun unselectRelay(stamp: String)
+
     @Transaction
     @Query("select * from DNSCryptRelayEndpoint where isSelected = 1")
     fun getConnectedRelays(): List<DnsCryptRelayEndpoint>

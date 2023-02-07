@@ -305,7 +305,7 @@
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.SwitchCompat
+                    <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/settings_activity_ptrans_switch"
                         style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                         android:layout_width="wrap_content"

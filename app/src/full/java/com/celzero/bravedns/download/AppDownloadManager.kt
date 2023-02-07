@@ -38,9 +38,6 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import java.util.concurrent.TimeUnit
 
 /**
@@ -59,7 +56,6 @@ class AppDownloadManager(
     // live data to initiate the download, contains time stamp if the download is required,
     // else will have
     val downloadRequired: MutableLiveData<DownloadManagerStatus> = MutableLiveData()
-    val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     // various download status used as part of Work manager.
     enum class DownloadManagerStatus(val id: Int) {

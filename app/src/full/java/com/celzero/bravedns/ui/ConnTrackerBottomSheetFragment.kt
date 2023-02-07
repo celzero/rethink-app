@@ -34,18 +34,19 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.FirewallManager.getLabelForStatus
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
+import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
@@ -294,7 +295,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         b.bsConnFirewallSpinner.adapter =
             FirewallStatusSpinnerAdapter(
                 requireContext(),
-                FirewallManager.FirewallStatus.getLabel(requireContext())
+                FirewallManager.getLabel(requireContext())
             )
         b.bsConnFirewallSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -327,7 +328,10 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             }
 
         b.bsConnIpRuleSpinner.adapter =
-            FirewallStatusSpinnerAdapter(requireContext(), IpRulesManager.IpRuleStatus.getLabel(requireContext()))
+            FirewallStatusSpinnerAdapter(
+                requireContext(),
+                IpRulesManager.IpRuleStatus.getLabel(requireContext())
+            )
         b.bsConnIpRuleSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -372,16 +376,20 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         if (firewallStatus.isUntracked()) return
 
         when (firewallStatus) {
-            FirewallManager.FirewallStatus.ALLOW -> {
-                b.bsConnFirewallSpinner.setSelection(0, true)
-            }
-            FirewallManager.FirewallStatus.BLOCK -> {
-                if (connStatus.both()) {
-                    b.bsConnFirewallSpinner.setSelection(1, true)
-                } else if (connStatus.wifi()) {
-                    b.bsConnFirewallSpinner.setSelection(2, true)
-                } else {
-                    b.bsConnFirewallSpinner.setSelection(3, true)
+            FirewallManager.FirewallStatus.NONE -> {
+                when (connStatus) {
+                    FirewallManager.ConnectionStatus.ALLOW -> {
+                        b.bsConnFirewallSpinner.setSelection(0, true)
+                    }
+                    FirewallManager.ConnectionStatus.BOTH -> {
+                        b.bsConnFirewallSpinner.setSelection(1, true)
+                    }
+                    FirewallManager.ConnectionStatus.UNMETERED -> {
+                        b.bsConnFirewallSpinner.setSelection(2, true)
+                    }
+                    FirewallManager.ConnectionStatus.METERED -> {
+                        b.bsConnFirewallSpinner.setSelection(3, true)
+                    }
                 }
             }
             FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
@@ -400,7 +408,9 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun updateIpRulesUi(uid: Int, ipAddress: String, port: Int) {
-        b.bsConnIpRuleSpinner.setSelection(IpRulesManager.isIpRuleAvailable(uid, ipAddress, port).id)
+        b.bsConnIpRuleSpinner.setSelection(
+            IpRulesManager.isIpRuleAvailable(uid, ipAddress, port).id
+        )
     }
 
     private fun showFirewallRulesDialog(blockedRule: String?) {
@@ -500,7 +510,9 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         builderSingle.setItems(packageList.toTypedArray(), null)
 
         builderSingle
-            .setPositiveButton(getString(status.getLabelId())) { dialog: DialogInterface, _: Int ->
+            .setPositiveButton(getString(getLabelForStatus(status, connStatus))) {
+                dialog: DialogInterface,
+                _: Int ->
                 // call dialog.dismiss() before updating the details.
                 // Without dismissing this dialog, the bottom sheet dialog is not
                 // refreshing/updating its UI. One way is to dismiss the dialog

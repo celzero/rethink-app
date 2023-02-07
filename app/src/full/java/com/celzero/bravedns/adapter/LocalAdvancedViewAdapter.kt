@@ -30,7 +30,6 @@ import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
-import com.celzero.bravedns.util.Constants.Companion.DEAD_PACK
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

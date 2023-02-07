@@ -112,18 +112,14 @@ class NotificationHandlerDialog : AppCompatActivity() {
 
     private fun handleAccessibilitySettings() {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.alert_permission_accessibility_regrant)
+        builder.setTitle(R.string.lbl_action_required)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) {
             _,
             _ ->
             openRethinkAppInfo(this)
         }
-        builder.setNegativeButton(getString(R.string.univ_accessibility_crash_dialog_negative)) {
-            _,
-            _ ->
-            finish()
-        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> finish() }
         builder.setCancelable(false)
 
         builder.create().show()

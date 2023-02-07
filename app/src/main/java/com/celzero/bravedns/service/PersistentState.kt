@@ -222,6 +222,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // biometric authentication
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
 
+    // enable dns alg
+    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
+
+    // dns crypt relay server
+    var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()

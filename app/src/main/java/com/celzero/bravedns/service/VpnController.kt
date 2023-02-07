@@ -221,13 +221,14 @@ object VpnController : KoinComponent {
             return t
         }
 
-        t = if (braveVpnService?.underlyingNetworks?.isActiveNetworkMetered == true) {
-            braveVpnService?.getString(R.string.ada_app_metered).toString()
-        } else {
-            // the network type is shown as unmetered even when rethink cannot determine
-            // the underlying network / no underlying network
-            braveVpnService?.getString(R.string.ada_app_unmetered).toString()
-        }
+        t =
+            if (braveVpnService?.underlyingNetworks?.isActiveNetworkMetered == true) {
+                braveVpnService?.getString(R.string.ada_app_metered).toString()
+            } else {
+                // the network type is shown as unmetered even when rethink cannot determine
+                // the underlying network / no underlying network
+                braveVpnService?.getString(R.string.ada_app_unmetered).toString()
+            }
         return t
     }
 }

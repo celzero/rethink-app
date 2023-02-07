@@ -68,12 +68,12 @@ import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -284,9 +284,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
         builder.setMessage(getString(R.string.orbot_stop_dialog_dns_message))
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.orbot_stop_dialog_positive)) {
-            dialogInterface,
-            _ ->
+        builder.setPositiveButton(getString(R.string.lbl_dismiss)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
         builder.setNegativeButton(getString(R.string.orbot_stop_dialog_neutral)) {
@@ -477,7 +475,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             disableFirewallCard()
             unobserveUniversalStates()
         } else {
-            b.fhsCardFirewallUnivRules.visibility = View.GONE
+            b.fhsCardFirewallUnivRules.visibility = View.INVISIBLE
             observeUniversalStates()
         }
     }
@@ -502,18 +500,18 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disableFirewallCard() {
-        b.fhsCardFirewallIps.text = getString(R.string.firewall_card_status_inactive)
+        b.fhsCardFirewallIps.text = getString(R.string.lbl_disabled)
         b.fhsCardFirewallUnivRules.visibility = View.VISIBLE
         b.fhsCardFirewallUnivRules.text = getString(R.string.firewall_card_text_inactive)
     }
 
     private fun disabledDnsCard() {
         b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
-        b.fhsCardDnsConnectedDns.text = getString(R.string.dns_card_connected_status_failure)
+        b.fhsCardDnsConnectedDns.text = getString(R.string.lbl_disabled)
     }
 
     private fun disableAppsCard() {
-        b.fhsCardAppsStatus.text = getString(R.string.firewall_card_status_inactive)
+        b.fhsCardAppsStatus.text = getString(R.string.lbl_disabled)
         b.fhsCardApps.text = getString(R.string.firewall_card_text_inactive)
     }
 
@@ -539,7 +537,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun observeUniversalStates() {
-        // write an observer for both ips list and
+        // observer for ips count
         IpRulesManager.getCustomIpsLiveData().observe(viewLifecycleOwner) {
             b.fhsCardFirewallIps.text = getString(R.string.apps_card_ips_count, it.toString())
         }
@@ -563,7 +561,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // creating a copy of the received value in a synchronized block.
                 synchronized(it) { copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList() }
                 val blockedApps =
-                    copy.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+                    copy.filter { a ->
+                        a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id
+                    }
                 val whiteListApps =
                     copy.filter { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id
@@ -632,7 +632,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setCancelable(false)
         builder.setPositiveButton(R.string.always_on_dialog_positive) { _, _ -> stopVpnService() }
 
-        builder.setNegativeButton(R.string.always_on_dialog_negative) { _, _ ->
+        builder.setNegativeButton(R.string.lbl_cancel) { _, _ ->
             /* No Op */
         }
 
@@ -671,7 +671,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             openVpnProfile(requireContext())
         }
 
-        builder.setNegativeButton(R.string.always_on_dialog_negative_btn) { _, _ ->
+        builder.setNegativeButton(R.string.lbl_cancel) { _, _ ->
             // no-op
         }
 
@@ -751,7 +751,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             openNetworkSettings(requireContext())
         }
 
-        builder.setNegativeButton(R.string.private_dns_dialog_negative) { _, _ ->
+        builder.setNegativeButton(R.string.lbl_dismiss) { _, _ ->
             /* No Op */
         }
         builder.create().show()
@@ -843,9 +843,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        builder.setNegativeButton(R.string.hsf_start_dialog_negative) { dialog, _ ->
-            dialog.dismiss()
-        }
+        builder.setNegativeButton(R.string.lbl_dismiss) { dialog, _ -> dialog.dismiss() }
         builder.create().show()
     }
 
@@ -941,7 +939,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startForResult.launch(prepareVpnIntent)
         }
 
-        builder.setNegativeButton(R.string.hsf_vpn_dialog_negative) { _, _ ->
+        builder.setNegativeButton(R.string.lbl_cancel) { _, _ ->
             /* No Op */
         }
         builder.create().show()

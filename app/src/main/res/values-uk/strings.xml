@@ -18,17 +18,14 @@
     <string name="dns_mode_notification_title">Захищено! Підключено до Швидкого та Безпечного DNS.</string>
     <string name="firewall_mode_notification_title">Захищено! Підключено до Брандмауера.</string>
     <string name="always_on_dialog_positive">Зупинити</string>
-    <string name="always_on_dialog_negative">Скасування</string>
     <string name="always_on_dialog_neutral">Налаштування</string>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="settings_title_desc">DNS і Брандмауер, що легко налаштовуються</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
     <string name="private_dns_dialog_heading">Вимкнути Приватний DNS</string>
     <string name="about_title_desc">Виявлення та блокування загроз мережевої безпеки</string>
     <string name="accessibility_service_description">RethinkDNS використовує службу спеціальних можливостей для виявлення і блокування фонових додатків. RethinkDNS не збирає та не продає жодної інформації.</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="slide_2_desc">RethinkDNS - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">дозволити</string>

@@ -151,7 +151,7 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:textSize="@dimen/large_font_text_view"
-            android:text="@string/dns_proxy_negative_btn"
+            android:text="@string/lbl_cancel"
             android:textColor="?attr/accentGood" />
 
         <com.google.android.material.button.MaterialButton

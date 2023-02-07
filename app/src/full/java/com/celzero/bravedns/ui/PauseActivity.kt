@@ -26,9 +26,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.databinding.ActivityPauseBinding
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
@@ -72,7 +72,7 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     private fun initView() {
         FirewallManager.getApplistObserver().observe(this) {
             val blockedList =
-                it.filter { a -> a.firewallStatus == FirewallManager.FirewallStatus.BLOCK.id }
+                it.filter { a -> a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id }
             b.pacTimerDesc.text = getString(R.string.pause_desc, blockedList.count().toString())
         }
     }

@@ -279,7 +279,7 @@ class OrbotHelper(
             builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_PROXY_ALERTS)
         }
 
-        val contentTitle = context.resources.getString(R.string.settings_orbot_notification_heading)
+        val contentTitle = context.resources.getString(R.string.lbl_action_required)
         val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
         builder
             .setSmallIcon(R.drawable.dns_icon)

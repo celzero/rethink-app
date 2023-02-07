@@ -25,8 +25,8 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.databinding.BottomSheetFirewallSortFilterBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -119,7 +119,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         val all =
             makeParentChip(
                 FirewallAppFragment.TopLevelFilter.ALL.id,
-                getString(R.string.fapps_filter_parent_all),
+                getString(R.string.lbl_all),
                 true
             )
         val allowed =

@@ -6,7 +6,7 @@
     android:padding="5dp">
 
     <TextView
-        android:id="@+id/custom_dialog_heading"
+        android:id="@+id/cip_heading"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/custom_dialog_ok_button"
-        android:layout_below="@id/custom_dialog_heading"
+        android:layout_below="@id/cip_heading"
         android:layout_marginTop="10dp" />
 
     <com.google.android.material.button.MaterialButton
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:text="@string/cd_dnscrypt_relay_dismiss_btn"
+        android:text="@string/lbl_dismiss"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view" />
 

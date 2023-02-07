@@ -26,6 +26,7 @@ import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -118,19 +119,30 @@ class FirewallAppFragment :
         fun getFilter(): Set<Int> {
             return when (this) {
                 ALL -> setOf(0, 1, 2, 3, 4, 5)
-                ALLOWED -> setOf(0)
-                BLOCKED -> setOf(1)
+                ALLOWED -> setOf(5)
+                BLOCKED -> setOf(5)
                 BYPASS_UNIVERSAL -> setOf(2)
                 EXCLUDED -> setOf(3)
                 LOCKDOWN -> setOf(4)
             }
         }
 
+        fun getConnectionStatusFilter(): Set<Int> {
+            return when (this) {
+                ALL -> setOf(0, 1, 2, 3)
+                ALLOWED -> setOf(3)
+                BLOCKED -> setOf(0, 1, 2)
+                BYPASS_UNIVERSAL -> setOf(0, 1, 2, 3)
+                EXCLUDED -> setOf(0, 1, 2, 3)
+                LOCKDOWN -> setOf(0, 1, 2, 3)
+            }
+        }
+
         fun getLabel(context: Context): String {
             return when (this) {
-                ALL -> context.getString(R.string.fapps_firewall_filter_all)
-                ALLOWED -> context.getString(R.string.fapps_firewall_filter_allowed)
-                BLOCKED -> context.getString(R.string.fapps_firewall_filter_blocked)
+                ALL -> context.getString(R.string.lbl_all)
+                ALLOWED -> context.getString(R.string.lbl_allowed)
+                BLOCKED -> context.getString(R.string.lbl_blocked)
                 BYPASS_UNIVERSAL ->
                     context.getString(R.string.fapps_firewall_filter_bypass_universal)
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
@@ -410,10 +422,8 @@ class FirewallAppFragment :
             AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(getString(R.string.fapps_unmetered_positive)) { _, _ ->
-                    updateBulkRules(type)
-                }
-                .setNegativeButton(getString(R.string.fapps_unmetered_negative)) { _, _ -> }
+                .setPositiveButton(getString(R.string.lbl_apply)) { _, _ -> updateBulkRules(type) }
+                .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
                 .setCancelable(true)
 
         builder.create().show()
@@ -440,13 +450,15 @@ class FirewallAppFragment :
     }
 
     private fun showInfoDialog() {
-        val li = requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val li =
+            requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
-        val builder = AlertDialog.Builder(requireContext())
-            .setView(view)
+        val builder = AlertDialog.Builder(requireContext()).setView(view)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }
+        val v = view.findViewById<AppCompatImageView>(R.id.info_rules_dialog_cancel_img)
+        v.setOnClickListener { builder.create().dismiss() }
         builder.setCancelable(true)
         builder.create().show()
     }
@@ -462,24 +474,11 @@ class FirewallAppFragment :
     private fun remakeFirewallChipsUi() {
         b.ffaFirewallChipGroup.removeAllViews()
 
-        val none =
-            makeFirewallChip(
-                FirewallFilter.ALL.id,
-                getString(R.string.fapps_firewall_filter_all),
-                true
-            )
+        val none = makeFirewallChip(FirewallFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed =
-            makeFirewallChip(
-                FirewallFilter.ALLOWED.id,
-                getString(R.string.fapps_firewall_filter_allowed),
-                false
-            )
+            makeFirewallChip(FirewallFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
-            makeFirewallChip(
-                FirewallFilter.BLOCKED.id,
-                getString(R.string.fapps_firewall_filter_blocked),
-                false
-            )
+            makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
         val bypassUniversal =
             makeFirewallChip(
                 FirewallFilter.BYPASS_UNIVERSAL.id,

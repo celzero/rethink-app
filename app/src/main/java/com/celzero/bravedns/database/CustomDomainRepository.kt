@@ -31,4 +31,8 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     fun getAllCustomDomains(): List<CustomDomain> {
         return customDomainDAO.getAllDomains()
     }
+
+    fun deleteIpRulesByUid(uid: Int) {
+        customDomainDAO.deleteIpRulesByUid(uid)
+    }
 }

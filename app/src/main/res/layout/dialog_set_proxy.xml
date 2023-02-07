@@ -215,7 +215,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:gravity="center"
-            android:text="@string/settings_dns_proxy_dialog_negative_btn"
+            android:text="@string/lbl_cancel"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/large_font_text_view" />
 

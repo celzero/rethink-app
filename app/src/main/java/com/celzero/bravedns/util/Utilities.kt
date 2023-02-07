@@ -226,8 +226,8 @@ class Utilities {
         }
 
         fun makeAddressPair(countryCode: String?, ipAddress: String?): String {
-            return if (ipAddress == null) {
-                ""
+            return if (ipAddress.isNullOrEmpty()) {
+                "--" // to avoid translation set to "--"
             } else if (countryCode == null) {
                 ipAddress
             } else {
@@ -300,6 +300,10 @@ class Utilities {
                 toast.setGravity(Gravity.CENTER, 0, 0)
                 toast.show()
             } catch (e: IllegalStateException) {
+                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            } catch (e: IllegalAccessException) {
+                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            } catch (e: IOException) {
                 Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
             }
         }

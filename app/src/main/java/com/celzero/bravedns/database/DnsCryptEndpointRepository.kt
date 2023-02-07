@@ -15,15 +15,14 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Transaction
-import com.celzero.bravedns.util.LoggerConstants
 
 class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) {
 
     @Transaction
     fun update(dnsCryptEndpoint: DnsCryptEndpoint) {
+        dnsCryptEndpointDAO.removeConnectionStatus()
         dnsCryptEndpointDAO.update(dnsCryptEndpoint)
     }
 
@@ -43,7 +42,7 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         dnsCryptEndpointDAO.removeConnectionStatus()
     }
 
-    suspend fun getConnectedDNSCrypt(): List<DnsCryptEndpoint> {
+    suspend fun getConnectedDNSCrypt(): DnsCryptEndpoint {
         return dnsCryptEndpointDAO.getConnectedDNSCrypt()
     }
 
@@ -57,23 +56,5 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
 
     suspend fun getCount(): Int {
         return dnsCryptEndpointDAO.getCount()
-    }
-
-    suspend fun updateConnectionStatus(liveServersID: String?) {
-        removeConnectionStatus()
-        liveServersID?.split(",")?.forEach {
-            dnsCryptEndpointDAO.updateConnectionStatus(it.trim().toInt())
-        }
-    }
-
-    suspend fun getServersToAdd(): String {
-        val servers =
-            getConnectedDNSCrypt().joinToString(separator = ",") { "${it.id}#${it.dnsCryptURL}" }
-        Log.i(LoggerConstants.LOG_TAG_APP_MODE, "Crypt Server: $servers")
-        return servers
-    }
-
-    suspend fun getServersToRemove(): String {
-        return getConnectedDNSCrypt().joinToString(separator = ",") { "${it.id}" }
     }
 }

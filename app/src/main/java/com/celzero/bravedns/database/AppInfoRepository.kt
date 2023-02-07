@@ -50,7 +50,7 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
     fun cpUpdate(appInfo: AppInfo, clause: String): Int {
         // update only firewall and metered
-        return appInfoDAO.cpUpdate(appInfo.firewallStatus, appInfo.metered, clause)
+        return appInfoDAO.cpUpdate(appInfo.firewallStatus, appInfo.connectionStatus, clause)
     }
 
     fun cpInsert(appInfo: AppInfo): Long {
@@ -64,5 +64,4 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     fun cpDelete(uid: Int): Int {
         return appInfoDAO.deleteByUid(uid)
     }
-
 }

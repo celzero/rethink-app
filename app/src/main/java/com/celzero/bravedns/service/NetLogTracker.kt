@@ -17,7 +17,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
-import com.celzero.bravedns.data.IPDetails
+import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
@@ -68,7 +68,7 @@ internal constructor(
         dnsNetLogBatcher!!.begin(scope!!)
     }
 
-    fun writeIpLog(info: IPDetails) {
+    fun writeIpLog(info: ConnTrackerMetaData) {
         if (!persistentState.logsEnabled) return
 
         scope?.launch {

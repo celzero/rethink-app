@@ -17,9 +17,8 @@ package com.celzero.bravedns.util
 
 import android.content.Context
 import android.util.Log
-import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.IOException

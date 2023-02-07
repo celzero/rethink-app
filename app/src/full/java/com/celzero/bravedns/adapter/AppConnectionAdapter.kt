@@ -102,7 +102,7 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, ipRuleStatus: IpRulesManager.IpRuleStatus) {
+        private fun openBottomSheet(ipAddress: String, rule: IpRulesManager.IpRuleStatus) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottom sheet")
                 return
@@ -115,9 +115,9 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             // so sending the data using Bundles
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
-            bundle.putString(AppConnectionBottomSheet.IPADDRESS, ipAddress)
+            bundle.putString(AppConnectionBottomSheet.IP_ADDRESS, ipAddress)
             bundle.putInt(AppConnectionBottomSheet.PORT, Constants.UNSPECIFIED_PORT)
-            bundle.putInt(AppConnectionBottomSheet.IPRULESTATUS, ipRuleStatus.id)
+            bundle.putInt(AppConnectionBottomSheet.IP_RULE, rule.id)
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
@@ -126,19 +126,14 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
         private fun displayTransactionDetails(appConnection: AppConnection) {
             b.acdCount.text = appConnection.count.toString()
             b.acdFlag.text = appConnection.flag
-            b.acdIpAddress.text =
-                context.getString(
-                    R.string.ct_ip_port,
-                    appConnection.ipAddress,
-                    appConnection.port.toString()
-                )
-            val ipRuleStatus =
+            b.acdIpAddress.text = appConnection.ipAddress
+            val rule =
                 IpRulesManager.isIpRuleAvailable(
                     uid,
                     appConnection.ipAddress,
                     null // don't check for port as adding rule from this screen port is null
                 )
-            updateStatusUi(ipRuleStatus)
+            updateStatusUi(rule)
             if (!appConnection.appOrDnsName.isNullOrEmpty()) {
                 b.acdDomainName.visibility = View.VISIBLE
                 b.acdDomainName.text = beautifyDomainString(appConnection.appOrDnsName)

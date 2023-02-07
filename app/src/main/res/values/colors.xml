@@ -67,8 +67,8 @@
 
     <color name="chipBgPositive">#3380CBC4</color>
     <color name="chipTextPositive">#18ffff</color>
-    <color name="chipBgNegative">#33F48FB1</color>
-    <color name="chipTextNegative">#C51162</color>
+    <color name="chipBgNegative">#11F48FB1</color>
+    <color name="chipTextNegative">#FF1744</color>
     <color name="chipBgNeutral">#33c17900</color>
     <color name="chipTextNeutral">#ffd149</color>
     <color name="chipColorBgNormal">#90444444</color>
@@ -125,13 +125,18 @@
     <color name="colorSurfaceLight">#FFFFFF</color>
 
     <color name="chipBackgroundColorLight">#CCC5E1A5</color>
-    <color name="chipBgPositiveLight">#eeC5E1A5</color>
-    <color name="chipTextPositiveLight">#33691E</color>
-    <color name="chipBgNegativeLight">#f5F48FB1</color>
-    <color name="chipTextNegativeLight">#C51162</color>
+
+    <color name="chipBgPositiveLight">#1a3da751</color>
+    <color name="chipTextPositiveLight">#005000</color>
+
+    <color name="chipBgNegativeLight">#1aC51162</color>
+    <color name="chipTextNegativeLight">#dd0302</color>
+
     <color name="chipColorBgNormalLight">#FFe1e1e1</color>
-    <color name="chipBgNeutralLight">#33c17900</color>
-    <color name="chipTextNeutralLight">#c17900</color>
+
+    <color name="chipBgNeutralLight">#2cc17900</color>
+    <color name="chipTextNeutralLight">#895601</color>
+
     <color name="chipColorBgHighlightLight">#901e88e5</color>
 
     <color name="strokeLight">#000000</color>

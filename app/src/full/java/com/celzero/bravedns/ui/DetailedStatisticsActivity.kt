@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -63,7 +62,6 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
         // remove the view if there is no data
         recyclerAdapter.addLoadStateListener {
             if (it.append.endOfPaginationReached) {
-                Log.d("TEST","TEST: Count: ${recyclerAdapter.itemCount}")
                 if (recyclerAdapter.itemCount < 1) {
                     b.dsaRecycler.visibility = View.GONE
                     b.dsaNoDataRl.visibility = View.VISIBLE

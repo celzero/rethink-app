@@ -26,7 +26,7 @@ interface AppInfoDAO {
     @Update fun update(appInfo: AppInfo): Int
 
     @Query(
-        "update AppInfo set firewallStatus = :firewallStatus, metered = :connectionStatus where uid = :uid"
+        "update AppInfo set firewallStatus = :firewallStatus, connectionStatus = :connectionStatus where uid = :uid"
     )
     fun updateFirewallStatusByUid(uid: Int, firewallStatus: Int, connectionStatus: Int)
 
@@ -40,64 +40,87 @@ interface AppInfoDAO {
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
-    fun getSystemApps(search: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
+    fun getSystemApps(
+        search: String,
+        firewall: Set<Int>,
+        connectionStatus: Set<Int>
+    ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and firewallStatus in (:firewall)  order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 1 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus)  order by lower(appName)"
     )
     fun getSystemApps(
         search: String,
         filter: Set<String>,
-        firewall: Set<Int>
+        firewall: Set<Int>,
+        connectionStatus: Set<Int>
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
-    fun getInstalledApps(search: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
+    fun getInstalledApps(
+        search: String,
+        firewall: Set<Int>,
+        connectionStatus: Set<Int>
+    ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and firewallStatus in (:firewall) order by lower(appName)"
+        "select * from AppInfo where isSystemApp = 0 and (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getInstalledApps(
         search: String,
         filter: Set<String>,
-        firewall: Set<Int>
+        firewall: Set<Int>,
+        connectionStatus: Set<Int>
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) order by lower(appName)"
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
-    fun getAppInfos(search: String, firewall: Set<Int>): PagingSource<Int, AppInfo>
+    fun getAppInfos(
+        search: String,
+        firewall: Set<Int>,
+        connectionStatus: Set<Int>
+    ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter)  and firewallStatus in (:firewall)  order by lower(appName)"
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:filter)  and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus)  order by lower(appName)"
     )
     fun getAppInfos(
         search: String,
         filter: Set<String>,
-        firewall: Set<Int>
+        firewall: Set<Int>,
+        connectionStatus: Set<Int>
     ): PagingSource<Int, AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:cat) and isSystemApp in (:appType) and firewallStatus in (:firewall) "
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and appCategory in (:cat) and isSystemApp in (:appType) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
     fun getFilteredApps(
         search: String,
         cat: Set<String>,
         firewall: Set<Int>,
-        appType: Set<Int>
+        appType: Set<Int>,
+        connectionStatus: Set<Int>
     ): List<AppInfo>
 
     @Query(
-        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and isSystemApp in (:appType) and firewallStatus in (:firewall) "
+        "select * from AppInfo where (appName like :search or uid like :search or packageName like :search) and isSystemApp in (:appType) and firewallStatus in (:firewall) and connectionStatus in (:connectionStatus) order by lower(appName)"
     )
-    fun getFilteredApps(search: String, firewall: Set<Int>, appType: Set<Int>): List<AppInfo>
+    fun getFilteredApps(
+        search: String,
+        firewall: Set<Int>,
+        appType: Set<Int>,
+        connectionStatus: Set<Int>
+    ): List<AppInfo>
 
-    @Query("update AppInfo set firewallStatus = :firewall, metered = :metered where :clause")
-    fun cpUpdate(firewall: Int, metered: Int, clause: String): Int
+    @Query(
+        "update AppInfo set firewallStatus = :firewall, connectionStatus = :connectionStatus where :clause"
+    )
+    fun cpUpdate(firewall: Int, connectionStatus: Int, clause: String): Int
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetailsCursor(): Cursor
 

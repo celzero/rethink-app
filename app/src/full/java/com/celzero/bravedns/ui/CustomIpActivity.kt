@@ -38,6 +38,7 @@ import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
@@ -62,17 +63,13 @@ class CustomIpActivity :
     private val persistentState by inject<PersistentState>()
     private var uid = UID_EVERYBODY
 
-    companion object {
-        const val INTENT_UID = "UID"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
 
         uid = intent.getIntExtra(INTENT_UID, UID_EVERYBODY)
 
-        b.customDialogHeading.text = getString(R.string.ci_header, getAppName())
+        b.cipHeading.text = getString(R.string.ci_header, getAppName())
 
         b.cipSearchView.setOnQueryTextListener(this)
         observeCustomRules()
@@ -103,7 +100,7 @@ class CustomIpActivity :
     }
 
     private fun observeCustomRules() {
-        viewModel.customIpSize(uid).observe(this) {
+        viewModel.ipRulesCount(uid).observe(this) {
             if (it <= 0) {
                 showNoRulesUi()
                 hideRulesUi()
@@ -116,19 +113,19 @@ class CustomIpActivity :
     }
 
     private fun hideRulesUi() {
-        b.customDialogShowRulesRl.visibility = View.GONE
+        b.cipShowRulesRl.visibility = View.GONE
     }
 
     private fun showRulesUi() {
-        b.customDialogShowRulesRl.visibility = View.VISIBLE
+        b.cipShowRulesRl.visibility = View.VISIBLE
     }
 
     private fun hideNoRulesUi() {
-        b.customDialogNoRulesRl.visibility = View.GONE
+        b.cipNoRulesRl.visibility = View.GONE
     }
 
     private fun showNoRulesUi() {
-        b.customDialogNoRulesRl.visibility = View.VISIBLE
+        b.cipNoRulesRl.visibility = View.VISIBLE
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -153,7 +150,7 @@ class CustomIpActivity :
     }
 
     private fun setupClickListeners() {
-        b.customDialogAddFab.setOnClickListener { showAddIpDialog() }
+        b.cipAddFab.setOnClickListener { showAddIpDialog() }
 
         b.cipSearchDeleteIcon.setOnClickListener { showIpRulesDeleteDialog() }
     }
@@ -249,7 +246,7 @@ class CustomIpActivity :
             )
         }
 
-        builder.setNegativeButton(getString(R.string.univ_ip_delete_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
             // no-op
         }
 

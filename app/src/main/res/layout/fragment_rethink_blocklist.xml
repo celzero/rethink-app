@@ -161,7 +161,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:text="@string/rt_cancel_btn"
+                android:text="@string/lbl_cancel"
                 android:textColor="?attr/primaryTextColor" />
 
             <androidx.appcompat.widget.AppCompatButton
@@ -170,7 +170,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:text="@string/rt_apply_btn" />
+                android:text="@string/lbl_apply" />
 
         </LinearLayout>
     </RelativeLayout>
@@ -251,7 +251,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:minHeight="40dp"
-            android:text="@string/rt_cancel_download"
+            android:text="@string/lbl_cancel"
             android:textColor="?attr/primaryTextColor" />
     </LinearLayout>
 </LinearLayout>

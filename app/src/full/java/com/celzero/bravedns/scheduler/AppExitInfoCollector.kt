@@ -24,8 +24,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent

@@ -27,16 +27,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.FragmentUniversalFirewallBinding
-import com.celzero.bravedns.databinding.UniversalFragementContainerBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.CustomIpActivity.Companion.INTENT_UID
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.BackgroundAccessibilityService
+import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
@@ -45,11 +42,10 @@ import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KMutableProperty0
 
-class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_container) {
-    private val b by viewBinding(UniversalFragementContainerBinding::bind)
+class UniversalFirewallFragment : Fragment(R.layout.fragment_universal_firewall) {
+    private val b by viewBinding(FragmentUniversalFirewallBinding::bind)
 
     private val persistentState by inject<PersistentState>()
-    private val appConfig by inject<AppConfig>()
 
     companion object {
         fun newInstance() = UniversalFirewallFragment()
@@ -58,66 +54,33 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
-        observeBraveMode()
-        observeConnectedDns()
-    }
-
-    private fun observeBraveMode() {
-        appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
-            handleDisallowDnsBypassUi()
-        }
-    }
-
-    private fun observeConnectedDns() {
-        appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            handleDisallowDnsBypassUi()
-        }
-    }
-
-    private fun handleDisallowDnsBypassUi() {
-        if (appConfig.canEnableDnsBypassFirewallSetting()) {
-            showDisallowDnsBypassUi()
-        } else {
-            hideDisallowDnsBypassUi()
-        }
-    }
-
-    private fun hideDisallowDnsBypassUi() {
-        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.GONE
-    }
-
-    private fun showDisallowDnsBypassUi() {
-        b.appScrollingInclFirewall.firewallDisallowDnsBypassLl.visibility = View.VISIBLE
     }
 
     private fun initView() {
-        val includeView = b.appScrollingInclFirewall
-
         val isServiceRunning = VpnController.state().on
 
         if (!isServiceRunning) {
-            includeView.firewallScrollConnectCheck.visibility = View.GONE
+            b.firewallScrollConnectCheck.visibility = View.GONE
             return
         }
 
-        includeView.firewallScrollConnectCheck.visibility = View.VISIBLE
+        b.firewallScrollConnectCheck.visibility = View.VISIBLE
 
-        includeView.firewallAllAppsCheck.isChecked = persistentState.blockWhenDeviceLocked
-        includeView.firewallBackgroundModeCheck.isChecked = persistentState.blockAppWhenBackground
-        includeView.firewallUdpConnectionModeCheck.isChecked = persistentState.udpBlockedSettings
-        includeView.firewallUnknownConnectionModeCheck.isChecked =
-            persistentState.blockUnknownConnections
-        includeView.firewallDisallowDnsBypassModeCheck.isChecked = persistentState.disallowDnsBypass
-        includeView.firewallBlockNewAppCheck.isChecked = persistentState.blockNewlyInstalledApp
-        includeView.firewallBlockMeteredCheck.isChecked = persistentState.blockMeteredConnections
+        b.firewallAllAppsCheck.isChecked = persistentState.blockWhenDeviceLocked
+        b.firewallBackgroundModeCheck.isChecked = persistentState.blockAppWhenBackground
+        b.firewallUdpConnectionModeCheck.isChecked = persistentState.udpBlockedSettings
+        b.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
+        b.firewallDisallowDnsBypassModeCheck.isChecked = persistentState.disallowDnsBypass
+        b.firewallBlockNewAppCheck.isChecked = persistentState.blockNewlyInstalledApp
+        b.firewallBlockMeteredCheck.isChecked = persistentState.blockMeteredConnections
         // now, the firewall rule (block ipv4 in ipv6) is hidden from user action.
         // decide whether we need to add this back in universal settings
         // uncomment the below code if enabled
         // includeView.firewallCheckIpv4Check.isChecked = persistentState.filterIpv4inIpv6
-        includeView.firewallBlockHttpCheck.isChecked = persistentState.blockHttpConnections
-        includeView.firewallUnivLockdownCheck.isChecked = persistentState.universalLockdown
+        b.firewallBlockHttpCheck.isChecked = persistentState.blockHttpConnections
+        b.firewallUnivLockdownCheck.isChecked = persistentState.universalLockdown
 
-        setupClickListeners(includeView)
+        setupClickListeners(b)
     }
 
     private fun setupClickListeners(includeView: FragmentUniversalFirewallBinding) {
@@ -233,9 +196,8 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     }
 
     private fun recheckFirewallBackgroundMode(isChecked: Boolean) {
-        val includeView = b.appScrollingInclFirewall
         if (!isChecked) {
-            includeView.firewallBackgroundModeCheck.isChecked = false
+            b.firewallBackgroundModeCheck.isChecked = false
             persistentState.blockAppWhenBackground = false
             return
         }
@@ -255,12 +217,12 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         if (isAccessibilityServiceFunctional) {
             persistentState.blockAppWhenBackground = true
-            includeView.firewallBackgroundModeCheck.isChecked = true
+            b.firewallBackgroundModeCheck.isChecked = true
             return
         }
 
         showPermissionAlert()
-        includeView.firewallBackgroundModeCheck.isChecked = false
+        b.firewallBackgroundModeCheck.isChecked = false
         persistentState.blockAppWhenBackground = false
     }
 
@@ -270,14 +232,10 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
     }
 
     private fun updateUniversalFirewallPreferences() {
-        b.appScrollingInclFirewall.firewallAllAppsCheck.isChecked =
-            persistentState.blockWhenDeviceLocked
-        b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked =
-            persistentState.blockAppWhenBackground
-        b.appScrollingInclFirewall.firewallUdpConnectionModeCheck.isChecked =
-            persistentState.udpBlockedSettings
-        b.appScrollingInclFirewall.firewallUnknownConnectionModeCheck.isChecked =
-            persistentState.blockUnknownConnections
+        b.firewallAllAppsCheck.isChecked = persistentState.blockWhenDeviceLocked
+        b.firewallBackgroundModeCheck.isChecked = persistentState.blockAppWhenBackground
+        b.firewallUdpConnectionModeCheck.isChecked = persistentState.udpBlockedSettings
+        b.firewallUnknownConnectionModeCheck.isChecked = persistentState.blockUnknownConnections
         checkAppNotInUseRule()
     }
 
@@ -305,7 +263,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
 
         if (!isAccessibilityServiceFunctional) {
             persistentState.blockAppWhenBackground = false
-            b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked = false
+            b.firewallBackgroundModeCheck.isChecked = false
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.accessibility_failure_toast),
@@ -315,8 +273,7 @@ class UniversalFirewallFragment : Fragment(R.layout.universal_fragement_containe
         }
 
         if (isAccessibilityServiceRunning) {
-            b.appScrollingInclFirewall.firewallBackgroundModeCheck.isChecked =
-                persistentState.blockAppWhenBackground
+            b.firewallBackgroundModeCheck.isChecked = persistentState.blockAppWhenBackground
             return
         }
     }

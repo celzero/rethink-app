@@ -320,7 +320,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
             observeBackupWorker()
         }
 
-        builder.setNegativeButton(getString(R.string.brbs_backup_dialog_failure_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { _, _ ->
             // no-op
         }
 
@@ -370,8 +370,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
             observeRestoreWorker()
         }
 
-        builder.setNegativeButton(getString(R.string.brbs_restore_dialog_failure_negative)) { _, _
-            ->
+        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { _, _ ->
             // no-op
         }
 
@@ -388,7 +387,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
             observeRestoreWorker()
         }
 
-        builder.setNegativeButton(getString(R.string.brbs_restore_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
             // no-op
         }
 
@@ -405,7 +404,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
             observeBackupWorker()
         }
 
-        builder.setNegativeButton(getString(R.string.brbs_backup_dialog_negative)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
             // no-op
         }
 
