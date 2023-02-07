@@ -103,7 +103,9 @@ object IpRulesManager : KoinComponent {
     }
 
     init {
-        loadIpRules()
+        io {
+            loadIpRules()
+        }
     }
 
     // returns CustomIp object based on uid and IP address
@@ -317,15 +319,6 @@ object IpRulesManager : KoinComponent {
         return persistentState.filterIpv4inIpv6
     }
 
-    fun clearAllIpRules() {
-        io {
-            customIpRepository.deleteAllIPRulesUniversal()
-            appIpRules.clear()
-            wildCards.clear()
-            ipRulesLookupCache.invalidateAll()
-        }
-    }
-
     fun deleteIpRulesByUid(uid: Int) {
         io {
             customIpRepository.deleteIpRulesByUid(uid)
@@ -335,7 +328,10 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    fun loadIpRules() {
+    suspend fun loadIpRules() {
+        if (appIpRules.isNotEmpty() || wildCards.isNotEmpty()) {
+            return
+        }
         io {
             val rules = customIpRepository.getIpRules()
             rules.forEach {

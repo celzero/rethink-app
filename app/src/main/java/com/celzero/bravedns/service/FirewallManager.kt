@@ -278,7 +278,7 @@ object FirewallManager : KoinComponent {
     }
 
     fun appStatus(uid: Int): FirewallStatus {
-        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.NONE
+        val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.UNTRACKED
 
         return when (appInfo.firewallStatus) {
             FirewallStatus.BYPASS_UNIVERSAL.id -> FirewallStatus.BYPASS_UNIVERSAL

@@ -86,11 +86,6 @@ object DomainRulesManager : KoinComponent {
         WILDCARD(1);
 
         companion object {
-            fun getAllDomainTypes(): Array<String> {
-                // TODO: move it to strings.xml
-                return arrayOf("Domain", "Wildcard")
-            }
-
             fun getType(id: Int): DomainType {
                 return when (id) {
                     DOMAIN.id -> DOMAIN
@@ -145,7 +140,6 @@ object DomainRulesManager : KoinComponent {
     }
 
     data class CacheKey(val domain: String, val uid: Int)
-    data class Test(val type: String, val status: Status)
 
     fun getDomainRule(d: String, uid: Int): Status {
         val key = CacheKey(d, uid)
@@ -158,21 +152,21 @@ object DomainRulesManager : KoinComponent {
         return Status.NONE
     }
 
-    fun status(domain: String, uid: Int): Test {
+    fun status(domain: String, uid: Int): Status {
         // return if the cache has the domain
         domainLookupCache.getIfPresent(domain)?.let {
-            return Test("Cache", Status.getStatus(it.id))
+            return Status.getStatus(it.id)
         }
 
         // check if the domain is added in custom domain list
         when (domainMatch(domain, uid)) {
             Status.TRUST -> {
                 updateLookupCache(domain, uid, Status.TRUST)
-                return Test("Domain", Status.TRUST)
+                return Status.TRUST
             }
             Status.BLOCK -> {
                 updateLookupCache(domain, uid, Status.BLOCK)
-                return Test("Domain", Status.BLOCK)
+                return Status.BLOCK
             }
             Status.NONE -> {
                 // fall-through
@@ -180,13 +174,17 @@ object DomainRulesManager : KoinComponent {
         }
 
         // check if the received domain is matching with the custom wildcard
-        val match = matchesWildcard(domain)
+        val match = matchesWildcard(domain, uid)
         updateLookupCache(domain, uid, match)
-        return Test("Wildcard", match)
+        return match
     }
 
-    private fun matchesWildcard(domain: String): Status {
+    private fun matchesWildcard(domain: String, uid: Int): Status {
         wildcards.forEach {
+            if (it.key.uid != uid) {
+                return@forEach
+            }
+
             val pattern = Pattern.compile(it.key.domain)
             if (pattern.matcher(domain).matches()) {
                 return Status.getStatus(it.value.status)
@@ -250,9 +248,9 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    fun addDomainRule(d: String, status: Status, uid: Int) {
+    fun addDomainRule(d: String, status: Status, type: DomainType = DomainType.DOMAIN, uid: Int) {
         io {
-            val cd = constructObject(d, uid, "", DomainType.DOMAIN, status.id)
+            val cd = constructObject(d, uid, "", type, status.id)
             dbInsertOrUpdate(cd)
         }
     }
