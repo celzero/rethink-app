@@ -490,14 +490,13 @@ internal constructor(
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.allow)
-                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
+                context.resources.getString(R.string.allow).uppercase(),
                 openIntent1
             )
         val notificationAction2: NotificationCompat.Action =
             NotificationCompat.Action(
                 0,
-                context.resources.getString(R.string.new_app_notification_action_deny),
+                context.resources.getString(R.string.new_app_notification_action_deny).uppercase(),
                 openIntent2
             )
         builder.addAction(notificationAction)
