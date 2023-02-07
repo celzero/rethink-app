@@ -17,6 +17,7 @@ package com.celzero.bravedns.database
 
 import android.content.ContentValues
 import androidx.room.Entity
+import com.celzero.bravedns.service.FirewallManager
 
 @Entity(primaryKeys = ["uid", "packageName"], tableName = "AppInfo")
 class AppInfo {
@@ -24,11 +25,11 @@ class AppInfo {
     var appName: String = ""
     var uid: Int = 0
     var isSystemApp: Boolean = false
-    var firewallStatus: Int = 0
+    var firewallStatus: Int = FirewallManager.FirewallStatus.NONE.id
     var appCategory: String = ""
     var wifiDataUsed: Long = 0
     var mobileDataUsed: Long = 0
-    var connectionStatus: Int = 0
+    var connectionStatus: Int = FirewallManager.ConnectionStatus.ALLOW.id
     var screenOffAllowed: Boolean = false
     var backgroundAllowed: Boolean = false
 

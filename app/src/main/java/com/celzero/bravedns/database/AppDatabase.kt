@@ -42,7 +42,7 @@ import com.celzero.bravedns.util.Constants
             LocalBlocklistPacksMap::class,
             RemoteBlocklistPacksMap::class
         ],
-    version = 16,
+    version = 17,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -78,6 +78,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_13_14)
                 .addMigrations(MIGRATION_14_15)
                 .addMigrations(MIGRATION_15_16)
+                .addMigrations(MIGRATION_16_17)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -577,8 +578,46 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
             }
+
+        // migration part of v054
+        private val MIGRATION_16_17: Migration =
+            object : Migration(16, 17) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL("DROP table if exists CustomDomain")
+                    database.execSQL(
+                        "CREATE TABLE 'CustomDomain' ( 'domain' TEXT NOT NULL, 'uid' INT NOT NULL,  'ips' TEXT NOT NULL, 'status' INTEGER NOT NULL, 'type' INTEGER NOT NULL, 'modifiedTs' INTEGER NOT NULL, 'deletedTs' INTEGER NOT NULL, 'version' INTEGER NOT NULL, PRIMARY KEY (domain, uid)) "
+                    )
+                    modifyAppInfo(database)
+                }
+
+                private fun modifyAppInfo(database: SupportSQLiteDatabase) {
+                    with(database) {
+                        execSQL(
+                            "CREATE TABLE 'AppInfo_backup' ('packageName' TEXT NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 5, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'connectionStatus' INTEGER NOT NULL DEFAULT 3, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0,  PRIMARY KEY(uid, packageName))"
+                        )
+                        execSQL(
+                            "INSERT INTO AppInfo_backup SELECT packageName, appName, uid, isSystemApp, firewallStatus, appCategory, wifiDataUsed, mobileDataUsed, metered, screenOffAllowed, backgroundAllowed FROM AppInfo"
+                        )
+                        execSQL(" DROP TABLE if exists AppInfo")
+                        execSQL(
+                            "CREATE TABLE 'AppInfo' ('packageName' TEXT NOT NULL, 'appName' TEXT NOT NULL, 'uid' INTEGER NOT NULL, 'isSystemApp' INTEGER NOT NULL, 'firewallStatus' INTEGER NOT NULL DEFAULT 5, 'appCategory' TEXT NOT NULL, 'wifiDataUsed' INTEGER NOT NULL, 'mobileDataUsed' INTEGER NOT NULL, 'connectionStatus' INTEGER NOT NULL DEFAULT 3, 'screenOffAllowed' INTEGER NOT NULL DEFAULT 0, 'backgroundAllowed' INTEGER NOT NULL DEFAULT 0,  PRIMARY KEY(uid, packageName))"
+                        )
+                        execSQL(
+                            "INSERT INTO AppInfo SELECT packageName, appName, uid, isSystemApp, firewallStatus, appCategory, wifiDataUsed, mobileDataUsed, connectionStatus, screenOffAllowed, backgroundAllowed FROM AppInfo_backup"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 5, connectionStatus = 3 where firewallStatus = 0"
+                        )
+                        execSQL("UPDATE AppInfo set firewallStatus = 5 where firewallStatus = 1")
+                        execSQL("DROP TABLE AppInfo_backup")
+                    }
+                }
+            }
     }
 
+    // fixme: revisit the links to remove the pragma for each table
+    // https://stackoverflow.com/questions/49030258/how-to-vacuum-roomdatabase
+    // https://stackoverflow.com/questions/50987119/backup-room-database
     fun checkPoint() {
         appInfoDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
         dohEndpointsDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
