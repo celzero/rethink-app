@@ -104,7 +104,6 @@
     <string name="conn_track_clear_logs_message">Hanya menghapus riwayat catatan jaringan, tidak dengan aturan-aturan firewall. Tindakan ini tidak dapat dibatalkan. Apakah Anda ingin melanjutkan\?</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">tidak terlindungi</string>
     <string name="about_website">Kunjungi rethinkdns.com</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="cd_dialog_positive_btn">tambahkan</string>
     <string name="settings_local_blocklist_version">Versi: v%1$s</string>
     <string name="firewall_rule_no_rule">Tanpa Aturan</string>
@@ -308,7 +307,6 @@
     <string name="ctbs_block_other_apps">Aturan yang diterapkan ke %1$s juga akan diterapkan ke %2$s aplikasi lainnya</string>
     <string name="settings_notification_desc">Tombol-tombol tindakan untuk ditampilkan di notifikasi RethinkDNS: %1$s</string>
     <string name="cd_toast_added">Domain berhasil ditambahkan</string>
-    <string name="cd_dialog_error_invalid_tld">Domain Tingkat Teratas tidak valid.</string>
     <string name="settings_network_all_networks">Gunakan semua jaringan yang tersedia (eksperimental)</string>
     <string name="settings_socks_forwarding_default_desc">Meneruskan koneksi ke titik akhir SOCKS5.</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (bawaan)</string>
@@ -522,7 +520,6 @@
     <string name="ci_no_rules_text">Tidak ada aturan IP atau Port yang ditemukan.</string>
     <string name="bsac_title_desc">Aturan hanya berlaku untuk aplikasi ini.</string>
     <string name="dns_crypt_relay_error_toast">Tidak ada server penyelesai yang dipilih</string>
-    <string name="dns_select_toast">Minimal satu server penyelesai (resolver) harus dipilih.</string>
     <string name="ada_app_status_whitelist">akan mengabaikan (Bypass) aturan firewall universal</string>
     <string name="settings_http_proxy_error_text3">Nama host tidak terisi</string>
     <string name="ct_delete_logs_positive_btn">Hapus riwayat</string>
@@ -621,7 +618,6 @@
     <string name="local_blocklist_redownload">Terbaru!</string>
     <string name="contributors_dialog_title">Pengarang</string>
     <string name="settings_import_export_desc">Mencadangkan atau memulihkan data dan pengaturan aplikasi secara manual.</string>
-    <string name="cd_bypass_txt">Daftar putih</string>
     <string name="brbs_restore_dialog_positive">Pulihkan</string>
     <string name="brbs_restore_dialog_title">Pulihkan cadangan</string>
     <string name="brbs_restore_dialog_failure_title">Pemulihan gagal</string>
@@ -646,7 +642,6 @@
     <string name="cd_custom_dns_proxy_title">Proksi DNS Khusus</string>
     <string name="cd_dns_crypt_error_text_1">Cap tidak boleh kosong</string>
     <string name="cd_dns_crypt_dialog_stamp">Cap</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="univ_firewall_rule_6">Blokir aplikasi yang baru saja diinstal secara default</string>
     <string name="orbot_toast_parameter">Tor-sebagai-proksi</string>
     <string name="notif_dialog_pause_dialog_message">Aplikasi dalam keadaan jeda, lanjut untuk meneruskan</string>
@@ -751,7 +746,6 @@
     <string name="firewall_rule_block_dns_bypass_desc">Sambungan ini diblokir dikarenakan <i>sumber aplikasi</i> tersebut telah memintaskan DNS pilihan pengguna.<br/><br/> Untuk mengubah setingan ini, buka tab <i>Universal</i>.</string>
     <string name="cd_dialog_desc">URL khusus (domain) atau wild card untuk mengizinkan atau memblokir. misalnya, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Memasukkan %1$s</string>
-    <string name="cd_bypass_initial">W</string>
     <string name="cd_dialog_error_invalid_wildcard">Wildcard tidak valid.</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_initial">N</string>

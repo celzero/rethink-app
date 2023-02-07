@@ -192,7 +192,6 @@
     <string name="cd_dns_crypt_error_text_1">El sello no puede estar vacío</string>
     <string name="ct_delete_logs_positive_btn">Borrar registros</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s otra(s) aplicación(es)</string>
     <string name="ctbs_app_info_not_available_toast">No se encontró la página de configuración de la aplicación</string>
     <string name="ctbs_block_other_apps">Las normas aplicadas para %1$s también serán aplicables para %2$s u otras aplicaciones</string>
@@ -254,7 +253,6 @@
     <string name="fapps_lockdown_hint">La VPN está en modo de aislamiento. El cortafuegos no respetará las reglas de “con límites/sin límites”.</string>
     <string name="fapps_firewall_filter_desc">Mostrando <u>%1$s</u> %2$s aplicaciones</string>
     <string name="fapps_firewall_filter_desc_category">Mostrando <u>%1$s</u> %2$s aplicaciones en las categorías: %3$s</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="rules_load_failure_heading">Nota</string>
     <string name="rules_load_failure_desc">No se han encontrado reglas de cortafuegos</string>
@@ -542,7 +540,6 @@
     <string name="dns_btm_record_type">Tipo de consulta: %1$s</string>
     <string name="univ_firewall_rule_1">Bloquear todas las aplicaciones cuando el dispositivo está bloqueado</string>
     <string name="univ_ip_delete_individual_positive">Borrar</string>
-    <string name="dns_select_toast">Debe seleccionarse al menos un servidor de resoluciones.</string>
     <string name="fapps_unmetered_block_dialog_title">Bloquear en redes sin límites</string>
     <string name="fapps_metered_block_dialog_message">¿Bloquear las conexiones en la red con límites (móvil) para las aplicaciones en la <i>lista</i>\?</string>
     <string name="fapps_firewall_filter_hint">Aplicar reglas a las aplicaciones en la lista</string>
@@ -576,10 +573,7 @@
     <string name="cd_dialog_desc">URL personalizada (dominio) o comodín para permitir o bloquear. P.ej., *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Entre en %1$s</string>
     <string name="cd_dialog_error_invalid_domain">URL(dominio) inválido.</string>
-    <string name="cd_dialog_error_invalid_tld">Dominio de nivel superior inválido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Comodín inválido.</string>
-    <string name="cd_bypass_initial">W</string>
-    <string name="cd_bypass_txt">Lista blanca</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="cd_no_rule_txt">Ninguna regla</string>

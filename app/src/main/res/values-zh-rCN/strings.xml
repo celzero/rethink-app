@@ -60,7 +60,6 @@
     <string name="cd_dns_proxy_error_text_3">无效端口</string>
     <string name="cd_dns_crypt_dialog_name">名称</string>
     <string name="univ_firewall_rule_9">拦截于收费网络（移动数据）</string>
-    <string name="dns_select_toast">需至少选择一个解析服务。</string>
     <string name="fapps_unmetered_unblock_dialog_message">是否于非收费网络（ WiFi ）放行<i>所列出的</i>应用？</string>
     <string name="firewall_rule_unknown">未知应用</string>
     <string name="firewall_rule_block_ip_univ_desc">一项用户定义的全局防火墙规则拦截了此<i>目标 IP / 端口</i>。<br/><br/>若需更改，请移步<i>全局</i>选项卡。</string>
@@ -247,7 +246,6 @@
     <string name="notif_dialog_pause_dialog_title">应用已暂停！</string>
     <string name="notif_channel_vpn_failure">VPN 未启用</string>
     <string name="cd_dialog_error_invalid_domain">无效 URL （域名）。</string>
-    <string name="cd_dialog_error_invalid_tld">无效顶级域名。</string>
     <string name="ci_dialog_edittext_hint">IP 地址、子网或端口</string>
     <string name="ada_noapp_dialog_message">未找到指定应用的信息。</string>
     <string name="bsac_unblock">解封</string>
@@ -343,7 +341,6 @@
     <string name="firewall_rule_trusted_ip">已绕行 IP （应用）</string>
     <string name="notif_channel_download">下载警报</string>
     <string name="category_name_installed">已安装程序</string>
-    <string name="cd_bypass_txt">放行</string>
     <string name="ada_app_status_block_wifi">已于非收费网络（ WiFi ）拦截</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="bsac_distrust">移除绕行</string>
@@ -411,7 +408,6 @@
     <string name="firewall_rule_block_dns_bypass_desc">此连接因<i>原始应用</i>绕过了用户设置的 DNS 而被拦截。<br/><br/>若需变更此行为，请移步<i>全局</i>选项卡。</string>
     <string name="notif_channel_desc_proxy_failure">在代理错误或异常时提醒我</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_bypass_initial">放</string>
     <string name="ci_dialog_added_success">已将 IP 加入列表</string>
     <string name="ci_no_rule_txt">无规则</string>
     <string name="ada_app_metered">收费网络</string>
@@ -499,7 +495,6 @@
     <string name="cd_dns_crypt_error_text_1">印戳不能为空</string>
     <string name="univ_ip_delete_individual_positive">删除</string>
     <string name="dns_query_latency">%1$sms</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 代理</string>
     <string name="update_complete_snack_message">已下载新版本。</string>
     <string name="accessibility_failure_toast">RethinkDNS 的无障碍服务已停止或崩溃。现已不再拦截后台应用。</string>
@@ -787,7 +782,6 @@
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
     <string name="intent_launch_error">无法打开 %1$s</string>
     <string name="no_browser_error">无法于浏览器打开网页。</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="relative_time_today">今天</string>
     <string name="relative_time_yesterday">昨天</string>
     <string name="settings_app_notification_a13_heading">应用通知</string>

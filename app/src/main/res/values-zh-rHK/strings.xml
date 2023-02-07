@@ -467,7 +467,6 @@
     <string name="dns_connected_no_count">連咗線</string>
     <string name="dns_connected">連咗線</string>
     <string name="dns_delete_positive">刪除</string>
-    <string name="dns_select_toast">要至少揀一個解析服務。</string>
     <string name="dns_crypt_relay_error_toast">未揀解析服務</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
@@ -505,7 +504,6 @@
     <string name="fapps_firewall_filter_desc">顯示 <u>%1$s</u> %2$s 個 app</string>
     <string name="fapps_firewall_filter_desc_category">顯示分類 %3$s 嘅 <u>%1$s</u> %2$s 個應用</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_heading">注意</string>
@@ -588,7 +586,6 @@
     <string name="cd_remove_dialog_title">係咪刪除網域？</string>
     <string name="cd_dialog_edittext_hint">輸入 %1$s</string>
     <string name="cd_dialog_error_invalid_domain">冇效嘅 URL（網域）。</string>
-    <string name="cd_dialog_error_invalid_tld">冇效嘅頂級網域。</string>
     <string name="cd_dialog_error_invalid_wildcard">冇效嘅通配符。</string>
     <string name="cd_no_rule_initial">冇</string>
     <string name="cd_no_rule_txt">冇規則</string>
@@ -740,8 +737,6 @@
     <string name="firewall_rule_trusted_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有分應用規則而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
     <string name="firewall_rule_bypass_universal_ip_desc">呢個連線因爲呢個<i>目標 IP</i> 設定咗做繞過所有全局規則而被放行。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>
     <string name="cd_dialog_desc">比一個自訂嘅 URL（網域）或者通配符嚟放行或者攔截，例如 *.test.com 或者 test.com/test</string>
-    <string name="cd_bypass_initial">放</string>
-    <string name="cd_bypass_txt">放行</string>
     <string name="cd_blocked_initial">攔</string>
     <string name="ci_bypass_universal_txt">無條件放行</string>
     <string name="ci_blocked_initial">攔</string>
@@ -773,7 +768,6 @@
     <string name="notif_download_cancel_content">下載取消咗。</string>
     <string name="rt_filter_parent_selected">揀咗嘅</string>
     <string name="rt_filter_hint">顯示緊<u>所有</u>攔截清單</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="relative_time_today">今日</string>
     <string name="relative_time_yesterday">尋日</string>
     <string name="settings_app_notification_a13_heading">應用程式通知</string>

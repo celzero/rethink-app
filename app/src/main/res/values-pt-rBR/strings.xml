@@ -572,7 +572,6 @@
     <string name="dns_connected">Conectado</string>
     <string name="dns_delete_positive">Apagar</string>
     <string name="dns_info_neutral">Copiar</string>
-    <string name="dns_select_toast">Pelo menos um resolvedor deve ser selecionado.</string>
     <string name="dns_crypt_relay_error_toast">Nenhum resolvedor selecionado</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
@@ -597,7 +596,6 @@
     <string name="fapps_firewall_filter_desc">Mostrando apps: <u>%1$s</u>, %2$s</string>
     <string name="fapps_firewall_filter_desc_category">Mostrando apps (<u>%1$s</u>, %2$s) em categorias: %3$s</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_heading">Observação</string>
@@ -681,10 +679,7 @@
     <string name="cd_dialog_desc">URL(domínio) personalizada ou wildcard para permitir ou bloquear. p.ex., *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Digite %1$s</string>
     <string name="cd_dialog_error_invalid_domain">URL(domínio) inválida.</string>
-    <string name="cd_dialog_error_invalid_tld">Domínio de nível superior inválido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Wildcard inválido.</string>
-    <string name="cd_bypass_initial">W</string>
-    <string name="cd_bypass_txt">Lista de permitidos</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="cd_no_rule_txt">Nenhuma regra</string>
@@ -791,7 +786,6 @@
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
     <string name="firewall_rule_block_univ_ip">IP / porta (universal)</string>
     <string name="whats_new_version_update">&lt;b&gt;Poliglótico!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Suporte retomado ao Android 6.&lt;br/&gt; 2. Nova interface.&lt;br/&gt; 3. Firewall e configurações de rede repaginados.&lt;br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: Traduções em mais de 15 idiomas.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: Ícones adaptativos.&lt;br/&gt; 6. &lt;i&gt;Novo recurso:&lt;/i&gt;: Nomes de domínio exibidos nos registros de rede por cada aplicativo.&lt;br/&gt; 7. Corrigida a falha na exibição de notificações no Android 13.&lt;br/&gt; 8. Corrigida a falha de integração com o Orbot.&lt;br/&gt; 9. Tela dos apps agora está disponível no modo somente DNS.&lt;br/&gt; 10. Melhorias no gerenciador de downloads integrado.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Ajude a traduzir este app&lt;/a&gt;</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="private_dns_dialog_heading">Desativar o DNS Privado</string>
     <string name="private_dns_dialog_desc">As configurações do Rethink DNS são substituídas pelo DNS Privado do Android.
 \n 

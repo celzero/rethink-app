@@ -298,7 +298,6 @@
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
     <string name="firewall_rule_trusted_ip_desc">Questa connessione è stata consentita perché l\'<i>IP di destinazione</i> è stato autorizzato.<br/><br/> Per modificare, vai alla schermata <i>del firewall specifica per l\'app</i>.</string>
     <string name="notif_dialog_pause_dialog_title">App in pausa!</string>
@@ -541,7 +540,6 @@
     <string name="dns_delete_positive">Elimina</string>
     <string name="dns_info_positive">Ok</string>
     <string name="dns_info_neutral">Copia</string>
-    <string name="dns_select_toast">Deve essere selezionato almeno un resolver.</string>
     <string name="dns_crypt_relay_error_toast">Nessun resolver selezionato</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
@@ -674,10 +672,7 @@
     <string name="cd_dialog_desc">Consenti o blocca uno specifico URL (dominio) o un insieme di questi utilizzando una wild-card. es. *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Scrivi %1$s</string>
     <string name="cd_dialog_error_invalid_domain">URL (dominio) non valido.</string>
-    <string name="cd_dialog_error_invalid_tld">Dominio di primo livello non valido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Wildcard non valida.</string>
-    <string name="cd_bypass_initial">C</string>
-    <string name="cd_bypass_txt">Lista consentiti</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="cd_no_rule_txt">Nessuna regola</string>
@@ -798,7 +793,6 @@
     <string name="rt_filter_desc">Liste dei filtri <u>%1$s</u> mostrate</string>
     <string name="rt_filter_desc_subgroups">Liste dei filtri <u>%1$s</u> nel sottogruppo %3$s del gruppo %2$s mostrate</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s blocklist</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
     <string name="ci_trust_initial">A</string>

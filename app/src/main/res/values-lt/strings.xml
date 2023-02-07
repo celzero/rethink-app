@@ -291,7 +291,6 @@
     <string name="dns_delete_positive">Išrinti</string>
     <string name="dns_info_positive">Gerai</string>
     <string name="dns_info_neutral">Kopijuoti</string>
-    <string name="dns_select_toast">Turi būti pasirinktas bent vienas sprendiklis.</string>
     <string name="dns_proxy_dialog_message">Programėlės pavadinimas: %1$s
 \n
 \nIP adresas: %2$s
@@ -319,7 +318,6 @@
     <string name="fapps_unmetered_block_dialog_title">Blokuoti nematuojamuose tinkluose</string>
     <string name="fapps_firewall_filter_desc_category">Rodomos <u>%1$s</u> %2$s programėlės kategorijose: %3$s</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_heading">Pastaba</string>
@@ -385,10 +383,7 @@
     <string name="cd_dialog_desc">Pasirinktinis URL (domenas) arba simbolis, kurį galima leisti arba blokuoti, pvz., *.testas.lt, testas.lt/testas</string>
     <string name="cd_dialog_edittext_hint">Įveskite %1$s</string>
     <string name="cd_dialog_error_invalid_domain">Netinkamas URL (domenas).</string>
-    <string name="cd_dialog_error_invalid_tld">Netinkamas aukščiausio lygio domenas.</string>
     <string name="cd_dialog_error_invalid_wildcard">Netinkamas pakaitos simbolis.</string>
-    <string name="cd_bypass_initial">L</string>
-    <string name="cd_bypass_txt">Leidžiamų sąrašas</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="cd_no_rule_txt">Nėra taisyklės</string>
@@ -791,7 +786,6 @@
     <string name="relative_time_yesterday">Vakar</string>
     <string name="settings_app_notification_a13_heading">Programėlės pranešimas</string>
     <string name="settings_app_notification_a13_desc">Įjungti pranešimų leidimą programėlei</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="private_dns_dialog_heading">Išjungti privatų DNS</string>
     <string name="private_dns_dialog_positive">Eiti į nustatymus</string>
 </resources>

@@ -288,8 +288,6 @@
     <string name="notif_dialog_pause_dialog_title">應用已暫停！</string>
     <string name="notif_dialog_pause_dialog_positive">恢復</string>
     <string name="notif_channel_desc_proxy_failure">在代理錯誤或異常時提醒我</string>
-    <string name="cd_bypass_initial">放</string>
-    <string name="cd_bypass_txt">放行</string>
     <string name="ada_ip_connection_count_zero">0 個 IP 位址</string>
     <string name="ada_app_status_exclude">已排除於 DNS 與防火牆外</string>
     <string name="notif_download_content_title">下載本地攔截清單</string>
@@ -343,7 +341,6 @@
     <string name="settings_http_proxy_dialog_title">自訂伺服器 URL</string>
     <string name="settings_ip_dialog_title">選擇 IP 版本</string>
     <string name="settings_selected_ip_desc">%1$s</string>
-    <string name="cd_dialog_error_invalid_tld">無效頂級網域。</string>
     <string name="ci_dialog_error_invalid_ip">無效 IP 位址、子網或埠。</string>
     <string name="rbl_privacy">隱私</string>
     <string name="rt_re_download">重新下載攔截清單</string>
@@ -658,7 +655,6 @@
     <string name="dns_delete_positive">刪除</string>
     <string name="dns_info_positive">確認</string>
     <string name="dns_info_neutral">複製</string>
-    <string name="dns_select_toast">需至少選擇一個解析服務。</string>
     <string name="dns_crypt_relay_error_toast">未選擇解析服務</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
@@ -701,7 +697,6 @@
     <string name="fapps_firewall_filter_desc">顯示 <u>%1$s</u> %2$s 個應用</string>
     <string name="fapps_firewall_filter_desc_category">正顯示 <u>%1$s</u> %2$s 個應用於分類：%3$s</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_heading">注意</string>
@@ -785,7 +780,6 @@
     <string name="relative_time_yesterday">昨天</string>
     <string name="settings_app_notification_a13_desc">啓用此應用的通知權限</string>
     <string name="settings_app_notification_a13_heading">應用通知</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ci_trust_initial">繞應</string>
     <string name="ci_trust_txt">放行應用規則</string>
     <string name="ada_app_firewall">防火牆</string>

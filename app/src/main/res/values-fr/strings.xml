@@ -302,7 +302,6 @@
     <string name="notif_dialog_pause_dialog_message">Application en pause, reprendre pour continuer</string>
     <string name="notif_dialog_pause_dialog_neutral">Afficher</string>
     <string name="cd_dialog_error_invalid_domain">URL (domaine) non valide.</string>
-    <string name="cd_dialog_error_invalid_tld">Domaine de premier niveau non valide.</string>
     <string name="cd_dialog_error_invalid_wildcard">Caractère joker non valide.</string>
     <string name="ci_blocked_initial">B</string>
     <string name="cd_blocked_initial">B</string>
@@ -481,7 +480,6 @@
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="fapps_unmetered_unblock_dialog_message">Autoriser les connexions sur réseau sans abonnement (Wi-Fi) pour les applications <i>listées</i> \?</string>
     <string name="ada_app_status_block_md">est bloquées sur les réseaux avec abonnement (mobile)</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="pause_desc">Remarque : %1$s applications bloquées continueront à être bloquées par le pare-feu.</string>
     <string name="firewall_rule_unknown">Source inconnue</string>
     <string name="new_app_notification_title">Action requise</string>
@@ -536,7 +534,6 @@
     <string name="cd_doh_dialog_resolver_name">Nom du résolveur</string>
     <string name="ct_delete_logs_positive_btn">Supprimer les journaux</string>
     <string name="settings_notification_heading">Choisir l’action de notification</string>
-    <string name="dns_select_toast">Au moins un résolveur doit être sélectionné.</string>
     <string name="firewall_rule_block_ip_univ_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination / le port</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Cette connexion a été bloquée car <i>l’application source</i> contournait le DNS spécifié par l’utilisateur.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="category_name_non_app_sys">Services système</string>
@@ -662,7 +659,6 @@
     <string name="notif_channel_desc_firewall_alerts">Alerte sur les erreurs et anomalies du pare-feu</string>
     <string name="cd_remove_dialog_title">Supprimer le domaine \?</string>
     <string name="ci_no_rules_text">Aucune règle IP ou port n’a été trouvée.</string>
-    <string name="cd_bypass_initial">LB</string>
     <string name="ada_app_status_whitelist">contournera les règles du pare-feu global</string>
     <string name="rt_list_adv_btn_txt">avancé</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
@@ -767,7 +763,6 @@
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="settings_local_blocklist_in_use">%1$s listes de blocage en cours d’utilisation</string>
     <string name="settings_local_blocklist_version">Version : v%1$s</string>
-    <string name="cd_bypass_txt">Liste blanche</string>
     <string name="ada_app_exclude">Exclure</string>
     <string name="brbs_backup_dialog_failure_title">Échec de la sauvegarde</string>
     <string name="other_dns_list_tab2">DNSCrypt</string>
@@ -785,7 +780,6 @@
     <string name="about_app_translate">Traduire</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
     <string name="notif_download_cancel_content">Téléchargement annulé.</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="firewall_rule_block_univ_ip">IP / Port (Global)</string>
     <string name="ada_firewall_title">règles de pare-feu pour cette appli</string>

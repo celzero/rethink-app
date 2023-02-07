@@ -142,7 +142,6 @@
     <string name="settings_network_all_networks_desc">Если функция включена, RethinkDNS использует все доступные сети для подключения к Интернету. Если нет, то используется та сеть, которая считается <i>активной</i> в Android.</string>
     <string name="hsf_stop_btn_state">стоп</string>
     <string name="hsf_vpn_dialog_header">Внимание!</string>
-    <string name="cd_bypass_initial">Б</string>
     <string name="hsf_start_dialog_positive">Начало</string>
     <string name="about_mail_to_string">почта:</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
@@ -241,7 +240,6 @@
     <string name="always_on_dialog_positive_btn">Перейдите в Настройки</string>
     <string name="about_sponsor_link_text">Спонсор</string>
     <string name="unicode_question_sign">❔</string>
-    <string name="cd_bypass_txt">Белый список</string>
     <string name="dns_query_clear_logs_message">Это удаляет DNS логи на устройстве. Это необратимая операция. Вы хотите продолжить\?</string>
     <string name="dns_proxy_remove_dialog_title">Удалить DNS-прокси\?</string>
     <string name="cd_custom_dns_proxy_name_default">Прокси</string>
@@ -253,7 +251,6 @@
     <string name="settings_theme_dialog_themes_2">Светлая</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="fapps_filter_categories_heading">Категории</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="firewall_rules">Правила сети</string>
     <string name="bsct_conn_desc_blocked">заблокирован %1$s %2$s</string>
     <string name="firewall_act_network_monitor_tab">Сетевые журналы</string>
@@ -376,7 +373,6 @@
     <string name="cd_no_rule_txt">Нет правил</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="cd_dialog_desc">Пользовательский URL (домен) или дикий символ для разрешения или блокировки. например, *.test.com, test.com/test</string>
-    <string name="cd_dialog_error_invalid_tld">Недействительный домен верхнего уровня.</string>
     <string name="ci_dialog_desc">Разрешить (обход) или заблокировать IP-адрес, IP-подсеть (диапазон), порт. Пример: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ci_header">Правила IP и портов: %1$s</string>
     <string name="ci_no_rule">Нет правил</string>
@@ -498,7 +494,6 @@
     <string name="dns_proxy_connection_failure_lockdown">Исключение %1$s для %2$s в режиме блокировки может вызвать проблемы с подключением к Интернету.</string>
     <string name="univ_ip_delete_dialog_positive">Удалить все</string>
     <string name="univ_accessibility_dialog_positive">Разрешить</string>
-    <string name="dns_select_toast">Необходимо выбрать как минимум один резольвер.</string>
     <string name="dns_proxy_ip_address">IP-адрес</string>
     <string name="fapps_firewall_filter_isolate">Изолированный</string>
     <string name="fapps_unmetered_block_dialog_title">Блокировка при бездоговорном режиме</string>
@@ -779,7 +774,6 @@
     <string name="cd_dnscrypt_relay_heading">Ретрансляторы</string>
     <string name="ct_delete_logs_positive_btn">Удаление журналов</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_info_not_available_toast">Страница настроек приложения не найдена</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s другое приложение (приложения)</string>
     <string name="ctbs_proceed_positive_text">Действуйте</string>

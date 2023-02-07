@@ -172,7 +172,6 @@
     <string name="vpn_profile_error">VPN প্রোফাইল চালু করা যায়নি।</string>
     <string name="collecting_logs_progress_text">ক্যাপচার করা হচ্ছে…</string>
     <string name="cd_dnscrypt_relay_heading">রিলে</string>
-    <string name="dns_select_toast">অন্তত একটি সমাধানকারী নির্বাচন করা উচিত.</string>
     <string name="dns_proxy_dialog_header_dns">DNS প্রক্সি যোগ করুন</string>
     <string name="fapps_filter_filter_heading">ধরণ</string>
     <string name="block">ব্লক</string>
@@ -572,7 +571,6 @@
     <string name="new_app_notification_action_toast_deny">অ্যাপের জন্য নেটওয়ার্ক সংযোগ অস্বীকার করা হয়েছে</string>
     <string name="build__flavor_website">ওয়েবসাইট</string>
     <string name="cd_dialog_desc">কাস্টম URL(ডোমেন) বা ওয়াইল্ড কার্ড হয় অনুমতি দিতে বা ব্লক করতে। যেমন, *.test.com, test.com/test</string>
-    <string name="cd_bypass_txt">হোয়াইটলিস্ট</string>
     <string name="cd_no_rule_txt">কোন নিয়ম নেই</string>
     <string name="ci_dialog_edittext_hint">আইপি ঠিকানা, সাবনেট বা পোর্ট</string>
     <string name="ada_app_bypass_univ">বাইপাস ইউনিভার্সাল</string>
@@ -630,7 +628,6 @@
     <string name="firewall_rule_block_http_desc">এই সংযোগটি ব্লক করা হয়েছে কারণ এটি সম্ভবত <i>অনিরাপদ HTTP</i> ব্যবহার করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান৷</string>
     <string name="notif_channel_vpn_failure">নিষ্ক্রিয় VPN</string>
     <string name="notif_channel_download">সতর্কতা ডাউনলোড করুন</string>
-    <string name="cd_bypass_initial">ডব্লিউ</string>
     <string name="ci_no_rule_initial">এন</string>
     <string name="ci_block">ব্লক</string>
     <string name="ada_ip_connection_count">%1$s আইপি ঠিকানা(গুলি) এর সাথে সংযুক্ত</string>
@@ -715,7 +712,6 @@
     <string name="new_app_notification_action_toast_allow">অ্যাপের জন্য নেটওয়ার্ক সংযোগ অনুমোদিত</string>
     <string name="notif_dialog_pause_dialog_neutral">দেখান</string>
     <string name="cd_toast_added">ডোমেন সফলভাবে যোগ করা হয়েছে</string>
-    <string name="cd_dialog_error_invalid_tld">অবৈধ শীর্ষ স্তরের ডোমেন৷</string>
     <string name="cd_no_rule_initial">এন</string>
     <string name="rt_dialog_message">আপনি কি নতুন কনফিগার করা ব্লকলিস্ট প্রয়োগ করতে চান\?</string>
     <string name="rt_chip_update_available">হালনাগাদ আছে</string>
@@ -749,7 +745,6 @@
     <string name="fapps_unmetered_unblock_dialog_title">আনমিটারে অনুমতি দিন</string>
     <string name="fapps_unmetered_unblock_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপগুলির জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগের অনুমতি দেবেন\?</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="unicode_question_sign">❔</string>
     <string name="rules_load_failure_heading">বিঃদ্রঃ</string>
     <string name="fapps_metered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারযুক্ত (মোবাইল) নেটওয়ার্কে সংযোগ ব্লক করবেন\?</string>

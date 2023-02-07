@@ -155,7 +155,6 @@
     <string name="dns_proxy_connection_failure_lockdown">Kilitleme modunda %2$s için %1$s adresinin hariç tutulması İnternet bağlantısı sorunlarına neden olabilir.</string>
     <string name="firewall_rule_block_app">Uygulama Engellendi</string>
     <string name="cd_toast_added">Alan adı başarıyla eklendi</string>
-    <string name="cd_bypass_txt">Beyaz Liste</string>
     <string name="rt_dialog_neutral">Devam Et</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="brbs_backup_dialog_title">Yedek alın</string>
@@ -322,7 +321,6 @@
     <string name="cd_custom_dns_proxy_default_app">Hiç kimse</string>
     <string name="cd_dns_proxy_mode_internal">Dahili</string>
     <string name="hs_download_positive_default">tamam</string>
-    <string name="dns_select_toast">En az bir çözümleyici seçilmelidir.</string>
     <string name="fapps_firewall_filter_hint">Listelenen uygulamalara ölçülmemiş / ölçülmüş kurallar uygulayın</string>
     <string name="system_dns_connection_failure">Geçerli DNS sunucusu belirlenemiyor</string>
     <string name="copy_clipboard_label">Adres</string>
@@ -336,7 +334,6 @@
     <string name="brbs_restore_dialog_title">Yedeği geri yükle</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_positive_btn">ekle</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="default_dns_name">RDNS Varsayılan</string>
     <string name="dns_query_clear_logs_title">Tüm DNS kayıtları silinsin mi\?</string>
     <string name="always_on_dialog_stop_message">Rethink için her zaman açık VPN etkinleştirildi. Yine de Rethink\'i durdurmak istediğinizden emin misiniz\?</string>
@@ -668,7 +665,6 @@
     <string name="about_bug_report">Hata raporu</string>
     <string name="collecting_logs_progress_text">Yakalanıyor…</string>
     <string name="ct_delete_logs_positive_btn">Günlükleri sil</string>
-    <string name="cd_dialog_error_invalid_tld">Geçersiz Üst düzey alan adı.</string>
     <string name="bsac_distrust_toast">Bu IP için bypass kaldırıldı %1$s</string>
     <string name="rbl_privacy">Gizlilik</string>
     <string name="rt_dialog_message">Yeni yapılandırılmış blok listelerini uygulamak istiyor musunuz\?</string>
@@ -689,7 +685,6 @@
     <string name="cd_remove_dialog_title">Etki alanı silinsin mi\?</string>
     <string name="firewall_rule_bypass_universal_ip">Bypass edilen IP</string>
     <string name="cd_dialog_error_invalid_domain">Geçersiz URL (alan adı).</string>
-    <string name="cd_bypass_initial">B</string>
     <string name="cd_blocked_initial">Si</string>
     <string name="ci_dialog_desc">IP adresine, IP alt ağına (aralık), Bağlantı Noktasına izin verin (bypass) veya engelleyin. Örnek: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
     <string name="ada_app_status_block_wifi">ölçülmemiş (wifi) ağlarda engellenir</string>
@@ -786,7 +781,6 @@
     <string name="notification_screen_error">Uygulama Bildirim ekranı başlatılamadı.</string>
     <string name="intent_launch_error">Sayım başlatılmadı %1$s</string>
     <string name="no_browser_error">Tarayıcıdan web sayfası açılamıyor.</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ada_app_isolate">Kilitlenme</string>
     <string name="firewall_rule_block_univ_ip">IP / Bağlantı Noktası (Evrensel)</string>
     <string name="rt_filter_desc"><u>%1$s</u> engelleme listesi gösteriliyor</string>

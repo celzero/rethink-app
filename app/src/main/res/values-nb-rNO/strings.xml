@@ -232,7 +232,6 @@
     <string name="fapps_filter_parent_system">System</string>
     <string name="unicode_question_sign">❔</string>
     <string name="settings_local_blocklist_dialog_positive">Last ned</string>
-    <string name="cd_dialog_error_invalid_tld">Ugyldig toppnivådomene.</string>
     <string name="status_protected_with_http_private_dns">Beskyttet med HTTP-mellomtjener og privat DNS</string>
     <string name="dns_mode_notification_title">Beskyttet. Tilkoblet til rask og sikker DNS.</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">Beskyttet</string>
@@ -286,7 +285,6 @@
     <string name="log_file_not_available">Fant ingen krasjrapporter</string>
     <string name="dns_btm_sheet_chip">+%1$s andre IP-er</string>
     <string name="fapps_info_dialog_positive_btn">OK</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="settings_local_blocklist_in_use">%1$s svartelister i bruk</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="notif_channel_proxy_failure">Mellomtjenervarsler</string>
@@ -298,7 +296,6 @@
     <string name="cd_custom_dns_proxy_default_app">Ingen</string>
     <string name="cd_dns_proxy_mode_external">Ekstern</string>
     <string name="firewall_rule_no_rule">Ingen regel</string>
-    <string name="cd_bypass_txt">Hvitliste</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">Venter</string>
     <string name="fapps_filter_categories_heading">Kategorier</string>
     <string name="fapps_filter_clear_btn">Tøm</string>

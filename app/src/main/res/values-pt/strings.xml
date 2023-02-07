@@ -456,7 +456,6 @@
     <string name="build__flavor_website">Site da web</string>
     <string name="cd_toast_deleted">Domínio removido da lista personalizada</string>
     <string name="cd_dialog_error_invalid_domain">URL (domínio) inválido.</string>
-    <string name="cd_bypass_initial">P</string>
     <string name="rbl_parental_control">Controlo parental</string>
     <string name="rt_download">Descarregar listas de bloqueio</string>
     <string name="ci_dialog_desc">Permitir (contornar) ou bloquear endereço IP, sub-rede IP (intervalo), porta. Exemplo: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
@@ -547,7 +546,6 @@
     <string name="cd_dnscrypt_relay_heading">Retransmissores</string>
     <string name="ct_delete_logs_positive_btn">Eliminar registos</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s outras aplicações</string>
     <string name="ctbs_block_other_apps">As regras aplicadas em %1$s também serão aplicadas em %2$s outras aplicações</string>
     <string name="ctbs_proceed_positive_text">Continuar</string>
@@ -580,7 +578,6 @@
     <string name="dns_connected">Conectado</string>
     <string name="dns_delete_positive">Eliminar</string>
     <string name="dns_info_positive">Ok</string>
-    <string name="dns_select_toast">Tem de ser selecionado pelo menos um resolvedor.</string>
     <string name="dns_crypt_relay_error_toast">Nenhum resolvedor selecionado</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
@@ -607,7 +604,6 @@
     <string name="fapps_firewall_filter_hint">Aplicar regras nas aplicações na lista</string>
     <string name="fapps_firewall_filter_desc">A mostrar aplicações: <u>%1$s</u>, %2$s</string>
     <string name="unicode_warning_sign">⚠</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_desc">Nenhuma regra de firewall encontrada</string>
@@ -681,9 +677,7 @@
     <string name="cd_dialog_title">Adicionar domínio</string>
     <string name="cd_dialog_desc">URL personalizado (domínio) ou curinga para permitir ou bloquear. por exemplo, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Digite %1$s</string>
-    <string name="cd_dialog_error_invalid_tld">Domínio de nível superior inválido.</string>
     <string name="cd_dialog_error_invalid_wildcard">Caractere curinga inválido.</string>
-    <string name="cd_bypass_txt">Lista de permissões</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">S</string>
     <string name="cd_no_rule_txt">Sem regra</string>

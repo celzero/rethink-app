@@ -343,7 +343,6 @@
     <string name="fapps_filter_clear_btn">Wissen</string>
     <string name="rules_load_failure_reload">herladen</string>
     <string name="fapps_info_dialog_positive_btn">Oke</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="fav_icon">fav_icon</string>
     <string name="network_log_app_name_unknown">Onbekend</string>
     <string name="rules_load_failure_desc">Geen firewall regels gevonden</string>
@@ -473,7 +472,6 @@
     <string name="dns_connected_no_count">Verbonden</string>
     <string name="dns_delete_positive">Verwijderen</string>
     <string name="dns_info_neutral">Kopieëren</string>
-    <string name="dns_select_toast">Er moet ten minste één resolver worden geselecteerd.</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="dns_proxy_dialog_message_no_app">IP adres: %1$s
 \n
@@ -533,7 +531,6 @@
     <string name="cd_dialog_positive_btn">toevoegen</string>
     <string name="cd_dns_crypt_error_text_1">Stempel kan niet leeg zijn</string>
     <string name="ct_delete_logs_positive_btn">Logboeken verwijderen</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s andere app(s)</string>
     <string name="ctbs_block_other_apps">De regels voor %1$s gelden ook voor %2$s andere apps</string>
     <string name="ctbs_dialog_negative_btn">Ga Terug</string>

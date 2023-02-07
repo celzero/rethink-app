@@ -388,8 +388,6 @@
     <string name="cd_remove_dialog_title">Domain löschen\?</string>
     <string name="cd_dialog_error_invalid_domain">Ungültige URL(Domain).</string>
     <string name="cd_dialog_title">Domäne hinzufügen</string>
-    <string name="cd_dialog_error_invalid_tld">Ungültige Domäne oberster Stufe.</string>
-    <string name="cd_bypass_initial">W</string>
     <string name="cd_dialog_desc">Benutzerdefinierte URL(Domäne) oder Platzhalter, um entweder zuzulassen oder zu blockieren. z.B. *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Eingabe %1$s</string>
     <string name="ci_dialog_title">IP-/Port-Regel hinzufügen</string>
@@ -511,7 +509,6 @@
     <string name="cd_toast_added">Domain erfolgreich hinzugefügt</string>
     <string name="cd_remove_dialog_positive">Löschen</string>
     <string name="cd_dialog_error_invalid_wildcard">Ungültiger Platzhalter.</string>
-    <string name="cd_bypass_txt">Positivliste</string>
     <string name="cd_blocked_initial">B</string>
     <string name="ci_trust_initial">T</string>
     <string name="ci_trust_txt">Vertrauenswürdig</string>
@@ -687,7 +684,6 @@
     <string name="cd_dns_proxy_error_text_1">Ungültige IP-Adresse</string>
     <string name="cd_dns_proxy_error_text_2">Portbereich sollte von 1024-65535 sein</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
-    <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_info_not_available_toast">Seite mit den App-Einstellungen nicht gefunden</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s andere App(s)</string>
     <string name="ctbs_block_other_apps">Regeln angewendet für %1$s sind auch anwendbar für %2$s andere Apps</string>
@@ -742,7 +738,6 @@
     <string name="fapps_firewall_filter_hint">Regeln auf aufgelistete Apps anwenden</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
-    <string name="unicode_x_sign">❌</string>
     <string name="rules_load_failure_heading">Anmerkung</string>
     <string name="network_log_app_name_unknown">Unbekannt</string>
     <string name="dns_crypt_connection_failure">Fehler beim Verbinden mit dem DNSCrypt-Server.</string>
@@ -781,7 +776,6 @@
     <string name="dns_delete_positive">Löschen</string>
     <string name="dns_info_positive">Ok</string>
     <string name="dns_info_neutral">Kopieren</string>
-    <string name="dns_select_toast">Mindestens ein Resolver sollte ausgewählt werden.</string>
     <string name="dns_crypt_relay_error_toast">Kein Resolver ausgewählt</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_query_latency">%1$sms</string>
