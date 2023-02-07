@@ -22,10 +22,16 @@
     <string name="lbl_cancel" translatable="true">Cancel</string>
     <string name="lbl_apply" translatable="true">Apply</string>
     <string name="lbl_dismiss" translatable="true">Dismiss</string>
-    <string name="lbl_all"  translatable="true">All</string>
+    <string name="lbl_all" translatable="true">All</string>
     <string name="lbl_allowed" translatable="true">Allowed</string>
     <string name="lbl_blocked" translatable="true">Blocked</string>
     <string name="lbl_disabled" translatable="true">Disabled</string>
+    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="lbl_action_required" translatable="true">Action Required</string>
+
+    <string name="lbl_ip_rules" translatable="true">IP Rules</string>
+    <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
 
     <string name="slide_2_title" translatable="true">Welcome</string>
     <string name="slide_2_desc" translatable="true">RethinkDNS is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
@@ -154,7 +160,6 @@
     <string name="wireguard_mode_info_explanation_new" translatable="true">Coming soon.</string>
 
     <string name="alert_permission_accessibility" translatable="true">Permission - Accessibility</string>
-    <string name="alert_permission_accessibility_regrant" translatable="true">Action Required</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).\n\nRethinkDNS does not collect any information or spy on you in any way.</string>
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">RethinkDNS accessibility service has stopped or crashed. <i><b>Goto Settings and Force Stop</b></i> RethinkDNS and start it again to use <i>Block any app not in use</i> feature.\n\nRethinkDNS uses accessibility service to track which apps are in-use (foreground) versus those that are not in-use (background).</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Failure opening Accessibility Settings. Try again later!</string>
@@ -378,7 +383,6 @@
     <string name="settings_orbot_disabled_error" translatable="true">Turn off HTTP(S) and/or SOCKS5 proxy to continue with Tor-as-a-proxy setup.</string>
     <string name="settings_https_disabled_error" translatable="true">Connected to Orbot. Turn it off to continue.</string>
 
-    <string name="settings_orbot_notification_heading" translatable="true">Action required</string>
     <string name="settings_orbot_notification_content" translatable="true">Failure starting Tor-as-a-Proxy. Open the Orbot app to start it manually.</string>
 
     <string name="settings_orbot_notification_action" translatable="true">Open Orbot</string>
@@ -565,7 +569,7 @@
     <string name="dc_entries" translatable="true">%1$s entries »</string>
 
     <string name="dc_local_block_heading" translatable="true">On-device blocklists</string>
-    <string name="dc_local_block_desc_1" translatable="true">Choose from 185+ blocklists. Click here to download or configure blocklists.</string>
+    <string name="dc_local_block_desc_1" translatable="true">Choose from 195+ blocklists. Click here to download or configure blocklists.</string>
 
     <string name="dc_custom_block_heading" translatable="true">Domain rules</string>
     <string name="dc_custom_block_desc" translatable="true">Modify blocked or trusted domain rules</string>
@@ -810,7 +814,6 @@
     <string name="dns_info_positive" translatable="true">Ok</string>
     <string name="dns_info_neutral" translatable="true">Copy</string>
 
-    <string name="dns_select_toast" translatable="true">Atleast one resolver should be selected.</string>
     <string name="dns_crypt_relay_error_toast" translatable="true">No resolver selected</string>
 
     <string name="dns_proxy_desc" translatable="false">%1$s:%2$s, %3$s</string>
@@ -831,7 +834,7 @@
     <string name="fapps_filter_filter_heading" translatable="true">Type</string>
     <string name="fapps_filter_categories_heading" translatable="true">Categories</string>
 
-      <string name="fapps_filter_clear_btn" translatable="true">Clear</string>
+    <string name="fapps_filter_clear_btn" translatable="true">Clear</string>
 
     <string name="fapps_filter_parent_installed" translatable="true">Installed</string>
     <string name="fapps_filter_parent_system" translatable="true">System</string>
@@ -884,7 +887,7 @@
     <string name="unicode_x_sign" translatable="false">\u274c</string>
     <string name="unicode_question_sign" translatable="false">\u2754</string>
     <string name="unicode_check_sign" translatable="false">\u2705</string>
-    <string name="fav_icon" translatable="true">fav_icon</string>
+    <string name="fav_icon" translatable="false">fav_icon</string>
 
     <!-- BraveVPN service rules failure -->
     <string name="rules_load_failure_heading" translatable="true">Note</string>
@@ -912,7 +915,6 @@
     <string name="settings_local_blocklist_dialog_positive" translatable="true">Download</string>
     <string name="settings_local_blocklist_version" translatable="true">Version: v%1$s</string>
 
-    <string name="accessibility_notification_title" translatable="true">Action Required</string>
     <string name="accessibility_notification_content" translatable="true">RethinkDNS accessibility service has stopped or crashed. No longer blocking backgrounded apps. Tap to re-enable.</string>
 
     <string name="accessibility_failure_toast" translatable="true">RethinkDNS accessibility service has stopped or crashed. No longer blocking backgrounded apps.</string>
@@ -983,7 +985,6 @@
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
     <string name="new_app_bulk_notification_content" translatable="true">RethinkDNS blocked %1$s new apps. Tap to view or modify.</string>
-    <string name="new_app_notification_title" translatable="true">Action Required</string>
     <string name="new_app_notification_content" translatable="true">RethinkDNS blocked recently installed app, %1$s.</string>
 
     <string name="new_app_notification_action_deny" translatable="true">Keep blocking</string>
@@ -1037,11 +1038,7 @@
     <string name="cd_dialog_desc" translatable="true">Custom URL(domain) or wild card to either allow or block. eg, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Enter %1$s</string>
     <string name="cd_dialog_error_invalid_domain" translatable="true">Invalid URL(domain).</string>
-    <string name="cd_dialog_error_invalid_tld" translatable="true">Invalid Top level domain.</string>
     <string name="cd_dialog_error_invalid_wildcard" translatable="true">Invalid wildcard.</string>
-
-    <string name="cd_bypass_initial" translatable="true">BU</string>
-    <string name="cd_bypass_txt" translatable="true">Bypass</string>
 
     <string name="cd_blocked_initial" translatable="true">B</string>
 
@@ -1202,7 +1199,7 @@
     <string name="lbbs_update_check" translatable="true">Check for update</string>
     <string name="lbbs_redownload" translatable="true">Redownload blocklists</string>
     <string name="lbbs_download" translatable="true">Update blocklists</string>
-    <string name="lbbs_heading" translatable="true">Configure 185+ blocklists</string>
+    <string name="lbbs_heading" translatable="true">Configure 195+ blocklists</string>
 
     <!-- backup / restore bottom sheet -->
     <string name="brbs_title" translatable="true">Backup &amp; restore</string>
