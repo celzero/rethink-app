@@ -21,12 +21,10 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.P2QuantileEstimation
 
-
 /**
- * A class for tracking DNS transactions.  This class counts the number of successful transactions,
+ * A class for tracking DNS transactions. This class counts the number of successful transactions,
  * records the last minute of query timestamps, and optionally maintains a history of recent
- * transactions.
- * Thread-safe.
+ * transactions. Thread-safe.
  */
 class QueryTracker(private var persistentState: PersistentState) {
 
@@ -47,8 +45,10 @@ class QueryTracker(private var persistentState: PersistentState) {
     }
 
     fun recordTransaction(transaction: Transaction) {
-        // if server-ip is nil and blocklists are not empty, skip because this tx was resolved locally
-        if (TextUtils.isEmpty(transaction.serverName) && !TextUtils.isEmpty(transaction.blocklist)) return
+        // if server-ip is nil and blocklists are not empty, skip because this tx was resolved
+        // locally
+        if (TextUtils.isEmpty(transaction.serverName) && !TextUtils.isEmpty(transaction.blocklist))
+            return
         ++numRequests
         if (numRequests % HISTORY_SIZE == 0L) {
             reinitializeQuantileEstimator()
@@ -57,7 +57,12 @@ class QueryTracker(private var persistentState: PersistentState) {
     }
 
     fun sync(transaction: Transaction?) {
-        if (transaction == null || transaction.serverName.isEmpty() || isUnspecifiedIp(transaction.serverName) || transaction.status != Transaction.Status.COMPLETE) {
+        if (
+            transaction == null ||
+                transaction.serverName.isEmpty() ||
+                isUnspecifiedIp(transaction.serverName) ||
+                transaction.status != Transaction.Status.COMPLETE
+        ) {
             return
         }
         // Restore number of requests from storage, or 0 if it isn't defined yet.
@@ -66,7 +71,7 @@ class QueryTracker(private var persistentState: PersistentState) {
     }
 
     private fun isUnspecifiedIp(serverIp: String): Boolean {
-        return Constants.UNSPECIFIED_IP_IPV4 == serverIp || Constants.UNSPECIFIED_IP_IPV6 == serverIp
+        return Constants.UNSPECIFIED_IP_IPV4 == serverIp ||
+            Constants.UNSPECIFIED_IP_IPV6 == serverIp
     }
-
 }

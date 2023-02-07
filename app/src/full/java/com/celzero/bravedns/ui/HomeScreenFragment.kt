@@ -68,12 +68,12 @@ import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -284,9 +284,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
         builder.setMessage(getString(R.string.orbot_stop_dialog_dns_message))
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.lbl_dismiss)) {
-            dialogInterface,
-            _ ->
+        builder.setPositiveButton(getString(R.string.lbl_dismiss)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
         builder.setNegativeButton(getString(R.string.orbot_stop_dialog_neutral)) {
@@ -563,7 +561,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // creating a copy of the received value in a synchronized block.
                 synchronized(it) { copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList() }
                 val blockedApps =
-                    copy.filter { a -> a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id }
+                    copy.filter { a ->
+                        a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id
+                    }
                 val whiteListApps =
                     copy.filter { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id
@@ -843,9 +843,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        builder.setNegativeButton(R.string.lbl_dismiss) { dialog, _ ->
-            dialog.dismiss()
-        }
+        builder.setNegativeButton(R.string.lbl_dismiss) { dialog, _ -> dialog.dismiss() }
         builder.create().show()
     }
 

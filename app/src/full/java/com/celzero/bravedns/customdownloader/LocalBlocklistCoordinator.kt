@@ -29,12 +29,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.customdownloader.RetrofitManager.Companion.getBlocklistBaseBuilder
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -254,7 +253,9 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             while (input.read(buf).also { bytesRead = it } != -1) {
                 val elapsedMs = SystemClock.elapsedRealtime() - startMs
                 downloadedMB += bytesToMB(bytesRead)
-                val progress = if (contentLength == Long.MAX_VALUE) 0 else (downloadedMB * 100 / expectedMB).toInt()
+                val progress =
+                    if (contentLength == Long.MAX_VALUE) 0
+                    else (downloadedMB * 100 / expectedMB).toInt()
                 if (elapsedMs >= progressJumpsMs) {
                     updateProgress(context, progress)
                     // increase the next update duration linearly by another sec; ie,
@@ -397,9 +398,8 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
                 .setContentText(contentText)
             builder.setProgress(100, 0, false)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-            builder.color = ContextCompat.getColor(context,
-                Utilities.getAccentColor(persistentState.theme)
-            )
+            builder.color =
+                ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
 
             // Secret notifications are not shown on the lock screen.  No need for this app to show
             // there.

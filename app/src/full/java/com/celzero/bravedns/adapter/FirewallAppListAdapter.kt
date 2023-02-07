@@ -19,7 +19,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -140,7 +139,7 @@ class FirewallAppListAdapter(
                             showWifiEnabled()
                             showMobileDataEnabled()
                         }
-                        FirewallManager.ConnectionStatus.UNMETERED-> {
+                        FirewallManager.ConnectionStatus.UNMETERED -> {
                             showWifiDisabled()
                             showMobileDataEnabled()
                         }

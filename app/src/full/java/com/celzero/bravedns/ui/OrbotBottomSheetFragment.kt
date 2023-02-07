@@ -34,10 +34,10 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.animation.Rotate3dAnimation
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
@@ -376,9 +376,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
 
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.lbl_dismiss)) {
-            dialogInterface,
-            _ ->
+        builder.setPositiveButton(getString(R.string.lbl_dismiss)) { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
         builder.setNegativeButton(getString(R.string.orbot_stop_dialog_negative)) {

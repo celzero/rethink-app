@@ -41,9 +41,9 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
-import java.net.InetAddress
 import protect.Blocker
 import settings.Settings
+import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -231,7 +231,6 @@ internal constructor(
         fun isTunProxySocks5(): Boolean {
             return mode == SOCKS5.mode
         }
-
     }
 
     // Provider - Custom - SOCKS5, Http proxy setup.

@@ -19,7 +19,6 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -49,7 +48,10 @@ class BlocklistUpdateCheckJob(val context: Context, workerParameters: WorkerPara
         return Result.success()
     }
 
-    private suspend fun isDownloadRequired(timestamp: Long, type: RethinkBlocklistManager.DownloadType) {
+    private suspend fun isDownloadRequired(
+        timestamp: Long,
+        type: RethinkBlocklistManager.DownloadType
+    ) {
         val response =
             BlocklistDownloadHelper.checkBlocklistUpdate(
                 timestamp,

@@ -98,9 +98,7 @@ class DnsCryptEndpointAdapter(
                 updateDnsCryptDetails(endpoint)
             }
 
-            b.dnsCryptEndpointListActionImage.setOnClickListener {
-                updateDnsCryptDetails(endpoint)
-            }
+            b.dnsCryptEndpointListActionImage.setOnClickListener { updateDnsCryptDetails(endpoint) }
 
             b.dnsCryptEndpointListInfoImage.setOnClickListener {
                 showExplanationOnImageClick(endpoint)

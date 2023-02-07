@@ -37,12 +37,12 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities.Companion.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
-import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentDnsLogsBinding::bind)
@@ -80,7 +80,6 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
             b.queryListSearch.setQuery(query, true)
         }
-
     }
 
     private fun initView() {
@@ -180,8 +179,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         b.filterChipGroup.removeAllViews()
 
         val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.lbl_all), true)
-        val allowed =
-            makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
+        val allowed = makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
             makeChip(
                 ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,

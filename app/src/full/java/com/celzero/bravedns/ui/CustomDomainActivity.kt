@@ -44,9 +44,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
+import org.koin.android.ext.android.inject
 import java.net.MalformedURLException
 import java.util.regex.Pattern
-import org.koin.android.ext.android.inject
 
 class CustomDomainActivity :
     AppCompatActivity(R.layout.activity_custom_domain), SearchView.OnQueryTextListener {

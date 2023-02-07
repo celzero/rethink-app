@@ -370,8 +370,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
             observeRestoreWorker()
         }
 
-        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { _, _
-            ->
+        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { _, _ ->
             // no-op
         }
 

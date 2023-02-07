@@ -119,11 +119,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
             _ ->
             openRethinkAppInfo(this)
         }
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) {
-            _,
-            _ ->
-            finish()
-        }
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> finish() }
         builder.setCancelable(false)
 
         builder.create().show()

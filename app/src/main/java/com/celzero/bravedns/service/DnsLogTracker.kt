@@ -38,14 +38,14 @@ import dnsx.Dnsx
 import dnsx.Summary
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class DnsLogTracker
 internal constructor(

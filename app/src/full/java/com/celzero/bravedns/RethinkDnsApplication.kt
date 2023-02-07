@@ -3,9 +3,9 @@ package com.celzero.bravedns
 import android.app.Application
 import android.os.StrictMode
 import android.util.Log
-import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.scheduler.ScheduleManager
+import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext

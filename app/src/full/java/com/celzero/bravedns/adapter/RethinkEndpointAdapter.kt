@@ -37,7 +37,6 @@ import com.celzero.bravedns.databinding.RethinkEndpointListItemBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp

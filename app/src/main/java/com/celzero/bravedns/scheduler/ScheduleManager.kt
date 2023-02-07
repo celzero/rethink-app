@@ -21,7 +21,6 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.util.LoggerConstants
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutionException

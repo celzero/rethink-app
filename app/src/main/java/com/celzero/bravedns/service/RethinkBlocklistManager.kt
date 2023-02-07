@@ -33,9 +33,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.BraveDNS
 import dnsx.Dnsx
-import java.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 

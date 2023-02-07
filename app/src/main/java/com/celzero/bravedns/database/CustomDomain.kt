@@ -17,11 +17,10 @@ package com.celzero.bravedns.database
 
 import android.os.SystemClock
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Constants
 
-@Entity(primaryKeys = ["domain", "uid"],tableName = "CustomDomain")
+@Entity(primaryKeys = ["domain", "uid"], tableName = "CustomDomain")
 class CustomDomain {
     var domain: String = ""
     var uid: Int = Constants.UID_EVERYBODY

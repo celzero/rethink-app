@@ -47,7 +47,7 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
                     val selected = getSelectedFilter()
                     val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
-                   if (subg.isNotEmpty()) {
+                    if (subg.isNotEmpty()) {
                         Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                                 rethinkLocalDao.getLocalFileTagsSubg(query, selected, subg)
                             }

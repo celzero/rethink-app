@@ -75,11 +75,12 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
         }
     }
 
-    private suspend fun consume() = withContext(Dispatchers.IO + ncons) {
-        for (y in buffers) {
-            processor(y)
+    private suspend fun consume() =
+        withContext(Dispatchers.IO + ncons) {
+            for (y in buffers) {
+                processor(y)
+            }
         }
-    }
 
     private suspend fun txswap() {
         val b = batches
@@ -100,34 +101,38 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
             }
         }
 
-    private suspend fun sig() = withContext(looper + nsig) {
-        // consume all signals
-        for (tracklsn in signal) {
-            // do not honor the signal for 'l' if a[l] is empty
-            // this can happen if the signal for 'l' is processed
-            // after the fact that 'l' has been swapped out by 'batch'
-            if (batches.size <= 0) {
-                if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue for buffer")
-                continue
-            } else {
+    private suspend fun sig() =
+        withContext(looper + nsig) {
+            // consume all signals
+            for (tracklsn in signal) {
+                // do not honor the signal for 'l' if a[l] is empty
+                // this can happen if the signal for 'l' is processed
+                // after the fact that 'l' has been swapped out by 'batch'
+                if (batches.size <= 0) {
+                    if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue for buffer")
+                    continue
+                } else {
+                    if (DEBUG)
+                        Log.d(
+                            LoggerConstants.LOG_BATCH_LOGGER,
+                            "signal sleep for $waitms for buffer"
+                        )
+                }
+
+                // wait for 'batch' to dispatch
+                delay(waitms)
                 if (DEBUG)
-                    Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal sleep for $waitms for buffer")
-            }
+                    Log.d(
+                        LoggerConstants.LOG_BATCH_LOGGER,
+                        "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})"
+                    )
 
-            // wait for 'batch' to dispatch
-            delay(waitms)
-            if (DEBUG)
-                Log.d(
-                    LoggerConstants.LOG_BATCH_LOGGER,
-                    "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})"
-                )
-
-            // 'l' is the current buffer, that is, 'l == i',
-            // and 'batch' hasn't dispatched it,
-            // but time's up...
-            if (lsn == tracklsn && batches.size > 0) {
-                txswap()
+                // 'l' is the current buffer, that is, 'l == i',
+                // and 'batch' hasn't dispatched it,
+                // but time's up...
+                if (lsn == tracklsn && batches.size > 0) {
+                    txswap()
+                }
             }
         }
-    }
 }

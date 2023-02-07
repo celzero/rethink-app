@@ -63,15 +63,15 @@ import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import java.util.*
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.io.File
+import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)

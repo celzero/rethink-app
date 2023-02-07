@@ -22,9 +22,9 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN

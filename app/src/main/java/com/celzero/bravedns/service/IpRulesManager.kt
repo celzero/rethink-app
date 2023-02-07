@@ -103,9 +103,7 @@ object IpRulesManager : KoinComponent {
     }
 
     init {
-        io {
-            loadIpRules()
-        }
+        io { loadIpRules() }
     }
 
     // returns CustomIp object based on uid and IP address

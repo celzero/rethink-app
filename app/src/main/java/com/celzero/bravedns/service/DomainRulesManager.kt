@@ -24,15 +24,15 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import java.util.*
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.util.regex.Pattern
-import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.regex.Pattern
+import kotlin.concurrent.write
 
 object DomainRulesManager : KoinComponent {
 
@@ -50,9 +50,7 @@ object DomainRulesManager : KoinComponent {
         CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
 
     init {
-        io {
-            load()
-        }
+        io { load() }
     }
 
     enum class Status(val id: Int) {
@@ -124,7 +122,7 @@ object DomainRulesManager : KoinComponent {
             return
         }
 
-        customDomains.forEach {cd ->
+        customDomains.forEach { cd ->
             when (DomainType.getType(cd.type)) {
                 DomainType.DOMAIN -> {
                     val key = CacheKey(cd.domain, cd.uid)

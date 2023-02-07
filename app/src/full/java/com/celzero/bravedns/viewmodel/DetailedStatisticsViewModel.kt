@@ -82,9 +82,7 @@ class DetailedStatisticsViewModel(
 
     val getAllContactedDomains =
         Transformations.switchMap(allowedDomains) { _ ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    dnsLogDAO.getAllContactedDomains()
-                }
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getAllContactedDomains() }
                 .liveData
                 .cachedIn(viewModelScope)
         }

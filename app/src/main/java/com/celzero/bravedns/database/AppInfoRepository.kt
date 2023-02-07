@@ -16,7 +16,6 @@ limitations under the License.
 package com.celzero.bravedns.database
 
 import android.database.Cursor
-import android.util.Log
 
 class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
 
@@ -65,5 +64,4 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
     fun cpDelete(uid: Int): Int {
         return appInfoDAO.deleteByUid(uid)
     }
-
 }

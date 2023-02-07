@@ -177,20 +177,11 @@ class ConnectionTrackerFragment :
     private fun remakeParentFilterChipsUi() {
         b.filterChipParentGroup.removeAllViews()
 
-        val all =
-            makeParentChip(TopLevelFilter.ALL.id, getString(R.string.lbl_all), true)
+        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed =
-            makeParentChip(
-                TopLevelFilter.ALLOWED.id,
-                getString(R.string.lbl_allowed),
-                false
-            )
+            makeParentChip(TopLevelFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
-            makeParentChip(
-                TopLevelFilter.BLOCKED.id,
-                getString(R.string.lbl_blocked),
-                false
-            )
+            makeParentChip(TopLevelFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
 
         b.filterChipParentGroup.addView(all)
         b.filterChipParentGroup.addView(allowed)

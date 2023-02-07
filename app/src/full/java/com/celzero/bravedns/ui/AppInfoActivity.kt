@@ -21,7 +21,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -98,10 +97,7 @@ class AppInfoActivity :
     }
 
     private fun observeAppRules() {
-        ipRulesViewModel.ipRulesCount(uid).observe(this) {
-            b.aadIpBlockHeader.text =
-                it.toString()
-        }
+        ipRulesViewModel.ipRulesCount(uid).observe(this) { b.aadIpBlockHeader.text = it.toString() }
 
         domainRulesViewModel.domainRulesCount(uid).observe(this) {
             b.aadDomainBlockHeader.text = it.toString()
@@ -412,20 +408,21 @@ class AppInfoActivity :
         // if unmetered -> none(app status) + both(connection status)
         // if metered -> none(app status) + allow(connection status)
         // if both -> none(app status) + unmetered(connection status)
-        val cStat = when (FirewallManager.connectionStatus(appInfo.uid)) {
-            FirewallManager.ConnectionStatus.METERED -> {
-                FirewallManager.ConnectionStatus.ALLOW
+        val cStat =
+            when (FirewallManager.connectionStatus(appInfo.uid)) {
+                FirewallManager.ConnectionStatus.METERED -> {
+                    FirewallManager.ConnectionStatus.ALLOW
+                }
+                FirewallManager.ConnectionStatus.UNMETERED -> {
+                    FirewallManager.ConnectionStatus.BOTH
+                }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    FirewallManager.ConnectionStatus.UNMETERED
+                }
+                FirewallManager.ConnectionStatus.ALLOW -> {
+                    FirewallManager.ConnectionStatus.METERED
+                }
             }
-            FirewallManager.ConnectionStatus.UNMETERED -> {
-                FirewallManager.ConnectionStatus.BOTH
-            }
-            FirewallManager.ConnectionStatus.BOTH -> {
-                FirewallManager.ConnectionStatus.UNMETERED
-            }
-            FirewallManager.ConnectionStatus.ALLOW -> {
-                FirewallManager.ConnectionStatus.METERED
-            }
-        }
 
         updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
     }
@@ -436,20 +433,21 @@ class AppInfoActivity :
         // if MOBILE DATA -> none(app status) + both(connection status)
         // if BOTH -> none(app status) + mobile data(connection status)
         // if ALLOW -> none(app status) + wifi(connection status)
-        val cStat = when (FirewallManager.connectionStatus(appInfo.uid)) {
-            FirewallManager.ConnectionStatus.UNMETERED -> {
-                FirewallManager.ConnectionStatus.ALLOW
+        val cStat =
+            when (FirewallManager.connectionStatus(appInfo.uid)) {
+                FirewallManager.ConnectionStatus.UNMETERED -> {
+                    FirewallManager.ConnectionStatus.ALLOW
+                }
+                FirewallManager.ConnectionStatus.BOTH -> {
+                    FirewallManager.ConnectionStatus.METERED
+                }
+                FirewallManager.ConnectionStatus.METERED -> {
+                    FirewallManager.ConnectionStatus.BOTH
+                }
+                FirewallManager.ConnectionStatus.ALLOW -> {
+                    FirewallManager.ConnectionStatus.UNMETERED
+                }
             }
-            FirewallManager.ConnectionStatus.BOTH -> {
-                FirewallManager.ConnectionStatus.METERED
-            }
-            FirewallManager.ConnectionStatus.METERED -> {
-                FirewallManager.ConnectionStatus.BOTH
-            }
-            FirewallManager.ConnectionStatus.ALLOW -> {
-                FirewallManager.ConnectionStatus.UNMETERED
-            }
-        }
 
         updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
     }

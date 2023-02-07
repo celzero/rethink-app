@@ -29,10 +29,10 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

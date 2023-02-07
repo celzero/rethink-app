@@ -65,14 +65,14 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     private val b by viewBinding(FragmentSettingsScreenBinding::bind)
@@ -125,8 +125,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
-            val currentAppLocales: LocaleList = requireContext().getSystemService(LocaleManager::class.java).applicationLocales
-            b.settingsLocaleDesc.text = currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
+            val currentAppLocales: LocaleList =
+                requireContext().getSystemService(LocaleManager::class.java).applicationLocales
+            b.settingsLocaleDesc.text =
+                currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
         } else {
             b.settingsLocaleDesc.text =
                 AppCompatDelegate.getApplicationLocales().get(0)?.displayName
@@ -925,9 +927,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             dialog.dismiss()
         }
 
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) {
-            dialog,
-            _ ->
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
             b.settingsActivityAllNetworkSwitch.isChecked = false
             persistentState.useMultipleNetworks = false
             dialog.dismiss()
@@ -944,9 +944,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
             handleOrbotInstall()
         }
-        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { dialog, _ ->
-            dialog.dismiss()
-        }
+        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { dialog, _ -> dialog.dismiss() }
         builder.setNeutralButton(getString(R.string.orbot_install_dialog_neutral)) { _, _ ->
             launchOrbotWebsite()
         }

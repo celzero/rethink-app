@@ -35,14 +35,18 @@ interface CustomDomainDAO {
     fun getAllDomains(): List<CustomDomain>
 
     @Transaction
-    @Query("select * from CustomDomain where uid = :uid and domain like :query order by modifiedTs desc")
-    fun getDomainsLiveData(uid: Int = Constants.UID_EVERYBODY, query: String): PagingSource<Int, CustomDomain>
+    @Query(
+        "select * from CustomDomain where uid = :uid and domain like :query order by modifiedTs desc"
+    )
+    fun getDomainsLiveData(
+        uid: Int = Constants.UID_EVERYBODY,
+        query: String
+    ): PagingSource<Int, CustomDomain>
 
     @Query("select count(*) from CustomDomain where uid = :uid")
     fun getAppWiseDomainRulesCount(uid: Int): LiveData<Int>
 
-    @Query("delete from CustomDomain where uid = :uid")
-    fun deleteIpRulesByUid(uid: Int)
+    @Query("delete from CustomDomain where uid = :uid") fun deleteIpRulesByUid(uid: Int)
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

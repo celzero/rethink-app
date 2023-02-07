@@ -30,11 +30,11 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsProxyEndpointAdapter
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
