@@ -312,11 +312,13 @@ internal constructor(
         entry.uid = appInfo.uid
         entry.isSystemApp = isSystemApp
 
-        // default value of apps internet permission is true, when the universal firewall
-        // parameter (blockNewlyInstalledApp is true) firewall the app
+        // do not firewall app by default, if blockNewlyInstalledApp is set to false
         if (persistentState.blockNewlyInstalledApp) {
             entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
             entry.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
+        } else {
+            entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
+            entry.connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id
         }
 
         entry.appCategory = determineAppCategory(appInfo)
@@ -456,7 +458,7 @@ internal constructor(
             builder = NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String = context.resources.getString(R.string.new_app_notification_title)
+        val contentTitle: String = context.resources.getString(R.string.lbl_action_required)
         val contentText: String =
             context.resources.getString(R.string.new_app_notification_content, appName)
 

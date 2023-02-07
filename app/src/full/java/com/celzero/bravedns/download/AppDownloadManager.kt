@@ -59,7 +59,6 @@ class AppDownloadManager(
     // live data to initiate the download, contains time stamp if the download is required,
     // else will have
     val downloadRequired: MutableLiveData<DownloadManagerStatus> = MutableLiveData()
-    val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     // various download status used as part of Work manager.
     enum class DownloadManagerStatus(val id: Int) {
