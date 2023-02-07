@@ -270,7 +270,7 @@ object DomainRulesManager : KoinComponent {
 
     fun deleteIpRulesByUid(uid: Int) {
         io {
-            customDomainsRepository.deleteIpRulesByUid(uid)
+            customDomainsRepository.deleteRulesByUid(uid)
             domains = domains.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
             wildcards = wildcards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
             domainLookupCache.invalidateAll()

@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.database
 
+import android.database.Cursor
+
 class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     suspend fun update(customDomain: CustomDomain) {
         customDomainDAO.update(customDomain)
@@ -32,7 +34,28 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         return customDomainDAO.getAllDomains()
     }
 
-    fun deleteIpRulesByUid(uid: Int) {
-        customDomainDAO.deleteIpRulesByUid(uid)
+    fun deleteRulesByUid(uid: Int) {
+        customDomainDAO.deleteRulesByUid(uid)
+    }
+
+    fun cpInsert(customDomain: CustomDomain): Long {
+        return customDomainDAO.insert(customDomain)
+    }
+
+    fun cpDelete(domain: String, uid: Int): Int {
+        return customDomainDAO.deleteDomain(domain, uid)
+    }
+
+    fun cpUpdate(customDomain: CustomDomain): Int {
+        return customDomainDAO.update(customDomain)
+    }
+
+    fun cpUpdate(customDomain: CustomDomain, clause: String): Int {
+        // update only status of the domain
+        return customDomainDAO.cpUpdate(customDomain.status, clause)
+    }
+
+    fun getRulesCursor(): Cursor {
+        return customDomainDAO.getRulesCursor()
     }
 }
