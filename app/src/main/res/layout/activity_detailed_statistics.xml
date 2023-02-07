@@ -44,7 +44,7 @@
         android:visibility="gone">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/custom_dialog_no_rules_text"
+            android:id="@+id/cip_no_rules_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
@@ -59,7 +59,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/custom_dialog_no_rules_text"
+            android:layout_below="@id/cip_no_rules_text"
             android:src="@drawable/illustrations_no_record" />
 
     </RelativeLayout>

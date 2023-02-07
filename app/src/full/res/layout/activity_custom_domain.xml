@@ -92,7 +92,7 @@
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
-                        app:queryHint="@string/search_universal_ips" />
+                        app:queryHint="@string/search_custom_domains" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/cda_search_delete_icon"
