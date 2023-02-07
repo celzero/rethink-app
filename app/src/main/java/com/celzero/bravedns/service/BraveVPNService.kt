@@ -74,16 +74,16 @@ import inet.ipaddr.IPAddressString
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Blocker
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Blocker
 
 class BraveVPNService :
     VpnService(),
@@ -248,7 +248,8 @@ class BraveVPNService :
         destAddress: String
     ): Boolean {
         handleVpnLockdownStateAsync()
-        val connInfo = createConnTrackerMetaData(_uid, sourceAddress, destAddress, protocol, _query = "")
+        val connInfo =
+            createConnTrackerMetaData(_uid, sourceAddress, destAddress, protocol, _query = "")
         return processFirewallRequest(connInfo)
     }
 
@@ -689,8 +690,7 @@ class BraveVPNService :
             builder = NotificationCompat.Builder(this, NOTIF_CHANNEL_ID_FIREWALL_ALERTS)
         }
 
-        val contentTitle: String =
-            this.resources.getString(R.string.lbl_action_required)
+        val contentTitle: String = this.resources.getString(R.string.lbl_action_required)
         val contentText: String =
             this.resources.getString(R.string.accessibility_notification_content)
 
@@ -1963,8 +1963,7 @@ class BraveVPNService :
         // as of now, only first ip is used
         val destIp = realIps?.split(",")?.get(0) ?: ""
 
-        val connInfo =
-            createConnTrackerMetaData(_uid, src, destIp, protocol, domains.first())
+        val connInfo = createConnTrackerMetaData(_uid, src, destIp, protocol, domains.first())
 
         return processFirewallRequest(connInfo)
     }
@@ -2001,9 +2000,6 @@ class BraveVPNService :
         _query: String
     ): ConnTrackerMetaData {
 
-        val query = _query.ifEmpty {
-            getDomainName(destAddress)
-        }
         // Ref: ipaddress doc:
         // https://seancfoley.github.io/IPAddress/ipaddress.html#host-name-or-address-with-port-or-service-name
         val first = HostName(sourceAddress)
@@ -2016,6 +2012,7 @@ class BraveVPNService :
 
         val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
 
+        val query = _query.ifEmpty { getDomainName(dstIp) }
 
         if (DEBUG)
             Log.d(
