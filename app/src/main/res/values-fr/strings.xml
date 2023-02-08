@@ -12,8 +12,8 @@
     <string name="slide_1_desc">RethinkDNS est un logiciel open source soutenu par le programme Mozilla Builders MVP.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">bloquer</string>
-    <string name="isolate">confinement</string>
-    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Appuyer pour changer le paramétrage de protection</string>
+    <string name="isolate">confiner</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Appuyez sur pour modifier le paramètre de protection</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Attention : RethinkDNS a été désactivé</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">en erreur</string>
     <string name="pause_mode_notification_title">En pause ! Les applications bloquées continueront à être soumises au pare-feu.</string>
@@ -117,7 +117,7 @@
     <string name="download_update_dialog_trylater_title">Impossible d’appliquer la mise à jour actuellement</string>
     <string name="download_update_dialog_trylater_message">La mise à jour ne peut être appliquée pour le moment, veuillez réessayer plus tard.</string>
     <string name="settings_enable_logs">Activer la journalisation embarquée sur l’appareil</string>
-    <string name="whats_new_version_update">&lt;b&gt;Polyglottisme !&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Support rétabli d’Android 6.&lt;br/&gt; 2. Nouvelle interface RDNS+.&lt;br/&gt; 3. Nouveau moteur de réseau et de pare-feu.&lt;br/&gt; 4. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Traductions dans plus de 15 langues.&lt;br/&gt; 5. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Icônes adaptatives.&lt;br/&gt; 6. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Afficher les noms de domaine dans les journaux réseau des applications.&lt;br/&gt; 7. Corrections des notifications manquantes sur Android 13.&lt;br/&gt; 8. Correction d’un mauvais comportement de l’intégration Orbot DNS.&lt;br/&gt; 9. L’écran des applications est désormais accessible en mode DNS uniquement.&lt;br/&gt; 10. Améliorations majeures du gestionnaire de téléchargement intégré.&lt;br/&gt;&lt;br/&gt; &lt;a href=https ://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Aidez-nous à traduire cette application&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;RA Fisher !&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Nouvel écran de statistiques.&lt;br/&gt; 2. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Sécurisez cette appli en utilisant le verrouillage de l\'écran.&lt;br/&gt; 3. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Choisissez votre langue préférée dans les paramètres de l\'appli.&lt;br/&gt; 4. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : La vue &lt;i&gt;Simple&lt;/i&gt; RDNS+ ne montre que les listes les mieux conçues.&lt;br/&gt; 5. Renommage : &lt;i&gt;Contourner les règles de l\'appli&lt;/i&gt; est maintenant appelé &lt;i&gt;Faire confiance&lt;/i&gt;.&lt;br/&gt; 6. Correction d\'un crash lorsque Rethink est installé dans un profil de travail.&lt;br/&gt; 7. Suppression des règles spécifiques aux applications lorsque l\'appli est désinstallée.&lt;br/&gt; 8. Et d\'autres modifications mineures de l\'interface utilisateur et des corrections de bogues.&lt;br/&gt;&lt;br/&gt; &lt;a href=https ://svc.rethinkdns.com/r/translate&gt;Aidez-nous à traduire cette application&lt;/a&gt;</string>
     <string name="settings_ptrans_desc">Traduit le trafic sortant IPv6 en IPv4 sur l’appareil. Activez cette option si vous êtes connecté à un réseau uniquement IPv4.</string>
     <string name="settings_allow_bypass_desc">Autorisez les applications à contourner le pare-feu de RethinkDNS à la demande. Certaines applications de conférence audio/vidéo comme Zoom et WhatsApp peuvent nécessiter cela pour fonctionner correctement.</string>
     <string name="settings_lock_down_mode_desc">Impossible de configurer un proxy ou d’autoriser le contournement du VPN lorsque celui-ci fonctionne en mode confinement. <u>Accéder aux paramètres VPN d’Android</u>.</string>
@@ -138,7 +138,7 @@
     <string name="settings_import_export_heading">Sauvegarder &amp; Restaurer</string>
     <string name="settings_dns_proxy_dialog_port_number">Numéro de port</string>
     <string name="settings_socks5_dialog_hint_ip">Adresse IP</string>
-    <string name="settings_theme_dialog_themes_4">Vrai Noir</string>
+    <string name="settings_theme_dialog_themes_4">Sombre</string>
     <string name="orbot_install_activity_error">Quelque chose s’est mal passé, essayez plus tard</string>
     <string name="settings_socks_forwarding_default_desc">Transférer les connexions vers le point de terminaison SOCKS5.</string>
     <string name="settings_orbot_desc">Orbot en mode non-vpn avec HTTPS/SOCKS5.</string>
@@ -219,7 +219,7 @@
     <string name="hsf_proxy_chip_remove_text">Arrêt…</string>
     <string name="hsf_blocklist_updating_text">Activation…</string>
     <string name="hsf_chip_appearance">Thème : %1$s</string>
-    <string name="dc_entries">%1$s entrées 🔗</string>
+    <string name="dc_entries">%1$s entrées »</string>
     <string name="dns_logs_blocked_queries">Requêtes bloquées : %1$s</string>
     <string name="dc_other_settings_heading">avancé</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
@@ -227,25 +227,19 @@
     <string name="ctbs_proceed_positive_text">Continuer</string>
     <string name="fapps_all_network_hint"><u>Utiliser tous les réseaux</u> est activé. Le pare-feu n’honorera pas les règles Avec / Sans abonnement.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Sans abonnement</i>.<br/><br/> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.</string>
-    <string name="fapps_info_dialog_message">Empêchez les applications de se connecter à l’Internet. Limiter l’accès à Internet permet d’éviter une utilisation injustifiée des données et d’économiser la batterie.
-\n
-\nLes règles de pare-feu avec abonnement (mobile) / sans abonnement (Wi-Fi) ne seront pas respectées dans les cas suivants :
-\n
-\n1. Le VPN est en mode confinement (c’est-à-dire que <i>Bloquer les connexions sans VPN</i> est activé).
-\n
-\n2. Le paramètre <i>Utiliser tous les réseaux disponibles</i> est activé.</string>
+    <string name="fapps_info_dialog_message">Empêchez les applications de se connecter à l’Internet. Limiter l’accès à Internet permet d’éviter une utilisation injustifiée des données et d’économiser la batterie.</string>
     <string name="dns_proxy_connection_failure_lockdown">L’exclusion de %1$s pour %2$s en mode confinement peut provoquer des problèmes de connectivité à Internet.</string>
     <string name="firewall_rule_block_ip_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination</i>.<br/><br/> Pour la modifier, allez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles du pare-feu global.<br/><br/>Pour modifier cela, allez dans <i>Règles IP</i> dans l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_unknown_desc">Cette connexion a été bloquée par un pare-feu car <i>l’application source</i> n’a pas pu être déterminée.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
-    <string name="firewall_rule_trusted_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles spécifiques de l’application.<br/><br/> Pour modifier cela, allez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est autorisée.<br/><br/> Pour modifier cela, allez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">Cette connexion a été autorisée parce que <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i> .</string>
     <string name="lbbs_download">Mettre à jour les listes de blocage</string>
     <string name="brbs_backup_title">Sauvegarder</string>
     <string name="info_dialog_rethink_toast_msg">Copié en tant qu’URL RDNS+ DNS over HTTPS</string>
     <string name="brbs_restore_dialog_message">Restaure les paramètres de l’application ainsi que les journaux réseau et DNS à partir d’un fichier de sauvegarde. Cela va redémarrer l’application.</string>
     <string name="brbs_restore_dialog_failure_message">Impossible de restaurer. Essayez à nouveau \?</string>
-    <string name="contributors_list">Le &lt;i&gt;projet libre et open source Rethink&lt;/i&gt; doit son existence à ces bénévoles qui consacrent d’innombrables heures à son développement.&lt;br/&gt; &lt;br/&gt;🛡️ Application Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Moteur réseau &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Résolveur &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Modérateurs de la communauté &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Géo-localisation IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traductions &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Serveurs de compilation &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">Le &lt;i&gt;projet libre et open source Rethink&lt;/i&gt; doit son existence à ces bénévoles qui consacrent d’innombrables heures à son développement.&lt;br/&gt; &lt;br/&gt;🛡️ Application Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Moteur réseau &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Résolveur &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Modérateurs de la communauté &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Géo-localisation IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traductions &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icônes &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Serveurs de compilation &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="orbot_explanation">Orbot est une application proxy gratuite qui permet à d’autres applications d’utiliser Internet de manière plus <u>sûre</u> .
 \nOrbot utilise <u>Tor</u> pour chiffrer votre trafic Internet, ce qui vous aide à <u>contourner la censure</u> et à vous défendre contre les formes de <u>surveillance du réseau</u> qui menacent les libertés individuelles et la vie privée.
 \n<u>Proxy TCP</u> : RethinkDNS transmet à Orbot les connexions TCP de toutes les applications sauf celles qui sont exclues.
@@ -282,7 +276,7 @@
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Supprimer le résolveur DNSCrypt \?</string>
     <string name="ct_bs_app_info_error">Infos sur l’application non trouvées</string>
-    <string name="ada_noapp_dialog_title">Infos sur l’application non trouvées</string>
+    <string name="ada_noapp_dialog_title">Aucune application correspondante</string>
     <string name="dns_connected_rethink_plus">Connecté. %1$s listes de blocage en cours d’utilisation</string>
     <string name="ada_app_metered">Avec abonnement</string>
     <string name="firewall_rule_block_app_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> .<br/><br/> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.</string>
@@ -360,7 +354,7 @@
     <string name="cd_toast_deleted">Domaine supprimé de la liste personnalisée</string>
     <string name="ci_dialog_title">Ajouter une règle IP / Port</string>
     <string name="ci_bypass_universal_txt">Exception globale</string>
-    <string name="ci_bypass_universal">exception globale</string>
+    <string name="ci_bypass_universal">Exception globale</string>
     <string name="ada_ip_connection_count">S’est connectée à %1$s adresse(s) IP</string>
     <string name="ada_ip_connection_count_zero">0 adresse IP</string>
     <string name="network_dns">DNS du système</string>
@@ -428,7 +422,7 @@
     <string name="brbs_backup_dialog_failure_positive">Retenter la sauvegarde</string>
     <string name="notif_dialog_pause_dialog_title">Application en pause !</string>
     <string name="dc_rethink_dns">DNS Rethink</string>
-    <string name="fapps_firewall_filter_hint">Appliquer les règles Avec / Sans abonnement aux applications listées</string>
+    <string name="fapps_firewall_filter_hint">Appliquer les règles aux applications listées</string>
     <string name="about_settings">système</string>
     <string name="univ_firewall_dialog_title">Supprimer la règle IP \?</string>
     <string name="blocklist_update_check_failure">Un problème est survenu. Essayez à nouveau plus tard !</string>
@@ -455,10 +449,10 @@
     <string name="firewall_rule_block_metered">Avec abonnement (Mobile, Appli)</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
     <string name="settings_local_blocklist_dialog_positive">Télécharger</string>
-    <string name="firewall_rule_isolate_desc">Une règle de pare-feu définie par l’utilisateur a bloqué la connexion de cette <i>application</i> à des adresses IP autres qu’avec <i>exceptions</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
+    <string name="firewall_rule_isolate_desc">Une règle de pare-feu définie par l’utilisateur a bloqué la connexion de cette <i>application</i> à des adresses IP qui ne sont pas de <i>confiance</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
     <string name="category_name_others">Autre</string>
-    <string name="cd_dialog_header">Domaine(s) personnalisé(s): %1$s</string>
-    <string name="ci_block">bloquer</string>
+    <string name="cd_dialog_header">Domaine(s) personnalisé(s)</string>
+    <string name="ci_block">Bloquer</string>
     <string name="ada_app_bypass_univ">Exception globale</string>
     <string name="bsdl_blocked_desc">bloqué %1$s par %2$s</string>
     <string name="dc_dns_proxy">Proxy DNS</string>
@@ -492,7 +486,7 @@
     <string name="hs_download_positive_play_store">Achever la mise à jour</string>
     <string name="notif_channel_vpn_failure">VPN inactif</string>
     <string name="cd_no_rule_initial">N</string>
-    <string name="hsf_uptime">(actif depuis %1$s ; protocoles : %2$s)</string>
+    <string name="hsf_uptime">(actif %1$s ; protocoles : %2$s ; type : %3$s)</string>
     <string name="local_blocklist_download_desc">Télécharger les listes de blocage (environ 60MB) pour utiliser cette fonctionnalité \?</string>
     <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
     <string name="app_mode_dns">DNS</string>
@@ -566,7 +560,7 @@
     <string name="firewall_rule_block_app">Appli bloquée</string>
     <string name="notif_channel_proxy_failure">Alertes du proxy</string>
     <string name="cd_dialog_edittext_hint">Entrez %1$s</string>
-    <string name="ci_dialog_desc">Autoriser (ajout d’exception) ou bloquer l’adresse IP, le sous-réseau IP (plage), le port. Exemple : 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
+    <string name="ci_dialog_desc">Autoriser (ajout d’exception) ou bloquer l’adresse IP, le sous-réseau IP (plage), le port. Exemple : 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
     <string name="ci_dialog_added_success">IP ajoutée à la liste</string>
     <string name="ci_bypass_universal_initial">EG</string>
     <string name="ada_noapp_dialog_positive">D’accord</string>
@@ -587,7 +581,8 @@
     <string name="about_bug_report">Rapport de bogue</string>
     <string name="vpn_profile_error">Impossible de lancer le profil VPN.</string>
     <string name="cd_doh_dialog_heading">Ajouter un résolveur DNS over HTTPS</string>
-    <string name="dns_btm_sheet_chip">+%1$s Autres IPs</string>
+    <string name="dns_btm_sheet_chip">+%1$s Autres IP</string>
+    <string name="dns_btm_sheet_chip_blocked">Bloquées</string>
     <string name="univ_ip_delete_toast_success">Suppression de toutes les règles IP.</string>
     <string name="univ_delete_firewall_dialog_title">Supprimer toutes les règles IP \?</string>
     <string name="dns_proxy_dialog_header_dns">Ajouter un proxy DNS</string>
@@ -599,7 +594,10 @@
     <string name="rules_load_failure_reload">recharger</string>
     <string name="firewall_rule_block_dns_bypass">DNS contourné</string>
     <string name="firewall_rule_no_rule_desc">Aucune règle de pare-feu ne s’applique à cette connexion.</string>
-    <string name="ci_header">Règles IP &amp; port: %1$s</string>
+    <string name="cd_sample_unicode_valid">✅</string>
+    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
+    <string name="ci_header">Règles IP &amp; port : %1$s</string>
+    <string name="ci_blocked_txt">Bloquée</string>
     <string name="rt_download_start">Téléchargement des listes de blocage…</string>
     <string name="bsrf_sub_group_heading">Sous-groupe</string>
     <string name="brbs_title">Sauvegarde &amp; restauration</string>
@@ -698,7 +696,7 @@
     <string name="contributors_dialog_title">Auteurs</string>
     <string name="settings_notification_dialog_title">Choisir l’action de notification</string>
     <string name="firewall_status_block_unmetered">bloqué sur les réseaux sans abonnement (Wi-Fi)</string>
-    <string name="ada_noapp_dialog_message">Les informations sur l’application spécifiée sont introuvables.</string>
+    <string name="ada_noapp_dialog_message">Les informations sur l’application sont introuvables. Peut-être qu\'elle a été désinstallée \?</string>
     <string name="univ_ip_delete_individual_toast">%1$s supprimé.</string>
     <string name="fapps_filter_clear_btn">Effacer</string>
     <string name="fapps_metered_block_dialog_title">Bloquer sur réseau avec abonnement</string>
@@ -737,9 +735,9 @@
     <string name="notif_channel_download">Alertes de téléchargement</string>
     <string name="cd_no_rule_txt">Aucune règle</string>
     <string name="ci_dialog_edittext_hint">Adresse IP, sous-réseau ou port</string>
-    <string name="ci_no_rule">aucune règle</string>
+    <string name="ci_no_rule">Aucune règle</string>
     <string name="ada_app_status_allow">est autorisée</string>
-    <string name="ada_app_status_isolate">est confinée</string>
+    <string name="ada_app_status_isolate">est confinée ; seules les IP de confiance sont autorisées</string>
     <string name="rt_dialog_neutral">Continuer</string>
     <string name="lbbs_search">Recherche de domaines dans les listes de blocage</string>
     <string name="lbbs_update_check">Vérifier MàJ</string>
@@ -751,7 +749,7 @@
     <string name="firewall_act_network_monitor_tab">Journaux du réseau</string>
     <string name="dns_crypt_url_remove_success">Résolveur DNSCrypt supprimé.</string>
     <string name="local_blocklist_download">Télécharger les listes de blocage</string>
-    <string name="whats_dialog_title">Quoi de neuf dans la v053l</string>
+    <string name="whats_dialog_title">Quoi de neuf dans la v053n</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_stop_dialog_neutral">Changer de DNS</string>
@@ -783,7 +781,8 @@
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="firewall_rule_block_univ_ip">IP / Port (Global)</string>
     <string name="ada_firewall_title">règles de pare-feu pour cette appli</string>
-    <string name="ada_app_isolate">Confinement</string>
+    <string name="ada_app_isolate">Confiner</string>
+    <string name="rt_filter_parent_all">Toutes</string>
     <string name="rt_filter_parent_selected">Sélectionnées</string>
     <string name="rt_filter_hint">Affichage de <u>toutes</u> les listes de blocage</string>
     <string name="private_dns_dialog_heading">Désactiver le DNS privé</string>
@@ -802,4 +801,38 @@
     <string name="ci_trust_initial">EA</string>
     <string name="private_dns_error">Impossible de charger l’écran DNS privé.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s listes de blocage</string>
+    <string name="title_statistics">Stats</string>
+    <string name="settings_locale_heading">Changer la langue</string>
+    <string name="settings_locale_desc">Choisissez votre langue préférée</string>
+    <string name="settings_locale_dialog_title">Choisissez votre langue préférée</string>
+    <string name="settings_locale_dialog_neutral">Aidez-nous à traduire cette application</string>
+    <string name="settings_biometeric_heading">Activer le verrouillage de l\'application</string>
+    <string name="settings_biometric_desc">Sécurisez cette application via l\'écran de verrouillage</string>
+    <string name="hs_biometeric_title">Déverrouillez Rethink</string>
+    <string name="hs_biometeric_desc">Utilisez l\'authentification biométrique pour déverrouiller RethinkDNS</string>
+    <string name="hs_biometeric_failed">L\'authentification biométrique a échoué</string>
+    <string name="fapps_info_unmetered_msg">Autoriser/Bloquer les connexions sur réseau sans abonnement (Wi-Fi).</string>
+    <string name="fapps_info_bypass_msg">Contourner les règles du pare-feu global.</string>
+    <string name="fapps_info_exclude_msg">Exclure à la fois du DNS et du pare-feu.</string>
+    <string name="fapps_info_isolate_msg">Bloquer tout sauf les IP de confiance.</string>
+    <string name="fapps_bypass_block_dialog_title">Exceptions</string>
+    <string name="fapps_unblock_dialog_title">Autoriser</string>
+    <string name="fapps_bypass_block_dialog_message">Contourner les règles du pare-feu global pour les applications <i>listées</i> \?</string>
+    <string name="fapps_unblock_dialog_message">Autoriser les connexions pour les applications <i>listées</i> \?</string>
+    <string name="fapps_exclude_block_dialog_title">Exclure</string>
+    <string name="fapps_info_metered_msg">Autoriser/Bloquer les connexions sur réseau avec abonnement (mobile).</string>
+    <string name="fapps_exclude_block_dialog_message">Exclure du DNS et du pare-feu les applications <i>listées</i> \?</string>
+    <string name="fapps_isolate_block_dialog_message">Confiner les applications <i>listées</i> \?</string>
+    <string name="fapps_isolate_block_dialog_title">Confiner</string>
+    <string name="ci_trust_rule">Faire confiance</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">applications les plus bloquées</string>
+    <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domaines les plus contactés</string>
+    <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">domaines les plus bloqués</string>
+    <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">IP les plus contactées</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Lancer Rethink pour procéder</string>
+    <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">IP les plus bloquées</string>
+    <string name="hs_biometeric_feature_not_supported">L\'authentification biométrique n\'est pas prise en charge ou est désactivée sur cet appareil</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">applications les plus autorisées</string>
+    <string name="hs_biometeric_error">Erreur lors de l\'authentification biométrique</string>
+    <string name="ssv_see_more">tout afficher</string>
 </resources>
