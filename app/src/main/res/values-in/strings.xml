@@ -483,7 +483,6 @@
     <string name="settings_socks5_dialog_hint_password">Kata sandi (tidak wajib)</string>
     <string name="settings_ip_dialog_title">Pilih versi IP</string>
     <string name="hsf_blocklist_chip_text_no_data">Aktifkan RDNS+</string>
-    <string name="univ_firewall_rule_2">Blokir semua aplikasi yang tidak digunakan</string>
     <string name="univ_firewall_rule_2">Blokir aplikasi apapun yang tidak digunakan</string>
     <string name="univ_ip_delete_dialog_negative">Batal</string>
     <string name="dns_proxy_negative_btn">Batal</string>
