@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 RethinkDNS and its authors
+ * Copyright 2022 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,28 +22,30 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoRepository
+import com.celzero.bravedns.database.CustomDomain
+import com.celzero.bravedns.database.CustomDomainRepository
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class ApplicationProvider : ContentProvider() {
+class DomainRuleProvider : ContentProvider() {
 
-    private val appInfoRepository by inject<AppInfoRepository>()
+    private val customDomainRepository by inject<CustomDomainRepository>()
 
     companion object {
-        private const val AUTHORITY = "com.celzero.bravedns.appprovider"
-        private const val URI_APP = "vnd.android.cursor.dir/$AUTHORITY.apps"
+        private const val AUTHORITY = "com.celzero.bravedns.domainrulesprovider"
+        private const val URI_DOMAIN_RULES = "vnd.android.cursor.dir/$AUTHORITY.domainrules"
 
         // apps: Uri.parse("content://$AUTHORITY/apps")
         val uriMatcher =
             UriMatcher(UriMatcher.NO_MATCH).apply {
-                addURI(AUTHORITY, "apps", 1)
-                addURI(AUTHORITY, "apps/#", 2)
+                addURI(AUTHORITY, "domainrules", 1)
+                addURI(AUTHORITY, "domainrules/delete", 2)
             }
 
         private const val RESOLVER_PACKAGE_NAME = "com.celzero.interop"
@@ -59,19 +61,20 @@ class ApplicationProvider : ContentProvider() {
         selection: String?,
         selectionArgs: Array<out String>?,
         sortOrder: String?
-    ): Cursor {
+    ): Cursor? {
         if (!isValidRequest(uri)) {
             Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
-        return appInfoRepository.getAppsCursor()
+
+        return customDomainRepository.getRulesCursor()
     }
 
     override fun getType(uri: Uri): String {
         uriMatcher.match(uri).let {
             return when (it) {
-                1 -> URI_APP
-                2 -> URI_APP
+                1 -> URI_DOMAIN_RULES
+                2 -> URI_DOMAIN_RULES
                 else -> throw IllegalArgumentException("Unknown URI: $uri")
             }
         }
@@ -82,11 +85,9 @@ class ApplicationProvider : ContentProvider() {
             Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
-        val appInfo = AppInfo().fromContentValues(values) ?: return null
+        val customDomain = CustomDomain().fromContentValues(values) ?: return null
 
-        val id = appInfoRepository.cpInsert(appInfo)
-        // update the app info cache
-        CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+        val id = customDomainRepository.cpInsert(customDomain)
         context?.contentResolver?.notifyChange(uri, null)
         return ContentUris.withAppendedId(uri, id)
     }
@@ -96,14 +97,51 @@ class ApplicationProvider : ContentProvider() {
             Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
+
+        if (selection.isNullOrEmpty()) {
+            Log.e(LoggerConstants.LOG_PROVIDER, "invalid selection clause: $selection")
+            throw java.lang.IllegalArgumentException("invalid selection clause: $selection")
+        }
+
         Log.i(
             LoggerConstants.LOG_PROVIDER,
             "request to delete app, parameters $uri, $selection, $selectionArgs"
         )
-        val id = ContentUris.parseId(uri).toInt()
-        val count = appInfoRepository.cpDelete(id)
+
+        val domain =
+            if (selection.contains("domain")) {
+                selectionArgs?.get(0)
+            } else {
+                null
+            }
+
+        if (domain.isNullOrEmpty()) {
+            Log.e(
+                LoggerConstants.LOG_PROVIDER,
+                "required domain name on selection clause: $selection"
+            )
+            throw java.lang.IllegalArgumentException(
+                "required domain name on selection clause: $selection"
+            )
+        }
+
+        val uid =
+            if (selection.contains("uid")) {
+                selectionArgs?.get(1)?.toInt()
+            } else {
+                Log.e(
+                    LoggerConstants.LOG_PROVIDER,
+                    "required domain name on selection clause: $selection"
+                )
+                throw java.lang.IllegalArgumentException(
+                    "required domain name on selection clause: $selection"
+                )
+            }
+                ?: Constants.UID_EVERYBODY
+
+        val count = customDomainRepository.cpDelete(domain, uid)
         // update the app info cache
-        CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+        CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.load() }
         context?.contentResolver?.notifyChange(uri, null)
         return count
     }
@@ -120,10 +158,10 @@ class ApplicationProvider : ContentProvider() {
         }
 
         val context = context ?: return 0
-        val appInfo = AppInfo().fromContentValues(values) ?: return 0
+        val customDomain = CustomDomain().fromContentValues(values) ?: return 0
 
         if (selectionClause.isNullOrEmpty()) {
-            val count = appInfoRepository.cpUpdate(appInfo)
+            val count = customDomainRepository.cpUpdate(customDomain)
             context.contentResolver?.notifyChange(uri, null)
             return count
         } else if (selectionClause.contains("uid") || selectionClause.contains("packageName")) {
@@ -143,9 +181,9 @@ class ApplicationProvider : ContentProvider() {
             }
             Log.d(
                 LoggerConstants.LOG_PROVIDER,
-                "selection ${appInfo.appName}, ${appInfo.uid}, ${appInfo.firewallStatus} clause: $clause"
+                "selection ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status} clause: $clause"
             )
-            val count = appInfoRepository.cpUpdate(appInfo, clause)
+            val count = customDomainRepository.cpUpdate(customDomain, clause)
             // update the app info cache
             CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
             context.contentResolver?.notifyChange(uri, null)

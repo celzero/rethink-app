@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import android.content.ContentValues
 import android.os.SystemClock
 import androidx.room.Entity
 import com.celzero.bravedns.service.DomainRulesManager
@@ -40,6 +41,8 @@ class CustomDomain {
     override fun hashCode(): Int {
         return this.domain.hashCode()
     }
+
+    constructor()
 
     constructor(
         domain: String,
@@ -71,5 +74,23 @@ class CustomDomain {
 
     fun isBlocked(): Boolean {
         return this.status == DomainRulesManager.Status.BLOCK.id
+    }
+
+    fun fromContentValues(values: ContentValues?): CustomDomain? {
+        if (values == null) return null
+        val a = values.valueSet()
+        a.forEach {
+            when (it.key) {
+                "domain" -> domain = it.value as String
+                "uid" -> uid == it.value as Int
+                "ips" -> ips = it.value as String
+                "status" -> status = it.value as Int
+                "type" -> type = it.value as Int
+                "modifiedTs" -> modifiedTs = it.value as Long
+                "deletedTs" -> deletedTs = it.value as Long
+                "version" -> version = it.value as Long
+            }
+        }
+        return CustomDomain(domain, uid, ips, status, type, modifiedTs, deletedTs, version)
     }
 }

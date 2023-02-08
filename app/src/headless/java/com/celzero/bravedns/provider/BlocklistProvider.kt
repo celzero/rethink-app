@@ -20,7 +20,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.database.RethinkLocalFileTagRepository
 import com.celzero.bravedns.service.PersistentState
@@ -57,8 +56,6 @@ class BlocklistProvider : ContentProvider() {
 
         private const val STAMP = "stamp"
 
-        private const val BLOCKLIST_TABLE = "RethinkLocalFileTag"
-
         private const val RESOLVER_PACKAGE_NAME = "com.celzero.interop"
     }
 
@@ -73,11 +70,6 @@ class BlocklistProvider : ContentProvider() {
         selectionArgs: Array<out String>?,
         sortOrder: String?
     ): Cursor? {
-        // access the appDatabase directly and create using default SQLiteQueryBuilder
-        // commented out this option in all the methods.
-        // return
-        // appDatabase.query(SupportSQLiteQueryBuilder.builder(BLOCKLIST_TABLE).selection(selection,
-        // selectionArgs).columns(projection).orderBy(sortOrder).create())
         if (!isValidRequest(uri)) {
             Log.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
@@ -136,9 +128,6 @@ class BlocklistProvider : ContentProvider() {
         val localFileTags = RethinkLocalFileTag().fromContentValues(values) ?: return null
         val id = localFileTagRepository.contentInsert(localFileTags)
         context?.contentResolver?.notifyChange(uri, null)
-        // val retId: Long = appDatabase.openHelper.writableDatabase.insert(BLOCKLIST_TABLE, 0,
-        // values)
-        // return ContentUris.withAppendedId(uri, retId)
         return ContentUris.withAppendedId(uri, id)
     }
 
@@ -147,11 +136,6 @@ class BlocklistProvider : ContentProvider() {
             Log.e(LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
-        /*return appDatabase.openHelper.writableDatabase.delete(
-            BLOCKLIST_TABLE,
-            selection,
-            selectionArgs
-        )*/
         Log.i(
             LOG_PROVIDER,
             "request to delete blocklist, parameters $uri, $selection, $selectionArgs"
@@ -162,7 +146,7 @@ class BlocklistProvider : ContentProvider() {
         return count
     }
 
-    override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
+    override fun call(method: String, arg: String?, extras: Bundle?): Bundle {
         val bundle = Bundle()
 
         when (method) {
@@ -195,8 +179,6 @@ class BlocklistProvider : ContentProvider() {
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
 
-        // return appDatabase.openHelper.writableDatabase.update(BLOCKLIST_TABLE, 0, values,
-        // selection, selectionArgs)
         val context = context ?: return 0
         val localFileTags = RethinkLocalFileTag().fromContentValues(values) ?: return 0
         val count = RethinkBlocklistManager.cpSelectFileTag(context, localFileTags)
@@ -218,7 +200,10 @@ class BlocklistProvider : ContentProvider() {
 
         // check the calling package
         if (callingPackage != RESOLVER_PACKAGE_NAME) {
-            Log.e(LOG_PROVIDER, "request received from unknown package: $callingPackage, $RESOLVER_PACKAGE_NAME")
+            Log.e(
+                LOG_PROVIDER,
+                "request received from unknown package: $callingPackage, $RESOLVER_PACKAGE_NAME"
+            )
             return false
         }
 

@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.database
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
@@ -24,9 +25,9 @@ import com.celzero.bravedns.util.Constants
 @Dao
 interface CustomDomainDAO {
 
-    @Update fun update(customDomain: CustomDomain)
+    @Update fun update(customDomain: CustomDomain): Int
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(customDomain: CustomDomain)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(customDomain: CustomDomain): Long
 
     @Delete fun delete(customDomain: CustomDomain)
 
@@ -46,7 +47,16 @@ interface CustomDomainDAO {
     @Query("select count(*) from CustomDomain where uid = :uid")
     fun getAppWiseDomainRulesCount(uid: Int): LiveData<Int>
 
-    @Query("delete from CustomDomain where uid = :uid") fun deleteIpRulesByUid(uid: Int)
+    @Query("delete from CustomDomain where uid = :uid") fun deleteRulesByUid(uid: Int)
+
+    @Query("select * from CustomDomain where status in (1,2) order by modifiedTs desc")
+    fun getRulesCursor(): Cursor
+
+    @Query("delete from CustomDomain where domain = :domain and uid = :uid")
+    fun deleteDomain(domain: String, uid: Int): Int
+
+    @Query("update CustomDomain set status = :status where :clause")
+    fun cpUpdate(status: Int, clause: String): Int
 
     @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

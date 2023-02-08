@@ -18,6 +18,7 @@ package com.celzero.bravedns
 import android.content.ContentResolver
 import com.celzero.bravedns.data.DataModule
 import com.celzero.bravedns.database.DatabaseModule
+import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.service.ServiceModule
 import com.celzero.bravedns.util.OrbotHelper
 import org.koin.android.ext.koin.androidContext
@@ -32,6 +33,10 @@ private val orbotHelperModule = module {
     single { OrbotHelper(androidContext(), get(), get()) }
 }
 
+private val schedulerModule = module {
+    single { ScheduleManager(androidContext()) }
+}
+
 val AppModules: List<Module> by lazy {
     mutableListOf<Module>().apply {
         add(RootModule)
@@ -39,5 +44,6 @@ val AppModules: List<Module> by lazy {
         addAll(DataModule.modules)
         addAll(ServiceModule.modules)
         add(orbotHelperModule)
+        add(schedulerModule)
     }
 }

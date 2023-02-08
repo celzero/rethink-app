@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.celzero.bravedns">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <permission
         android:name="com.celzero.bravedns.contentprovider.READ_WRITE"
@@ -20,11 +19,19 @@
         <provider
             android:name=".provider.ApplicationProvider"
             android:authorities="com.celzero.bravedns.appprovider"
+            android:enabled="true"
             android:exported="true"
             android:permission="com.celzero.bravedns.contentprovider.READ_WRITE" />
         <provider
             android:name=".provider.BlocklistProvider"
             android:authorities="com.celzero.bravedns.blocklistprovider"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.celzero.bravedns.contentprovider.READ_WRITE" />
+        <provider
+            android:name=".provider.DomainRuleProvider"
+            android:authorities="com.celzero.bravedns.domainrulesprovider"
+            android:enabled="true"
             android:exported="true"
             android:permission="com.celzero.bravedns.contentprovider.READ_WRITE" />
     </application>
