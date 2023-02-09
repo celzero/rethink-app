@@ -32,9 +32,9 @@ jobs:
     needs: evaluateChanges
     if: needs.evaluateChanges.outputs.SHOULD_BUILD == 'true'
     env:
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-      SCHEDULED_BUILD_VARIANT: ${{ secrets.SCHEDULED_BUILD_VARIANT }}
+      SCHEDULED_BUILD_VARIANT: ${{ vars.SCHEDULED_BUILD_VARIANT }}
     steps:
       - uses: actions/checkout@v3
         with:
