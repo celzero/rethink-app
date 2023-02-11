@@ -133,7 +133,6 @@
     <string name="dns_firewall_mode_info_explanation_new">上面所有功能加埋繞過互聯網審查。</string>
     <string name="wireguard_mode_info_explanation_new">就嚟推出。</string>
     <string name="alert_permission_accessibility">權限 - 無障礙設定</string>
-    <string name="alert_permission_accessibility_regrant">要做嘢</string>
     <string name="alert_firewall_accessibility_explanation">RethinkDNS 用咗無障礙服務嚟追蹤你用緊嘅 app（前景）同唔係用緊嘅 app（背景）。
 \n
 \nRethinkDNS 並唔會收集任何資料，同埋唔會以任何方式監視您。</string>
@@ -236,7 +235,6 @@
     <string name="settings_socks5_vpn_disabled_error">啓動 RethinkDNS 以繼續。</string>
     <string name="settings_orbot_disabled_error">熄咗 HTTP(S) 同埋／或者 SOCKS5 代理以繼續設定 Tor 代理。</string>
     <string name="settings_https_disabled_error">連線咗去 Orbot 。請閂咗佢先。</string>
-    <string name="settings_orbot_notification_heading">要做嘢</string>
     <string name="settings_orbot_notification_content">啓動唔到 Tor 代理。請手動開啓 Orbot 程式。</string>
     <string name="settings_orbot_notification_action">打開 Orbot</string>
     <string name="settings_general_header">一般設定</string>
@@ -525,7 +523,6 @@
     <string name="settings_local_blocklist_in_use">用緊 %1$s 份攔截清單</string>
     <string name="settings_local_blocklist_dialog_positive">下載</string>
     <string name="settings_local_blocklist_version">版本：v%1$s</string>
-    <string name="accessibility_notification_title">要做嘢</string>
     <string name="accessibility_notification_content">RethinkDNS 嘅無障礙服務停咗或者 hang 咗。而家唔再攔截背景應用。㩒一下重新啓用。</string>
     <string name="accessibility_failure_toast">RethinkDNS 嘅無障礙服務停咗或者 hang 咗。而家唔再攔截背景應用。</string>
     <string name="coming_soon_toast">就嚟推出</string>
@@ -556,7 +553,6 @@
     <string name="firewall_rule_global_lockdown">閉關模式</string>
     <string name="new_app_bulk_notification_title">注意</string>
     <string name="new_app_bulk_notification_content">RethinkDNS 攔截咗 %1$s 款新應用程式。㩒一下睇下或者更改。</string>
-    <string name="new_app_notification_title">要做嘢</string>
     <string name="new_app_notification_content">RethinkDNS 攔截咗新安裝嘅應用程式，%1$s。</string>
     <string name="new_app_notification_action_deny">繼續攔截</string>
     <string name="notif_dialog_pause_dialog_positive">恢復</string>
@@ -619,7 +615,6 @@
     <string name="bsac_distrust">唔信任</string>
     <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
     <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
-    <string name="bsdl_domain_heading">網域規則</string>
     <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
     <string name="bsac_trust_toast">信任呢個 app 嘅 %1$s</string>
     <string name="bsdl_blocked_desc">由 %2$s 攔截咗 %1$s</string>

@@ -30,7 +30,6 @@
     <string name="firewall_mode_info_title">Zapora</string>
     <string name="dns_firewall_mode_info_explanation_new">Powyższe + omijanie cenzury Internetu.</string>
     <string name="wireguard_mode_info_explanation_new">Dostępne wkrótce.</string>
-    <string name="alert_permission_accessibility_regrant">Działanie Konieczne</string>
     <string name="pause_title_desc">chwila przerwy…</string>
     <string name="settings_title_desc">Wysoce konfigurowalny DNS i Zapora sieciowa</string>
     <string name="about_title_desc">Wykrywaj i blokuj zagrożenia bezpieczeństwa sieci</string>
@@ -85,13 +84,11 @@
     <string name="notification_action_dns_mode">DNS</string>
     <string name="always_on_dialog_positive_btn">Przejdź do ustawień</string>
     <string name="always_on_dialog_heading">Wyłączenie zawsze włączonej sieci VPN</string>
-    <string name="always_on_dialog_negative_btn">Anuluj</string>
     <string name="always_on_dialog_stop_heading">Zawsze włączona sieć VPN</string>
     <string name="private_dns_dialog_heading">Wyłącz prywatny DNS</string>
     <string name="private_dns_dialog_desc">Ustawienia DNS Rethink są nadrzędne w stosunku do prywatnych DNS Androida.
 \n
 \nAby użyć DNS Rethink przejdź do Ustawień Androida i wyłącz \"Prywatny DNS\".</string>
-    <string name="private_dns_dialog_negative">Odrzuć</string>
     <string name="doh_custom_url_remove_success">Punkt końcowy usunięty.</string>
     <string name="dns_crypt_url_remove_dialog_message">Usuń resolver DNSCrypt z zapisanej konfiguracji.</string>
     <string name="doh_custom_url_remove_dialog_message">Usuń punkt końcowy DNS over Https z zapisanej konfiguracji.</string>
@@ -99,12 +96,10 @@
     <string name="dns_crypt_custom_url_remove_dialog_title">Usunąć resolver DNSCrypt\?</string>
     <string name="dns_crypt_relay_remove_success">DNSCrypt Relay usunięty.</string>
     <string name="always_on_dialog_positive">Stop</string>
-    <string name="always_on_dialog_negative">Anuluj</string>
     <string name="univ_firewall_dialog_title">Usunąć regułę IP\?</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt resolver usunięty.</string>
     <string name="brbs_restore_no_uri_toast">Przywracanie nie powiodło się; spróbuj ponownie</string>
     <string name="title_statistics">Statystyki</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="slide_2_title">Witaj</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
@@ -134,7 +129,6 @@
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Uruchom Rethink, aby kontynuować</string>
     <string name="ssv_see_more">pokaż wszystko</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="txt_home">Strona główna</string>
     <string name="settings_allow_bypass_heading">Pozwól na obejście</string>
 </resources>

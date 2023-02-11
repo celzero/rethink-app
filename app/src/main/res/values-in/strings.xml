@@ -100,7 +100,6 @@
     <string name="status_dns_server_down">server dns tidak berfungsi</string>
     <string name="status_app_error">kesalahan aplikasi</string>
     <string name="dns_firewall_mode_info_explanation_new">Semua di pilihan atas + lewati sensor internet.</string>
-    <string name="alert_permission_accessibility_regrant">Perlu tindakan</string>
     <string name="conn_track_clear_logs_message">Hanya menghapus riwayat catatan jaringan, tidak dengan aturan-aturan firewall. Tindakan ini tidak dapat dibatalkan. Apakah Anda ingin melanjutkan\?</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">tidak terlindungi</string>
     <string name="about_website">Kunjungi rethinkdns.com</string>
@@ -249,7 +248,6 @@
     <string name="doh_custom_url_remove_dialog_title">Hapus titik-akhir DoH\?</string>
     <string name="orbot_none">Tidak ada (bawaan)</string>
     <string name="settings_theme_desc">Tema gelap/terang</string>
-    <string name="ct_filter_parent_blocked">Diblokir</string>
     <string name="dns_crypt_relay_remove_success">Jembatan Penghubung (Relay) DNSCrypt telah terhapus.</string>
     <string name="cd_dns_proxy_error_text_1">Alamat IP tidak valid</string>
     <string name="cd_dns_crypt_relay_heading">Jembatan Penghubung</string>
@@ -274,7 +272,6 @@
     <string name="rt_dialog_message">Apakah Anda ingin menerapkan daftar-daftar blokir yang baru saja diatur\?</string>
     <string name="settings_allow_bypass_heading">Izinkan Pintasan (Bypass)</string>
     <string name="firewall_status_blocked">terblokir</string>
-    <string name="ct_filter_parent_allowed">Diizinkan</string>
     <string name="dns_filter_parent_blocked">Diblokir</string>
     <string name="univ_ip_delete_toast_success">Hapus semua aturan IP.</string>
     <string name="univ_accessibility_crash_dialog_positive">Masuk ke Pengaturan</string>
@@ -339,7 +336,6 @@
     <string name="slide_2_desc">RethinkDNS adalah cara termudah untuk memantau aktivitas jaringan, melewati penyensoran jaringan, dan mem-firewall aplikasi-aplikasi di perangkat Anda.</string>
     <string name="settings_dns_proxy_dialog_username">Nama pengguna</string>
     <string name="settings_ip_text_ipv46">Otomatis</string>
-    <string name="dns_btm_sheet_chip_blocked">Diblokir</string>
     <string name="dns_btm_sheet_chip_no_answer">Tidak Ada Jawaban</string>
     <string name="hs_download_negative_default">Ingatkan saya nanti</string>
     <string name="univ_firewall_rule_10">Blokir semua kecuali aplikasi dan IP yang dipintaskan (di-bypass)</string>
@@ -428,14 +424,12 @@
     <string name="settings_http_proxy_desc">Meneruskan ke %1$s:%2$s</string>
     <string name="about_connect">kontak</string>
     <string name="cd_dns_proxy_mode_internal">Internal</string>
-    <string name="accessibility_notification_title">Butuh Tindakan</string>
     <string name="settings_https_heading">Atur Proksi HTTP(S)</string>
     <string name="settings_http_proxy_toast_success">Proksi HTTP telah diatur</string>
     <string name="dc_dns_proxy">Proksi DNS</string>
     <string name="cd_dnscrypt_relay_heading">Jembatan-jembatan penghubung</string>
     <string name="notif_dialog_pause_dialog_positive">Lanjutkan</string>
     <string name="firewall_rule_block_http">HTTP tidak aman</string>
-    <string name="new_app_notification_title">Butuh Tindakan</string>
     <string name="firewall_rule_block_ip">IP / Port (Aplikasi)</string>
     <string name="ada_noapp_dialog_title">Tidak ada aplikasi yang dimaksud</string>
     <string name="ci_dialog_title">Menambah Aturan IP / Port</string>
@@ -467,7 +461,6 @@
     <string name="ctbs_dialog_negative_btn">Kembali</string>
     <string name="fapps_filter_parent_system">Sistem</string>
     <string name="rules_load_failure_heading">Catatan</string>
-    <string name="settings_orbot_notification_heading">Butuh tindakan</string>
     <string name="orbot_bs_status_2">Proksi HTTP telah diatur (aplikasi mungkin mengabaikannya).</string>
     <string name="status_protected_with_proxy_private_dns">terproteksi dengan proksi &amp; dns pribadi</string>
     <string name="fapps_filter_clear_btn">Kosongkan</string>
@@ -484,7 +477,6 @@
     <string name="settings_ip_dialog_title">Pilih versi IP</string>
     <string name="hsf_blocklist_chip_text_no_data">Aktifkan RDNS+</string>
     <string name="univ_firewall_rule_2">Blokir aplikasi apapun yang tidak digunakan</string>
-    <string name="univ_ip_delete_dialog_negative">Batal</string>
     <string name="dns_proxy_negative_btn">Batal</string>
     <string name="ci_block">Blokir</string>
     <string name="ci_delete">hapus</string>

@@ -41,7 +41,6 @@
     <string name="settings_socks5_disabled_error">Verbonden met Orbot. Zet het uit om verder te gaan.</string>
     <string name="settings_import_export_heading">Back-up &amp; Herstel</string>
     <string name="settings_https_disabled_error">Verbonden met Orbot. Zet het uit om verder te gaan.</string>
-    <string name="settings_orbot_notification_heading">Vereiste actie</string>
     <string name="settings_autostart_bootup_desc">Start RethinkDNS bij het opstarten van het apparaat als het actief was voor het afsluiten.</string>
     <string name="settings_autostart_bootup_heading">Auto-start bij opstarten (experimenteel)</string>
     <string name="settings_all_networks_dialog_message">Indien ingeschakeld, worden app firewall regels voor gemeten (bijv. Mobiel) en niet gemeten (bijv. WiFi) niet gehonoreerd.
@@ -126,7 +125,6 @@
     <string name="firewall_mode_info_title">Firewall</string>
     <string name="firewall_mode_info_explanation_new">Controleer netwerkactiviteit en firewall elke app of IP-adres.</string>
     <string name="apps_info_title">Applicaties</string>
-    <string name="alert_permission_accessibility_regrant">Vereiste actie</string>
     <string name="alert_firewall_accessibility_exception">Storing bij het openen van de Toegankelijkheidsinstellingen. Probeer het later nog eens!</string>
     <string name="default_dns_name">RDNS Standaard</string>
     <string name="custom_url_error_invalid_url">Ongeldige URL</string>
@@ -498,7 +496,6 @@
     <string name="copy_clipboard_label">URL</string>
     <string name="update_complete_action_snack">HERSTARTEN</string>
     <string name="settings_local_blocklist_dialog_positive">Download</string>
-    <string name="accessibility_notification_title">Vereiste actie</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="firewall_rule_block_app_new_install">Nieuwe app</string>
     <string name="firewall_rule_block_app_exception">Fout</string>

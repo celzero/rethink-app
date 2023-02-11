@@ -131,7 +131,6 @@
     <string name="dc_local_block_enabled">Etkin</string>
     <string name="lbbs_download">Blok listelerini güncelleme</string>
     <string name="brbs_backup_dialog_positive">Yedekle</string>
-    <string name="alert_permission_accessibility_regrant">Eylem Gerekli</string>
     <string name="bsct_app_info">Uygulama Bilgisi</string>
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">Güvenlik Duvarı</string>
@@ -324,7 +323,6 @@
     <string name="fapps_firewall_filter_hint">Listelenen uygulamalara ölçülmemiş / ölçülmüş kurallar uygulayın</string>
     <string name="system_dns_connection_failure">Geçerli DNS sunucusu belirlenemiyor</string>
     <string name="copy_clipboard_label">Adres</string>
-    <string name="accessibility_notification_title">Eylem Gerekli</string>
     <string name="new_app_bulk_notification_content">RethinkDNS %1$s yeni uygulamaları engelledi. Görüntülemek veya değiştirmek için dokunun.</string>
     <string name="notif_channel_desc_proxy_failure">Proxy hataları ve anomalileri hakkında uyarı</string>
     <string name="rt_download_desc">Bu özelliği kullanmak için blok listelerini (yaklaşık 60MB) indirin.</string>
@@ -378,7 +376,6 @@
     <string name="dns_connected_no_count">Bağlandı</string>
     <string name="fapps_filter_parent_system">Sistem</string>
     <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s uygulamaları gösteriliyor</string>
-    <string name="new_app_notification_title">Eylem Gerekli</string>
     <string name="notif_channel_vpn_notification">Aktif VPN</string>
     <string name="category_name_sys_apps">Sistem Uygulamaları</string>
     <string name="cd_dialog_header">Özel alan(lar): %1$s</string>
@@ -477,7 +474,6 @@
     <string name="connection_http3">HTTP3</string>
     <string name="settings_lock_down_mode_desc">VPN kilitleme modunda çalışırken bypass\'a izin verilemez veya proxy\'ler kurulamaz. <u>VPN ayarlarına gidin</u>.</string>
     <string name="orbot_stop_dialog_message">RethinkDNS, bağlantıları Orbot\'a yönlendirmeyi durdurdu, ancak Orbot arka planda çalışıyor olabilir.</string>
-    <string name="settings_orbot_notification_heading">Yapılması gerekenler</string>
     <string name="settings_dns_proxy_dialog_port_number">Liman Numarası</string>
     <string name="settings_dns_proxy_dialog_positive_btn">set</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (deneysel)</string>

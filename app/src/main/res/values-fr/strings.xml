@@ -86,7 +86,6 @@
     <string name="bsct_app_info">Infos sur l’appli</string>
     <string name="bsct_conn_desc_allowed">autorisée sur %1$s %2$s</string>
     <string name="firewall_mode_info_explanation_new">Surveillez l’activité du réseau et mettez en place un pare-feu pour toute application ou adresse IP.</string>
-    <string name="alert_permission_accessibility_regrant">Action requise</string>
     <string name="status_dns_error">erreur DNS</string>
     <string name="hybrid_mode_info_title">DNS + Pare-feu</string>
     <string name="dns_mode_notification_title">Protégé ! Connecté via un DNS rapide et sécurisé.</string>
@@ -143,7 +142,6 @@
     <string name="settings_socks_forwarding_default_desc">Transférer les connexions vers le point de terminaison SOCKS5.</string>
     <string name="settings_orbot_desc">Orbot en mode non-vpn avec HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc">Appuyer ici pour installer Orbot</string>
-    <string name="settings_orbot_notification_heading">Action requise</string>
     <string name="settings_orbot_notification_action">Ouvrir Orbot</string>
     <string name="settings_socks5_disabled_error">Connecté via Orbot. Désactivez-le pour continuer.</string>
     <string name="settings_socks5_vpn_disabled_error">Lancez RethinkDNS pour continuer.</string>
@@ -476,7 +474,6 @@
     <string name="ada_app_status_block_md">est bloquées sur les réseaux avec abonnement (mobile)</string>
     <string name="pause_desc">Remarque : %1$s applications bloquées continueront à être bloquées par le pare-feu.</string>
     <string name="firewall_rule_unknown">Source inconnue</string>
-    <string name="new_app_notification_title">Action requise</string>
     <string name="category_name_sys_apps">Applications système</string>
     <string name="ada_firewall_status">Cette application <b><i>%1$s</i></b>.</string>
     <string name="bsac_trust_toast">Ajout d’une exception pour l’IP %1$s</string>
@@ -582,7 +579,6 @@
     <string name="vpn_profile_error">Impossible de lancer le profil VPN.</string>
     <string name="cd_doh_dialog_heading">Ajouter un résolveur DNS over HTTPS</string>
     <string name="dns_btm_sheet_chip">+%1$s Autres IP</string>
-    <string name="dns_btm_sheet_chip_blocked">Bloquées</string>
     <string name="univ_ip_delete_toast_success">Suppression de toutes les règles IP.</string>
     <string name="univ_delete_firewall_dialog_title">Supprimer toutes les règles IP \?</string>
     <string name="dns_proxy_dialog_header_dns">Ajouter un proxy DNS</string>
@@ -594,10 +590,8 @@
     <string name="rules_load_failure_reload">recharger</string>
     <string name="firewall_rule_block_dns_bypass">DNS contourné</string>
     <string name="firewall_rule_no_rule_desc">Aucune règle de pare-feu ne s’applique à cette connexion.</string>
-    <string name="cd_sample_unicode_valid">✅</string>
     <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ci_header">Règles IP &amp; port : %1$s</string>
-    <string name="ci_blocked_txt">Bloquée</string>
     <string name="rt_download_start">Téléchargement des listes de blocage…</string>
     <string name="bsrf_sub_group_heading">Sous-groupe</string>
     <string name="brbs_title">Sauvegarde &amp; restauration</string>
@@ -645,7 +639,6 @@
     <string name="ada_app_unmetered">Sans abonnement</string>
     <string name="rules_load_failure_desc">Aucune règle de pare-feu trouvée</string>
     <string name="copy_clipboard_label">URL</string>
-    <string name="accessibility_notification_title">Action requise</string>
     <string name="other_dns_list_tab3">Proxy DNS</string>
     <string name="firewall_rule_block_app_exception">Erreur</string>
     <string name="firewall_rule_block_ip">IP / Port (Appli)</string>
@@ -782,7 +775,6 @@
     <string name="firewall_rule_block_univ_ip">IP / Port (Global)</string>
     <string name="ada_firewall_title">règles de pare-feu pour cette appli</string>
     <string name="ada_app_isolate">Confiner</string>
-    <string name="rt_filter_parent_all">Toutes</string>
     <string name="rt_filter_parent_selected">Sélectionnées</string>
     <string name="rt_filter_hint">Affichage de <u>toutes</u> les listes de blocage</string>
     <string name="private_dns_dialog_heading">Désactiver le DNS privé</string>

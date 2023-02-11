@@ -28,7 +28,6 @@
     <string name="dns_firewall_mode_info_explanation_new">Para além dos dois anteriores (DNS e Firewall), contornar também a censura da Internet.</string>
     <string name="alert_permission_accessibility">Permissão - Acessibilidade</string>
     <string name="wireguard_mode_info_explanation_new">Brevemente.</string>
-    <string name="alert_permission_accessibility_regrant">Ação requerida</string>
     <string name="alert_firewall_accessibility_explanation">O RethinkDNS utiliza o serviço de acessibilidade para rastrear as aplicações estão a ser utilizadas (primeiro plano) e diferenciar as que não estão em utilização (segundo plano).
 \n
 \nO RethinkDNS não recolhe nenhuma informação sua nem o vigia.</string>
@@ -268,7 +267,6 @@
     <string name="title_about">Sobre</string>
     <string name="orbot_bs_status_trying_connect">A configurar o Orbot…</string>
     <string name="orbot_install_dialog_title">Instalar o Orbot\?</string>
-    <string name="settings_orbot_notification_heading">Ação necessária</string>
     <string name="settings_network_all_networks_desc">Quando ativado, o RethinkDNS utiliza todas as redes disponíveis para se ligar à Internet. Caso contrário, utiliza a rede que estiver <i>ativada</i> pelo Android.</string>
     <string name="settings_import_export_desc">Faça cópias de segurança ou restaure os dados e configurações da aplicação.</string>
     <string name="settings_title_desc">Um DNS e Firewall altamente personalizável</string>
@@ -488,7 +486,6 @@
     <string name="univ_accessibility_dialog_negative">Negar</string>
     <string name="univ_delete_firewall_dialog_message">Ao eliminar estas regras irá permitir que qualquer aplicação se conecte aos IPs atualmente bloqueados.</string>
     <string name="network_log_app_name_unnamed">Sem nome (%1$s)</string>
-    <string name="accessibility_notification_title">Ação requerida</string>
     <string name="dns_connected_rethink_plus">Conectado. %1$s listas de bloqueio usadas</string>
     <string name="dns_info_neutral">Copiar</string>
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede limitada (móvel) para aplicações <i>na lista</i>\?</string>
@@ -653,7 +650,6 @@
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta conexão foi permitida porque a configuração do <i>Tor-como-proxy com um clique</i> via Orbot estava a decorrer.</string>
     <string name="new_app_bulk_notification_title">Atenção</string>
     <string name="new_app_bulk_notification_content">RethinkDNS bloqueou %1$s novas aplicações. Toque para visualizar ou alterar.</string>
-    <string name="new_app_notification_title">Ação requerida</string>
     <string name="new_app_notification_content">RethinkDNS bloqueou a aplicação instalada recentemente: %1$s.</string>
     <string name="new_app_notification_action_deny">Continuar a bloquear</string>
     <string name="new_app_notification_action_toast_deny">Conexão de rede negada para a aplicação</string>
