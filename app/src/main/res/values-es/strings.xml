@@ -30,7 +30,6 @@
     <string name="cd_dns_crypt_dialog_desc">Descripción (opcional)</string>
     <string name="cd_dns_crypt_relay_name">Repetidor DNS %1$s</string>
     <string name="cd_dnscrypt_relay_heading">Repetidores</string>
-    <string name="dns_filter_parent_allowed">Permitidas</string>
     <string name="univ_ip_delete_toast_success">Se han borrado todas las reglas IP.</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="dns_proxy_dialog_message_no_app">Dirección IP: %1$s
@@ -108,8 +107,8 @@
 \n
 \nRethinkDNS no recoge ninguna información ni te espía de ninguna manera.</string>
     <string name="dc_local_block_heading">Listas de bloqueo en el dispositivo</string>
-    <string name="dc_local_block_desc_1">Elija entre más de 185 listas de bloqueo. Pulse aquí para descargar o configurar las listas de bloqueo.</string>
-    <string name="dc_custom_block_heading">Permitir o denegar dominios individuales</string>
+    <string name="dc_local_block_desc_1">Elija entre más de 195 listas de bloqueo. Pulse aquí para descargar o configurar las listas de bloqueo.</string>
+    <string name="dc_custom_block_heading">Reglas de dominio</string>
     <string name="dc_check_update_heading">Aviso sobre las actualizaciones de la lista de bloqueo</string>
     <string name="about_bravedns_whoarewe">RethinkDNS es un proyecto gratuito y de código abierto, dirigido por exingenieros de Amazon, IBM y Scientific Games.</string>
     <string name="about_bravedns_toreport_text">ayuda y comentarios</string>
@@ -192,7 +191,6 @@
     <string name="cd_dns_crypt_error_text_1">El sello no puede estar vacío</string>
     <string name="ct_delete_logs_positive_btn">Borrar registros</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_filter_parent_blocked">Bloqueadas</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s otra(s) aplicación(es)</string>
     <string name="ctbs_app_info_not_available_toast">No se encontró la página de configuración de la aplicación</string>
@@ -322,11 +320,7 @@
     <string name="build__flavor_play_store">Play</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_toast_deleted">Dominio eliminado de la lista personalizada</string>
-    <string name="cd_dialog_header">Dominio(s) personalizado(s)</string>
-    <string name="cd_add_dialog_show_btn">mostrar</string>
-    <string name="cd_add_dialog_sample_2">%1$s https://%2$s.%3$s
-\n</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
+    <string name="cd_dialog_header">Reglas de dominio: %1$s</string>
     <string name="cd_filter_allowed">Permitidas</string>
     <string name="ci_dialog_title">Añadir regla de IP/puerto</string>
     <string name="ci_no_rule_initial">N</string>
@@ -363,9 +357,7 @@
     <string name="rt_download_start">Descargando las listas de bloqueo…</string>
     <string name="rt_download">Descargar listas de bloqueo</string>
     <string name="rt_chip_update_available">Actualización disponible</string>
-    <string name="rt_filter_parent_all">Todas</string>
     <string name="rt_filter_parent_selected">Seleccionadas</string>
-    <string name="rt_apply_btn">Aplicar</string>
     <string name="rt_filter_hint">Mostrando <u>todas</u> las listas de bloqueo</string>
     <string name="rt_filter_desc">Mostrando listas de bloqueo <u>%1$s</u></string>
     <string name="rt_download_desc">Descargue las listas de bloqueo (alrededor de 60MB) para utilizar esta función.</string>
@@ -382,7 +374,7 @@
     <string name="lbbs_update_check">Buscar actualizaciones</string>
     <string name="lbbs_redownload">Volver a descargar las listas de bloqueo</string>
     <string name="brbs_backup_title">Respaldo</string>
-    <string name="lbbs_heading">Configurar más de 185 listas de bloqueo</string>
+    <string name="lbbs_heading">Configurar más de 195 listas de bloqueo</string>
     <string name="brbs_restore_title">Restaurar</string>
     <string name="brbs_restore_desc">Restaurar desde un archivo de copia de seguridad</string>
     <string name="brbs_backup_desc">Copia de seguridad de la configuración de la aplicación, la red y los registros dns</string>
@@ -507,7 +499,7 @@
     <string name="dc_dns_website_heading">Mostrar el icono del sitio web en los registros de DNS (en pruebas)</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_entries">%1$s entradas »</string>
-    <string name="dc_custom_block_desc">Próximamente</string>
+    <string name="dc_custom_block_desc">Modificar reglas de dominios bloqueados o de confianza</string>
     <string name="dc_dns_leaks_heading">Evitar las fugas de DNS</string>
     <string name="dc_check_update_desc">Comprueba las actualizaciones de la lista de bloqueo una vez cada <i>tres</i> días</string>
     <string name="about_join_telegram">Telegram</string>
@@ -559,7 +551,6 @@
     <string name="dns_proxy_positive_btn">Añadir</string>
     <string name="fapps_filter_filter_heading">Tipo</string>
     <string name="fapps_filter_categories_heading">Categorías</string>
-    <string name="fapps_firewall_filter_allowed">Permitidas</string>
     <string name="orbot_toast_parameter">Tor-como-un-proxy</string>
     <string name="firewall_rule_block_unmetered">Sin límites (WiFi)</string>
     <string name="firewall_rule_univ_block_metered">Con límites (Universal)</string>
@@ -838,4 +829,22 @@
     <string name="hs_biometeric_feature_not_supported">La autenticación biométrica no es compatible o está desactivada en este dispositivo</string>
     <string name="fapps_unblock_dialog_message">¿Permitir conexiones para las aplicaciones en la <i>lista</i>\?</string>
     <string name="fapps_isolate_block_dialog_message">¿Aislar las aplicaciones de la <i>lista</i>\?</string>
+    <string name="lbl_apply" translatable="true">Aplicar</string>
+    <string name="lbl_all" translatable="true">Todos</string>
+    <string name="lbl_disabled" translatable="true">Desactivado</string>
+    <string name="lbl_domain" translatable="true">Dominio</string>
+    <string name="lbl_wildcard" translatable="true">Comodín</string>
+    <string name="lbl_action_required" translatable="true">Acción requerida</string>
+    <string name="lbl_ip_rules" translatable="true">Reglas IP</string>
+    <string name="lbl_domain_rules" translatable="true">Reglas del dominio</string>
+    <string name="lbl_dismiss" translatable="true">Salir</string>
+    <string name="lbl_allowed" translatable="true">Permitidas</string>
+    <string name="lbl_cancel" translatable="true">Cancelar</string>
+    <string name="lbl_blocked" translatable="true">Bloqueadas</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Dominio (App)</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Una regla de cortafuegos establecida por el usuario bloqueaba el <i>dominio</i>.<br/><br/> Para cambiarla, vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.</string>
+    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar en <u>este dominio</u></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Esta conexión se permitió porque el <i>dominio</i> está configurado como Dominio de confianza.<br/><br/> Para cambiarlo, vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.</string>
+    <string name="cd_no_rules_text" translatable="true">No se han encontrado reglas de dominio.</string>
+    <string name="firewall_rule_block_domain" translatable="true">Dominio (App)</string>
 </resources>
