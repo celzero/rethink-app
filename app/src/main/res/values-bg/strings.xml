@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RethinkDNS</string>
-    <string name="app_name_rethink">Rethink</string>
     <string name="settings_title_desc">DNS и Firewall с много възможности за персонализиране</string>
     <string name="accessibility_service_description">RethinkDNS използва услугата за достъпност при засичането и блокирането на приложенията на заден план. RethinkDNS не събира или продава никаква информация.</string>
     <string name="slide_2_desc">RethinkDNS е най-лесният начин да наблюдавате мрежовата активност, да заобиколите интернет цензурата и приложенията за защитна стена на вашето устройство с Android.</string>
@@ -20,7 +19,6 @@
     <string name="universal_firewall_explanation">Прилагайте правила за защитна стена за всички приложения въз основа на събития в устройството, например защитна стена, когато устройството е заключено или когато дадено приложение не се използва.</string>
     <string name="notification_action_stop_vpn">STOP</string>
     <string name="firewall_mode_info_title">Защитна стена</string>
-    <string name="alert_permission_accessibility_regrant">Необходими действия</string>
     <string name="firewall_mode_info_explanation_new">Наблюдавайте мрежовата активност и защитната стена за всяко приложение или IP адрес.</string>
     <string name="hybrid_mode_info_title">DNS + защитна стена</string>
     <string name="wireguard_mode_info_explanation_new">Очаквайте скоро…</string>
@@ -34,7 +32,6 @@
     <string name="pause_title_desc">на пауза…</string>
     <string name="about_title_desc">Засичай и блокирай мрежови заплахи</string>
     <string name="txt_home">Начало</string>
-    <string name="accessibility_service_label">RethinkDNS</string>
     <string name="next">След.</string>
     <string name="skip">Пропусни</string>
     <string name="finish">Завърши</string>

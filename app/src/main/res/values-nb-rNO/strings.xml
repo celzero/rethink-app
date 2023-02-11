@@ -45,7 +45,6 @@
     <string name="dns_mode_info_title">DNS</string>
     <string name="apps_info_title">Programmer</string>
     <string name="hybrid_mode_info_title">DNS og brannmur</string>
-    <string name="alert_permission_accessibility_regrant">Handling kreves</string>
     <string name="brave_dns_connect_mode_change_firewall">Velg modus.</string>
     <string name="brave_dns_connect_mode_change_dns">Velg modus.</string>
     <string name="custom_url_error_invalid_url">Ugyldig nettadresse</string>
@@ -92,7 +91,6 @@
     <string name="settings_orbot_heading">Sett opp Orbot</string>
     <string name="settings_orbot_install_desc">Trykk her for å installere Orbot</string>
     <string name="settings_socks5_vpn_disabled_error">Start Rethink for å fortsette.</string>
-    <string name="settings_orbot_notification_heading">Handling kreves</string>
     <string name="settings_orbot_notification_action">Åpne Orbot</string>
     <string name="settings_general_header">Generelt</string>
     <string name="settings_theme_heading">Utseende</string>
@@ -259,7 +257,6 @@
     <string name="status_app_error">Programfeil</string>
     <string name="hsf_network_logs_chip_text">Nettverkslogger</string>
     <string name="dns_proxy_dialog_header_dns">Legg til DNS-mellomtjener</string>
-    <string name="accessibility_notification_title">Handling kreves</string>
     <string name="firewall_rule_unknown">Ukjent kilde</string>
     <string name="firewall_rule_block_http">Usikker HTTP</string>
     <string name="category_name_others">Annet</string>
@@ -534,7 +531,6 @@
     <string name="hs_download_positive_play_store">Fullfør installasjon</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s svarteliste(r)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dc_check_update_heading">Spør om oppdatering av svartelister</string>
-    <string name="new_app_notification_title">Handling kreves</string>
     <string name="settings_selected_theme">Iført drakt: %1$s</string>
     <string name="firewall_status_excluded">utelatt fra DNS og brannmur</string>
     <string name="firewall_status_whitelisted">omgår universelle brannmursregler</string>

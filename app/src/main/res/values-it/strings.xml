@@ -186,7 +186,6 @@
     <string name="settings_socks5_vpn_disabled_error">Avvia RethinkDNS per continuare.</string>
     <string name="settings_orbot_disabled_error">Disattiva il proxy HTTP(S) e/o SOCKS5 per continuare a impostare Tor-come-proxy.</string>
     <string name="settings_https_disabled_error">Connesso a Orbot. Disabilitarlo per continuare.</string>
-    <string name="settings_orbot_notification_heading">Azione richiesta</string>
     <string name="settings_orbot_notification_content">Errore durante l\'avvio di Tor-come-Proxy. Apri l\'app Orbot e avvialo manualmente.</string>
     <string name="settings_orbot_notification_action">Apri Orbot</string>
     <string name="settings_general_header">generali</string>
@@ -233,7 +232,6 @@
     <string name="brave_dns_connect_mode_change_firewall">Scegli la modalità.</string>
     <string name="brave_dns_connect_mode_change_dns">Scegli la modalità.</string>
     <string name="conn_track_clear_logs_message">Ciò eliminerà solo il registro delle connessioni, ma non le regole del firewall. Questa operazione non è reversibile. Vuoi procedere\?</string>
-    <string name="alert_permission_accessibility_regrant">Azione richiesta</string>
     <string name="status_dns_server_down">server dns non raggiungibile</string>
     <string name="status_protected_with_http_private_dns">protetto con proxy http e dns privato</string>
     <string name="status_protected_with_socks5">protetto con proxy socks</string>
@@ -584,7 +582,6 @@
     <string name="settings_local_blocklist_in_use">%1$s liste dei filtri in uso</string>
     <string name="settings_local_blocklist_dialog_positive">Scarica</string>
     <string name="settings_local_blocklist_version">Versione: v%1$s</string>
-    <string name="accessibility_notification_title">Azione richiesta</string>
     <string name="accessibility_notification_content">Il servizio di accessibilità di RethinkDNS si è interrotto. Le app in background non sono più bloccate. Tocca per riattivarlo.</string>
     <string name="accessibility_failure_toast">Il servizio di accessibilità di RethinkDNS si è interrotto. Le app in background non sono più bloccate.</string>
     <string name="coming_soon_toast">presto in arrivo</string>
@@ -637,7 +634,6 @@
     <string name="firewall_rule_global_lockdown_desc">Questa connessione è stata bloccata perché è attivata la quarantena universale.<br/><br/> Per modificare, vai a <i>Regole Universali</i>.</string>
     <string name="new_app_bulk_notification_title">Attenzione</string>
     <string name="new_app_bulk_notification_content">RethinkDNS ha bloccato %1$s nuove applicazioni. Tocca per visualizzare o modificare.</string>
-    <string name="new_app_notification_title">Azione richiesta</string>
     <string name="new_app_notification_content">RethinkDNS ha bloccato l\'app installata di recente, %1$s.</string>
     <string name="new_app_notification_action_deny">Continua a bloccare</string>
     <string name="new_app_notification_action_toast_allow">Consentita all\'app la connessione di rete</string>

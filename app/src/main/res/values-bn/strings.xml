@@ -81,7 +81,6 @@
     <string name="app_mode_dns_firewall">DNS এবং ফায়ারওয়াল (ডিফল্ট)</string>
     <string name="orbot_http">হাইপারটেক্সট ট্রান্সফার প্রটোকল প্রক্সি</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
-    <string name="settings_orbot_notification_heading">অ্যাকশন প্রয়োজন</string>
     <string name="settings_all_networks_dialog_positive_btn">যাইহোক সক্ষম করুন</string>
     <string name="settings_theme_desc">গাঢ়/হালকা থিম</string>
     <string name="settings_http_proxy_dialog_title">কাস্টম সার্ভার URL</string>
@@ -411,7 +410,6 @@
 \n
 \nRethinkDNS অ্যাক্সেসিবিলিটি পরিষেবা ব্যবহার করে কোন অ্যাপগুলি ব্যবহার করা হচ্ছে (ফোরগ্রাউন্ড) বনাম যেগুলি ব্যবহারে নেই (পটভূমিতে) তা ট্র্যাক করতে।</string>
     <string name="alert_firewall_accessibility_exception">অ্যাক্সেসিবিলিটি সেটিংস খোলার ব্যর্থতা৷ পরে আবার চেষ্টা করুন!</string>
-    <string name="alert_permission_accessibility_regrant">অ্যাকশন প্রয়োজন</string>
     <string name="conn_track_clear_logs_title">সমস্ত নেটওয়ার্ক লগ মুছবেন\?</string>
     <string name="http_proxy_dialog_desc">HTTP(S) প্রক্সি সেটিংস শুধুমাত্র অ্যাপ্লিকেশনগুলির জন্য একটি ইঙ্গিত কিন্তু তারা এটি ব্যবহার করতে পারে বা নাও করতে পারে; যাইহোক, ক্রোম এবং ফায়ারফক্সের মত ব্রাউজার এগুলো ব্যবহার করে। HTTP(S) প্রক্সি ব্যবহার করা অ্যাপগুলি ফায়ারওয়াল এবং DNS উভয় নিয়মকে বাইপাস করবে।</string>
     <string name="bsct_conn_desc_blocked">%1$s %2$s এ অবরুদ্ধ</string>
@@ -683,7 +681,6 @@
     <string name="firewall_rule_block_unmetered">মিটারবিহীন (ওয়াইফাই)</string>
     <string name="firewall_rule_block_app_univ_mobile_desc"><i>Metered</i> (মোবাইল) নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ইউনিভার্সাল ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে। ট্যাব</string>
     <string name="firewall_rule_block_udp_ntp_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>UDP</i> সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
-    <string name="new_app_notification_title">অ্যাকশন প্রয়োজন</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="ci_header">আইপি এবং পোর্টের নিয়ম: %1$s</string>
     <string name="ci_delete">মুছে ফেলা</string>
