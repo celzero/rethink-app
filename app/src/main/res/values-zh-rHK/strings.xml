@@ -615,7 +615,6 @@
     <string name="bsac_distrust">唔信任</string>
     <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
     <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
-    <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
     <string name="bsac_trust_toast">信任呢個 app 嘅 %1$s</string>
     <string name="bsdl_blocked_desc">由 %2$s 攔截咗 %1$s</string>
     <string name="network_dns">系統 DNS</string>
@@ -827,4 +826,10 @@
     <string name="fapps_isolate_block_dialog_title">隔離應用程式</string>
     <string name="fapps_isolate_block_dialog_message">係咪要隔離<i>呢度列出嘅</i>應用程式？</string>
     <string name="ci_trust_rule">信任</string>
+    <string name="lbl_dismiss" translatable="true">忽略</string>
+    <string name="lbl_disabled" translatable="true">禁用</string>
+    <string name="lbl_all" translatable="true">全部</string>
+    <string name="lbl_cancel" translatable="true">取消</string>
+    <string name="lbl_allowed" translatable="true">放行</string>
+    <string name="lbl_blocked" translatable="true">攔截</string>
 </resources>

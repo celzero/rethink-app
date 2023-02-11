@@ -51,7 +51,6 @@
     <string name="cd_custom_dns_proxy_name">代理 %1$s</string>
     <string name="cd_dns_proxy_error_text_3">无效端口</string>
     <string name="cd_dns_crypt_dialog_name">名称</string>
-    <string name="dns_btm_sheet_chip_blocked">已拦截</string>
     <string name="univ_firewall_rule_9">拦截于收费网络（移动数据）</string>
     <string name="fapps_unmetered_unblock_dialog_message">是否于非收费网络（ WiFi ）放行<i>所列出的</i>应用？</string>
     <string name="firewall_rule_unknown">未知应用</string>
@@ -134,7 +133,6 @@
     <string name="build__flavor_play_store">play</string>
     <string name="cd_remove_dialog_message">于已保存配置中删除此域名。</string>
     <string name="ada_firewall_status">此应用<b><i>%1$s</i></b>。</string>
-    <string name="bsdl_domain_rule_allow">放行</string>
     <string name="rt_chip_update_available">更新可用</string>
     <string name="rt_chip_check_update">检查更新</string>
     <string name="rt_list_adv_btn_txt">高级</string>
@@ -260,7 +258,7 @@
     <string name="settings_socks_forwarding_desc_no_app">正转发至 %1$s:%2$s</string>
     <string name="settings_ip_text_ipv46">自动</string>
     <string name="firewall_status_whitelisted">已绕过全局防火墙规则</string>
-    <string name="dc_local_block_desc_1">于逾 185 条屏蔽名单中选择。轻触此处以下载或配置屏蔽名单。</string>
+    <string name="dc_local_block_desc_1">于逾 195 条屏蔽名单中选择。轻触此处以下载或配置屏蔽名单。</string>
     <string name="about_mail_to_string">mailto:</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
@@ -301,7 +299,6 @@
     <string name="fapps_metered_unblock_dialog_message">是否于收费网络放行<i>已列出</i>应用？</string>
     <string name="firewall_rule_block_udp_ntp_desc">一项用户定义的防火墙规则拦截了此 <i>UDP</i> 连接。<br/><br/>若需更改，请移步<i>全局</i>选项卡。</string>
     <string name="new_app_notification_action_toast_deny">拦截应用网络连接</string>
-    <string name="cd_blocked_txt">拦截</string>
     <string name="ada_app_bypass_univ">无条件放行</string>
     <string name="rethink_sky_desc">逾 280 处地点；更长的在线时间；于 cloudflare.com 上运行的中间解析服务</string>
     <string name="wireguard_mode_info_explanation_new">即将推出。</string>
@@ -334,7 +331,6 @@
     <string name="firewall_rule_trusted_ip">已信任 IP</string>
     <string name="notif_channel_download">下载警报</string>
     <string name="category_name_installed">已安装程序</string>
-    <string name="cd_whitelist_txt">放行</string>
     <string name="ada_app_status_block_wifi">已于非收费网络（ WiFi ）拦截</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="bsac_distrust">不信任</string>
@@ -434,7 +430,7 @@
     <string name="firewall_rule_foreground_desc">此连接因原始应用<i>未处于前台</i>而被拦截。<br/><br/>若需变更此行为，请至<i>全局</i>选项卡。</string>
     <string name="new_app_bulk_notification_content">RethinkDNS 拦截了 %1$s 款新应用。轻触以查看或更改。</string>
     <string name="new_app_notification_action_toast_allow">放行应用网络连接</string>
-    <string name="cd_dialog_header">自定义域名</string>
+    <string name="cd_dialog_header">自定义域名：%1$s</string>
     <string name="ada_noapp_dialog_positive">确认</string>
     <string name="ada_app_dns_settings">DNS 设置</string>
     <string name="bsac_distrust_toast">不信任此 IP 的 %1$s</string>
@@ -549,7 +545,7 @@
     <string name="settings_socks5_dialog_hint_ip">IP 地址</string>
     <string name="firewall_status_block_metered">已阻止连接收费（移动数据）网络</string>
     <string name="firewall_card_text_inactive">请启用防火墙模式。</string>
-    <string name="dc_custom_block_heading">放行或拦截个別域名</string>
+    <string name="dc_custom_block_heading">域名规则</string>
     <string name="about_twitter">在 Twitter 上关注我们</string>
     <string name="slide_1_desc">RethinkDNS 是一款受 Mozilla Builders MVP 计划资助与支持的开源软件。</string>
     <string name="about_mail_bugreport_share_title">选择电邮供应商</string>
@@ -585,7 +581,7 @@
     <string name="hsf_vpn_dialog_message">RethinkDNS 需要设置本地 VPN 的权限，以加密设备的 DNS 请求、实现网络监测与执行防火墙规则。
 \n
 \nRethinkDNS 并不会收集任何数据，且不会以任何方式监视您。</string>
-    <string name="dc_custom_block_desc">即将推出</string>
+    <string name="dc_custom_block_desc">修改拦截域名及信任域名规则</string>
     <string name="dc_check_update_desc">每<i>三</i>天检查有无屏蔽名单更新</string>
     <string name="about_settings">系统</string>
     <string name="cd_dnscrypt_relay_heading">中继</string>
@@ -741,7 +737,7 @@
     <string name="lbbs_update_check">检查更新</string>
     <string name="brbs_restore_desc">从备份文件中恢复</string>
     <string name="rethink_max_desc">逾 50 处地点；更私密；于 fly.io 运行的递归解析服务</string>
-    <string name="lbbs_heading">配置逾 185 个屏蔽名单</string>
+    <string name="lbbs_heading">配置逾 195 个屏蔽名单</string>
     <string name="brbs_backup_dialog_message">将应用设置、网络日志与 DNS 日志备份至单个文件内。这将重启 VPN 。</string>
     <string name="brbs_backup_dialog_failure_title">备份失败</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
@@ -751,7 +747,6 @@
     <string name="brbs_backup_dialog_title">执行备份</string>
     <string name="brbs_restore_dialog_title">恢复备份</string>
     <string name="brbs_restore_dialog_message">从单个备份文件中恢复应用设置、网络日志与 DNS 日志。这将重启应用。</string>
-    <string name="brbs_restore_dialog_failure_negative">忽略</string>
     <string name="lbbs_redownload">重新下载屏蔽名单</string>
     <string name="brbs_title">备份与恢复</string>
     <string name="brbs_restore_dialog_failure_positive">重试恢复</string>
@@ -832,4 +827,22 @@
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">连接最多的 IP</string>
     <string name="ssv_see_more">显示所有</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">启动 Rethink 以继续</string>
+    <string name="lbl_all" translatable="true">全部</string>
+    <string name="lbl_blocked" translatable="true">拦截</string>
+    <string name="lbl_wildcard" translatable="true">通配</string>
+    <string name="lbl_domain_rules" translatable="true">域名规则</string>
+    <string name="lbl_cancel" translatable="true">取消</string>
+    <string name="lbl_ip_rules" translatable="true">IP 规则</string>
+    <string name="lbl_apply" translatable="true">应用</string>
+    <string name="lbl_domain" translatable="true">域名</string>
+    <string name="lbl_dismiss" translatable="true">忽略</string>
+    <string name="lbl_allowed" translatable="true">放行</string>
+    <string name="lbl_action_required" translatable="true">需采取行动</string>
+    <string name="lbl_disabled" translatable="true">禁用</string>
+    <string name="cd_no_rules_text" translatable="true">未找到域名规则。</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">域名（应用）</string>
+    <string name="firewall_rule_block_domain" translatable="true">域名（应用）</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">此连接因此<i>域名</i>被设置为信任域名而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">一项用户定义的全局防火墙规则拦截了此<i>域名</i>。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。</string>
+    <string name="bsdl_block_desc" translatable="true">拦截、信任<u>此域名</u></string>
 </resources>

@@ -244,7 +244,7 @@
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="firewall_rule_unknown_desc">此連線因無法得知<i>原始應用</i>而被攔截。<br/><br/>若需變更此行爲，請至<i>全局</i>選項卡。</string>
     <string name="new_app_bulk_notification_title">注意</string>
-    <string name="cd_dialog_header">自訂網域: %1$s</string>
+    <string name="cd_dialog_header">自訂網域：%1$s</string>
     <string name="cd_no_rule_initial">無</string>
     <string name="ci_no_rule_txt">無規則</string>
     <string name="ci_bypass_universal">無條件放行</string>
@@ -259,9 +259,8 @@
     <string name="ci_block">攔截</string>
     <string name="ada_app_status_isolate">正處隔離模式中；僅放行信任 IP</string>
     <string name="bsac_trust_toast">信任此應用的 %1$s</string>
-    <string name="rt_cancel_download">取消</string>
     <string name="lbbs_enabled">已啓用</string>
-    <string name="firewall_rule_block_ip_desc">一項用戶定義的全局防火牆規則攔截了此<i>目標 IP </i><br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_block_ip_desc">一項用戶定義的全局防火牆規則攔截了此<i>目標 IP </i>。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
     <string name="firewall_rule_block_dns_bypass_desc">此連線因<i>原始應用</i>繞過了用戶設定的 DNS 而被攔截。<br/><br/>若需變更此行爲，請移步<i>全局</i>選項卡。</string>
     <string name="build__flavor_play_store">play</string>
     <string name="cd_remove_dialog_positive">刪除</string>
@@ -300,7 +299,7 @@
     <string name="rt_download_start">正在下載攔截清單……</string>
     <string name="lbbs_configure">配置</string>
     <string name="lbbs_redownload">重新下載攔截清單</string>
-    <string name="lbbs_heading">配置逾 185 個攔截清單</string>
+    <string name="lbbs_heading">配置逾 195 個攔截清單</string>
     <string name="firewall_rule_block_udp_ntp_desc">一項用戶定義的防火牆規則攔截了此 <i>UDP</i> 連線。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">此連線因<i>原始應用</i>被設爲<i>無條件放行</i>而放行。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
     <string name="new_app_bulk_notification_content">RethinkDNS 攔截了 %1$s 款新應用。輕觸以查看或更改。</string>
@@ -518,9 +517,9 @@
     <string name="dc_custom_dns_radio">其他 DNS</string>
     <string name="dc_entries">%1$s 條目 »</string>
     <string name="dc_local_block_heading">本地攔截清單</string>
-    <string name="dc_local_block_desc_1">於逾 185 條攔截清單中選擇。輕觸此處以下載或配置攔截清單。</string>
-    <string name="dc_custom_block_heading">放行或攔截個別網域</string>
-    <string name="dc_custom_block_desc">即將推出</string>
+    <string name="dc_local_block_desc_1">於逾 195 條攔截清單中選擇。輕觸此處以下載或配置攔截清單。</string>
+    <string name="dc_custom_block_heading">網域規則</string>
+    <string name="dc_custom_block_desc">修改攔截網域及信任網域規則</string>
     <string name="dc_dns_website_heading">於 DNS 日誌中展示網站圖示（實驗性）</string>
     <string name="dc_dns_website_desc">從 <i>nextdns.io</i> 與 <i>duckduckgo.com</i> 獲取網站圖示。約佔用 350 MB 磁碟空間</string>
     <string name="dc_dns_leaks_desc">若啓用， RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
@@ -828,4 +827,22 @@
     <string name="fapps_isolate_block_dialog_title">隔離應用</string>
     <string name="fapps_isolate_block_dialog_message">是否隔離<i>已列出</i>應用？</string>
     <string name="ci_trust_rule">信任</string>
+    <string name="lbl_cancel" translatable="true">取消</string>
+    <string name="lbl_apply" translatable="true">應用</string>
+    <string name="lbl_dismiss" translatable="true">忽略</string>
+    <string name="lbl_all" translatable="true">全部</string>
+    <string name="lbl_allowed" translatable="true">放行</string>
+    <string name="lbl_blocked" translatable="true">攔截</string>
+    <string name="lbl_domain" translatable="true">網域</string>
+    <string name="lbl_wildcard" translatable="true">萬用字元</string>
+    <string name="lbl_action_required" translatable="true">需採取行動</string>
+    <string name="lbl_ip_rules" translatable="true">IP 規則</string>
+    <string name="lbl_domain_rules" translatable="true">網域規則</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">網域（應用）</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">此連線因此<i>網域</i> 被設定爲信任網域而被放行。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
+    <string name="bsdl_block_desc" translatable="true">攔截、信任<u>此網域</u></string>
+    <string name="lbl_disabled" translatable="true">禁用</string>
+    <string name="firewall_rule_block_domain" translatable="true">網域（應用）</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">一項用戶定義的全局防火牆規則攔截了此<i>網域</i>。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
+    <string name="cd_no_rules_text" translatable="true">未找到網域規則。</string>
 </resources>
