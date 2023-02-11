@@ -14,7 +14,6 @@
     <string name="warning_title" description="Status indicator text shown in a warning notification.">انتباہ:ریتھینک ڈی این ایس کو غیر فعال کر دیا گیا ہے</string>
     <string name="app_name_small_case">ریتھینک</string>
     <string name="slide_1_title">مفت اور اوپن سورس</string>
-    <string name="app_name_rethink">ریتھینک</string>
     <string name="pause_title_desc">جھپکی لینا…</string>
     <string name="settings_title_desc">ایک انتہائی حسب ضرورت DNS اور فائر وال</string>
     <string name="about_title_desc">نیٹ ورک سیکیورٹی خطرات کا پتہ لگائیں اور بلاک کریں</string>
@@ -29,7 +28,6 @@
     <string name="pause_mode_notification_title">روک دیا گیا! سدود ایپس کو فائر وال کیا جاتا رہے گا۔</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">محفوظ</string>
     <string name="status_protected_with_tor">ٹور کے ساتھ محفوظ</string>
-    <string name="accessibility_service_label">ریتھینک ڈی این ایس</string>
     <string name="next">Next</string>
     <string name="finish">ختم کرنا</string>
     <string name="slide_1_desc">ریتھینک ڈی این ایس ایک اوپن سورس سافٹ ویئر ہے جسے Mozilla Builders MVP پروگرام کی حمایت حاصل ہے۔</string>

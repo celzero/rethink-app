@@ -28,7 +28,6 @@
     <string name="dns_firewall_mode_info_explanation_new">Para além dos dois anteriores (DNS e Firewall), contornar também a censura da Internet.</string>
     <string name="alert_permission_accessibility">Permissão - Acessibilidade</string>
     <string name="wireguard_mode_info_explanation_new">Brevemente.</string>
-    <string name="alert_permission_accessibility_regrant">Ação requerida</string>
     <string name="alert_firewall_accessibility_explanation">O RethinkDNS utiliza o serviço de acessibilidade para rastrear as aplicações estão a ser utilizadas (primeiro plano) e diferenciar as que não estão em utilização (segundo plano).
 \n
 \nO RethinkDNS não recolhe nenhuma informação sua nem o vigia.</string>
@@ -268,7 +267,6 @@
     <string name="title_about">Sobre</string>
     <string name="orbot_bs_status_trying_connect">A configurar o Orbot…</string>
     <string name="orbot_install_dialog_title">Instalar o Orbot\?</string>
-    <string name="settings_orbot_notification_heading">Ação necessária</string>
     <string name="settings_network_all_networks_desc">Quando ativado, o RethinkDNS utiliza todas as redes disponíveis para se ligar à Internet. Caso contrário, utiliza a rede que estiver <i>ativada</i> pelo Android.</string>
     <string name="settings_import_export_desc">Faça cópias de segurança ou restaure os dados e configurações da aplicação.</string>
     <string name="settings_title_desc">Um DNS e Firewall altamente personalizável</string>
@@ -357,8 +355,8 @@
     <string name="orbot_http_desc">Recomenda que as aplicações utilizem o proxy HTTP do Orbot.</string>
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
     <string name="settings_autostart_bootup_heading">Arranque automático ao ligar (experimental)</string>
-    <string name="dc_custom_block_heading">Permitir ou negar domínios individuais</string>
-    <string name="dc_custom_block_desc">Brevemente</string>
+    <string name="dc_custom_block_heading">Regras de domínio</string>
+    <string name="dc_custom_block_desc">Alterar regras de domínio de bloqueios ou de confiança</string>
     <string name="dc_dns_website_heading">Mostrar ícone do site nos registos de DNS (experimental)</string>
     <string name="dc_dns_website_desc">Obtém ícones de sites de <i>nextdns.io</i> e <i>duckduckgo.com</i>. Usa até 350 MB de espaço de armazenamento</string>
     <string name="about_bravedns_explantion">O RethinkDNS é a forma mais fácil de monitorizar a atividade da aplicação, contornar a censura da Internet e aplicações de firewall no seu dispositivo Android.</string>
@@ -381,7 +379,7 @@
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_entries">%1$s entradas »</string>
     <string name="dc_local_block_heading">Listas de bloqueio no dispositivo</string>
-    <string name="dc_local_block_desc_1">Escolha entre mais de 185 listas de bloqueio. Clique aqui para descarregar ou configurar listas de bloqueio.</string>
+    <string name="dc_local_block_desc_1">Escolha entre mais de 195 listas de bloqueio. Clique aqui para descarregar ou configurar listas de bloqueio.</string>
     <string name="dc_dns_leaks_heading">Prevenir fugas de DNS</string>
     <string name="dc_dns_leaks_desc">Quando ativado, o RethinkDNS captura todos os pacotes na porta 53 e encaminha-os para um ponto terminal de DNS definido pelo utilizador</string>
     <string name="dc_check_update_heading">Avisar sobre atualizações de listas de bloqueio</string>
@@ -488,7 +486,6 @@
     <string name="univ_accessibility_dialog_negative">Negar</string>
     <string name="univ_delete_firewall_dialog_message">Ao eliminar estas regras irá permitir que qualquer aplicação se conecte aos IPs atualmente bloqueados.</string>
     <string name="network_log_app_name_unnamed">Sem nome (%1$s)</string>
-    <string name="accessibility_notification_title">Ação requerida</string>
     <string name="dns_connected_rethink_plus">Conectado. %1$s listas de bloqueio usadas</string>
     <string name="dns_info_neutral">Copiar</string>
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede limitada (móvel) para aplicações <i>na lista</i>\?</string>
@@ -653,7 +650,6 @@
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta conexão foi permitida porque a configuração do <i>Tor-como-proxy com um clique</i> via Orbot estava a decorrer.</string>
     <string name="new_app_bulk_notification_title">Atenção</string>
     <string name="new_app_bulk_notification_content">RethinkDNS bloqueou %1$s novas aplicações. Toque para visualizar ou alterar.</string>
-    <string name="new_app_notification_title">Ação requerida</string>
     <string name="new_app_notification_content">RethinkDNS bloqueou a aplicação instalada recentemente: %1$s.</string>
     <string name="new_app_notification_action_deny">Continuar a bloquear</string>
     <string name="new_app_notification_action_toast_deny">Conexão de rede negada para a aplicação</string>
@@ -758,7 +754,7 @@
     <string name="lbbs_search">Pesquisar domínios em listas de bloqueio</string>
     <string name="lbbs_redownload">Descarregar novamente as listas de bloqueio</string>
     <string name="lbbs_download">Atualizar listas de bloqueio</string>
-    <string name="lbbs_heading">Configurar mais de 185 listas de bloqueio</string>
+    <string name="lbbs_heading">Configurar mais de 195 listas de bloqueio</string>
     <string name="brbs_title">Cópia de segurança e restauro</string>
     <string name="brbs_backup_title">Cópia de segurança</string>
     <string name="brbs_restore_title">Restaurar</string>
@@ -830,4 +826,22 @@
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Inicie o Rethink para continuar</string>
     <string name="settings_biometric_desc">Protege esta aplicação usando o bloqueio de ecrã</string>
     <string name="ssv_see_more">mostrar tudo</string>
+    <string name="lbl_allowed" translatable="true">Permitidas</string>
+    <string name="lbl_disabled" translatable="true">Desativadas</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Uma regra de firewall definida pelo utilizador bloqueou o <i>IP de destino</i>.<br/><br/> Para a alterar, vá ao ecrã da <i>Firewall específica da aplicação</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Esta conexão foi permitida porque o <i>domínio</i> está definido como domínio confiável.<br/><br/> Para o alterar, vá ao ecrã da <i>Firewall específica da aplicação</i>.</string>
+    <string name="bsdl_block_desc" translatable="true">Bloquear, confiar <u>neste domínio</u></string>
+    <string name="lbl_cancel" translatable="true">Cancelar</string>
+    <string name="lbl_apply" translatable="true">Aplicar</string>
+    <string name="lbl_dismiss" translatable="true">Cancelar</string>
+    <string name="lbl_all" translatable="true">Tudo</string>
+    <string name="lbl_blocked" translatable="true">Bloqueadas</string>
+    <string name="lbl_domain" translatable="true">Domínio</string>
+    <string name="lbl_wildcard" translatable="true">Curinga</string>
+    <string name="lbl_action_required" translatable="true">Ação necessária</string>
+    <string name="lbl_ip_rules" translatable="true">Regras de IP</string>
+    <string name="lbl_domain_rules" translatable="true">Regras de domínio</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Domínio (aplicação)</string>
+    <string name="firewall_rule_block_domain" translatable="true">Domínio (aplicação)</string>
+    <string name="cd_no_rules_text" translatable="true">Não foi encontrada nenhuma regra de domínio.</string>
 </resources>

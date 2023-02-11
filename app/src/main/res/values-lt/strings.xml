@@ -480,7 +480,6 @@
     <string name="always_on_dialog_positive">Sustabdyti</string>
     <string name="download_update_dialog_message_ok">Jau naudojate naujausią versiją.</string>
     <string name="alert_permission_accessibility">Leidimas - prieinamumas</string>
-    <string name="alert_permission_accessibility_regrant">Reikalingas veiksmas</string>
     <string name="bsct_app_info">Programėlės informacija</string>
     <string name="dns_act_configure_tab">Konfigūravimas</string>
     <string name="alert_firewall_accessibility_explanation">RethinkDNS naudoja pritaikymo neįgaliesiems paslaugą, kad atsektų, kurios programėlės yra naudojamos (pirmame plane), palyginti su tomis, kurios nenaudojamos (fone).
@@ -530,7 +529,6 @@
     <string name="settings_orbot_install_desc">Bakstelėkite čia, kad įdiegtumėte Orbot</string>
     <string name="settings_socks5_disabled_error">Prisijungta prie Orbot. Norėdami tęsti, jį išjunkite.</string>
     <string name="settings_https_disabled_error">Prisijungta prie Orbot. Norėdami tęsti, jį išjunkite.</string>
-    <string name="settings_orbot_notification_heading">Reikalingas veiksmas</string>
     <string name="settings_network_all_networks_desc">Kai įjungta, RethinkDNS naudoja visus galimus tinklus prisijungti prie interneto. Jei ne, ji naudoja tą tinklą, kurį Android laiko <i>aktyviu</i>.</string>
     <string name="settings_socks5_vpn_disabled_error">Norėdami tęsti, paleiskite RethinkDNS.</string>
     <string name="settings_orbot_notification_content">Gedimas paleidžiant Tor kaip įgaliotasis serveris. Atidarykite Orbot programėlę, kad paleistumėte jį rankiniu būdu.</string>
@@ -638,7 +636,6 @@
     <string name="dns_proxy_toast_parameter">DNS įgaliotasis serveris</string>
     <string name="orbot_toast_parameter">Tor kaip įgaliotasis serveris</string>
     <string name="system_dns_connection_failure">Nepavyko nustatyti dabartinio DNS serverio</string>
-    <string name="accessibility_notification_title">Reikalingas veiksmas</string>
     <string name="firewall_rule_device_lock">Įrenginys užrakintas</string>
     <string name="firewall_rule_block_udp_ntp">UDP užblokuotas</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 įgaliotasis serveris</string>
@@ -667,7 +664,6 @@
     <string name="cd_dialog_title">Pridėti domeną</string>
     <string name="new_app_bulk_notification_content">RethinkDNS užblokavo %1$s naujas (-ą) programėles (-ę). Bakstelėkite norėdami peržiūrėti arba keisti.</string>
     <string name="notif_channel_desc_vpn_failure">Informuoti, kai Android arba kita VPN programa sustabdo RethinkDNS</string>
-    <string name="new_app_notification_title">Reikalingas veiksmas</string>
     <string name="notif_channed_desc_download">Įspėti apie įrenginio blokavimo sąrašų atsisiuntimo eigą</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="notif_channel_desc_firewall_alerts">Įspėti apie ugniasienės klaidas ir anomalijas</string>

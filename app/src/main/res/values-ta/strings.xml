@@ -5,10 +5,8 @@
     <string name="allow">அனுமதி</string>
     <string name="untracked">கண்காணிக்கப்படவில்லை</string>
     <string name="title_statistics">புள்ளிவிவரங்கள்</string>
-    <string name="app_name_rethink">மறுபரிசீலனை செய்</string>
     <string name="settings_title_desc">மிகவும் தனிப்பயனாக்கக்கூடிய டிஎன்எஸ் மற்றும் ஃபயர்வால்</string>
     <string name="dns_mode_info_title">டிஎன்எஸ்</string>
-    <string name="always_on_dialog_negative_btn">ரத்து</string>
     <string name="always_on_dialog_neutral">அமைப்புகள்</string>
     <string name="app_name">"மறுபரிசீலனை  டிஎன்எஸ்"</string>
     <string name="app_name_small_case">மறுபரிசீலனை</string>
@@ -18,7 +16,6 @@
     <string name="about_title_desc">நெட்வொர்க் பாதுகாப்பு அச்சுறுத்தல்களைக் கண்டறிந்து தடுக்கவும்</string>
     <string name="txt_home">முகப்பு</string>
     <string name="accessibility_service_description">"மறுபரிசீலனை டிஎன்எஸ்  ஆனது ஃபயர்வால் பின்னணி பயன்பாடுகளைக் கண்டறிந்து அணுக அணுகல் சேவையைப் பயன்படுத்துகிறது. மறுபரிசீலனை டிஎன்எஸ் எந்த தகவலையும் சேகரிக்கவோ விற்கவோ இல்லை."</string>
-    <string name="accessibility_service_label">மறுபரிசீலனை டிஎன்எஸ்</string>
     <string name="next">அடுத்தது</string>
     <string name="skip">தவிர்க்கவும்</string>
     <string name="finish">முடிந்தது</string>
@@ -56,7 +53,6 @@
     <string name="hybrid_mode_info_title">டிஎன்எஸ் + ஃபயர்வால்</string>
     <string name="dns_mode_info_explanation_new">டிஎன்எஸ் கோரிக்கைகளை கண்காணிக்கவும், தடுக்கவும் மற்றும் குறியாக்கம் செய்யவும்.</string>
     <string name="dns_firewall_mode_info_explanation_new">மேலே உள்ள அனைத்தும் + இணைய தணிக்கையைத் தவிர்க்கவும்.</string>
-    <string name="private_dns_dialog_negative">ரத்து செய்</string>
     <string name="alert_permission_accessibility_regrant">நடவடிக்கை தேவை</string>
     <string name="private_dns_dialog_positive">அமைப்புகளுக்குச் செல்லவும்</string>
     <string name="default_dns_name">RDNS இயல்புநிலை</string>
@@ -94,14 +90,12 @@
     <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt தீர்வை நீக்கவா\?</string>
     <string name="bsct_conn_desc_blocked">%1$s %2$s இல் தடுக்கப்பட்டது</string>
     <string name="always_on_dialog_stop_message">மறுபரிசீலனை செய்ய எப்போதும் இயங்கும் VPN இயக்கப்பட்டுள்ளது. எப்படியும் மறுபரிசீலனை செய்வதை நிச்சயமாக நிறுத்த விரும்புகிறீர்களா\?</string>
-    <string name="always_on_dialog_negative">ரத்து</string>
     <string name="dns_act_log">பதிவுகள்</string>
     <string name="doh_custom_url_remove_dialog_title">DoH இறுதிப்புள்ளியை நீக்கவா\?</string>
     <string name="doh_custom_url_remove_dialog_message">சேமித்த உள்ளமைவிலிருந்து Https இறுதிப் புள்ளியில் DNS ஐ நீக்கவும்.</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt தீர்வு நீக்கப்பட்டது.</string>
     <string name="always_on_dialog_stop_heading">எப்போதும் VPN-ஆன்</string>
     <string name="always_on_dialog_positive">நிறுத்து</string>
-    <string name="univ_firewall_no_ip_message">ஐபிகள் எதுவும் இல்லை. தனிப்பட்ட ஐபி முகவரிகளைத் தடுக்க நெட்வொர்க் பதிவுத் திரையில் உள்ளீடுகளைத் தட்டவும்.</string>
     <string name="dns_crypt_relay_remove_dialog_title">DNSCrypt Relay ஐ நீக்கவா\?</string>
     <string name="dns_act_configure_tab">கட்டமைக்க</string>
     <string name="univ_firewall_dialog_title">ஐபி விதியை நீக்கவா\?</string>

@@ -227,7 +227,6 @@
     <string name="status_protected_with_private_dns">protegido pelo dns privado</string>
     <string name="status_protected_with_tor_private_dns">protegido pelo tor e dns privado</string>
     <string name="dns_explanation_dns_connected">Conectado ao RethinkDNS</string>
-    <string name="alert_permission_accessibility_regrant">Ação requerida</string>
     <string name="status_protected_with_proxy_private_dns">protegido pelo proxy e dns privado</string>
     <string name="status_protected_with_socks5_private_dns">protegido pelo socks5 e dns privado</string>
     <string name="orbot_explanation">Orbot é um app de proxy gratuito que permite que outros apps usem a internet com mais <u>segurança</u>.
@@ -398,7 +397,6 @@
     <string name="settings_socks5_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
     <string name="settings_socks5_vpn_disabled_error">Iniciar RethinkDNS para continuar.</string>
     <string name="settings_orbot_disabled_error">Desative proxy HTTP(S) e/ou SOCKS5 para continuar com a configuração do Tor-como-proxy.</string>
-    <string name="settings_orbot_notification_heading">Ação necessária</string>
     <string name="settings_orbot_notification_content">Falha ao iniciar Tor-como-Proxy. Abra Orbot app para iniciá-lo manualmente.</string>
     <string name="settings_orbot_notification_action">Abrir Orbot</string>
     <string name="settings_all_networks_dialog_title">Atenção!</string>
@@ -615,7 +613,6 @@
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio em uso</string>
     <string name="settings_local_blocklist_dialog_positive">Baixar</string>
     <string name="settings_local_blocklist_version">Versão: v%1$s</string>
-    <string name="accessibility_notification_title">Ação requerida</string>
     <string name="accessibility_notification_content">O serviço de acessibilidade do RethinkDNS parou ou travou. Não bloqueia mais apps em segundo plano. Toque para reativar.</string>
     <string name="accessibility_failure_toast">O serviço de acessibilidade do RethinkDNS parou ou travou. Não bloqueia mais apps em segundo plano.</string>
     <string name="coming_soon_toast">em breve</string>
@@ -652,7 +649,6 @@
     <string name="firewall_rule_global_lockdown_desc">Esta conexão foi bloqueada porque foi definida uma restrição universal.<br/><br/> Para alterar acesse <i>Universal</i>.</string>
     <string name="new_app_bulk_notification_title">Atenção</string>
     <string name="new_app_bulk_notification_content">RethinkDNS bloqueou %1$s novos apps. Toque para ver ou modificar.</string>
-    <string name="new_app_notification_title">Ação requerida</string>
     <string name="new_app_notification_content">RethinkDNS bloqueou o app %1$s, recentemente instalado.</string>
     <string name="new_app_notification_action_deny">Continue bloqueando</string>
     <string name="new_app_notification_action_toast_deny">Conexão da rede negada para este app</string>
