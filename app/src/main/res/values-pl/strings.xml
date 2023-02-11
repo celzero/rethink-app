@@ -131,4 +131,91 @@
     <string name="app_name_small_case">rethink</string>
     <string name="txt_home">Strona główna</string>
     <string name="settings_allow_bypass_heading">Pozwól na obejście</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (oszczędzanie baterii)</string>
+    <string name="settings_ptrans_desc" translatable="true">Przetłumacz wychodzący ruch IPv6 na IPv4 na urządzeniu. Włącz, jeśli masz połączenie z siecią obsługującą tylko IPv4.</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Pozwól żądającym aplikacjom ominąć zaporę RethinkDNS na żądanie. Niektóre aplikacje do obsługi konferencji audio/wideo, takie jak Zoom i WhatsApp, mogą wymagać obejścia na żądanie, aby działać poprawnie.</string>
+    <string name="settings_https_heading" translatable="true">Ustawienia HTTP (S) proxy serwera</string>
+    <string name="settings_https_desc" translatable="true">To ustawienie jest tylko zaleceniem i możliwe jest, że aplikacje je zignorują. Aplikacje korzystające z serwera proxy HTTP (S) będą pomijać zarówno reguły Firewall, jak i DNS.</string>
+    <string name="always_on_dialog" translatable="true">\"Always-On VPN\" jest włączona na tym urządzeniu. Aby rozpocząć Rethink, przejdź do aplikacji Ustawienia i wyłącz \"Always-on VPN\".</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkDNS uruchamia VPN w trybie <i>blokady</i>. Zatrzymanie go spowodowałoby utratę połączenia z Internetem w tym profilu użytkownika. Czy mimo to chcesz kontynuować\?</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Listy zablokowanych są już w najnowszej wersji.</string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">DNS serwer proxy</string>
+    <string name="configure_dns_connection_name" translatable="true">Połączony do %1$s</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS i Firewall (domyślnie)</string>
+    <string name="app_mode_firewall" translatable="true">Firewall</string>
+    <string name="app_mode_choose" translatable="true">Wybierz tryb</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="relative_time_today" translatable="true">Dziś</string>
+    <string name="lbl_cancel" translatable="true">Anuluj</string>
+    <string name="lbl_domain" translatable="true">Domena</string>
+    <string name="dns_proxy_remove_success" translatable="true">Usunięto serwer proxy DNS.</string>
+    <string name="local_blocklist_download" translatable="true">Pobierz listy zablokowanych</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Usunąć DNS Proxy\?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Usuń serwer proxy DNS z zapisanej konfiguracji.</string>
+    <string name="local_blocklist_redownload" translatable="true">Aktualny!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">Listy blokowania na urządzeniu są już w najnowszej wersji v% 1$s.</string>
+    <string name="refresh_complete" translatable="true">Ponowna synchronizacja listy aplikacji zakończona.</string>
+    <string name="local_blocklist_download_desc" translatable="true">Pobierz listy zablokowanych (około 60MB), aby korzystać z tej funkcji\?</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS przez HTTPS</string>
+    <string name="configure_dns_crypt" translatable="true">DNSCrypt: %1$s resolwery</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Rejestrowanie połączeń zostało wyłączone. Aby ponownie włączyć, przejdź do <i>Ustawień</i> i włącz <i>Włącz rejestrowanie na urządzeniu.</i></string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Rejestrowanie żądań DNS zostało wyłączone. Aby ponownie włączyć, przejdź do <i>Ustawień</i> i włącz <i>Włącz rejestrowanie na urządzeniu.</i></string>
+    <string name="http_proxy_dialog_heading" translatable="true">Ustawianie serwera proxy HTTP (S)</string>
+    <string name="download_update_dialog_title" translatable="true">Nowa aktualizacja!</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Ustawienia serwera proxy HTTP (S) są tylko wskazówką dla aplikacji, ale mogą one z niego korzystać lub nie; jednak przeglądarki takie jak Chrome i Firefox używają ich. Aplikacje korzystające z serwera proxy HTTP (S) będą pomijać firewall, jak i dns ustawienia.</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Aktualizacja nie może zostać wykonana teraz, spróbuj ponownie później.</string>
+    <string name="search_universal_ips" translatable="true"><font size="12"> Wyszukiwanie adresów IP</font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Wyszukaj nazwy domen</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true">&lt;rozmiar czcionki=\"12\"&gt;Listy blokowania wyszukiwania&lt;/font&gt;</string>
+    <string name="download_update_dialog_message" translatable="true">Nowa wersja aplikacji jest dostępna do pobrania ze strony internetowej. Czy chcesz kontynuować\?</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Albo nasze serwery są wyłączone, albo nie można nawiązać połączenia. Spróbuj ponownie za jakiś czas.</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">Zkopiowano adres IP.</string>
+    <string name="whats_dialog_title" translatable="true">Co nowego w wersji v053n</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">Z kopiowano URL</string>
+    <string name="blocklist_update_check_failure" translatable="true">Coś poszło nie tak. Spróbuj ponownie później!</string>
+    <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Aktualny!</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Nie można pobrać aktualizacji</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Coś poszło nie tak!</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12"> Wyszukaj aplikacje według uid, name</font></string>
+    <string name="search_dns_logs" translatable="true"><font size="12">Wyszukaj nazwy domen lub adresy IP</font></string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12"> Wyszukaj aplikacje, adresy IP, domeny</font></string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">Skopiowane jako adres URL RDNS+ DNS-over-HTTPS</string>
+    <string name="settings_enable_logs_desc" translatable="true">Zapisz log-a DNS i Firewall lokalnie na urządzeniu.</string>
+    <string name="orbot_http" translatable="true">HTTP proxy</string>
+    <string name="orbot_bs_status_2" translatable="true">Ustawiony jest serwer proxy HTTP (aplikacje mogą go ignorować).</string>
+    <string name="orbot_bs_status_3" translatable="true">Przekazywanie %1$s do Orbota, HTTP Proxy również ustawione.</string>
+    <string name="orbot_both_desc" translatable="true">Wszystkie powyższe.</string>
+    <string name="orbot_none" translatable="true">Brak (domyślnie)</string>
+    <string name="orbot_none_desc" translatable="true">Żadne z powyższych.</string>
+    <string name="orbot_bs_status_1" translatable="true">Przekazywanie połączeń %1$s do Orbota.</string>
+    <string name="lbl_apply" translatable="true">Zastosuj</string>
+    <string name="lbl_dismiss" translatable="true">Odrzuć</string>
+    <string name="lbl_all" translatable="true">Wszystkie</string>
+    <string name="lbl_allowed" translatable="true">Dozwolone</string>
+    <string name="lbl_blocked" translatable="true">Zablokowane</string>
+    <string name="lbl_disabled" translatable="true">Wyłączone</string>
+    <string name="lbl_wildcard" translatable="true">Wieloznawczy</string>
+    <string name="lbl_action_required" translatable="true">Wymagane działanie</string>
+    <string name="lbl_ip_rules" translatable="true">Reguły IP</string>
+    <string name="lbl_domain_rules" translatable="true">Reguły Domen</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Jesteś już na najnowszej wersji.</string>
+    <string name="download_update_dialog_message_success" translatable="true">Pobrano listy blokowania.</string>
+    <string name="settings_enable_logs" translatable="true">Włącz logowanie na urządzeniu</string>
+    <string name="relative_time_yesterday" translatable="true">Wczoraj</string>
+    <string name="settings_ip_network_heading" translatable="true">Wybierz wersję IP</string>
+    <string name="settings_ip_network_desc" translatable="true">Wybierz jedną z wersji protokołu internetowego.</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Nie można zezwolić na obejście ani skonfigurować serwerów proxy, gdy sieć VPN działa w trybie blokady. <u>Przejdź do ustawień VPN</u>.</string>
+    <string name="settings_socks5_heading" translatable="true">Ustawienia SOCKS5 proxy serwera</string>
+    <string name="settings_socks5_desc" translatable="true">Przekieruj połączenia do punktu końcowego SOCKS5.</string>
+    <string name="orbot_socks5" translatable="true">Serwer proxy tylko TCP</string>
+    <string name="orbot_socks5_desc" translatable="true">Przekazuj wszystkie połączenia TCP do programu Orbot.</string>
+    <string name="orbot_http_desc" translatable="true">Zaleca, aby aplikacje używały serwera proxy HTTP Orbot.</string>
+    <string name="orbot_both" translatable="true">TCP+ HTTP proxy serwer</string>
+    <string name="settings_proxy_header" translatable="true">proxy serwer</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="always_on_dialog_stop_message" translatable="true">Zawsze włączona sieć VPN jest włączona dla Rethink. Czy na pewno i tak chcesz zatrzymać Rethink\?</string>
 </resources>

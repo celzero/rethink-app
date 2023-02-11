@@ -446,7 +446,7 @@
     <string name="lbbs_download">Blocklisten aktualisieren</string>
     <string name="lbbs_update_check">Nach Updates suchen</string>
     <string name="lbbs_redownload">Blocklisten erneut herunterladen</string>
-    <string name="lbbs_heading">Konfigurieren Sie 185+ Blocklisten</string>
+    <string name="lbbs_heading">Konfigurieren Sie 195+ Blocklisten</string>
     <string name="brbs_title">Sichern &amp; Wiederherstellen</string>
     <string name="brbs_backup_title">Sichern (Backup)</string>
     <string name="brbs_restore_title">Wiederherstellen</string>
@@ -631,7 +631,7 @@
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="dns_log_dialog_positive">Protokolle löschen</string>
     <string name="dns_btm_sheet_chip">+%1$s andere IPs</string>
-    <string name="dc_custom_block_desc">Demnächst verfügbar</string>
+    <string name="dc_custom_block_desc">Ändern von Regeln für blockierte oder vertrauenswürdige Domänen</string>
     <string name="dc_dns_website_heading">Zeige Website Icon in DNS-Logs (experimentell)</string>
     <string name="dc_dns_website_desc">Ruft Webseitensymbole von <i>nextdns.io</i> und <i>duckduckgo.com</i> ab. Verbraucht bis zu 350 MB Speicherplatz</string>
     <string name="dc_dns_leaks_heading">Verhindere DNS Lecks</string>
@@ -714,7 +714,7 @@
     <string name="dc_custom_dns_radio">Andere DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_entries">%1$s Einträge »</string>
-    <string name="dc_local_block_desc_1">Wählen Sie aus über 185 Blocklisten. Klicken Sie hier um Blocklisten herunterzuladen oder zu konfigurieren.</string>
+    <string name="dc_local_block_desc_1">Wählen Sie aus über 195 Blocklisten. Klicken Sie hier um Blocklisten herunterzuladen oder zu konfigurieren.</string>
     <string name="dc_local_block_heading">Geräteinterne Sperrlisten</string>
     <string name="intent_launch_error">Zählung nicht gestartet %1$s</string>
     <string name="cd_dns_crypt_title">Resolver</string>
@@ -750,15 +750,9 @@
     <string name="dns_proxy_dialog_message_no_app">IP-Adresse: %1$s
 \n
 \nPortnummer: %2$s</string>
-    <string name="fapps_info_dialog_message">Blockieren Sie die Verbindung von Apps mit dem Internet. Die Beschränkung des Internetzugangs hilft, eine unangemessene Datennutzung zu verhindern und den Akku zu schonen.
-\n
-\nDie Firewall-Regeln für gebührenpflichtige (Mobile) / nicht gebührenpflichtige (WiFi) Verbindungen werden nicht beachtet, wenn:
-\n
-\n1. VPN im Sperrmodus ist (d. h. <i>Verbindungen ohne VPN</i> blockieren ist aktiviert).
-\n
-\n2. <i>Alle verfügbaren Netzwerke verwenden</i> ist aktiviert.</string>
+    <string name="fapps_info_dialog_message">Blockieren Sie die Verbindung von Apps mit dem Internet. Die Beschränkung des Internetzugangs hilft, eine unangemessene Datennutzung zu verhindern und den Akku zu schonen.</string>
     <string name="dc_other_settings_heading">Fortgeschritten</string>
-    <string name="dc_custom_block_heading">Erlaube oder verbiete individuelle Domains</string>
+    <string name="dc_custom_block_heading">Domain Regeln</string>
     <string name="dc_check_update_heading">Aufforderung zur Aktualisierung der Blockliste</string>
     <string name="univ_view_blocked_ip_desc">Blockierte oder vertrauenswürdige IP-/Port-Regeln ändern.</string>
     <string name="univ_ip_delete_individual_toast">%1$s gelöscht.</string>
@@ -834,4 +828,30 @@
     <string name="dns_proxy_app">App</string>
     <string name="fapps_filter_filter_heading">Typ</string>
     <string name="copy_clipboard_label">URL</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">Blockieren auf nicht getakteten Verbindung</string>
+    <string name="fapps_all_network_hint" translatable="true"><u>Alle Netzwerke verwenden</u> ist aktiviert. Die Firewall berücksichtigt keine getakteten/nicht getakteten-Regeln.</string>
+    <string name="fapps_info_metered_msg" translatable="true">Zulassen / Blockieren im getakteten (mobilen) Netzwerk.</string>
+    <string name="fapps_lockdown_hint" translatable="true">VPN befindet sich im Sperrmodus. Die Firewall berücksichtigt keine Metered/Unmetered-Regeln.</string>
+    <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starten Sie Rethink, um fortzufahren</string>
+    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="lbl_allowed" translatable="true">Erlaubt</string>
+    <string name="lbl_blocked" translatable="true">Geblockt</string>
+    <string name="lbl_disabled" translatable="true">Deaktiviert</string>
+    <string name="lbl_action_required" translatable="true">Aktion erforderlich</string>
+    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Zulassen / Blockieren im Netzwerk ohne Zähler (WiFi).</string>
+    <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS durch Proxy geleitet</string>
+    <string name="firewall_rule_block_domain" translatable="true">Domain (App)</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Eine vom Benutzer festgelegte Firewallregel blockierte die <i>Domäne</i>.<br/><br/> Um dies zu ändern, gehen Sie zum <i>Bildschirm App-spezifische Firewall.</i></string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Diese Verbindung wurde zugelassen, da die Domäne als vertrauenswürdige <i>Domäne</i> festgelegt ist.<br/><br/> Um dies zu ändern, gehen Sie zum <i>Bildschirm App-spezifische Firewall.</i></string>
+    <string name="lbl_cancel" translatable="true">Abbrechen</string>
+    <string name="lbl_apply" translatable="true">Akzeptieren</string>
+    <string name="lbl_dismiss" translatable="true">Verwerfen</string>
+    <string name="lbl_all" translatable="true">Alle</string>
+    <string name="lbl_ip_rules" translatable="true">Regeln IP</string>
+    <string name="lbl_domain_rules" translatable="true">Domain-Regeln</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Zulassen auf nicht getakteten Verbindung</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Domain (App)</string>
+    <string name="cd_no_rules_text" translatable="true">Keine Domain Regeln gefunden.</string>
+    <string name="bsdl_block_desc" translatable="true">Blockieren, <u>dieser Domäne</u> vertrauen</string>
 </resources>
