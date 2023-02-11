@@ -139,7 +139,6 @@
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="firewall_status_isolate">изолированный</string>
     <string name="settings_selected_ip_desc">%1$s</string>
-    <string name="firewall_card_status_inactive">Отключено</string>
     <string name="settings_network_all_networks_desc">Если функция включена, RethinkDNS использует все доступные сети для подключения к интернету. Если нет, то используется та сеть, которая считается <i>активной</i> в Android.</string>
     <string name="hsf_stop_btn_state">стоп</string>
     <string name="hsf_vpn_dialog_header">Внимание!</string>
@@ -149,7 +148,6 @@
     <string name="cd_dns_crypt_dialog_name">Имя</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
     <string name="hs_download_positive_default">ok</string>
-    <string name="univ_ip_delete_dialog_negative">Отмена</string>
     <string name="settings_allow_bypass_desc">Разрешить приложениям запрашивать обход брандмауэра RethinkDNS по запросу. Некоторым приложениям для аудио/видеоконференций, таким как Zoom и WhatsApp, для правильной работы может потребоваться обход по требованию.</string>
     <string name="dns_delete_positive">Удалить</string>
     <string name="dns_proxy_app">Приложение</string>
@@ -205,7 +203,6 @@
     <string name="hsf_proxy_chip_remove_text">Остановка…</string>
     <string name="contributors_dialog_title">Авторы</string>
     <string name="dns_proxy_positive_btn">добавить</string>
-    <string name="cd_sample_unicode_valid">✅</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Удалить резолвер DNSCrypt\?</string>
     <string name="dns_proxy_remove_dialog_message">Удалить DNS-прокси из сохраненной конфигурации.</string>
     <string name="fapps_filter_parent_system">Системные</string>
@@ -233,7 +230,6 @@
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS запускает VPN в режиме <i>Lockdown</i>. Его остановка приведет к потере подключения к интернету для этого профиля пользователя. Вы хотите продолжить в любом случае\?</string>
     <string name="settings_ip_text_ipv46">Авто</string>
     <string name="cd_remove_dialog_positive">Удалить</string>
-    <string name="rt_dialog_negative">Отмена</string>
     <string name="brbs_restore_dialog_failure_negative">Отклонить</string>
     <string name="dns_firewall_mode_info_explanation_new">Все вышеперечисленное + обход интернет-цензуры.</string>
     <string name="bsct_app_info">Информация о приложении</string>
@@ -262,7 +258,6 @@
     <string name="about_join_telegram">Telegram</string>
     <string name="cd_custom_dns_proxy_default_app">Никто</string>
     <string name="dns_info_positive">Ok</string>
-    <string name="cd_dialog_negative_btn">отмена</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s резолверы</string>
     <string name="download_update_dialog_title">Новое обновление!</string>
     <string name="search_firewall_network_log"><font size="12">Поиск приложений, IP, доменов</font></string>
@@ -361,7 +356,6 @@
     <string name="new_app_bulk_notification_content">RethinkDNS заблокировал %1$s новые приложения. Нажмите для просмотра или изменения.</string>
     <string name="notif_channel_desc_vpn_failure">Информируйте, когда RethinkDNS остановлен Android или другим приложением VPN</string>
     <string name="category_name_sys_components">Компоненты системы</string>
-    <string name="cd_filter_allowed">Разрешено</string>
     <string name="notif_channel_vpn_notification">Активная VPN</string>
     <string name="notif_channel_proxy_failure">Оповещения о прокси-серверах</string>
     <string name="notif_channed_desc_download">Оповещение о ходе загрузки списков блокировки</string>
@@ -457,7 +451,7 @@
     <string name="hsf_dns_logs_chip_text">Журналы DNS</string>
     <string name="hsf_chip_appearance">Тема: %1$s</string>
     <string name="dns_logs_lifetime_queries">Всего запросов: %1$s</string>
-    <string name="dc_custom_block_heading">Разрешить или запретить отдельные домены</string>
+    <string name="dc_custom_block_heading">Правила домена</string>
     <string name="dc_check_update_heading">Уведомление об обновлении списка блокировки</string>
     <string name="dc_check_update_desc">Проверять обновления списков блокировки каждые <i>три</i> дня</string>
     <string name="dc_dns_website_desc">Получает иконки сайтов с <i>nextdns.io</i> и <i>duckduckgo.com</i>. Потребляет до 350 мб дискового пространства</string>
@@ -512,7 +506,6 @@
     <string name="network_log_app_name_unnamed">Неназванный (%1$s)</string>
     <string name="cd_toast_deleted">Домен удален из пользовательского списка</string>
     <string name="cd_remove_dialog_message">Удалить домен из сохраненной конфигурации.</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="cd_dialog_title">Добавить домен</string>
     <string name="cd_dialog_edittext_hint">Войти %1$s</string>
     <string name="cd_dialog_error_invalid_domain">Неверный URL (домен).</string>
@@ -563,7 +556,7 @@
     <string name="lbbs_copy">Скопировать как URL RDNS+</string>
     <string name="lbbs_search">Поиск доменов в списках блокировок</string>
     <string name="lbbs_update_check">Проверить наличие обновлений</string>
-    <string name="lbbs_heading">Настройка 185+ списков блокировки</string>
+    <string name="lbbs_heading">Настройка 195+ списков блокировки</string>
     <string name="brbs_backup_title">Резервное копирование</string>
     <string name="brbs_restore_title">Восстановить</string>
     <string name="brbs_restore_desc">Восстановить из файла резервной копии</string>
@@ -618,9 +611,9 @@
     <string name="dns_logs_blocked_queries">Заблокированных запросов: %1$s</string>
     <string name="dc_custom_dns_radio">Другие DNS</string>
     <string name="dc_entries">%1$s записи »</string>
-    <string name="dc_local_block_desc_1">Выбирайте из 185+ списков блокировок. Нажмите здесь, чтобы загрузить их или настроить.</string>
+    <string name="dc_local_block_desc_1">Выбирайте из 195+ списков блокировок. Нажмите здесь, чтобы загрузить их или настроить.</string>
     <string name="dc_dns_website_heading">Показывать значок веб-сайта в журналах DNS (экспериментально)</string>
-    <string name="dc_custom_block_desc">В ближайшее время</string>
+    <string name="dc_custom_block_desc">Изменение правил заблокированных или доверенных доменов</string>
     <string name="about_bravedns_toreport_text">помощь и отзывы</string>
     <string name="about_bug_report_desc">журналы аварий электронной почты</string>
     <string name="about_bug_report">Сообщение об ошибке</string>
@@ -641,9 +634,7 @@
     <string name="intent_launch_error">Граф не запускается %1$s</string>
     <string name="error_loading_log_file">Ошибка загрузки файла журнала</string>
     <string name="dns_btm_sheet_chip">+%1$s IP</string>
-    <string name="dns_btm_sheet_chip_blocked">Заблокировано</string>
     <string name="dns_btm_sheet_chip_no_answer">Нет ответа</string>
-    <string name="dns_filter_parent_blocked">Заблокировано</string>
     <string name="dns_btm_resolved_crypt">разрешено <u>анонимно</u> %1$s по %2$s</string>
     <string name="dns_btm_resolved_doh">разрешено %1$s через %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">разрешено %1$s</string>
@@ -781,7 +772,6 @@
     <string name="cd_dnscrypt_relay_heading">Ретрансляторы</string>
     <string name="ct_delete_logs_positive_btn">Удаление журналов</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
-    <string name="ct_filter_parent_blocked">Заблокировано</string>
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ctbs_app_info_not_available_toast">Страница настроек приложения не найдена</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s другое приложение (приложения)</string>
@@ -839,4 +829,22 @@
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">самые блокируемые IP</string>
     <string name="ci_trust_txt">Доверенный</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">самые встречающиеся IP</string>
+    <string name="firewall_rule_block_domain" translatable="true">Домен (приложение)</string>
+    <string name="lbl_cancel" translatable="true">Отмена</string>
+    <string name="lbl_apply" translatable="true">Применить</string>
+    <string name="lbl_all" translatable="true">Все</string>
+    <string name="lbl_allowed" translatable="true">Разрешено</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Домен (приложение)</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Установленное пользователем правило брандмауэра заблокировало <i>домен</i>.<br/><br/> Для изменения перейдите к экрану <i>Брандмауэр для приложений</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Это соединение было разрешено, поскольку <i>домен</i> установлен как доверенный.<br/><br/> Для изменения перейдите на экран <i>Брандмауэр для приложений</i>.</string>
+    <string name="lbl_dismiss" translatable="true">Отклонить</string>
+    <string name="lbl_blocked" translatable="true">Заблокировано</string>
+    <string name="lbl_disabled" translatable="true">Отключено</string>
+    <string name="lbl_domain" translatable="true">Домен</string>
+    <string name="lbl_action_required" translatable="true">Требуется действие</string>
+    <string name="lbl_ip_rules" translatable="true">IP-правила</string>
+    <string name="lbl_wildcard" translatable="true">Подстановочный знак</string>
+    <string name="lbl_domain_rules" translatable="true">Правила домена</string>
+    <string name="cd_no_rules_text" translatable="true">Правила домена не найдены.</string>
+    <string name="bsdl_block_desc" translatable="true">Блокировка, доверие к <u>этому домену</u></string>
 </resources>
