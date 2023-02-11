@@ -202,7 +202,7 @@
     <string name="allow">অনুমতি</string>
     <string name="status_protected_with_tor_private_dns">টর এবং প্রাইভেট ডিএনএস দিয়ে সুরক্ষিত</string>
     <string name="dns_mode_info_title">DNS</string>
-    <string name="bsct_block_app"><u>এই অ্যাপের</u> জন্য <u>এই IP</u> ব্লক করুন, বাইপাস করুন</string>
+    <string name="bsct_block_ip"><u>এই অ্যাপের</u> জন্য <u>এই IP</u> ব্লক করুন, বাইপাস করুন</string>
     <string name="bsct_conn_block_desc">%2$s দ্বারা %1$s অবরুদ্ধ</string>
     <string name="always_on_dialog_positive_btn">সেটিংস এ যান</string>
     <string name="dns_proxy_remove_success">DNS প্রক্সি মুছে ফেলা হয়েছে৷</string>
@@ -549,7 +549,6 @@
     <string name="firewall_rule_bypass_universal_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ &lt;i&gt;গন্তব্য আইপি&lt;/i&gt; সমস্ত সার্বজনীন ফায়ারওয়াল নিয়মগুলিকে বাইপাস করতে সেট করা হয়েছে৷&lt;br/&gt;&lt;br/&gt; পরিবর্তন করতে &lt;i&gt;ইউনিভার্সাল&lt;-এ &lt;i&gt;আইপি নিয়মে&lt;i&gt; যান &lt;/i&gt; ট্যাব।</string>
     <string name="firewall_rule_device_lock_desc">এই সংযোগটি ফায়ারওয়াল করা হয়েছিল কারণ <i>ডিভাইসটি সেই সময়ে লক করা ছিল</i>।</string>
     <string name="notif_channel_desc_proxy_failure">প্রক্সি ত্রুটি এবং অসঙ্গতির বিষয়ে সতর্কতা</string>
-    <string name="bsac_distrust_toast">এই IP %1$s এর জন্য বাইপাস সরানো হয়েছে</string>
     <string name="network_dns">সিস্টেম DNS</string>
     <string name="lbbs_update_check">হালনাগাদ আছে কিনা দেখো</string>
     <string name="brbs_backup_desc">ব্যাকআপ অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ</string>
@@ -574,7 +573,6 @@
     <string name="cd_no_rule_txt">কোন নিয়ম নেই</string>
     <string name="ci_dialog_edittext_hint">আইপি ঠিকানা, সাবনেট বা পোর্ট</string>
     <string name="ada_app_bypass_univ">বাইপাস ইউনিভার্সাল</string>
-    <string name="bsac_distrust">বাইপাস সরান</string>
     <string name="brbs_restore_title">পুনঃস্থাপন</string>
     <string name="brbs_backup_dialog_failure_title">ব্যাকআপ ব্যর্থ হয়েছে</string>
     <string name="network_log_app_name_unknown">অজ্ঞাত</string>
@@ -583,8 +581,6 @@
     <string name="firewall_rule_exempt_app_bypass_univ_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>সোর্স অ্যাপ</i> সেট করা হয়েছে <i>বাইপাস ইউনিভার্সাল</i> ফায়ারওয়াল নিয়মে।</string>
     <string name="notif_dialog_pause_dialog_message">বিরতি অবস্থায় আবেদন, চালিয়ে যেতে পুনরায় শুরু করুন</string>
     <string name="cd_remove_dialog_positive">মুছুন</string>
-    <string name="bsac_block">অবরোধ</string>
-    <string name="bsac_trust_toast">এই IP %1$s এর জন্য অ্যাপের নিয়মগুলি বাইপাস করা</string>
     <string name="brbs_backup_dialog_message">একটি ফাইলে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ ব্যাক আপ করে। এটি VPN পুনরায় চালু করবে।</string>
     <string name="other_dns_list_tab2">ডিএনস্ক্রিপ্ট</string>
     <string name="firewall_rule_block_udp_ntp">UDP অবরুদ্ধ</string>
@@ -599,12 +595,10 @@
     <string name="ada_app_status_unknown">অজানা</string>
     <string name="ada_network_log_title">এই অ্যাপের জন্য নেটওয়ার্ক লগ</string>
     <string name="ada_app_exclude">বাদ দিন</string>
-    <string name="bsac_unblock_toast">এই অ্যাপের জন্য %1$s আনব্লক করা হয়েছে</string>
     <string name="rt_dialog_title">Save changes</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="dc_local_block_enabled">সক্ষম করা হয়েছে</string>
     <string name="brbs_restore_no_uri_toast">পুনরুদ্ধার ব্যর্থ হয়েছে; আবার চেষ্টা করুন</string>
-    <string name="accessibility_notification_title">অ্যাকশন প্রয়োজন</string>
     <string name="firewall_rule_block_metered">মিটারযুক্ত (মোবাইল)</string>
     <string name="firewall_rule_bypass_universal_ip">বাইপাস আইপি</string>
     <string name="category_name_non_app_sys">সিস্টেম পরিষেবা</string>
@@ -612,7 +606,6 @@
     <string name="cd_dialog_error_invalid_domain">অবৈধ URL(ডোমেন)।</string>
     <string name="ada_app_status_block">বন্ধ</string>
     <string name="ada_app_dns_settings">DNS সেটিংস</string>
-    <string name="bsac_block_toast">এই অ্যাপের জন্য %1$s ব্লক করা হচ্ছে</string>
     <string name="bsdl_blocked_desc">%2$s দ্বারা %1$s অবরুদ্ধ</string>
     <string name="rt_download_start">ব্লকলিস্ট ডাউনলোড করা হচ্ছে…</string>
     <string name="radio_max_btn">🪂 Max</string>
@@ -684,7 +677,6 @@
     <string name="new_app_bulk_notification_content">RethinkDNS ব্লক করেছে %1$s নতুন অ্যাপ। দেখতে বা পরিবর্তন করতে আলতো চাপুন।</string>
     <string name="category_name_installed">ইনস্টল করা অ্যাপস</string>
     <string name="ci_blocked_initial">নীল</string>
-    <string name="bsac_trust">বাইপাস অ্যাপের নিয়ম</string>
     <string name="notif_download_failure_content">নামাতে ব্যার্থ. আবার চেষ্টা করুন.</string>
     <string name="rt_download_desc">এই বৈশিষ্ট্যটি ব্যবহার করতে ব্লকলিস্ট ডাউনলোড করুন (প্রায় 60MB)।</string>
     <string name="settings_local_blocklist_in_use">%1$s ব্লকলিস্ট ব্যবহার করা হচ্ছে</string>
@@ -697,7 +689,6 @@
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
     <string name="ada_app_metered">মিটারযুক্ত</string>
-    <string name="bsac_unblock">Unblock</string>
     <string name="rbl_security">নিরাপত্তা</string>
     <string name="rt_re_download">ব্লকলিস্ট পুনরায় ডাউনলোড করুন</string>
     <string name="bsrf_clear_filter">পরিষ্কার করুন</string>

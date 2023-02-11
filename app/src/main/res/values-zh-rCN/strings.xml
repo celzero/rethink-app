@@ -65,7 +65,6 @@
     <string name="category_name_sys_components">系统组件</string>
     <string name="cd_dialog_error_invalid_wildcard">无效通配符。</string>
     <string name="ci_no_rule">无规则</string>
-    <string name="bsac_trust">信任</string>
     <string name="rt_dialog_message">您是否想要应用新配置的屏蔽名单？</string>
     <string name="dc_dns_proxy">DNS 代理</string>
     <string name="notification_action_pause_vpn">暂停</string>
@@ -180,7 +179,6 @@
     <string name="ci_blocked_initial">拦</string>
     <string name="ci_bypass_universal">无条件放行</string>
     <string name="ada_app_status_block_md">已于收费网络（移动数据）拦截</string>
-    <string name="bsac_block_toast">正为此应用拦截 %1$s</string>
     <string name="notif_download_failure_content">下载失败。请重试。</string>
     <string name="brbs_restore_dialog_failure_title">恢复失败</string>
     <string name="notification_action_dns_mode">DNS</string>
@@ -252,7 +250,6 @@
     <string name="cd_dialog_error_invalid_domain">无效 URL （域名）。</string>
     <string name="ci_dialog_edittext_hint">IP 地址、子网或端口</string>
     <string name="ada_noapp_dialog_message">未找到指定应用的信息。此应用或许已被卸载。</string>
-    <string name="bsac_unblock">解封</string>
     <string name="rt_dialog_title">保存更改</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="title_settings">设置</string>
@@ -343,17 +340,13 @@
     <string name="univ_ip_delete_toast_success">已删除所有 IP 规则。</string>
     <string name="dns_proxy_dialog_header_dns">添加 DNS 代理</string>
     <string name="dns_proxy_app">应用</string>
-    <string name="fapps_firewall_filter_blocked">已拦截</string>
     <string name="fapps_unmetered_unblock_dialog_title">于非收费网络放行</string>
     <string name="fapps_firewall_filter_hint">对已列出的应用程序应用规则</string>
     <string name="firewall_rule_trusted_ip">已信任 IP</string>
     <string name="notif_channel_download">下载警报</string>
     <string name="category_name_installed">已安装程序</string>
-    <string name="cd_sample_unicode_valid">✅</string>
-    <string name="cd_whitelist_txt">放行</string>
     <string name="ada_app_status_block_wifi">已于非收费网络（ WiFi ）拦截</string>
     <string name="ada_app_status_unknown">未知</string>
-    <string name="bsac_distrust">不信任</string>
     <string name="bsdl_blocked_desc">已由 %2$s 拦截 %1$s</string>
     <string name="bsrf_sub_group_heading">子分组</string>
     <string name="allow">放行</string>
@@ -377,10 +370,8 @@
     <string name="cd_dns_crypt_relay_heading">中继</string>
     <string name="cd_dns_crypt_dialog_stamp">印戳</string>
     <string name="cd_doh_dialog_resolver_url">解析服务 URL</string>
-    <string name="dns_filter_parent_allowed">已放行</string>
     <string name="univ_firewall_rule_2">拦截任何未使用的应用</string>
     <string name="dns_connected_rethink_plus">已连接。正使用 %1$s 个屏蔽名单</string>
-    <string name="fapps_unmetered_positive">应用</string>
     <string name="system_dns_connection_failure">无法确定当前的 DNS 服务器</string>
     <string name="firewall_rule_block_udp_ntp">已拦截 UDP</string>
     <string name="category_name_others">其他</string>
@@ -456,7 +447,6 @@
     <string name="cd_dialog_header">自定义域名</string>
     <string name="ada_noapp_dialog_positive">确认</string>
     <string name="ada_app_dns_settings">DNS 设置</string>
-    <string name="bsac_distrust_toast">不信任此 IP 的 %1$s</string>
     <string name="rbl_privacy">隐私</string>
     <string name="rbl_security">安全</string>
     <string name="brbs_restore_title">恢复</string>
@@ -521,9 +511,6 @@
     <string name="notif_channel_desc_vpn_failure">在 Rethink 被 Android 或其他 VPN 应用停止时提醒我</string>
     <string name="cd_remove_dialog_title">是否删除域名？</string>
     <string name="ci_delete">删除</string>
-    <string name="bsac_block">拦截</string>
-    <string name="bsac_unblock_toast">已为此应用放行 %1$s</string>
-    <string name="dc_local_block_disabled">已停用</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">已保护</string>
     <string name="status_protected_with_tor_private_dns">已由 Tor 与私人 DNS 保护</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS 正以<i>隔离</i>模式运行 VPN 。将其停止会致本用户失去互联网连接。您是否仍要继续？</string>
@@ -588,12 +575,9 @@
     <string name="new_app_notification_content">RethinkDNS 拦截了新安装的应用程序， %1$s 。</string>
     <string name="notif_dialog_pause_dialog_message">应用已被暂停，为继续请先恢复</string>
     <string name="notif_channed_desc_download">提示本地屏蔽名单下载进度</string>
-    <string name="cd_filter_blocked">拦截</string>
     <string name="ci_dialog_title">添加 IP / 端口规则</string>
     <string name="ada_app_status_whitelist">将绕过全局防火墙规则</string>
     <string name="bsac_title_desc">规则仅应用于此应用程序。</string>
-    <string name="bsac_trust_toast">信任此应用的 %1$s</string>
-    <string name="bsdl_domain_desc">轻触下方以放行或拦截 DNS 查询请求</string>
     <string name="notif_download_success_content">下载成功。</string>
     <string name="dc_doh">Dns over HTTPS</string>
     <string name="status_protected_with_socks5">已由 SOCKS5 代理保护</string>
@@ -671,7 +655,7 @@
 \nRethinkDNS 使用无障碍服务来关注正在使用的应用（前台）与未使用的应用（后台）。</string>
     <string name="status_protected_with_proxy">已由代理保护</string>
     <string name="dns_explanation_firewall_connected">已连接至防火墙</string>
-    <string name="bsct_block_app">对<u>此应用</u>拦截、信任<u>此 IP</u></string>
+    <string name="bsct_block_ip">对<u>此应用</u>拦截、信任<u>此 IP</u></string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">未保护</string>
     <string name="dns_mode_info_title">DNS</string>
     <string name="conn_track_clear_logs_message">这仅会删除网络日志，不会触及防火墙规则。此操作不可逆。请问您是否想要继续？</string>

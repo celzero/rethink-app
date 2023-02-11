@@ -297,7 +297,7 @@
     <string name="dns_query_clear_logs_title">Apagar todos os registros do DNS\?</string>
     <string name="dns_query_clear_logs_message">Isso apaga os registros do DNS no dispositivo. Esta operação é irreversível. Você quer continuar\?</string>
     <string name="bsct_app_info">Detalhes do app</string>
-    <string name="bsct_block_app">Bloqueie, contorne <u>este IP</u> para <u>este aplicativo</u></string>
+    <string name="bsct_block_ip">Bloqueie, contorne <u>este IP</u> para <u>este aplicativo</u></string>
     <string name="bsct_conn_block_desc">%1$s bloqueado por %2$s</string>
     <string name="bsct_conn_block_desc_device">%1$s bloqueado no dispositivo</string>
     <string name="bsct_conn_desc_blocked">bloqueado em %1$s %2$s</string>
@@ -714,14 +714,6 @@
     <string name="ada_app_exclude">Excluir</string>
     <string name="ada_app_dns_settings">Configurações de DNS</string>
     <string name="bsac_title_desc">As regras se aplicam apenas a este app.</string>
-    <string name="bsac_unblock">Desbloquear</string>
-    <string name="bsac_block">Bloquear</string>
-    <string name="bsac_trust">Regras de autorização do app</string>
-    <string name="bsac_distrust">Remover autorização</string>
-    <string name="bsac_block_toast">Bloqueando %1$s para este app</string>
-    <string name="bsac_unblock_toast">Desbloqueado %1$s para este app</string>
-    <string name="bsac_trust_toast">Contornando as regras do app para este IP %1$s</string>
-    <string name="bsac_distrust_toast">Foi removida a autorização para este IP %1$s</string>
     <string name="bsdl_blocked_desc">bloqueado %1$s por %2$s</string>
     <string name="network_dns">DNS do sistema</string>
     <string name="notif_download_content_text">Download em andamento…</string>

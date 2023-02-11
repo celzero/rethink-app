@@ -406,10 +406,6 @@
     <string name="ada_app_status_whitelist">apeis universaliąsias ugniasienės taisykles</string>
     <string name="ada_app_dns_settings">DNS nustatymai</string>
     <string name="bsac_title_desc">Taisyklės taikomos tik šiai programėlei.</string>
-    <string name="bsac_unblock">Atblokuoti</string>
-    <string name="bsac_block">Blokuoti</string>
-    <string name="bsac_trust">Apeiti programėlės taisykles</string>
-    <string name="bsac_distrust">Pašalinti apėjimą</string>
     <string name="rt_dialog_neutral">Tęsti</string>
     <string name="rt_list_simple_btn_txt">paprasta</string>
     <string name="rt_list_adv_btn_txt">išplėstinė</string>
@@ -711,7 +707,7 @@
     <string name="bypass_universal">apeiti universaliąsias</string>
     <string name="isolate">visiškas užrakinimas</string>
     <string name="notification_action_resume_vpn">TĘSTI</string>
-    <string name="bsct_block_app">Blokuoti, leisti apeiti <u>šį IP</u> <u>šiai programėlei</u></string>
+    <string name="bsct_block_ip">Blokuoti, leisti apeiti <u>šį IP</u> <u>šiai programėlei</u></string>
     <string name="bsct_block">Blokuoti, leisti apeiti, išskirti, visiškai užrakinti <u>šią programėlę</u></string>
     <string name="bsct_conn_desc_allowed">leidžiama %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked">užblokuota %1$s %2$s</string>
@@ -759,10 +755,6 @@
     <string name="ci_bypass_universal">apeiti universaliąsias</string>
     <string name="ada_app_unmetered">Nematuojami</string>
     <string name="ada_app_bypass_univ">Apeiti universaliąsias</string>
-    <string name="bsac_block_toast">%1$s blokuojamas šiais programėlei</string>
-    <string name="bsac_unblock_toast">%1$s atblokuotas šiais programėlei</string>
-    <string name="bsac_trust_toast">Apeinamos programėlės taisyklės šiam IP %1$s</string>
-    <string name="bsac_distrust_toast">Pašalintas apėjimas šiam IP %1$s</string>
     <string name="bsdl_blocked_desc">%1$s užblokuota pagal %2$s</string>
     <string name="rethink_sky_desc">Daugiau nei 280 vietų; geresnis veikimo laikas; stub sprendiklis veikia cloudflare.com</string>
     <string name="rethink_max_desc">Daugiau nei 50 vietovių; daugiau privatumo; rekursyvus sprendiklis veikia fly.io</string>

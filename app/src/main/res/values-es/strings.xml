@@ -365,12 +365,6 @@
     <string name="ada_app_isolate">Aislamiento</string>
     <string name="ada_app_dns_settings">Configuración DNS</string>
     <string name="bsac_title_desc">Las normas se aplican únicamente a esta aplicación.</string>
-    <string name="bsac_unblock">Desbloquear</string>
-    <string name="bsac_trust">Confiar</string>
-    <string name="bsac_distrust">Desconfiar</string>
-    <string name="bsac_block_toast">Bloqueando %1$s para esta aplicación</string>
-    <string name="bsac_block">Bloquear</string>
-    <string name="bsac_unblock_toast">Desbloqueado %1$s para esta aplicación</string>
     <string name="notif_download_content_text">Descarga en curso…</string>
     <string name="network_dns">Sistema DNS</string>
     <string name="notif_download_failure_content">La descarga ha fallado. Inténtelo de nuevo.</string>
@@ -632,8 +626,6 @@
     <string name="ada_network_log_title">registro de red para esta aplicación</string>
     <string name="ada_app_firewall">Cortafuegos</string>
     <string name="ada_app_exclude">Excluir</string>
-    <string name="bsac_trust_toast">Confiar en %1$s para esta aplicación</string>
-    <string name="bsac_distrust_toast">Desconfiar para esta IP %1$s</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Borrar registros</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Borra todos los registros relacionados con esta aplicación.</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Proceder</string>
@@ -795,7 +787,7 @@
     <string name="bsct_block">Bloquear, omitir, excluir, aislar <u>esta aplicación</u></string>
     <string name="bsct_conn_block_desc">bloqueado %1$s por %2$s</string>
     <string name="bsct_conn_block_desc_device">bloqueado %1$s en el dispositivo</string>
-    <string name="bsct_block_app">Bloquear, confiar en <u>esta IP</u> para <u>esta aplicación</u></string>
+    <string name="bsct_block_ip">Bloquear, confiar en <u>esta IP</u> para <u>esta aplicación</u></string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Bloquea una aplicación para que no se conecte a Internet.
 \n <u>#2</u>: Bloquea cualquier aplicación para que no se conecte a una IP concreta.
 \n <u>#3</u>: Bloquea todas las conexiones cuando el dispositivo está bloqueado (Cortafuegos Universal).

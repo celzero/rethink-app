@@ -65,7 +65,7 @@
     <string name="dns_query_clear_logs_title">Cancellare il registro delle connessioni DNS\?</string>
     <string name="dns_query_clear_logs_message">Ciò eliminerà il registro delle connessioni DNS sul dispositivo. Questa operazione non è reversibile. Vuoi procedere\?</string>
     <string name="bsct_app_info">Informazioni sull\'app</string>
-    <string name="bsct_block_app">Blocca, autorizza <u>questo IP</u> per <u>questa app</u></string>
+    <string name="bsct_block_ip">Blocca, autorizza <u>questo IP</u> per <u>questa app</u></string>
     <string name="bsct_block">Blocca, aggira, escludi, isola <u>questa app</u></string>
     <string name="bsct_conn_block_desc">bloccato %1$s da %2$s</string>
     <string name="bsct_conn_desc_allowed">consentito su %1$s %2$s</string>
@@ -308,7 +308,6 @@
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_unmetered">Non a consumo</string>
     <string name="ada_app_metered">A consumo</string>
-    <string name="bsac_distrust_toast">Rimuovi autorizzazione a %1$s per questo IP</string>
     <string name="bsdl_blocked_desc">bloccato %1$s da %2$s</string>
     <string name="network_dns">DNS del sistema</string>
     <string name="notif_download_success_content">Scaricamento completato.</string>
@@ -710,13 +709,6 @@
     <string name="ada_app_exclude">Escludi</string>
     <string name="ada_app_dns_settings">Impostazioni DNS</string>
     <string name="bsac_title_desc">Le regole si applicano solo a quest\'app.</string>
-    <string name="bsac_unblock">Sblocca</string>
-    <string name="bsac_block">Blocca</string>
-    <string name="bsac_trust">Autorizza</string>
-    <string name="bsac_distrust">Rimuovi autorizzazione</string>
-    <string name="bsac_block_toast">%1$s bloccato per quest\'app</string>
-    <string name="bsac_unblock_toast">%1$s sbloccato per quest\'app</string>
-    <string name="bsac_trust_toast">Autorizza %1$s per questa app</string>
     <string name="notif_download_content_title">Scaricamento liste dei filtri su dispositivo</string>
     <string name="notif_download_content_text">Scaricamento in corso…</string>
     <string name="rt_dialog_title">Salva cambiamenti</string>

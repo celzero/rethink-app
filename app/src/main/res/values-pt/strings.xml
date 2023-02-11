@@ -38,7 +38,7 @@
     <string name="alert_firewall_accessibility_exception">Falha ao abrir as configurações de acessibilidade. Tente mais tarde!</string>
     <string name="dns_query_clear_logs_message">Isto elimina os registos DNS do dispositivo. Esta operação não é reversível. Deseja prosseguir\?</string>
     <string name="bsct_app_info">Informações da aplicação</string>
-    <string name="bsct_block_app"><u>Regras de IP</u> para <u>esta aplicação</u></string>
+    <string name="bsct_block_ip"><u>Regras de IP</u> para <u>esta aplicação</u></string>
     <string name="bsct_block">Regras de firewall para <u>esta aplicação</u></string>
     <string name="bsct_conn_desc_allowed">permitido em %1$s %2$s</string>
     <string name="always_on_dialog_positive_btn">Ir às configurações</string>
@@ -463,7 +463,6 @@
     <string name="ada_app_bypass_univ">Contorno universal</string>
     <string name="ada_ip_no_connection">Não há registos de rede para esta aplicação.</string>
     <string name="ada_app_status_allow">é permitida</string>
-    <string name="bsac_distrust_toast">Retirar confiança em %1$s para este IP</string>
     <string name="notif_download_content_text">A descarregar…</string>
     <string name="bsdl_blocked_desc">%1$s bloqueado por %2$s</string>
     <string name="rt_chip_update_available">Atualização disponível</string>
@@ -715,13 +714,6 @@
     <string name="ada_app_isolate">Isolar</string>
     <string name="ada_app_dns_settings">Configurações de DNS</string>
     <string name="bsac_title_desc">As regras aplicam-se apenas a esta aplicação.</string>
-    <string name="bsac_unblock">Desbloquear</string>
-    <string name="bsac_block">Bloquear</string>
-    <string name="bsac_trust">Confiar</string>
-    <string name="bsac_distrust">Desconfiar</string>
-    <string name="bsac_block_toast">A bloquear %1$s nesta aplicação</string>
-    <string name="bsac_unblock_toast">A desbloquear %1$s nesta aplicação</string>
-    <string name="bsac_trust_toast">Confiar em %1$s para esta aplicação</string>
     <string name="notif_download_content_title">Descarregamento da lista de bloqueio no dispositivo</string>
     <string name="notif_download_failure_content">O descarregamento falhou. Tente novamente.</string>
     <string name="notif_download_cancel_content">Descarregamento cancelado.</string>

@@ -86,7 +86,6 @@
     <string name="ada_network_log_title">呢個 app 嘅網絡日誌</string>
     <string name="ada_app_metered">收費嘅網絡</string>
     <string name="ada_app_exclude">排除</string>
-    <string name="bsac_distrust_toast">唔信任呢個 IP 嘅 %1$s</string>
     <string name="rethink_sky_desc">超過 280 個地方；更長嘅在線時間；喺 cloudflare.com 上面行嘅中間解析服務</string>
     <string name="dc_rethink_dns">Rethink DNS</string>
     <string name="app_name">RethinkDNS</string>
@@ -614,14 +613,6 @@
     <string name="ada_app_status_unknown">未知</string>
     <string name="ada_app_dns_settings">DNS 設定</string>
     <string name="bsac_title_desc">呢條規則淨係適用於呢個 app。</string>
-    <string name="bsac_unblock">解封</string>
-    <string name="bsac_trust">信任</string>
-    <string name="bsac_distrust">唔信任</string>
-    <string name="bsac_block_toast">爲呢個 app 攔截緊 %1$s</string>
-    <string name="bsac_unblock_toast">爲呢個 app 放行咗 %1$s</string>
-    <string name="bsdl_domain_heading">網域規則</string>
-    <string name="bsdl_domain_desc">㩒一下下面以放行或攔截 DNS 查詢請求</string>
-    <string name="bsac_trust_toast">信任呢個 app 嘅 %1$s</string>
     <string name="bsdl_blocked_desc">由 %2$s 攔截咗 %1$s</string>
     <string name="network_dns">系統 DNS</string>
     <string name="notif_download_content_title">下載本地攔截清單</string>
@@ -708,7 +699,7 @@
     <string name="always_on_dialog">呢部電話嘅「永久連線 VPN」已經開着咗。要開 Rethink 嘅話，請去系統設定禁用咗「永久連線 VPN」先。</string>
     <string name="alert_firewall_accessibility_exception">打開唔到無障礙設定。請等陣再試過！</string>
     <string name="bsct_conn_block_desc">由 %2$s 攔截咗 %1$s</string>
-    <string name="bsct_block_app">對<u>呢個 app</u> 攔截、信任<u>呢個 IP</u></string>
+    <string name="bsct_block_ip">對<u>呢個 app</u> 攔截、信任<u>呢個 IP</u></string>
     <string name="bsct_block">針對<u>呢個 app</u> 攔截、放行、排除或者隔離</string>
     <string name="bsct_conn_block_desc_device">本地攔截 %1$s</string>
     <string name="bsct_conn_desc_allowed">%2$s 放行 %1$s</string>
@@ -749,7 +740,6 @@
     <string name="ada_app_status_block_wifi">已經喺唔收費嘅網絡（WiFi）攔截咗</string>
     <string name="ada_app_status_block_md">已經喺收費嘅網絡（流動數據）攔截咗</string>
     <string name="ada_app_bypass_univ">無條件放行</string>
-    <string name="bsac_block">攔截</string>
     <string name="notif_download_failure_content">下載失敗。請再試過。</string>
     <string name="brbs_restore_no_uri_toast">恢復失敗；請再試過</string>
     <string name="firewall_rule_block_udp_ntp_desc">一條用戶定義嘅防火牆規則攔截咗呢個 <i>UDP</i> 連線。<br/><br/>如果要改，請去<i>全局</i>選項卡。</string>

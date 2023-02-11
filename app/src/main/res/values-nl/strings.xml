@@ -133,7 +133,7 @@
     <string name="conn_track_clear_logs_title">Alle netwerk logs verwijderen\?</string>
     <string name="dns_query_clear_logs_title">Alle DNS logs verwijderen\?</string>
     <string name="bsct_app_info">App Info</string>
-    <string name="bsct_block_app">Blokkeer, omzeil <u>dit IP</u> voor <u>deze app</u></string>
+    <string name="bsct_block_ip">Blokkeer, omzeil <u>dit IP</u> voor <u>deze app</u></string>
     <string name="bsct_conn_block_desc">geblokkeerd %1$s door %2$s</string>
     <string name="bsct_conn_block_desc_device">geblokkeerd %1$s op apparaat</string>
     <string name="bsct_conn_desc_allowed">toegestaan op %1$s %2$s</string>

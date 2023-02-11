@@ -118,7 +118,7 @@
 \n
 \nRethinkDNS использует службу доступности для отслеживания того, какие приложения используются (на переднем плане), а какие не используются (на заднем плане).</string>
     <string name="dc_other_settings_heading">продвинутый</string>
-    <string name="bsct_block_app">Блокировать, доверять <u>этому IP</u> для <u>этого приложения</u></string>
+    <string name="bsct_block_ip">Блокировать, доверять <u>этому IP</u> для <u>этого приложения</u></string>
     <string name="bsct_conn_block_desc">заблокирован %1$s по %2$s</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Блокирует приложение от подключения к интернету.
 \n <u>#2</u>: Блокирует любое приложение от подключения к определенному IP-адресу.
@@ -416,15 +416,11 @@
     <string name="ada_app_status_isolate">изолирован; разрешено только доверенным IP</string>
     <string name="network_dns">Системный DNS</string>
     <string name="notif_download_failure_content">Загрузка не удалась. Попробуйте еще раз.</string>
-    <string name="bsac_unblock">Разблокировать</string>
-    <string name="bsac_trust">Доверие</string>
-    <string name="bsdl_domain_rule_norule">нет правил</string>
     <string name="notif_download_content_title">Загрузка списка блокировки</string>
     <string name="notif_download_content_text">Загрузка продолжается…</string>
     <string name="notif_download_cancel_content">Загрузка отменена.</string>
     <string name="bsdl_blocked_desc">заблокирован %1$s по %2$s</string>
     <string name="rbl_parental_control">Родительский контроль</string>
-    <string name="bsac_unblock_toast">Разблокировано %1$s для этого приложения</string>
     <string name="radio_sky_btn">⛅ Небо</string>
     <string name="brbs_title">Резервное копирование и восстановление</string>
     <string name="rt_dialog_title">Сохранить изменения</string>
@@ -574,11 +570,6 @@
     <string name="ada_app_exclude">Убрать</string>
     <string name="ada_app_isolate">Изолировать</string>
     <string name="ada_app_dns_settings">Настройки DNS</string>
-    <string name="bsac_block">Заблокировать</string>
-    <string name="bsac_distrust">Недоверие</string>
-    <string name="bsac_block_toast">Блокировка %1$s для этого приложения</string>
-    <string name="bsac_trust_toast">Доверьтесь %1$s для этого приложения</string>
-    <string name="bsac_distrust_toast">Недоверие %1$s для этого IP</string>
     <string name="notif_download_success_content">Скачать успешно.</string>
     <string name="rbl_privacy">Приватность</string>
     <string name="rbl_security">Безопасность</string>
