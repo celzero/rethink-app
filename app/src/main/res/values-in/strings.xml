@@ -272,7 +272,6 @@
     <string name="rt_dialog_message">Apakah Anda ingin menerapkan daftar-daftar blokir yang baru saja diatur\?</string>
     <string name="settings_allow_bypass_heading">Izinkan Pintasan (Bypass)</string>
     <string name="firewall_status_blocked">terblokir</string>
-    <string name="dns_filter_parent_blocked">Diblokir</string>
     <string name="univ_ip_delete_toast_success">Hapus semua aturan IP.</string>
     <string name="univ_accessibility_crash_dialog_positive">Masuk ke Pengaturan</string>
     <string name="fapps_firewall_filter_bypass_universal">Dipintaskan</string>
@@ -477,7 +476,6 @@
     <string name="settings_ip_dialog_title">Pilih versi IP</string>
     <string name="hsf_blocklist_chip_text_no_data">Aktifkan RDNS+</string>
     <string name="univ_firewall_rule_2">Blokir aplikasi apapun yang tidak digunakan</string>
-    <string name="dns_proxy_negative_btn">Batal</string>
     <string name="ci_block">Blokir</string>
     <string name="ci_delete">hapus</string>
     <string name="orbot_bs_status_3">Meneruskan %1$s ke Orbot, Proksi HTTP telah diatur.</string>
@@ -828,4 +826,10 @@
     <string name="bsac_trust">Dipercaya</string>
     <string name="bsac_distrust">Ketidakpercayaan</string>
     <string name="bsac_distrust_toast">Ketidakpercayaan %1$s untuk IP ini</string>
+    <string name="lbl_apply" translatable="true">Terapkan</string>
+    <string name="lbl_cancel" translatable="true">Batal</string>
+    <string name="lbl_dismiss" translatable="true">Tutup</string>
+    <string name="lbl_all" translatable="true">Semua</string>
+    <string name="lbl_allowed" translatable="true">Diizinkan</string>
+    <string name="lbl_blocked" translatable="true">Diblokir</string>
 </resources>
