@@ -122,6 +122,4 @@ interface ConnectionTrackerDAO {
         "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 group by ipAddress order by count desc"
     )
     fun getAllBlockedIps(): PagingSource<Int, AppConnection>
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

@@ -619,17 +619,8 @@ abstract class AppDatabase : RoomDatabase() {
     // https://stackoverflow.com/questions/49030258/how-to-vacuum-roomdatabase
     // https://stackoverflow.com/questions/50987119/backup-room-database
     fun checkPoint() {
-        appInfoDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dohEndpointsDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsCryptEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsCryptRelayEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsProxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        proxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        customDomainEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        customIpEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        rethinkEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        rethinkRemoteFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        rethinkLocalFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        appDatabaseRawQueries().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        appDatabaseRawQueries().vacuum(SimpleSQLiteQuery("VACUUM"))
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
@@ -645,6 +636,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun rethinkLocalFileTagDao(): RethinkLocalFileTagDao
     abstract fun localBlocklistPacksMapDao(): LocalBlocklistPacksMapDao
     abstract fun remoteBlocklistPacksMapDao(): RemoteBlocklistPacksMapDao
+    abstract fun appDatabaseRawQueries(): AppDatabaseRawQueryDao
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())

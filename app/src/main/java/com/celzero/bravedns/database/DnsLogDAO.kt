@@ -66,6 +66,4 @@ interface DnsLogDAO {
         "select 0 as uid, '' as ipAddress, 0 as port, count(queryStr) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 group by queryStr order by count desc"
     )
     fun getAllBlockedDomains(): PagingSource<Int, AppConnection>
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

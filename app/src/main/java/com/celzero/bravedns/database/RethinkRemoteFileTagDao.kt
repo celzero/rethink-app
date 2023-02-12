@@ -95,6 +95,4 @@ interface RethinkRemoteFileTagDao {
     fun getSelectedTags(): List<Int>
 
     @Query("delete from RethinkRemoteFileTag") fun deleteAll()
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

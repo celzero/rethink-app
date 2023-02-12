@@ -153,12 +153,13 @@ abstract class LogDatabase : RoomDatabase() {
     }
 
     fun checkPoint() {
-        connectionTrackerDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsLogDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        logsDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        logsDao().vacuum(SimpleSQLiteQuery("VACUUM"))
     }
 
     abstract fun connectionTrackerDAO(): ConnectionTrackerDAO
     abstract fun dnsLogDAO(): DnsLogDAO
+    abstract fun logsDao(): LogDatabaseRawQueryDao
 
     fun connectionTrackerRepository() = ConnectionTrackerRepository(connectionTrackerDAO())
     fun dnsLogRepository() = DnsLogRepository(dnsLogDAO())
