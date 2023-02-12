@@ -37,12 +37,12 @@ import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities.Companion.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
+import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
 
 class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentDnsLogsBinding::bind)
@@ -86,6 +86,15 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         if (!persistentState.logsEnabled) {
             b.queryListLogsDisabledTv.visibility = View.VISIBLE
+            b.queryListLogsDisabledTv.text = getString(R.string.show_logs_disabled_dns_message)
+            b.queryListCardViewTop.visibility = View.GONE
+            b.queryDetailsLl.visibility = View.GONE
+            return
+        }
+
+        if (persistentState.enableDnsAlg) {
+            b.queryListLogsDisabledTv.visibility = View.VISIBLE
+            b.queryListLogsDisabledTv.text = getString(R.string.show_logs_disabled_dns_message_alg)
             b.queryListCardViewTop.visibility = View.GONE
             b.queryDetailsLl.visibility = View.GONE
             return
