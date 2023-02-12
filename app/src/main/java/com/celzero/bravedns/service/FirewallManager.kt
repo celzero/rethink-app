@@ -54,7 +54,7 @@ object FirewallManager : KoinComponent {
 
     data class DnsCacheRecord(val ttl: Long, val fqdn: String, val flag: String?)
 
-    private const val CACHE_BUILDER_MAX_SIZE = 20000L
+    private const val CACHE_BUILDER_MAX_SIZE = 35000L
     private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
 
     val ipDomainLookup: Cache<String, DnsCacheRecord> =
