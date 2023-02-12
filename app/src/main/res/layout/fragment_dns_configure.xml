@@ -300,7 +300,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
-                    android:visibility="gone"
                     android:paddingBottom="15dp">
 
                     <androidx.appcompat.widget.AppCompatImageView

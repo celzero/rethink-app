@@ -111,8 +111,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
         updateNewVersion()
 
-        persistentState.enableDnsAlg = true
-
         if (savedInstanceState == null) {
             homeScreenFragment = HomeScreenFragment()
             supportFragmentManager
