@@ -114,7 +114,7 @@ dependencies {
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
     // new version 2.0.0 need minimum of gradle plugin 7.4.0-alpha10
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
 
     fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     fullImplementation 'androidx.appcompat:appcompat:1.7.0-alpha01'
