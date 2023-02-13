@@ -163,7 +163,7 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core features
-    implementation "io.insert-koin:koin-core:3.2.2"
+    implementation "io.insert-koin:koin-core:3.3.3"
     // Koin main features for Android (Scope,ViewModel ...)
     implementation "io.insert-koin:koin-android:3.2.3"
 
