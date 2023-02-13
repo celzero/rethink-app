@@ -165,7 +165,7 @@ dependencies {
     // Koin core features
     implementation "io.insert-koin:koin-core:3.2.2"
     // Koin main features for Android (Scope,ViewModel ...)
-    implementation "io.insert-koin:koin-android:3.2.3"
+    implementation "io.insert-koin:koin-android:3.3.3"
 
     implementation 'hu.autsoft:krate:2.0.0'
 
