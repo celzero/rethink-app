@@ -149,7 +149,7 @@ class WorkScheduler(val context: Context) {
             OneTimeWorkRequestBuilder<AppExitInfoCollector>()
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(APP_EXIT_INFO_ONE_TIME_JOB_TAG)

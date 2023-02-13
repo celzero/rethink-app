@@ -270,7 +270,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 .setInputData(data.build())
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(RestoreAgent.TAG)

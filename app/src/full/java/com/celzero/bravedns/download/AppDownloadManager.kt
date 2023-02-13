@@ -255,7 +255,7 @@ class AppDownloadManager(
                 .setInputData(data.build())
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER)
@@ -273,7 +273,7 @@ class AppDownloadManager(
                 .setInputData(data.build())
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(LocalBlocklistCoordinator.CUSTOM_DOWNLOAD)
@@ -292,7 +292,7 @@ class AppDownloadManager(
                 .setInputData(data.build())
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(DOWNLOAD_TAG)
@@ -306,7 +306,7 @@ class AppDownloadManager(
                 .setInputData(timestampWorkerData)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(FILE_TAG)
