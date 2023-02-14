@@ -218,4 +218,21 @@
     <string name="settings_proxy_header" translatable="true">proxy serwer</string>
     <string name="orbot" translatable="true">Orbot</string>
     <string name="always_on_dialog_stop_message" translatable="true">Zawsze włączona sieć VPN jest włączona dla Rethink. Czy na pewno i tak chcesz zatrzymać Rethink\?</string>
+    <string name="orbot_app_issue" translatable="true">Nie można uruchomić programu Orbot. Czy jest zainstalowany\?</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Konfigurowanie Orbot…</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Wymagana ręczna interwencja</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">RethinkDNS jest skonfigurowany do przekazywania zapytań DNS do Orbot. Zmień zgodnie z wymaganiami.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Zatrzymaj Orbot</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Zmień DNS</string>
+    <string name="orbot_title" translatable="true">Orbot i serwery porxy</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot przenosi funkcje i funkcjonalność Tor na Androida.</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Instalacja</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">Strona Web</string>
+    <string name="settings_orbot_heading" translatable="true">Konfiguracja Orbot</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot w trybie non-vpn z HTTPS/SOCKS5.</string>
+    <string name="orbot_bs_status_4" translatable="true">Konfiguracja Tor-as-a-Proxy (Orbot) jednym kliknięciem.</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS i TCP</string>
+    <string name="orbot_stop_dialog_message" translatable="true">RethinkDNS przestał przekazywać połączenia do Orbota, ale Orbot może działać w tle.</string>
+    <string name="orbot_install_dialog_title" translatable="true">Zainstalować Orbot\?</string>
 </resources>
