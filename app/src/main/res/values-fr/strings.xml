@@ -590,7 +590,6 @@
     <string name="rules_load_failure_reload">recharger</string>
     <string name="firewall_rule_block_dns_bypass">DNS contourné</string>
     <string name="firewall_rule_no_rule_desc">Aucune règle de pare-feu ne s’applique à cette connexion.</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ci_header">Règles IP &amp; port : %1$s</string>
     <string name="rt_download_start">Téléchargement des listes de blocage…</string>
     <string name="bsrf_sub_group_heading">Sous-groupe</string>

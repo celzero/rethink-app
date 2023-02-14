@@ -230,7 +230,6 @@
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS запускает VPN в режиме <i>Lockdown</i>. Его остановка приведет к потере подключения к интернету для этого профиля пользователя. Вы хотите продолжить в любом случае\?</string>
     <string name="settings_ip_text_ipv46">Авто</string>
     <string name="cd_remove_dialog_positive">Удалить</string>
-    <string name="brbs_restore_dialog_failure_negative">Отклонить</string>
     <string name="dns_firewall_mode_info_explanation_new">Все вышеперечисленное + обход интернет-цензуры.</string>
     <string name="bsct_app_info">Информация о приложении</string>
     <string name="always_on_dialog_stop_heading">Постоянный VPN</string>

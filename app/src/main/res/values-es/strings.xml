@@ -321,7 +321,6 @@
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_toast_deleted">Dominio eliminado de la lista personalizada</string>
     <string name="cd_dialog_header">Reglas de dominio: %1$s</string>
-    <string name="cd_filter_allowed">Permitidas</string>
     <string name="ci_dialog_title">Añadir regla de IP/puerto</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ci_no_rule_txt">Ninguna regla</string>

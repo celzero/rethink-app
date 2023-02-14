@@ -53,7 +53,6 @@
     <string name="hybrid_mode_info_title">டிஎன்எஸ் + ஃபயர்வால்</string>
     <string name="dns_mode_info_explanation_new">டிஎன்எஸ் கோரிக்கைகளை கண்காணிக்கவும், தடுக்கவும் மற்றும் குறியாக்கம் செய்யவும்.</string>
     <string name="dns_firewall_mode_info_explanation_new">மேலே உள்ள அனைத்தும் + இணைய தணிக்கையைத் தவிர்க்கவும்.</string>
-    <string name="alert_permission_accessibility_regrant">நடவடிக்கை தேவை</string>
     <string name="private_dns_dialog_positive">அமைப்புகளுக்குச் செல்லவும்</string>
     <string name="default_dns_name">RDNS இயல்புநிலை</string>
     <string name="bsct_conn_block_desc_device">சாதனத்தில் %1$s தடுக்கப்பட்டது</string>
