@@ -146,7 +146,7 @@
     <string name="hsf_start_dialog_header">Mulai %1$s</string>
     <string name="firewall_rules">Aturan-aturan Jaringan</string>
     <string name="notif_channel_firewall_alerts">Peringatan Firewall</string>
-    <string name="dc_custom_block_desc">Segera</string>
+    <string name="dc_custom_block_desc">Ubah aturan domain yang diblokir atau dipercaya</string>
     <string name="about_twitter">Ikuti kami di Twitter</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="about_mail_bugreport_share_title">Pilih penyedia email</string>
@@ -230,7 +230,7 @@
     <string name="cd_remove_dialog_message">Menghapus domain dari konfigurasi tersimpan.</string>
     <string name="dns_proxy_dialog_header_dns">Tambahkan Proksi DNS</string>
     <string name="rt_download">Unduh daftar-daftar blokir</string>
-    <string name="lbbs_heading">Atur 185+ daftar blokir</string>
+    <string name="lbbs_heading">Atur lebih dari 195 daftar blokir</string>
     <string name="rt_download_desc">Unduh daftar blokir (sekitar 60MB) untuk menggunakan fitur ini.</string>
     <string name="about_github">Berkontribusi di GitHub</string>
     <string name="alert_permission_accessibility">Perijinan - Aksesibilitas</string>
@@ -285,7 +285,7 @@
     <string name="ci_dialog_added_success">IP telah ditambahkan ke daftar</string>
     <string name="ci_dialog_error_invalid_ip">Alamat IP, subnet atau port tidak sah.</string>
     <string name="local_blocklist_download_desc">Unduh daftar blokir (sekitar 60MB) untuk menggunakan fitur ini\?</string>
-    <string name="dc_local_block_desc_1">Pilih dari lebih 185+ daftar blokir. Klik di sini untuk mengunduh atau mengkonfigurasi (mengatur) daftar blokir.</string>
+    <string name="dc_local_block_desc_1">Pilih dari 195+ daftar blokir. Klik di sini untuk mengunduh atau mengatur daftar blokir.</string>
     <string name="settings_general_header">umum</string>
     <string name="settings_dns_proxy_dialog_password">Kata sandi</string>
     <string name="hsf_blocklist_updating_text">Mengaktifkan…</string>
@@ -452,7 +452,7 @@
     <string name="ctbs_app_other_apps">%1$s + %2$s aplikasi lainnya</string>
     <string name="dc_local_block_heading">Daftar blokir di perangkat</string>
     <string name="custom_url_error_invalid_url">URL tidak valid</string>
-    <string name="dc_custom_block_heading">Izinkan atau blokir nama domain individual</string>
+    <string name="dc_custom_block_heading">Aturan Domain</string>
     <string name="cd_remove_dialog_title">Hapus domain\?</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (eksperimental)</string>
     <string name="settings_selected_ip_desc">%1$s</string>
@@ -832,4 +832,16 @@
     <string name="lbl_all" translatable="true">Semua</string>
     <string name="lbl_allowed" translatable="true">Diizinkan</string>
     <string name="lbl_blocked" translatable="true">Diblokir</string>
+    <string name="firewall_rule_block_domain" translatable="true">Domain (Aplikasi)</string>
+    <string name="lbl_disabled" translatable="true">Dinonaktifkan</string>
+    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>Domain</i>.<br/><br/> Untuk mengubahnya, pergi ke tampilan <i>Firewall khusus aplikasi</i>.</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Domain (Aplikasi)</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Sambungan ini diizinkan karena <i>domain</i> ditetapkan sebagai domain tepercaya.<br/><br/> Untuk mengubahnya, buka tampilan <i>Firewall khusus aplikasi</i>.</string>
+    <string name="cd_no_rules_text" translatable="true">Tidak ditemukan aturan domain.</string>
+    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="lbl_action_required" translatable="true">Diperlukan Tindakan</string>
+    <string name="lbl_ip_rules" translatable="true">Aturan IP</string>
+    <string name="lbl_domain_rules" translatable="true">Aturan Domain</string>
+    <string name="bsdl_block_desc" translatable="true">Blokir, percayai <u>domain ini</u></string>
 </resources>
