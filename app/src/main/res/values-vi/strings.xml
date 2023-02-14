@@ -16,7 +16,6 @@
     <string name="lbl_domain" translatable="true">Tên miền</string>
     <string name="slide_2_title" translatable="true">Chào mừng</string>
     <string name="slide_1_title" translatable="true">Miễn phí và mã nguồn mở</string>
-    <string name="title_about" translatable="true"></string>
     <string name="allow" translatable="true">Cho phép</string>
     <string name="block" translatable="true">Chặn</string>
     <string name="exclude" translatable="true">Loại trừ</string>
