@@ -227,11 +227,11 @@
     <string name="firewall_rule_block_app_unmetered_desc">Une règle de pare-feu définie par l’utilisateur a bloqué cette <i>application</i> lors de la tentative de connexion sur un réseau <i>Sans abonnement</i>.<br/><br/> Pour la modifier, allez dans l’onglet <i>Toutes les applications</i>.</string>
     <string name="fapps_info_dialog_message">Empêchez les applications de se connecter à l’Internet. Limiter l’accès à Internet permet d’éviter une utilisation injustifiée des données et d’économiser la batterie.</string>
     <string name="dns_proxy_connection_failure_lockdown">L’exclusion de %1$s pour %2$s en mode confinement peut provoquer des problèmes de connectivité à Internet.</string>
-    <string name="firewall_rule_block_ip_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination</i>.<br/><br/> Pour la modifier, allez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_block_ip_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est configurée pour contourner les règles du pare-feu global.<br/><br/>Pour modifier cela, allez dans <i>Règles IP</i> dans l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_unknown_desc">Cette connexion a été bloquée par un pare-feu car <i>l’application source</i> n’a pas pu être déterminée.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_trusted_ip_desc">Cette connexion a été autorisée car <i>l’IP de destination</i> est autorisée.<br/><br/> Pour modifier cela, allez à l’écran <i>Pare-feu de l’application</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Cette connexion a été autorisée parce que <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i> .</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i> .</string>
     <string name="lbbs_download">Mettre à jour les listes de blocage</string>
     <string name="brbs_backup_title">Sauvegarder</string>
     <string name="info_dialog_rethink_toast_msg">Copié en tant qu’URL RDNS+ DNS over HTTPS</string>
@@ -281,7 +281,7 @@
     <string name="ci_no_rule_txt">Sans règle</string>
     <string name="notif_channel_vpn_notification">VPN actif</string>
     <string name="doh_custom_url_remove_success">Point de terminaison supprimé.</string>
-    <string name="dc_custom_block_desc">Prochainement</string>
+    <string name="dc_custom_block_desc">Modifier les règles relatives aux domaines bloqués ou de confiance</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="cd_custom_dns_proxy_name_default">Proxy</string>
     <string name="cd_dns_proxy_error_text_3">Port invalide</string>
@@ -358,11 +358,11 @@
     <string name="network_dns">DNS du système</string>
     <string name="rbl_privacy">Confidentialité</string>
     <string name="lbbs_redownload">Re-télécharger les listes de blocage</string>
-    <string name="lbbs_heading">Configurer plus de 185 listes de blocage</string>
+    <string name="lbbs_heading">Configurer plus de 195 listes de blocage</string>
     <string name="brbs_restore_title">Restaurer</string>
     <string name="brbs_backup_dialog_title">Faire une sauvegarde</string>
     <string name="orbot_bs_status_trying_connect">Configuration d’Orbot…</string>
-    <string name="dc_custom_block_heading">Autoriser ou bloquer certains domaines</string>
+    <string name="dc_custom_block_heading">Règles de domaines</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS exécute le VPN en mode <i>Confinement</i>. L’arrêter entraînerait une perte de connectivité Internet sur ce profil utilisateur. Voulez-vous continuer malgré tout \?</string>
     <string name="orbot_stop_dialog_dns_message">RethinkDNS est configuré pour transmettre les requêtes DNS à Orbot. Modifiez-le si nécessaire.</string>
     <string name="app_mode_firewall">Pare-feu</string>
@@ -449,7 +449,7 @@
     <string name="settings_local_blocklist_dialog_positive">Télécharger</string>
     <string name="firewall_rule_isolate_desc">Une règle de pare-feu définie par l’utilisateur a bloqué la connexion de cette <i>application</i> à des adresses IP qui ne sont pas de <i>confiance</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Toutes les applications</i>.</string>
     <string name="category_name_others">Autre</string>
-    <string name="cd_dialog_header">Domaine(s) personnalisé(s)</string>
+    <string name="cd_dialog_header">Règle(s) de domaine(s) : %1$s</string>
     <string name="ci_block">Bloquer</string>
     <string name="ada_app_bypass_univ">Exception globale</string>
     <string name="bsdl_blocked_desc">bloqué %1$s par %2$s</string>
@@ -461,7 +461,7 @@
     <string name="download_update_dialog_message_success">Téléchargement de la liste de blocage réussi.</string>
     <string name="search_dns_logs"><font size="12">Recherche de noms de domaine ou d’IP</font></string>
     <string name="connection_http3">HTTP3</string>
-    <string name="dc_local_block_desc_1">Choisissez parmi plus de 185 listes de blocage. Cliquez ici pour télécharger ou configurer les listes de blocage.</string>
+    <string name="dc_local_block_desc_1">Choisissez parmi plus de 195 listes de blocage. Cliquez ici pour télécharger ou configurer les listes de blocage.</string>
     <string name="about_bug_no_log_dialog_message">Impossible de récupérer les journaux de crash. Voulez-vous signaler manuellement votre bogue \?</string>
     <string name="about_dialog_neutral_button">Proposer des fonctionnalités</string>
     <string name="collecting_logs_progress_text">Capture…</string>
@@ -590,7 +590,6 @@
     <string name="rules_load_failure_reload">recharger</string>
     <string name="firewall_rule_block_dns_bypass">DNS contourné</string>
     <string name="firewall_rule_no_rule_desc">Aucune règle de pare-feu ne s’applique à cette connexion.</string>
-    <string name="cd_add_dialog_sample_4">%1$s https://%2$s</string>
     <string name="ci_header">Règles IP &amp; port : %1$s</string>
     <string name="rt_download_start">Téléchargement des listes de blocage…</string>
     <string name="bsrf_sub_group_heading">Sous-groupe</string>
@@ -827,4 +826,22 @@
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">applications les plus autorisées</string>
     <string name="hs_biometeric_error">Erreur lors de l\'authentification biométrique</string>
     <string name="ssv_see_more">tout afficher</string>
+    <string name="firewall_rule_block_domain" translatable="true">Domaine (Appli)</string>
+    <string name="lbl_cancel" translatable="true">Annuler</string>
+    <string name="lbl_apply" translatable="true">Appliquer</string>
+    <string name="lbl_dismiss" translatable="true">Rejeter</string>
+    <string name="lbl_all" translatable="true">Tous</string>
+    <string name="lbl_allowed" translatable="true">Autorisés</string>
+    <string name="lbl_blocked" translatable="true">Bloqués</string>
+    <string name="lbl_disabled" translatable="true">Désactivés</string>
+    <string name="lbl_domain" translatable="true">Domaine</string>
+    <string name="lbl_action_required" translatable="true">Action requise</string>
+    <string name="lbl_ip_rules" translatable="true">Règles IP</string>
+    <string name="lbl_wildcard" translatable="true">Caractère joker</string>
+    <string name="lbl_domain_rules" translatable="true">Règles de domaines</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Domaine (Appli)</string>
+    <string name="cd_no_rules_text" translatable="true">Aucune règle de domaine n\'a été trouvée.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Cette connexion a été autorisée car <i>le domaine</i> est autorisé.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Une règle de pare-feu définie par l’utilisateur a bloqué le <i>domaine</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="bsdl_block_desc" translatable="true">Bloquer, tolérer <u>ce domaine</u></string>
 </resources>

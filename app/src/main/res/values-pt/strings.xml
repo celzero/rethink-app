@@ -78,7 +78,7 @@
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Conectado com RethinkDNS e Firewall</string>
     <string name="notification_action_resume_vpn">RETOMAR</string>
     <string name="universal_firewall_explanation">Aplicar regras de firewall em todas as aplicações com base em eventos do dispositivo, por exemplo, firewall quando o dispositivo está bloqueado ou quando uma determinada aplicação não está a ser utilizada.</string>
-    <string name="notification_action_pause_vpn">PAUSA</string>
+    <string name="notification_action_pause_vpn">PAUSAR</string>
     <string name="notification_action_dns_mode">DNS</string>
     <string name="notification_action_dns_firewall_mode">DNS + Firewall</string>
     <string name="firewall_rules">Regras de rede</string>
@@ -649,7 +649,7 @@
     <string name="firewall_rule_unknown_desc">Esta conexão foi protegida por firewall porque não foi possível determinar a <i>aplicação de origem</i>.<br/><br/> Para alterar este comportamento, vá ao separador <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta conexão foi permitida porque a configuração do <i>Tor-como-proxy com um clique</i> via Orbot estava a decorrer.</string>
     <string name="new_app_bulk_notification_title">Atenção</string>
-    <string name="new_app_bulk_notification_content">RethinkDNS bloqueou %1$s novas aplicações. Toque para visualizar ou alterar.</string>
+    <string name="new_app_bulk_notification_content">RethinkDNS bloqueou %1$s novas aplicações. Toque para ver ou alterar.</string>
     <string name="new_app_notification_content">RethinkDNS bloqueou a aplicação instalada recentemente: %1$s.</string>
     <string name="new_app_notification_action_deny">Continuar a bloquear</string>
     <string name="new_app_notification_action_toast_deny">Conexão de rede negada para a aplicação</string>

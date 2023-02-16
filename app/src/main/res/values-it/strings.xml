@@ -414,9 +414,9 @@
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_entries">%1$s elementi »</string>
     <string name="dc_local_block_heading">Liste dei filtri sul dispositivo</string>
-    <string name="dc_local_block_desc_1">Scegli tra 185+ liste di filtri. Clicca qui per scaricarle o configurarle.</string>
-    <string name="dc_custom_block_heading">Consenti o blocca singoli domini</string>
-    <string name="dc_custom_block_desc">Presto in arrivo</string>
+    <string name="dc_local_block_desc_1">Scegli tra più di 195 liste di filtri. Clicca qui per scaricarle o configurarle.</string>
+    <string name="dc_custom_block_heading">Regole domini</string>
+    <string name="dc_custom_block_desc">Modifica le regole dei domini bloccati o attendibili</string>
     <string name="dc_dns_website_heading">Mostra l\'icona dei siti web nel registro DNS (sperimentale)</string>
     <string name="dc_dns_website_desc">Recupera icone dei siti web da <i>nextdns.io</i> e <i>duckduckgo.com</i>. Utilizza fino a 350 MB di spazio su disco</string>
     <string name="dc_dns_leaks_heading">Previeni aggiramenti del DNS</string>
@@ -741,7 +741,7 @@
     <string name="lbbs_update_check">Controlla aggiornamenti</string>
     <string name="lbbs_redownload">Ri-scarica le liste dei filtri</string>
     <string name="lbbs_download">Aggiorna le liste dei filtri</string>
-    <string name="lbbs_heading">Configura 185+ liste dei filtri</string>
+    <string name="lbbs_heading">Configura più di 195 liste filtri</string>
     <string name="brbs_title">Backup e ripristino</string>
     <string name="brbs_backup_desc">Backup delle impostazioni dell\'app e dei registri di rete e dns</string>
     <string name="brbs_restore_title">Ripristino</string>
@@ -826,4 +826,22 @@
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domini più contattati</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">domini più bloccati</string>
     <string name="ssv_see_more">mostra tutto</string>
+    <string name="lbl_cancel" translatable="true">Annulla</string>
+    <string name="lbl_apply" translatable="true">Applica</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Dominio (App)</string>
+    <string name="firewall_rule_block_domain" translatable="true">Dominio (App)</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Una regola del firewall impostata dall\'utente ha bloccato questo <i>dominio</i>.<br/><br/> Per modificarla, vai a alla schermata del <i>firewall specifico per le app</i>.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Questa connessione è stata consentita perché il <i>dominio</i> è impostato come attendibile.<br/><br/> Per modificarlo, accedere alla schermata del <i>firewall specifico per le app</i>.</string>
+    <string name="cd_no_rules_text" translatable="true">Regole dominio non trovate.</string>
+    <string name="lbl_dismiss" translatable="true">Chiudi</string>
+    <string name="lbl_all" translatable="true">Tutti</string>
+    <string name="lbl_allowed" translatable="true">Consentito</string>
+    <string name="lbl_blocked" translatable="true">Bloccato</string>
+    <string name="lbl_disabled" translatable="true">Disabilitato</string>
+    <string name="lbl_domain" translatable="true">Dominio</string>
+    <string name="lbl_wildcard" translatable="true">Jolly</string>
+    <string name="lbl_action_required" translatable="true">Azione richiesta</string>
+    <string name="lbl_ip_rules" translatable="true">Regole IP</string>
+    <string name="lbl_domain_rules" translatable="true">Regole dominio</string>
+    <string name="bsdl_block_desc" translatable="true">Blocca, autorizza <u>questo dominio</u></string>
 </resources>
