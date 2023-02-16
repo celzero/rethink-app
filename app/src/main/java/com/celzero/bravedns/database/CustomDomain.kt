@@ -91,6 +91,6 @@ class CustomDomain {
                 "version" -> version = it.value as Long
             }
         }
-        return CustomDomain(domain, uid, ips, status, type, modifiedTs, deletedTs, version)
+        return CustomDomain(domain, uid, ips, type, status, modifiedTs, deletedTs, version)
     }
 }

@@ -22,6 +22,7 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.service.DomainRulesManager
@@ -67,6 +68,11 @@ class DomainRuleProvider : ContentProvider() {
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
         }
 
+        if (DEBUG)
+            Log.d(
+                LoggerConstants.LOG_PROVIDER,
+                "insert blocklists with uri: $uri, projection: $projection, selection: $selection, selectionArgs: $selectionArgs, sortOrder: $sortOrder"
+            )
         return customDomainRepository.getRulesCursor()
     }
 
@@ -87,6 +93,11 @@ class DomainRuleProvider : ContentProvider() {
         }
         val customDomain = CustomDomain().fromContentValues(values) ?: return null
 
+        if (DEBUG)
+            Log.d(
+                LoggerConstants.LOG_PROVIDER,
+                "insert blocklists with uri: $uri, values: $values, obj: ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status}"
+            )
         val id = customDomainRepository.cpInsert(customDomain)
         context?.contentResolver?.notifyChange(uri, null)
         return ContentUris.withAppendedId(uri, id)
