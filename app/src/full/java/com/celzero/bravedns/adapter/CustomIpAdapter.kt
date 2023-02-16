@@ -15,21 +15,25 @@
  */
 package com.celzero.bravedns.adapter
 
+import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
+import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.ui.CustomIpActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
@@ -37,7 +41,13 @@ import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import inet.ipaddr.HostName
+import inet.ipaddr.HostNameException
+import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CustomIpAdapter(private val context: Context) :
     PagingDataAdapter<CustomIp, CustomIpAdapter.CustomIpsViewHolder>(DIFF_CALLBACK) {
@@ -97,6 +107,10 @@ class CustomIpAdapter(private val context: Context) :
             updateStatusUi(status)
 
             b.customIpToggleGroup.addOnButtonCheckedListener(ipRulesGroupListener)
+
+            b.customIpEditIcon.setOnClickListener {
+                showEditIpDialog(customIp)
+            }
 
             b.customIpExpandIcon.setOnClickListener { toggleActionsUi() }
 
@@ -382,6 +396,114 @@ class CustomIpAdapter(private val context: Context) :
             }
 
             builder.create().show()
+        }
+    }
+
+    private fun showEditIpDialog(customIp: CustomIp) {
+        val dialog = Dialog(context)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setTitle(context.getString(R.string.ci_dialog_title))
+        val dBind = DialogAddCustomIpBinding.inflate((context as CustomIpActivity).layoutInflater)
+        dialog.setContentView(dBind.root)
+
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialog.show()
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.window?.attributes = lp
+
+        dBind.daciIpTitle.text = context.getString(R.string.ci_dialog_title)
+        dBind.daciIpEditText.setText(customIp.ipAddress)
+
+        if (customIp.uid == UID_EVERYBODY) {
+            dBind.daciTrustBtn.text = context.getString(R.string.bypass_universal)
+        } else {
+            dBind.daciTrustBtn.text = context.getString(R.string.ci_trust_rule)
+        }
+
+        dBind.daciIpEditText.addTextChangedListener {
+            if (dBind.daciFailureTextView.isVisible) {
+                dBind.daciFailureTextView.visibility = View.GONE
+            }
+        }
+
+        dBind.daciBlockBtn.setOnClickListener {
+            handleIp(dBind, customIp, IpRulesManager.IpRuleStatus.BLOCK)
+            dialog.dismiss()
+        }
+
+        dBind.daciTrustBtn.setOnClickListener {
+            if (customIp.uid == UID_EVERYBODY) {
+                handleIp(dBind, customIp, IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL)
+            } else {
+                handleIp(dBind, customIp, IpRulesManager.IpRuleStatus.TRUST)
+            }
+            dialog.dismiss()
+        }
+
+        dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun handleIp(
+        dBind: DialogAddCustomIpBinding,
+        customIp: CustomIp,
+        status: IpRulesManager.IpRuleStatus
+    ) {
+        ui {
+            val input = dBind.daciIpEditText.text.toString()
+            val ipString = Utilities.removeLeadingAndTrailingDots(input)
+            var hostName: HostName? = null
+            var ip: IPAddress? = null
+
+            // chances of creating NetworkOnMainThread exception, handling with io operation
+            ioCtx {
+                hostName = getHostName(ipString)
+                ip = hostName?.address
+            }
+
+            if (ip == null || ipString.isEmpty()) {
+                dBind.daciFailureTextView.text =
+                    context.getString(R.string.ci_dialog_error_invalid_ip)
+                dBind.daciFailureTextView.visibility = View.VISIBLE
+                return@ui
+            }
+
+            updateCustomIp(customIp, hostName, status)
+        }
+    }
+
+    private suspend fun getHostName(ip: String): HostName? {
+        return try {
+            val host = HostName(ip)
+            host.validate()
+            host
+        } catch (e: HostNameException) {
+            val ipAddress = IPAddressString(ip).address ?: return null
+            HostName(ipAddress)
+        }
+    }
+
+    private fun updateCustomIp(
+        prevIp: CustomIp,
+        hostName: HostName?,
+        status: IpRulesManager.IpRuleStatus
+    ) {
+        if (hostName == null) return
+
+        IpRulesManager.updateIpRule(prevIp, hostName, status)
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) { f() }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        (context as CustomIpActivity).lifecycleScope.launch {
+            withContext(Dispatchers.Main) { f() }
         }
     }
 }

@@ -24,15 +24,15 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import java.util.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.regex.Pattern
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.*
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.util.regex.Pattern
-import kotlin.concurrent.write
 
 object DomainRulesManager : KoinComponent {
 
@@ -41,6 +41,8 @@ object DomainRulesManager : KoinComponent {
 
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
+
+    data class CacheKey(val domain: String, val uid: Int)
 
     var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
     var wildcards: MutableMap<CacheKey, CustomDomain> = hashMapOf()
@@ -99,11 +101,11 @@ object DomainRulesManager : KoinComponent {
     private fun updateCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                val key = CacheKey(cd.domain, cd.uid)
+                val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
                 lock.write { domains[key] = cd }
             }
             DomainType.WILDCARD -> {
-                val d = constructWildCardString(cd.domain)
+                val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
                 val key = CacheKey(d, cd.uid)
                 lock.write { wildcards[key] = cd }
             }
@@ -125,11 +127,11 @@ object DomainRulesManager : KoinComponent {
         customDomains.forEach { cd ->
             when (DomainType.getType(cd.type)) {
                 DomainType.DOMAIN -> {
-                    val key = CacheKey(cd.domain, cd.uid)
+                    val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
                     domains[key] = cd
                 }
                 DomainType.WILDCARD -> {
-                    val d = constructWildCardString(cd.domain)
+                    val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
                     val key = CacheKey(d, cd.uid)
                     wildcards[key] = cd
                 }
@@ -137,27 +139,15 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    data class CacheKey(val domain: String, val uid: Int)
-
-    fun getDomainRule(d: String, uid: Int): Status {
-        val key = CacheKey(d, uid)
-        if (domains.contains(key)) {
-            val cd = domains[key]
-            if (cd?.uid == uid) {
-                return Status.getStatus(cd.status)
-            }
-        }
-        return Status.NONE
-    }
-
-    fun status(domain: String, uid: Int): Status {
+    fun status(d: String, uid: Int): Status {
+        val domain = d.lowercase(Locale.ROOT)
         // return if the cache has the domain
         domainLookupCache.getIfPresent(domain)?.let {
             return Status.getStatus(it.id)
         }
 
         // check if the domain is added in custom domain list
-        when (domainMatch(domain, uid)) {
+        when (getDomainRule(domain, uid)) {
             Status.TRUST -> {
                 updateLookupCache(domain, uid, Status.TRUST)
                 return Status.TRUST
@@ -192,8 +182,8 @@ object DomainRulesManager : KoinComponent {
         return Status.NONE
     }
 
-    private fun domainMatch(domain: String, uid: Int): Status {
-        val key = CacheKey(domain, uid)
+    fun getDomainRule(domain: String, uid: Int): Status {
+        val key = CacheKey(domain.lowercase(Locale.ROOT), uid)
         val d =
             domains.getOrElse(key) {
                 return Status.NONE
@@ -250,6 +240,21 @@ object DomainRulesManager : KoinComponent {
         io {
             val cd = constructObject(d, uid, "", type, status.id)
             dbInsertOrUpdate(cd)
+            updateCache(cd)
+        }
+    }
+
+    fun updateDomainRule(
+        d: String,
+        status: Status,
+        type: DomainType,
+        prevDomain: CustomDomain
+    ) {
+        io {
+            deleteDomain(prevDomain)
+            val cd = constructObject(d, prevDomain.uid, "", type, status.id)
+            dbInsertOrUpdate(cd)
+            updateCache(cd)
         }
     }
 
@@ -257,13 +262,13 @@ object DomainRulesManager : KoinComponent {
         customDomainsRepository.insert(cd)
     }
 
-    private suspend fun dbDelte(cd: CustomDomain) {
+    private suspend fun dbDelete(cd: CustomDomain) {
         customDomainsRepository.delete(cd)
     }
 
     fun deleteDomain(cd: CustomDomain) {
         io {
-            dbDelte(cd)
+            dbDelete(cd)
             removeFromCache(cd)
         }
     }

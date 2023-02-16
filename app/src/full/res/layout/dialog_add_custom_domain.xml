@@ -46,11 +46,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
+            android:checked="true"
             android:padding="2dp"
             android:text="@string/lbl_domain"
             android:textAlignment="center"
             android:textSize="@dimen/default_font_text_view"
-            android:checked="true"
             app:checkedIconTint="?attr/primaryTextColor"
             app:chipBackgroundColor="@drawable/bg_chip_state_list"
             app:chipIconEnabled="true"
@@ -63,11 +63,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
+            android:checked="false"
             android:padding="2dp"
             android:text="@string/lbl_wildcard"
             android:textAlignment="center"
             android:textSize="@dimen/default_font_text_view"
-            android:checked="false"
             app:checkedIconTint="?attr/primaryTextColor"
             app:chipBackgroundColor="@drawable/bg_chip_state_list"
             app:chipIconEnabled="true"
@@ -122,12 +122,12 @@
         app:layout_constraintTop_toBottomOf="@id/dacd_input_layout" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/dacd_add_btn"
+        android:id="@+id/dacd_block_btn"
         style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="@string/cd_dialog_positive_btn"
+        android:text="@string/block"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintEnd_toEndOf="parent"
@@ -143,7 +143,20 @@
         android:text="@string/lbl_cancel"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
-        app:layout_constraintEnd_toStartOf="@id/dacd_add_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dacd_trust_btn"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="@string/ci_trust_rule"
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view"
+        app:layout_constraintEnd_toStartOf="@id/dacd_block_btn"
         app:layout_constraintTop_toBottomOf="@id/dacd_failure_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

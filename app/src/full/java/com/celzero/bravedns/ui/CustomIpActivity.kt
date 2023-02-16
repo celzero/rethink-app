@@ -177,38 +177,60 @@ class CustomIpActivity :
 
         dBind.daciIpTitle.text = getString(R.string.ci_dialog_title)
 
+        if (uid == UID_EVERYBODY) {
+            dBind.daciTrustBtn.text = getString(R.string.bypass_universal)
+        } else {
+            dBind.daciTrustBtn.text = getString(R.string.ci_trust_rule)
+        }
+
         dBind.daciIpEditText.addTextChangedListener {
             if (dBind.daciFailureTextView.isVisible) {
                 dBind.daciFailureTextView.visibility = View.GONE
             }
         }
 
-        dBind.daciAddBtn.setOnClickListener {
-            ui {
-                val input = dBind.daciIpEditText.text.toString()
-                val ipString = Utilities.removeLeadingAndTrailingDots(input)
-                var hostName: HostName? = null
-                var ip: IPAddress? = null
+        dBind.daciBlockBtn.setOnClickListener {
+            handleInsertIp(dBind, IpRulesManager.IpRuleStatus.BLOCK)
+        }
 
-                // chances of creating NetworkOnMainThread exception, handling with io operation
-                ioCtx {
-                    hostName = getHostName(ipString)
-                    ip = hostName?.address
-                }
-
-                if (ip == null || ipString.isEmpty()) {
-                    dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
-                    dBind.daciFailureTextView.visibility = View.VISIBLE
-                    return@ui
-                }
-
-                dBind.daciIpEditText.text.clear()
-                insertCustomIp(hostName)
+        dBind.daciTrustBtn.setOnClickListener {
+            if (uid == UID_EVERYBODY) {
+                handleInsertIp(dBind, IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL)
+            } else {
+                handleInsertIp(dBind, IpRulesManager.IpRuleStatus.TRUST)
             }
+
         }
 
         dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun handleInsertIp(
+        dBind: DialogAddCustomIpBinding,
+        status: IpRulesManager.IpRuleStatus
+    ) {
+        ui {
+            val input = dBind.daciIpEditText.text.toString()
+            val ipString = Utilities.removeLeadingAndTrailingDots(input)
+            var hostName: HostName? = null
+            var ip: IPAddress? = null
+
+            // chances of creating NetworkOnMainThread exception, handling with io operation
+            ioCtx {
+                hostName = getHostName(ipString)
+                ip = hostName?.address
+            }
+
+            if (ip == null || ipString.isEmpty()) {
+                dBind.daciFailureTextView.text = getString(R.string.ci_dialog_error_invalid_ip)
+                dBind.daciFailureTextView.visibility = View.VISIBLE
+                return@ui
+            }
+
+            dBind.daciIpEditText.text.clear()
+            insertCustomIp(hostName, status)
+        }
     }
 
     private suspend fun getHostName(ip: String): HostName? {
@@ -222,10 +244,10 @@ class CustomIpActivity :
         }
     }
 
-    private fun insertCustomIp(ip: HostName?) {
+    private fun insertCustomIp(ip: HostName?, status: IpRulesManager.IpRuleStatus) {
         if (ip == null) return
 
-        IpRulesManager.addIpRule(uid, ip, IpRulesManager.IpRuleStatus.BLOCK)
+        IpRulesManager.addIpRule(uid, ip, status)
         Utilities.showToastUiCentered(
             this,
             getString(R.string.ci_dialog_added_success),

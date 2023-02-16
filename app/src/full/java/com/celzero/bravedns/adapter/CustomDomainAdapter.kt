@@ -15,12 +15,12 @@
  */
 package com.celzero.bravedns.adapter
 
+import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Patterns
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.paging.PagingDataAdapter
@@ -28,12 +28,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
+import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.ui.CustomDomainActivity
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import java.net.MalformedURLException
+import java.util.regex.Pattern
 
 class CustomDomainAdapter(val context: Context) :
     PagingDataAdapter<CustomDomain, CustomDomainAdapter.CustomDomainViewHolder>(DIFF_CALLBACK) {
@@ -93,6 +97,8 @@ class CustomDomainAdapter(val context: Context) :
             )
 
             b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
+
+            b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
 
             b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
 
@@ -316,6 +322,153 @@ class CustomDomainAdapter(val context: Context) :
                 // no-op
             }
             builder.create().show()
+        }
+
+        private fun showEditDomainDialog(customDomain: CustomDomain) {
+            val dialog = Dialog(context)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setTitle(context.getString(R.string.cd_dialog_title))
+            val dBind =
+                DialogAddCustomDomainBinding.inflate(
+                    (context as CustomDomainActivity).layoutInflater
+                )
+            dialog.setContentView(dBind.root)
+
+            var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
+
+            dBind.dacdDomainEditText.setText(customDomain.domain)
+
+            dBind.dacdDomainChip.setOnCheckedChangeListener { _, isSelected ->
+                if (isSelected) {
+                    selectedType = DomainRulesManager.DomainType.DOMAIN
+                    dBind.dacdDomainEditText.hint =
+                        context.getString(
+                            R.string.cd_dialog_edittext_hint,
+                            context.getString(R.string.lbl_domain)
+                        )
+                    dBind.dacdTextInputLayout.hint =
+                        context.getString(
+                            R.string.cd_dialog_edittext_hint,
+                            context.getString(R.string.lbl_domain)
+                        )
+                }
+            }
+
+            dBind.dacdWildcardChip.setOnCheckedChangeListener { _, isSelected ->
+                if (isSelected) {
+                    selectedType = DomainRulesManager.DomainType.WILDCARD
+                    dBind.dacdDomainEditText.hint =
+                        context.getString(
+                            R.string.cd_dialog_edittext_hint,
+                            context.getString(R.string.lbl_wildcard)
+                        )
+                    dBind.dacdTextInputLayout.hint =
+                        context.getString(
+                            R.string.cd_dialog_edittext_hint,
+                            context.getString(R.string.lbl_wildcard)
+                        )
+                }
+            }
+
+            val lp = WindowManager.LayoutParams()
+            lp.copyFrom(dialog.window?.attributes)
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+            dialog.show()
+            dialog.setCancelable(false)
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.window?.attributes = lp
+
+            dBind.dacdUrlTitle.text = context.getString(R.string.cd_dialog_title)
+            dBind.dacdDomainEditText.hint =
+                context.getString(
+                    R.string.cd_dialog_edittext_hint,
+                    context.getString(R.string.lbl_domain)
+                )
+            dBind.dacdTextInputLayout.hint =
+                context.getString(
+                    R.string.cd_dialog_edittext_hint,
+                    context.getString(R.string.lbl_domain)
+                )
+
+            dBind.dacdBlockBtn.setOnClickListener {
+                handleDomain(dBind, selectedType, customDomain, DomainRulesManager.Status.BLOCK)
+                dialog.dismiss()
+            }
+
+            dBind.dacdTrustBtn.setOnClickListener {
+                handleDomain(dBind, selectedType, customDomain, DomainRulesManager.Status.TRUST)
+                dialog.dismiss()
+            }
+
+            dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
+            dialog.show()
+        }
+
+        private fun handleDomain(
+            dBind: DialogAddCustomDomainBinding,
+            selectedType: DomainRulesManager.DomainType,
+            prevDomain: CustomDomain,
+            status: DomainRulesManager.Status
+        ) {
+            dBind.dacdFailureText.visibility = View.GONE
+            val url = dBind.dacdDomainEditText.text.toString()
+            when (selectedType) {
+                DomainRulesManager.DomainType.WILDCARD -> {
+                    if (!isWildCardEntry(url)) {
+                        dBind.dacdFailureText.text =
+                            context.getString(R.string.cd_dialog_error_invalid_wildcard)
+                        dBind.dacdFailureText.visibility = View.VISIBLE
+                        return
+                    }
+                }
+                DomainRulesManager.DomainType.DOMAIN -> {
+                    if (!isValidDomain(url)) {
+                        dBind.dacdFailureText.text =
+                            context.getString(R.string.cd_dialog_error_invalid_domain)
+                        dBind.dacdFailureText.visibility = View.VISIBLE
+                        return
+                    }
+                }
+            }
+
+            insertDomain(
+                Utilities.removeLeadingAndTrailingDots(url),
+                selectedType,
+                prevDomain,
+                status
+            )
+        }
+
+        private fun isValidDomain(url: String): Boolean {
+            return try {
+                Patterns.WEB_URL.matcher(url).matches() ||
+                    Patterns.DOMAIN_NAME.matcher(url).matches()
+            } catch (ignored: MalformedURLException) { // ignored
+                false
+            }
+        }
+
+        private fun isWildCardEntry(url: String): Boolean {
+            // ref: https://regex101.com/r/wG1nZ3/2
+            // https://stackoverflow.com/questions/26302101/regular-expression-for-wildcard-domain-validation
+            // valid entries: *.test.com, test.com, abc.test.com
+            val pattern = Pattern.compile("^(([\\w\\d]+\\.)|(\\*\\.))+[\\w\\d]+\$")
+            return pattern.matcher(url).find()
+        }
+
+        private fun insertDomain(
+            domain: String,
+            type: DomainRulesManager.DomainType,
+            prevDomain: CustomDomain,
+            status: DomainRulesManager.Status
+        ) {
+            DomainRulesManager.updateDomainRule(domain, status, type, prevDomain)
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.cd_toast_added),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 }

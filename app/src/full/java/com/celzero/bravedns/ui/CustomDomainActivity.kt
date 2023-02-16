@@ -44,9 +44,9 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
-import org.koin.android.ext.android.inject
 import java.net.MalformedURLException
 import java.util.regex.Pattern
+import org.koin.android.ext.android.inject
 
 class CustomDomainActivity :
     AppCompatActivity(R.layout.activity_custom_domain), SearchView.OnQueryTextListener {
@@ -202,33 +202,44 @@ class CustomDomainActivity :
         dBind.dacdTextInputLayout.hint =
             resources.getString(R.string.cd_dialog_edittext_hint, getString(R.string.lbl_domain))
 
-        dBind.dacdAddBtn.setOnClickListener {
-            dBind.dacdFailureText.visibility = View.GONE
-            val url = dBind.dacdDomainEditText.text.toString()
-            when (selectedType) {
-                DomainRulesManager.DomainType.WILDCARD -> {
-                    if (!isWildCardEntry(url)) {
-                        dBind.dacdFailureText.text =
-                            resources.getString(R.string.cd_dialog_error_invalid_wildcard)
-                        dBind.dacdFailureText.visibility = View.VISIBLE
-                        return@setOnClickListener
-                    }
-                }
-                DomainRulesManager.DomainType.DOMAIN -> {
-                    if (!isValidDomain(url)) {
-                        dBind.dacdFailureText.text =
-                            resources.getString(R.string.cd_dialog_error_invalid_domain)
-                        dBind.dacdFailureText.visibility = View.VISIBLE
-                        return@setOnClickListener
-                    }
-                }
-            }
+        dBind.dacdBlockBtn.setOnClickListener {
+            handleDomain(dBind, selectedType, DomainRulesManager.Status.BLOCK)
+        }
 
-            insertDomain(removeLeadingAndTrailingDots(url), selectedType)
+        dBind.dacdTrustBtn.setOnClickListener {
+            handleDomain(dBind, selectedType, DomainRulesManager.Status.TRUST)
         }
 
         dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun handleDomain(
+        dBind: DialogAddCustomDomainBinding,
+        selectedType: DomainRulesManager.DomainType,
+        status: DomainRulesManager.Status
+    ) {
+        dBind.dacdFailureText.visibility = View.GONE
+        val url = dBind.dacdDomainEditText.text.toString()
+        when (selectedType) {
+            DomainRulesManager.DomainType.WILDCARD -> {
+                if (!isWildCardEntry(url)) {
+                    dBind.dacdFailureText.text =
+                        getString(R.string.cd_dialog_error_invalid_wildcard)
+                    dBind.dacdFailureText.visibility = View.VISIBLE
+                    return
+                }
+            }
+            DomainRulesManager.DomainType.DOMAIN -> {
+                if (!isValidDomain(url)) {
+                    dBind.dacdFailureText.text = getString(R.string.cd_dialog_error_invalid_domain)
+                    dBind.dacdFailureText.visibility = View.VISIBLE
+                    return
+                }
+            }
+        }
+
+        insertDomain(removeLeadingAndTrailingDots(url), selectedType, status)
     }
 
     private fun isValidDomain(url: String): Boolean {
@@ -247,8 +258,12 @@ class CustomDomainActivity :
         return pattern.matcher(url).find()
     }
 
-    private fun insertDomain(domain: String, type: DomainRulesManager.DomainType) {
-        DomainRulesManager.block(domain, type = type, uid = uid)
+    private fun insertDomain(
+        domain: String,
+        type: DomainRulesManager.DomainType,
+        status: DomainRulesManager.Status
+    ) {
+        DomainRulesManager.addDomainRule(domain, status, type, uid = uid)
         Utilities.showToastUiCentered(
             this,
             resources.getString(R.string.cd_toast_added),

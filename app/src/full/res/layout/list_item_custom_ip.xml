@@ -57,13 +57,24 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/custom_ip_expand_icon"
+            android:layout_toStartOf="@id/custom_ip_edit_icon"
             android:background="@drawable/rectangle_border_background"
             android:gravity="center"
             android:minWidth="25dp"
             android:padding="5dp"
             android:text="B"
             android:textSize="@dimen/default_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/custom_ip_edit_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/custom_ip_expand_icon"
+            android:layout_centerVertical="true"
+            android:alpha="0.5"
+            android:padding="5dp"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/ic_edit_icon_grey" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/custom_ip_expand_icon"
