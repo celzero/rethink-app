@@ -367,7 +367,7 @@ abstract class AppDatabase : RoomDatabase() {
                             "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Quad9 Secure','https://dns.quad9.net/dns-query','Quad9 routes your DNS queries through a secure network of servers around the globe.',0,0,0,0)"
                         )
                         execSQL(
-                            "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Digitale Gesellschaft','https://dns.digitale-gesellschaft.ch','Public DoH resolver operated by the Digital Society (https://www.digitale-gesellschaft.ch). Hosted in Zurich, Switzerland.',0,0,0,0)"
+                            "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Digitale Gesellschaft','https://dns.digitale-gesellschaft.ch/dns-query','Public DoH resolver operated by the Digital Society (https://www.digitale-gesellschaft.ch). Hosted in Zurich, Switzerland.',0,0,0,0)"
                         )
                     }
                 }
