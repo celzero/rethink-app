@@ -359,7 +359,7 @@ object RethinkBlocklistManager : KoinComponent {
             // only add the tag if it is not already present
             selectedTags.add(localFileTags.value)
         } else {
-            return 0
+            // no-op
         }
 
         val stamp = getStamp(context, selectedTags, RethinkBlocklistType.LOCAL)
