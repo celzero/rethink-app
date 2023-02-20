@@ -89,25 +89,25 @@ class RethinkLocalFileTag {
                 "group" -> group = it.value as String
                 "subg" -> subg = it.value as String
                 "url" -> {
-                    if (it.value is String) {
+                    if (it.value as Any? is String) {
                         url = listOf(it.value as String)
-                    } else if (it.value is List<*>) {
+                    } else if (it.value as Any? is List<*>) {
                         url = it.value as List<String>
                     }
                 }
                 "show" -> show = it.value as Int
                 "entries" -> entries = it.value as Int
                 "pack" -> {
-                    if (it.value is String) {
+                    if (it.value as Any? is String) {
                         pack = listOf(it.value as String)
-                    } else if (it.value is List<*>) {
+                    } else if (it.value as Any? is List<*>) {
                         pack = it.value as List<String>
                     }
                 }
                 "simpleTagId" -> simpleTagId = it.value as Int
                 "isSelected" -> {
                     isSelected =
-                        if (it.value is Boolean) {
+                        if (it.value as Any? is Boolean) {
                             it.value as Boolean
                         } else {
                             (it.value as Int) == 1
