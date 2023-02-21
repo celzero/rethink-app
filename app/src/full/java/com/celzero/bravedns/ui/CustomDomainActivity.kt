@@ -27,6 +27,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -154,6 +155,12 @@ class CustomDomainActivity :
         dialog.setContentView(dBind.root)
 
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
+
+        dBind.dacdDomainEditText.addTextChangedListener {
+            if (it?.contains("*") == true) {
+                dBind.dacdWildcardChip.isChecked = true
+            }
+        }
 
         dBind.dacdDomainChip.setOnCheckedChangeListener { _, isSelected ->
             if (isSelected) {

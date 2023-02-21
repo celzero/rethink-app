@@ -19,10 +19,13 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
+import android.util.Log
 import android.util.Patterns
 import android.view.*
+import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.addTextChangedListener
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -338,6 +341,12 @@ class CustomDomainAdapter(val context: Context) :
 
             dBind.dacdDomainEditText.setText(customDomain.domain)
 
+            dBind.dacdDomainEditText.addTextChangedListener {
+                if (it?.contains("*") == true) {
+                    dBind.dacdWildcardChip.isChecked = true
+                }
+            }
+
             dBind.dacdDomainChip.setOnCheckedChangeListener { _, isSelected ->
                 if (isSelected) {
                     selectedType = DomainRulesManager.DomainType.DOMAIN
@@ -393,12 +402,10 @@ class CustomDomainAdapter(val context: Context) :
 
             dBind.dacdBlockBtn.setOnClickListener {
                 handleDomain(dBind, selectedType, customDomain, DomainRulesManager.Status.BLOCK)
-                dialog.dismiss()
             }
 
             dBind.dacdTrustBtn.setOnClickListener {
                 handleDomain(dBind, selectedType, customDomain, DomainRulesManager.Status.TRUST)
-                dialog.dismiss()
             }
 
             dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
@@ -412,7 +419,7 @@ class CustomDomainAdapter(val context: Context) :
             status: DomainRulesManager.Status
         ) {
             dBind.dacdFailureText.visibility = View.GONE
-            val url = dBind.dacdDomainEditText.text.toString()
+            val url = dBind.dacdDomainEditText.text.toString().trim()
             when (selectedType) {
                 DomainRulesManager.DomainType.WILDCARD -> {
                     if (!isWildCardEntry(url)) {
