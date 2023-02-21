@@ -136,9 +136,6 @@ class Constants {
         // base-url for rethinkdns
         const val RETHINKDNS_DOMAIN = "rethinkdns.com"
 
-        // default doh url
-        const val DEFAULT_DOH_URL = "https://zero.rethinkdns.com/dns-query"
-
         // json object constants received as part of update check
         // FIXME: Avoid usage of these parameters, map to POJO instead
         const val JSON_VERSION = "version"
@@ -266,5 +263,14 @@ class Constants {
 
         // intent extra name for uid
         const val INTENT_UID = "UID"
+
+        data class DefaultDnsServer(val id: Int, val name: String, val url: String, val type: String)
+
+        val DEFAULT_DNS_LIST =
+            listOf(
+                DefaultDnsServer(0, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
+                DefaultDnsServer(1, "Google", "https://dns.google.com/dns-query", "DoH"),
+                DefaultDnsServer(2, "CloudFlare", "https://cloudflare-dns.com/dns-query", "DoH")
+            )
     }
 }

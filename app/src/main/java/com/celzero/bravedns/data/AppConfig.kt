@@ -622,6 +622,10 @@ internal constructor(
         onDnsChange(DnsType.RETHINK_REMOTE)
     }
 
+    suspend fun getDefaultDns(): String {
+        return persistentState.defaultDnsUrl
+    }
+
     suspend fun getRemoteRethinkEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointRepository.getConnectedEndpoint()
     }

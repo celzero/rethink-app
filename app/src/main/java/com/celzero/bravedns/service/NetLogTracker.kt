@@ -91,7 +91,7 @@ internal constructor(
         // ideally this check should be carried out before processing the dns object.
         // Now, the ipDomain cache is adding while making the dnsLog object.
         // TODO: move ipDomain cache out of DnsLog object creation
-        if (!persistentState.logsEnabled) return
+        if (!persistentState.logsEnabled || persistentState.enableDnsAlg) return
 
         dnsLogTracker?.updateDnsRequestCount(dnsLog)
         scope?.launch { dnsNetLogBatcher?.add(dnsLog) }

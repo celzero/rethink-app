@@ -41,6 +41,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DNS_RELAYS = "dnscrypt_relay"
         const val INTERNET_PROTOCOL = "internet_protocol"
         const val PROTOCOL_TRANSLATION = "protocol_translation"
+        const val DEFAULT_DNS_SERVER = "default_dns_server"
 
         // const val APP_STATE = "app_state"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
@@ -227,6 +228,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // dns crypt relay server
     var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")
+
+    // default dns url
+    var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>("")
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

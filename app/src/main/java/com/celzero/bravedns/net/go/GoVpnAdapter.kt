@@ -28,7 +28,7 @@ import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.BraveVPNService.Companion.USER_SELECTED_TRANSPORT_ID
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants.Companion.DEFAULT_DOH_URL
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -42,6 +42,7 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
+import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +51,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import settings.Settings
 import tun2socks.Tun2socks
-import java.io.IOException
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -145,6 +145,8 @@ class GoVpnAdapter(
 
         if (transport != null) {
             tunnel?.resolver?.add(transport)
+            // add transport to gateway to resolve the dns queries on dns-alg
+            tunnel?.resolver?.gateway()?.withTransport(transport)
             Log.i(LOG_TAG_VPN, "add transport to resolver, addr: ${transport.addr}")
         } else {
             Log.e(LOG_TAG_VPN, "transport is null for dns type: ${appConfig.getDnsType()}")
@@ -153,7 +155,7 @@ class GoVpnAdapter(
 
     private suspend fun createDohTransport(): Transport? {
         val doh = appConfig.getDOHDetails()
-        val url = doh?.dohURL ?: DEFAULT_DOH_URL
+        val url = doh?.dohURL
         val transport = Intra.newDoHTransport(USER_SELECTED_TRANSPORT_ID, url, "", null)
         Log.i(
             LOG_TAG_VPN,
@@ -176,7 +178,7 @@ class GoVpnAdapter(
             return transport
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt failure", e)
-            handleDnscryptFailure()
+            showDnscryptConnectionFailureToast()
             return null
         }
     }
@@ -197,7 +199,7 @@ class GoVpnAdapter(
             return transport
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy failure", e)
-            handleDnsProxyFailure()
+            showDnsProxyConnectionFailureToast()
             return null
         }
     }
@@ -218,7 +220,6 @@ class GoVpnAdapter(
             return transport
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy failure", e)
-            handleDnsProxyFailure()
             return null
         }
     }
@@ -337,18 +338,6 @@ class GoVpnAdapter(
                 e
             )
         }
-    }
-
-    private suspend fun handleDnscryptFailure() {
-        appConfig.setDefaultConnection()
-        showDnscryptConnectionFailureToast()
-        Log.i(LOG_TAG_VPN, "connect-tunnel: falling back to doh since dnscrypt failed")
-    }
-
-    private suspend fun handleDnsProxyFailure() {
-        appConfig.setDefaultConnection()
-        showDnsProxyConnectionFailureToast()
-        Log.i(LOG_TAG_VPN, "connect-tunnel: falling back to doh since dns proxy failed")
     }
 
     private fun showDnscryptConnectionFailureToast() {
@@ -482,8 +471,8 @@ class GoVpnAdapter(
         }
     }
 
-    private fun getDefaultDohUrl(): String {
-        return DEFAULT_DOH_URL
+    private suspend fun getDefaultDohUrl(): String {
+        return persistentState.defaultDnsUrl.ifEmpty { Constants.DEFAULT_DNS_LIST[0].url }
     }
 
     private fun setBraveDNSLocalMode() {
@@ -521,7 +510,7 @@ class GoVpnAdapter(
                 )
             }
         } catch (e: java.lang.Exception) {
-            Log.e(LOG_TAG_VPN, "could not set set local-brave dns stamp: ${e.message}", e)
+            Log.e(LOG_TAG_VPN, "could not set local-brave dns stamp: ${e.message}", e)
         }
     }
 
