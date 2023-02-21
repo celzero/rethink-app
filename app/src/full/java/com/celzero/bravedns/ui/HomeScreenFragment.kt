@@ -566,7 +566,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                 val whiteListApps =
                     copy.filter { a ->
-                        a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id
+                        a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
+                        a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
                     }
                 val excludedApps =
                     copy.filter { a ->

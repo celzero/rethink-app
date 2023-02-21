@@ -34,16 +34,16 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Multimap
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 object FirewallManager : KoinComponent {
 
@@ -74,7 +74,8 @@ object FirewallManager : KoinComponent {
         EXCLUDE(3),
         ISOLATE(4),
         NONE(5),
-        UNTRACKED(6);
+        UNTRACKED(6),
+        BYPASS_DNS_FIREWALL(7);
 
         companion object {
 
@@ -88,6 +89,9 @@ object FirewallManager : KoinComponent {
                     }
                     ISOLATE.id -> {
                         ISOLATE
+                    }
+                    BYPASS_DNS_FIREWALL.id -> {
+                        BYPASS_DNS_FIREWALL
                     }
                     else -> {
                         NONE
@@ -110,13 +114,16 @@ object FirewallManager : KoinComponent {
                         NONE
                     }
                     4 -> {
-                        BYPASS_UNIVERSAL
+                        ISOLATE
                     }
                     5 -> {
-                        EXCLUDE
+                        BYPASS_DNS_FIREWALL
                     }
                     6 -> {
-                        ISOLATE
+                        BYPASS_UNIVERSAL
+                    }
+                    7 -> {
+                        EXCLUDE
                     }
                     else -> {
                         NONE
@@ -127,6 +134,10 @@ object FirewallManager : KoinComponent {
 
         fun bypassUniversal(): Boolean {
             return this == BYPASS_UNIVERSAL
+        }
+
+        fun bypassDnsFirewall(): Boolean {
+            return this == BYPASS_DNS_FIREWALL
         }
 
         fun excluded(): Boolean {
@@ -284,6 +295,7 @@ object FirewallManager : KoinComponent {
             FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
             FirewallStatus.NONE.id -> FirewallStatus.NONE
             FirewallStatus.ISOLATE.id -> FirewallStatus.ISOLATE
+            FirewallStatus.BYPASS_DNS_FIREWALL.id -> FirewallStatus.BYPASS_DNS_FIREWALL
             else -> FirewallStatus.NONE
         }
     }
@@ -518,6 +530,9 @@ object FirewallManager : KoinComponent {
             }
             FirewallStatus.UNTRACKED -> {
                 R.string.untracked
+            }
+            FirewallStatus.BYPASS_DNS_FIREWALL -> {
+                R.string.bypass_dns_firewall
             }
         }
     }

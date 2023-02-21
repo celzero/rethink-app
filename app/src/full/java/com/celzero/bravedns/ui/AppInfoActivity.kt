@@ -177,13 +177,6 @@ class AppInfoActivity :
     }
 
     private fun openCustomDomainScreen() {
-        // TODO: enable this once the dns alg is ready
-        // prompt user a dialog to enable app-wise domain rules if it is not enabled already
-        if (!persistentState.enableDnsAlg) {
-            promptDnsAlgDialog()
-            return
-        }
-
         val intent = Intent(this, CustomDomainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(Constants.INTENT_UID, uid)
@@ -225,8 +218,10 @@ class AppInfoActivity :
                 enableAppBypassedUi()
             }
             FirewallManager.FirewallStatus.ISOLATE -> {
-                disableFirewallStatusUi()
                 enableIsolateUi()
+            }
+            FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
+                enableDnsFirewallBypassedUi()
             }
             FirewallManager.FirewallStatus.NONE -> {
                 when (connectionStatus) {
@@ -253,16 +248,16 @@ class AppInfoActivity :
             Utilities.openAndroidAppInfo(this, appInfo.packageName)
         }
 
-        b.aadAppSettingsBlock.setOnClickListener {
+        b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             // update both the wifi and mobile data to either block or allow state
-            if (connStatus == FirewallManager.ConnectionStatus.ALLOW) {
+            if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
                 updateFirewallStatus(
                     FirewallManager.FirewallStatus.NONE,
-                    FirewallManager.ConnectionStatus.BOTH
+                    FirewallManager.ConnectionStatus.ALLOW
                 )
             } else {
                 updateFirewallStatus(
-                    FirewallManager.FirewallStatus.NONE,
+                    FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL,
                     FirewallManager.ConnectionStatus.ALLOW
                 )
             }
@@ -285,13 +280,12 @@ class AppInfoActivity :
                     FirewallManager.FirewallStatus.NONE,
                     FirewallManager.ConnectionStatus.ALLOW
                 )
-                return@setOnClickListener
+            } else {
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
+                    FirewallManager.ConnectionStatus.ALLOW
+                )
             }
-
-            updateFirewallStatus(
-                FirewallManager.FirewallStatus.BYPASS_UNIVERSAL,
-                FirewallManager.ConnectionStatus.ALLOW
-            )
         }
 
         b.aadAppSettingsExclude.setOnClickListener {
@@ -306,13 +300,12 @@ class AppInfoActivity :
                     FirewallManager.FirewallStatus.NONE,
                     FirewallManager.ConnectionStatus.ALLOW
                 )
-                return@setOnClickListener
+            } else {
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.EXCLUDE,
+                    FirewallManager.ConnectionStatus.ALLOW
+                )
             }
-
-            updateFirewallStatus(
-                FirewallManager.FirewallStatus.EXCLUDE,
-                FirewallManager.ConnectionStatus.ALLOW
-            )
         }
 
         b.aadAppSettingsIsolate.setOnClickListener {
@@ -322,13 +315,12 @@ class AppInfoActivity :
                     FirewallManager.FirewallStatus.NONE,
                     FirewallManager.ConnectionStatus.ALLOW
                 )
-                return@setOnClickListener
+            } else {
+                updateFirewallStatus(
+                    FirewallManager.FirewallStatus.ISOLATE,
+                    FirewallManager.ConnectionStatus.ALLOW
+                )
             }
-
-            updateFirewallStatus(
-                FirewallManager.FirewallStatus.ISOLATE,
-                FirewallManager.ConnectionStatus.ALLOW
-            )
         }
 
         b.aadConnDetailIndicator.setOnClickListener { toggleNetworkLogState(ipListUiState) }
@@ -521,7 +513,7 @@ class AppInfoActivity :
     }
 
     private fun enableAppBypassedUi() {
-        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_bypass_dns_firewall_off, b.aadAppSettingsBypassDnsFirewall)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_bypass_on, b.aadAppSettingsBypassUniv)
@@ -529,8 +521,17 @@ class AppInfoActivity :
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsIsolate)
     }
 
+    private fun enableDnsFirewallBypassedUi() {
+        setDrawable(R.drawable.ic_bypass_dns_firewall_on, b.aadAppSettingsBypassDnsFirewall)
+        setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
+        setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
+        setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsBypassUniv)
+        setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsIsolate)
+    }
+
     private fun enableAppExcludedUi() {
-        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_bypass_dns_firewall_off, b.aadAppSettingsBypassDnsFirewall)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsBypassUniv)
@@ -542,6 +543,7 @@ class AppInfoActivity :
         setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsBypassUniv)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
         setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsIsolate)
+        setDrawable(R.drawable.ic_bypass_dns_firewall_off, b.aadAppSettingsBypassDnsFirewall)
     }
 
     private fun disableFirewallStatusUi() {
@@ -553,7 +555,7 @@ class AppInfoActivity :
     }
 
     private fun enableIsolateUi() {
-        setDrawable(R.drawable.ic_firewall_allow_grey, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_bypass_dns_firewall_off, b.aadAppSettingsBypassDnsFirewall)
         setDrawable(R.drawable.ic_firewall_wifi_on_grey, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on_grey, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsBypassUniv)
@@ -562,7 +564,7 @@ class AppInfoActivity :
     }
 
     private fun enableAllow() {
-        setDrawable(R.drawable.ic_firewall_allow, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_bypass_dns_firewall_off, b.aadAppSettingsBypassDnsFirewall)
         setDrawable(R.drawable.ic_firewall_wifi_on, b.aadAppSettingsBlockWifi)
         setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
         setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsBypassUniv)
@@ -590,9 +592,10 @@ class AppInfoActivity :
                 setDrawable(R.drawable.ic_firewall_data_on, b.aadAppSettingsBlockMd)
             }
         }
-        setDrawable(R.drawable.ic_firewall_block, b.aadAppSettingsBlock)
+        setDrawable(R.drawable.ic_bypass_dns_firewall_off, b.aadAppSettingsBypassDnsFirewall)
         setDrawable(R.drawable.ic_firewall_bypass_off, b.aadAppSettingsBypassUniv)
         setDrawable(R.drawable.ic_firewall_exclude_off, b.aadAppSettingsExclude)
+        setDrawable(R.drawable.ic_firewall_lockdown_off, b.aadAppSettingsIsolate)
     }
 
     private fun setDrawable(drawable: Int, txt: TextView) {
@@ -618,6 +621,8 @@ class AppInfoActivity :
             FirewallManager.FirewallStatus.BYPASS_UNIVERSAL ->
                 getString(R.string.ada_app_status_whitelist)
             FirewallManager.FirewallStatus.ISOLATE -> getString(R.string.ada_app_status_isolate)
+            FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL ->
+                getString(R.string.ada_app_status_bypass_dns_firewall)
             FirewallManager.FirewallStatus.UNTRACKED -> getString(R.string.ada_app_status_unknown)
         }
     }
@@ -708,20 +713,6 @@ class AppInfoActivity :
             .load(drawable)
             .error(Utilities.getDefaultIcon(this))
             .into(mIconImageView)
-    }
-
-    private fun promptDnsAlgDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Enable app-wise domain rules")
-        builder.setMessage("App-wise domain rules setting is disabled. Do you want to enable?")
-        builder.setCancelable(true)
-        builder.setPositiveButton("Enable") { _, _ ->
-            persistentState.enableDnsAlg = true
-            openCustomDomainScreen()
-        }
-
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
-        builder.create().show()
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
