@@ -16,6 +16,7 @@
 package com.celzero.bravedns.database
 
 import android.database.Cursor
+import androidx.room.Transaction
 
 class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     suspend fun update(customDomain: CustomDomain) {
@@ -28,6 +29,12 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
 
     suspend fun delete(customDomain: CustomDomain) {
         customDomainDAO.delete(customDomain)
+    }
+
+    @Transaction
+    suspend fun update(prevDomain: CustomDomain, newDomain: CustomDomain) {
+        customDomainDAO.delete(prevDomain)
+        customDomainDAO.insert(newDomain)
     }
 
     fun getAllCustomDomains(): List<CustomDomain> {

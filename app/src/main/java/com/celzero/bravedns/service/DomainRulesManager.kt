@@ -96,8 +96,7 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    // three diff lists are maintained for the custom domains
-    // add to the appropriate list based on the type
+    // update the cache with the domain and its status based on the domain type
     private fun updateCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
@@ -124,7 +123,10 @@ object DomainRulesManager : KoinComponent {
             return
         }
 
-        customDomains.forEach { cd ->
+        // sort the custom domains based on the length of the domain
+        val selector: (String) -> Int = { str -> str.length }
+        val sortedDomains = customDomains.sortedByDescending { selector(it.domain) }
+        sortedDomains.forEach { cd ->
             when (DomainType.getType(cd.type)) {
                 DomainType.DOMAIN -> {
                     val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
@@ -244,22 +246,20 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    fun updateDomainRule(
-        d: String,
-        status: Status,
-        type: DomainType,
-        prevDomain: CustomDomain
-    ) {
+    fun updateDomainRule(d: String, status: Status, type: DomainType, prevDomain: CustomDomain) {
         io {
-            deleteDomain(prevDomain)
             val cd = constructObject(d, prevDomain.uid, "", type, status.id)
-            dbInsertOrUpdate(cd)
+            dbUpdate(prevDomain, cd)
             updateCache(cd)
         }
     }
 
     private suspend fun dbInsertOrUpdate(cd: CustomDomain) {
         customDomainsRepository.insert(cd)
+    }
+
+    private suspend fun dbUpdate(prevDomain: CustomDomain, cd: CustomDomain) {
+        customDomainsRepository.update(prevDomain, cd)
     }
 
     private suspend fun dbDelete(cd: CustomDomain) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bsac_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -22,71 +22,71 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:gravity="center"
         android:padding="5dp"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"
         android:textSize="@dimen/extra_large_font_text_view"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/bsac_unblock"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
-        android:text="@string/bsac_unblock"
-        app:drawableEndCompat="@drawable/ic_tick_normal"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:orientation="horizontal"
+        android:padding="10dp">
 
-    <TextView
-        android:id="@+id/bsac_block"
+        <TextView
+            android:id="@+id/bsac_ip_rule_txt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.6"
+            android:padding="5dp"
+            android:text="@string/bsct_block_ip"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <Spinner
+            android:id="@+id/bsac_ip_rule_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.4"
+            android:background="@drawable/spinner_outline"
+            android:popupBackground="@drawable/spinner_outline_with_bg"
+            android:spinnerMode="dropdown"
+            tools:listitem="@layout/spinner_item_firewall_status" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bsac_domain_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
-        android:text="@string/bsac_block"
-        app:drawableEndCompat="@drawable/ic_disallowed_16"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:orientation="vertical"
+        android:padding="5dp">
 
-    <TextView
-        android:id="@+id/bsac_trust_ip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
-        android:text="@string/bsac_trust"
-        app:drawableEndCompat="@drawable/ic_trust_ip"
-        android:textColor="?attr/primaryTextColor"
-        android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/bsac_domain_rule_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:alpha="0.6"
+            android:text="@string/bsct_block_domain"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/bsac_domain_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/bsac_distrust_ip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:fontFamily="sans-serif-medium"
-        android:padding="10dp"
-        android:text="@string/bsac_distrust"
-        android:textColor="?attr/primaryTextColor"
-        app:drawableEndCompat="@drawable/ic_trust_ip"
-        android:textSize="@dimen/extra_large_font_text_view"
-        android:visibility="gone" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/bsac_desc"
@@ -94,9 +94,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:alpha="0.7"
         android:gravity="center"
         android:padding="5dp"
-        android:alpha="0.7"
         android:text="@string/bsac_title_desc"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view" />
