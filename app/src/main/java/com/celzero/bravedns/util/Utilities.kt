@@ -52,6 +52,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.DnsLogTracker
 import com.celzero.bravedns.util.Constants.Companion.ACTION_VPN_SETTINGS_INTENT
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_FDROID
 import com.celzero.bravedns.util.Constants.Companion.FLAVOR_HEADLESS
@@ -63,6 +64,7 @@ import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
+import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
@@ -70,9 +72,9 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
+import inet.ipaddr.HostName
+import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
-import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -81,6 +83,9 @@ import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
+import xdns.Xdns
 
 class Utilities {
 
@@ -225,6 +230,24 @@ class Utilities {
             return String(Character.toChars(firstHalf)) + String(Character.toChars(secondHalf))
         }
 
+        fun normalizeIp(ipstr: String?): InetAddress? {
+            if (ipstr == null) return null
+
+            val ipAddress: IPAddress = HostName(ipstr).address ?: return null
+            val ip = ipAddress.toInetAddress()
+
+            // no need to check if IP is not of type IPv6
+            if (!IpManager.isIpV6(ipAddress)) return ip
+
+            val ipv4 = IpManager.toIpV4(ipAddress)
+
+            return if (ipv4 != null) {
+                ipv4.toInetAddress()
+            } else {
+                ip
+            }
+        }
+
         fun makeAddressPair(countryCode: String?, ipAddress: String?): String {
             return if (ipAddress.isNullOrEmpty()) {
                 "--" // to avoid translation set to "--"
@@ -278,20 +301,6 @@ class Utilities {
             }
 
             return false
-        }
-
-        fun getNonLiveDnscryptServers(servers: String, liveServers: String): String {
-            val serverList = servers.split(",")
-            val liveServerList = liveServers.split(",")
-            var serversToSend = ""
-
-            serverList.forEach {
-                if (!liveServerList.contains(it)) {
-                    serversToSend += "${it.trim()},"
-                }
-            }
-            if (DEBUG) Log.d(LOG_TAG_VPN, "In: $serverList / Out: $serversToSend")
-            return serversToSend.dropLast(1)
         }
 
         fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
@@ -623,6 +632,20 @@ class Utilities {
                     context.getString(R.string.about_mail_bugreport_share_title)
                 )
             )
+        }
+
+        fun isUnspecifiedIp(serverIp: String): Boolean {
+            return UNSPECIFIED_IP_IPV4 == serverIp ||
+                UNSPECIFIED_IP_IPV6 == serverIp
+        }
+
+        fun calculateTtl(ttl: Long): Long {
+            val now = System.currentTimeMillis()
+
+            // on negative ttl, cache dns record for a day
+            if (ttl < 0) return now + TimeUnit.DAYS.toMillis(1L)
+
+            return now + TimeUnit.SECONDS.toMillis((ttl + DnsLogTracker.DNS_TTL_GRACE_SEC))
         }
 
         fun deleteRecursive(fileOrDirectory: File) {

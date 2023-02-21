@@ -48,8 +48,9 @@
                 android:textSize="@dimen/heading_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="300dp"
+                android:layout_height="250dp"
+                android:layout_centerHorizontal="true"
                 android:layout_below="@id/cda_no_rules_text"
                 android:src="@drawable/illustrations_no_record" />
 

@@ -29,13 +29,13 @@ import com.google.common.cache.CacheBuilder
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.write
 
 object IpRulesManager : KoinComponent {
 
@@ -294,12 +294,12 @@ object IpRulesManager : KoinComponent {
             }
 
         val key = CacheKey(ip, uid)
-        val customIpObj = appIpRules.getOrElse(key) {
-            return IpRuleStatus.NONE
-        }
+        val customIpObj =
+            appIpRules.getOrElse(key) {
+                return IpRuleStatus.NONE
+            }
 
         return IpRuleStatus.getStatus(customIpObj.status)
-
     }
 
     private fun isIpv6ToV4FilterRequired(): Boolean {
@@ -321,7 +321,11 @@ object IpRulesManager : KoinComponent {
         }
         io {
             val rules = customIpRepository.getIpRules()
-            rules.forEach {
+            // sort the rules by the network prefix length
+            val selector: (IPAddressString?) -> Int = { str -> str?.networkPrefixLength ?: 32 }
+            val subnetMap =
+                rules.sortedByDescending { selector(it.getCustomIpAddress().asAddressString()) }
+            subnetMap.forEach {
                 if (
                     it.getCustomIpAddress().address.isMultiple ||
                         it.getCustomIpAddress().address.isAnyLocal

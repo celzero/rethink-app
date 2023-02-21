@@ -377,7 +377,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                 )
         }
         text = text.replace(",", ", ")
-        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        return updateHtmlEncodedText(text)
     }
 
     private fun displayDescription() {
