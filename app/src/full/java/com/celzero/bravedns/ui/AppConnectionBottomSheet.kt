@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
@@ -113,10 +114,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             this.dismiss()
             return
         }
-        b.bsacHeading.text = ipAddress
+        b.bsacIpAddressTv.text = ipAddress
 
         b.bsacIpRuleTxt.text = Utilities.updateHtmlEncodedText(getString(R.string.bsct_block_ip))
-        b.bsacDomainRuleTxt.text = Utilities.updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+        b.bsacDomainRuleTxt.text =
+            Utilities.updateHtmlEncodedText(getString(R.string.bsct_block_domain))
 
         setupRecycler()
     }
@@ -141,7 +143,20 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         // no need to send port number for the app info screen
         ipRule = IpRulesManager.isIpRuleAvailable(uid, ipAddress, null)
         Log.d("FirewallManager", "Set selection of ip: $ipAddress, ${ipRule.id}")
-        b.bsacIpRuleSpinner.setSelection(ipRule.id)
+        when (ipRule) {
+            IpRulesManager.IpRuleStatus.TRUST -> {
+                enableTrustUi()
+            }
+            IpRulesManager.IpRuleStatus.BLOCK -> {
+                enableBlockUi()
+            }
+            IpRulesManager.IpRuleStatus.NONE -> {
+                noRuleUi()
+            }
+            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                noRuleUi()
+            }
+        }
     }
 
     override fun onResume() {
@@ -154,31 +169,25 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private fun initializeClickListeners() {
 
-        b.bsacIpRuleSpinner.adapter =
-            FirewallStatusSpinnerAdapter(
-                requireContext(),
-                IpRulesManager.IpRuleStatus.getLabel(requireContext())
-            )
-        b.bsacIpRuleSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val iv = view?.findViewById<AppCompatImageView>(R.id.spinner_icon)
-                    iv?.visibility = View.VISIBLE
-                    val fid = IpRulesManager.IpRuleStatus.getStatus(position)
-
-                    // no need to apply rule, prev selection and current selection are same
-                    if (ipRule == fid) return
-
-                    applyIpRule(fid)
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+        b.blockIcon.setOnClickListener {
+            if (ipRule == IpRulesManager.IpRuleStatus.BLOCK) {
+                applyIpRule(IpRulesManager.IpRuleStatus.NONE)
+                noRuleUi()
+            } else {
+                applyIpRule(IpRulesManager.IpRuleStatus.BLOCK)
+                enableBlockUi()
             }
+        }
+
+        b.trustIcon.setOnClickListener {
+            if (ipRule == IpRulesManager.IpRuleStatus.TRUST) {
+                applyIpRule(IpRulesManager.IpRuleStatus.NONE)
+                noRuleUi()
+            } else {
+                applyIpRule(IpRulesManager.IpRuleStatus.TRUST)
+                enableTrustUi()
+            }
+        }
     }
 
     private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
@@ -186,6 +195,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
             LoggerConstants.LOG_TAG_FIREWALL,
             "ip rule for uid: $uid, ip: $ipAddress (${status.name})"
         )
+        ipRule = status
         // set port number as null for all the rules applied from this screen
         IpRulesManager.addIpRule(uid, ipAddress, null, status)
     }
@@ -193,5 +203,32 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         dismissListener?.notifyDataset(position)
+    }
+
+    private fun enableTrustUi() {
+        b.trustIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_trust_accent)
+        )
+        b.blockIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_block)
+        )
+    }
+
+    private fun enableBlockUi() {
+        b.trustIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_trust)
+        )
+        b.blockIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_block_accent)
+        )
+    }
+
+    private fun noRuleUi() {
+        b.trustIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_trust)
+        )
+        b.blockIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_block)
+        )
     }
 }

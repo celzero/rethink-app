@@ -18,49 +18,66 @@
         android:background="?attr/border" />
 
     <TextView
-        android:id="@+id/bsac_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:gravity="center"
+        android:text="Apply Rules"
         android:padding="5dp"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"
         android:textSize="@dimen/extra_large_font_text_view"
         android:textStyle="bold" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/bsac_ip_rule_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:alpha="0.6"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="@string/bsct_block_ip"
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view" />
 
-        <TextView
-            android:id="@+id/bsac_ip_rule_txt"
-            android:layout_width="0dp"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:padding="5dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/bsac_ip_address_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.6"
-            android:padding="5dp"
-            android:text="@string/bsct_block_ip"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/trust_icon"
+            android:paddingStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:paddingEnd="10dp"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
 
-        <Spinner
-            android:id="@+id/bsac_ip_rule_spinner"
-            android:layout_width="0dp"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/trust_icon"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.4"
-            android:background="@drawable/spinner_outline"
-            android:popupBackground="@drawable/spinner_outline_with_bg"
-            android:spinnerMode="dropdown"
-            tools:listitem="@layout/spinner_item_firewall_status" />
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="30dp"
+            android:layout_toStartOf="@id/block_icon"
+            android:src="@drawable/ic_trust" />
 
-    </LinearLayout>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/block_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_block" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/bsac_domain_ll"
@@ -75,8 +92,9 @@
             android:id="@+id/bsac_domain_rule_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:alpha="0.6"
+            android:gravity="center"
+            android:padding="10dp"
             android:text="@string/bsct_block_domain"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/large_font_text_view" />
