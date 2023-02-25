@@ -235,4 +235,17 @@
     <string name="orbot_status_arg_3" translatable="true">DNS i TCP</string>
     <string name="orbot_stop_dialog_message" translatable="true">RethinkDNS przestał przekazywać połączenia do Orbota, ale Orbot może działać w tle.</string>
     <string name="orbot_install_dialog_title" translatable="true">Zainstalować Orbot\?</string>
+    <string name="settings_app_notification_a13_heading" translatable="true">Powiadomienia aplikacji</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">Włącz uprawnienie do pokazywania powiadomień</string>
+    <string name="settings_http_proxy_desc" translatable="true">Przekierowuję do: %1$s:%2$s</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">Własny adres URL serwera</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
+\n
+\n%2$s</string>
+    <string name="settings_theme_heading" translatable="true">Wygląd</string>
+    <string name="settings_theme_desc" translatable="true">Ciemny/jasny motyw</string>
+    <string name="orbot_explanation" translatable="true">Orbot jest bezpłatną aplikacją proxy, która umożliwia innym aplikacjom korzystanie z Internetu w bardziej <u>bezpieczny sposób</u>.
+\nOrbot używa <u>Tora</u> do szyfrowania ruchu internetowego, co pomaga <u>ominąć cenzurę</u> i bronić się przed formami <u>inwigilacji</u>, które zagrażają wolności osobistej i prywatności.
+\n<u>Proxy TCP</u>: RethinkDNS przekazuje do Orbota tylko połączenia TCP wszystkich aplikacji poza wykluczonymi.
+\n<u>Proxy HTTP</u>: RethinkDNS <i>ustawia</i> proxy HTTP, ale nie wymusza używania go przez aplikacje. Zwykle używają go przeglądarki takie jak Chrome i Firefox. Aplikacje korzystające z serwera proxy HTTP(S) będą omijać zarówno reguły zapory sieciowej, jak i DNS.</string>
 </resources>
