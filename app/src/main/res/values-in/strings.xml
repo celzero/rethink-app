@@ -329,7 +329,7 @@
     <string name="cd_no_rule_txt">Tanpa Aturan</string>
     <string name="system_dns_connection_failure">Tidak dapat menentukan server DNS saat ini</string>
     <string name="lbbs_search">Cari domain didalam daftar blokir</string>
-    <string name="notif_download_content_title">Unduhan Daftar Blokir di Perangkat</string>
+    <string name="notif_download_content_title">Mengunduh Daftar Blokir Lokal</string>
     <string name="slide_2_desc">RethinkDNS adalah cara termudah untuk memantau aktivitas jaringan, melewati penyensoran jaringan, dan mem-firewall aplikasi-aplikasi di perangkat Anda.</string>
     <string name="settings_dns_proxy_dialog_username">Nama pengguna</string>
     <string name="settings_ip_text_ipv46">Otomatis</string>
@@ -376,7 +376,7 @@
     <string name="fapps_filter_filter_heading">Tipe</string>
     <string name="firewall_rule_block_app_exception">Kesalahan</string>
     <string name="ada_app_status_allow">diperbolehkan</string>
-    <string name="notif_download_success_content">Berhasil mengunduh.</string>
+    <string name="notif_download_success_content">Berhasil terunduh.</string>
     <string name="rt_dialog_title">Simpan Perubahan</string>
     <string name="brbs_backup_dialog_failure_positive">Cadangkan Ulang</string>
     <string name="blocklist_update_check_not_required">Daftar-daftar blokir sudah dalam versi terbaru.</string>
