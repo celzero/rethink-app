@@ -92,31 +92,9 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
             return
         }
 
-        if (handleDnsAlg()) {
-            // If DNS ALG is enabled, then return from here.
-            return
-        }
-
         displayPerDnsUi()
         setupClickListeners()
         remakeFilterChipsUi()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        handleDnsAlg()
-    }
-
-    private fun handleDnsAlg(): Boolean {
-        return if (persistentState.enableDnsAlg) {
-            b.queryListLogsDisabledTv.visibility = View.VISIBLE
-            b.queryListLogsDisabledTv.text = getString(R.string.show_logs_disabled_dns_message_alg)
-            b.queryListCardViewTop.visibility = View.GONE
-            b.queryDetailsLl.visibility = View.GONE
-            true
-        } else {
-            false
-        }
     }
 
     private fun observeDnsStats() {
