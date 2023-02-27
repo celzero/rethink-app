@@ -33,7 +33,7 @@ import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.CustomIpActivity
+import com.celzero.bravedns.ui.CustomIpFragment
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
@@ -403,7 +403,7 @@ class CustomIpAdapter(private val context: Context) :
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(context.getString(R.string.ci_dialog_title))
-        val dBind = DialogAddCustomIpBinding.inflate((context as CustomIpActivity).layoutInflater)
+        val dBind = DialogAddCustomIpBinding.inflate((context as CustomIpFragment).layoutInflater)
         dialog.setContentView(dBind.root)
 
         val lp = WindowManager.LayoutParams()
@@ -502,7 +502,7 @@ class CustomIpAdapter(private val context: Context) :
     }
 
     private fun ui(f: suspend () -> Unit) {
-        (context as CustomIpActivity).lifecycleScope.launch {
+        (context as CustomIpFragment).lifecycleScope.launch {
             withContext(Dispatchers.Main) { f() }
         }
     }

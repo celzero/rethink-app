@@ -19,10 +19,8 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.*
-import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
@@ -34,7 +32,7 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.ui.CustomDomainActivity
+import com.celzero.bravedns.ui.CustomDomainFragment
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.google.android.material.button.MaterialButton
@@ -333,7 +331,7 @@ class CustomDomainAdapter(val context: Context) :
             dialog.setTitle(context.getString(R.string.cd_dialog_title))
             val dBind =
                 DialogAddCustomDomainBinding.inflate(
-                    (context as CustomDomainActivity).layoutInflater
+                    (context as CustomDomainFragment).layoutInflater
                 )
             dialog.setContentView(dBind.root)
 

@@ -23,6 +23,7 @@
             android:layout_marginTop="5dp"
             android:focusable="true"
             android:padding="5dp"
+            android:visibility="gone"
             android:text="@string/cd_dialog_header"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view" />
