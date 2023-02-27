@@ -44,6 +44,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
@@ -167,18 +168,20 @@ class AppInfoActivity :
     }
 
     private fun openCustomIpScreen() {
-        val intent = Intent(this, CustomIpActivity::class.java)
+        val intent = Intent(this, CustomRulesActivity::class.java)
         // this activity is either being started in a new task or bringing to the top an
         // existing task, then it will be launched as the front door of the task.
         // This will result in the application to have that task in the proper state.
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.IP_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)
     }
 
     private fun openCustomDomainScreen() {
-        val intent = Intent(this, CustomDomainActivity::class.java)
+        val intent = Intent(this, CustomRulesActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        intent.putExtra(VIEW_PAGER_SCREEN_TO_LOAD, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
         intent.putExtra(Constants.INTENT_UID, uid)
         startActivity(intent)
     }

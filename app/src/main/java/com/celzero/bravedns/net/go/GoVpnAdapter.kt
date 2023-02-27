@@ -26,7 +26,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
-import com.celzero.bravedns.service.BraveVPNService.Companion.USER_SELECTED_TRANSPORT_ID
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
@@ -79,7 +78,8 @@ class GoVpnAdapter(
 
         try {
             if (DEBUG) {
-                Tun2socks.enableDebugLog()
+                // 0 - debug, 1 - info, 2 - warn, 3 - error
+                Tun2socks.logLevel(0)
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
@@ -98,6 +98,7 @@ class GoVpnAdapter(
             tunnel =
                 Tun2socks.connectIntraTunnel(
                     tunFd!!.fd.toLong(),
+                    DISABLE_PCAP, // fd for pcap logging
                     tunnelOptions.mtu.toLong(),
                     tunnelOptions.fakeDns,
                     transport,
@@ -125,6 +126,8 @@ class GoVpnAdapter(
 
     private suspend fun addTransport() {
         var transport: Transport? = null
+        var blockFreeTransport: Transport? = null
+
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
                 transport = createDohTransport()
@@ -140,13 +143,19 @@ class GoVpnAdapter(
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 transport = createRethinkDnsTransport()
+                // create block free transport only for rethink dns
+                blockFreeTransport = createBlockFreeTransport()
             }
+        }
+
+        // always set the block free transport before setting the transport to the resolver
+        // because of the way the alg is implemented in the go code.
+        if (blockFreeTransport != null) {
+            tunnel?.resolver?.add(blockFreeTransport)
         }
 
         if (transport != null) {
             tunnel?.resolver?.add(transport)
-            // add transport to gateway to resolve the dns queries on dns-alg
-            tunnel?.resolver?.gateway()?.withTransport(transport)
             Log.i(LOG_TAG_VPN, "add transport to resolver, addr: ${transport.addr}")
         } else {
             Log.e(LOG_TAG_VPN, "transport is null for dns type: ${appConfig.getDnsType()}")
@@ -156,10 +165,10 @@ class GoVpnAdapter(
     private suspend fun createDohTransport(): Transport? {
         val doh = appConfig.getDOHDetails()
         val url = doh?.dohURL
-        val transport = Intra.newDoHTransport(USER_SELECTED_TRANSPORT_ID, url, "", null)
+        val transport = Intra.newDoHTransport(Dnsx.Preferred, url, "", null)
         Log.i(
             LOG_TAG_VPN,
-            "create doh transport with id: $USER_SELECTED_TRANSPORT_ID(${doh?.dohName}), url: $url, transport: $transport"
+            "create doh transport with id: ${Dnsx.Preferred} (${doh?.dohName}), url: $url, transport: $transport"
         )
         return transport
     }
@@ -169,10 +178,10 @@ class GoVpnAdapter(
             val dnscrypt = appConfig.getConnectedDnscryptServer()
             val url = dnscrypt.dnsCryptURL
             val resolver = tunnel?.resolver
-            val transport = Intra.newDNSCryptTransport(resolver, USER_SELECTED_TRANSPORT_ID, url)
+            val transport = Intra.newDNSCryptTransport(resolver, Dnsx.Preferred, url)
             Log.d(
                 LOG_TAG_VPN,
-                "create dnscrypt transport with id: $USER_SELECTED_TRANSPORT_ID(${dnscrypt.dnsCryptName}), url: $url, transport: $transport"
+                "create dnscrypt transport with id: ${Dnsx.Preferred}(${dnscrypt.dnsCryptName}), url: $url, transport: $transport"
             )
             setDnscryptResolversIfAny()
             return transport
@@ -187,14 +196,10 @@ class GoVpnAdapter(
         try {
             val dnsProxy = appConfig.getSelectedDnsProxyDetails() ?: return null
             val transport =
-                Intra.newDNSProxy(
-                    USER_SELECTED_TRANSPORT_ID,
-                    dnsProxy.proxyIP,
-                    dnsProxy.proxyPort.toString()
-                )
+                Intra.newDNSProxy(Dnsx.Preferred, dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
             Log.d(
                 LOG_TAG_VPN,
-                "create dns proxy transport with id: $USER_SELECTED_TRANSPORT_ID(${dnsProxy.proxyName}), ip: ${dnsProxy.proxyIP}, port: ${dnsProxy.proxyPort}"
+                "create dns proxy transport with id: ${Dnsx.Preferred}(${dnsProxy.proxyName}), ip: ${dnsProxy.proxyIP}, port: ${dnsProxy.proxyPort}"
             )
             return transport
         } catch (e: Exception) {
@@ -208,14 +213,10 @@ class GoVpnAdapter(
         try {
             val systemDns = appConfig.getSystemDns()
             val transport =
-                Intra.newDNSProxy(
-                    USER_SELECTED_TRANSPORT_ID,
-                    systemDns.ipAddress,
-                    systemDns.port.toString()
-                )
+                Intra.newDNSProxy(Dnsx.Preferred, systemDns.ipAddress, systemDns.port.toString())
             Log.d(
                 LOG_TAG_VPN,
-                "create network dnsproxy transport with id: $USER_SELECTED_TRANSPORT_ID, url: ${systemDns.ipAddress}/${systemDns.port}, transport: $transport"
+                "create network dnsproxy transport with id: ${Dnsx.Preferred}, url: ${systemDns.ipAddress}/${systemDns.port}, transport: $transport"
             )
             return transport
         } catch (e: Exception) {
@@ -228,10 +229,25 @@ class GoVpnAdapter(
         return try {
             val rethinkDns = appConfig.getRemoteRethinkEndpoint()
             val url = rethinkDns?.url
-            val transport = Intra.newDoHTransport(USER_SELECTED_TRANSPORT_ID, url, "", null)
+            val transport = Intra.newDoHTransport(Dnsx.Preferred, url, "", null)
             Log.i(
                 LOG_TAG_VPN,
-                "create doh transport with id: $USER_SELECTED_TRANSPORT_ID(${rethinkDns?.name}), url: $url, transport: $transport"
+                "create doh transport with id: ${Dnsx.Preferred}(${rethinkDns?.name}), url: $url, transport: $transport"
+            )
+            transport
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "connect-tunnel: rethinkdns creation failure", e)
+            null
+        }
+    }
+
+    private suspend fun createBlockFreeTransport(): Transport? {
+        return try {
+            val url = appConfig.getBlockFreeRethinkEndpoint()
+            val transport = Intra.newDoHTransport(Dnsx.BlockFree, url, "", null)
+            Log.i(
+                LOG_TAG_VPN,
+                "create doh transport with id: ${Dnsx.BlockFree}, url: $url, transport: $transport"
             )
             transport
         } catch (e: Exception) {
@@ -541,6 +557,10 @@ class GoVpnAdapter(
             }
             return ""
         }
+
+        // const to enable/disable pcap
+        private const val ENABLE_PCAP = 0L
+        private const val DISABLE_PCAP = -1L
     }
 
     private fun io(f: suspend () -> Unit) {

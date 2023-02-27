@@ -290,7 +290,7 @@ internal constructor(
         appInfo.appCategory = context.getString(FirewallManager.CategoryConstants.NON_APP.nameResId)
 
         appInfo.uid = uid
-        if (persistentState.blockNewlyInstalledApp) {
+        if (persistentState.getBlockNewlyInstalledApp()) {
             appInfo.firewallStatus = FirewallManager.FirewallStatus.NONE.id
             appInfo.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         }
@@ -312,7 +312,7 @@ internal constructor(
         entry.isSystemApp = isSystemApp
 
         // do not firewall app by default, if blockNewlyInstalledApp is set to false
-        if (persistentState.blockNewlyInstalledApp) {
+        if (persistentState.getBlockNewlyInstalledApp()) {
             entry.firewallStatus = FirewallManager.FirewallStatus.NONE.id
             entry.connectionStatus = FirewallManager.ConnectionStatus.BOTH.id
         } else {
@@ -327,7 +327,7 @@ internal constructor(
 
     private fun handleNewAppNotification(apps: HashSet<FirewallManager.AppInfoTuple>) {
         // no need to notify if the Universal setting is off
-        if (!persistentState.blockNewlyInstalledApp) return
+        if (!persistentState.getBlockNewlyInstalledApp()) return
 
         // if there is no apps in the cache, don't show the notification
         if (FirewallManager.getTotalApps() == 0) return
@@ -345,7 +345,7 @@ internal constructor(
 
     private fun showNewAppsBulkNotificationIfNeeded(appSize: Int) {
         // no need to notify if the Universal setting is off
-        if (!persistentState.blockNewlyInstalledApp) return
+        if (!persistentState.getBlockNewlyInstalledApp()) return
 
         val notificationManager =
             context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
@@ -410,7 +410,7 @@ internal constructor(
 
     private fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
         // no need to notify if the Universal setting is off
-        if (!persistentState.blockNewlyInstalledApp) return
+        if (!persistentState.getBlockNewlyInstalledApp()) return
 
         if (app.packageName.isEmpty()) {
             app.packageName = FirewallManager.getPackageNameByUid(app.uid) ?: ""

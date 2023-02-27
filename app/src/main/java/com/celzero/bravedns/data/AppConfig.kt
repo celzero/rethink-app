@@ -24,8 +24,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
@@ -54,7 +56,8 @@ internal constructor(
     private val dnsCryptEndpointRepository: DnsCryptEndpointRepository,
     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
     private val proxyEndpointRepository: ProxyEndpointRepository,
-    private val persistentState: PersistentState
+    private val persistentState: PersistentState,
+    private val networkLogs: ConnectionTrackerRepository
 ) {
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
@@ -630,6 +633,15 @@ internal constructor(
         return rethinkDnsEndpointRepository.getConnectedEndpoint()
     }
 
+    suspend fun getBlockFreeRethinkEndpoint(): String {
+        // decide which blockfree endpoint to use
+        if (getRemoteRethinkEndpoint()?.url?.contains(MAX_ENDPOINT) == true) {
+            return Constants.BLOCK_FREE_DNS_MAX
+        } else {
+            return Constants.BLOCK_FREE_DNS_SKY
+        }
+    }
+
     suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
         return rethinkDnsEndpointRepository.getRethinkPlusEndpoint()
     }
@@ -957,6 +969,8 @@ internal constructor(
         proxyEndpointRepository.clearOrbotData()
         proxyEndpointRepository.insert(proxyEndpoint)
     }
+
+    val networkLogsCount: LiveData<Long> = networkLogs.logsCount()
 
     val connectedProxy: LiveData<ProxyEndpoint?> =
         proxyEndpointRepository.getConnectedProxyLiveData()

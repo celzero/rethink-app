@@ -2,16 +2,19 @@
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
     <locale android:name="en-US" /> <!-- English (United States) -->
     <locale android:name="ar" /> <!-- Arabic -->
+    <locale android:name="bn" /> <!-- Bengali -->
     <locale android:name="zh-CN" /> <!-- Chinese (Simplified) -->
     <locale android:name="zh-TW" /> <!-- Chinese (Traditional) -->
     <locale android:name="zh-HK" /> <!-- Chinese (Hong Kong) -->
     <locale android:name="fr" /> <!-- French (France) -->
+    <locale android:name="de" /> <!-- German -->
     <locale android:name="in" /> <!-- Indonesian -->
     <locale android:name="it" /> <!-- Italian -->
+    <locale android:name="lt" /> <!-- Lithuanian -->
     <locale android:name="pt-BR" /> <!-- Portuguese (Brazil) -->
     <locale android:name="pt-PT" /> <!-- Portuguese (Portugal) -->
-    <locale android:name="es" /> <!-- Spanish (Spain) -->
     <locale android:name="ru" /> <!-- Russian -->
+    <locale android:name="es" /> <!-- Spanish (Spain) -->
     <locale android:name="tr" /> <!-- Turkish -->
 
     <!--

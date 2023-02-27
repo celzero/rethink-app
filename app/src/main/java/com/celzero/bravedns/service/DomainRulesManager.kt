@@ -17,6 +17,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
@@ -303,6 +304,10 @@ object DomainRulesManager : KoinComponent {
         // add ^ and $ in the start and end
         // replace * with .* (regEx format)
         return "^" + temp.replace("*", ".*") + "$"
+    }
+
+    fun getUniversalCustomDomainCount(): LiveData<Int> {
+        return customDomainsRepository.getUniversalCustomDomainCount()
     }
 
     private fun constructObject(

@@ -73,7 +73,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
     override fun run() {
         Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST)
         // url will have . at end of the file, which needs to be removed.
-        val fdqnUrl = url.dropLast(1)
+        val fdqnUrl = url.dropLastWhile { it == '.' }
 
         // only proceed to fetch the fav icon if the url is not in failed cache
         // Returns the value associated with key in this cache, or null if there is no cached

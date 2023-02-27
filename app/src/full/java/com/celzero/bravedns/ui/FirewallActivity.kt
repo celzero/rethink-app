@@ -29,7 +29,6 @@ import com.celzero.bravedns.databinding.ActivityFirewallBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
@@ -37,12 +36,10 @@ import org.koin.android.ext.android.inject
 class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val b by viewBinding(ActivityFirewallBinding::bind)
     private var fragmentIndex = 0
-    private var searchParam = ""
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
-        UNIVERSAL(0),
-        LOGS(1);
+        UNIVERSAL(0);
 
         companion object {
             fun getCount(): Int {
@@ -54,8 +51,6 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        fragmentIndex = intent.getIntExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, 0)
-        searchParam = intent.getStringExtra(Constants.SEARCH_QUERY) ?: ""
         init()
     }
 
@@ -71,7 +66,6 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
                 override fun createFragment(position: Int): Fragment {
                     return when (position) {
                         Tabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
-                        Tabs.LOGS.screen -> ConnectionTrackerFragment.newInstance(searchParam)
                         else -> UniversalFirewallFragment.newInstance()
                     }
                 }
@@ -86,7 +80,6 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
                 tab.text =
                     when (position) {
                         Tabs.UNIVERSAL.screen -> getString(R.string.firewall_act_universal_tab)
-                        Tabs.LOGS.screen -> getString(R.string.firewall_act_network_monitor_tab)
                         else -> getString(R.string.firewall_act_universal_tab)
                     }
             }

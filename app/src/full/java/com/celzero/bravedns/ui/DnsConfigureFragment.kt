@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.CompoundButton
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
@@ -34,7 +33,6 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
@@ -86,35 +84,6 @@ class DnsConfigureFragment :
         b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
 
         b.connectedStatusTitle.text = getConnectedDnsType()
-
-        handleDefaultDns()
-    }
-
-    private fun handleDefaultDns() {
-        if (persistentState.enableDnsAlg) {
-            b.dcDefaultDnsRl.visibility = View.VISIBLE
-        } else {
-            b.dcDefaultDnsRl.visibility = View.GONE
-        }
-    }
-
-
-    private fun showDefaultDnsDialog() {
-        val alertBuilder = AlertDialog.Builder(requireContext())
-        alertBuilder.setTitle("Select default DNS")
-        val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
-        // get the index of the default dns url
-        // if the default dns url is not in the list, then select the first item
-        val checkedItem =
-            Constants.DEFAULT_DNS_LIST.firstOrNull { it.url == persistentState.defaultDnsUrl }
-                ?.let { Constants.DEFAULT_DNS_LIST.indexOf(it) }
-                ?: 0
-        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, pos ->
-            dialog.dismiss()
-            // update the default dns url
-            persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
-        }
-        alertBuilder.create().show()
     }
 
     private fun updateLocalBlocklistUi() {
@@ -274,11 +243,6 @@ class DnsConfigureFragment :
 
     private fun initClickListeners() {
 
-        b.dcCustomDomainRl.setOnClickListener {
-            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcCustomDomainRl)
-            openCustomDomainDialog()
-        }
-
         b.dcLocalBlocklistRl.setOnClickListener { openLocalBlocklist() }
 
         b.dcLocalBlocklistImg.setOnClickListener { openLocalBlocklist() }
@@ -290,7 +254,6 @@ class DnsConfigureFragment :
         b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
             persistentState.enableDnsAlg = enabled
-            handleDefaultDns()
         }
 
         b.dcAlgRl.setOnClickListener { b.dcAlgSwitch.isChecked = !b.dcAlgSwitch.isChecked }
@@ -350,8 +313,6 @@ class DnsConfigureFragment :
         b.dcDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.useCustomDownloadManager = b
         }
-
-        b.dcDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
     }
 
     // open local blocklist bottom sheet
@@ -400,13 +361,6 @@ class DnsConfigureFragment :
             val sysDns = appConfig.getSystemDns()
             appConfig.setSystemDns(sysDns.ipAddress, sysDns.port)
         }
-    }
-
-    private fun openCustomDomainDialog() {
-        val intent = Intent(requireContext(), CustomDomainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        intent.putExtra(INTENT_UID, Constants.UID_EVERYBODY)
-        startActivity(intent)
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

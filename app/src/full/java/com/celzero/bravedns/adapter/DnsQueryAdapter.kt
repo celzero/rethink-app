@@ -161,7 +161,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         }
 
         private fun displayNextDnsFavIcon(dnsLog: DnsLog) {
-            val trim = dnsLog.queryStr.dropLast(1)
+            val trim = dnsLog.queryStr.dropLastWhile { it == '.' }
             // url to check if the icon is cached from nextdns
             val nextDnsUrl = FavIconDownloader.constructFavIcoUrlNextDns(trim)
             // url to check if the icon is cached from duckduckgo

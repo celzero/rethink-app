@@ -65,14 +65,14 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     private val b by viewBinding(FragmentSettingsScreenBinding::bind)
@@ -561,6 +561,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             ->
             persistentState.biometricAuth = checked
         }
+
+        b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
     }
 
     private fun invokeChangeLocaleDialog() {
@@ -981,6 +983,24 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
     }
 
+    private fun showDefaultDnsDialog() {
+        val alertBuilder = AlertDialog.Builder(requireContext())
+        alertBuilder.setTitle(getString(R.string.settings_default_dns_dialog_title))
+        val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
+        // get the index of the default dns url
+        // if the default dns url is not in the list, then select the first item
+        val checkedItem =
+            Constants.DEFAULT_DNS_LIST.firstOrNull { it.url == persistentState.defaultDnsUrl }
+                ?.let { Constants.DEFAULT_DNS_LIST.indexOf(it) }
+                ?: 0
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, pos ->
+            dialog.dismiss()
+            // update the default dns url
+            persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
+        }
+        alertBuilder.create().show()
+    }
+
     private fun showSocks5ProxyDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -1006,7 +1026,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
         val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
 
-        udpBlockCheckBox.isChecked = persistentState.udpBlockedSettings
+        udpBlockCheckBox.isChecked = persistentState.getUdpBlocked()
 
         val appNames: MutableList<String> = ArrayList()
         appNames.add(getString(R.string.settings_app_list_default_app))
@@ -1090,7 +1110,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             val password: String = passwordEditText.text.toString()
             if (isValid && isIPValid) {
                 // Do the Socks5 Proxy setting there
-                persistentState.udpBlockedSettings = udpBlockCheckBox.isChecked
+                persistentState.setUdpBlocked(udpBlockCheckBox.isChecked)
                 insertSocks5ProxyEndpointDB(
                     mode,
                     appPackageName,
@@ -1172,7 +1192,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
                 getString(R.string.notification_screen_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 

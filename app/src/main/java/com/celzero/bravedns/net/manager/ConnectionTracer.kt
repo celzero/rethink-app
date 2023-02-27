@@ -6,6 +6,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig.Companion.isUidAppRange
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
@@ -19,7 +20,6 @@ class ConnectionTracer(ctx: Context) {
     companion object {
         private const val CACHE_BUILDER_WRITE_EXPIRE_SEC: Long = 300
         private const val CACHE_BUILDER_MAX_SIZE: Long = 1000
-        private const val DEBUG = false
     }
     private val cm: ConnectivityManager
     private val uidCache: Cache<String, Int>
@@ -74,9 +74,6 @@ class ConnectionTracer(ctx: Context) {
         var uid = Constants.INVALID_UID
         val key = makeCacheKey(protocol, local, remote, destPort)
         try {
-            return uidCache.getIfPresent(key)!!
-        } catch (ignored: Exception) {}
-        try {
             uid = cm.getConnectionOwnerUid(protocol, local, remote)
             // Cache only uid's in app range
             if (isUidAppRange(uid)) {
@@ -87,8 +84,11 @@ class ConnectionTracer(ctx: Context) {
         } catch (secEx: SecurityException) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.message, secEx)
         }
-        if (DEBUG)
-            Log.d(LoggerConstants.LOG_TAG_VPN, "GetUidQ($local,$remote): $uid")
+        // If the uid is not in connectivity manager, then return the uid from cache.
+        try {
+            return uidCache.getIfPresent(key)!!
+        } catch (ignored: Exception) {}
+
         return uid
     }
 

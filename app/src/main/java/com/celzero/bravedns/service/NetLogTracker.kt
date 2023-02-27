@@ -22,6 +22,7 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.NetLogBatcher
 import dnsx.Summary
 import kotlinx.coroutines.CoroutineScope
@@ -91,7 +92,7 @@ internal constructor(
         // ideally this check should be carried out before processing the dns object.
         // Now, the ipDomain cache is adding while making the dnsLog object.
         // TODO: move ipDomain cache out of DnsLog object creation
-        if (!persistentState.logsEnabled || persistentState.enableDnsAlg) return
+        if (!persistentState.logsEnabled) return
 
         dnsLogTracker?.updateDnsRequestCount(dnsLog)
         scope?.launch { dnsNetLogBatcher?.add(dnsLog) }

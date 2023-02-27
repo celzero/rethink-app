@@ -62,10 +62,7 @@
             android:name=".ui.DnsListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.CustomIpActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.CustomDomainActivity"
+            android:name=".ui.CustomRulesActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.ConfigureRethinkBasicActivity"
@@ -75,6 +72,9 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.DetailedStatisticsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.NetworkLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"

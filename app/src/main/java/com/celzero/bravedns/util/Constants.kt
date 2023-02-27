@@ -266,6 +266,9 @@ class Constants {
 
         data class DefaultDnsServer(val id: Int, val name: String, val url: String, val type: String)
 
+        const val BLOCK_FREE_DNS_MAX = "https://max.rethinkdns.com/dns-query"
+        const val BLOCK_FREE_DNS_SKY = "https://sky.rethinkdns.com/dns-query"
+
         val DEFAULT_DNS_LIST =
             listOf(
                 DefaultDnsServer(0, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),

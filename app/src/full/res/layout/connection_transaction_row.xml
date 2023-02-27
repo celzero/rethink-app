@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="1dp"
     android:animateLayoutChanges="true"
     android:background="?attr/background"
     android:orientation="vertical">
@@ -34,21 +33,20 @@
         <LinearLayout
             android:id="@+id/connection_screen_ll"
             android:layout_width="0dp"
+            android:paddingTop="5dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
             android:weightSum="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:baselineAligned="false"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:weightSum="1"
-                android:baselineAligned="false">
+                android:weightSum="1">
 
 
                 <LinearLayout
@@ -70,6 +68,7 @@
                         android:paddingEnd="10dp"
                         android:scrollHorizontally="true"
                         android:singleLine="false"
+                        android:maxLines="2"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
@@ -113,8 +112,8 @@
                         android:layout_gravity="center"
                         android:ellipsize="none"
                         android:gravity="center"
-                        android:maxHeight="20dp"
-                        android:minWidth="20dp"
+                        android:maxHeight="16dp"
+                        android:minWidth="16dp"
                         android:singleLine="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         android:textSize="26sp"
@@ -126,23 +125,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:baselineAligned="false"
                 android:gravity="center"
+                android:paddingBottom="10dp"
                 android:orientation="horizontal"
-                android:baselineAligned="false">
+                android:weightSum="1">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:weightSum="1">
+                    android:layout_weight="0.65"
+                    android:orientation="vertical">
+
                     <TextView
                         android:id="@+id/connection_ip_address"
                         style="@style/TextAppearance.AppCompat.Subhead"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="0.65"
                         android:ellipsize="end"
                         android:focusable="true"
                         android:focusableInTouchMode="true"
@@ -154,40 +154,59 @@
                         android:textSize="@dimen/large_font_text_view"
                         android:typeface="monospace" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/connection_domain"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_weight="0.20"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/connection_response_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:fontFamily="sans-serif-condensed"
-                            android:singleLine="true"
-                            android:text="?attr/primaryTextColor"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.15"
-                        android:orientation="vertical">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/indicator"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_keyboard_arrow_down" />
-                    </LinearLayout>
-
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-light"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:alpha="0.7"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                        android:text="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
                 </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.20"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/connection_response_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-condensed"
+                        android:singleLine="true"
+                        android:text="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.15"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_keyboard_arrow_down" />
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

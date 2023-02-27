@@ -444,7 +444,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
         if (!persistentState.fetchFavIcon || transaction!!.groundedQuery()) return
 
-        val trim = transaction!!.queryStr.dropLast(1)
+        val trim = transaction!!.queryStr.dropLastWhile { it == '.' }
 
         // no need to check in glide cache if the value is available in failed cache
         if (FavIconDownloader.isUrlAvailableInFailedCache(trim) != null) {

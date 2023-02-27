@@ -26,9 +26,11 @@ import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.util.Log
@@ -68,12 +70,12 @@ import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -87,6 +89,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private lateinit var startForResult: ActivityResultLauncher<Intent>
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
+    enum class ScreenType {
+        DNS,
+        FIREWALL,
+        LOGS,
+        RULES
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         registerForActivityResult()
@@ -98,6 +107,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         initializeClickListeners()
         observeVpnState()
         observeChipStates()
+        observeLogsCount()
         updateConfigureDnsChip()
     }
 
@@ -155,8 +165,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsWhatsNewChip.chipIcon?.colorFilter = colorFilter
         b.fhsProxyChip.chipIcon?.colorFilter = colorFilter
         b.fhsDnsConfigureChip.chipIcon?.colorFilter = colorFilter
-        b.fhsDnsLogsChip.chipIcon?.colorFilter = colorFilter
-        b.fhsNetworkLogsChip.chipIcon?.colorFilter = colorFilter
+        b.fhsSponsorChip.chipIcon?.colorFilter = colorFilter
         b.fhsThemeChip.chipIcon?.colorFilter = colorFilter
     }
 
@@ -244,9 +253,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        b.fhsDnsLogsChip.setOnClickListener { openDnsLogsScreen() }
+        b.fhsCardLogsLl.setOnClickListener {
+            startActivity(ScreenType.LOGS, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
+        }
 
-        b.fhsNetworkLogsChip.setOnClickListener { openNetworkLogsScreen() }
+        b.fhsCardRulesLl.setOnClickListener {
+            // make domain rules as default
+            startActivity(ScreenType.RULES, CustomRulesActivity.Tabs.DOMAIN_RULES.screen)
+        }
+
+        b.fhsSponsorChip.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
+            startActivity(intent)
+        }
 
         b.fhsProxyChip.setOnCloseIconClickListener {
             removeProxy()
@@ -273,7 +292,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        b.fhsSponsorLl.setOnClickListener {
+        b.fhsSponsor.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
             startActivity(intent)
         }
@@ -389,14 +408,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    private fun openNetworkLogsScreen() {
-        startFirewallActivity(FirewallActivity.Tabs.LOGS.screen)
-    }
-
-    private fun openDnsLogsScreen() {
-        startDnsActivity(DnsDetailActivity.Tabs.LOGS.screen)
-    }
-
     private fun updateCardsUi() {
         if (isVpnActivated) {
             showActiveCards()
@@ -438,12 +449,16 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         disableFirewallCard()
         disabledDnsCard()
         disableAppsCard()
+        disableRulesCard()
+        disableLogsCard()
     }
 
     private fun showActiveCards() {
         enableFirewallCardIfNeeded()
         enableDnsCardIfNeeded()
         enableAppsCardIfNeeded()
+        enableRulesCardIfNeeded()
+        enableLogsCardIfNeeded()
     }
 
     private fun showNewFeaturesDialog() {
@@ -470,37 +485,70 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun enableFirewallCardIfNeeded() {
-        // handle the positive case before negative.
-        if (appConfig.getBraveMode().isDnsMode()) {
+        if (appConfig.getBraveMode().isFirewallActive()) {
+            b.fhsCardFirewallUnivRules.visibility = View.INVISIBLE
+            b.fhsCardFirewallUnivRulesCount.text =
+                getString(
+                    R.string.firewall_card_universal_rules,
+                    persistentState.getUniversalRulesCount().toString()
+                )
+            b.fhsCardFirewallUnivRulesCount.isSelected = true
+            observeUniversalStates()
+        } else {
             disableFirewallCard()
             unobserveUniversalStates()
-        } else {
-            b.fhsCardFirewallUnivRules.visibility = View.INVISIBLE
-            observeUniversalStates()
         }
     }
 
     private fun enableAppsCardIfNeeded() {
         // apps screen can be accessible on all app modes.
-        if (!isVpnActivated) {
-            disableAppsCard()
-            unobserveFirewallStates()
+        if (isVpnActivated) {
+            observeAppStates()
         } else {
-            observeFirewallStates()
+            disableAppsCard()
+            unobserveAppStates()
         }
     }
 
     private fun enableDnsCardIfNeeded() {
-        if (appConfig.getBraveMode().isFirewallMode()) {
+        if (appConfig.getBraveMode().isDnsActive()) {
+            observeDnsStates()
+        } else {
             disabledDnsCard()
             unobserveDnsStates()
-        } else {
-            observeDnsStates()
         }
     }
 
+    private fun enableRulesCardIfNeeded() {
+        if (isVpnActivated) {
+            observeCustomRulesCount()
+        } else {
+            disableRulesCard()
+            unObserveCustomRulesCount()
+        }
+    }
+
+    private fun enableLogsCardIfNeeded() {
+        if (isVpnActivated) {
+            observeLogsCount()
+        } else {
+            disableLogsCard()
+            unObserveLogsCount()
+        }
+    }
+
+    private fun disableLogsCard() {
+        b.fhsCardNetworkLogsCount.text = getString(R.string.firewall_card_text_inactive)
+        b.fhsCardDnsLogsCount.text = getString(R.string.lbl_disabled)
+    }
+
+    private fun disableRulesCard() {
+        b.fhsCardIpRulesCount.text = getString(R.string.firewall_card_text_inactive)
+        b.fhsCardDomainRulesCount.text = getString(R.string.lbl_disabled)
+    }
+
     private fun disableFirewallCard() {
-        b.fhsCardFirewallIps.text = getString(R.string.lbl_disabled)
+        b.fhsCardFirewallUnivRulesCount.text = getString(R.string.lbl_disabled)
         b.fhsCardFirewallUnivRules.visibility = View.VISIBLE
         b.fhsCardFirewallUnivRules.text = getString(R.string.firewall_card_text_inactive)
     }
@@ -508,6 +556,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun disabledDnsCard() {
         b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_inactive)
         b.fhsCardDnsConnectedDns.text = getString(R.string.lbl_disabled)
+        b.fhsCardDnsConnectedDns.isSelected = true
     }
 
     private fun disableAppsCard() {
@@ -522,11 +571,37 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun observeDnsStates() {
         persistentState.median.observe(viewLifecycleOwner) {
             b.fhsCardDnsLatency.text = getString(R.string.dns_card_latency_active, it.toString())
+            b.fhsCardDnsLatency.isSelected = true
         }
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
             b.fhsCardDnsConnectedDns.text = it
+            b.fhsCardDnsConnectedDns.isSelected = true
             updateConfigureDnsChip()
+        }
+    }
+
+    private fun observeLogsCount() {
+        persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
+            val count = formatDecimal(it)
+            b.fhsCardDnsLogsCount.text = getString(R.string.logs_card_dns_count, count)
+            b.fhsCardDnsLogsCount.isSelected = true
+        }
+
+        appConfig.networkLogsCount.observe(viewLifecycleOwner) {
+            val count = formatDecimal(it)
+            b.fhsCardNetworkLogsCount.text =
+                getString(R.string.logs_card_network_count, count)
+            b.fhsCardNetworkLogsCount.isSelected = true
+        }
+    }
+
+    private fun formatDecimal(i: Long?): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT)
+                .format(i)
+        } else {
+            i.toString()
         }
     }
 
@@ -537,22 +612,45 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun observeUniversalStates() {
+        persistentState.universalRulesCount.observe(viewLifecycleOwner) {
+            b.fhsCardFirewallUnivRulesCount.text =
+                getString(R.string.firewall_card_universal_rules, it.toString())
+            b.fhsCardFirewallUnivRulesCount.isSelected = true
+        }
+    }
+
+    private fun observeCustomRulesCount() {
         // observer for ips count
         IpRulesManager.getCustomIpsLiveData().observe(viewLifecycleOwner) {
-            b.fhsCardFirewallIps.text = getString(R.string.apps_card_ips_count, it.toString())
+            b.fhsCardIpRulesCount.text = getString(R.string.apps_card_ips_count, it.toString())
         }
+
+        DomainRulesManager.getUniversalCustomDomainCount().observe(viewLifecycleOwner) {
+            b.fhsCardDomainRulesCount.text =
+                getString(R.string.rules_card_domain_count, it.toString())
+        }
+    }
+
+    private fun unObserveLogsCount() {
+        persistentState.dnsRequestsCountLiveData.removeObservers(viewLifecycleOwner)
+        appConfig.networkLogsCount.removeObservers(viewLifecycleOwner)
+    }
+
+    private fun unObserveCustomRulesCount() {
+        DomainRulesManager.getUniversalCustomDomainCount().removeObservers(viewLifecycleOwner)
+        IpRulesManager.getCustomIpsLiveData().removeObservers(viewLifecycleOwner)
     }
 
     // remove firewall card related observers
     private fun unobserveUniversalStates() {
-        IpRulesManager.getCustomIpsLiveData().removeObservers(viewLifecycleOwner)
+        persistentState.universalRulesCount.removeObservers(viewLifecycleOwner)
     }
 
     /**
      * The observers for the firewall card in the home screen, will be calling this method when the
      * VPN is active and the mode is set to either Firewall or DNS+Firewall.
      */
-    private fun observeFirewallStates() {
+    private fun observeAppStates() {
         FirewallManager.getApplistObserver().observe(viewLifecycleOwner) {
             try {
                 val copy: Collection<AppInfo>
@@ -567,7 +665,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val whiteListApps =
                     copy.filter { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
-                        a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
+                            a.firewallStatus ==
+                                FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
                     }
                 val excludedApps =
                     copy.filter { a ->
@@ -587,6 +686,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         excludedApps.count().toString(),
                         isolateApps.count().toString()
                     )
+                b.fhsCardApps.isSelected = true
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
             }
@@ -594,7 +694,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     /** Unregister all the firewall related observers for the Home screen card. */
-    private fun unobserveFirewallStates() {
+    private fun unobserveAppStates() {
         FirewallManager.getApplistObserver().removeObservers(viewLifecycleOwner)
     }
 
@@ -713,34 +813,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun startDnsActivity(screenToLoad: Int) {
-        if (!isVpnActivated) {
-            // when the dns/firewall is not enabled and VPN is not active. show the dialog to start
-            // VPN
-            showStartDialog()
-            return
-        }
-
         if (isPrivateDnsActive(requireContext())) {
             showPrivateDnsDialog()
             return
         }
 
-        if (appConfig.getBraveMode().isDnsActive()) {
-            startActivity(isDns = true, screenToLoad)
-            return
-        }
-
-        openBottomSheet()
-        showToastUiCentered(
-            requireContext(),
-            resources
-                .getText(R.string.brave_dns_connect_mode_change_firewall)
-                .toString()
-                .replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                },
-            Toast.LENGTH_SHORT
-        )
+        startActivity(ScreenType.DNS, screenToLoad)
+        return
     }
 
     private fun showPrivateDnsDialog() {
@@ -759,42 +838,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun startFirewallActivity(screenToLoad: Int) {
-        if (DEBUG)
-            Log.d(LOG_TAG_VPN, "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}")
-        if (!isVpnActivated) {
-            // when the dns/firewall is not enabled and VPN is not active. show the dialog to start
-            // VPN
-            showStartDialog()
-            return
-        }
-
-        if (appConfig.getBraveMode().isFirewallActive()) {
-            startActivity(isDns = false, screenToLoad)
-            return
-        }
-
-        openBottomSheet()
-        showToastUiCentered(
-            requireContext(),
-            resources
-                .getText(R.string.brave_dns_connect_mode_change_firewall)
-                .toString()
-                .replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                },
-            Toast.LENGTH_SHORT
-        )
+        startActivity(ScreenType.FIREWALL, screenToLoad)
+        return
     }
 
     private fun startAppsActivity() {
         if (DEBUG)
             Log.d(LOG_TAG_VPN, "Status : $isVpnActivated , BraveMode: ${appConfig.getBraveMode()}")
-        if (!isVpnActivated) {
-            // when the dns/firewall is not enabled and VPN is not active. show the dialog to start
-            // VPN
-            showStartDialog()
-            return
-        }
 
         // no need to check for app modes to open this activity
         // one use case: https://github.com/celzero/rethink-app/issues/611
@@ -803,11 +853,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         startActivity(intent)
     }
 
-    private fun startActivity(isDns: Boolean, screenToLoad: Int) {
+    private fun startActivity(type: ScreenType, screenToLoad: Int = 0) {
         val intent =
-            when (isDns) {
-                true -> Intent(requireContext(), DnsDetailActivity::class.java)
-                false -> Intent(requireContext(), FirewallActivity::class.java)
+            when (type) {
+                ScreenType.DNS -> Intent(requireContext(), DnsDetailActivity::class.java)
+                ScreenType.FIREWALL -> Intent(requireContext(), FirewallActivity::class.java)
+                ScreenType.LOGS -> Intent(requireContext(), NetworkLogsActivity::class.java)
+                ScreenType.RULES -> Intent(requireContext(), CustomRulesActivity::class.java)
             }
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
@@ -820,32 +872,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             AppConfig.BraveMode.FIREWALL -> getString(R.string.app_mode_firewall)
             AppConfig.BraveMode.DNS_FIREWALL -> getString(R.string.app_mode_dns_firewall)
         }
-    }
-
-    private fun showStartDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(getString(R.string.hsf_start_dialog_header, getModeText()))
-        builder.setMessage(getString(R.string.hsf_start_dialog_message))
-        builder.setCancelable(false)
-        builder.setPositiveButton(R.string.hsf_start_dialog_positive) { _, _ ->
-            handleMainScreenBtnClickEvent()
-            if (isVpnActivated) {
-                openBottomSheet()
-                showToastUiCentered(
-                    requireContext(),
-                    resources
-                        .getText(R.string.brave_dns_connect_mode_change_dns)
-                        .toString()
-                        .replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                        },
-                    Toast.LENGTH_SHORT
-                )
-            }
-        }
-
-        builder.setNegativeButton(R.string.lbl_dismiss) { dialog, _ -> dialog.dismiss() }
-        builder.create().show()
     }
 
     private fun prepareAndStartVpn() {

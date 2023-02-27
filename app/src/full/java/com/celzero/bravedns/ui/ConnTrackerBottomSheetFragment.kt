@@ -272,7 +272,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         b.bsConnBlockedRule2HeaderLl.visibility = View.VISIBLE
         // hide the app firewall layout
         b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
-        b.bsConnUnknownAppCheck.isChecked = persistentState.blockUnknownConnections
+        b.bsConnUnknownAppCheck.isChecked = persistentState.getBlockUnknownConnections()
         b.bsConnTrackAppName.text = connectionInfo!!.appName
     }
 
@@ -284,7 +284,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                     LOG_TAG_FIREWALL,
                     "Unknown app, universal firewall settings(block unknown app): ${b.bsConnUnknownAppCheck.isChecked} "
                 )
-            persistentState.blockUnknownConnections = b.bsConnUnknownAppCheck.isChecked
+            persistentState.setBlockUnknownConnections(b.bsConnUnknownAppCheck.isChecked)
         }
 
         b.bsConnTrackAppKill.setOnClickListener {

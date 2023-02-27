@@ -76,14 +76,14 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var numberOfLocalBlocklists by intPref("local_block_list_count").withDefault<Int>(0)
 
     // whether all udp connection except dns must be dropped
-    var udpBlockedSettings by
+    private var _udpBlocked by
         booleanPref("block_udp_traffic_other_than_dns").withDefault<Boolean>(false)
 
     // user chosen blocklists stored custom dictionary indexed in base64
     var localBlocklistStamp by stringPref("local_block_list_stamp").withDefault<String>("")
 
     // whether to drop packets when the source app originating the reqs couldn't be determined
-    var blockUnknownConnections by
+    private var _blockUnknownConnections by
         booleanPref("block_unknown_connections").withDefault<Boolean>(false)
 
     // whether user has enable on-device blocklists
@@ -119,7 +119,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var prefAutoStartBootUp by booleanPref("auto_start_on_boot").withDefault<Boolean>(true)
 
     // user set preference whether firewall should block all connections when device is locked
-    var blockWhenDeviceLocked by booleanPref("screen_state").withDefault<Boolean>(false)
+    private var _blockWhenDeviceLocked by booleanPref("screen_state").withDefault<Boolean>(false)
 
     // total dns requests the app has served since installation (or post clear data)
     var numberOfRequests by longPref("dns_number_request").withDefault<Long>(0)
@@ -128,7 +128,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var numberOfBlockedRequests by longPref("dns_blocked_request").withDefault<Long>(0)
 
     // whether to block connections from apps not in the foreground
-    var blockAppWhenBackground by booleanPref("background_mode").withDefault<Boolean>(false)
+    private var _blockAppWhenBackground by booleanPref("background_mode").withDefault<Boolean>(false)
 
     // whether to check for app updates once-a-week (on website / play-store builds)
     var checkForAppUpdate by booleanPref("check_for_app_update").withDefault<Boolean>(true)
@@ -167,14 +167,14 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var showWhatsNewChip by booleanPref("show_whats_new_chip").withDefault<Boolean>(true)
 
     // block dns which are not resolved by app
-    var disallowDnsBypass by booleanPref("disallow_dns_bypass").withDefault<Boolean>(false)
+    private var _disallowDnsBypass by booleanPref("disallow_dns_bypass").withDefault<Boolean>(false)
 
     // trap all packets on port 53 to be sent to a dns endpoint or just the packets sent to vpn's
     // dns-ip
     var preventDnsLeaks by booleanPref("prevent_dns_leaks").withDefault<Boolean>(true)
 
     // block all newly installed apps
-    var blockNewlyInstalledApp by booleanPref("block_new_app").withDefault<Boolean>(false)
+    private var _blockNewlyInstalledApp by booleanPref("block_new_app").withDefault<Boolean>(false)
 
     // user setting to use custom download manager or android's default download manager
     var useCustomDownloadManager by
@@ -207,14 +207,14 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var filterIpv4inIpv6 by booleanPref("filter_ip4_ipv6").withDefault<Boolean>(true)
 
     // universal firewall settings to block all http connections
-    var blockHttpConnections by booleanPref("block_http_connections").withDefault<Boolean>(false)
+    private var _blockHttpConnections by booleanPref("block_http_connections").withDefault<Boolean>(false)
 
     // universal firewall settings to block all metered connections
-    var blockMeteredConnections by
+    private var _blockMeteredConnections by
         booleanPref("block_metered_connections").withDefault<Boolean>(false)
 
     // universal firewall settings to lockdown all apps
-    var universalLockdown by booleanPref("universal_lockdown").withDefault<Boolean>(false)
+    private var _universalLockdown by booleanPref("universal_lockdown").withDefault<Boolean>(false)
 
     // notification permission request (Android 13 ana above)
     var shouldRequestNotificationPermission by
@@ -237,6 +237,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var dnsRequestsCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
 
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
@@ -261,4 +262,106 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     fun getRemoteBlocklistCount(): Int {
         return numberOfRemoteBlocklists
     }
+
+    private fun setUniversalRulesCount() {
+        val list = listOf  (
+            _blockHttpConnections,
+            _blockMeteredConnections,
+            _universalLockdown,
+            _blockNewlyInstalledApp,
+            _disallowDnsBypass,
+            _udpBlocked,
+            _blockUnknownConnections,
+            _blockAppWhenBackground,
+            _blockWhenDeviceLocked
+        )
+        universalRulesCount.postValue(list.count { it })
+    }
+
+    fun getUniversalRulesCount(): Int {
+        if (universalRulesCount.value == null) setUniversalRulesCount()
+        return universalRulesCount.value ?: 0
+    }
+
+    fun setBlockHttpConnections(b: Boolean) {
+        _blockHttpConnections = b
+        setUniversalRulesCount()
+    }
+
+    fun getBlockHttpConnections(): Boolean {
+        return _blockHttpConnections
+    }
+
+    fun setBlockMeteredConnections(b: Boolean) {
+        _blockMeteredConnections = b
+        setUniversalRulesCount()
+    }
+
+    fun getBlockMeteredConnections(): Boolean {
+        return _blockMeteredConnections
+    }
+
+    fun setUniversalLockdown(b: Boolean) {
+        _universalLockdown = b
+        setUniversalRulesCount()
+    }
+
+    fun getUniversalLockdown(): Boolean {
+        return _universalLockdown
+    }
+
+    fun setBlockNewlyInstalledApp(b: Boolean) {
+        _blockNewlyInstalledApp = b
+        setUniversalRulesCount()
+    }
+
+    fun getBlockNewlyInstalledApp(): Boolean {
+        return _blockNewlyInstalledApp
+    }
+
+    fun setDisallowDnsBypass(b: Boolean) {
+        _disallowDnsBypass = b
+        setUniversalRulesCount()
+    }
+
+    fun getDisallowDnsBypass(): Boolean {
+        return _disallowDnsBypass
+    }
+
+    fun setUdpBlocked(b: Boolean) {
+        _udpBlocked = b
+        setUniversalRulesCount()
+    }
+
+    fun getUdpBlocked(): Boolean {
+        return _udpBlocked
+    }
+
+    fun setBlockUnknownConnections(b: Boolean) {
+        _blockUnknownConnections = b
+        setUniversalRulesCount()
+    }
+
+    fun getBlockUnknownConnections(): Boolean {
+        return _blockUnknownConnections
+    }
+
+    fun setBlockAppWhenBackground(b: Boolean) {
+        _blockAppWhenBackground = b
+        setUniversalRulesCount()
+    }
+
+    fun getBlockAppWhenBackground(): Boolean {
+        return _blockAppWhenBackground
+    }
+
+    fun setBlockWhenDeviceLocked(b: Boolean) {
+        _blockWhenDeviceLocked = b
+        setUniversalRulesCount()
+    }
+
+    fun getBlockWhenDeviceLocked(): Boolean {
+        return _blockWhenDeviceLocked
+    }
+
 }

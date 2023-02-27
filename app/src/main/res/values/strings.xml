@@ -11,8 +11,8 @@
     <string name="txt_home" translatable="true">Home</string>
 
     <string name="accessibility_service_description" translatable="true">
-        RethinkDNS uses accessibility service to detect and firewall background applications.
-        RethinkDNS does not collect or sell any information.
+        Rethink uses accessibility service to detect and firewall background applications.
+        Rethink does not collect or sell any information.
     </string>
 
     <string name="next" translatable="true">Next</string>
@@ -29,15 +29,16 @@
     <string name="lbl_domain" translatable="true">Domain</string>
     <string name="lbl_wildcard" translatable="true">Wildcard</string>
     <string name="lbl_action_required" translatable="true">Action Required</string>
+    <string name="lbl_rules" translatable="true">Rules</string>
 
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
 
     <string name="slide_2_title" translatable="true">Welcome</string>
-    <string name="slide_2_desc" translatable="true">RethinkDNS is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
+    <string name="slide_2_desc" translatable="true">Rethink is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
 
     <string name="slide_1_title" translatable="true">Free and Open Source</string>
-    <string name="slide_1_desc" translatable="true">RethinkDNS is an open source software backed by Mozilla Builders MVP program.</string>
+    <string name="slide_1_desc" translatable="true">Rethink is an open source software backed by Mozilla Builders MVP program.</string>
 
     <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
@@ -181,7 +182,7 @@
 
     <string name="bsct_app_info" translatable="true">App Info</string>
     <string name="bsct_block_ip" translatable="true">Block, trust &lt;u>this IP&lt;/u> for &lt;u>this app&lt;/u></string>
-    <string name="bsct_block_domain" translatable="true">Block, trust &lt;u>below domains&lt;/u> for &lt;u>this app&lt;/u></string>
+    <string name="bsct_block_domain" translatable="true">Block, trust &lt;u>domain(s)&lt;/u> for &lt;u>this app&lt;/u></string>
     <string name="bsct_block" translatable="true">Block, bypass, exclude, isolate &lt;u>this app&lt;/u></string>
     <string name="bsct_conn_block_desc" translatable="true">blocked %1$s by %2$s</string>
     <string name="bsct_conn_block_desc_device" translatable="true">blocked %1$s on device</string>
@@ -213,10 +214,9 @@
 
     <string name="firewall_act_universal_tab" translatable="true">Universal</string>
 
-    <string name="firewall_act_network_monitor_tab" translatable="true">Network Logs</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Network</string>
 
     <string name="dns_act_configure_tab" translatable="true">Configure</string>
-    <string name="dns_act_log" translatable="true">Logs</string>
 
     <string name="univ_firewall_dialog_title" translatable="true">Delete IP Rule?</string>
     <string name="univ_firewall_dialog_message" translatable="true">Deleting this rule would allow any app to connect to this IP. Do you want to proceed?</string>
@@ -250,7 +250,6 @@
 
     <string name="show_logs_disabled_network_message" translatable="true">Connection logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable on-device logging.</i></string>
     <string name="show_logs_disabled_dns_message" translatable="true">DNS request logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable on-device logging.</i></string>
-    <string name="show_logs_disabled_dns_message_alg" translatable="true">DNS request logging has been merged with Network logs when DNS Alg is enabled. To disable DNS Alg, goto <i>DNS Configure</i> and turn off <i>DNS Alg.</i></string>
 
     <string name="configure_dns_connected_doh_status" translatable="true">DNS over HTTPS</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
@@ -366,7 +365,6 @@
             \n&lt;u>TCP Proxy&lt;/u>: RethinkDNS forwards only TCP connections of all but excluded apps to Orbot.
         \n&lt;u>HTTP Proxy&lt;/u>: RethinkDNS &lt;i>sets&lt;/i> HTTP proxy but does not enforce that the apps use it. Usually, browsers like Chrome and Firefox do use it. Apps using HTTP(S) proxy will bypass both Firewall and DNS rules.
     </string>
-
 
     <string name="orbot_install_dialog_title" translatable="true">Install Orbot?</string>
     <string name="orbot_install_dialog_message" translatable="true">Orbot brings the features and functionality of Tor to Android.</string>
@@ -487,6 +485,10 @@
 
     <string name="settings_protocol_translation_dns_inactive" translatable="true">Switch to DNS/DNS+Firewall mode to enable this setting</string>
 
+    <string name="settings_default_dns_heading" translatable="true">Fallback DNS</string>
+    <string name="settings_default_dns_desc" translatable="true">In rare cases when user-preferred DNS could not be ascertained, Fallback DNS is used.</string>
+    <string name="settings_default_dns_dialog_title" translatable="true">Select Fallback DNS</string>
+
     <!-- FirewallAppFragment -->
     <string name="apps_icon_content_desc" translatable="true">Application Icon</string>
 
@@ -513,13 +515,18 @@
     <!-- Home screen -->
     <string name="firewall_card_status_active" translatable="true">%1$s apps</string>
 
-    <string name="firewall_card_text_active" translatable="true">%1$s blocked\n%2$s bypassed\n%3$s excluded\n%4$s isolated</string>
+    <string name="firewall_card_text_active" translatable="true">%1$s blocked, %2$s bypassed, %3$s excluded, %4$s isolated</string>
     <string name="firewall_card_text_inactive" translatable="true">Enable firewall mode.</string>
 
     <string name="dns_card_latency_active" translatable="true">Latency: %1$sms</string>
     <string name="dns_card_latency_inactive" translatable="true">Enable DNS mode.</string>
 
+    <string name="firewall_card_universal_rules" translatable="true">%1$s universal rule(s)</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s domain rules</string>
     <string name="apps_card_ips_count" translatable="true">%1$s IP &amp; Port rules</string>
+
+    <string name="logs_card_network_count" translatable="true">%1$s connections</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s queries</string>
 
     <string name="hsf_start_btn_state" translatable="true">start</string>
     <string name="hsf_stop_btn_state" translatable="true">stop</string>
@@ -542,8 +549,6 @@
     <string name="hsf_whats_new_chip_text" translatable="true">What\'s new</string>
     <string name="hsf_proxy_chip_text" translatable="true">Proxy active</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Enable RDNS+</string>
-    <string name="hsf_dns_logs_chip_text" translatable="true">DNS logs</string>
-    <string name="hsf_network_logs_chip_text" translatable="true">Network logs</string>
 
     <string name="hsf_exclude_error" translatable="true">Exclude not possible in VPN lockdown mode</string>
 
@@ -577,7 +582,6 @@
     <string name="dc_local_block_desc_1" translatable="true">Choose from 195+ blocklists. Click here to download or configure blocklists.</string>
 
     <string name="dc_custom_block_heading" translatable="true">Domain rules</string>
-    <string name="dc_custom_block_desc" translatable="true">Modify blocked or trusted domain rules</string>
 
     <string name="dc_dns_website_heading" translatable="true">Show website icon in DNS logs (experimental)</string>
     <string name="dc_dns_website_desc" translatable="true">Fetches website icons from <i>nextdns.io</i> and <i>duckduckgo.com</i>. Consumes up to 350 mb in disk space</string>
@@ -742,6 +746,9 @@
 
     <string name="cd_dnscrypt_relay_heading" translatable="true">Relays</string>
 
+    <string name="cd_dns_alg_heading" translatable="true">Advanced DNS filtering (experimental)</string>
+    <string name="cd_dns_alg_desc" translatable="true">Apply domain rules alongside IP rules</string>
+
     <!-- Connection Tracker fragment string -->
     <string name="ct_delete_logs_positive_btn" translatable="true">Delete logs</string>
 
@@ -796,8 +803,8 @@
     <string name="univ_firewall_rule_9" translatable="true">Block on metered (mobile) network</string>
     <string name="univ_firewall_rule_10" translatable="true">Block all except bypassed apps and IPs</string>
 
-    <string name="univ_view_blocked_ip" translatable="true">ip &amp; port rules</string>
-    <string name="univ_view_blocked_ip_desc" translatable="true">Modify blocked or trusted IP / Port rules.</string>
+    <string name="univ_view_blocked_ip" translatable="true">IP &amp; Port rules</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">Modify blocked or trusted Domain, IP / Port rules.</string>
 
     <string name="univ_ip_delete_individual_positive" translatable="true">Delete</string>
     <string name="univ_ip_delete_individual_toast" translatable="true">%1$s deleted.</string>
@@ -1050,7 +1057,7 @@
     <string name="cd_remove_dialog_message" translatable="true">Delete the domain from saved configuration.</string>
     <string name="cd_remove_dialog_positive" translatable="true">Delete</string>
 
-    <string name="cd_no_rules_text" translatable="true">No domain rules found.</string>
+    <string name="cd_no_rules_text" translatable="true">No domain rules.</string>
 
     <string name="cd_dialog_title" translatable="true">Add domain</string>
     <string name="cd_dialog_desc" translatable="true">Custom URL(domain) or wild card to either allow or block. eg, *.test.com, test.com/test</string>
@@ -1073,7 +1080,7 @@
 
     <string name="ci_header" translatable="true">IP &amp; Port Rules: %1$s</string>
 
-    <string name="ci_no_rules_text" translatable="true">No IP or Port rules found.</string>
+    <string name="ci_no_rules_text" translatable="true">No IP or Port rules.</string>
 
     <string name="ci_bypass_universal_initial" translatable="true">BU</string>
     <string name="ci_bypass_universal_txt" translatable="true">Bypass Universal</string>

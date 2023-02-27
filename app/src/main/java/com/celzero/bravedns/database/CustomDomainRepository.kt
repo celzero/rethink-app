@@ -16,7 +16,9 @@
 package com.celzero.bravedns.database
 
 import android.database.Cursor
+import androidx.lifecycle.LiveData
 import androidx.room.Transaction
+import com.celzero.bravedns.util.Constants
 
 class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     suspend fun update(customDomain: CustomDomain) {
@@ -43,6 +45,11 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
 
     fun deleteRulesByUid(uid: Int) {
         customDomainDAO.deleteRulesByUid(uid)
+    }
+
+    fun getUniversalCustomDomainCount(): LiveData<Int> {
+        // get the count of the universal rules
+        return customDomainDAO.getAppWiseDomainRulesCount(Constants.UID_EVERYBODY)
     }
 
     fun cpInsert(customDomain: CustomDomain): Long {

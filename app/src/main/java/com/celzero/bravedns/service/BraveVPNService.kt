@@ -130,8 +130,6 @@ class BraveVPNService :
         // This value must match the hardcoded MTU in outline-go-tun2socks.
         // TODO: Make outline-go-tun2socks's MTU configurable.
         private const val VPN_INTERFACE_MTU: Int = 1500
-
-        const val USER_SELECTED_TRANSPORT_ID = "USER_SELECTED"
     }
 
     private var isLockDownPrevious: Boolean = false
@@ -301,7 +299,7 @@ class BraveVPNService :
     /** Checks if incoming connection is blocked by any user-set firewall rule */
     private fun firewall(
         connInfo: ConnTrackerMetaData,
-        isDomainBlockedByUpstream: Boolean = false
+        anyRealIpBlocked: Boolean = false
     ): FirewallRuleset {
         try {
 
@@ -410,16 +408,16 @@ class BraveVPNService :
                 }
             }
 
-            // if the app is blocked by the upstream dns then allow only if it is trusted,
+            // if any of the real ip is blocked then allow only if it is trusted,
             // otherwise no need to check further
-            if (isDomainBlockedByUpstream) {
+            if (anyRealIpBlocked) {
                 return FirewallRuleset.RULE2G
             } else {
                 // no-op; pass-through
             }
 
             // block all metered connections (Universal firewall setting)
-            if (persistentState.blockMeteredConnections && isConnectionMetered()) {
+            if (persistentState.getBlockMeteredConnections() && isConnectionMetered()) {
                 return FirewallRuleset.RULE1F
             }
 
@@ -471,7 +469,7 @@ class BraveVPNService :
     }
 
     private fun universalLockdown(): Boolean {
-        return persistentState.universalLockdown
+        return persistentState.getUniversalLockdown()
     }
 
     private fun httpBlocked(port: Int): Boolean {
@@ -480,7 +478,7 @@ class BraveVPNService :
             return false
         }
 
-        return persistentState.blockHttpConnections
+        return persistentState.getBlockHttpConnections()
     }
 
     private fun allowOrbot(uid: Int): Boolean {
@@ -495,7 +493,7 @@ class BraveVPNService :
     }
 
     private fun dnsBypassed(destIp: String): Boolean {
-        return if (!persistentState.disallowDnsBypass) {
+        return if (!persistentState.getDisallowDnsBypass()) {
             false
         } else {
             unresolvedIp(destIp)
@@ -510,7 +508,7 @@ class BraveVPNService :
     }
 
     private fun newAppBlocked(uid: Int): Boolean {
-        return if (!persistentState.blockNewlyInstalledApp || isMissingOrInvalidUid(uid)) {
+        return if (!persistentState.getBlockNewlyInstalledApp() || isMissingOrInvalidUid(uid)) {
             false
         } else {
             waitAndCheckIfUidBlocked(uid)
@@ -526,7 +524,7 @@ class BraveVPNService :
     }
 
     private fun unknownAppBlocked(uid: Int): Boolean {
-        return if (!persistentState.blockUnknownConnections) {
+        return if (!persistentState.getBlockUnknownConnections()) {
             false
         } else {
             isMissingOrInvalidUid(uid)
@@ -564,7 +562,7 @@ class BraveVPNService :
     }
 
     private fun udpBlocked(uid: Int, protocol: Int, port: Int): Boolean {
-        val hasUserBlockedUdp = persistentState.udpBlockedSettings
+        val hasUserBlockedUdp = persistentState.getUdpBlocked()
         if (!hasUserBlockedUdp) return false
 
         val isUdp = protocol == Protocol.UDP.protocolType
@@ -609,7 +607,7 @@ class BraveVPNService :
     // Now the code only checks whether the KeyguardManager#isKeyguardLocked() is true/false.
     // if isKeyguardLocked() is true, the connections will be blocked.
     private fun deviceLocked(): Boolean {
-        if (!persistentState.blockWhenDeviceLocked) return false
+        if (!persistentState.getBlockWhenDeviceLocked()) return false
 
         if (keyguardManager == null) {
             keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -684,7 +682,7 @@ class BraveVPNService :
     }
 
     private fun blockBackgroundData(uid: Int): Boolean {
-        if (!persistentState.blockAppWhenBackground) return false
+        if (!persistentState.getBlockAppWhenBackground()) return false
 
         if (!accessibilityServiceFunctional()) {
             Log.w(LOG_TAG_VPN, "accessibility service not functional, disable bg-block")
@@ -699,7 +697,7 @@ class BraveVPNService :
 
     private fun handleAccessibilityFailure() {
         // Disable app not in use behaviour when the accessibility failure is detected.
-        persistentState.blockAppWhenBackground = false
+        persistentState.setBlockAppWhenBackground(false)
         showAccessibilityStoppedNotification()
     }
 
@@ -1007,7 +1005,7 @@ class BraveVPNService :
         connectivityManager =
             this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        if (persistentState.blockAppWhenBackground) {
+        if (persistentState.getBlockAppWhenBackground()) {
             registerAccessibilityServiceState()
         }
     }
@@ -1357,7 +1355,7 @@ class BraveVPNService :
                 io("local-blocklist") { updateTun(opts) }
             }
             PersistentState.BACKGROUND_MODE -> {
-                if (persistentState.blockAppWhenBackground) {
+                if (persistentState.getBlockAppWhenBackground()) {
                     registerAccessibilityServiceState()
                 } else {
                     unregisterAccessibilityServiceState()
@@ -1934,19 +1932,13 @@ class BraveVPNService :
     override fun onQuery(query: String?, suggestedId: String): String {
         if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery: rcvd query: $query, suggested_id: $suggestedId")
         if (query == null) {
-            return suggestedId.ifEmpty { USER_SELECTED_TRANSPORT_ID }
+            return suggestedId.ifEmpty { Dnsx.Preferred }
         }
 
-        return if (persistentState.enableDnsAlg) {
-            if (DEBUG) Log.d(LOG_TAG_VPN, "alg onQuery: return :${Dnsx.Alg}")
+        return if (appConfig.getBraveMode().isDnsFirewallMode() && persistentState.enableDnsAlg) {
             Dnsx.Alg
         } else {
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "alg onQuery: return USER_SELECTED_TRANSPORT_ID:$USER_SELECTED_TRANSPORT_ID"
-                )
-            USER_SELECTED_TRANSPORT_ID
+            Dnsx.Preferred
         }
     }
 
@@ -1995,16 +1987,16 @@ class BraveVPNService :
 
         val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
 
-        val ips = realIps?.split(",")?.toSet()?.reversed() ?: emptySet()
-        // do not use dstIp here, use realIps instead
-        // as of now, only first ip is used, the ips are reversed, so use the last one
-        // TODO: use all ips
-        val realDestIp = ips.last()
-        var isDomainBlockedByUpstream = false
+        val ips = realIps?.split(",")?.toList() ?: emptyList()
+        // use realIps; as of now, netstack uses the first ip
+        // TODO: apply firewall rules on all real ips
+        val realDestIp = ips.first()
+        var anyRealIpBlocked = false
 
         ips.forEach {
             if (isUnspecifiedIp(it)) {
-                isDomainBlockedByUpstream = true
+                // if `d` is blocked, then at least one of the real ips is unspecified
+                anyRealIpBlocked = true
             } else {
                 val ip = normalizeIp(it)
                 val countryCode: String? = Utilities.getCountryCode(ip, this)
@@ -2026,7 +2018,7 @@ class BraveVPNService :
                 domains.first()
             )
         if (DEBUG) Log.d(LOG_TAG_VPN, "block-alg connInfo: $connInfo")
-        return processFirewallRequest(connInfo, isDomainBlockedByUpstream, blocklists)
+        return processFirewallRequest(connInfo, anyRealIpBlocked, blocklists)
     }
 
     private fun getFlagIfPresent(hostAddress: String?): String {
@@ -2038,7 +2030,7 @@ class BraveVPNService :
 
     private fun processFirewallRequest(
         metadata: ConnTrackerMetaData,
-        isDomainBlockedByUpstream: Boolean = false,
+        anyRealIpBlocked: Boolean = false,
         blocklists: String = ""
     ): Boolean {
         // skip the block-ceremony for dns conns
@@ -2047,7 +2039,7 @@ class BraveVPNService :
             return false
         }
 
-        val rule = firewall(metadata, isDomainBlockedByUpstream)
+        val rule = firewall(metadata, anyRealIpBlocked)
 
         // handle 2G rule as a special case, as it is has blocklists
         if (rule.id == FirewallRuleset.RULE2G.id && blocklists.isNotEmpty()) {
