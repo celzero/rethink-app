@@ -255,7 +255,7 @@
                         android:layout_marginBottom="5dp"
                         android:alpha="0.5"
                         android:padding="10dp"
-                        android:src="@drawable/ic_custom_allow_deny" />
+                        android:src="@drawable/ic_adv_dns_filter" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"

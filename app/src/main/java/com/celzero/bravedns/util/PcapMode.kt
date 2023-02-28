@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 RethinkDNS and its authors
+ * Copyright 2023 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.data
+package com.celzero.bravedns.util
 
-import org.koin.android.ext.koin.androidContext
-import org.koin.dsl.module
+enum class PcapMode(val id: Int) {
+    NONE(0),
+    LOGCAT(1),
+    EXTERNAL_FILE(2);
 
-object DataModule {
-    private val dataModule = module {
-        single {
-            AppConfig(
-                androidContext(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get()
-            )
+    companion object {
+        fun getPcapType(id: Int): PcapMode {
+            return when (id) {
+                0 -> NONE
+                1 -> LOGCAT
+                2 -> EXTERNAL_FILE
+                else -> NONE
+            }
         }
     }
-
-    val modules = listOf(dataModule)
 }

@@ -73,7 +73,7 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
                         Tabs.NETWORK_LOGS.screen ->
                             ConnectionTrackerFragment.newInstance(searchParam)
                         Tabs.DNS_LOGS.screen -> DnsLogFragment.newInstance(searchParam)
-                        else -> UniversalFirewallFragment.newInstance()
+                        else -> FirewallSettingsFragment.newInstance()
                     }
                 }
 

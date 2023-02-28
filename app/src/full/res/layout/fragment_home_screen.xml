@@ -100,9 +100,9 @@
                             android:gravity="center"
                             android:padding="5dp"
                             android:text="@string/apps_info_title"
-                            android:textColor="?attr/accentGood"
+                            android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
+                            app:drawableEndCompat="@drawable/ic_right_arrow_chip" />
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
@@ -164,9 +164,9 @@
                             android:gravity="center"
                             android:padding="5dp"
                             android:text="@string/lbl_rules"
-                            android:textColor="?attr/secondaryTextColor"
+                            android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
+                            app:drawableEndCompat="@drawable/ic_right_arrow_chip" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
@@ -232,9 +232,9 @@
                             android:gravity="center"
                             android:padding="5dp"
                             android:text="@string/dns_mode_info_title"
-                            android:textColor="?attr/secondaryTextColor"
+                            android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
+                            app:drawableEndCompat="@drawable/ic_right_arrow_chip" />
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
@@ -293,9 +293,9 @@
                             android:gravity="center"
                             android:padding="5dp"
                             android:text="@string/firewall_mode_info_title"
-                            android:textColor="?attr/secondaryTextColor"
+                            android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
+                            app:drawableEndCompat="@drawable/ic_right_arrow_chip" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
@@ -356,9 +356,9 @@
                             android:gravity="center"
                             android:padding="5dp"
                             android:text="Logs"
-                            android:textColor="?attr/secondaryTextColor"
+                            android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
-                            app:drawableEndCompat="@drawable/ic_right_arrow_secondary" />
+                            app:drawableEndCompat="@drawable/ic_right_arrow_chip" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
@@ -396,6 +396,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/hsf_proxy_chip_text"
+                    app:chipIcon="@drawable/ic_socks5" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/fhs_pcap_chip"
+                    style="@style/Chip.HomeScreen.Entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hsf_packet_capture_chip_text"
                     app:chipIcon="@drawable/ic_socks5" />
 
                 <com.google.android.material.chip.Chip

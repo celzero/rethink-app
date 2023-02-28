@@ -76,7 +76,7 @@ import java.util.concurrent.TimeUnit
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 
-    private lateinit var settingsFragment: SettingsFragment
+    private lateinit var configureFragment: ConfigureFragment
     private lateinit var homeScreenFragment: HomeScreenFragment
     private lateinit var aboutFragment: AboutFragment
     private lateinit var statisticsFragment: SummaryStatisticsFragment
@@ -707,13 +707,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     return@setOnItemSelectedListener true
                 }
                 R.id.navigation_settings -> {
-                    settingsFragment = SettingsFragment()
+                    configureFragment = ConfigureFragment()
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
                             R.id.fragment_container,
-                            settingsFragment,
-                            settingsFragment.javaClass.simpleName
+                            configureFragment,
+                            configureFragment.javaClass.simpleName
                         )
                         .commit()
                     return@setOnItemSelectedListener true

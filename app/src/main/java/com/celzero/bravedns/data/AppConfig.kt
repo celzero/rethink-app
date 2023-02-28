@@ -38,14 +38,15 @@ import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getDnsPort
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
+import java.net.InetAddress
 import protect.Blocker
 import settings.Settings
-import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -57,7 +58,8 @@ internal constructor(
     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
     private val proxyEndpointRepository: ProxyEndpointRepository,
     private val persistentState: PersistentState,
-    private val networkLogs: ConnectionTrackerRepository
+    networkLogs: ConnectionTrackerRepository,
+    dnsLogs: DnsLogRepository
 ) {
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
@@ -616,15 +618,6 @@ internal constructor(
         dnsCryptRelayEndpointRepository.unselectRelay(stamp)
     }
 
-    suspend fun setDefaultConnection() {
-        if (getDnsType() != DnsType.RETHINK_REMOTE) {
-            removeConnectionStatus()
-        }
-
-        rethinkDnsEndpointRepository.updateConnectionDefault()
-        onDnsChange(DnsType.RETHINK_REMOTE)
-    }
-
     suspend fun getDefaultDns(): String {
         return persistentState.defaultDnsUrl
     }
@@ -667,18 +660,21 @@ internal constructor(
         return getDnsType() == DnsType.RETHINK_REMOTE
     }
 
-    suspend fun setSystemDns(ip: String, port: Int) {
+    suspend fun enableSystemDns() {
         if (getDnsType() != DnsType.NETWORK_DNS) {
             removeConnectionStatus()
         }
 
-        systemDns.ipAddress = ip
-        systemDns.port = port
         onDnsChange(DnsType.NETWORK_DNS)
     }
 
     suspend fun updateSystemDnsServers(dnsServers: List<InetAddress>) {
         var dnsIp: String? = null
+        val dnsPort = 0
+        Log.d("TEST", "TEST: $dnsServers")
+        dnsServers.forEach {
+            Log.d("TEST", "TEST: ${it.hostAddress}, ${it.address}, ${it.hostName}")
+        }
 
         when (getInternetProtocol()) {
             InternetProtocol.IPv4 -> {
@@ -709,9 +705,12 @@ internal constructor(
         if (dnsIp.isNullOrEmpty()) {
             dnsIp = dnsServers[0].hostAddress
         }
+        systemDns.ipAddress = dnsIp ?: ""
+        systemDns.port = getDnsPort(dnsPort)
     }
 
     fun getSystemDns(): SystemDns {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "SystemDns: ${systemDns.ipAddress}:${systemDns.port}")
         return systemDns
     }
 
@@ -971,6 +970,8 @@ internal constructor(
     }
 
     val networkLogsCount: LiveData<Long> = networkLogs.logsCount()
+
+    val dnsLogsCount: LiveData<Long> = dnsLogs.logsCount()
 
     val connectedProxy: LiveData<ProxyEndpoint?> =
         proxyEndpointRepository.getConnectedProxyLiveData()

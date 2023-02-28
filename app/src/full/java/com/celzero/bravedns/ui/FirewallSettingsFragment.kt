@@ -40,13 +40,13 @@ import com.celzero.bravedns.util.Utilities
 import java.util.concurrent.TimeUnit
 import org.koin.android.ext.android.inject
 
-class UniversalFirewallFragment : Fragment(R.layout.fragment_universal_firewall) {
+class FirewallSettingsFragment : Fragment(R.layout.fragment_universal_firewall) {
     private val b by viewBinding(FragmentUniversalFirewallBinding::bind)
 
     private val persistentState by inject<PersistentState>()
 
     companion object {
-        fun newInstance() = UniversalFirewallFragment()
+        fun newInstance() = FirewallSettingsFragment()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -18,28 +18,14 @@
         android:background="?attr/border" />
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:text="Apply Rules"
-        android:padding="5dp"
-        android:textColor="?attr/primaryLightColorText"
-        android:textIsSelectable="true"
-        android:textSize="@dimen/extra_large_font_text_view"
-        android:textStyle="bold" />
-
-    <TextView
         android:id="@+id/bsac_ip_rule_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="0.6"
         android:gravity="center"
         android:padding="10dp"
         android:text="@string/bsct_block_ip"
-        android:textColor="?attr/accentGood"
-        android:textSize="@dimen/large_font_text_view" />
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/extra_large_font_text_view" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -92,12 +78,11 @@
             android:id="@+id/bsac_domain_rule_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.6"
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/bsct_block_domain"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/large_font_text_view" />
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/extra_large_font_text_view" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bsac_domain_list"

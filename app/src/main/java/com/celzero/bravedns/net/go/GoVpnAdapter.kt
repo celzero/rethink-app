@@ -31,7 +31,9 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities.Companion.blocklistFile
+import com.celzero.bravedns.util.Utilities.Companion.isValidDnsPort
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import dnsx.BraveDNS
@@ -89,16 +91,17 @@ class GoVpnAdapter(
             val transport: Transport = makeDefaultTransport(dohURL)
             Log.i(
                 LOG_TAG_VPN,
-                "Connect tunnel with url $tunFd dnsMode: ${tunnelOptions.tunDnsMode}, blockMode: ${tunnelOptions.tunFirewallMode}, proxyMode: ${tunnelOptions.tunProxyMode}, fake dns: ${tunnelOptions.fakeDns}, mtu:${tunnelOptions.mtu}"
+                "Connect tunnel with url $tunFd dnsMode: ${tunnelOptions.tunDnsMode}, blockMode: ${tunnelOptions.tunFirewallMode}, proxyMode: ${tunnelOptions.tunProxyMode}, fake dns: ${tunnelOptions.fakeDns}, mtu:${tunnelOptions.mtu}, pcap: ${getPcapOption()}"
             )
 
             if (tunFd == null) return
 
             setPreferredEngine(tunnelOptions)
+
             tunnel =
                 Tun2socks.connectIntraTunnel(
                     tunFd!!.fd.toLong(),
-                    DISABLE_PCAP, // fd for pcap logging
+                    getPcapOption(), // fd for pcap logging
                     tunnelOptions.mtu.toLong(),
                     tunnelOptions.fakeDns,
                     transport,
@@ -113,6 +116,15 @@ class GoVpnAdapter(
             Log.e(LOG_TAG_VPN, e.message, e)
             tunnel?.disconnect()
             tunnel = null
+        }
+    }
+
+    private fun getPcapOption(): Long {
+        return when (persistentState.pcapMode) {
+            PcapMode.NONE.id -> DISABLE_PCAP
+            PcapMode.LOGCAT.id -> ENABLE_PCAP_LOGCAT
+            PcapMode.EXTERNAL_FILE.id -> DISABLE_PCAP
+            else -> DISABLE_PCAP
         }
     }
 
@@ -151,12 +163,21 @@ class GoVpnAdapter(
         // always set the block free transport before setting the transport to the resolver
         // because of the way the alg is implemented in the go code.
         if (blockFreeTransport != null) {
-            tunnel?.resolver?.add(blockFreeTransport)
+            val added = tunnel?.resolver?.add(blockFreeTransport)
+            Log.i(
+                LOG_TAG_VPN,
+                "add blockfree transport to resolver, addr: ${blockFreeTransport.addr}, $added"
+            )
+        } else {
+            Log.e(
+                LOG_TAG_VPN,
+                "blockfree transport is null for dns type: ${appConfig.getDnsType()}"
+            )
         }
 
         if (transport != null) {
-            tunnel?.resolver?.add(transport)
-            Log.i(LOG_TAG_VPN, "add transport to resolver, addr: ${transport.addr}")
+            val added = tunnel?.resolver?.add(transport)
+            Log.i(LOG_TAG_VPN, "add transport to resolver, id: ${transport.id()} addr:  ${transport.addr}, $added")
         } else {
             Log.e(LOG_TAG_VPN, "transport is null for dns type: ${appConfig.getDnsType()}")
         }
@@ -419,25 +440,26 @@ class GoVpnAdapter(
 
     fun setSystemDns() {
         if (tunnel != null) {
-            val dnsProxy =
-                if (appConfig.isSystemDns()) {
-                    val systemDns = appConfig.getSystemDns()
+            try {
+                val systemDns = appConfig.getSystemDns()
+                val dnsProxy =
                     HostName(IPAddressString(systemDns.ipAddress).address, systemDns.port)
-                } else {
-                    null
+
+                if (dnsProxy.host.isNullOrEmpty() || !isValidDnsPort(dnsProxy.port)) {
+                    Log.e(LOG_TAG_VPN, "setSystemDns: invalid dnsProxy: $dnsProxy")
+                    return
                 }
 
-            if (dnsProxy == null) {
-                return
+                if (DEBUG)
+                    Log.d(LOG_TAG_VPN, "setSystemDns mode set: ${dnsProxy.host} , ${dnsProxy.port}")
+
+                // below code is commented out, add the code to set the system dns via resolver
+                // val transport = Intra.newDNSProxy("ID", dnsProxy.host, dnsProxy.port.toString())
+                // tunnel?.resolver?.addSystemDNS(transport)
+                tunnel?.setSystemDNS(dnsProxy.toNormalizedString())
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_VPN, "setSystemDns: could not set system dns", e)
             }
-
-            if (DEBUG)
-                Log.d(LOG_TAG_VPN, "setSystemDns mode set: ${dnsProxy.host} , ${dnsProxy.port}")
-
-            // below code is commented out, add the code to set the system dns via resolver
-            // val transport = Intra.newDNSProxy("ID", dnsProxy.host, dnsProxy.port.toString())
-            // tunnel?.resolver?.addSystemDNS(transport)
-            tunnel?.setSystemDNS(dnsProxy.toNormalizedString())
         }
     }
 
@@ -559,7 +581,7 @@ class GoVpnAdapter(
         }
 
         // const to enable/disable pcap
-        private const val ENABLE_PCAP = 0L
+        private const val ENABLE_PCAP_LOGCAT = 0L
         private const val DISABLE_PCAP = -1L
     }
 

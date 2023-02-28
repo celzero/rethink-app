@@ -98,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:text="@string/lbl_cancel"
+        android:text="@string/fapps_info_dialog_positive_btn"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintStart_toStartOf="parent"

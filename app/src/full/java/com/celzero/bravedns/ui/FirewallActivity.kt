@@ -35,7 +35,6 @@ import org.koin.android.ext.android.inject
 
 class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
     private val b by viewBinding(ActivityFirewallBinding::bind)
-    private var fragmentIndex = 0
     private val persistentState by inject<PersistentState>()
 
     enum class Tabs(val screen: Int) {
@@ -65,8 +64,8 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
             object : FragmentStateAdapter(this) {
                 override fun createFragment(position: Int): Fragment {
                     return when (position) {
-                        Tabs.UNIVERSAL.screen -> UniversalFirewallFragment.newInstance()
-                        else -> UniversalFirewallFragment.newInstance()
+                        Tabs.UNIVERSAL.screen -> FirewallSettingsFragment.newInstance()
+                        else -> FirewallSettingsFragment.newInstance()
                     }
                 }
 
@@ -84,8 +83,6 @@ class FirewallActivity : AppCompatActivity(R.layout.activity_firewall) {
                     }
             }
             .attach()
-
-        b.firewallActViewpager.setCurrentItem(fragmentIndex, false)
 
         observeAppState()
     }

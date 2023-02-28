@@ -103,22 +103,22 @@ interface ConnectionTrackerDAO {
     fun getAllBlockedAppNetworkActivity(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 group by ipAddress order by count desc LIMIT 7"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and blockedByRule not like '%Rule #2G%' group by ipAddress order by count desc LIMIT 7"
     )
     fun getMostContactedIps(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 group by ipAddress order by count desc"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and blockedByRule not like '%Rule #2G%' group by ipAddress order by count desc"
     )
     fun getAllContactedIps(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 group by ipAddress order by count desc LIMIT 7"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and blockedByRule not like '%Rule #2G%' group by ipAddress order by count desc LIMIT 7"
     )
     fun getMostBlockedIps(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 group by ipAddress order by count desc"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(ipAddress) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and blockedByRule not like '%Rule #2G%' group by ipAddress order by count desc"
     )
     fun getAllBlockedIps(): PagingSource<Int, AppConnection>
 

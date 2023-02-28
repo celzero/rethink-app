@@ -21,7 +21,7 @@ import androidx.paging.*
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.ConnectionTrackerFragment
-import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import kotlinx.coroutines.flow.Flow
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
     ViewModel() {
@@ -73,13 +73,27 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun getBlockedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+            Pager(
+                    PagingConfig(
+                        pageSize = 15,
+                        enablePlaceholders = false,
+                        maxSize = 30,
+                        prefetchDistance = 1
+                    )
+                ) {
                     connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+            Pager(
+                    PagingConfig(
+                        pageSize = 15,
+                        enablePlaceholders = false,
+                        maxSize = 30,
+                        prefetchDistance = 1
+                    )
+                ) {
                     connectionTrackerDAO.getBlockedConnections("%$input%")
                 }
                 .liveData
@@ -89,13 +103,27 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun getAllowedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+            Pager(
+                    PagingConfig(
+                        pageSize = 15,
+                        enablePlaceholders = false,
+                        maxSize = 30,
+                        prefetchDistance = 1
+                    )
+                ) {
                     connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
-            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+            Pager(
+                    PagingConfig(
+                        pageSize = 15,
+                        enablePlaceholders = false,
+                        maxSize = 30,
+                        prefetchDistance = 1
+                    )
+                ) {
                     connectionTrackerDAO.getAllowedConnections("%$input%")
                 }
                 .liveData
@@ -104,7 +132,14 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private fun getAllNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
-        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+        return Pager(
+                PagingConfig(
+                    pageSize = 15,
+                    enablePlaceholders = false,
+                    maxSize = 30,
+                    prefetchDistance = 1
+                )
+            ) {
                 connectionTrackerDAO.getConnectionTrackerByName("%$input%")
             }
             .liveData

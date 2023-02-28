@@ -44,7 +44,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 
-class DnsConfigureFragment :
+class DnsSettingsFragment :
     Fragment(R.layout.fragment_dns_configure),
     LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
@@ -53,7 +53,7 @@ class DnsConfigureFragment :
     private val appConfig by inject<AppConfig>()
 
     companion object {
-        fun newInstance() = DnsConfigureFragment()
+        fun newInstance() = DnsSettingsFragment()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -358,8 +358,7 @@ class DnsConfigureFragment :
     private fun setNetworkDns() {
         // set network dns
         io {
-            val sysDns = appConfig.getSystemDns()
-            appConfig.setSystemDns(sysDns.ipAddress, sysDns.port)
+            appConfig.enableSystemDns()
         }
     }
 

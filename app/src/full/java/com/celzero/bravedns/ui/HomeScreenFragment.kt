@@ -149,6 +149,14 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 View.GONE
             }
 
+        b.fhsPcapChip.visibility =
+            when (persistentState.pcapMode) {
+                PcapMode.NONE.id -> View.GONE
+                PcapMode.LOGCAT.id -> View.VISIBLE
+                PcapMode.EXTERNAL_FILE.id -> View.VISIBLE
+                else -> View.GONE
+            }
+
         b.fhsThemeChip.text =
             getString(R.string.hsf_chip_appearance, themeNames[persistentState.theme])
     }
@@ -164,6 +172,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             )
         b.fhsWhatsNewChip.chipIcon?.colorFilter = colorFilter
         b.fhsProxyChip.chipIcon?.colorFilter = colorFilter
+        b.fhsPcapChip.chipIcon?.colorFilter = colorFilter
         b.fhsDnsConfigureChip.chipIcon?.colorFilter = colorFilter
         b.fhsSponsorChip.chipIcon?.colorFilter = colorFilter
         b.fhsThemeChip.chipIcon?.colorFilter = colorFilter
@@ -278,6 +287,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
+        b.fhsPcapChip.setOnCloseIconClickListener {
+            disablePcap()
+        }
+
         b.fhsThemeChip.setOnClickListener { applyAppTheme() }
 
         b.fhsWhatsNewChip.setOnClickListener { showNewFeaturesDialog() }
@@ -328,6 +341,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             showToastUiCentered(
                 requireContext(),
                 getString(R.string.hsf_proxy_chip_removed_toast),
+                Toast.LENGTH_SHORT
+            )
+        }
+    }
+
+    private fun disablePcap() {
+        b.fhsPcapChip.isEnabled = false
+        persistentState.pcapMode = PcapMode.NONE.id
+        b.fhsPcapChip.text = getString(R.string.hsf_proxy_chip_remove_text)
+        delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
+            if (!isAdded) return@delay
+
+            b.fhsPcapChip.visibility = View.GONE
+            b.fhsPcapChip.isEnabled = true
+            showToastUiCentered(
+                requireContext(),
+                getString(R.string.hsf_packet_capture_chip_disabled_toast),
                 Toast.LENGTH_SHORT
             )
         }
@@ -582,7 +612,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun observeLogsCount() {
-        persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
+        appConfig.dnsLogsCount.observe(viewLifecycleOwner) {
             val count = formatDecimal(it)
             b.fhsCardDnsLogsCount.text = getString(R.string.logs_card_dns_count, count)
             b.fhsCardDnsLogsCount.isSelected = true
@@ -590,8 +620,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appConfig.networkLogsCount.observe(viewLifecycleOwner) {
             val count = formatDecimal(it)
-            b.fhsCardNetworkLogsCount.text =
-                getString(R.string.logs_card_network_count, count)
+            b.fhsCardNetworkLogsCount.text = getString(R.string.logs_card_network_count, count)
             b.fhsCardNetworkLogsCount.isSelected = true
         }
     }

@@ -905,5 +905,14 @@ class Utilities {
         fun removeBeginningTrailingCommas(value: String): String {
             return value.removePrefix(",").dropLastWhile { it == ',' }
         }
+
+        fun getDnsPort(port: Int): Int {
+            if (port > 65535 || port <= 0) return 53
+            return port
+        }
+
+        fun isValidDnsPort(port: Int): Boolean {
+            return port in 1..65535
+        }
     }
 }

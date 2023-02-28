@@ -1420,6 +1420,10 @@ class BraveVPNService :
             PersistentState.DEFAULT_DNS_SERVER -> {
                 io("default-dns-server") { restartVpn(opts) }
             }
+            PersistentState.PCAP_MODE -> {
+                // restart vpn to enable/disable pcap
+                io("pcap") { restartVpn(opts) }
+            }
         }
     }
 
@@ -1436,7 +1440,6 @@ class BraveVPNService :
                     Toast.LENGTH_SHORT
                 )
             }
-            appConfig.setDefaultConnection()
             return
         }
 
@@ -1586,6 +1589,9 @@ class BraveVPNService :
         underlyingNetworks = networks
         Log.i(LOG_TAG_VPN, "connecting to networks, $underlyingNetworks")
 
+        // always set system dns to tunnel
+        setDnsServers(networks)
+
         // restart vpn on network changes in auto (IP4+6) mode
         if (appConfig.getInternetProtocol().isIPv46()) {
             io("ip46-restart-vpn") { restartVpnWithExistingAppConfig() }
@@ -1600,9 +1606,6 @@ class BraveVPNService :
         } else {
             setUnderlyingNetworks(networks.allNet.toTypedArray())
         }
-
-        // set system dns address to tunnel
-        setDnsServers(networks)
     }
 
     private fun setDnsServers(networks: ConnectionMonitor.UnderlyingNetworks) {
@@ -1613,7 +1616,7 @@ class BraveVPNService :
             // TODO: send an alert/notification instead of toast
             Log.w(LOG_TAG_VPN, "No dns servers found")
             if (appConfig.isSystemDns()) {
-                // on null dns servers, show toast and fallback to default dns
+                // on null dns servers, show toast
                 ui {
                     showToastUiCentered(
                         this,
@@ -1621,7 +1624,6 @@ class BraveVPNService :
                         Toast.LENGTH_LONG
                     )
                 }
-                io("set-default-dns") { appConfig.setDefaultConnection() }
             } else {
                 // no-op
             }

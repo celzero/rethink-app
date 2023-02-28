@@ -33,6 +33,7 @@ import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.ui.CustomDomainFragment
+import com.celzero.bravedns.ui.CustomRulesActivity
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.google.android.material.button.MaterialButton
@@ -331,7 +332,7 @@ class CustomDomainAdapter(val context: Context) :
             dialog.setTitle(context.getString(R.string.cd_dialog_title))
             val dBind =
                 DialogAddCustomDomainBinding.inflate(
-                    (context as CustomDomainFragment).layoutInflater
+                    (context as CustomRulesActivity).layoutInflater
                 )
             dialog.setContentView(dBind.root)
 

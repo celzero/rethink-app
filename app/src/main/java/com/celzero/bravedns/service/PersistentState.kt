@@ -22,6 +22,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities
 import hu.autsoft.krate.*
 import hu.autsoft.krate.default.withDefault
@@ -42,8 +43,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val INTERNET_PROTOCOL = "internet_protocol"
         const val PROTOCOL_TRANSLATION = "protocol_translation"
         const val DEFAULT_DNS_SERVER = "default_dns_server"
-
-        // const val APP_STATE = "app_state"
+        const val PCAP_MODE = "pcap_mode"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
     }
 
@@ -231,6 +231,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // default dns url
     var defaultDnsUrl by stringPref("default_dns_query").withDefault<String>("")
+
+    // packet capture type
+    var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

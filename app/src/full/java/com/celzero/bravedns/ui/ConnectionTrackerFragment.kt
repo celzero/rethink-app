@@ -97,8 +97,10 @@ class ConnectionTrackerFragment :
         layoutManager = CustomLinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        viewModel.connectionTrackerList.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(this.lifecycle, it)
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.connectionTrackerList.observe(viewLifecycleOwner) { it ->
+                recyclerAdapter.submitData(lifecycle, it)
+            }
         }
         b.recyclerConnection.adapter = recyclerAdapter
 
