@@ -237,7 +237,7 @@
     <string name="settings_https_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
     <string name="settings_general_header">geral</string>
     <string name="settings_autostart_bootup_desc">Ao ligar o dispositivo, inicie RethinkDNS se ele estava funcionando antes de desligar aparelho.</string>
-    <string name="isolate">restrito</string>
+    <string name="isolate">restringir</string>
     <string name="app_name_small_case">rethink</string>
     <string name="pause_title_desc">descansando…</string>
     <string name="settings_title_desc">DNS e Firewall altamente personalizável</string>
@@ -266,7 +266,7 @@
     <string name="status_dns_error">falha do dns</string>
     <string name="status_dns_server_down">servidor dns inativo</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns privado está ativado</string>
-    <string name="bsct_block">Bloqueie, contorne, exclua, restrinja <u>este aplicativo</u></string>
+    <string name="bsct_block">Bloqueie, contorne, exclua e restrinja <u>este aplicativo</u></string>
     <string name="notification_action_resume_vpn">RESTABELECER</string>
     <string name="dns_explanation_firewall_connected">Conectado ao Firewall</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">Conectado ao RethinkDNS e Firewall</string>
@@ -458,10 +458,10 @@
     <string name="firewall_status_block_metered">bloqueado em redes com franquia de dados (móvel)</string>
     <string name="firewall_status_blocked">bloqueado</string>
     <string name="firewall_status_unknown">desconhecido</string>
-    <string name="firewall_card_text_active">%1$s bloqueado
-\n%2$s contornado
-\n%3$s excluído
-\n%4$s restrito</string>
+    <string name="firewall_card_text_active">%1$s bloqueados
+\n%2$s contornados
+\n%3$s excluídos
+\n%4$s restritos</string>
     <string name="firewall_card_text_inactive">Ative modo de firewall.</string>
     <string name="dns_card_latency_active">Latência: %1$sms</string>
     <string name="dns_card_latency_inactive">Ative modo DNS.</string>
@@ -587,7 +587,7 @@
     <string name="fapps_filter_parent_installed">Instalada</string>
     <string name="fapps_filter_parent_system">Sistema</string>
     <string name="fapps_firewall_filter_bypass_universal">Contornado</string>
-    <string name="fapps_firewall_filter_isolate">Restrito</string>
+    <string name="fapps_firewall_filter_isolate">Restritos</string>
     <string name="fapps_metered_block_dialog_message">Bloquear conexões em rede com franquia de dados (móvel) para apps <i>listados</i>\?</string>
     <string name="fapps_metered_unblock_dialog_title">Permitir em redes com franquia de dados</string>
     <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes com franquia de dados (móvel) para apps <i>listados</i>\?</string>
@@ -780,4 +780,18 @@
 \nPara usar um servidor no Rethink DNS, vá até as configurações do Android e desative o DNS Privado.</string>
     <string name="private_dns_error">Não foi possível iniciar a tela do DNS Privado.</string>
     <string name="private_dns_dialog_positive">Vá para Configurações</string>
+    <string name="lbl_apply" translatable="true">Aplicar</string>
+    <string name="lbl_disabled" translatable="true">Desativados</string>
+    <string name="title_statistics" translatable="true">Estatísticas</string>
+    <string name="fapps_info_isolate_msg" translatable="true">Bloquear todos, exceto os IPs de confiança.</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">Isolar aplicativos</string>
+    <string name="lbl_cancel" translatable="true">Cancelar</string>
+    <string name="lbl_allowed" translatable="true">Permitidos</string>
+    <string name="lbl_blocked" translatable="true">Bloqueados</string>
+    <string name="lbl_all" translatable="true">Tudo</string>
+    <string name="lbl_domain_rules" translatable="true">Regras de domínio</string>
+    <string name="lbl_action_required" translatable="true">Ação necessária</string>
+    <string name="lbl_ip_rules" translatable="true">Regras de IP</string>
+    <string name="lbl_domain" translatable="true">Domínio</string>
+    <string name="lbl_wildcard" translatable="true">Curinga</string>
 </resources>
