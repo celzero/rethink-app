@@ -20,7 +20,7 @@
             style="@style/TextAppearance.Heading.HomeScreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.75"
+            android:alpha="0.5"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
             android:text="@string/app_name_small_case" />

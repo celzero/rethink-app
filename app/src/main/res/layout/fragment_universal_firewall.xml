@@ -23,7 +23,7 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="55dp"
+            android:layout_marginStart="40dp"
             android:layout_marginTop="15dp"
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"

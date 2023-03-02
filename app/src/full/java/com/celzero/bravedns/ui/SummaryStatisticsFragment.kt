@@ -180,6 +180,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun showMostContactedDomain() {
+        // if dns is not active then hide the view
+        if (!appConfig.getBraveMode().isDnsActive()) {
+            b.fssDomainAllowedLl.visibility = View.GONE
+            return
+        }
+
         b.fssContactedDomainRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssContactedDomainRecyclerView.layoutManager = layoutManager
@@ -210,6 +216,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun showBlockedDomains() {
+        // if dns is not active, hide the view
+        if (!appConfig.getBraveMode().isDnsActive()) {
+            b.fssDomainBlockedLl.visibility = View.GONE
+            return
+        }
         b.fssBlockedDomainRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssBlockedDomainRecyclerView.layoutManager = layoutManager
@@ -240,6 +251,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun showMostContactedIps() {
+        // if firewall is not active, hide the view
+        if (!appConfig.getBraveMode().isFirewallActive()) {
+            b.fssIpAllowedLl.visibility = View.GONE
+            return
+        }
+
         b.fssContactedIpsRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssContactedIpsRecyclerView.layoutManager = layoutManager
@@ -269,6 +286,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun showBlockedIps() {
+        // if firewall is not active, hide the view
+        if (!appConfig.getBraveMode().isFirewallActive()) {
+            b.fssIpBlockedLl.visibility = View.GONE
+            return
+        }
+
         b.fssBlockedIpsRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssBlockedIpsRecyclerView.layoutManager = layoutManager

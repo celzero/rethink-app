@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityNetworkLogsBinding
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
@@ -38,7 +39,9 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     private val b by viewBinding(ActivityNetworkLogsBinding::bind)
     private var fragmentIndex = 0
     private var searchParam = ""
+
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
 
     enum class Tabs(val screen: Int) {
         NETWORK_LOGS(0),
@@ -96,7 +99,22 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
 
         b.logsActViewpager.setCurrentItem(fragmentIndex, false)
 
+        handleTabs()
         observeAppState()
+    }
+
+    private fun handleTabs() {
+        when (appConfig.getBraveMode()) {
+            AppConfig.BraveMode.DNS -> {
+                b.logsActTabLayout.getTabAt(0)?.let { b.logsActTabLayout.removeTab(it) }!!
+            }
+            AppConfig.BraveMode.FIREWALL -> {
+                b.logsActTabLayout.getTabAt(1)?.let { b.logsActTabLayout.removeTab(it) }!!
+            }
+            AppConfig.BraveMode.DNS_FIREWALL -> {
+                // no-op
+            }
+        }
     }
 
     private fun observeAppState() {
