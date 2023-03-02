@@ -24,7 +24,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
@@ -32,12 +32,9 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BAS
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.getDnsPort
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import dnsx.BraveDNS
@@ -65,6 +62,7 @@ internal constructor(
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
     private var braveDns: BraveDNS? = null
+    private var pcapFilePath: String = ""
 
     companion object {
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
@@ -128,7 +126,8 @@ internal constructor(
         val listener: Listener,
         val fakeDns: String,
         val preferredEngine: InternetProtocol,
-        val mtu: Int
+        val mtu: Int,
+        val pcapFilePath: String
     )
 
     enum class BraveMode(val mode: Int) {
@@ -331,6 +330,26 @@ internal constructor(
         determineFirewallMode()
     }
 
+    fun setPcap(mode: Int, path: String = PcapMode.DISABLE_PCAP) {
+        pcapFilePath =
+            when (PcapMode.getPcapType(mode)) {
+                PcapMode.NONE -> {
+                    ""
+                }
+                PcapMode.LOGCAT -> {
+                    "0"
+                }
+                PcapMode.EXTERNAL_FILE -> {
+                    path
+                }
+            }
+        persistentState.pcapMode = mode
+    }
+
+    fun getPcapFilePath(): String {
+        return pcapFilePath
+    }
+
     fun getDnsType(): DnsType {
         return when (persistentState.dnsType) {
             DnsType.DOH.type -> DnsType.DOH
@@ -505,7 +524,8 @@ internal constructor(
         fakeDns: String,
         preferredEngine: InternetProtocol,
         ptMode: ProtoTranslationMode,
-        mtu: Int
+        mtu: Int,
+        pcapFilePath: String
     ): TunnelOptions {
         return TunnelOptions(
             getDnsMode(),
@@ -516,7 +536,8 @@ internal constructor(
             listener,
             fakeDns,
             preferredEngine,
-            mtu
+            mtu,
+            pcapFilePath
         )
     }
 

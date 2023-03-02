@@ -44,7 +44,7 @@ class ConnectionTracer(ctx: Context) {
         destIp: String,
         destPort: Int
     ): Int {
-        // https://android.googlesource.com/platform/development/+/da84168fb2f5eb5ca012c3f430f701bc64472f34/ndk/platforms/android-21/include/linux/in.h
+        // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) {
             return Constants.MISSING_UID
         }

@@ -18,7 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp"
+            android:paddingStart="15dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="15dp"
             android:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -30,6 +32,8 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/fhs_sponsor"
                 android:alpha="0.5"
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp"
                 android:text="@string/app_name_small_case" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -404,7 +408,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/hsf_packet_capture_chip_text"
-                    app:chipIcon="@drawable/ic_socks5" />
+                    app:chipIcon="@drawable/ic_pcap" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/fhs_dns_configure_chip"

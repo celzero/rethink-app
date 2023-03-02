@@ -23,9 +23,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.LocaleList
+import android.os.*
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -43,6 +41,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.service.PersistentState
@@ -56,7 +55,9 @@ import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import java.io.IOException
+import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
@@ -171,7 +172,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_2)
             }
             PcapMode.EXTERNAL_FILE -> {
-                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_1)
+                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_3)
             }
         }
     }
@@ -567,22 +568,17 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 PcapMode.NONE -> {
                     b.settingsActivityPcapDesc.text =
                         getString(R.string.settings_pcap_dialog_option_1)
-                    persistentState.pcapMode = PcapMode.NONE.id
+                    appConfig.setPcap(PcapMode.NONE.id)
                 }
                 PcapMode.LOGCAT -> {
                     b.settingsActivityPcapDesc.text =
                         getString(R.string.settings_pcap_dialog_option_2)
-                    persistentState.pcapMode = PcapMode.LOGCAT.id
+                    appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
                 }
                 PcapMode.EXTERNAL_FILE -> {
                     b.settingsActivityPcapDesc.text =
-                        getString(R.string.settings_pcap_dialog_option_1)
-                    showToastUiCentered(
-                        this,
-                        getString(R.string.coming_soon_toast),
-                        Toast.LENGTH_SHORT
-                    )
-                    persistentState.pcapMode = PcapMode.NONE.id
+                        getString(R.string.settings_pcap_dialog_option_3)
+                    createAndSetPcapFile()
                 }
             }
         }
@@ -684,6 +680,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun registerForActivityResult() {
+        // app notification permission android 13
         if (!isAtleastT()) return
 
         // Sets up permissions request launcher.
@@ -701,6 +698,44 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     invokeAndroidNotificationSetting()
                 }
             }
+    }
+
+    private fun showFileCreationErrorToast() {
+        showToastUiCentered(this, getString(R.string.pcap_failure_toast), Toast.LENGTH_SHORT)
+    }
+
+    private fun createAndSetPcapFile() {
+        try {
+            val file = makePcapFile()
+            if (file == null) {
+                showFileCreationErrorToast()
+                return
+            }
+            // set the file descriptor instead of fd, need to close the file descriptor
+            // after tunnel creation
+            appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
+        } catch (e: Exception) {
+            showFileCreationErrorToast()
+        }
+    }
+
+    private fun makePcapFile(): File? {
+        return try {
+            val sdf = SimpleDateFormat(BackupHelper.BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
+            // create folder in DOWNLOADS
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            // create folder in DOWNLOADS/Rethink
+            val dir = File(downloadsDir, Constants.PCAP_FOLDER_NAME)
+            dir.mkdirs()
+            // filename format (Rethink_PCAP_DATE_FORMAT.pcap)
+            val pcapFileName: String =
+                Constants.PCAP_FILE_NAME_PART + sdf.format(Date()) + Constants.PCAP_FILE_EXTENSION
+            val file = File(dir, pcapFileName)
+            file
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
+            null
+        }
     }
 
     private fun invokeNotificationPermission() {

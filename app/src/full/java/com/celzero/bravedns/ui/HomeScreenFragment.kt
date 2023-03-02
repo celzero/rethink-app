@@ -272,8 +272,17 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         b.fhsSponsorChip.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
-            startActivity(intent)
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.no_browser_error),
+                    Toast.LENGTH_SHORT
+                )
+                Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+            }
         }
 
         b.fhsProxyChip.setOnCloseIconClickListener {
@@ -287,9 +296,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        b.fhsPcapChip.setOnCloseIconClickListener {
-            disablePcap()
-        }
+        b.fhsPcapChip.setOnCloseIconClickListener { disablePcap() }
 
         b.fhsThemeChip.setOnClickListener { applyAppTheme() }
 

@@ -31,7 +31,6 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities.Companion.blocklistFile
 import com.celzero.bravedns.util.Utilities.Companion.isValidDnsPort
 import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
@@ -91,7 +90,7 @@ class GoVpnAdapter(
             val transport: Transport = makeDefaultTransport(dohURL)
             Log.i(
                 LOG_TAG_VPN,
-                "Connect tunnel with url $tunFd dnsMode: ${tunnelOptions.tunDnsMode}, blockMode: ${tunnelOptions.tunFirewallMode}, proxyMode: ${tunnelOptions.tunProxyMode}, fake dns: ${tunnelOptions.fakeDns}, mtu:${tunnelOptions.mtu}, pcap: ${getPcapOption()}"
+                "Connect tunnel with url $tunFd dnsMode: ${tunnelOptions.tunDnsMode}, blockMode: ${tunnelOptions.tunFirewallMode}, proxyMode: ${tunnelOptions.tunProxyMode}, fake dns: ${tunnelOptions.fakeDns}, mtu:${tunnelOptions.mtu}, pcap: ${tunnelOptions.pcapFilePath}"
             )
 
             if (tunFd == null) return
@@ -101,7 +100,7 @@ class GoVpnAdapter(
             tunnel =
                 Tun2socks.connectIntraTunnel(
                     tunFd!!.fd.toLong(),
-                    getPcapOption(), // fd for pcap logging
+                    tunnelOptions.pcapFilePath, // fd for pcap logging
                     tunnelOptions.mtu.toLong(),
                     tunnelOptions.fakeDns,
                     transport,
@@ -116,15 +115,6 @@ class GoVpnAdapter(
             Log.e(LOG_TAG_VPN, e.message, e)
             tunnel?.disconnect()
             tunnel = null
-        }
-    }
-
-    private fun getPcapOption(): Long {
-        return when (persistentState.pcapMode) {
-            PcapMode.NONE.id -> DISABLE_PCAP
-            PcapMode.LOGCAT.id -> ENABLE_PCAP_LOGCAT
-            PcapMode.EXTERNAL_FILE.id -> DISABLE_PCAP
-            else -> DISABLE_PCAP
         }
     }
 
@@ -177,7 +167,10 @@ class GoVpnAdapter(
 
         if (transport != null) {
             val added = tunnel?.resolver?.add(transport)
-            Log.i(LOG_TAG_VPN, "add transport to resolver, id: ${transport.id()} addr:  ${transport.addr}, $added")
+            Log.i(
+                LOG_TAG_VPN,
+                "add transport to resolver, id: ${transport.id()} addr:  ${transport.addr}, $added"
+            )
         } else {
             Log.e(LOG_TAG_VPN, "transport is null for dns type: ${appConfig.getDnsType()}")
         }
@@ -418,11 +411,20 @@ class GoVpnAdapter(
         return (tunnel != null)
     }
 
+    fun refresh() {
+        if (tunnel != null) {
+            tunnel?.resolver?.refresh()
+        }
+    }
+
     fun close() {
         if (tunnel != null) {
             tunnel?.disconnect()
             Log.i(LOG_TAG_VPN, "Tunnel disconnect")
+        } else {
+            Log.i(LOG_TAG_VPN, "Tunnel already disconnected")
         }
+
         try {
             tunFd?.close()
         } catch (e: IOException) {
@@ -579,10 +581,6 @@ class GoVpnAdapter(
             }
             return ""
         }
-
-        // const to enable/disable pcap
-        private const val ENABLE_PCAP_LOGCAT = 0L
-        private const val DISABLE_PCAP = -1L
     }
 
     private fun io(f: suspend () -> Unit) {

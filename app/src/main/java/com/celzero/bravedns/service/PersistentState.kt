@@ -235,6 +235,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // packet capture type
     var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
 
+    // dns caching in tunnel
+    var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(false)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()

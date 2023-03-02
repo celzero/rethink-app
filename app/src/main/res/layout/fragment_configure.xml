@@ -10,10 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:orientation="vertical"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp">
+        android:padding="15dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/fhs_title_rethink"
@@ -21,8 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="0.5"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
+            android:paddingStart="7dp"
+            android:paddingEnd="7dp"
             android:text="@string/app_name_small_case" />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -30,7 +28,8 @@
             style="@style/TextAppearance.SubHeading.HomeScreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="9dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:alpha="0.5"
             android:text="@string/settings_title_desc" />
 
@@ -62,7 +61,7 @@
                 android:id="@+id/fs_dns_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DNS"
+                android:text="@string/dns_mode_info_title"
                 android:layout_marginStart="15dp"
                 android:layout_toEndOf="@id/fs_dns_icon"
                 android:textColor="?attr/primaryTextColor"
@@ -74,7 +73,7 @@
                 android:layout_below="@id/fs_dns_tv"
                 android:layout_toEndOf="@id/fs_dns_icon"
                 android:layout_marginStart="15dp"
-                android:text="Configure DNS servers and other filtering "
+                android:text="@string/cs_dns_desc"
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -117,7 +116,7 @@
                 android:layout_toEndOf="@id/fs_firewall_icon"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
-                android:text="Firewall"
+                android:text="@string/firewall_mode_info_title"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 
@@ -127,7 +126,7 @@
                 android:layout_below="@id/fs_firewall_tv"
                 android:layout_toEndOf="@id/fs_firewall_icon"
                 android:layout_marginStart="15dp"
-                android:text="Configure Firewall"
+                android:text="@string/cd_firewall_desc"
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -170,7 +169,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/fs_proxy_icon"
-                android:text="Proxy"
+                android:text="@string/cd_custom_dns_proxy_name_default"
                 android:layout_marginStart="15dp"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
@@ -181,7 +180,7 @@
                 android:layout_below="@id/fs_proxy_tv"
                 android:layout_toEndOf="@id/fs_proxy_icon"
                 android:layout_marginStart="15dp"
-                android:text="Configure Proxy"
+                android:text="@string/cs_proxy_desc"
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -224,7 +223,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/fs_others_icon"
-                android:text="Others"
+                android:text="@string/cs_general_title"
                 android:layout_marginStart="15dp"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
@@ -235,7 +234,7 @@
                 android:layout_below="@id/fs_others_tv"
                 android:layout_toEndOf="@id/fs_others_icon"
                 android:layout_marginStart="15dp"
-                android:text="Other configurations"
+                android:text="@string/cs_general_desc"
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatImageView

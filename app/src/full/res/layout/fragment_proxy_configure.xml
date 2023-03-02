@@ -19,14 +19,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="55dp"
+            android:layout_marginTop="15dp"
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
-            android:layout_marginTop="15dp"
             android:padding="5dp"
             android:text="@string/settings_proxy_header"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/settings_activity_vpn_lockdown_desc"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="10dp"
+            android:paddingStart="10dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
+            android:text="@string/settings_lock_down_proxy_desc"
+            android:textSize="@dimen/default_font_text_view"
+            android:visibility="visible"
+            app:drawableStartCompat="@drawable/dis_allowed" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

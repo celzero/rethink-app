@@ -267,10 +267,6 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return values().toList().filter { it.act != R.integer.allow }
         }
 
-        fun stall(rule: FirewallRuleset): Boolean {
-            return rule.act == R.integer.stall
-        }
-
         fun ground(rule: FirewallRuleset): Boolean {
             return rule.act != R.integer.allow
         }

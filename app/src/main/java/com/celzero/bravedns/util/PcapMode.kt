@@ -21,6 +21,11 @@ enum class PcapMode(val id: Int) {
     EXTERNAL_FILE(2);
 
     companion object {
+
+        // const to enable/disable pcap
+        const val ENABLE_PCAP_LOGCAT = "0"
+        const val DISABLE_PCAP = ""
+
         fun getPcapType(id: Int): PcapMode {
             return when (id) {
                 0 -> NONE

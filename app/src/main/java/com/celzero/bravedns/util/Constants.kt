@@ -275,5 +275,14 @@ class Constants {
                 DefaultDnsServer(1, "Google", "https://dns.google.com/dns-query", "DoH"),
                 DefaultDnsServer(2, "CloudFlare", "https://cloudflare-dns.com/dns-query", "DoH")
             )
+
+        // pcap folder name
+        const val PCAP_FOLDER_NAME = "Rethink"
+
+        // pcap file name
+        const val PCAP_FILE_NAME_PART = "Rethink_PCAP_"
+
+        // pcap file extension
+        const val PCAP_FILE_EXTENSION = ".pcap"
     }
 }

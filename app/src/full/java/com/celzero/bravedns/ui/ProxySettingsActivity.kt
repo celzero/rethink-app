@@ -96,6 +96,8 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
         }
 
+        b.settingsActivityVpnLockdownDesc.setOnClickListener { Utilities.openVpnProfile(this) }
+
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener {
             _: CompoundButton,
             checked: Boolean ->
@@ -483,10 +485,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivitySocks5Rl.alpha = 1f
             b.settingsActivityHttpProxyContainer.alpha = 1f
             b.settingsActivityOrbotContainer.alpha = 1f
+            b.settingsActivityVpnLockdownDesc.visibility = View.GONE
         } else {
             b.settingsActivitySocks5Rl.alpha = 0.5f
             b.settingsActivityHttpProxyContainer.alpha = 0.5f
             b.settingsActivityOrbotContainer.alpha = 0.5f
+            b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
         }
         // Orbot
         b.settingsActivityOrbotImg.isEnabled = canEnableProxy

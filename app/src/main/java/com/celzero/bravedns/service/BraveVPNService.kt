@@ -837,10 +837,6 @@ class BraveVPNService :
         )
     }
 
-    private fun stallResponse() {
-        Thread.sleep(DELAY_FIREWALL_RESPONSE_MS)
-    }
-
     // ref: https://stackoverflow.com/a/363692
     private val baseWaitMs = TimeUnit.MILLISECONDS.toMillis(50)
 
@@ -1234,7 +1230,8 @@ class BraveVPNService :
                     getFakeDns(),
                     appConfig.getInternetProtocol(),
                     appConfig.getProtocolTranslationMode(),
-                    VPN_INTERFACE_MTU
+                    VPN_INTERFACE_MTU,
+                    appConfig.getPcapFilePath()
                 )
 
             Log.i(LOG_TAG_VPN, "start-foreground with opts $opts (for new-vpn? $isNewVpn)")
@@ -1336,23 +1333,14 @@ class BraveVPNService :
         /* TODO Check on the Persistent State variable
         Check on updating the values for Package change and for mode change.
         As of now handled manually */
-        val opts =
-            appConfig.newTunnelOptions(
-                this,
-                this,
-                getFakeDns(),
-                appConfig.getInternetProtocol(),
-                appConfig.getProtocolTranslationMode(),
-                VPN_INTERFACE_MTU
-            )
-        Log.i(LOG_TAG_VPN, "onPrefChange key: $key, opts: $opts")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "on pref change, key: $key")
         when (key) {
             PersistentState.BRAVE_MODE -> {
-                io("brave-mode-change") { restartVpn(opts) }
+                io("brave-mode-change") { restartVpn(createNewTunnelOptsObj()) }
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
-                io("local-blocklist") { updateTun(opts) }
+                io("local-blocklist") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.BACKGROUND_MODE -> {
                 if (persistentState.getBlockAppWhenBackground()) {
@@ -1367,7 +1355,7 @@ class BraveVPNService :
             }
             PersistentState
                 .REMOTE_BLOCK_LIST_STAMP -> { // update tunnel on remote blocklist stamp change.
-                io("remote-blocklist") { updateTun(opts) }
+                io("remote-blocklist") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.DNS_CHANGE -> {
                 /*
@@ -1379,31 +1367,31 @@ class BraveVPNService :
                 io("dns-change") {
                     when (appConfig.getDnsType()) {
                         AppConfig.DnsType.DOH -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.DNSCRYPT -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.DNS_PROXY -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.RETHINK_REMOTE -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.NETWORK_DNS -> {
-                            enableSystemDns(opts)
+                            enableSystemDns(createNewTunnelOptsObj())
                         }
                     }
                 }
             }
             PersistentState.DNS_RELAYS -> {
-                io("update-dnscrypt") { updateTun(opts) }
+                io("update-dnscrypt") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.ALLOW_BYPASS -> {
-                io("allow-bypass") { restartVpn(opts) }
+                io("allow-bypass") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROXY_TYPE -> {
-                io("proxy") { restartVpn(opts) }
+                io("proxy") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.NETWORK -> {
                 connectionMonitor?.onUserPreferenceChanged()
@@ -1412,19 +1400,34 @@ class BraveVPNService :
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.INTERNET_PROTOCOL -> {
-                io("Internet-protocol-change") { restartVpn(opts) }
+                io("Internet-protocol-change") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROTOCOL_TRANSLATION -> {
-                io("protocol-translation") { updateTun(opts) }
+                io("protocol-translation") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.DEFAULT_DNS_SERVER -> {
-                io("default-dns-server") { restartVpn(opts) }
+                io("default-dns-server") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PCAP_MODE -> {
                 // restart vpn to enable/disable pcap
-                io("pcap") { restartVpn(opts) }
+                io("pcap") { restartVpn(createNewTunnelOptsObj()) }
             }
         }
+    }
+
+    private fun createNewTunnelOptsObj(): AppConfig.TunnelOptions {
+        val opts =
+            appConfig.newTunnelOptions(
+                this,
+                this,
+                getFakeDns(),
+                appConfig.getInternetProtocol(),
+                appConfig.getProtocolTranslationMode(),
+                VPN_INTERFACE_MTU,
+                appConfig.getPcapFilePath()
+            )
+        Log.i(LOG_TAG_VPN, "created new tunnel options, opts: $opts")
+        return opts
     }
 
     private suspend fun enableSystemDns(opts: AppConfig.TunnelOptions) {
@@ -1507,7 +1510,8 @@ class BraveVPNService :
                 getFakeDns(),
                 appConfig.getInternetProtocol(),
                 appConfig.getProtocolTranslationMode(),
-                VPN_INTERFACE_MTU
+                VPN_INTERFACE_MTU,
+                appConfig.getPcapFilePath()
             )
         )
     }
@@ -1567,6 +1571,10 @@ class BraveVPNService :
 
     fun isOn(): Boolean {
         return vpnAdapter != null
+    }
+
+    fun refresh() {
+        vpnAdapter?.refresh()
     }
 
     private suspend fun makeVpnAdapter(): GoVpnAdapter? {
@@ -1940,7 +1948,11 @@ class BraveVPNService :
         return if (appConfig.getBraveMode().isDnsFirewallMode() && persistentState.enableDnsAlg) {
             Dnsx.Alg
         } else {
-            Dnsx.Preferred
+            if (persistentState.enableDnsCache) {
+                Dnsx.CT + Dnsx.Preferred
+            } else {
+                Dnsx.Preferred
+            }
         }
     }
 
@@ -2058,10 +2070,6 @@ class BraveVPNService :
 
         // write to conntrack, written in background
         connTrack(metadata)
-
-        if (FirewallRuleset.stall(rule)) {
-            stallResponse()
-        }
 
         return blocked
     }

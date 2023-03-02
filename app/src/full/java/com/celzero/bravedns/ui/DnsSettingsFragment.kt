@@ -19,7 +19,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
@@ -52,8 +55,17 @@ class DnsSettingsFragment :
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
 
+    private lateinit var animation: Animation
+
     companion object {
         fun newInstance() = DnsSettingsFragment()
+        private const val REFRESH_TIMEOUT: Long = 4000
+
+        private const val ANIMATION_DURATION = 750L
+        private const val ANIMATION_REPEAT_COUNT = -1
+        private const val ANIMATION_PIVOT_VALUE = 0.5f
+        private const val ANIMATION_START_DEGREE = 0.0f
+        private const val ANIMATION_END_DEGREE = 360.0f
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,6 +84,8 @@ class DnsSettingsFragment :
     }
 
     private fun initView() {
+        // init animation
+        initAnimation()
         // display fav icon in dns logs
         b.dcFaviconSwitch.isChecked = persistentState.fetchFavIcon
         // prevent dns leaks
@@ -82,6 +96,8 @@ class DnsSettingsFragment :
         b.dcDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
         // enable per-app domain rules (dns alg)
         b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
+        // enable dns caching in tunnel
+        b.dcDownloaderSwitch.isChecked = persistentState.enableDnsCache
 
         b.connectedStatusTitle.text = getConnectedDnsType()
     }
@@ -313,6 +329,42 @@ class DnsSettingsFragment :
         b.dcDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.useCustomDownloadManager = b
         }
+
+        b.dcDownloaderSwitch.setOnCheckedChangeListener { _, b ->
+            persistentState.enableDnsCache = b
+        }
+
+        b.dcRefresh.setOnClickListener {
+            b.dcRefresh.isEnabled = false
+            b.dcRefresh.animation = animation
+            b.dcRefresh.startAnimation(animation)
+            VpnController.refresh()
+            Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
+                if (isAdded) {
+                    b.dcRefresh.isEnabled = true
+                    b.dcRefresh.clearAnimation()
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.dc_refresh_toast),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initAnimation() {
+        animation =
+            RotateAnimation(
+                ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE
+            )
+        animation.repeatCount = ANIMATION_REPEAT_COUNT
+        animation.duration = ANIMATION_DURATION
     }
 
     // open local blocklist bottom sheet
@@ -357,9 +409,7 @@ class DnsSettingsFragment :
 
     private fun setNetworkDns() {
         // set network dns
-        io {
-            appConfig.enableSystemDns()
-        }
+        io { appConfig.enableSystemDns() }
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

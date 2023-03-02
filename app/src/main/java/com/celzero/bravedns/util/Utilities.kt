@@ -551,6 +551,8 @@ class Utilities {
                 return context.packageManager.getPackagesForUid(uid)
             } catch (e: PackageManager.NameNotFoundException) {
                 Log.w(LoggerConstants.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
+            } catch (e: SecurityException) {
+                Log.w(LoggerConstants.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
             }
             return null
         }
