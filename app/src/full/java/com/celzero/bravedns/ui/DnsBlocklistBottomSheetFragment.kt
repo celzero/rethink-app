@@ -226,10 +226,9 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private fun handleResponseIpsChip() {
         b.dnsBlockIpsChip.visibility = View.VISIBLE
         lightenUpChip(b.dnsBlockIpsChip, true)
-
         if (
             ResourceRecordTypes.mayContainIp(transaction!!.typeName) &&
-                transaction!!.responseIps.isEmpty()
+                transaction!!.responseIps == "--"
         ) {
             b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
