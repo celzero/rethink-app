@@ -355,8 +355,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun disablePcap() {
         b.fhsPcapChip.isEnabled = false
-        persistentState.pcapMode = PcapMode.NONE.id
         b.fhsPcapChip.text = getString(R.string.hsf_proxy_chip_remove_text)
+        appConfig.setPcap(PcapMode.NONE.id)
         delay(TimeUnit.SECONDS.toMillis(2), lifecycleScope) {
             if (!isAdded) return@delay
 

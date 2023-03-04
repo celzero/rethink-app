@@ -1945,6 +1945,18 @@ class BraveVPNService :
             return suggestedId.ifEmpty { Dnsx.Preferred }
         }
 
+        // check for global domain rules in dns only mode
+        // for other modes, block/blockalg call takes care of global rules
+        // TODO; come up with a implementation to handle all the app modes
+        if (appConfig.getBraveMode().isDnsMode()) {
+            when (DomainRulesManager.getDomainRule(query, UID_EVERYBODY)) {
+                // TODO: return Preferred for now
+                DomainRulesManager.Status.TRUST -> return Dnsx.BlockFree
+                DomainRulesManager.Status.BLOCK -> return Dnsx.BlockAll
+                else -> {} // no-op, fall-through;
+            }
+        }
+
         return if (appConfig.getBraveMode().isDnsFirewallMode() && persistentState.enableDnsAlg) {
             Dnsx.Alg
         } else {

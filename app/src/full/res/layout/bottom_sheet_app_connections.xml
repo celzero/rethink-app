@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bsac_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -39,9 +38,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/trust_icon"
             android:paddingStart="10dp"
-            android:layout_marginEnd="10dp"
             android:paddingEnd="10dp"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view" />
@@ -87,7 +86,10 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bsac_domain_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:nestedScrollingEnabled="true" />
 
     </LinearLayout>
 

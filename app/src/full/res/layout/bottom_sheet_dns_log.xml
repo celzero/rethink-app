@@ -78,7 +78,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="60dp">
+        android:paddingBottom="100dp">
 
         <LinearLayout
             android:id="@+id/dns_block_header_container"
@@ -165,27 +165,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="5dp"
-                android:layout_weight="0.2"
+                android:layout_weight="0.1"
                 android:background="@drawable/drawable_purple_gradient"
                 android:padding="7dp"
                 android:textAlignment="center"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 
-
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/dns_block_blocked_desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dns_block_ip_header"
-            android:layout_centerInParent="true"
-            android:padding="5dp"
-            android:text="@string/bsdl_blocked_desc"
-            android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view"
-            android:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -224,6 +211,18 @@
                 tools:listitem="@layout/spinner_item_firewall_status" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/dns_block_blocked_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dns_block_ip_header"
+            android:layout_centerInParent="true"
+            android:padding="5dp"
+            android:text="@string/bsdl_blocked_desc"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view"
+            android:visibility="visible" />
 
 
     </RelativeLayout>

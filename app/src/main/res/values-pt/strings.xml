@@ -56,7 +56,6 @@
     <string name="always_on_dialog_stop_heading">VPN sempre ativa</string>
     <string name="always_on_dialog_stop_message">A opção \"VPN sempre ativa\" das configurações de VPN do Android está ativada para o RethinkDNS. Quer mesmo parar o RethinkDNS\?</string>
     <string name="always_on_dialog_lockdown_stop_message">O RethinkDNS está a executar a VPN no modo <i>bloqueado</i>. Se o parar não terá ligação à Internet neste perfil de utilizador. Quer mesmo parar\?</string>
-    <string name="dns_act_log">Registos</string>
     <string name="blocklist_update_check_not_required">As listas de bloqueio já são da última versão.</string>
     <string name="download_update_dialog_message">Está disponível uma nova versão da aplicação para descarregar a partir do site. Quer continuar\?</string>
     <string name="local_blocklist_redownload_desc">As listas de bloqueio no dispositivo já são da última versão v%1$s.</string>
@@ -126,7 +125,6 @@
     <string name="firewall_card_text_inactive">Ativar o modo firewall.</string>
     <string name="hsf_start_dialog_message">Está a um passo de distância do Android seguro e protegido: veja instantaneamente a atividade da rede, bloqueie sites, IPs e aplicações suspeitas.</string>
     <string name="firewall_status_isolate">isolada</string>
-    <string name="hsf_dns_logs_chip_text">Registos de DNS</string>
     <string name="firewall_status_block_metered">bloqueada em redes limitadas (móveis)</string>
     <string name="hsf_stop_btn_state">parar</string>
     <string name="hsf_notification_permission_failure">Ative a permissão de notificação em Configurações</string>
@@ -249,7 +247,6 @@
     <string name="hsf_whats_new_chip_text">Novidades</string>
     <string name="hsf_proxy_chip_text">Proxy ativo</string>
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
-    <string name="hsf_network_logs_chip_text">Registos de rede</string>
     <string name="hsf_exclude_error">Não é possível excluir no modo de VPN bloqueado</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy removido</string>
     <string name="hsf_proxy_chip_remove_text">A parar…</string>
@@ -257,8 +254,6 @@
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausar: o RethinkDNS não está ativo</string>
     <string name="hsf_pause_lockdown_failure">Não é possível pausar: o RethinkDNS está no modo confinado</string>
-    <string name="dns_logs_lifetime_queries">Pedidos desde o início: %1$s</string>
-    <string name="dns_logs_blocked_queries">Pedidos bloqueados: %1$s</string>
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="conn_track_clear_logs_message">Isto só elimina os registos da rede, mas não as regras de firewall. Esta operação não é reversível. Quer prosseguir\?</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiado</string>
@@ -356,7 +351,6 @@
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
     <string name="settings_autostart_bootup_heading">Arranque automático ao ligar (experimental)</string>
     <string name="dc_custom_block_heading">Regras de domínio</string>
-    <string name="dc_custom_block_desc">Alterar regras de domínio de bloqueios ou de confiança</string>
     <string name="dc_dns_website_heading">Mostrar ícone do site nos registos de DNS (experimental)</string>
     <string name="dc_dns_website_desc">Obtém ícones de sites de <i>nextdns.io</i> e <i>duckduckgo.com</i>. Usa até 350 MB de espaço de armazenamento</string>
     <string name="about_bravedns_explantion">O RethinkDNS é a forma mais fácil de monitorizar a atividade da aplicação, contornar a censura da Internet e aplicações de firewall no seu dispositivo Android.</string>
@@ -774,7 +768,6 @@
 \nPara usar o DNS do Rethink, vá às configurações do Android e desative a opção \"DNS privado\".</string>
     <string name="ci_trust_initial">CO</string>
     <string name="ci_trust_txt">Confiança</string>
-    <string name="ada_app_firewall">Firewall</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Bloquear sites com conteúdo adulto, pirataria, jogos de azar, encontros online e redes sociais.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Bloquear attentionware, spyware, scareware.</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Bloquear malware, ransomware, cryptoware, phishers e outras ameaças.</string>

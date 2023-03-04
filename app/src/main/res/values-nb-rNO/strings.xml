@@ -55,7 +55,6 @@
     <string name="always_on_dialog_positive">Stopp</string>
     <string name="firewall_act_network_monitor_tab">Nettverkslogger</string>
     <string name="dns_act_configure_tab">Sett opp</string>
-    <string name="dns_act_log">Loggføring</string>
     <string name="univ_firewall_dialog_title">Slett IP-regel\?</string>
     <string name="doh_custom_url_remove_dialog_title">Slett DoH-endepunkt\?</string>
     <string name="doh_custom_url_remove_success">Endepunkt slettet\?</string>
@@ -136,7 +135,6 @@
     <string name="dc_custom_dns_radio">Annen DNS</string>
     <string name="dc_rethink_dns_radio">Rethink</string>
     <string name="dc_entries">%1$s oppføringer 🔗</string>
-    <string name="dc_custom_block_desc">Kommer snart</string>
     <string name="dc_dns_leaks_heading">Forhindre DNS-lekkasjer</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report">Feilrapport</string>
@@ -255,7 +253,6 @@
     <string name="cd_dialog_error_invalid_domain">Ugyldig nettadresse (domene).</string>
     <string name="cd_no_rule_txt">Ingen regel</string>
     <string name="status_app_error">Programfeil</string>
-    <string name="hsf_network_logs_chip_text">Nettverkslogger</string>
     <string name="dns_proxy_dialog_header_dns">Legg til DNS-mellomtjener</string>
     <string name="firewall_rule_unknown">Ukjent kilde</string>
     <string name="firewall_rule_block_http">Usikker HTTP</string>
@@ -278,7 +275,6 @@
     <string name="firewall_rule_exempt_dns_proxied">DNS mellomtjent</string>
     <string name="status_protected_with_socks5_private_dns">Beskyttet med SOCKS5 og privat DNS</string>
     <string name="status_protected_with_proxy">Beskyttet med mellomtjener</string>
-    <string name="hsf_dns_logs_chip_text">DNS-logger</string>
     <string name="log_file_not_available">Fant ingen krasjrapporter</string>
     <string name="dns_btm_sheet_chip">+%1$s andre IP-er</string>
     <string name="fapps_info_dialog_positive_btn">OK</string>

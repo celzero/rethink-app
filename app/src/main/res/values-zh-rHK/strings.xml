@@ -149,7 +149,6 @@
     <string name="firewall_act_universal_tab">通用</string>
     <string name="firewall_act_network_monitor_tab">網絡日誌</string>
     <string name="dns_act_configure_tab">配置</string>
-    <string name="dns_act_log">日誌</string>
     <string name="univ_firewall_dialog_title">係咪刪除 IP 規則？</string>
     <string name="univ_firewall_dialog_message">丟咗呢條規則將會容許任何嘅 app 連去呢個 IP 地址。您係咪要繼續？</string>
     <string name="doh_custom_url_remove_dialog_title">係咪刪除 DNS 端點？</string>
@@ -325,8 +324,6 @@
     <string name="hsf_whats_new_chip_text">新內容</string>
     <string name="hsf_proxy_chip_text">啓用咗代理</string>
     <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
-    <string name="hsf_dns_logs_chip_text">DNS 日誌</string>
-    <string name="hsf_network_logs_chip_text">網絡日誌</string>
     <string name="hsf_exclude_error">VPN 閉關模式下冇得排除</string>
     <string name="hsf_proxy_chip_removed_toast">移除咗代理</string>
     <string name="hsf_proxy_chip_remove_text">停止緊……</string>
@@ -335,8 +332,6 @@
     <string name="hsf_chip_appearance">主題：%1$s</string>
     <string name="hsf_pause_vpn_failure">暫停唔到：RethinkDNS 未啓用</string>
     <string name="hsf_pause_lockdown_failure">暫停唔到：RethinkDNS 用緊閉關模式</string>
-    <string name="dns_logs_lifetime_queries">總請求：%1$s</string>
-    <string name="dns_logs_blocked_queries">已攔截：%1$s</string>
     <string name="dc_block_heading">規則</string>
     <string name="dc_other_dns_heading">類型</string>
     <string name="dc_custom_dns_radio">其他 DNS</string>
@@ -344,7 +339,6 @@
     <string name="dc_entries">%1$s 個項目 »</string>
     <string name="dc_local_block_heading">本地攔截清單</string>
     <string name="dc_local_block_desc_1">喺超過 195 條攔截清單之中揀。㩒一下呢度下載或者配置攔截清單。</string>
-    <string name="dc_custom_block_desc">修改攔截網域同信任網域規則</string>
     <string name="dc_dns_website_desc">由 <i>nextdns.io</i> 同 <i>duckduckgo.com</i> 拎網站圖示。大約佔用 350 MB 磁碟空間</string>
     <string name="dc_dns_leaks_heading">防止 DNS 洩漏</string>
     <string name="dc_dns_leaks_desc">如果啓用，RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
@@ -768,7 +762,6 @@
     <string name="notification_screen_error">開唔到應用程式通知區。</string>
     <string name="no_browser_error">瀏覽器開唔到網頁。</string>
     <string name="intent_launch_error">開唔到 %1$s</string>
-    <string name="ada_app_firewall">防火牆</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除關於呢個 app 嘅日誌。</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s 份攔截清單</string>
     <string name="private_dns_dialog_heading">熄私人 DNS</string>

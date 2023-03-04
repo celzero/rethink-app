@@ -128,6 +128,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 b.connectionIpAddress.text = connTracker.ipAddress
                 b.connectionDomain.text = connTracker.dnsQuery
                 b.connectionDomain.visibility = View.VISIBLE
+                // marquee is not working for the textview, hence the workaround.
                 b.connectionDomain.isSelected = true
             }
         }

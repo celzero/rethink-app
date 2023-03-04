@@ -79,8 +79,8 @@ class GoVpnAdapter(
 
         try {
             if (DEBUG) {
-                // 0 - debug, 1 - info, 2 - warn, 3 - error
-                Tun2socks.logLevel(0)
+                // 0 - verbose, 1 - debug, 2 - info, 3 - warn, 4 - error, 5 - fatal
+                Tun2socks.logLevel(1)
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
@@ -132,20 +132,24 @@ class GoVpnAdapter(
 
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
-                transport = createDohTransport()
+                transport = createDohTransport(Dnsx.Preferred)
+                blockFreeTransport = createDohTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.DNSCRYPT -> {
-                transport = createDNSCryptTransport()
+                transport = createDNSCryptTransport(Dnsx.Preferred)
+                blockFreeTransport = createDNSCryptTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.DNS_PROXY -> {
-                transport = createDnsProxyTransport()
+                transport = createDnsProxyTransport(Dnsx.Preferred)
+                blockFreeTransport = createDnsProxyTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.NETWORK_DNS -> {
-                transport = createNetworkDnsTransport()
+                transport = createNetworkDnsTransport(Dnsx.Preferred)
+                blockFreeTransport = createNetworkDnsTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 transport = createRethinkDnsTransport()
-                // create block free transport only for rethink dns
+                // only rethink has different stamp for block free transport
                 blockFreeTransport = createBlockFreeTransport()
             }
         }
@@ -176,26 +180,26 @@ class GoVpnAdapter(
         }
     }
 
-    private suspend fun createDohTransport(): Transport? {
+    private suspend fun createDohTransport(id: String): Transport? {
         val doh = appConfig.getDOHDetails()
         val url = doh?.dohURL
-        val transport = Intra.newDoHTransport(Dnsx.Preferred, url, "", null)
+        val transport = Intra.newDoHTransport(id, url, "", null)
         Log.i(
             LOG_TAG_VPN,
-            "create doh transport with id: ${Dnsx.Preferred} (${doh?.dohName}), url: $url, transport: $transport"
+            "create doh transport with id: $id (${doh?.dohName}), url: $url, transport: $transport"
         )
         return transport
     }
 
-    private suspend fun createDNSCryptTransport(): Transport? {
+    private suspend fun createDNSCryptTransport(id: String): Transport? {
         try {
             val dnscrypt = appConfig.getConnectedDnscryptServer()
             val url = dnscrypt.dnsCryptURL
             val resolver = tunnel?.resolver
-            val transport = Intra.newDNSCryptTransport(resolver, Dnsx.Preferred, url)
+            val transport = Intra.newDNSCryptTransport(resolver, id, url)
             Log.d(
                 LOG_TAG_VPN,
-                "create dnscrypt transport with id: ${Dnsx.Preferred}(${dnscrypt.dnsCryptName}), url: $url, transport: $transport"
+                "create dnscrypt transport with id: $id, (${dnscrypt.dnsCryptName}), url: $url, transport: $transport"
             )
             setDnscryptResolversIfAny()
             return transport
@@ -206,14 +210,14 @@ class GoVpnAdapter(
         }
     }
 
-    private suspend fun createDnsProxyTransport(): Transport? {
+    private suspend fun createDnsProxyTransport(id: String): Transport? {
         try {
             val dnsProxy = appConfig.getSelectedDnsProxyDetails() ?: return null
             val transport =
-                Intra.newDNSProxy(Dnsx.Preferred, dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
+                Intra.newDNSProxy(id, dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
             Log.d(
                 LOG_TAG_VPN,
-                "create dns proxy transport with id: ${Dnsx.Preferred}(${dnsProxy.proxyName}), ip: ${dnsProxy.proxyIP}, port: ${dnsProxy.proxyPort}"
+                "create dns proxy transport with id: $id(${dnsProxy.proxyName}), ip: ${dnsProxy.proxyIP}, port: ${dnsProxy.proxyPort}"
             )
             return transport
         } catch (e: Exception) {
@@ -223,14 +227,14 @@ class GoVpnAdapter(
         }
     }
 
-    private suspend fun createNetworkDnsTransport(): Transport? {
+    private suspend fun createNetworkDnsTransport(id: String): Transport? {
         try {
             val systemDns = appConfig.getSystemDns()
             val transport =
-                Intra.newDNSProxy(Dnsx.Preferred, systemDns.ipAddress, systemDns.port.toString())
+                Intra.newDNSProxy(id, systemDns.ipAddress, systemDns.port.toString())
             Log.d(
                 LOG_TAG_VPN,
-                "create network dnsproxy transport with id: ${Dnsx.Preferred}, url: ${systemDns.ipAddress}/${systemDns.port}, transport: $transport"
+                "create network dnsproxy transport with id: $id, url: ${systemDns.ipAddress}/${systemDns.port}, transport: $transport"
             )
             return transport
         } catch (e: Exception) {

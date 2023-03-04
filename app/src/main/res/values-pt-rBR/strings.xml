@@ -65,7 +65,6 @@
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="dc_local_block_desc_1">Escolha entre mais de 185 listas de bloqueio. Toque aqui para baixar ou configurar listas de bloqueio.</string>
     <string name="dc_custom_block_heading">Permitir ou negar domínios individuais</string>
-    <string name="dc_custom_block_desc">Em breve</string>
     <string name="dc_block_heading">regras</string>
     <string name="dc_other_settings_heading">avançado</string>
     <string name="dc_dns_website_heading">Mostrar ícone de site em registros do DNS (experimental)</string>
@@ -196,7 +195,6 @@
     <string name="http_proxy_dialog_desc">As configurações de proxy HTTP(S) dão apenas uma dica para os apps, mas podem ou não ser usadas; no entanto, navegadores como Chrome e Firefox as usam. Os aplicativos que usam o proxy HTTP(S) contornarão as regras do Firewall e do DNS.</string>
     <string name="download_update_dialog_trylater_title">Não é possível atualizar agora</string>
     <string name="search_universal_ips"><font size="12">Buscar IPs</font></string>
-    <string name="dns_act_log">Registros</string>
     <string name="search_custom_domains"><font size="12">Buscar nomes de domínio</font></string>
     <string name="search_rethinkplus_file_tag"><font size="12">Buscar listas de bloqueio</font></string>
     <string name="status_protected_with_http_private_dns">protegido pelo proxy de http e dns privado</string>
@@ -478,13 +476,9 @@
     <string name="firewall_status_block_unmetered">bloqueado em redes de banda larga (wifi)</string>
     <string name="hsf_start_dialog_positive">Começar</string>
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
-    <string name="hsf_dns_logs_chip_text">Registros de DNS</string>
-    <string name="hsf_network_logs_chip_text">Registros da rede</string>
     <string name="hsf_exclude_error">Não é possível excluir em modo restrito da VPN</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausar: RethinkDNS não está ativo</string>
     <string name="hsf_pause_lockdown_failure">Não é possível pausar: RethinkDNS no modo restrito</string>
-    <string name="dns_logs_lifetime_queries">Consultas desde começou: %1$s</string>
-    <string name="dns_logs_blocked_queries">Consultas bloqueadas: %1$s</string>
     <string name="dc_dns_website_desc">Obter ícones através de <i>nextdns.com</i> e <i>duckduckgo.com</i>. Consome mais de 350mb de espaço em disco</string>
     <string name="dc_dns_leaks_desc">Quando ativado, RethinkDNS captura todos pacotes na porta 53 e os encaminha para um endpoint de DNS definido pelo usuário</string>
     <string name="dc_check_update_heading">Avisar sobre atualizações das listas de bloqueio</string>

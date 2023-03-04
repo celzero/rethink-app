@@ -25,7 +25,6 @@
     <string name="app_mode_dns">DNS</string>
     <string name="orbot_stop_dialog_message">RethinkDNS berhenti meneruskan koneksi ke Orbot, tapi mungkin Orbot masih berjalan di latar belakang.</string>
     <string name="settings_orbot_install_desc">Ketuk di sini untuk memasang Orbot</string>
-    <string name="dns_act_log">Riwayat</string>
     <string name="download_update_dialog_trylater_title">Tidak dapat memperbaharui saat ini</string>
     <string name="settings_ip_network_heading">Pilih versi IP</string>
     <string name="orbot_install_dialog_title">Pasang Orbot\?</string>
@@ -112,7 +111,6 @@
     <string name="about_version">v%1$s</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
     <string name="settings_selected_theme">Tema saat ini: %1$s</string>
-    <string name="hsf_network_logs_chip_text">Riwayat jaringan</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="cd_dns_crypt_dialog_name">Nama</string>
@@ -146,7 +144,6 @@
     <string name="hsf_start_dialog_header">Mulai %1$s</string>
     <string name="firewall_rules">Aturan-aturan Jaringan</string>
     <string name="notif_channel_firewall_alerts">Peringatan Firewall</string>
-    <string name="dc_custom_block_desc">Ubah aturan domain yang diblokir atau dipercaya</string>
     <string name="about_twitter">Ikuti kami di Twitter</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="about_mail_bugreport_share_title">Pilih penyedia email</string>
@@ -194,7 +191,6 @@
     <string name="notif_channel_download">Peringatan Unduhan</string>
     <string name="about_faq">Lihat FAQ</string>
     <string name="hsf_start_btn_state">mulai</string>
-    <string name="hsf_dns_logs_chip_text">Riwayat DNS</string>
     <string name="settings_local_blocklist_dialog_positive">Unduh</string>
     <string name="category_name_others">Lainnya</string>
     <string name="dc_custom_dns_radio">DNS lain</string>
@@ -538,7 +534,6 @@
     <string name="fapps_metered_block_dialog_title">Blokir jaringan yang terukur</string>
     <string name="ada_app_status_block_md">Diblokir pada jaringan yang terukur (Data Seluler)</string>
     <string name="cd_dns_crypt_dialog_heading">Tambahkan Penyelesai (Resolver) atau Jembatan-Penghubung (Relay) DNSCrypt</string>
-    <string name="dns_logs_blocked_queries">Permintaan yang sudah terblokir: %1$s</string>
     <string name="ada_network_log_title">log jaringan untuk aplikasi ini</string>
     <string name="cd_doh_dialog_resolver_name">Nama Server Penyelesai</string>
     <string name="rt_chip_update_available">Pembaruan tersedia</string>
@@ -655,7 +650,6 @@
 \nTidak menampilkan tombol.
 \n"</string>
     <string name="about_privacy_policy">Baca kebijakan privasi</string>
-    <string name="dns_logs_lifetime_queries">Semua permintaan: %1$s</string>
     <string name="log_file_not_available">Tidak ditemukan laporan kecelakaan</string>
     <string name="cd_dns_crypt_resolver_heading">Server penyelesai</string>
     <string name="update_complete_action_snack">MULAI ULANG</string>
@@ -667,7 +661,6 @@
     <string name="rt_filter_parent_selected">Dipilih</string>
     <string name="notif_download_cancel_content">Unduh dibatalkan.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Blokir attentionware, spyware, scareware.</string>
-    <string name="ada_app_firewall">Firewall</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Hapus log</string>
     <string name="rt_filter_hint">Menampilkan <u>semua</u> daftar blokir</string>
     <string name="dc_dns_crypt">DNSCrypt</string>

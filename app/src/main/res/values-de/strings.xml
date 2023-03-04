@@ -191,7 +191,6 @@
     <string name="settings_orbot_notification_content">Der Start von Tor-as-a-Proxy ist fehlgeschlagen. Öffne die Orbot-App, um sie manuell zu starten.</string>
     <string name="settings_ip_network_desc">Wählen Sie zwischen den Versionen des Internetprotokolls.</string>
     <string name="settings_socks5_desc">Verbindungen zum SOCKS5-Endpunkt weiterleiten.</string>
-    <string name="dns_act_log">Protokoll</string>
     <string name="orbot_bs_status_3">Weiterleitung %1$s an Orbot, HTTP Proxy ebenfalls eingestellt.</string>
     <string name="orbot_install_activity_error">Irgendetwas ist schief gelaufen, versuchen Sie es nach einiger Zeit erneut</string>
     <string name="settings_orbot_notification_action">Orbot öffnen</string>
@@ -467,7 +466,6 @@
     <string name="ci_dialog_desc">IP-Adresse, IP-Subnetz (Bereich), Port zulassen (umgehen) oder sperren. Beispiel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
     <string name="ada_app_status_exclude">ist von DNS und Firewall ausgeschlossen</string>
     <string name="ada_firewall_title">Firewall-Regeln für diese Anwendung</string>
-    <string name="ada_app_firewall">Firewall</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Fortfahren</string>
     <string name="bsdl_blocked_desc">blockiert %1$s durch %2$s</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperren Sie Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating, sowie soziale Medien.</string>
@@ -563,8 +561,6 @@
     <string name="hsf_start_dialog_message">Sie sind einen Schritt von einem sicheren Android entfernt: Kontrollieren Sie Netzwerkaktivitäten, blockieren Sie Webseiten, IP-Adressen oder Apps mit unerwünschten Verhaltensweisen.</string>
     <string name="hsf_proxy_chip_text">Proxy aktiviert</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ aktivieren</string>
-    <string name="hsf_dns_logs_chip_text">DNS Logs</string>
-    <string name="hsf_network_logs_chip_text">Netzwerk Logs</string>
     <string name="hsf_exclude_error">Ausschließen im VPN-Lockdown-Modus nicht möglich</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy entfernt</string>
     <string name="hsf_proxy_chip_remove_text">Stoppen…</string>
@@ -573,8 +569,6 @@
     <string name="hsf_chip_appearance">Thema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Kann nicht pausieren: RethinkDNS nicht aktiv</string>
     <string name="hsf_pause_lockdown_failure">Kann nicht pausieren: RethinkDNS im Lockdown-Modus</string>
-    <string name="dns_logs_lifetime_queries">Alle Abfragen: %1$s</string>
-    <string name="dns_logs_blocked_queries">Blockierte Abfragen: %1$s</string>
     <string name="dc_block_heading">Regeln</string>
     <string name="dc_other_dns_heading">Typ</string>
     <string name="about_bravedns_whoarewe">RethinkDNS ist ein freies und quelloffenes Projekt, das von ehemaligen Ingenieuren von Amazon, IBM und Scientific Games geleitet wird.</string>
@@ -623,7 +617,6 @@
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="dns_log_dialog_positive">Protokolle löschen</string>
     <string name="dns_btm_sheet_chip">+%1$s andere IPs</string>
-    <string name="dc_custom_block_desc">Ändern von Regeln für blockierte oder vertrauenswürdige Domänen</string>
     <string name="dc_dns_website_heading">Zeige Website Icon in DNS-Logs (experimentell)</string>
     <string name="dc_dns_website_desc">Ruft Webseitensymbole von <i>nextdns.io</i> und <i>duckduckgo.com</i> ab. Verbraucht bis zu 350 MB Speicherplatz</string>
     <string name="dc_dns_leaks_heading">Verhindere DNS Lecks</string>

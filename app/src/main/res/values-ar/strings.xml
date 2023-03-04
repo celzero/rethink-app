@@ -64,7 +64,6 @@
     <string name="rethink_max_desc">أكثر من 50 موقعًا ؛ أكثر خصوصية محلل تكراري يعمل على fly.io</string>
     <string name="orbot_status_arg_3">DNS و TCP</string>
     <string name="firewall_status_allow">مسموح</string>
-    <string name="hsf_dns_logs_chip_text">سجلات DNS</string>
     <string name="univ_ip_delete_individual_positive">احذف</string>
     <string name="hsf_proxy_chip_remove_text">يتوقف…</string>
     <string name="category_name_others">أخرى</string>
@@ -204,7 +203,6 @@
     <string name="brbs_backup_complete_toast">النسخ الاحتياطي اكتمل</string>
     <string name="status_protected_with_http_private_dns">محمي ببروكسي http ونظام dns الخصوصي</string>
     <string name="notification_action_stop_vpn">قف</string>
-    <string name="dns_act_log">السجلات</string>
     <string name="settings_socks5_desc">قم بإعادة توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
     <string name="orbot_install_activity_error">حدث خطأ ما ، حاول بعد قليل</string>
     <string name="settings_socks5_dialog_hint_port">المنفذ</string>
@@ -244,7 +242,6 @@
     <string name="settings_https_disabled_error">متصل بـ Orbot. قم بإيقاف تشغيله للمتابعة.</string>
     <string name="settings_http_proxy_desc">إعادة توجيه إلى %1$s: %2$s</string>
     <string name="settings_socks5_dialog_hint_ip">عنوان الإنترنت (IP address)</string>
-    <string name="dns_logs_lifetime_queries">استعلامات مدى الحياة: %1$s</string>
     <string name="about_mail_bugreport_share_title">حدد مزود البريد الإلكتروني</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="ctbs_block_other_apps">القواعد المطبقة على %1$s ستنطبق أيضًا على تطبيقات أخرى %2$s</string>
@@ -460,7 +457,6 @@
     <string name="settings_orbot_install_desc">انقر هنا لتثبيت Orbot</string>
     <string name="settings_orbot_notification_content">فشل بدء Tor-a-Proxy. افتح تطبيق Orbot لبدء تشغيله يدويًا.</string>
     <string name="settings_notification_heading">اختر إجراء الإخطار</string>
-    <string name="hsf_network_logs_chip_text">سجلات الشبكة</string>
     <string name="hsf_proxy_chip_removed_toast">تمت إزالة الوكيل</string>
     <string name="dc_other_dns_heading">النوع</string>
     <string name="about_connect">اتصل</string>
@@ -483,7 +479,6 @@
     <string name="hsf_stop_btn_state">توقف</string>
     <string name="hsf_start_dialog_header">ابدأ %1$s</string>
     <string name="hsf_pause_lockdown_failure">لا يمكن التوقف مؤقتاً: RethinkDNS في وضع القفل</string>
-    <string name="dns_logs_blocked_queries">الاستعلامات المحظورة: %1$s</string>
     <string name="about_github">المساهمة على جيثب</string>
     <string name="dns_btm_sheet_chip_no_answer">لا اجابة</string>
     <string name="univ_view_blocked_ip">قواعد الملكية الفكرية والميناء</string>
@@ -515,7 +510,6 @@
 \n%3$s مستثنى
 \n%4$s مقفل</string>
     <string name="dc_custom_dns_radio">DNS آخر</string>
-    <string name="dc_custom_block_desc">قريبا</string>
     <string name="about_bravedns_whoarewe">RethinkDNS هو مشروع مجاني ومفتوح المصدر ، يقوده مهندسين سابقين من Amazon و IBM و Scientific Games.</string>
     <string name="cd_custom_dns_proxy_name_default">البروكسي</string>
     <string name="cd_dns_proxy_error_text_1">عنوان IP غير صالح</string>
@@ -786,7 +780,6 @@
     <string name="private_dns_dialog_desc">تم تجاوز إعدادات DNS الخاصة بـ Rethink بواسطة DNS الخاص بنظام Android.
 \n
 \nلاستخدام DNS الخاص بـ Rethink، انتقل إلى إعدادات Android وقم بإيقاف تشغيل \"Private DNS\".</string>
-    <string name="ada_app_firewall">جدار الحماية</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">مسح السجلات</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">حظر البرامج الضارة وبرامج الفدية وبرامج التشفير والمخادعين والتهديدات الأخرى.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">حظر مواقع البالغين والمحتوى المقرصن، مواقع المقامرة عبر الإنترنت والمواعدة، ووسائل التواصل الاجتماعي.</string>

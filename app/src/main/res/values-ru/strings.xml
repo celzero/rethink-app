@@ -89,7 +89,6 @@
     <string name="status_no_internet">нет интернета</string>
     <string name="status_protected_with_socks5">защищено socks-прокси</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
-    <string name="dns_act_log">Журналы</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="dns_explanation_firewall_connected">Подключен к брандмауэру</string>
     <string name="hsf_whats_new_remove_text">Закрытие…</string>
@@ -444,9 +443,7 @@
     <string name="hsf_notification_permission_failure">Включите разрешение на уведомления на экране Настройки</string>
     <string name="hsf_whats_new_chip_text">Что нового</string>
     <string name="hsf_start_dialog_header">Начать %1$s</string>
-    <string name="hsf_dns_logs_chip_text">Журналы DNS</string>
     <string name="hsf_chip_appearance">Тема: %1$s</string>
-    <string name="dns_logs_lifetime_queries">Всего запросов: %1$s</string>
     <string name="dc_custom_block_heading">Правила домена</string>
     <string name="dc_check_update_heading">Уведомление об обновлении списка блокировки</string>
     <string name="dc_check_update_desc">Проверять обновления списков блокировки каждые <i>три</i> дня</string>
@@ -595,16 +592,13 @@
     <string name="hsf_start_dialog_message">Вы в одном шаге от безопасного и надежного Android: мгновенно просматривайте сетевую активность, блокируйте веб-сайты, IP-адреса и приложения с некорректным поведением.</string>
     <string name="hsf_proxy_chip_text">Прокси активен</string>
     <string name="hsf_blocklist_chip_text_no_data">Включить RethinkDNS+</string>
-    <string name="hsf_network_logs_chip_text">Сетевые журналы</string>
     <string name="hsf_exclude_error">Исключение невозможно в режиме блокировки VPN</string>
     <string name="hsf_proxy_chip_removed_toast">Прокси удален</string>
     <string name="hsf_pause_vpn_failure">Невозможно сделать паузу: RethinkDNS не активен</string>
-    <string name="dns_logs_blocked_queries">Заблокированных запросов: %1$s</string>
     <string name="dc_custom_dns_radio">Другие DNS</string>
     <string name="dc_entries">%1$s записи »</string>
     <string name="dc_local_block_desc_1">Выбирайте из 195+ списков блокировок. Нажмите здесь, чтобы загрузить их или настроить.</string>
     <string name="dc_dns_website_heading">Показывать значок веб-сайта в журналах DNS (экспериментально)</string>
-    <string name="dc_custom_block_desc">Изменение правил заблокированных или доверенных доменов</string>
     <string name="about_bravedns_toreport_text">помощь и отзывы</string>
     <string name="about_bug_report_desc">журналы аварий электронной почты</string>
     <string name="about_bug_report">Сообщение об ошибке</string>
@@ -782,7 +776,6 @@
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Блокировка вредоносного ПО, привлекающего внимание, программ шпионов и программ-страшилок.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">Списков блокировок: %1$s</string>
     <string name="private_dns_error">Не удалось отправить настройки персонального DNS.</string>
-    <string name="ada_app_firewall">Брандмауэр</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Очистить журналы</string>
     <string name="title_statistics">Статистика</string>
     <string name="settings_locale_heading">Изменить язык</string>

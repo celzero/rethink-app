@@ -477,22 +477,18 @@
     <string name="hsf_proxy_chip_text">Proxy activo</string>
     <string name="hsf_pause_lockdown_failure">No se puede pausar: RethinkDNS está en modo de aislamiento</string>
     <string name="hsf_blocklist_chip_text_no_data">Activar RethinkDNS+</string>
-    <string name="hsf_dns_logs_chip_text">Registros DNS</string>
-    <string name="hsf_network_logs_chip_text">Registros de red</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy eliminado</string>
     <string name="hsf_proxy_chip_remove_text">Parando…</string>
     <string name="hsf_whats_new_remove_text">Cerrando…</string>
     <string name="hsf_blocklist_updating_text">Activando…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">No se puede pausar: RethinkDNS no está activo</string>
-    <string name="dns_logs_blocked_queries">Consultas bloqueadas: %1$s</string>
     <string name="dc_other_dns_heading">tipo</string>
     <string name="dc_custom_dns_radio">Otros DNS</string>
     <string name="hsf_exclude_error">La exclusión no es posible en el modo de aislamiento VPN</string>
     <string name="dc_dns_website_heading">Mostrar el icono del sitio web en los registros de DNS (en pruebas)</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_entries">%1$s entradas »</string>
-    <string name="dc_custom_block_desc">Modificar reglas de dominios bloqueados o de confianza</string>
     <string name="dc_dns_leaks_heading">Evitar las fugas de DNS</string>
     <string name="dc_check_update_desc">Comprueba las actualizaciones de la lista de bloqueo una vez cada <i>tres</i> días</string>
     <string name="about_join_telegram">Telegram</string>
@@ -591,7 +587,6 @@
     <string name="ada_noapp_dialog_positive">Bien</string>
     <string name="ada_firewall_title">reglas de cortafuegos para esta aplicación</string>
     <string name="ada_network_log_title">registro de red para esta aplicación</string>
-    <string name="ada_app_firewall">Cortafuegos</string>
     <string name="ada_app_exclude">Excluir</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Borrar registros</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Borra todos los registros relacionados con esta aplicación.</string>
@@ -650,7 +645,6 @@
     <string name="show_logs_disabled_dns_message">El registro de solicitudes DNS ha sido desactivado. Para volver a activarlo, vaya a <i>Ajustes</i> y habilite <i>Activar el registro en el dispositivo.</i></string>
     <string name="orbot_bs_status_3">Reenviando %1$s a Orbot, Proxy HTTP también configurado.</string>
     <string name="settings_dns_proxy_dialog_app">Aplicación</string>
-    <string name="dns_logs_lifetime_queries">Duración de las consultas: %1$s</string>
     <string name="settings_socks5_heading">Configurar el proxy SOCKS5</string>
     <string name="settings_socks5_desc">Reenvía las conexiones al punto de acceso SOCKS5.</string>
     <string name="orbot_stop_dialog_neutral">Cambiar el DNS</string>
@@ -768,7 +762,6 @@
     <string name="firewall_act_network_monitor_tab">Registros de red</string>
     <string name="always_on_dialog_positive">Parar</string>
     <string name="dns_act_configure_tab">Configurar</string>
-    <string name="dns_act_log">Registros</string>
     <string name="dns_crypt_url_remove_success">Servidor de resoluciones DNSCrypt borrado.</string>
     <string name="dns_crypt_url_remove_dialog_message">Borra el servidor de resoluciones DNSCrypt de la configuración guardada.</string>
     <string name="dns_proxy_remove_success">Proxy DNS borrado.</string>

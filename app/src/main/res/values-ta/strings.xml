@@ -89,7 +89,6 @@
     <string name="dns_crypt_custom_url_remove_dialog_title">DNSCrypt தீர்வை நீக்கவா\?</string>
     <string name="bsct_conn_desc_blocked">%1$s %2$s இல் தடுக்கப்பட்டது</string>
     <string name="always_on_dialog_stop_message">மறுபரிசீலனை செய்ய எப்போதும் இயங்கும் VPN இயக்கப்பட்டுள்ளது. எப்படியும் மறுபரிசீலனை செய்வதை நிச்சயமாக நிறுத்த விரும்புகிறீர்களா\?</string>
-    <string name="dns_act_log">பதிவுகள்</string>
     <string name="doh_custom_url_remove_dialog_title">DoH இறுதிப்புள்ளியை நீக்கவா\?</string>
     <string name="doh_custom_url_remove_dialog_message">சேமித்த உள்ளமைவிலிருந்து Https இறுதிப் புள்ளியில் DNS ஐ நீக்கவும்.</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt தீர்வு நீக்கப்பட்டது.</string>
@@ -106,7 +105,6 @@
     <string name="brave_dns_connect_mode_change_dns">பயன்முறையைத் தேர்ந்தெடுக்கவும்.</string>
     <string name="bsct_app_info">பயன்பாட்டுத் தகவல்</string>
     <string name="brave_dns_connect_mode_change_firewall">பயன்முறையைத் தேர்ந்தெடுக்கவும்.</string>
-    <string name="bsct_block_app"><u>இந்த பயன்பாட்டிற்கு</u> <u> இந்த ஐபியை</u> தடு, நம்புங்கள்</string>
     <string name="bsct_block"><u>இந்தப் பயன்பாட்டை</u> தடு, பைபாஸ், விலக்கு, தனிமைப்படுத்து</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">எச்சரிக்கை: மறுபரிசீலனை டிஎன்எஸ் செயலிழக்கச் செய்யப்பட்டுள்ளது</string>
     <string name="status_protected_with_proxy_private_dns">ப்ராக்ஸி மற்றும் தனியார் டிஎன்எஸ் மூலம் பாதுகாக்கப்படுகிறது</string>

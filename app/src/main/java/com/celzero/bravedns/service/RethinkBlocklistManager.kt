@@ -151,8 +151,9 @@ object RethinkBlocklistManager : KoinComponent {
                             packsBlocklistMapping.put(PacksMappingKey(s, 0), l.value)
                             return@forEachIndexed
                         }
+                        val level = l.level?.elementAt(index) ?: 2
                         packsBlocklistMapping.put(
-                            PacksMappingKey(s, l.level?.elementAt(index)!!),
+                            PacksMappingKey(s, level),
                             l.value
                         )
                     }
@@ -232,8 +233,10 @@ object RethinkBlocklistManager : KoinComponent {
                             packsBlocklistMapping.put(PacksMappingKey(s, 0), r.value)
                             return@forEachIndexed
                         }
+                        // if the level is empty, then set the level to 2 (assume highest) #756
+                        val level = r.level?.elementAt(index) ?: 2
                         packsBlocklistMapping.put(
-                            PacksMappingKey(s, r.level?.elementAt(index)!!),
+                            PacksMappingKey(s, level),
                             r.value
                         )
                     }

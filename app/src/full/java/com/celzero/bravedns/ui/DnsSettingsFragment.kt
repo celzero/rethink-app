@@ -97,7 +97,7 @@ class DnsSettingsFragment :
         // enable per-app domain rules (dns alg)
         b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
         // enable dns caching in tunnel
-        b.dcDownloaderSwitch.isChecked = persistentState.enableDnsCache
+        b.dcEnableCacheSwitch.isChecked = persistentState.enableDnsCache
 
         b.connectedStatusTitle.text = getConnectedDnsType()
     }
@@ -233,28 +233,7 @@ class DnsSettingsFragment :
     }
 
     private fun observeBraveMode() {
-        appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            if (AppConfig.BraveMode.getMode(it).isDnsMode()) {
-                updateDnsOnlyModeUi()
-            }
-        }
-
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) { updateSelectedDns() }
-    }
-
-    private fun updateDnsOnlyModeUi() {
-        // disable local-blocklist for dns-only mode
-        b.dcLocalBlocklistIcon.isEnabled = false
-        b.dcLocalBlocklistRl.isEnabled = false
-
-        b.dcLocalBlocklistRl.isClickable = false
-        b.dcLocalBlocklistIcon.isClickable = false
-
-        // disable prevent dns leaks in dns-only mode
-        b.dcPreventDnsLeaksSwitch.isClickable = false
-        b.dcPreventDnsLeaksSwitch.isEnabled = false
     }
 
     private fun initClickListeners() {
@@ -330,7 +309,11 @@ class DnsSettingsFragment :
             persistentState.useCustomDownloadManager = b
         }
 
-        b.dcDownloaderSwitch.setOnCheckedChangeListener { _, b ->
+        b.dcEnableCacheRl.setOnClickListener {
+            b.dcEnableCacheSwitch.isChecked = !b.dcEnableCacheSwitch.isChecked
+        }
+
+        b.dcEnableCacheSwitch.setOnCheckedChangeListener { _, b ->
             persistentState.enableDnsCache = b
         }
 

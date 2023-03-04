@@ -116,7 +116,6 @@
     <string name="firewall_act_universal_tab">Uniwersalny</string>
     <string name="firewall_act_network_monitor_tab">Logi sieciowe</string>
     <string name="dns_act_configure_tab">Konfiguruj</string>
-    <string name="dns_act_log">Logi</string>
     <string name="univ_firewall_dialog_message">Usunięcie tej reguły pozwoli każdej aplikacji na połączenie się z tym IP. Czy chcesz kontynuować\?</string>
     <string name="doh_custom_url_remove_dialog_title">Usunąć punkt końcowy DoH\?</string>
     <string name="dns_crypt_relay_remove_dialog_title">Usunąć DNSCrypt Relay\?</string>

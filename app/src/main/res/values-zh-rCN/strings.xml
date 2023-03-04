@@ -78,7 +78,6 @@
     <string name="settings_notification_desc3">无</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
     <string name="settings_import_export_desc">手动备份或恢复应用数据与设置。</string>
-    <string name="hsf_network_logs_chip_text">网络日志</string>
     <string name="hsf_whats_new_remove_text">关闭中……</string>
     <string name="dc_entries">%1$s 条目 »</string>
     <string name="dc_local_block_heading">本地屏蔽名单</string>
@@ -187,7 +186,6 @@
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_selected_theme">当前主题：%1$s</string>
     <string name="ct_bs_app_info_error">未找到应用信息</string>
-    <string name="hsf_dns_logs_chip_text">DNS 日志</string>
     <string name="hsf_blocklist_updating_text">启动中……</string>
     <string name="hsf_chip_appearance">主题：%1$s</string>
     <string name="about_bug_no_log_dialog_positive_btn">发送电邮</string>
@@ -403,7 +401,6 @@
     <string name="apps_info_title">应用</string>
     <string name="dns_firewall_mode_info_explanation_new">上述所有功能及绕过互联网审查。</string>
     <string name="always_on_dialog_stop_heading">永久连接的 VPN</string>
-    <string name="dns_act_log">日志</string>
     <string name="local_blocklist_redownload_desc">本地屏蔽名单已为最新版本 v%1$s 。</string>
     <string name="blocklist_update_check_not_required">屏蔽名单已为最新版本。</string>
     <string name="download_update_dialog_message_success">屏蔽名单下载成功。</string>
@@ -510,7 +507,6 @@
     <string name="hsf_uptime">（自%1$s启动；协议：%2$s；类型：%3$s）</string>
     <string name="hsf_vpn_dialog_positive">继续</string>
     <string name="hsf_start_dialog_header">启动 %1$s</string>
-    <string name="dns_logs_blocked_queries">已拦截： %1$s</string>
     <string name="about_bug_report">漏洞报告</string>
     <string name="about_mail_bugreport_subject">[RethinkDns]: Bug report</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
@@ -573,7 +569,6 @@
     <string name="hsf_vpn_dialog_message">RethinkDNS 需要设置本地 VPN 的权限，以加密设备的 DNS 请求、实现网络监测与执行防火墙规则。
 \n
 \nRethinkDNS 并不会收集任何数据，且不会以任何方式监视您。</string>
-    <string name="dc_custom_block_desc">修改拦截域名及信任域名规则</string>
     <string name="dc_check_update_desc">每<i>三</i>天检查有无屏蔽名单更新</string>
     <string name="about_settings">系统</string>
     <string name="cd_dnscrypt_relay_heading">中继</string>
@@ -657,7 +652,6 @@
     <string name="show_logs_disabled_network_message">连接日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
     <string name="hsf_pause_lockdown_failure">无法暂停： RethinkDNS 正使用闭关模式</string>
     <string name="refresh_complete">应用列表已重新同步完毕。</string>
-    <string name="dns_logs_lifetime_queries">总请求： %1$s</string>
     <string name="show_logs_disabled_dns_message">DNS 请求日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
     <string name="search_firewall_all_apps"><font size="12">以 UID / 应用名搜索应用</font></string>
     <string name="orbot_explanation">Orbot 是一款能让其他程序更<u>安全</u>地连接到互联网的免费代理应用。
@@ -771,7 +765,6 @@
     <string name="settings_app_notification_a13_desc">启用此应用的通知权限</string>
     <string name="private_dns_dialog_positive">前往设置</string>
     <string name="ci_trust_txt">信任</string>
-    <string name="ada_app_firewall">防火墙</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日志</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有与此应用有联系的日志。</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">继续</string>

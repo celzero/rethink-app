@@ -108,7 +108,6 @@
     <string name="cd_toast_deleted">Alan adı özel listeden kaldırıldı</string>
     <string name="cd_dns_crypt_name">DNSCrypt %1$s</string>
     <string name="bsct_conn_desc_allowed">izin verilir %1$s %2$s</string>
-    <string name="dns_act_log">Günlükler</string>
     <string name="dns_proxy_remove_dialog_message">DNS Proxy\'sini kayıtlı yapılandırmadan silin.</string>
     <string name="blocklist_update_check_not_required">Blok listeleri zaten en son sürümde.</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s çözümleyiciler</string>
@@ -165,7 +164,6 @@
     <string name="settings_http_proxy_error_text1">Port aralığı 1024-65535 arasında olmalıdır</string>
     <string name="hsf_stop_btn_state">durak</string>
     <string name="hsf_vpn_prepare_failure">Ya VPN izni eksiktir ya da başka bir uygulama Her Zaman Açık VPN modundadır.</string>
-    <string name="hsf_network_logs_chip_text">Ağ günlükleri</string>
     <string name="dc_custom_block_heading">Bireysel alan adlarına izin verme veya reddetme</string>
     <string name="about_bug_report_dialog_positive_btn">E-posta gönder</string>
     <string name="contributors_dialog_title">Katkıda bulunanlar</string>
@@ -395,7 +393,6 @@
     <string name="settings_notification_desc">RethinkDNS bildirimiyle birlikte gösterilecek eylem düğmeleri: %1$s</string>
     <string name="settings_notification_dialog_title">Bildirim eylemini seçin</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+\'ı Etkinleştir</string>
-    <string name="dns_logs_lifetime_queries">Ömür boyu sorgular: %1$s</string>
     <string name="about_bravedns_toreport_text">yardim &amp; geri̇ bi̇ldi̇ri̇m</string>
     <string name="about_github">GitHub üzerinden katkıda bulunun</string>
     <string name="about_mozilla">RethinkDNS, Mozilla Builders MVP programının bir parçasıdır.</string>
@@ -507,7 +504,6 @@
     <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)</string>
     <string name="firewall_status_isolate">kilitle</string>
     <string name="hsf_vpn_dialog_positive">Devam Et</string>
-    <string name="dc_custom_block_desc">Çok yakında</string>
     <string name="about_website">rethinkdns.com adresini ziyaret edin</string>
     <string name="about_settings">sistem</string>
     <string name="cd_custom_dns_proxy_title">Özel DNS Proxy</string>
@@ -535,7 +531,6 @@
     <string name="settings_ip_text_ipv46">Otomatik</string>
     <string name="settings_notification_desc3">Hiçbiri</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy kaldırıldı</string>
-    <string name="dns_logs_blocked_queries">Engellenen sorgular: %1$s</string>
     <string name="dc_block_heading">kurallar</string>
     <string name="dc_check_update_heading">Blok listesi güncellemeleri hakkında bilgi istemi</string>
     <string name="about_join_telegram">Telegram</string>
@@ -555,7 +550,6 @@
     <string name="search_dns_logs"><font size="12">Alan adlarını veya IP\'leri arama</font></string>
     <string name="settings_http_proxy_dialog_title">Özel Sunucu URL\'si</string>
     <string name="settings_http_proxy_port">Bağlantı noktası</string>
-    <string name="hsf_dns_logs_chip_text">DNS günlükleri</string>
     <string name="hsf_proxy_chip_remove_text">Durduruluyor…</string>
     <string name="hsf_pause_vpn_failure">Duraklatılamıyor: RethinkDNS etkin değil</string>
     <string name="about_docs">Dokümanları okuyun</string>
@@ -780,7 +774,6 @@
 \nRethink\'in DNS\'sini kullanmak için Android Ayarları\'na gidin ve \"Özel DNS \"yi kapatın.</string>
     <string name="private_dns_dialog_positive">Ayarlara git</string>
     <string name="private_dns_error">Özel dns ekranı başlatılamadı.</string>
-    <string name="ada_app_firewall">Güvenlik Duvarı</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Günlükleri temizleyin</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Bu uygulamayla ilgili tüm günlükleri temizleyin.</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Devam Et</string>

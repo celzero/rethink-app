@@ -45,13 +45,7 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
 
     enum class Tabs(val screen: Int) {
         NETWORK_LOGS(0),
-        DNS_LOGS(1);
-
-        companion object {
-            fun getCount(): Int {
-                return values().count()
-            }
-        }
+        DNS_LOGS(1)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,47 +66,58 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
         b.logsActViewpager.adapter =
             object : FragmentStateAdapter(this) {
                 override fun createFragment(position: Int): Fragment {
-                    return when (position) {
-                        Tabs.NETWORK_LOGS.screen ->
-                            ConnectionTrackerFragment.newInstance(searchParam)
-                        Tabs.DNS_LOGS.screen -> DnsLogFragment.newInstance(searchParam)
-                        else -> FirewallSettingsFragment.newInstance()
-                    }
+                    return getFragment(position)
                 }
 
                 override fun getItemCount(): Int {
-                    return Tabs.getCount()
+                    return getCount()
                 }
             }
 
         TabLayoutMediator(b.logsActTabLayout, b.logsActViewpager) { tab, position
                 -> // Styling each tab here
-                tab.text =
-                    when (position) {
-                        Tabs.NETWORK_LOGS.screen ->
-                            getString(R.string.firewall_act_network_monitor_tab)
-                        Tabs.DNS_LOGS.screen -> getString(R.string.dns_mode_info_title)
-                        else -> getString(R.string.firewall_act_network_monitor_tab)
-                    }
+                tab.text = getTabText(position)
             }
             .attach()
 
         b.logsActViewpager.setCurrentItem(fragmentIndex, false)
 
-        handleTabs()
         observeAppState()
     }
 
-    private fun handleTabs() {
-        when (appConfig.getBraveMode()) {
-            AppConfig.BraveMode.DNS -> {
-                b.logsActTabLayout.getTabAt(0)?.let { b.logsActTabLayout.removeTab(it) }!!
+    private fun getCount(): Int {
+        return when (appConfig.getBraveMode()) {
+            AppConfig.BraveMode.DNS -> 1
+            AppConfig.BraveMode.FIREWALL -> 1
+            AppConfig.BraveMode.DNS_FIREWALL -> 2
+        }
+    }
+
+    private fun getFragment(position: Int): Fragment {
+        return if (appConfig.getBraveMode().isDnsMode()) {
+            DnsLogFragment.newInstance(searchParam)
+        } else if (appConfig.getBraveMode().isFirewallMode()) {
+            ConnectionTrackerFragment.newInstance(searchParam)
+        } else {
+            when (position) {
+                Tabs.NETWORK_LOGS.screen -> ConnectionTrackerFragment.newInstance(searchParam)
+                Tabs.DNS_LOGS.screen -> DnsLogFragment.newInstance(searchParam)
+                else -> ConnectionTrackerFragment.newInstance(searchParam)
             }
-            AppConfig.BraveMode.FIREWALL -> {
-                b.logsActTabLayout.getTabAt(1)?.let { b.logsActTabLayout.removeTab(it) }!!
-            }
-            AppConfig.BraveMode.DNS_FIREWALL -> {
-                // no-op
+        }
+    }
+
+    // get tab text based on brave mode
+    private fun getTabText(position: Int): String {
+        return if (appConfig.getBraveMode().isDnsMode()) {
+            getString(R.string.dns_mode_info_title)
+        } else if (appConfig.getBraveMode().isFirewallMode()) {
+            getString(R.string.firewall_act_network_monitor_tab)
+        } else {
+            when (position) {
+                Tabs.NETWORK_LOGS.screen -> getString(R.string.firewall_act_network_monitor_tab)
+                Tabs.DNS_LOGS.screen -> getString(R.string.dns_mode_info_title)
+                else -> getString(R.string.firewall_act_network_monitor_tab)
             }
         }
     }

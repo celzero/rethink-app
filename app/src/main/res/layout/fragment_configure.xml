@@ -67,22 +67,12 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/fs_dns_tv"
-                android:layout_toEndOf="@id/fs_dns_icon"
-                android:layout_marginStart="15dp"
-                android:text="@string/cs_dns_desc"
-                android:textSize="12sp" />
-
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:alpha="0.5"
-                android:src="@drawable/ic_right_arrow_secondary" />
+                android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -120,22 +110,12 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/fs_firewall_tv"
-                android:layout_toEndOf="@id/fs_firewall_icon"
-                android:layout_marginStart="15dp"
-                android:text="@string/cd_firewall_desc"
-                android:textSize="12sp" />
-
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:alpha="0.5"
-                android:src="@drawable/ic_right_arrow_secondary" />
+                android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -174,22 +154,12 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/fs_proxy_tv"
-                android:layout_toEndOf="@id/fs_proxy_icon"
-                android:layout_marginStart="15dp"
-                android:text="@string/cs_proxy_desc"
-                android:textSize="12sp" />
-
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:alpha="0.5"
-                android:src="@drawable/ic_right_arrow_secondary" />
+                android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -223,27 +193,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/fs_others_icon"
-                android:text="@string/cs_general_title"
+                android:text="@string/title_settings"
                 android:layout_marginStart="15dp"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/fs_others_tv"
-                android:layout_toEndOf="@id/fs_others_icon"
-                android:layout_marginStart="15dp"
-                android:text="@string/cs_general_desc"
-                android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:alpha="0.5"
-                android:src="@drawable/ic_right_arrow_secondary" />
+                android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 

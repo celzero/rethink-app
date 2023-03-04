@@ -51,8 +51,9 @@ class DomainRulesBtmSheetAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun update(item: String) {
-            b.domainText.text = item.trim()
-            when (DomainRulesManager.getDomainRule(item.trim(), uid)) {
+            val domain = item.trim()
+            b.domainText.text = domain.trim()
+            when (DomainRulesManager.getDomainRule(domain, uid)) {
                 DomainRulesManager.Status.TRUST -> {
                     enableTrustUi()
                 }
@@ -66,26 +67,26 @@ class DomainRulesBtmSheetAdapter(
 
             b.blockIcon.setOnClickListener {
                 if (
-                    DomainRulesManager.getDomainRule(item.trim(), uid) ==
+                    DomainRulesManager.getDomainRule(domain, uid) ==
                         DomainRulesManager.Status.BLOCK
                 ) {
-                    applyDomainRule(item, DomainRulesManager.Status.NONE)
+                    applyDomainRule(domain, DomainRulesManager.Status.NONE)
                     noRuleUi()
                 } else {
-                    applyDomainRule(item, DomainRulesManager.Status.BLOCK)
+                    applyDomainRule(domain, DomainRulesManager.Status.BLOCK)
                     enableBlockUi()
                 }
             }
 
             b.trustIcon.setOnClickListener {
                 if (
-                    DomainRulesManager.getDomainRule(item.trim(), uid) ==
+                    DomainRulesManager.getDomainRule(domain, uid) ==
                         DomainRulesManager.Status.TRUST
                 ) {
-                    applyDomainRule(item, DomainRulesManager.Status.NONE)
+                    applyDomainRule(domain, DomainRulesManager.Status.NONE)
                     noRuleUi()
                 } else {
-                    applyDomainRule(item, DomainRulesManager.Status.TRUST)
+                    applyDomainRule(domain, DomainRulesManager.Status.TRUST)
                     enableTrustUi()
                 }
             }
@@ -97,7 +98,7 @@ class DomainRulesBtmSheetAdapter(
                 "Apply domain rule for $domain, ${domainRuleStatus.name}"
             )
             DomainRulesManager.addDomainRule(
-                domain,
+                domain.trim(),
                 domainRuleStatus,
                 DomainRulesManager.DomainType.DOMAIN,
                 uid,

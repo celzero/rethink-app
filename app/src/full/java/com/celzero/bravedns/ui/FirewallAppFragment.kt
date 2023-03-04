@@ -19,6 +19,7 @@ import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.Animation
@@ -660,24 +661,24 @@ class FirewallAppFragment :
     private fun updateBypassBulk() {
         if (isInitTag(b.ffaToggleAllBypass)) {
             b.ffaToggleAllBypass.tag = 1
-            b.ffaToggleAllBypass.setImageResource(R.drawable.ic_bypass_dns_firewall_on)
+            b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_on)
             io { appInfoViewModel.updateBypassStatus(true) }
         } else {
             b.ffaToggleAllBypass.tag = 0
-            b.ffaToggleAllBypass.setImageResource(R.drawable.ic_bypass_dns_firewall_off)
+            b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
             io { appInfoViewModel.updateBypassStatus(false) }
         }
         resetFirewallIcons(BlockType.BYPASS)
     }
 
     private fun updateBypassDnsFirewallBulk() {
-        if (isInitTag(b.ffaToggleAllBypass)) {
+        if (isInitTag(b.ffaToggleAllBypassDnsFirewall)) {
             b.ffaToggleAllBypassDnsFirewall.tag = 1
-            b.ffaToggleAllBypassDnsFirewall.setImageResource(R.drawable.ic_firewall_bypass_on)
+            b.ffaToggleAllBypassDnsFirewall.setImageResource(R.drawable.ic_bypass_dns_firewall_on)
             io { appInfoViewModel.updateBypassDnsFirewall(true) }
         } else {
             b.ffaToggleAllBypassDnsFirewall.tag = 0
-            b.ffaToggleAllBypassDnsFirewall.setImageResource(R.drawable.ic_firewall_bypass_off)
+            b.ffaToggleAllBypassDnsFirewall.setImageResource(R.drawable.ic_bypass_dns_firewall_off)
             io { appInfoViewModel.updateBypassDnsFirewall(false) }
         }
         resetFirewallIcons(BlockType.BYPASS_DNS_FIREWALL)

@@ -67,7 +67,6 @@
     <string name="firewall_act_universal_tab">通用</string>
     <string name="firewall_act_network_monitor_tab">網路日誌</string>
     <string name="dns_act_configure_tab">配置</string>
-    <string name="dns_act_log">日誌</string>
     <string name="univ_firewall_dialog_title">是否刪除 IP 規則？</string>
     <string name="doh_custom_url_remove_dialog_title">是否刪除 DNS 端點？</string>
     <string name="doh_custom_url_remove_success">端點已刪除。</string>
@@ -491,8 +490,6 @@
     <string name="hsf_whats_new_chip_text">新內容</string>
     <string name="settings_notification_dialog_title">選擇通知行爲</string>
     <string name="hsf_blocklist_chip_text_no_data">啓用 RDNS+</string>
-    <string name="hsf_dns_logs_chip_text">DNS 日誌</string>
-    <string name="hsf_network_logs_chip_text">網路日誌</string>
     <string name="hsf_exclude_error">VPN 閉關模式下無法排除</string>
     <string name="hsf_proxy_chip_removed_toast">已移除代理</string>
     <string name="hsf_proxy_chip_remove_text">停止中……</string>
@@ -501,8 +498,6 @@
     <string name="hsf_chip_appearance">主題：%1$s</string>
     <string name="hsf_pause_vpn_failure">無法暫停： RethinkDNS 未啓用</string>
     <string name="hsf_pause_lockdown_failure">無法暫停： RethinkDNS 正使用閉關模式</string>
-    <string name="dns_logs_lifetime_queries">總請求： %1$s</string>
-    <string name="dns_logs_blocked_queries">已攔截： %1$s</string>
     <string name="dc_block_heading">規則</string>
     <string name="dc_other_dns_heading">類型</string>
     <string name="dc_other_settings_heading">進階</string>
@@ -511,7 +506,6 @@
     <string name="dc_local_block_heading">本地攔截清單</string>
     <string name="dc_local_block_desc_1">於逾 195 條攔截清單中選擇。輕觸此處以下載或配置攔截清單。</string>
     <string name="dc_custom_block_heading">網域規則</string>
-    <string name="dc_custom_block_desc">修改攔截網域及信任網域規則</string>
     <string name="dc_dns_website_heading">於 DNS 日誌中展示網站圖示（實驗性）</string>
     <string name="dc_dns_website_desc">從 <i>nextdns.io</i> 與 <i>duckduckgo.com</i> 獲取網站圖示。約佔用 350 MB 磁碟空間</string>
     <string name="dc_dns_leaks_desc">若啓用， RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
@@ -771,7 +765,6 @@
     <string name="ct_ip_port">%1$s:%2$s</string>
     <string name="ci_trust_initial">信</string>
     <string name="ci_trust_txt">信任</string>
-    <string name="ada_app_firewall">防火牆</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日誌</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有與此應用有聯繫的日誌。</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">繼續</string>

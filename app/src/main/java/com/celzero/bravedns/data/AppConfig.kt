@@ -692,10 +692,6 @@ internal constructor(
     suspend fun updateSystemDnsServers(dnsServers: List<InetAddress>) {
         var dnsIp: String? = null
         val dnsPort = 0
-        Log.d("TEST", "TEST: $dnsServers")
-        dnsServers.forEach {
-            Log.d("TEST", "TEST: ${it.hostAddress}, ${it.address}, ${it.hostName}")
-        }
 
         when (getInternetProtocol()) {
             InternetProtocol.IPv4 -> {
