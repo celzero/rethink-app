@@ -177,6 +177,7 @@
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@id/ffa_toggle_all_wifi"
             android:maxWidth="24dp"
+            android:visibility="gone"
             android:maxHeight="24dp"
             android:padding="5dp"
             android:src="@drawable/ic_bypass_dns_firewall_off"

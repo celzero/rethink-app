@@ -50,7 +50,7 @@
         <item>Block (unmetered)</item>
         <item>Block (metered)</item>
         <item>Isolate</item>
-        <item>Bypass DNS and Firewall</item>
+        <!--<item>Bypass DNS and Firewall</item>-->
         <item>Bypass Universal</item>
         <item>Exclude</item>
     </string-array>
@@ -300,11 +300,10 @@
         1. <i>New feature</i>: Advanced DNS filtering; apply domain rules only when apps connect.<br/>
         2. <i>New feature</i>: Allow or deny domains per app.<br/>
         3. <i>New feature</i>: Allow or deny domains for all apps.<br/>
-        4. <i>New feature</i>: Bypass both DNS and Firewall rules per app.<br/>
-        5. <i>New feature</i>: Packet capture (PCAP).<br/>
-        6. <i>New feature</i>: DNS Booster; coalesce requests, cache responses.<br/>
-        7. <i>New feature</i>: Edit domain and IP rules.<br/>
-        8. And other minor UI changes and bug fixes.<br/><br/>
+        4. <i>New feature</i>: Packet capture (PCAP).<br/>
+        5. <i>New feature</i>: DNS Booster; coalesce requests, cache responses.<br/>
+        6. <i>New feature</i>: Edit domain and IP rules.<br/>
+        7. And other minor UI changes and bug fixes.<br/><br/>
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 
@@ -1137,6 +1136,7 @@
 
     <string name="ada_network_log_title" translatable="true">network log for this app</string>
 
+    <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="ada_app_metered" translatable="true">Metered</string>
     <string name="ada_app_unmetered" translatable="true">Unmetered</string>
     <string name="ada_app_bypass_univ" translatable="true">Bypass Universal</string>

@@ -359,9 +359,9 @@ class BraveVPNService :
             }
 
             // by-pass dns firewall, go-through app specific ip and domain rules before applying
-            if (appStatus.bypassDnsFirewall()) {
+            /*if (appStatus.bypassDnsFirewall()) {
                 return FirewallRuleset.RULE1H
-            }
+            }*/
 
             // isolate mode
             if (appStatus.isolate()) {

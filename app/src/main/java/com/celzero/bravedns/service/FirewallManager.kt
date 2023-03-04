@@ -74,8 +74,10 @@ object FirewallManager : KoinComponent {
         EXCLUDE(3),
         ISOLATE(4),
         NONE(5),
-        UNTRACKED(6),
-        BYPASS_DNS_FIREWALL(7);
+        UNTRACKED(6);
+        // TODO implement bypass DNS+Firewall feature in proper way
+        // remove rules related to bypass dns+firewall
+        // BYPASS_DNS_FIREWALL(7);
 
         companion object {
 
@@ -90,9 +92,9 @@ object FirewallManager : KoinComponent {
                     ISOLATE.id -> {
                         ISOLATE
                     }
-                    BYPASS_DNS_FIREWALL.id -> {
-                        BYPASS_DNS_FIREWALL
-                    }
+                    // BYPASS_DNS_FIREWALL.id -> {
+                    //   BYPASS_DNS_FIREWALL
+                    // }
                     else -> {
                         NONE
                     }
@@ -116,13 +118,13 @@ object FirewallManager : KoinComponent {
                     4 -> {
                         ISOLATE
                     }
+                    // 5 -> {
+                    //  BYPASS_DNS_FIREWALL
+                    // }
                     5 -> {
-                        BYPASS_DNS_FIREWALL
-                    }
-                    6 -> {
                         BYPASS_UNIVERSAL
                     }
-                    7 -> {
+                    6 -> {
                         EXCLUDE
                     }
                     else -> {
@@ -134,14 +136,6 @@ object FirewallManager : KoinComponent {
 
         fun bypassUniversal(): Boolean {
             return this == BYPASS_UNIVERSAL
-        }
-
-        fun bypassDnsFirewall(): Boolean {
-            return this == BYPASS_DNS_FIREWALL
-        }
-
-        fun excluded(): Boolean {
-            return this == EXCLUDE
         }
 
         fun isolate(): Boolean {
@@ -295,7 +289,7 @@ object FirewallManager : KoinComponent {
             FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
             FirewallStatus.NONE.id -> FirewallStatus.NONE
             FirewallStatus.ISOLATE.id -> FirewallStatus.ISOLATE
-            FirewallStatus.BYPASS_DNS_FIREWALL.id -> FirewallStatus.BYPASS_DNS_FIREWALL
+            //FirewallStatus.BYPASS_DNS_FIREWALL.id -> FirewallStatus.BYPASS_DNS_FIREWALL
             else -> FirewallStatus.NONE
         }
     }
@@ -531,9 +525,9 @@ object FirewallManager : KoinComponent {
             FirewallStatus.UNTRACKED -> {
                 R.string.untracked
             }
-            FirewallStatus.BYPASS_DNS_FIREWALL -> {
-                R.string.bypass_dns_firewall
-            }
+            //FirewallStatus.BYPASS_DNS_FIREWALL -> {
+            //    R.string.bypass_dns_firewall
+            //}
         }
     }
 

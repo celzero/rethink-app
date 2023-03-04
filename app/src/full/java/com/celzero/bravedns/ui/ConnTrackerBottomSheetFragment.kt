@@ -446,14 +446,14 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             FirewallManager.FirewallStatus.ISOLATE -> {
                 b.bsConnFirewallSpinner.setSelection(4, true)
             }
-            FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
+            /*FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
+                b.bsConnFirewallSpinner.setSelection(5, true)
+            }*/
+            FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
                 b.bsConnFirewallSpinner.setSelection(5, true)
             }
-            FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
-                b.bsConnFirewallSpinner.setSelection(6, true)
-            }
             FirewallManager.FirewallStatus.EXCLUDE -> {
-                b.bsConnFirewallSpinner.setSelection(7, true)
+                b.bsConnFirewallSpinner.setSelection(6, true)
             }
             else -> {
                 // no-op
