@@ -22,7 +22,6 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.NetLogBatcher
 import dnsx.Summary
 import kotlinx.coroutines.CoroutineScope

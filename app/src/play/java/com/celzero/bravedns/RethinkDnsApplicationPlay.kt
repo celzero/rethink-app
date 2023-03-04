@@ -17,6 +17,7 @@ package com.celzero.bravedns
 
 import android.app.Application
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.service.AppUpdater
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -39,6 +40,7 @@ class RethinkDnsApplicationPlay : Application() {
         }
 
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
-        get<WorkScheduler>().scheduleDatabaseRefreshJob()
+        get<ScheduleManager>().scheduleDatabaseRefreshJob()
+        get<WorkScheduler>().schedulePurgeConnectionsLog()
     }
 }

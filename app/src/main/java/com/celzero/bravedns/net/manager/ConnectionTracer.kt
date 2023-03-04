@@ -6,7 +6,6 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.AndroidUidConfig.Companion.isUidAppRange
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
@@ -50,8 +49,6 @@ class ConnectionTracer(ctx: Context) {
         }
         val local: InetSocketAddress
         val remote: InetSocketAddress
-        if (DEBUG)
-            Log.d(LoggerConstants.LOG_TAG_VPN, "$sourceIp [$sourcePort] to $destIp [$destPort]")
         try {
             local =
                 if (TextUtils.isEmpty(sourceIp)) {

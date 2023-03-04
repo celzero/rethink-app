@@ -36,14 +36,19 @@ private val updaterModule = module {
     single<AppUpdater> { get<NonStoreAppUpdater>() }
 }
 
+private val updaterModules = listOf(updaterModule)
+
 private val orbotHelperModule = module { single { OrbotHelper(androidContext(), get(), get()) } }
 
 private val appDownloadManagerModule = module {
     single { AppDownloadManager(androidContext(), get()) }
 }
 
-private val schedulerModule = module {
+private val workerModule = module {
     single { WorkScheduler(androidContext()) }
+}
+
+private val schedulerModule = module {
     single { ScheduleManager(androidContext()) }
 }
 
@@ -54,9 +59,10 @@ val AppModules: List<Module> by lazy {
         addAll(ViewModelModule.modules)
         addAll(DataModule.modules)
         addAll(ServiceModule.modules)
-        add(updaterModule)
+        addAll(updaterModules)
+        add(schedulerModule)
+        add(workerModule)
         add(orbotHelperModule)
         add(appDownloadManagerModule)
-        add(schedulerModule)
     }
 }

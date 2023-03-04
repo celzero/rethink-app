@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.StrictMode
 import android.util.Log
 import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -34,5 +35,7 @@ class RethinkDnsApplication : Application() {
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
+        // database refresh is used in both headless and main project
+         get<ScheduleManager>().scheduleDatabaseRefreshJob()
     }
 }
