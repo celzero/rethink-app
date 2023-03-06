@@ -39,6 +39,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private var isVpnActive: Boolean = false
 
+
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
         MOST_BLOCKED_APPS(1),
@@ -114,6 +115,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     companion object {
         fun newInstance() = SummaryStatisticsFragment()
+        private const val RECYCLER_ITEM_VIEW_HEIGHT = 420
     }
 
     private fun showAppNetworkActivity() {
@@ -143,7 +145,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssAppNetworkActivityRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppNetworkActivityRecyclerView.adapter = recyclerAdapter
     }
@@ -174,7 +176,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
     }
@@ -210,7 +212,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedDomainRecyclerView.adapter = recyclerAdapter
     }
@@ -245,7 +247,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedDomainRecyclerView.adapter = recyclerAdapter
     }
@@ -280,7 +282,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
     }
@@ -315,7 +317,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
     }

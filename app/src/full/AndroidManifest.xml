@@ -70,7 +70,8 @@
         <activity
             android:name=".ui.ProxySettingsActivity"
             android:finishOnTaskLaunch="true" />
-        <activity android:name=".ui.MiscSettingsActivity"
+        <activity
+            android:name=".ui.MiscSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.AppDetailActivity"
