@@ -50,7 +50,7 @@
         <item>Block (unmetered)</item>
         <item>Block (metered)</item>
         <item>Isolate</item>
-        <!--<item>Bypass DNS and Firewall</item>-->
+        <item>Bypass DNS and Firewall</item>
         <item>Bypass Universal</item>
         <item>Exclude</item>
     </string-array>

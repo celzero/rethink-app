@@ -54,9 +54,10 @@ object FirewallManager : KoinComponent {
 
     data class DnsCacheRecord(val ttl: Long, val fqdn: String, val flag: String?)
 
-    private const val CACHE_BUILDER_MAX_SIZE = 35000L
+    private const val CACHE_BUILDER_MAX_SIZE = 10000L
     private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
 
+    // TODO: check for the usages and remove if not used
     val ipDomainLookup: Cache<String, DnsCacheRecord> =
         CacheBuilder.newBuilder()
             .maximumSize(CACHE_BUILDER_MAX_SIZE)
@@ -74,10 +75,8 @@ object FirewallManager : KoinComponent {
         EXCLUDE(3),
         ISOLATE(4),
         NONE(5),
-        UNTRACKED(6);
-        // TODO implement bypass DNS+Firewall feature in proper way
-        // remove rules related to bypass dns+firewall
-        // BYPASS_DNS_FIREWALL(7);
+        UNTRACKED(6),
+        BYPASS_DNS_FIREWALL(7);
 
         companion object {
 
@@ -92,9 +91,9 @@ object FirewallManager : KoinComponent {
                     ISOLATE.id -> {
                         ISOLATE
                     }
-                    // BYPASS_DNS_FIREWALL.id -> {
-                    //   BYPASS_DNS_FIREWALL
-                    // }
+                    BYPASS_DNS_FIREWALL.id -> {
+                       BYPASS_DNS_FIREWALL
+                    }
                     else -> {
                         NONE
                     }
@@ -118,13 +117,13 @@ object FirewallManager : KoinComponent {
                     4 -> {
                         ISOLATE
                     }
-                    // 5 -> {
-                    //  BYPASS_DNS_FIREWALL
-                    // }
                     5 -> {
-                        BYPASS_UNIVERSAL
+                        BYPASS_DNS_FIREWALL
                     }
                     6 -> {
+                        BYPASS_UNIVERSAL
+                    }
+                    7 -> {
                         EXCLUDE
                     }
                     else -> {
@@ -136,6 +135,10 @@ object FirewallManager : KoinComponent {
 
         fun bypassUniversal(): Boolean {
             return this == BYPASS_UNIVERSAL
+        }
+
+        fun bypassDnsFirewall(): Boolean {
+            return this == BYPASS_DNS_FIREWALL
         }
 
         fun isolate(): Boolean {
@@ -289,7 +292,7 @@ object FirewallManager : KoinComponent {
             FirewallStatus.EXCLUDE.id -> FirewallStatus.EXCLUDE
             FirewallStatus.NONE.id -> FirewallStatus.NONE
             FirewallStatus.ISOLATE.id -> FirewallStatus.ISOLATE
-            //FirewallStatus.BYPASS_DNS_FIREWALL.id -> FirewallStatus.BYPASS_DNS_FIREWALL
+            FirewallStatus.BYPASS_DNS_FIREWALL.id -> FirewallStatus.BYPASS_DNS_FIREWALL
             else -> FirewallStatus.NONE
         }
     }
@@ -525,9 +528,9 @@ object FirewallManager : KoinComponent {
             FirewallStatus.UNTRACKED -> {
                 R.string.untracked
             }
-            //FirewallStatus.BYPASS_DNS_FIREWALL -> {
-            //    R.string.bypass_dns_firewall
-            //}
+            FirewallStatus.BYPASS_DNS_FIREWALL -> {
+                R.string.bypass_dns_firewall
+            }
         }
     }
 

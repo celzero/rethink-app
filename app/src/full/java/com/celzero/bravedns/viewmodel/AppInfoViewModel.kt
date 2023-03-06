@@ -170,7 +170,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
-    /*fun updateBypassDnsFirewall(bypass: Boolean) {
+    fun updateBypassDnsFirewall(bypass: Boolean) {
         val appList = getFilteredApps()
         // update the bypass status for the filtered apps
         // if the app is already in the bypass list, remove it
@@ -190,7 +190,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         appList
             .distinctBy { it.uid }
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
-    }*/
+    }
 
     fun updateExcludeStatus(exclude: Boolean) {
         val appList = getFilteredApps()
