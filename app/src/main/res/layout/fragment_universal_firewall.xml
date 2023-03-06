@@ -7,8 +7,8 @@
     android:layout_height="match_parent"
     android:background="?attr/background"
     android:fillViewport="true"
-    tools:context=".ui.UniversalFirewallFragment"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".ui.FirewallSettingsFragment">
 
 
     <LinearLayout
@@ -17,6 +17,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="5dp">
+
+        <TextView
+            android:id="@+id/settings_activity_vpn_heading_text"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="15dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
+            android:padding="5dp"
+            android:text="@string/firewall_act_universal_tab"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/extra_large_font_text_view"
+            android:textStyle="bold" />
+
 
         <TextView
             android:layout_width="match_parent"
@@ -395,7 +411,7 @@
                     android:gravity="center_vertical"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/univ_view_blocked_ip"
+                    android:text="@string/lbl_rules"
                     android:textColor="?attr/secondaryTextColor"
                     android:textSize="@dimen/extra_large_font_text_view"
                     android:textStyle="bold" />

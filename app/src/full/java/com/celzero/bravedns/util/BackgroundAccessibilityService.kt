@@ -113,7 +113,7 @@ class BackgroundAccessibilityService : AccessibilityService(), KoinComponent {
         // no need ot handle the events when the vpn is not running
         if (!VpnController.isOn()) return
 
-        if (!persistentState.blockAppWhenBackground) return
+        if (!persistentState.getBlockAppWhenBackground()) return
 
         val latestTrackedPackage = getEventPackageName(event)
 

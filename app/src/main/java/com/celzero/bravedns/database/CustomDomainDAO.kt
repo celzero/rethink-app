@@ -57,6 +57,4 @@ interface CustomDomainDAO {
 
     @Query("update CustomDomain set status = :status where :clause")
     fun cpUpdate(status: Int, clause: String): Int
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

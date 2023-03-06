@@ -47,12 +47,23 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/custom_domain_expand_icon"
+            android:layout_toStartOf="@id/custom_domain_edit_icon"
             android:background="@drawable/rectangle_border_background"
             android:gravity="center"
             android:minWidth="25dp"
             android:padding="5dp"
             android:textSize="@dimen/default_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/custom_domain_edit_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_toStartOf="@id/custom_domain_expand_icon"
+            android:alpha="0.5"
+            android:src="@drawable/ic_edit_icon_grey" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/custom_domain_expand_icon"
@@ -68,13 +79,13 @@
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/custom_domain_toggle_group"
-        android:layout_below="@id/custom_domain_container"
-        app:selectionRequired="true"
-        app:singleSelection="true"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center">
+        android:layout_below="@id/custom_domain_container"
+        android:gravity="center"
+        android:visibility="gone"
+        app:selectionRequired="true"
+        app:singleSelection="true">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/custom_domain_tg_no_rule"

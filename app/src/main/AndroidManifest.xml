@@ -25,12 +25,14 @@
         android:protectionLevel="signature"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- https://github.com/celzero/rethink-app/issues/786 set memtagMode to off -->
     <application
         android:name=".RethinkDnsApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:memtagMode="off"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppThemeInitial"

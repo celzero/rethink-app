@@ -110,5 +110,16 @@ enum class ResourceRecordTypes(val value: Int, val desc: String) {
                 else -> false
             }
         }
+
+        fun mayContainIp(desc: String): Boolean {
+            return when (desc) {
+                A.desc,
+                AAAA.desc,
+                CNAME.desc,
+                HTTPS.desc,
+                SVCB.desc -> true
+                else -> false
+            }
+        }
     }
 }

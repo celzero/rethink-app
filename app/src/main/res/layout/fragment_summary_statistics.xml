@@ -68,19 +68,23 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.chip.Chip
                     android:id="@+id/fss_app_info_chip"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/rounded_corners_button_accent"
-                    android:minHeight="30dp"
+                    android:layout_marginEnd="10dp"
                     android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="?attr/chipBgColorPositive"
+                    app:chipSurfaceColor="@null" />
+
+
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -118,19 +122,21 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.chip.Chip
                     android:id="@+id/fss_app_info_chip_second"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/rounded_corners_button_accent"
-                    android:minHeight="30dp"
+                    android:layout_marginEnd="10dp"
                     android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="?attr/chipBgColorPositive"
+                    app:chipSurfaceColor="@null" />
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -170,19 +176,22 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.chip.Chip
                     android:id="@+id/fss_dns_logs_chip"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:layout_centerHorizontal="true"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/rounded_corners_button_accent"
-                    android:minHeight="30dp"
+                    android:layout_marginEnd="10dp"
                     android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="?attr/chipBgColorPositive"
+                    app:chipSurfaceColor="@null" />
 
             </RelativeLayout>
 
@@ -224,19 +233,21 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.chip.Chip
                     android:id="@+id/fss_dns_logs_chip_second"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/rounded_corners_button_accent"
-                    android:minHeight="30dp"
+                    android:layout_marginEnd="10dp"
                     android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="?attr/chipBgColorPositive"
+                    app:chipSurfaceColor="@null" />
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -276,19 +287,21 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.chip.Chip
                     android:id="@+id/fss_network_logs_chip"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/rounded_corners_button_accent"
-                    android:minHeight="30dp"
+                    android:layout_marginEnd="10dp"
                     android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="?attr/chipBgColorPositive"
+                    app:chipSurfaceColor="@null" />
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -327,19 +340,21 @@
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/extra_large_font_text_view" />
 
-                <androidx.appcompat.widget.AppCompatButton
+                <com.google.android.material.chip.Chip
                     android:id="@+id/fss_network_logs_chip_second"
+                    style="@style/ThinnerChip.Action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:layout_gravity="end"
-                    android:layout_marginEnd="5dp"
-                    android:background="@drawable/rounded_corners_button_accent"
-                    android:minHeight="30dp"
+                    android:layout_marginEnd="10dp"
                     android:text="@string/ssv_see_more"
-                    android:textColor="?attr/chipTextColor"
-                    android:textSize="@dimen/large_font_text_view" />
+                    android:textColor="?attr/chipTextPositive"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="?attr/chipBgColorPositive"
+                    app:chipSurfaceColor="@null" />
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView

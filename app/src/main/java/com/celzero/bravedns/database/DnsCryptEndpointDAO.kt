@@ -67,6 +67,4 @@ interface DnsCryptEndpointDAO {
     fun updateConnectionStatus(liveServerID: Int)
 
     @Transaction @Query("update DNSCryptEndpoint set isSelected=0") fun updateFailingConnections()
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

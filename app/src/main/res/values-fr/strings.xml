@@ -40,7 +40,7 @@
 \n
 \nRethinkDNS utilise le service d’accessibilité pour savoir quelles sont les applications en cours d’utilisation (avant-plan) et celles qui ne le sont pas (arrière-plan).</string>
     <string name="bsct_conn_block_desc_device">bloquée %1$s sur l’appareil</string>
-    <string name="bsct_block_app">Bloquer, tolérer <u>cette IP</u> pour <u>cette appli</u></string>
+    <string name="bsct_block_ip">Bloquer, tolérer <u>cette IP</u> pour <u>cette appli</u></string>
     <string name="always_on_dialog">L’option \"VPN permanent\" est déjà activée sur cet appareil. Pour lancer RethinkDNS, allez dans les paramètres de l’application et désactivez \"VPN permanent\".</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u> : Bloque la connexion d’une application à Internet.
 \n <u>#2</u> : Bloque la connexion d’une application à une IP particulière.
@@ -206,19 +206,16 @@
     <string name="hsf_downtime">(inactif depuis %1$s)</string>
     <string name="hsf_vpn_dialog_positive">Continuer</string>
     <string name="hsf_vpn_prepare_failure">Soit l’autorisation VPN manque, soit une autre application est en mode VPN permanent.</string>
-    <string name="hsf_network_logs_chip_text">Journaux du réseau</string>
     <string name="hsf_start_dialog_message">Vous n’êtes qu’à un pas d’un Android sûr et sécurisé : Voyez instantanément l’activité du réseau, bloquez les sites web, les IP et les applications qui se comportent mal.</string>
     <string name="hsf_whats_new_chip_text">Quoi de neuf</string>
     <string name="hsf_proxy_chip_text">Proxy actif</string>
     <string name="hsf_exclude_error">Exclusion impossible en mode confinement VPN</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy supprimé</string>
     <string name="hsf_whats_new_remove_text">Fermeture…</string>
-    <string name="hsf_dns_logs_chip_text">Journaux DNS</string>
     <string name="hsf_proxy_chip_remove_text">Arrêt…</string>
     <string name="hsf_blocklist_updating_text">Activation…</string>
     <string name="hsf_chip_appearance">Thème : %1$s</string>
     <string name="dc_entries">%1$s entrées »</string>
-    <string name="dns_logs_blocked_queries">Requêtes bloquées : %1$s</string>
     <string name="dc_other_settings_heading">avancé</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_other_dns_heading">type</string>
@@ -261,7 +258,6 @@
     <string name="settings_allow_bypass_heading">Autoriser le contournement</string>
     <string name="ada_network_log_title">journal du réseau pour cette application</string>
     <string name="settings_http_proxy_error_text2">Port invalide</string>
-    <string name="bsac_distrust">Supprimer l’exception</string>
     <string name="dns_info_positive">Valider</string>
     <string name="firewall_status_blocked">bloquée</string>
     <string name="settings_https_disabled_error">Connecté via Orbot. Désactivez-le pour continuer.</string>
@@ -281,7 +277,6 @@
     <string name="ci_no_rule_txt">Sans règle</string>
     <string name="notif_channel_vpn_notification">VPN actif</string>
     <string name="doh_custom_url_remove_success">Point de terminaison supprimé.</string>
-    <string name="dc_custom_block_desc">Modifier les règles relatives aux domaines bloqués ou de confiance</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="cd_custom_dns_proxy_name_default">Proxy</string>
     <string name="cd_dns_proxy_error_text_3">Port invalide</string>
@@ -298,7 +293,6 @@
     <string name="ci_blocked_initial">B</string>
     <string name="cd_blocked_initial">B</string>
     <string name="ada_app_status_block">est bloquée</string>
-    <string name="bsac_block_toast">Blocage de %1$s pour cette application</string>
     <string name="rt_chip_update_available">Mise à jour disponible</string>
     <string name="dc_doh">DNS over HTTPS</string>
     <string name="lbbs_copy">Copier en tant qu’URL RDNS+</string>
@@ -412,8 +406,6 @@
     <string name="firewall_rule_device_lock">Appareil verrouillé</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Cette connexion a été autorisée car la configuration <i>en un clic Tor-as-a-proxy</i> via Orbot était en cours.</string>
     <string name="ada_app_dns_settings">Paramètres DNS</string>
-    <string name="bsac_trust">Exception aux règles de l’appli</string>
-    <string name="bsac_unblock_toast">Débloqué %1$s pour cette application</string>
     <string name="rbl_security">Sécurité</string>
     <string name="rt_download">Télécharger les listes de blocage</string>
     <string name="rethink_max_desc">Plus de 50 emplacements ; plus privé ; résolveur récursif fonctionnant sur fly.io</string>
@@ -476,7 +468,6 @@
     <string name="firewall_rule_unknown">Source inconnue</string>
     <string name="category_name_sys_apps">Applications système</string>
     <string name="ada_firewall_status">Cette application <b><i>%1$s</i></b>.</string>
-    <string name="bsac_trust_toast">Ajout d’une exception pour l’IP %1$s</string>
     <string name="brbs_restore_dialog_failure_positive">Retenter la restauration</string>
     <string name="brbs_restore_complete_toast">Restauration terminée, redémarrage de l’application…</string>
     <string name="about_app">app</string>
@@ -502,7 +493,6 @@
     <string name="fav_icon">fav_icon</string>
     <string name="network_log_app_name_unnamed">Sans nom (%1$s)</string>
     <string name="ada_app_status_unknown">est dans un mode inconnu</string>
-    <string name="bsac_block">Bloquer</string>
     <string name="notif_download_success_content">Téléchargement réussi.</string>
     <string name="rbl_parental_control">Contrôle parental</string>
     <string name="rt_dialog_title">Enregistrer les changements</string>
@@ -514,7 +504,6 @@
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s liste(s) de blocage&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="settings_dns_proxy_dialog_app_desc">L’application sélectionnée sera exclue du VPN pour lui permettre d’établir des connexions par proxy pour votre compte.</string>
     <string name="always_on_dialog_neutral">Paramètres</string>
-    <string name="dns_act_log">Journaux</string>
     <string name="dns_crypt_relay_remove_dialog_message">Supprimer le relais DNSCrypt de la configuration enregistrée.</string>
     <string name="local_blocklist_redownload">À jour !</string>
     <string name="settings_enable_logs_desc">Stockez les journaux du DNS et du pare-feu localement sur l’appareil.</string>
@@ -528,7 +517,6 @@
     <string name="firewall_rule_block_ip_univ_desc">Une règle de pare-feu définie par l’utilisateur a bloqué <i>l’IP de destination / le port</i>.<br/><br/> Pour la modifier, allez sur l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Cette connexion a été bloquée car <i>l’application source</i> contournait le DNS spécifié par l’utilisateur.<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="category_name_non_app_sys">Services système</string>
-    <string name="bsac_distrust_toast">Retrait de l’exception pour l’IP %1$s</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="brbs_backup_dialog_positive">Sauvegarder</string>
     <string name="brbs_restore_no_uri_toast">La restauration a échoué ; réessayez</string>
@@ -561,7 +549,6 @@
     <string name="ci_dialog_added_success">IP ajoutée à la liste</string>
     <string name="ci_bypass_universal_initial">EG</string>
     <string name="ada_noapp_dialog_positive">D’accord</string>
-    <string name="bsac_unblock">Débloquer</string>
     <string name="rt_download_desc">Téléchargez les listes de blocage (environ 60MB) pour utiliser cette fonctionnalité.</string>
     <string name="brbs_restore_dialog_title">Restaurer une sauvegarde</string>
     <string name="hs_download_positive_default">ok</string>
@@ -711,7 +698,6 @@
     <string name="about_docs">Lire la documentation</string>
     <string name="cd_dns_proxy_error_text_2">La plage de ports doit être comprise entre 1024 et 65535</string>
     <string name="firewall_act_universal_tab">Global</string>
-    <string name="dns_logs_lifetime_queries">Total des requêtes : %1$s</string>
     <string name="cd_custom_doh_dialog_title">URL du serveur personnalisé</string>
     <string name="dns_btm_sheet_chip_no_answer">Sans réponse</string>
     <string name="dns_btm_resolved_crypt">résolu <u>anonymement</u> %1$s par %2$s</string>
@@ -782,7 +768,6 @@
 \nPour utiliser le DNS de Rethink, allez dans les paramètres d’Android et désactivez le \"DNS privé\".</string>
     <string name="private_dns_dialog_positive">Aller dans les paramètres d’Android</string>
     <string name="ci_trust_txt">Exception aux règles de l’appli</string>
-    <string name="ada_app_firewall">Pare-feu</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Effacer les journaux</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Effacer les journaux de cette application.</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Procéder</string>

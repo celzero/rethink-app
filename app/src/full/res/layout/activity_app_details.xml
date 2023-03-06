@@ -134,7 +134,7 @@
                         android:weightSum="1">
 
                         <TextView
-                            android:id="@+id/aad_app_settings_block"
+                            android:id="@+id/aad_app_settings_block1"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
@@ -146,7 +146,9 @@
                             android:text="@string/ada_app_firewall"
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
+                            android:visibility="gone"
                             app:drawableTopCompat="@drawable/ic_firewall_allow_grey" />
+
 
                         <TextView
                             android:id="@+id/aad_app_settings_block_wifi"
@@ -177,14 +179,6 @@
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_data_on_grey" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:gravity="center"
-                        android:weightSum="1">
 
                         <TextView
                             android:id="@+id/aad_app_settings_isolate"
@@ -201,6 +195,31 @@
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_lockdown_off" />
 
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center"
+                        android:weightSum="1">
+
+                        <TextView
+                            android:id="@+id/aad_app_settings_bypass_dns_firewall"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.33"
+                            android:drawablePadding="5dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="@string/ada_app_bypass_dns_firewall"
+                            android:textColor="?primaryTextColor"
+                            android:textSize="@dimen/default_font_text_view"
+                            app:drawableTopCompat="@drawable/ic_firewall_bypass_off" />
 
                         <TextView
                             android:id="@+id/aad_app_settings_bypass_univ"

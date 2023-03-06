@@ -43,8 +43,7 @@ import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.AppInfoActivity
-import com.celzero.bravedns.ui.DnsDetailActivity
-import com.celzero.bravedns.ui.FirewallActivity
+import com.celzero.bravedns.ui.NetworkLogsActivity
 import com.celzero.bravedns.ui.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
@@ -155,7 +154,7 @@ class SummaryStatisticsAdapter(
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     itemBinding.ssFlag.text = appConnection.flag
-                    val query = appConnection.appOrDnsName?.dropLast(1)
+                    val query = appConnection.appOrDnsName?.dropLastWhile { it == ',' }
                     if (query == null) {
                         hideFavIcon()
                         showFlag()
@@ -203,11 +202,13 @@ class SummaryStatisticsAdapter(
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     // remove the trailing dot
-                    itemBinding.ssName.text = appConnection.appOrDnsName?.dropLast(1)
+                    itemBinding.ssName.text =
+                        appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     // remove the trailing dot
-                    itemBinding.ssName.text = appConnection.appOrDnsName?.dropLast(1)
+                    itemBinding.ssName.text =
+                        appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                     itemBinding.ssName.text = appConnection.ipAddress
@@ -291,11 +292,7 @@ class SummaryStatisticsAdapter(
             if (!handleVpnState()) return
 
             if (appConfig.getBraveMode().isDnsActive()) {
-                startActivity(
-                    isDns = true,
-                    DnsDetailActivity.Tabs.LOGS.screen,
-                    appConnection.appOrDnsName
-                )
+                startActivity(NetworkLogsActivity.Tabs.DNS_LOGS.screen, appConnection.appOrDnsName)
             } else {
                 Utilities.showToastUiCentered(
                     context,
@@ -309,11 +306,7 @@ class SummaryStatisticsAdapter(
             if (!handleVpnState()) return
 
             if (appConfig.getBraveMode().isFirewallActive()) {
-                startActivity(
-                    isDns = false,
-                    FirewallActivity.Tabs.LOGS.screen,
-                    appConnection.ipAddress
-                )
+                startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.ipAddress)
             } else {
                 Utilities.showToastUiCentered(
                     context,
@@ -335,12 +328,8 @@ class SummaryStatisticsAdapter(
             return true
         }
 
-        private fun startActivity(isDns: Boolean, screenToLoad: Int, searchParam: String?) {
-            val intent =
-                when (isDns) {
-                    true -> Intent(context, DnsDetailActivity::class.java)
-                    false -> Intent(context, FirewallActivity::class.java)
-                }
+        private fun startActivity(screenToLoad: Int, searchParam: String?) {
+            val intent = Intent(context, NetworkLogsActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
             intent.putExtra(Constants.SEARCH_QUERY, searchParam ?: "")

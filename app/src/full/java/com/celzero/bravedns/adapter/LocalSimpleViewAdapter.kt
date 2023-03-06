@@ -16,6 +16,7 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -106,8 +107,8 @@ class LocalSimpleViewAdapter(val context: Context) :
 
         private fun setFileTag(tagIds: MutableList<Int>, selected: Int) {
             io {
-                RethinkBlocklistManager.updateFiletagsRemote(tagIds.toSet(), selected)
-                val selectedTags = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
+                RethinkBlocklistManager.updateFiletagsLocal(tagIds.toSet(), selected)
+                val selectedTags = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
                 RethinkBlocklistFragment.updateFileTagList(selectedTags)
             }
         }

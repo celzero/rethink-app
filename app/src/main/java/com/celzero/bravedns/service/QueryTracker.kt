@@ -20,6 +20,7 @@ import android.text.TextUtils
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.P2QuantileEstimation
+import com.celzero.bravedns.util.Utilities.Companion.isUnspecifiedIp
 
 /**
  * A class for tracking DNS transactions. This class counts the number of successful transactions,
@@ -70,8 +71,4 @@ class QueryTracker(private var persistentState: PersistentState) {
         persistentState.setMedianLatency(quantileEstimator!!.getQuantile())
     }
 
-    private fun isUnspecifiedIp(serverIp: String): Boolean {
-        return Constants.UNSPECIFIED_IP_IPV4 == serverIp ||
-            Constants.UNSPECIFIED_IP_IPV6 == serverIp
-    }
 }

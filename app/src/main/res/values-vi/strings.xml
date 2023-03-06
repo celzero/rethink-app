@@ -88,7 +88,6 @@
     <string name="dns_query_clear_logs_title" translatable="true">Xoá tất cả nhật ký DNS\?</string>
     <string name="dns_query_clear_logs_message" translatable="true">Thao tác này sẽ xóa nhật ký DNS trên thiết bị. Hoạt động này là không thể đảo ngược. Bạn có muốn tiếp tục\?</string>
     <string name="bsct_app_info" translatable="true">Thông tin ứng dụng</string>
-    <string name="bsct_block_app" translatable="true">Chặn, tin tưởng <u>IP này</u> cho <u>ứng dụng này</u></string>
     <string name="bsct_block" translatable="true">Chặn, bỏ qua, loại trừ, cách ly<u>ứng dụng này</u></string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s bị chặn bởi %2$s</string>
     <string name="bsct_conn_block_desc_device" translatable="true">đã chặn %1$s trên thiết bị</string>
@@ -107,7 +106,6 @@
     <string name="firewall_act_universal_tab" translatable="true">Chung</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Nhật ký mạng</string>
     <string name="dns_act_configure_tab" translatable="true">Cấu hình</string>
-    <string name="dns_act_log" translatable="true">Nhật ký</string>
     <string name="univ_firewall_dialog_title" translatable="true">Xoá quy tắc IP\?</string>
     <string name="univ_firewall_dialog_message" translatable="true">Xóa quy tắc này sẽ cho phép bất kỳ ứng dụng nào kết nối với IP này. Bạn có muốn tiếp tục\?</string>
     <string name="doh_custom_url_remove_success" translatable="true">Đã xóa điểm cuối.</string>

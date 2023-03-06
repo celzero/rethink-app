@@ -103,6 +103,4 @@ interface RethinkLocalFileTagDao {
     @Query("delete from RethinkLocalFileTag") fun deleteAll()
 
     @Query("select * from RethinkLocalFileTag order by `group`") fun getFileTags(): Cursor
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

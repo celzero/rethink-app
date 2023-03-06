@@ -83,7 +83,8 @@ class FirewallAppFragment :
         METER,
         BYPASS,
         LOCKDOWN,
-        EXCLUDE
+        EXCLUDE,
+        BYPASS_DNS_FIREWALL
     }
 
     enum class TopLevelFilter(val id: Int) {
@@ -112,16 +113,16 @@ class FirewallAppFragment :
         ALL(0),
         ALLOWED(1),
         BLOCKED(2),
-        BYPASS_UNIVERSAL(3),
+        BYPASS(3),
         EXCLUDED(4),
         LOCKDOWN(5);
 
         fun getFilter(): Set<Int> {
             return when (this) {
-                ALL -> setOf(0, 1, 2, 3, 4, 5)
+                ALL -> setOf(0, 1, 2, 3, 4, 5, 7)
                 ALLOWED -> setOf(5)
                 BLOCKED -> setOf(5)
-                BYPASS_UNIVERSAL -> setOf(2)
+                BYPASS -> setOf(2, 7)
                 EXCLUDED -> setOf(3)
                 LOCKDOWN -> setOf(4)
             }
@@ -132,7 +133,7 @@ class FirewallAppFragment :
                 ALL -> setOf(0, 1, 2, 3)
                 ALLOWED -> setOf(3)
                 BLOCKED -> setOf(0, 1, 2)
-                BYPASS_UNIVERSAL -> setOf(0, 1, 2, 3)
+                BYPASS -> setOf(0, 1, 2, 3)
                 EXCLUDED -> setOf(0, 1, 2, 3)
                 LOCKDOWN -> setOf(0, 1, 2, 3)
             }
@@ -143,8 +144,7 @@ class FirewallAppFragment :
                 ALL -> context.getString(R.string.lbl_all)
                 ALLOWED -> context.getString(R.string.lbl_allowed)
                 BLOCKED -> context.getString(R.string.lbl_blocked)
-                BYPASS_UNIVERSAL ->
-                    context.getString(R.string.fapps_firewall_filter_bypass_universal)
+                BYPASS -> context.getString(R.string.fapps_firewall_filter_bypass_universal)
                 EXCLUDED -> context.getString(R.string.fapps_firewall_filter_excluded)
                 LOCKDOWN -> context.getString(R.string.fapps_firewall_filter_isolate)
             }
@@ -156,7 +156,7 @@ class FirewallAppFragment :
                     ALL.id -> ALL
                     ALLOWED.id -> ALLOWED
                     BLOCKED.id -> BLOCKED
-                    BYPASS_UNIVERSAL.id -> BYPASS_UNIVERSAL
+                    BYPASS.id -> BYPASS
                     EXCLUDED.id -> EXCLUDED
                     LOCKDOWN.id -> LOCKDOWN
                     else -> ALL
@@ -318,6 +318,14 @@ class FirewallAppFragment :
             )
         }
 
+        b.ffaToggleAllBypassDnsFirewall.setOnClickListener {
+            showBulkRulesUpdateDialog(
+                getBulkActionDialogTitle(BlockType.BYPASS_DNS_FIREWALL),
+                getBulkActionDialogMessage(BlockType.BYPASS_DNS_FIREWALL),
+                BlockType.BYPASS_DNS_FIREWALL
+            )
+        }
+
         b.ffaToggleAllBypass.setOnClickListener {
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.BYPASS),
@@ -374,6 +382,13 @@ class FirewallAppFragment :
                     getString(R.string.fapps_unblock_dialog_title)
                 }
             }
+            BlockType.BYPASS_DNS_FIREWALL -> {
+                if (isInitTag(b.ffaToggleAllBypassDnsFirewall)) {
+                    getString(R.string.fapps_bypass_dns_firewall_dialog_title)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_title)
+                }
+            }
         }
     }
 
@@ -403,6 +418,13 @@ class FirewallAppFragment :
             BlockType.BYPASS -> {
                 if (isInitTag(b.ffaToggleAllBypass)) {
                     getString(R.string.fapps_bypass_block_dialog_message)
+                } else {
+                    getString(R.string.fapps_unblock_dialog_message)
+                }
+            }
+            BlockType.BYPASS_DNS_FIREWALL -> {
+                if (isInitTag(b.ffaToggleAllBypassDnsFirewall)) {
+                    getString(R.string.fapps_bypass_dns_firewall_dialog_message)
                 } else {
                     getString(R.string.fapps_unblock_dialog_message)
                 }
@@ -443,6 +465,9 @@ class FirewallAppFragment :
             BlockType.BYPASS -> {
                 updateBypassBulk()
             }
+            BlockType.BYPASS_DNS_FIREWALL -> {
+                updateBypassDnsFirewallBulk()
+            }
             BlockType.EXCLUDE -> {
                 updateExcludedBulk()
             }
@@ -481,7 +506,7 @@ class FirewallAppFragment :
             makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
         val bypassUniversal =
             makeFirewallChip(
-                FirewallFilter.BYPASS_UNIVERSAL.id,
+                FirewallFilter.BYPASS.id,
                 getString(R.string.fapps_firewall_filter_bypass_universal),
                 false
             )
@@ -556,30 +581,52 @@ class FirewallAppFragment :
                 b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+                b.ffaToggleAllBypassDnsFirewall.setImageResource(
+                    R.drawable.ic_bypass_dns_firewall_off
+                )
             }
             BlockType.METER -> {
                 b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
                 b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+                b.ffaToggleAllBypassDnsFirewall.setImageResource(
+                    R.drawable.ic_bypass_dns_firewall_off
+                )
             }
             BlockType.LOCKDOWN -> {
                 b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
                 b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
                 b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
+                b.ffaToggleAllBypassDnsFirewall.setImageResource(
+                    R.drawable.ic_bypass_dns_firewall_off
+                )
             }
             BlockType.BYPASS -> {
                 b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
                 b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
                 b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+                b.ffaToggleAllBypassDnsFirewall.setImageResource(
+                    R.drawable.ic_bypass_dns_firewall_off
+                )
+            }
+            BlockType.BYPASS_DNS_FIREWALL -> {
+                b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
+                b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
+                b.ffaToggleAllExclude.setImageResource(R.drawable.ic_firewall_exclude_off)
+                b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+                b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
             }
             BlockType.EXCLUDE -> {
                 b.ffaToggleAllMobileData.setImageResource(R.drawable.ic_firewall_data_on_grey)
                 b.ffaToggleAllWifi.setImageResource(R.drawable.ic_firewall_wifi_on_grey)
                 b.ffaToggleAllBypass.setImageResource(R.drawable.ic_firewall_bypass_off)
                 b.ffaToggleAllLockdown.setImageResource(R.drawable.ic_firewall_lockdown_off)
+                b.ffaToggleAllBypassDnsFirewall.setImageResource(
+                    R.drawable.ic_bypass_dns_firewall_off
+                )
             }
         }
     }
@@ -621,6 +668,19 @@ class FirewallAppFragment :
             io { appInfoViewModel.updateBypassStatus(false) }
         }
         resetFirewallIcons(BlockType.BYPASS)
+    }
+
+    private fun updateBypassDnsFirewallBulk() {
+        if (isInitTag(b.ffaToggleAllBypassDnsFirewall)) {
+            b.ffaToggleAllBypassDnsFirewall.tag = 1
+            b.ffaToggleAllBypassDnsFirewall.setImageResource(R.drawable.ic_bypass_dns_firewall_on)
+            io { appInfoViewModel.updateBypassDnsFirewall(true) }
+        } else {
+            b.ffaToggleAllBypassDnsFirewall.tag = 0
+            b.ffaToggleAllBypassDnsFirewall.setImageResource(R.drawable.ic_bypass_dns_firewall_off)
+            io { appInfoViewModel.updateBypassDnsFirewall(false) }
+        }
+        resetFirewallIcons(BlockType.BYPASS_DNS_FIREWALL)
     }
 
     private fun updateExcludedBulk() {

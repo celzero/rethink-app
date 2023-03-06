@@ -15,8 +15,6 @@
  */
 package com.celzero.bravedns.ui
 
-import android.icu.text.CompactDecimalFormat
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
@@ -42,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
 
 class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryTextListener {
     private val b by viewBinding(FragmentDnsLogsBinding::bind)
@@ -75,7 +72,6 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
-        observeDnsStats()
         if (arguments != null) {
             val query = arguments?.getString(Constants.SEARCH_QUERY) ?: return
             b.queryListSearch.setQuery(query, true)
@@ -86,36 +82,14 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         if (!persistentState.logsEnabled) {
             b.queryListLogsDisabledTv.visibility = View.VISIBLE
+            b.queryListLogsDisabledTv.text = getString(R.string.show_logs_disabled_dns_message)
             b.queryListCardViewTop.visibility = View.GONE
-            b.queryDetailsLl.visibility = View.GONE
             return
         }
 
         displayPerDnsUi()
         setupClickListeners()
         remakeFilterChipsUi()
-    }
-
-    private fun observeDnsStats() {
-        persistentState.dnsRequestsCountLiveData.observe(viewLifecycleOwner) {
-            val lifeTimeConversion = formatDecimal(it)
-            b.totalQueriesTxt.text =
-                getString(R.string.dns_logs_lifetime_queries, lifeTimeConversion)
-        }
-
-        persistentState.dnsBlockedCountLiveData.observe(viewLifecycleOwner) {
-            val blocked = formatDecimal(it)
-            b.latencyTxt.text = getString(R.string.dns_logs_blocked_queries, blocked)
-        }
-    }
-
-    private fun formatDecimal(i: Long?): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            CompactDecimalFormat.getInstance(Locale.US, CompactDecimalFormat.CompactStyle.SHORT)
-                .format(i)
-        } else {
-            i.toString()
-        }
     }
 
     private fun setupClickListeners() {
@@ -134,7 +108,6 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     private fun displayPerDnsUi() {
         b.queryListLogsDisabledTv.visibility = View.GONE
         b.queryListCardViewTop.visibility = View.VISIBLE
-        b.queryDetailsLl.visibility = View.VISIBLE
 
         b.recyclerQuery.setHasFixedSize(true)
         layoutManager = CustomLinearLayoutManager(requireContext())

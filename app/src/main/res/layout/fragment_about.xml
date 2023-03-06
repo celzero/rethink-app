@@ -100,7 +100,7 @@
                     android:layout_marginBottom="30dp"
                     android:background="@drawable/rectangle_border_background"
                     android:clickable="true"
-                    android:drawableStart="@drawable/ic_heart"
+                    android:drawableStart="@drawable/ic_heart_accent"
                     android:drawablePadding="-15dp"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"

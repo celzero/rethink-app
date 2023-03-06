@@ -68,7 +68,7 @@
     <string name="conn_track_clear_logs_message">Dabei werden nur die Netzwerkprotokolle, nicht aber die Firewall-Regeln gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchten Sie fortfahren\?</string>
     <string name="dns_query_clear_logs_title">Alle DNS-Protokolle löschen\?</string>
     <string name="dns_query_clear_logs_message">Dadurch werden die DNS-Protokolle auf dem Gerät gelöscht. Dieser Vorgang ist nicht umkehrbar. Möchten Sie fortfahren\?</string>
-    <string name="bsct_block_app">Blockieren, <u>dieser IP</u> für <u>diese App</u> vertrauen</string>
+    <string name="bsct_block_ip">Blockieren, <u>dieser IP</u> für <u>diese App</u> vertrauen</string>
     <string name="bsct_block"><u>Diese App</u> blockieren, umgehen, ausschließen, isolieren</string>
     <string name="bsct_conn_block_desc">blockiert %1$s durch %2$s</string>
     <string name="bsct_conn_desc_blocked">blockiert am %1$s %2$s</string>
@@ -191,7 +191,6 @@
     <string name="settings_orbot_notification_content">Der Start von Tor-as-a-Proxy ist fehlgeschlagen. Öffne die Orbot-App, um sie manuell zu starten.</string>
     <string name="settings_ip_network_desc">Wählen Sie zwischen den Versionen des Internetprotokolls.</string>
     <string name="settings_socks5_desc">Verbindungen zum SOCKS5-Endpunkt weiterleiten.</string>
-    <string name="dns_act_log">Protokoll</string>
     <string name="orbot_bs_status_3">Weiterleitung %1$s an Orbot, HTTP Proxy ebenfalls eingestellt.</string>
     <string name="orbot_install_activity_error">Irgendetwas ist schief gelaufen, versuchen Sie es nach einiger Zeit erneut</string>
     <string name="settings_orbot_notification_action">Orbot öffnen</string>
@@ -414,9 +413,6 @@
     <string name="ada_app_status_isolate">ist isoliert; nur vertrauenswürdige IPs erlaubt</string>
     <string name="ada_app_status_unknown">ist unbekannt</string>
     <string name="ada_app_status_whitelist">umgeht die universellen Firewall-Regeln</string>
-    <string name="bsac_unblock_toast">Ungesperrt %1$s für diese App</string>
-    <string name="bsac_distrust_toast">%1$s für diese App nicht vertrauen</string>
-    <string name="bsac_trust_toast">%1$s für diese App vertrauen</string>
     <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines">Elterliche Kontrolle</string>
     <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines">Datenschutz</string>
     <string name="notif_download_cancel_content">Download abgebrochen.</string>
@@ -470,9 +466,7 @@
     <string name="ci_dialog_desc">IP-Adresse, IP-Subnetz (Bereich), Port zulassen (umgehen) oder sperren. Beispiel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
     <string name="ada_app_status_exclude">ist von DNS und Firewall ausgeschlossen</string>
     <string name="ada_firewall_title">Firewall-Regeln für diese Anwendung</string>
-    <string name="ada_app_firewall">Firewall</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Fortfahren</string>
-    <string name="bsac_trust">Vertrauen</string>
     <string name="bsdl_blocked_desc">blockiert %1$s durch %2$s</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperren Sie Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating, sowie soziale Medien.</string>
     <string name="rt_dialog_message">Möchten Sie neu konfigurierte Blocklisten anwenden\?</string>
@@ -518,10 +512,6 @@
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Protokolle löschen</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Löschen Sie alle Protokolle, die sich auf diese Anwendung beziehen.</string>
     <string name="bsac_title_desc">Die Regeln gelten nur für diese App.</string>
-    <string name="bsac_unblock">Entsperren</string>
-    <string name="bsac_block">Sperren</string>
-    <string name="bsac_distrust">Nicht vertrauen</string>
-    <string name="bsac_block_toast">Sperrung von %1$s für diese Anwendung</string>
     <string name="network_dns">System DNS</string>
     <string name="notif_download_content_title">On-Device Blockliste herunterladen</string>
     <string name="notif_download_content_text">Download in Arbeit…</string>
@@ -571,8 +561,6 @@
     <string name="hsf_start_dialog_message">Sie sind einen Schritt von einem sicheren Android entfernt: Kontrollieren Sie Netzwerkaktivitäten, blockieren Sie Webseiten, IP-Adressen oder Apps mit unerwünschten Verhaltensweisen.</string>
     <string name="hsf_proxy_chip_text">Proxy aktiviert</string>
     <string name="hsf_blocklist_chip_text_no_data">RDNS+ aktivieren</string>
-    <string name="hsf_dns_logs_chip_text">DNS Logs</string>
-    <string name="hsf_network_logs_chip_text">Netzwerk Logs</string>
     <string name="hsf_exclude_error">Ausschließen im VPN-Lockdown-Modus nicht möglich</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy entfernt</string>
     <string name="hsf_proxy_chip_remove_text">Stoppen…</string>
@@ -581,8 +569,6 @@
     <string name="hsf_chip_appearance">Thema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Kann nicht pausieren: RethinkDNS nicht aktiv</string>
     <string name="hsf_pause_lockdown_failure">Kann nicht pausieren: RethinkDNS im Lockdown-Modus</string>
-    <string name="dns_logs_lifetime_queries">Alle Abfragen: %1$s</string>
-    <string name="dns_logs_blocked_queries">Blockierte Abfragen: %1$s</string>
     <string name="dc_block_heading">Regeln</string>
     <string name="dc_other_dns_heading">Typ</string>
     <string name="about_bravedns_whoarewe">RethinkDNS ist ein freies und quelloffenes Projekt, das von ehemaligen Ingenieuren von Amazon, IBM und Scientific Games geleitet wird.</string>
@@ -631,7 +617,6 @@
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="dns_log_dialog_positive">Protokolle löschen</string>
     <string name="dns_btm_sheet_chip">+%1$s andere IPs</string>
-    <string name="dc_custom_block_desc">Ändern von Regeln für blockierte oder vertrauenswürdige Domänen</string>
     <string name="dc_dns_website_heading">Zeige Website Icon in DNS-Logs (experimentell)</string>
     <string name="dc_dns_website_desc">Ruft Webseitensymbole von <i>nextdns.io</i> und <i>duckduckgo.com</i> ab. Verbraucht bis zu 350 MB Speicherplatz</string>
     <string name="dc_dns_leaks_heading">Verhindere DNS Lecks</string>

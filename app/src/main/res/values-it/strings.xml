@@ -65,7 +65,7 @@
     <string name="dns_query_clear_logs_title">Cancellare il registro delle connessioni DNS\?</string>
     <string name="dns_query_clear_logs_message">Ciò eliminerà il registro delle connessioni DNS sul dispositivo. Questa operazione non è reversibile. Vuoi procedere\?</string>
     <string name="bsct_app_info">Informazioni sull\'app</string>
-    <string name="bsct_block_app">Blocca, autorizza <u>questo IP</u> per <u>questa app</u></string>
+    <string name="bsct_block_ip">Blocca, autorizza <u>questo IP</u> per <u>questa app</u></string>
     <string name="bsct_block">Blocca, aggira, escludi, isola <u>questa app</u></string>
     <string name="bsct_conn_block_desc">bloccato %1$s da %2$s</string>
     <string name="bsct_conn_desc_allowed">consentito su %1$s %2$s</string>
@@ -78,7 +78,6 @@
     <string name="firewall_act_universal_tab">Regole Universali</string>
     <string name="firewall_act_network_monitor_tab">Registro di rete</string>
     <string name="dns_act_configure_tab">Configura</string>
-    <string name="dns_act_log">Registro</string>
     <string name="univ_firewall_dialog_title">Eliminare regola IP\?</string>
     <string name="univ_firewall_dialog_message">L\'eliminazione di questa regola consentirà a qualsiasi app di connettersi a questo IP. Vuoi procedere\?</string>
     <string name="doh_custom_url_remove_dialog_title">Eliminare l\'endpoint DoH\?</string>
@@ -306,7 +305,6 @@
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_unmetered">Non a consumo</string>
     <string name="ada_app_metered">A consumo</string>
-    <string name="bsac_distrust_toast">Rimuovi autorizzazione a %1$s per questo IP</string>
     <string name="bsdl_blocked_desc">bloccato %1$s da %2$s</string>
     <string name="network_dns">DNS del sistema</string>
     <string name="notif_download_success_content">Scaricamento completato.</string>
@@ -395,8 +393,6 @@
     <string name="hsf_whats_new_chip_text">Cosa c\'è di nuovo</string>
     <string name="hsf_proxy_chip_text">Proxy attivo</string>
     <string name="hsf_blocklist_chip_text_no_data">Attiva RDNS+</string>
-    <string name="hsf_dns_logs_chip_text">Registro DNS</string>
-    <string name="hsf_network_logs_chip_text">Registro di rete</string>
     <string name="hsf_exclude_error">Impossibile escludere in modalità VPN obbligatoria</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy rimosso</string>
     <string name="hsf_proxy_chip_remove_text">Arresto…</string>
@@ -405,8 +401,6 @@
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Impossibile mettere in pausa: RethinkDNS non è attivo</string>
     <string name="hsf_pause_lockdown_failure">Impossibile mettere in pausa: RethinkDNS è impostata come VPN obbligatoria</string>
-    <string name="dns_logs_lifetime_queries">Richieste totali: %1$s</string>
-    <string name="dns_logs_blocked_queries">Richieste bloccate: %1$s</string>
     <string name="dc_block_heading">regole</string>
     <string name="dc_other_dns_heading">tipo</string>
     <string name="dc_other_settings_heading">avanzate</string>
@@ -416,7 +410,6 @@
     <string name="dc_local_block_heading">Liste dei filtri sul dispositivo</string>
     <string name="dc_local_block_desc_1">Scegli tra più di 195 liste di filtri. Clicca qui per scaricarle o configurarle.</string>
     <string name="dc_custom_block_heading">Regole domini</string>
-    <string name="dc_custom_block_desc">Modifica le regole dei domini bloccati o attendibili</string>
     <string name="dc_dns_website_heading">Mostra l\'icona dei siti web nel registro DNS (sperimentale)</string>
     <string name="dc_dns_website_desc">Recupera icone dei siti web da <i>nextdns.io</i> e <i>duckduckgo.com</i>. Utilizza fino a 350 MB di spazio su disco</string>
     <string name="dc_dns_leaks_heading">Previeni aggiramenti del DNS</string>
@@ -706,13 +699,6 @@
     <string name="ada_app_exclude">Escludi</string>
     <string name="ada_app_dns_settings">Impostazioni DNS</string>
     <string name="bsac_title_desc">Le regole si applicano solo a quest\'app.</string>
-    <string name="bsac_unblock">Sblocca</string>
-    <string name="bsac_block">Blocca</string>
-    <string name="bsac_trust">Autorizza</string>
-    <string name="bsac_distrust">Rimuovi autorizzazione</string>
-    <string name="bsac_block_toast">%1$s bloccato per quest\'app</string>
-    <string name="bsac_unblock_toast">%1$s sbloccato per quest\'app</string>
-    <string name="bsac_trust_toast">Autorizza %1$s per questa app</string>
     <string name="notif_download_content_title">Scaricamento liste dei filtri su dispositivo</string>
     <string name="notif_download_content_text">Scaricamento in corso…</string>
     <string name="rt_dialog_title">Salva cambiamenti</string>
@@ -774,7 +760,6 @@
     <string name="no_browser_error">Impossibile aprire pagina web da browser.</string>
     <string name="firewall_rule_block_univ_ip">IP / Porta (universale)</string>
     <string name="ci_trust_txt">Autorizzato</string>
-    <string name="ada_app_firewall">Firewall</string>
     <string name="ada_firewall_title">regole firewall per questa app</string>
     <string name="ada_app_isolate">Isola</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Procedi</string>

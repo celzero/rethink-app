@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
+            android:visibility="gone"
             android:focusable="true"
             android:padding="5dp"
             android:text="@string/ci_header"
@@ -30,8 +31,9 @@
         <RelativeLayout
             android:id="@+id/cip_no_rules_rl"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/cip_heading"
+            android:layout_centerInParent="true"
             android:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -48,9 +50,10 @@
                 android:textSize="@dimen/heading_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="match_parent"
+                android:layout_width="220dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/cip_no_rules_text"
+                android:layout_centerHorizontal="true"
                 android:src="@drawable/illustrations_no_record" />
 
         </RelativeLayout>

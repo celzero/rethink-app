@@ -12,6 +12,7 @@
         android:id="@+id/firewall_act_tabLayout"
         style="@style/TabbedLayoutDefault"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="wrap_content" />
 
     <androidx.viewpager2.widget.ViewPager2

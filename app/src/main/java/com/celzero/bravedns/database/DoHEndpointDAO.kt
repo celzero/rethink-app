@@ -55,6 +55,4 @@ interface DoHEndpointDAO {
     fun getConnectedDoH(): DoHEndpoint?
 
     @Query("select count(*) from DoHEndpoint") fun getCount(): Int
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

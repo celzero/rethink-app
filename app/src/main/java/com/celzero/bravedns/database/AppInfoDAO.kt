@@ -125,6 +125,4 @@ interface AppInfoDAO {
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetailsCursor(): Cursor
 
     @Query("delete from AppInfo where uid = :uid") fun deleteByUid(uid: Int): Int
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

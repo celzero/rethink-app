@@ -59,7 +59,7 @@
     <string name="status_protected_with_proxy_private_dns">zabezpieczone przez proxy &amp; prywatnym dns</string>
     <string name="status_protected_with_socks5_private_dns">zabezpieczone przez socks5 &amp; prywatnym dns</string>
     <string name="bsct_conn_block_desc_device">zablokowane %1$s na urządzeniu</string>
-    <string name="bsct_block_app">Blokowanie, zaufaj <u>temu adresowi IP</u> dla <u>tej aplikacji</u></string>
+    <string name="bsct_block_ip">Blokowanie, zaufaj <u>temu adresowi IP</u> dla <u>tej aplikacji</u></string>
     <string name="bsct_block">Blokuj, omijaj, wyklucz, izoluj <u>tę aplikację</u></string>
     <string name="bsct_conn_block_desc">zablokowany %1$s przez %2$s</string>
     <string name="bsct_conn_desc_allowed">dozwolony na %1$s %2$s</string>
@@ -116,7 +116,6 @@
     <string name="firewall_act_universal_tab">Uniwersalny</string>
     <string name="firewall_act_network_monitor_tab">Logi sieciowe</string>
     <string name="dns_act_configure_tab">Konfiguruj</string>
-    <string name="dns_act_log">Logi</string>
     <string name="univ_firewall_dialog_message">Usunięcie tej reguły pozwoli każdej aplikacji na połączenie się z tym IP. Czy chcesz kontynuować\?</string>
     <string name="doh_custom_url_remove_dialog_title">Usunąć punkt końcowy DoH\?</string>
     <string name="dns_crypt_relay_remove_dialog_title">Usunąć DNSCrypt Relay\?</string>

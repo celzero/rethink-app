@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
+
 class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
 
     suspend fun insert(dnsLog: DnsLog) {
@@ -31,5 +33,9 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
 
     suspend fun clearAllData() {
         dnsLogDAO.clearAllData()
+    }
+
+    fun logsCount(): LiveData<Long> {
+        return dnsLogDAO.logsCount()
     }
 }

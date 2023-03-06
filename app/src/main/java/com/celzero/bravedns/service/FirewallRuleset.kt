@@ -68,6 +68,12 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         R.string.firewall_rule_isolate_desc,
         R.integer.stall
     ),
+    RULE1H(
+        "Rule #1H",
+        R.string.firewall_rule_bypass_dns_firewall,
+        R.string.firewall_rule_bypass_dns_firewall_desc,
+        R.integer.allow
+    ),
     RULE2(
         "Rule #2",
         R.string.firewall_rule_block_ip,
@@ -102,6 +108,24 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         "Rule #2F",
         R.string.firewall_rule_trusted_domain,
         R.string.firewall_rule_trusted_domain_desc,
+        R.integer.allow
+    ),
+    RULE2G(
+        "Rule #2G",
+        R.string.firewall_rule_dns_blocked,
+        R.string.firewall_rule_dns_blocked_desc,
+        R.integer.stall
+    ),
+    RULE2H(
+        "Rule #2H",
+        R.string.firewall_rule_domain_blocked_univ,
+        R.string.firewall_rule_domain_blocked_univ_desc,
+        R.integer.stall
+    ),
+    RULE2I(
+        "Rule #2I",
+        R.string.firewall_rule_domain_trusted_univ,
+        R.string.firewall_rule_domain_trusted_univ_desc,
         R.integer.allow
     ),
     RULE3(
@@ -176,12 +200,16 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE1E.id -> RULE1E
                 RULE1F.id -> RULE1F
                 RULE1G.id -> RULE1G
+                RULE1H.id -> RULE1H
                 RULE2.id -> RULE2
                 RULE2B.id -> RULE2B
                 RULE2C.id -> RULE2C
                 RULE2D.id -> RULE2D
                 RULE2E.id -> RULE2E
                 RULE2F.id -> RULE2F
+                RULE2G.id -> RULE2G
+                RULE2H.id -> RULE2H
+                RULE2I.id -> RULE2I
                 RULE3.id -> RULE3
                 RULE4.id -> RULE4
                 RULE5.id -> RULE5
@@ -207,12 +235,16 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE1E.id -> R.drawable.ic_firewall_data_on_grey_alpha
                 RULE1F.id -> R.drawable.ic_univ_metered
                 RULE1G.id -> R.drawable.ic_firewall_lockdown_off
+                RULE1H.id -> R.drawable.ic_bypass_dns_firewall_off
                 RULE2.id -> R.drawable.ic_firewall_block_grey
                 RULE2B.id -> R.drawable.ic_bypass
                 RULE2C.id -> R.drawable.ic_bypass
                 RULE2D.id -> R.drawable.ic_bypass
                 RULE2E.id -> R.drawable.bs_dns_home_screen
                 RULE2F.id -> R.drawable.bs_dns_home_screen
+                RULE2G.id -> R.drawable.bs_dns_home_screen
+                RULE2H.id -> R.drawable.bs_dns_home_screen
+                RULE2I.id -> R.drawable.bs_dns_home_screen
                 RULE3.id -> R.drawable.ic_device_lock
                 RULE4.id -> R.drawable.ic_foreground
                 RULE5.id -> R.drawable.ic_unknown_app
@@ -235,10 +267,6 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return values().toList().filter { it.act != R.integer.allow }
         }
 
-        fun stall(rule: FirewallRuleset): Boolean {
-            return rule.act == R.integer.stall
-        }
-
         fun ground(rule: FirewallRuleset): Boolean {
             return rule.act != R.integer.allow
         }
@@ -248,12 +276,14 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
 
             return when (rule) {
                 RULE8.id -> true
+                RULE1H.id -> true
                 RULE9.id -> true
                 RULE9B.id -> true
                 RULE7.id -> true
                 RULE2B.id -> true
                 RULE2C.id -> true
                 RULE2F.id -> true
+                RULE2I.id -> true
                 else -> false
             }
         }

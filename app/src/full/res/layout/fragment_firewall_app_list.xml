@@ -159,11 +159,27 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_toStartOf="@id/ffa_toggle_all_wifi"
+            android:layout_toStartOf="@id/ffa_toggle_all_bypass_dns_firewall"
             android:maxWidth="24dp"
             android:maxHeight="24dp"
             android:padding="5dp"
             android:src="@drawable/ic_firewall_bypass_off"
+            android:tag="0" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ffa_toggle_all_bypass_dns_firewall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@id/ffa_toggle_all_wifi"
+            android:maxWidth="24dp"
+            android:maxHeight="24dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_bypass_dns_firewall_off"
             android:tag="0" />
 
         <androidx.appcompat.widget.AppCompatImageView

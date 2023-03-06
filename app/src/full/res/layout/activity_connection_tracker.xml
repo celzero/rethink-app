@@ -112,11 +112,7 @@
             android:clickable="true"
             android:focusable="true"
             android:orientation="vertical"
-            app:fastScrollEnabled="true"
-            app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
-            app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_line_drawable"
-            app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb_drawable"
-            app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_line_drawable" />
+            />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/connection_list_scroll_header"

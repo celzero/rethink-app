@@ -513,7 +513,6 @@ class RethinkBlocklistFragment :
 
     private fun processSelectedFileTags(stamp: String) {
         val list = RethinkBlocklistManager.getTagsFromStamp(requireContext(), stamp, type)
-
         updateSelectedFileTags(list.toMutableSet())
     }
 

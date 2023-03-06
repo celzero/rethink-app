@@ -31,9 +31,11 @@ import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.IpManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.ResourceRecordTypes
+import com.celzero.bravedns.util.Utilities.Companion.calculateTtl
 import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
 import com.celzero.bravedns.util.Utilities.Companion.getFlag
 import com.celzero.bravedns.util.Utilities.Companion.makeAddressPair
+import com.celzero.bravedns.util.Utilities.Companion.normalizeIp
 import dnsx.Dnsx
 import dnsx.Summary
 import inet.ipaddr.HostName
@@ -61,7 +63,7 @@ internal constructor(
         // Some apps like firefox, instagram do not respect ttls
         // add a reasonable grace period to account for that
         // for eg: https://support.mozilla.org/en-US/questions/1213045
-        private val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
+        val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
         private const val RDATA_MAX_LENGTH = 100
     }
 
@@ -169,6 +171,8 @@ internal constructor(
                                 )
                             ipDomainLookup.put(it, dnsCacheRecord)
                         }
+                    } else {
+                        // no-op
                     }
                 } else {
                     // no ip address found
@@ -253,32 +257,6 @@ internal constructor(
         }
     }
 
-    private fun normalizeIp(ipstr: String?): InetAddress? {
-        if (ipstr == null) return null
-
-        val ipAddress: IPAddress = HostName(ipstr).address ?: return null
-        val ip = ipAddress.toInetAddress()
-
-        // no need to check if IP is not of type IPv6
-        if (!IpManager.isIpV6(ipAddress)) return ip
-
-        val ipv4 = IpManager.toIpV4(ipAddress)
-
-        return if (ipv4 != null) {
-            ipv4.toInetAddress()
-        } else {
-            ip
-        }
-    }
-
-    private fun calculateTtl(ttl: Long): Long {
-        val now = System.currentTimeMillis()
-
-        // on negative ttl, cache dns record for a day
-        if (ttl < 0) return now + TimeUnit.DAYS.toMillis(1L)
-
-        return now + TimeUnit.SECONDS.toMillis((ttl + DNS_TTL_GRACE_SEC))
-    }
 
     private fun fetchFavIcon(dnsLog: DnsLog) {
         if (!persistentState.fetchFavIcon || dnsLog.groundedQuery()) return

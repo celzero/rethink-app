@@ -62,6 +62,4 @@ interface DnsCryptRelayEndpointDAO {
     fun getConnectedRelays(): List<DnsCryptRelayEndpoint>
 
     @Transaction @Query("select count(*) from DNSCryptRelayEndpoint") fun getCount(): Int
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

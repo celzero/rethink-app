@@ -85,6 +85,4 @@ interface CustomIpDao {
         "select * from CustomIp where ipAddress like :query and uid = :uid and  isActive = 1 order by modifiedDateTime desc"
     )
     fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

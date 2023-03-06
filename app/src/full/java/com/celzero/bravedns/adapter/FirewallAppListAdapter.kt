@@ -123,6 +123,8 @@ class FirewallAppListAdapter(
                     context.getString(R.string.firewall_status_isolate)
                 FirewallManager.FirewallStatus.BYPASS_UNIVERSAL ->
                     context.getString(R.string.firewall_status_whitelisted)
+                FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL ->
+                    context.getString(R.string.firewall_status_bypass_dns_firewall)
                 FirewallManager.FirewallStatus.UNTRACKED ->
                     context.getString(R.string.firewall_status_unknown)
             }
@@ -165,6 +167,10 @@ class FirewallAppListAdapter(
                     showMobileDataUnused()
                     showWifiUnused()
                 }
+                /*FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
+                    showMobileDataUnused()
+                    showWifiUnused()
+                }*/
                 else -> {
                     showWifiDisabled()
                     showMobileDataDisabled()
@@ -241,6 +247,11 @@ class FirewallAppListAdapter(
                     )
                 }
                 FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
+                    mIconIndicator.setBackgroundColor(
+                        context.getColor(R.color.primaryLightColorText)
+                    )
+                }
+                FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
                     mIconIndicator.setBackgroundColor(
                         context.getColor(R.color.primaryLightColorText)
                     )

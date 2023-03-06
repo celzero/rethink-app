@@ -124,8 +124,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v053m)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1672610161204
+        // default filetag.json for remote blocklist (stored in assets folder) (v054)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1677707762437
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"
@@ -135,9 +135,6 @@ class Constants {
 
         // base-url for rethinkdns
         const val RETHINKDNS_DOMAIN = "rethinkdns.com"
-
-        // default doh url
-        const val DEFAULT_DOH_URL = "https://zero.rethinkdns.com/dns-query"
 
         // json object constants received as part of update check
         // FIXME: Avoid usage of these parameters, map to POJO instead
@@ -266,5 +263,26 @@ class Constants {
 
         // intent extra name for uid
         const val INTENT_UID = "UID"
+
+        data class DefaultDnsServer(val id: Int, val name: String, val url: String, val type: String)
+
+        const val BLOCK_FREE_DNS_MAX = "https://max.rethinkdns.com/dns-query"
+        const val BLOCK_FREE_DNS_SKY = "https://sky.rethinkdns.com/dns-query"
+
+        val DEFAULT_DNS_LIST =
+            listOf(
+                DefaultDnsServer(0, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
+                DefaultDnsServer(1, "Google", "https://dns.google.com/dns-query", "DoH"),
+                DefaultDnsServer(2, "CloudFlare", "https://cloudflare-dns.com/dns-query", "DoH")
+            )
+
+        // pcap folder name
+        const val PCAP_FOLDER_NAME = "Rethink"
+
+        // pcap file name
+        const val PCAP_FILE_NAME_PART = "Rethink_PCAP_"
+
+        // pcap file extension
+        const val PCAP_FILE_EXTENSION = ".pcap"
     }
 }

@@ -61,11 +61,9 @@
     <string name="accessibility_service_description">يستخدم RethinkDNS خدمة إمكانية الوصول لاكتشاف تطبيقات الخلفية وحمايتها. لا يقوم RethinkDNS بجمع أو بيع أي معلومات.</string>
     <string name="cd_custom_doh_dialog_title">عنوان URL مخصص للخادم</string>
     <string name="ada_ip_connection_count_zero">0 عنوان IP</string>
-    <string name="bsac_trust_toast">تجاوز قواعد التطبيق لعنوان IP هذا %1$s</string>
     <string name="rethink_max_desc">أكثر من 50 موقعًا ؛ أكثر خصوصية محلل تكراري يعمل على fly.io</string>
     <string name="orbot_status_arg_3">DNS و TCP</string>
     <string name="firewall_status_allow">مسموح</string>
-    <string name="hsf_dns_logs_chip_text">سجلات DNS</string>
     <string name="univ_ip_delete_individual_positive">احذف</string>
     <string name="hsf_proxy_chip_remove_text">يتوقف…</string>
     <string name="category_name_others">أخرى</string>
@@ -79,7 +77,6 @@
     <string name="rt_re_download">إعادة تنزيل قوائم الحظر</string>
     <string name="orbot_stop_dialog_neutral">تغيير DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
-    <string name="bsac_distrust_toast">تم إزالة تجاوز لـ IP هذا %1$s</string>
     <string name="rbl_privacy">الخصوصية</string>
     <string name="about_app">تطبيق</string>
     <string name="firewall_rule_block_metered">مقنن (جوال)</string>
@@ -105,8 +102,6 @@
     <string name="hsf_blocklist_updating_text">جارٍ التمكين …</string>
     <string name="firewall_rule_unknown">المصدر غير معروف</string>
     <string name="notif_channel_download">تنزيل التنبيهات</string>
-    <string name="bsac_block">حظر</string>
-    <string name="bsac_unblock">إلغاء الحظر</string>
     <string name="network_log_app_name_unnamed">بدون اسم (%1$s)</string>
     <string name="settings_http_proxy_error_text2">المنفذ غير صالح</string>
     <string name="settings_vpn_heading">vpn</string>
@@ -208,7 +203,6 @@
     <string name="brbs_backup_complete_toast">النسخ الاحتياطي اكتمل</string>
     <string name="status_protected_with_http_private_dns">محمي ببروكسي http ونظام dns الخصوصي</string>
     <string name="notification_action_stop_vpn">قف</string>
-    <string name="dns_act_log">السجلات</string>
     <string name="settings_socks5_desc">قم بإعادة توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
     <string name="orbot_install_activity_error">حدث خطأ ما ، حاول بعد قليل</string>
     <string name="settings_socks5_dialog_hint_port">المنفذ</string>
@@ -237,7 +231,6 @@
     <string name="build__flavor_fdroid">فدرويد</string>
     <string name="cd_dialog_header">%1$s: المجال (المجالات) المخصص</string>
     <string name="cd_toast_added">تمت إضافة المجال بنجاح</string>
-    <string name="bsac_block_toast">حظر %1$s لهذا التطبيق</string>
     <string name="lbbs_enabled">‮مُفعّل</string>
     <string name="status_protected_with_private_dns">محمي بنظام أسماء النطاقات الخصوصي</string>
     <string name="bsct_conn_desc_allowed">مسموح به على %1$s %2$s</string>
@@ -249,7 +242,6 @@
     <string name="settings_https_disabled_error">متصل بـ Orbot. قم بإيقاف تشغيله للمتابعة.</string>
     <string name="settings_http_proxy_desc">إعادة توجيه إلى %1$s: %2$s</string>
     <string name="settings_socks5_dialog_hint_ip">عنوان الإنترنت (IP address)</string>
-    <string name="dns_logs_lifetime_queries">استعلامات مدى الحياة: %1$s</string>
     <string name="about_mail_bugreport_share_title">حدد مزود البريد الإلكتروني</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
     <string name="ctbs_block_other_apps">القواعد المطبقة على %1$s ستنطبق أيضًا على تطبيقات أخرى %2$s</string>
@@ -424,8 +416,6 @@
     <string name="notif_channel_desc_vpn_notification">أبلغ عندما يكون RethinkDNS نشطًا ويعمل في الخلفية</string>
     <string name="category_name_installed">التطبيقات المثبتة</string>
     <string name="ci_dialog_error_invalid_ip">عنوان IP أو الشبكة الفرعية أو المنفذ غير صالح.</string>
-    <string name="bsac_trust">تجاوز قواعد التطبيق</string>
-    <string name="bsac_distrust">إزالة الالتفافية</string>
     <string name="dns_act_configure_tab">الضبط</string>
     <string name="local_blocklist_download_desc">هل تريد تنزيل قوائم الحظر (حوالي 60 ميجابايت) لاستخدام هذه الميزة؟</string>
     <string name="download_update_dialog_message_ok">أنت بالفعل على أحدث إصدار.</string>
@@ -467,7 +457,6 @@
     <string name="settings_orbot_install_desc">انقر هنا لتثبيت Orbot</string>
     <string name="settings_orbot_notification_content">فشل بدء Tor-a-Proxy. افتح تطبيق Orbot لبدء تشغيله يدويًا.</string>
     <string name="settings_notification_heading">اختر إجراء الإخطار</string>
-    <string name="hsf_network_logs_chip_text">سجلات الشبكة</string>
     <string name="hsf_proxy_chip_removed_toast">تمت إزالة الوكيل</string>
     <string name="dc_other_dns_heading">النوع</string>
     <string name="about_connect">اتصل</string>
@@ -490,7 +479,6 @@
     <string name="hsf_stop_btn_state">توقف</string>
     <string name="hsf_start_dialog_header">ابدأ %1$s</string>
     <string name="hsf_pause_lockdown_failure">لا يمكن التوقف مؤقتاً: RethinkDNS في وضع القفل</string>
-    <string name="dns_logs_blocked_queries">الاستعلامات المحظورة: %1$s</string>
     <string name="about_github">المساهمة على جيثب</string>
     <string name="dns_btm_sheet_chip_no_answer">لا اجابة</string>
     <string name="univ_view_blocked_ip">قواعد الملكية الفكرية والميناء</string>
@@ -503,7 +491,6 @@
     <string name="notif_channel_vpn_failure">VPN غير نشط</string>
     <string name="ci_delete">حذف</string>
     <string name="ada_app_status_block">تم حظره</string>
-    <string name="bsac_unblock_toast">غير محظور %1$s لهذا التطبيق</string>
     <string name="notif_download_success_content">تم التنزيل بنجاح.</string>
     <string name="rt_dialog_title">حفظ التغييرات</string>
     <string name="rt_dialog_message">هل تريد تطبيق قوائم الحظر المكونة حديثًا؟</string>
@@ -523,7 +510,6 @@
 \n%3$s مستثنى
 \n%4$s مقفل</string>
     <string name="dc_custom_dns_radio">DNS آخر</string>
-    <string name="dc_custom_block_desc">قريبا</string>
     <string name="about_bravedns_whoarewe">RethinkDNS هو مشروع مجاني ومفتوح المصدر ، يقوده مهندسين سابقين من Amazon و IBM و Scientific Games.</string>
     <string name="cd_custom_dns_proxy_name_default">البروكسي</string>
     <string name="cd_dns_proxy_error_text_1">عنوان IP غير صالح</string>
@@ -679,7 +665,7 @@
     <string name="settings_ip_network_heading">اختر إصدار IP</string>
     <string name="orbot_bs_status_2">تم تعيين وكيل HTTP (قد تتجاهله التطبيقات).</string>
     <string name="whats_new_version_update">&lt;b&gt;متعدد اللغات!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. إعادة دعم Android 6.&lt;br/&gt;2. تجديد RDNS + UI.&lt;br/&gt; 3. تجديد محرك الشبكة وجدار الحماية.&lt;br/&gt; 4. &lt;i&gt;ميزة جديدة&lt;/i&gt;: الترجمة لأكثر من 15 لغة&lt;br/&gt; 5. &lt;i&gt;ميزة جديدة&lt;/i&gt;: ايقونات متكيفة&lt;br/&gt; 6. &lt;i&gt;ميزة جديدة&lt;/i&gt;: إظهار أسماء النطاقات في سجلات شبكة التطبيق.&lt;br/&gt; 7. إصلاح الاشعارات المفقودة في Android 13.&lt;br/&gt; 8. إصلاح سلوك Orbot DNS المتضمن.&lt;br/&gt; 9. شاشة التطبيقات متاحة الآن في نمط DNS-only.&lt;br/&gt; 10. تحسينات كبيرة على مدير التنزيل المدمج.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;ساعدنا في ترجمة هذا التطبيق&lt;/a&gt;</string>
-    <string name="bsct_block_app">حظر ، تجاوز <u> عنوان IP هذا </u> لـ <u> هذا التطبيق </u></string>
+    <string name="bsct_block_ip">حظر ، تجاوز <u> عنوان IP هذا </u> لـ <u> هذا التطبيق </u></string>
     <string name="bsct_block">حظر ، تجاوز ، استبعاد ، تأمين <u> هذا التطبيق </u></string>
     <string name="orbot_both_desc">كل ما ورداعلاه.</string>
     <string name="orbot_stop_dialog_message">توقف RethinkDNS عن إعادة توجيه الاتصالات إلى Orbot ، ولكن ربما يعمل Orbot في الخلفية.</string>
@@ -794,7 +780,6 @@
     <string name="private_dns_dialog_desc">تم تجاوز إعدادات DNS الخاصة بـ Rethink بواسطة DNS الخاص بنظام Android.
 \n
 \nلاستخدام DNS الخاص بـ Rethink، انتقل إلى إعدادات Android وقم بإيقاف تشغيل \"Private DNS\".</string>
-    <string name="ada_app_firewall">جدار الحماية</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">مسح السجلات</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">حظر البرامج الضارة وبرامج الفدية وبرامج التشفير والمخادعين والتهديدات الأخرى.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">حظر مواقع البالغين والمحتوى المقرصن، مواقع المقامرة عبر الإنترنت والمواعدة، ووسائل التواصل الاجتماعي.</string>

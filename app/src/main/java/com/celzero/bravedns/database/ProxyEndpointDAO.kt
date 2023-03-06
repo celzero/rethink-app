@@ -56,6 +56,4 @@ interface ProxyEndpointDAO {
 
     @Query("select * from ProxyEndpoint where isSelected = 1 and proxyName = 'ORBOT'")
     fun getConnectedOrbotProxy(): ProxyEndpoint
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

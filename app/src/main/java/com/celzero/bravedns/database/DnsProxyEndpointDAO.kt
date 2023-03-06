@@ -56,6 +56,4 @@ interface DnsProxyEndpointDAO {
 
     @Query("select * from DNSProxyEndpoint where proxyName = 'Orbot' and isCustom = 0 LIMIT 1")
     fun getOrbotDnsEndpoint(): DnsProxyEndpoint?
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

@@ -16,6 +16,7 @@
 
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -67,5 +68,6 @@ interface DnsLogDAO {
     )
     fun getAllBlockedDomains(): PagingSource<Int, AppConnection>
 
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    @Query("select count(*) from DNSLogs")
+    fun logsCount(): LiveData<Long>
 }

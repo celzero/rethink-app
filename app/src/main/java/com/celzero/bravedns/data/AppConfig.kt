@@ -24,26 +24,26 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
+import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
-import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.OrbotHelper
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.getDnsPort
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
+import java.net.InetAddress
 import protect.Blocker
 import settings.Settings
-import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -54,12 +54,15 @@ internal constructor(
     private val dnsCryptEndpointRepository: DnsCryptEndpointRepository,
     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
     private val proxyEndpointRepository: ProxyEndpointRepository,
-    private val persistentState: PersistentState
+    private val persistentState: PersistentState,
+    networkLogs: ConnectionTrackerRepository,
+    dnsLogs: DnsLogRepository
 ) {
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
     private var braveDns: BraveDNS? = null
+    private var pcapFilePath: String = ""
 
     companion object {
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
@@ -123,7 +126,8 @@ internal constructor(
         val listener: Listener,
         val fakeDns: String,
         val preferredEngine: InternetProtocol,
-        val mtu: Int
+        val mtu: Int,
+        val pcapFilePath: String
     )
 
     enum class BraveMode(val mode: Int) {
@@ -326,6 +330,26 @@ internal constructor(
         determineFirewallMode()
     }
 
+    fun setPcap(mode: Int, path: String = PcapMode.DISABLE_PCAP) {
+        pcapFilePath =
+            when (PcapMode.getPcapType(mode)) {
+                PcapMode.NONE -> {
+                    ""
+                }
+                PcapMode.LOGCAT -> {
+                    "0"
+                }
+                PcapMode.EXTERNAL_FILE -> {
+                    path
+                }
+            }
+        persistentState.pcapMode = mode
+    }
+
+    fun getPcapFilePath(): String {
+        return pcapFilePath
+    }
+
     fun getDnsType(): DnsType {
         return when (persistentState.dnsType) {
             DnsType.DOH.type -> DnsType.DOH
@@ -500,7 +524,8 @@ internal constructor(
         fakeDns: String,
         preferredEngine: InternetProtocol,
         ptMode: ProtoTranslationMode,
-        mtu: Int
+        mtu: Int,
+        pcapFilePath: String
     ): TunnelOptions {
         return TunnelOptions(
             getDnsMode(),
@@ -511,7 +536,8 @@ internal constructor(
             listener,
             fakeDns,
             preferredEngine,
-            mtu
+            mtu,
+            pcapFilePath
         )
     }
 
@@ -613,17 +639,21 @@ internal constructor(
         dnsCryptRelayEndpointRepository.unselectRelay(stamp)
     }
 
-    suspend fun setDefaultConnection() {
-        if (getDnsType() != DnsType.RETHINK_REMOTE) {
-            removeConnectionStatus()
-        }
-
-        rethinkDnsEndpointRepository.updateConnectionDefault()
-        onDnsChange(DnsType.RETHINK_REMOTE)
+    suspend fun getDefaultDns(): String {
+        return persistentState.defaultDnsUrl
     }
 
     suspend fun getRemoteRethinkEndpoint(): RethinkDnsEndpoint? {
         return rethinkDnsEndpointRepository.getConnectedEndpoint()
+    }
+
+    suspend fun getBlockFreeRethinkEndpoint(): String {
+        // decide which blockfree endpoint to use
+        if (getRemoteRethinkEndpoint()?.url?.contains(MAX_ENDPOINT) == true) {
+            return Constants.BLOCK_FREE_DNS_MAX
+        } else {
+            return Constants.BLOCK_FREE_DNS_SKY
+        }
     }
 
     suspend fun getRethinkPlusEndpoint(): RethinkDnsEndpoint {
@@ -651,18 +681,17 @@ internal constructor(
         return getDnsType() == DnsType.RETHINK_REMOTE
     }
 
-    suspend fun setSystemDns(ip: String, port: Int) {
+    suspend fun enableSystemDns() {
         if (getDnsType() != DnsType.NETWORK_DNS) {
             removeConnectionStatus()
         }
 
-        systemDns.ipAddress = ip
-        systemDns.port = port
         onDnsChange(DnsType.NETWORK_DNS)
     }
 
     suspend fun updateSystemDnsServers(dnsServers: List<InetAddress>) {
         var dnsIp: String? = null
+        val dnsPort = 0
 
         when (getInternetProtocol()) {
             InternetProtocol.IPv4 -> {
@@ -693,9 +722,12 @@ internal constructor(
         if (dnsIp.isNullOrEmpty()) {
             dnsIp = dnsServers[0].hostAddress
         }
+        systemDns.ipAddress = dnsIp ?: ""
+        systemDns.port = getDnsPort(dnsPort)
     }
 
     fun getSystemDns(): SystemDns {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "SystemDns: ${systemDns.ipAddress}:${systemDns.port}")
         return systemDns
     }
 
@@ -953,6 +985,10 @@ internal constructor(
         proxyEndpointRepository.clearOrbotData()
         proxyEndpointRepository.insert(proxyEndpoint)
     }
+
+    val networkLogsCount: LiveData<Long> = networkLogs.logsCount()
+
+    val dnsLogsCount: LiveData<Long> = dnsLogs.logsCount()
 
     val connectedProxy: LiveData<ProxyEndpoint?> =
         proxyEndpointRepository.getConnectedProxyLiveData()

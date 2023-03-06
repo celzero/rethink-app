@@ -29,13 +29,13 @@ import com.google.common.cache.CacheBuilder
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.write
 
 object IpRulesManager : KoinComponent {
 
@@ -69,14 +69,6 @@ object IpRulesManager : KoinComponent {
 
         fun isBlocked(): Boolean {
             return this.id == BLOCK.id
-        }
-
-        fun trustIp(): Boolean {
-            return this.id == TRUST.id
-        }
-
-        fun noRule(): Boolean {
-            return this.id == NONE.id
         }
 
         companion object {
@@ -247,7 +239,7 @@ object IpRulesManager : KoinComponent {
         if (appIpRules.contains(key)) {
             val customIp = appIpRules[key]
 
-            if (customIp?.uid == uid) {
+            if (customIp != null) {
                 val status = IpRuleStatus.getStatus(customIp.status)
                 ipRulesLookupCache.put(CacheKey(ip, uid), status)
                 return status
@@ -302,15 +294,12 @@ object IpRulesManager : KoinComponent {
             }
 
         val key = CacheKey(ip, uid)
-        if (appIpRules.contains(key)) {
-            val customIp = appIpRules[key]
-
-            if (customIp?.uid == uid) {
-                return IpRuleStatus.getStatus(customIp.status)
+        val customIpObj =
+            appIpRules.getOrElse(key) {
+                return IpRuleStatus.NONE
             }
-        }
 
-        return IpRuleStatus.NONE
+        return IpRuleStatus.getStatus(customIpObj.status)
     }
 
     private fun isIpv6ToV4FilterRequired(): Boolean {
@@ -332,7 +321,11 @@ object IpRulesManager : KoinComponent {
         }
         io {
             val rules = customIpRepository.getIpRules()
-            rules.forEach {
+            // sort the rules by the network prefix length
+            val selector: (IPAddressString?) -> Int = { str -> str?.networkPrefixLength ?: 32 }
+            val subnetMap =
+                rules.sortedByDescending { selector(it.getCustomIpAddress().asAddressString()) }
+            subnetMap.forEach {
                 if (
                     it.getCustomIpAddress().address.isMultiple ||
                         it.getCustomIpAddress().address.isAnyLocal
@@ -418,6 +411,16 @@ object IpRulesManager : KoinComponent {
                 "IP Rules, add rule for ip: $ipAddress with status: ${status.name}"
             )
             val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
+            customIpRepository.insert(customIpObj)
+            updateLocalCache(customIpObj)
+            ipRulesLookupCache.invalidateAll()
+        }
+    }
+
+    fun updateIpRule(prevIp: CustomIp, hostName: HostName, status: IpRuleStatus) {
+        io {
+            customIpRepository.deleteIpRules(prevIp.uid, prevIp.ipAddress, prevIp.port)
+            val customIpObj = constructCustomIpObject(prevIp.uid, hostName, status)
             customIpRepository.insert(customIpObj)
             updateLocalCache(customIpObj)
             ipRulesLookupCache.invalidateAll()

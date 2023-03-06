@@ -18,24 +18,23 @@ package com.celzero.bravedns.ui
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
+import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
+import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
+import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class AppConnectionBottomSheet : BottomSheetDialogFragment() {
@@ -57,14 +56,13 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
     private var uid: Int = -1
     private var ipAddress: String = ""
-    private var port: Int = UNSPECIFIED_PORT
-    private var rule: IpRulesManager.IpRuleStatus = IpRulesManager.IpRuleStatus.NONE
+    private var ipRule: IpRulesManager.IpRuleStatus = IpRulesManager.IpRuleStatus.NONE
+    private var domains: String = ""
 
     companion object {
         const val UID = "UID"
         const val IP_ADDRESS = "IP_ADDRESS"
-        const val PORT = "PORT"
-        const val IP_RULE = "IP_RULE"
+        const val DOMAINS = "DOMAINS"
     }
 
     private fun isDarkThemeOn(): Boolean {
@@ -99,29 +97,62 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         uid = arguments?.getInt(UID) ?: INVALID_UID
         ipAddress = arguments?.getString(IP_ADDRESS) ?: ""
-        port = arguments?.getInt(PORT) ?: UNSPECIFIED_PORT
-        val status = arguments?.getInt(IP_RULE) ?: IpRulesManager.IpRuleStatus.NONE.id
-        rule = IpRulesManager.IpRuleStatus.getStatus(status)
+        domains = arguments?.getString(DOMAINS) ?: ""
+
         dismissListener = adapter
 
-        initView()
+        init()
         initializeClickListeners()
+        setRulesUi()
     }
 
-    private fun initView() {
+    private fun init() {
         if (uid == INVALID_UID) {
             this.dismiss()
             return
         }
-        b.bsacHeading.text = ipAddress
+        b.bsacIpAddressTv.text = ipAddress
 
-        when (rule) {
-            IpRulesManager.IpRuleStatus.NONE -> showButtonsForStatusNone()
-            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                // no-op, bypass universal rules don't apply in app specific list
+        b.bsacIpRuleTxt.text = Utilities.updateHtmlEncodedText(getString(R.string.bsct_block_ip))
+        b.bsacDomainRuleTxt.text =
+            Utilities.updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+
+        setupRecycler()
+    }
+
+    private fun setupRecycler() {
+        if (domains.isEmpty()) {
+            b.bsacDomainLl.visibility = View.GONE
+            return
+        }
+
+        val list = domains.split(",").toTypedArray()
+
+        b.bsacDomainList.setHasFixedSize(true)
+        val layoutManager = CustomLinearLayoutManager(requireContext())
+        b.bsacDomainList.layoutManager = layoutManager
+
+        val recyclerAdapter = DomainRulesBtmSheetAdapter(requireContext(), uid, list)
+        b.bsacDomainList.adapter = recyclerAdapter
+    }
+
+    private fun setRulesUi() {
+        // no need to send port number for the app info screen
+        ipRule = IpRulesManager.isIpRuleAvailable(uid, ipAddress, null)
+        Log.d("FirewallManager", "Set selection of ip: $ipAddress, ${ipRule.id}")
+        when (ipRule) {
+            IpRulesManager.IpRuleStatus.TRUST -> {
+                enableTrustUi()
             }
-            IpRulesManager.IpRuleStatus.TRUST -> showByPassAppRulesUi()
-            IpRulesManager.IpRuleStatus.BLOCK -> showButtonForStatusBlock()
+            IpRulesManager.IpRuleStatus.BLOCK -> {
+                enableBlockUi()
+            }
+            IpRulesManager.IpRuleStatus.NONE -> {
+                noRuleUi()
+            }
+            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                noRuleUi()
+            }
         }
     }
 
@@ -133,69 +164,37 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun showButtonForStatusBlock() {
-        b.bsacUnblock.visibility = View.VISIBLE
-        b.bsacTrustIp.visibility = View.VISIBLE
-    }
-
-    private fun showByPassAppRulesUi() {
-        b.bsacBlock.visibility = View.VISIBLE
-        b.bsacDistrustIp.visibility = View.VISIBLE
-    }
-
-    private fun showButtonsForStatusNone() {
-        b.bsacBlock.visibility = View.VISIBLE
-        b.bsacTrustIp.visibility = View.VISIBLE
-    }
-
     private fun initializeClickListeners() {
-        b.bsacBlock.setOnClickListener {
-            applyRule(
-                uid,
-                ipAddress,
-                IpRulesManager.IpRuleStatus.BLOCK,
-                getString(R.string.bsac_block_toast, ipAddress)
-            )
+
+        b.blockIcon.setOnClickListener {
+            if (ipRule == IpRulesManager.IpRuleStatus.BLOCK) {
+                applyIpRule(IpRulesManager.IpRuleStatus.NONE)
+                noRuleUi()
+            } else {
+                applyIpRule(IpRulesManager.IpRuleStatus.BLOCK)
+                enableBlockUi()
+            }
         }
 
-        b.bsacUnblock.setOnClickListener {
-            applyRule(
-                uid,
-                ipAddress,
-                IpRulesManager.IpRuleStatus.NONE,
-                getString(R.string.bsac_unblock_toast, ipAddress)
-            )
-        }
-
-        b.bsacTrustIp.setOnClickListener {
-            applyRule(
-                uid,
-                ipAddress,
-                IpRulesManager.IpRuleStatus.TRUST,
-                getString(R.string.bsac_trust_toast, ipAddress)
-            )
-        }
-
-        b.bsacDistrustIp.setOnClickListener {
-            applyRule(
-                uid,
-                ipAddress,
-                IpRulesManager.IpRuleStatus.NONE,
-                getString(R.string.bsac_distrust_toast, ipAddress)
-            )
+        b.trustIcon.setOnClickListener {
+            if (ipRule == IpRulesManager.IpRuleStatus.TRUST) {
+                applyIpRule(IpRulesManager.IpRuleStatus.NONE)
+                noRuleUi()
+            } else {
+                applyIpRule(IpRulesManager.IpRuleStatus.TRUST)
+                enableTrustUi()
+            }
         }
     }
 
-    private fun applyRule(
-        uid: Int,
-        ipAddress: String,
-        status: IpRulesManager.IpRuleStatus,
-        toastMsg: String
-    ) {
-        // set port number as UNSPECIFIED_PORT for all the rules applied from this screen
-        io { IpRulesManager.addIpRule(uid, ipAddress, UNSPECIFIED_PORT, status) }
-        Utilities.showToastUiCentered(requireContext(), toastMsg, Toast.LENGTH_SHORT)
-        this.dismiss()
+    private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
+        Log.i(
+            LoggerConstants.LOG_TAG_FIREWALL,
+            "ip rule for uid: $uid, ip: $ipAddress (${status.name})"
+        )
+        ipRule = status
+        // set port number as null for all the rules applied from this screen
+        IpRulesManager.addIpRule(uid, ipAddress, null, status)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -203,7 +202,30 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         dismissListener?.notifyDataset(position)
     }
 
-    private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    private fun enableTrustUi() {
+        b.trustIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_trust_accent)
+        )
+        b.blockIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_block)
+        )
+    }
+
+    private fun enableBlockUi() {
+        b.trustIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_trust)
+        )
+        b.blockIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_block_accent)
+        )
+    }
+
+    private fun noRuleUi() {
+        b.trustIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_trust)
+        )
+        b.blockIcon.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_block)
+        )
     }
 }

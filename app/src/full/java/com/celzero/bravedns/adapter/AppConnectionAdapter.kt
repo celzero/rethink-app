@@ -31,7 +31,6 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
@@ -95,14 +94,13 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
 
         private fun setupClickListeners(appConn: AppConnection) {
             b.acdContainer.setOnClickListener {
-                // no need to send port number for the app info screen
-                val status = IpRulesManager.isIpRuleAvailable(uid, appConn.ipAddress, null)
+
                 // open bottom sheet for options
-                openBottomSheet(appConn.ipAddress, status)
+                openBottomSheet(appConn)
             }
         }
 
-        private fun openBottomSheet(ipAddress: String, rule: IpRulesManager.IpRuleStatus) {
+        private fun openBottomSheet(appConn: AppConnection) {
             if (context !is AppCompatActivity) {
                 Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottom sheet")
                 return
@@ -115,9 +113,11 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             // so sending the data using Bundles
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
-            bundle.putString(AppConnectionBottomSheet.IP_ADDRESS, ipAddress)
-            bundle.putInt(AppConnectionBottomSheet.PORT, Constants.UNSPECIFIED_PORT)
-            bundle.putInt(AppConnectionBottomSheet.IP_RULE, rule.id)
+            bundle.putString(AppConnectionBottomSheet.IP_ADDRESS, appConn.ipAddress)
+            bundle.putString(
+                AppConnectionBottomSheet.DOMAINS,
+                beautifyDomainString(appConn.appOrDnsName ?: "")
+            )
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)

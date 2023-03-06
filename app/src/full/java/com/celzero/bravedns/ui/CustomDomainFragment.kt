@@ -16,8 +16,6 @@
 package com.celzero.bravedns.ui
 
 import android.app.Dialog
-import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
@@ -25,22 +23,21 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomDomainAdapter
-import com.celzero.bravedns.databinding.ActivityCustomDomainBinding
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
+import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
-import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
@@ -48,22 +45,33 @@ import org.koin.android.ext.android.inject
 import java.net.MalformedURLException
 import java.util.regex.Pattern
 
-class CustomDomainActivity :
-    AppCompatActivity(R.layout.activity_custom_domain), SearchView.OnQueryTextListener {
+class CustomDomainFragment :
+    Fragment(R.layout.fragment_custom_domain), SearchView.OnQueryTextListener {
 
-    private val b by viewBinding(ActivityCustomDomainBinding::bind)
+    private val b by viewBinding(FragmentCustomDomainBinding::bind)
     private var layoutManager: RecyclerView.LayoutManager? = null
 
-    private val persistentState by inject<PersistentState>()
     private val viewModel by inject<CustomDomainViewModel>()
 
-    private var uid = Constants.UID_EVERYBODY
+    private var uid = UID_EVERYBODY
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
-        super.onCreate(savedInstanceState)
+    companion object {
+        fun newInstance(uid: Int): CustomDomainFragment {
+            val args = Bundle()
+            args.putInt(INTENT_UID, uid)
+            val fragment = CustomDomainFragment()
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
-        uid = intent.getIntExtra(INTENT_UID, Constants.UID_EVERYBODY)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initView()
+    }
+
+    private fun initView() {
+        uid = arguments?.getInt(INTENT_UID, UID_EVERYBODY) ?: UID_EVERYBODY
         b.cdaHeading.text = getString(R.string.cd_dialog_header, getAppName())
 
         b.cdaSearchView.setOnQueryTextListener(this)
@@ -74,13 +82,8 @@ class CustomDomainActivity :
         b.cdaRecycler.requestFocus()
     }
 
-    private fun Context.isDarkThemeOn(): Boolean {
-        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            Configuration.UI_MODE_NIGHT_YES
-    }
-
     private fun getAppName(): String {
-        if (uid == Constants.UID_EVERYBODY) {
+        if (uid == UID_EVERYBODY) {
             return getString(R.string.firewall_act_universal_tab)
         }
 
@@ -95,8 +98,8 @@ class CustomDomainActivity :
     }
 
     private fun setupRecyclerView() {
-        layoutManager = LinearLayoutManager(this)
-        val adapter = CustomDomainAdapter(this)
+        layoutManager = LinearLayoutManager(requireContext())
+        val adapter = CustomDomainAdapter(requireContext())
         b.cdaRecycler.layoutManager = layoutManager
         b.cdaRecycler.adapter = adapter
 
@@ -113,7 +116,7 @@ class CustomDomainActivity :
     }
 
     private fun observeCustomRules() {
-        viewModel.domainRulesCount(uid).observe(this) {
+        viewModel.domainRulesCount(uid).observe(viewLifecycleOwner) {
             if (it <= 0) {
                 showNoRulesUi()
                 hideRulesUi()
@@ -147,13 +150,19 @@ class CustomDomainActivity :
      * based on it. User can either select the entered domain to be added in whitelist or blocklist.
      */
     private fun showAddDomainDialog() {
-        val dialog = Dialog(this)
+        val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(getString(R.string.cd_dialog_title))
         val dBind = DialogAddCustomDomainBinding.inflate(layoutInflater)
         dialog.setContentView(dBind.root)
 
         var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
+
+        dBind.dacdDomainEditText.addTextChangedListener {
+            if (it?.contains("*") == true) {
+                dBind.dacdWildcardChip.isChecked = true
+            }
+        }
 
         dBind.dacdDomainChip.setOnCheckedChangeListener { _, isSelected ->
             if (isSelected) {
@@ -202,33 +211,44 @@ class CustomDomainActivity :
         dBind.dacdTextInputLayout.hint =
             resources.getString(R.string.cd_dialog_edittext_hint, getString(R.string.lbl_domain))
 
-        dBind.dacdAddBtn.setOnClickListener {
-            dBind.dacdFailureText.visibility = View.GONE
-            val url = dBind.dacdDomainEditText.text.toString()
-            when (selectedType) {
-                DomainRulesManager.DomainType.WILDCARD -> {
-                    if (!isWildCardEntry(url)) {
-                        dBind.dacdFailureText.text =
-                            resources.getString(R.string.cd_dialog_error_invalid_wildcard)
-                        dBind.dacdFailureText.visibility = View.VISIBLE
-                        return@setOnClickListener
-                    }
-                }
-                DomainRulesManager.DomainType.DOMAIN -> {
-                    if (!isValidDomain(url)) {
-                        dBind.dacdFailureText.text =
-                            resources.getString(R.string.cd_dialog_error_invalid_domain)
-                        dBind.dacdFailureText.visibility = View.VISIBLE
-                        return@setOnClickListener
-                    }
-                }
-            }
+        dBind.dacdBlockBtn.setOnClickListener {
+            handleDomain(dBind, selectedType, DomainRulesManager.Status.BLOCK)
+        }
 
-            insertDomain(removeLeadingAndTrailingDots(url), selectedType)
+        dBind.dacdTrustBtn.setOnClickListener {
+            handleDomain(dBind, selectedType, DomainRulesManager.Status.TRUST)
         }
 
         dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun handleDomain(
+        dBind: DialogAddCustomDomainBinding,
+        selectedType: DomainRulesManager.DomainType,
+        status: DomainRulesManager.Status
+    ) {
+        dBind.dacdFailureText.visibility = View.GONE
+        val url = dBind.dacdDomainEditText.text.toString()
+        when (selectedType) {
+            DomainRulesManager.DomainType.WILDCARD -> {
+                if (!isWildCardEntry(url)) {
+                    dBind.dacdFailureText.text =
+                        getString(R.string.cd_dialog_error_invalid_wildcard)
+                    dBind.dacdFailureText.visibility = View.VISIBLE
+                    return
+                }
+            }
+            DomainRulesManager.DomainType.DOMAIN -> {
+                if (!isValidDomain(url)) {
+                    dBind.dacdFailureText.text = getString(R.string.cd_dialog_error_invalid_domain)
+                    dBind.dacdFailureText.visibility = View.VISIBLE
+                    return
+                }
+            }
+        }
+
+        insertDomain(removeLeadingAndTrailingDots(url), selectedType, status)
     }
 
     private fun isValidDomain(url: String): Boolean {
@@ -247,10 +267,14 @@ class CustomDomainActivity :
         return pattern.matcher(url).find()
     }
 
-    private fun insertDomain(domain: String, type: DomainRulesManager.DomainType) {
-        DomainRulesManager.block(domain, type = type, uid = uid)
+    private fun insertDomain(
+        domain: String,
+        type: DomainRulesManager.DomainType,
+        status: DomainRulesManager.Status
+    ) {
+        DomainRulesManager.addDomainRule(domain, status, type, uid = uid)
         Utilities.showToastUiCentered(
-            this,
+            requireContext(),
             resources.getString(R.string.cd_toast_added),
             Toast.LENGTH_SHORT
         )
@@ -267,13 +291,13 @@ class CustomDomainActivity :
     }
 
     private fun showDomainRulesDeleteDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
             DomainRulesManager.deleteIpRulesByUid(uid)
             Utilities.showToastUiCentered(
-                this,
+                requireContext(),
                 getString(R.string.univ_ip_delete_toast_success),
                 Toast.LENGTH_SHORT
             )

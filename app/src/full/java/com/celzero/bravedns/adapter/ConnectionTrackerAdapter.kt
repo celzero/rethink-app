@@ -123,13 +123,13 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
             if (connTracker.dnsQuery.isNullOrEmpty()) {
                 b.connectionIpAddress.text = connTracker.ipAddress
+                b.connectionDomain.visibility = View.GONE
             } else {
-                b.connectionIpAddress.text =
-                    context.getString(
-                        R.string.ct_ip_details,
-                        connTracker.ipAddress,
-                        connTracker.dnsQuery
-                    )
+                b.connectionIpAddress.text = connTracker.ipAddress
+                b.connectionDomain.text = connTracker.dnsQuery
+                b.connectionDomain.visibility = View.VISIBLE
+                // marquee is not working for the textview, hence the workaround.
+                b.connectionDomain.isSelected = true
             }
         }
 

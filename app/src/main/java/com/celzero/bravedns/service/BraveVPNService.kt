@@ -60,11 +60,14 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIB
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities.Companion.calculateTtl
 import com.celzero.bravedns.util.Utilities.Companion.getAccentColor
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isMissingOrInvalidUid
+import com.celzero.bravedns.util.Utilities.Companion.isUnspecifiedIp
+import com.celzero.bravedns.util.Utilities.Companion.normalizeIp
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.common.collect.Sets
 import dnsx.Dnsx
@@ -74,16 +77,16 @@ import inet.ipaddr.IPAddressString
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Blocker
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Blocker
 
 class BraveVPNService :
     VpnService(),
@@ -127,8 +130,6 @@ class BraveVPNService :
         // This value must match the hardcoded MTU in outline-go-tun2socks.
         // TODO: Make outline-go-tun2socks's MTU configurable.
         private const val VPN_INTERFACE_MTU: Int = 1500
-
-        const val USER_SELECTED_TRANSPORT_ID = "USER_SELECTED"
     }
 
     private var isLockDownPrevious: Boolean = false
@@ -241,15 +242,31 @@ class BraveVPNService :
         }
     }
 
-    override fun block(
-        protocol: Int,
-        _uid: Long,
-        sourceAddress: String,
-        destAddress: String
-    ): Boolean {
+    override fun block(protocol: Int, _uid: Long, src: String, dest: String): Boolean {
         handleVpnLockdownStateAsync()
+
+        val first = HostName(src)
+        val second = HostName(dest)
+
+        val srcIp = if (first.address == null) "" else first.address.toString()
+        val srcPort = first.port ?: 0
+        val dstIp = if (second.address == null) "" else second.address.toString()
+        val dstPort = second.port ?: 0
+
+        val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
+
+        // print the invalid destination ip received
+        // 64:ff9b:1:DA19:0100: or 100.
+        if (dstIp.startsWith("64:ff9b:1:DA19:0100:") || dstIp.startsWith("100.")) {
+            Log.e(
+                LOG_TAG_VPN,
+                "invalid destination ip received:  protocol: $protocol, uid: $uid, src: $src, dest: $dest, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort"
+            )
+        }
+
         val connInfo =
-            createConnTrackerMetaData(_uid, sourceAddress, destAddress, protocol, _query = "")
+            createConnTrackerMetaData(uid, srcIp, srcPort, dstIp, dstPort, protocol, _query = "")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "block: $connInfo")
         return processFirewallRequest(connInfo)
     }
 
@@ -280,7 +297,10 @@ class BraveVPNService :
     }
 
     /** Checks if incoming connection is blocked by any user-set firewall rule */
-    private fun firewall(connInfo: ConnTrackerMetaData): FirewallRuleset {
+    private fun firewall(
+        connInfo: ConnTrackerMetaData,
+        anyRealIpBlocked: Boolean = false
+    ): FirewallRuleset {
         try {
 
             val uid = connInfo.uid
@@ -303,26 +323,10 @@ class BraveVPNService :
                 }
             }
 
-            // IP rules
-            when (ipStatus(uid, connInfo.destIP, connInfo.destPort)) {
-                IpRulesManager.IpRuleStatus.BLOCK -> {
-                    return FirewallRuleset.RULE2
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
-                    // trust ip will taken into account only if the app is in isolate mode
-                    if (appStatus.isolate()) {
-                        return FirewallRuleset.RULE2B
-                    } else {
-                        // no-op; pass-through
-                    }
-                }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    // no-op; pass-through
-                    // By-pass universal should be validated after app-firewall rules
-                }
-                IpRulesManager.IpRuleStatus.NONE -> {
-                    // no-op; pass-through
-                }
+            // check for app rules (unmetered, metered connections)
+            val appRuleset = appBlocked(connectionStatus)
+            if (appRuleset != null) {
+                return appRuleset
             }
 
             when (getDomainRule(connInfo.query, connInfo.uid)) {
@@ -337,14 +341,31 @@ class BraveVPNService :
                 }
             }
 
+            // IP rules
+            when (ipStatus(uid, connInfo.destIP, connInfo.destPort)) {
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    return FirewallRuleset.RULE2
+                }
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    return FirewallRuleset.RULE2B
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    // no-op; pass-through
+                    // By-pass universal should be validated after app-firewall rules
+                }
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    // no-op; pass-through
+                }
+            }
+
+            // by-pass dns firewall, go-through app specific ip and domain rules before applying
+            if (appStatus.bypassDnsFirewall()) {
+                return FirewallRuleset.RULE1H
+            }
+
             // isolate mode
             if (appStatus.isolate()) {
                 return FirewallRuleset.RULE1G
-            }
-
-            val appRuleset = appBlocked(appStatus, connectionStatus)
-            if (appRuleset != null) {
-                return appRuleset
             }
 
             // should firewall rules by-pass universal firewall rules (previously whitelist)
@@ -353,6 +374,21 @@ class BraveVPNService :
                     FirewallRuleset.RULE9
                 } else {
                     FirewallRuleset.RULE8
+                }
+            }
+
+            // check for global domain allow/block domains
+            getDomainRule(connInfo.query, UID_EVERYBODY).let {
+                when (it) {
+                    DomainRulesManager.Status.TRUST -> {
+                        return FirewallRuleset.RULE2I
+                    }
+                    DomainRulesManager.Status.BLOCK -> {
+                        return FirewallRuleset.RULE2H
+                    }
+                    else -> {
+                        // fall through
+                    }
                 }
             }
 
@@ -370,6 +406,19 @@ class BraveVPNService :
                 IpRulesManager.IpRuleStatus.NONE -> {
                     // no-op; pass-through
                 }
+            }
+
+            // if any of the real ip is blocked then allow only if it is trusted,
+            // otherwise no need to check further
+            if (anyRealIpBlocked) {
+                return FirewallRuleset.RULE2G
+            } else {
+                // no-op; pass-through
+            }
+
+            // block all metered connections (Universal firewall setting)
+            if (persistentState.getBlockMeteredConnections() && isConnectionMetered()) {
+                return FirewallRuleset.RULE1F
             }
 
             // block apps when universal lockdown is enabled
@@ -420,7 +469,7 @@ class BraveVPNService :
     }
 
     private fun universalLockdown(): Boolean {
-        return persistentState.universalLockdown
+        return persistentState.getUniversalLockdown()
     }
 
     private fun httpBlocked(port: Int): Boolean {
@@ -429,7 +478,7 @@ class BraveVPNService :
             return false
         }
 
-        return persistentState.blockHttpConnections
+        return persistentState.getBlockHttpConnections()
     }
 
     private fun allowOrbot(uid: Int): Boolean {
@@ -444,7 +493,7 @@ class BraveVPNService :
     }
 
     private fun dnsBypassed(destIp: String): Boolean {
-        return if (!persistentState.disallowDnsBypass) {
+        return if (!persistentState.getDisallowDnsBypass()) {
             false
         } else {
             unresolvedIp(destIp)
@@ -459,7 +508,7 @@ class BraveVPNService :
     }
 
     private fun newAppBlocked(uid: Int): Boolean {
-        return if (!persistentState.blockNewlyInstalledApp || isMissingOrInvalidUid(uid)) {
+        return if (!persistentState.getBlockNewlyInstalledApp() || isMissingOrInvalidUid(uid)) {
             false
         } else {
             waitAndCheckIfUidBlocked(uid)
@@ -475,7 +524,7 @@ class BraveVPNService :
     }
 
     private fun unknownAppBlocked(uid: Int): Boolean {
-        return if (!persistentState.blockUnknownConnections) {
+        return if (!persistentState.getBlockUnknownConnections()) {
             false
         } else {
             isMissingOrInvalidUid(uid)
@@ -505,7 +554,7 @@ class BraveVPNService :
     private fun unresolvedIp(ip: String): Boolean {
         val resolvedIp = testWithBackoff {
             val now = System.currentTimeMillis()
-            val ttl = FirewallManager.ipDomainLookup.getIfPresent(ip)?.ttl ?: Long.MIN_VALUE
+            val ttl = ipDomainLookup.getIfPresent(ip)?.ttl ?: Long.MIN_VALUE
             ttl >= now
         }
 
@@ -513,7 +562,7 @@ class BraveVPNService :
     }
 
     private fun udpBlocked(uid: Int, protocol: Int, port: Int): Boolean {
-        val hasUserBlockedUdp = persistentState.udpBlockedSettings
+        val hasUserBlockedUdp = persistentState.getUdpBlocked()
         if (!hasUserBlockedUdp) return false
 
         val isUdp = protocol == Protocol.UDP.protocolType
@@ -558,7 +607,7 @@ class BraveVPNService :
     // Now the code only checks whether the KeyguardManager#isKeyguardLocked() is true/false.
     // if isKeyguardLocked() is true, the connections will be blocked.
     private fun deviceLocked(): Boolean {
-        if (!persistentState.blockWhenDeviceLocked) return false
+        if (!persistentState.getBlockWhenDeviceLocked()) return false
 
         if (keyguardManager == null) {
             keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -568,10 +617,7 @@ class BraveVPNService :
 
     // Check if the app has firewall rules set
     // refer: FirewallManager.kt line-no#58
-    private fun appBlocked(
-        firewallStatus: FirewallManager.FirewallStatus,
-        connectionStatus: FirewallManager.ConnectionStatus
-    ): FirewallRuleset? {
+    private fun appBlocked(connectionStatus: FirewallManager.ConnectionStatus): FirewallRuleset? {
         if (isAppBlocked(connectionStatus)) {
             return FirewallRuleset.RULE1
         }
@@ -583,11 +629,6 @@ class BraveVPNService :
 
         if (isWifiBlockedForUid(connectionStatus) && !isConnectionMetered()) {
             return FirewallRuleset.RULE1D
-        }
-
-        // block all metered connections (Universal firewall setting)
-        if (persistentState.blockMeteredConnections && isConnectionMetered()) {
-            return FirewallRuleset.RULE1F
         }
 
         if (isMobileDataBlockedForUid(connectionStatus) && isConnectionMetered()) {
@@ -641,7 +682,7 @@ class BraveVPNService :
     }
 
     private fun blockBackgroundData(uid: Int): Boolean {
-        if (!persistentState.blockAppWhenBackground) return false
+        if (!persistentState.getBlockAppWhenBackground()) return false
 
         if (!accessibilityServiceFunctional()) {
             Log.w(LOG_TAG_VPN, "accessibility service not functional, disable bg-block")
@@ -656,7 +697,7 @@ class BraveVPNService :
 
     private fun handleAccessibilityFailure() {
         // Disable app not in use behaviour when the accessibility failure is detected.
-        persistentState.blockAppWhenBackground = false
+        persistentState.setBlockAppWhenBackground(false)
         showAccessibilityStoppedNotification()
     }
 
@@ -794,10 +835,6 @@ class BraveVPNService :
             NOTIF_ID_LOAD_RULES_FAIL,
             builder.build()
         )
-    }
-
-    private fun stallResponse() {
-        Thread.sleep(DELAY_FIREWALL_RESPONSE_MS)
     }
 
     // ref: https://stackoverflow.com/a/363692
@@ -964,7 +1001,7 @@ class BraveVPNService :
         connectivityManager =
             this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        if (persistentState.blockAppWhenBackground) {
+        if (persistentState.getBlockAppWhenBackground()) {
             registerAccessibilityServiceState()
         }
     }
@@ -1193,7 +1230,8 @@ class BraveVPNService :
                     getFakeDns(),
                     appConfig.getInternetProtocol(),
                     appConfig.getProtocolTranslationMode(),
-                    VPN_INTERFACE_MTU
+                    VPN_INTERFACE_MTU,
+                    appConfig.getPcapFilePath()
                 )
 
             Log.i(LOG_TAG_VPN, "start-foreground with opts $opts (for new-vpn? $isNewVpn)")
@@ -1295,26 +1333,17 @@ class BraveVPNService :
         /* TODO Check on the Persistent State variable
         Check on updating the values for Package change and for mode change.
         As of now handled manually */
-        val opts =
-            appConfig.newTunnelOptions(
-                this,
-                this,
-                getFakeDns(),
-                appConfig.getInternetProtocol(),
-                appConfig.getProtocolTranslationMode(),
-                VPN_INTERFACE_MTU
-            )
-        Log.i(LOG_TAG_VPN, "onPrefChange key: $key, opts: $opts")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "on pref change, key: $key")
         when (key) {
             PersistentState.BRAVE_MODE -> {
-                io("brave-mode-change") { restartVpn(opts) }
+                io("brave-mode-change") { restartVpn(createNewTunnelOptsObj()) }
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
-                io("local-blocklist") { updateTun(opts) }
+                io("local-blocklist") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.BACKGROUND_MODE -> {
-                if (persistentState.blockAppWhenBackground) {
+                if (persistentState.getBlockAppWhenBackground()) {
                     registerAccessibilityServiceState()
                 } else {
                     unregisterAccessibilityServiceState()
@@ -1326,7 +1355,7 @@ class BraveVPNService :
             }
             PersistentState
                 .REMOTE_BLOCK_LIST_STAMP -> { // update tunnel on remote blocklist stamp change.
-                io("remote-blocklist") { updateTun(opts) }
+                io("remote-blocklist") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.DNS_CHANGE -> {
                 /*
@@ -1338,31 +1367,31 @@ class BraveVPNService :
                 io("dns-change") {
                     when (appConfig.getDnsType()) {
                         AppConfig.DnsType.DOH -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.DNSCRYPT -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.DNS_PROXY -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.RETHINK_REMOTE -> {
-                            updateTun(opts)
+                            updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.NETWORK_DNS -> {
-                            enableSystemDns(opts)
+                            enableSystemDns(createNewTunnelOptsObj())
                         }
                     }
                 }
             }
             PersistentState.DNS_RELAYS -> {
-                io("update-dnscrypt") { updateTun(opts) }
+                io("update-dnscrypt") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.ALLOW_BYPASS -> {
-                io("allow-bypass") { restartVpn(opts) }
+                io("allow-bypass") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROXY_TYPE -> {
-                io("proxy") { restartVpn(opts) }
+                io("proxy") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.NETWORK -> {
                 connectionMonitor?.onUserPreferenceChanged()
@@ -1371,12 +1400,37 @@ class BraveVPNService :
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.INTERNET_PROTOCOL -> {
-                io("Internet-protocol-change") { restartVpn(opts) }
+                io("Internet-protocol-change") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROTOCOL_TRANSLATION -> {
-                io("protocol-translation") { updateTun(opts) }
+                io("protocol-translation") { updateTun(createNewTunnelOptsObj()) }
+            }
+            PersistentState.DEFAULT_DNS_SERVER -> {
+                io("default-dns-server") { restartVpn(createNewTunnelOptsObj()) }
+            }
+            PersistentState.PCAP_MODE -> {
+                // restart vpn to enable/disable pcap
+                io("pcap") { restartVpn(createNewTunnelOptsObj()) }
+            }
+            PersistentState.DNS_ALG -> {
+                io("dns-alg") { updateDnsAlg() }
             }
         }
+    }
+
+    private fun createNewTunnelOptsObj(): AppConfig.TunnelOptions {
+        val opts =
+            appConfig.newTunnelOptions(
+                this,
+                this,
+                getFakeDns(),
+                appConfig.getInternetProtocol(),
+                appConfig.getProtocolTranslationMode(),
+                VPN_INTERFACE_MTU,
+                appConfig.getPcapFilePath()
+            )
+        Log.i(LOG_TAG_VPN, "created new tunnel options, opts: $opts")
+        return opts
     }
 
     private suspend fun enableSystemDns(opts: AppConfig.TunnelOptions) {
@@ -1392,21 +1446,11 @@ class BraveVPNService :
                     Toast.LENGTH_SHORT
                 )
             }
-            appConfig.setDefaultConnection()
             return
         }
 
         appConfig.updateSystemDnsServers(dnsServers)
         updateTun(opts)
-    }
-
-    private suspend fun updateDnsProxy(opts: AppConfig.TunnelOptions) {
-        val dnsProxyEndpoint = appConfig.getSelectedDnsProxyDetails()
-        if (dnsProxyEndpoint?.isInternal(this) == true) {
-            restartVpn(opts)
-        } else {
-            updateTun(opts)
-        }
     }
 
     private fun spawnLocalBlocklistStampUpdate() {
@@ -1416,6 +1460,14 @@ class BraveVPNService :
 
                 vpnAdapter?.setBraveDnsStamp()
             }
+        }
+    }
+
+    private suspend fun updateDnsAlg() {
+        VpnController.mutex.withLock {
+            if (connectionMonitor == null) return@withLock
+
+            vpnAdapter?.setDnsAlg()
         }
     }
 
@@ -1460,7 +1512,8 @@ class BraveVPNService :
                 getFakeDns(),
                 appConfig.getInternetProtocol(),
                 appConfig.getProtocolTranslationMode(),
-                VPN_INTERFACE_MTU
+                VPN_INTERFACE_MTU,
+                appConfig.getPcapFilePath()
             )
         )
     }
@@ -1522,6 +1575,10 @@ class BraveVPNService :
         return vpnAdapter != null
     }
 
+    fun refresh() {
+        vpnAdapter?.refresh()
+    }
+
     private suspend fun makeVpnAdapter(): GoVpnAdapter? {
         val tunFd = establishVpn()
         return establish(this, vpnScope, tunFd)
@@ -1542,6 +1599,9 @@ class BraveVPNService :
         underlyingNetworks = networks
         Log.i(LOG_TAG_VPN, "connecting to networks, $underlyingNetworks")
 
+        // always set system dns to tunnel
+        setDnsServers(networks)
+
         // restart vpn on network changes in auto (IP4+6) mode
         if (appConfig.getInternetProtocol().isIPv46()) {
             io("ip46-restart-vpn") { restartVpnWithExistingAppConfig() }
@@ -1556,9 +1616,6 @@ class BraveVPNService :
         } else {
             setUnderlyingNetworks(networks.allNet.toTypedArray())
         }
-
-        // set system dns address to tunnel
-        setDnsServers(networks)
     }
 
     private fun setDnsServers(networks: ConnectionMonitor.UnderlyingNetworks) {
@@ -1569,7 +1626,7 @@ class BraveVPNService :
             // TODO: send an alert/notification instead of toast
             Log.w(LOG_TAG_VPN, "No dns servers found")
             if (appConfig.isSystemDns()) {
-                // on null dns servers, show toast and fallback to default dns
+                // on null dns servers, show toast
                 ui {
                     showToastUiCentered(
                         this,
@@ -1577,7 +1634,6 @@ class BraveVPNService :
                         Toast.LENGTH_LONG
                     )
                 }
-                io("set-default-dns") { appConfig.setDefaultConnection() }
             } else {
                 // no-op
             }
@@ -1888,41 +1944,30 @@ class BraveVPNService :
     override fun onQuery(query: String?, suggestedId: String): String {
         if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery: rcvd query: $query, suggested_id: $suggestedId")
         if (query == null) {
-            return suggestedId.ifEmpty { USER_SELECTED_TRANSPORT_ID }
+            return suggestedId.ifEmpty { Dnsx.Preferred }
         }
 
-        // remove trailing dot if available
-        val domain = query.dropLastWhile { it == '.' }
-        // check for global domain allow/block domains
-        getDomainRule(domain, UID_EVERYBODY).let {
-            when (it) {
-                DomainRulesManager.Status.TRUST -> {
-                    return Dnsx.BlockFree
-                }
-                DomainRulesManager.Status.BLOCK -> {
-                    return Dnsx.BlockAll
-                }
-                else -> {
-                    // fall through
-                }
+        // check for global domain rules in dns only mode
+        // for other modes, block/blockalg call takes care of global rules
+        // TODO; come up with a implementation to handle all the app modes
+        if (appConfig.getBraveMode().isDnsMode()) {
+            when (DomainRulesManager.getDomainRule(query, UID_EVERYBODY)) {
+                // TODO: return Preferred for now
+                DomainRulesManager.Status.TRUST -> return Dnsx.BlockFree
+                DomainRulesManager.Status.BLOCK -> return Dnsx.BlockAll
+                else -> {} // no-op, fall-through;
             }
         }
 
-        if (DEBUG)
-            Log.d(
-                LOG_TAG_VPN,
-                "onQuery: return user selected transport:$USER_SELECTED_TRANSPORT_ID"
-            )
-        return USER_SELECTED_TRANSPORT_ID
-        // no need to check for dns-alg option for now
-        /* return if (persistentState.enableDnsAlg) {
-            if (DEBUG) Log.d(LOG_TAG_VPN, "alg onQuery: return :${Dnsx.Alg}")
+        return if (appConfig.getBraveMode().isDnsFirewallMode()) {
             Dnsx.Alg
-            //USER_SELECTED_TRANSPORT_ID
         } else {
-            if (DEBUG) Log.d(LOG_TAG_VPN, "alg onQuery: return USER_SELECTED_TRANSPORT_ID:$USER_SELECTED_TRANSPORT_ID")
-            USER_SELECTED_TRANSPORT_ID
-        } */
+            if (persistentState.enableDnsCache) {
+                Dnsx.CT + Dnsx.Preferred
+            } else {
+                Dnsx.Preferred
+            }
+        }
     }
 
     override fun onResponse(summary: Summary?) {
@@ -1948,9 +1993,10 @@ class BraveVPNService :
         src: String,
         dest: String,
         realIps: String?,
-        d: String?
+        d: String?,
+        blocklists: String
     ): Boolean {
-        // fixme: this is a not used function, revisit later when dns-alg is enabled
+        Log.d(LOG_TAG_VPN, "block-alg: $_uid, $src, $dest, $realIps, $d, $blocklists")
         if (d == null) return true
 
         val domains: Set<String> = d.split(",").toSet()
@@ -1959,58 +2005,102 @@ class BraveVPNService :
             return true
         }
 
-        // do not use dest here, use realIps instead
-        // as of now, only first ip is used
-        val destIp = realIps?.split(",")?.get(0) ?: ""
+        val first = HostName(src)
+        val second = HostName(dest)
 
-        val connInfo = createConnTrackerMetaData(_uid, src, destIp, protocol, domains.first())
+        val srcIp = if (first.address == null) "" else first.address.toString()
+        val srcPort = first.port ?: 0
+        val dstIp = if (second.address == null) "" else second.address.toString()
+        val dstPort = second.port ?: 0
 
-        return processFirewallRequest(connInfo)
+        val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
+
+        val ips = realIps?.split(",")?.toList() ?: emptyList()
+        // use realIps; as of now, netstack uses the first ip
+        // TODO: apply firewall rules on all real ips
+        val realDestIp = ips.first().trim()
+        var anyRealIpBlocked = false
+
+        ips.forEach {
+            val ip = it.trim()
+            if (isUnspecifiedIp(ip)) {
+                // if `d` is blocked, then at least one of the real ips is unspecified
+                anyRealIpBlocked = true
+            } else {
+                val normalizeIp = normalizeIp(ip)
+                val countryCode: String? = Utilities.getCountryCode(normalizeIp, this)
+                val flag = getFlagIfPresent(countryCode)
+                val dnsCacheRecord =
+                    FirewallManager.DnsCacheRecord(calculateTtl(0L), domains.first(), flag)
+                ipDomainLookup.put(ip, dnsCacheRecord)
+            }
+        }
+
+        val connInfo =
+            createConnTrackerMetaData(
+                uid,
+                src,
+                srcPort,
+                realDestIp,
+                dstPort,
+                protocol,
+                domains.first()
+            )
+        if (DEBUG) Log.d(LOG_TAG_VPN, "block-alg connInfo: $connInfo")
+        return processFirewallRequest(connInfo, anyRealIpBlocked, blocklists)
     }
 
-    private fun processFirewallRequest(metadata: ConnTrackerMetaData): Boolean {
+    private fun getFlagIfPresent(hostAddress: String?): String {
+        if (hostAddress == null) {
+            return this.getString(R.string.unicode_warning_sign)
+        }
+        return ipDomainLookup.getIfPresent(hostAddress)?.flag ?: Utilities.getFlag(hostAddress)
+    }
+
+    private fun processFirewallRequest(
+        metadata: ConnTrackerMetaData,
+        anyRealIpBlocked: Boolean = false,
+        blocklists: String = ""
+    ): Boolean {
         // skip the block-ceremony for dns conns
         if (isDns(metadata.destPort) && isVpnDns(metadata.destIP)) {
+            if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule dns-request no-op on conn $metadata")
             return false
         }
 
-        val rule = firewall(metadata)
+        val rule = firewall(metadata, anyRealIpBlocked)
+
+        // handle 2G rule as a special case, as it is has blocklists
+        if (rule.id == FirewallRuleset.RULE2G.id && blocklists.isNotEmpty()) {
+            if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule allow on conn $metadata")
+            metadata.blockedByRule = rule.id + "|" + blocklists
+        } else {
+            metadata.blockedByRule = rule.id
+        }
 
         val blocked = FirewallRuleset.ground(rule)
-        metadata.blockedByRule = rule.id
         metadata.isBlocked = blocked
 
-        if (DEBUG) Log.i(LOG_TAG_VPN, "firewall-rule $rule on conn $metadata")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule $rule on conn $metadata")
 
         // write to conntrack, written in background
         connTrack(metadata)
-
-        if (FirewallRuleset.stall(rule)) {
-            stallResponse()
-        }
 
         return blocked
     }
 
     private fun createConnTrackerMetaData(
-        _uid: Long,
-        sourceAddress: String,
-        destAddress: String,
+        uid: Int,
+        srcIp: String,
+        srcPort: Int,
+        dstIp: String,
+        dstPort: Int,
         protocol: Int,
         _query: String
     ): ConnTrackerMetaData {
 
         // Ref: ipaddress doc:
         // https://seancfoley.github.io/IPAddress/ipaddress.html#host-name-or-address-with-port-or-service-name
-        val first = HostName(sourceAddress)
-        val second = HostName(destAddress)
-
-        val srcIp = if (first.address == null) "" else first.address.toString()
-        val srcPort = first.port
-        val dstIp = if (second.address == null) "" else second.address.toString()
-        val dstPort = second.port
-
-        val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
 
         val query = _query.ifEmpty { getDomainName(dstIp) }
 

@@ -87,6 +87,4 @@ interface RethinkDnsEndpointDao {
     @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'sky', 'max')") fun switchToMax()
 
     @Query("update RethinkDnsEndpoint set url = REPLACE(url, 'max', 'sky')") fun switchToSky()
-
-    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

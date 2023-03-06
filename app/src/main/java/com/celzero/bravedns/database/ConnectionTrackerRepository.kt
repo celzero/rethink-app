@@ -15,6 +15,8 @@
  */
 package com.celzero.bravedns.database
 
+import androidx.lifecycle.LiveData
+
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
     suspend fun insert(connectionTracker: ConnectionTracker) {
@@ -31,6 +33,10 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun clearAllData() {
         connectionTrackerDAO.clearAllData()
+    }
+
+    fun logsCount(): LiveData<Long> {
+        return connectionTrackerDAO.logsCount()
     }
 
     suspend fun clearLogsByUid(uid: Int) {

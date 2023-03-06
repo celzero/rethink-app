@@ -16,7 +16,6 @@
 package com.celzero.bravedns.ui
 
 import android.Manifest
-import android.app.Dialog
 import android.app.LocaleManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -24,81 +23,64 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.LocaleList
+import android.os.*
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.ProxyEndpoint
-import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
-import com.celzero.bravedns.databinding.DialogSetProxyBinding
-import com.celzero.bravedns.databinding.FragmentSettingsScreenBinding
-import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.*
-import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
 import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
-import java.io.IOException
+import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
-class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
-    private val b by viewBinding(FragmentSettingsScreenBinding::bind)
-
-    private var proxyEndpoint: ProxyEndpoint? = null
+class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
+    private val b by viewBinding(ActivityMiscSettingsBinding::bind)
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
-    private val orbotHelper by inject<OrbotHelper>()
 
     private lateinit var notificationPermissionResult: ActivityResultLauncher<String>
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        super.onCreate(savedInstanceState)
+        registerForActivityResult()
         initView()
         setupClickListeners()
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        registerForActivityResult()
-    }
-
     private fun initView() {
         b.settingsActivityAllowBypassProgress.visibility = View.GONE
-        b.settingsActivityHttpProxyProgress.visibility = View.GONE
 
         if (isFdroidFlavour()) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
@@ -126,7 +108,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
             val currentAppLocales: LocaleList =
-                requireContext().getSystemService(LocaleManager::class.java).applicationLocales
+                getSystemService(LocaleManager::class.java).applicationLocales
             b.settingsLocaleDesc.text =
                 currentAppLocales[0]?.displayName ?: getString(R.string.settings_locale_desc)
         } else {
@@ -136,7 +118,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         }
         // biometric authentication
         if (
-            BiometricManager.from(requireContext())
+            BiometricManager.from(this)
                 .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
                 BiometricManager.BIOMETRIC_SUCCESS
         ) {
@@ -145,63 +127,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             b.settingsBiometricRl.visibility = View.GONE
         }
 
-        observeCustomProxy()
-
         displayInternetProtocolUi()
         displayAppThemeUi()
         displayNotificationActionUi()
-        displaySocks5Ui()
-        displayHttpProxyUi()
-    }
-
-    private fun observeCustomProxy() {
-        appConfig.connectedProxy.observe(viewLifecycleOwner) {
-            proxyEndpoint = it
-            displaySocks5Ui()
-        }
-    }
-
-    private fun displayHttpProxyUi() {
-        if (!isAtleastQ()) {
-            b.settingsActivityHttpProxyContainer.visibility = View.GONE
-            return
-        }
-
-        b.settingsActivityHttpProxyContainer.visibility = View.VISIBLE
-        b.settingsActivityHttpProxySwitch.isChecked = appConfig.isCustomHttpProxyEnabled()
-        if (b.settingsActivityHttpProxySwitch.isChecked) {
-            b.settingsActivityHttpProxyDesc.text =
-                getString(
-                    R.string.settings_http_proxy_desc,
-                    persistentState.httpProxyHostAddress,
-                    persistentState.httpProxyPort.toString()
-                )
-        }
-    }
-
-    private fun displaySocks5Ui() {
-        val isCustomSocks5Enabled = appConfig.isCustomSocks5Enabled()
-
-        b.settingsActivitySocks5Progress.visibility = View.GONE
-        b.settingsActivitySocks5Switch.isChecked = isCustomSocks5Enabled
-
-        if (!isCustomSocks5Enabled) {
-            return
-        }
-
-        val appName =
-            if (proxyEndpoint?.proxyAppName == getString(R.string.settings_app_list_default_app)) {
-                getString(R.string.settings_app_list_default_app)
-            } else {
-                FirewallManager.getAppInfoByPackage(proxyEndpoint?.proxyAppName)?.appName
-            }
-        b.settingsActivitySocks5Desc.text =
-            getString(
-                R.string.settings_socks_forwarding_desc,
-                proxyEndpoint?.proxyIP,
-                proxyEndpoint?.proxyPort.toString(),
-                appName
-            )
+        displayPcapUi()
     }
 
     private fun displayNotificationActionUi() {
@@ -229,6 +158,21 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
                         R.string.settings_notification_desc,
                         getString(R.string.settings_notification_desc3)
                     )
+            }
+        }
+    }
+
+    private fun displayPcapUi() {
+        b.settingsActivityPcapRl.isEnabled = true
+        when (PcapMode.getPcapType(persistentState.pcapMode)) {
+            PcapMode.NONE -> {
+                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_1)
+            }
+            PcapMode.LOGCAT -> {
+                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_2)
+            }
+            PcapMode.EXTERNAL_FILE -> {
+                b.settingsActivityPcapDesc.text = getString(R.string.settings_pcap_dialog_option_3)
             }
         }
     }
@@ -317,66 +261,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
     }
 
-    private fun refreshOrbotUi() {
-        // Checks whether the Orbot is installed.
-        // If not, then prompt the user for installation.
-        // Else, enable the Orbot bottom sheet fragment.
-        if (!FirewallManager.isOrbotInstalled()) {
-            b.settingsActivityHttpOrbotDesc.text = getString(R.string.settings_orbot_install_desc)
-            return
-        }
-
-        if (!appConfig.isOrbotProxyEnabled()) {
-            b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
-            return
-        }
-
-        io {
-            val isOrbotDns = appConfig.isOrbotDns()
-
-            uiCtx {
-                when (appConfig.getProxyType()) {
-                    AppConfig.ProxyType.HTTP.name -> {
-                        b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_2)
-                    }
-                    AppConfig.ProxyType.SOCKS5.name -> {
-                        if (isOrbotDns) {
-                            b.settingsActivityHttpOrbotDesc.text =
-                                getString(
-                                    R.string.orbot_bs_status_1,
-                                    getString(R.string.orbot_status_arg_3)
-                                )
-                        } else {
-                            b.settingsActivityHttpOrbotDesc.text =
-                                getString(
-                                    R.string.orbot_bs_status_1,
-                                    getString(R.string.orbot_status_arg_2)
-                                )
-                        }
-                    }
-                    AppConfig.ProxyType.HTTP_SOCKS5.name -> {
-                        if (isOrbotDns) {
-                            b.settingsActivityHttpOrbotDesc.text =
-                                getString(
-                                    R.string.orbot_bs_status_3,
-                                    getString(R.string.orbot_status_arg_3)
-                                )
-                        } else {
-                            b.settingsActivityHttpOrbotDesc.text =
-                                getString(
-                                    R.string.orbot_bs_status_3,
-                                    getString(R.string.orbot_status_arg_2)
-                                )
-                        }
-                    }
-                    else -> {
-                        b.settingsActivityHttpOrbotDesc.text = getString(R.string.orbot_bs_status_4)
-                    }
-                }
-            }
-        }
-    }
-
     private fun setupClickListeners() {
         b.settingsActivityEnableLogsRl.setOnClickListener {
             b.settingsActivityEnableLogsSwitch.isChecked =
@@ -439,73 +323,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
 
             delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
-                if (isAdded) {
-                    b.settingsActivityAllowBypassSwitch.isEnabled = true
-                    b.settingsActivityAllowBypassProgress.visibility = View.GONE
-                    b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
-                }
+                b.settingsActivityAllowBypassSwitch.isEnabled = true
+                b.settingsActivityAllowBypassProgress.visibility = View.GONE
+                b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
             }
         }
 
-        b.settingsActivityVpnLockdownDesc.setOnClickListener { openVpnProfile(requireContext()) }
-
-        b.settingsActivitySocks5Rl.setOnClickListener {
-            b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
-        }
-
-        b.settingsActivitySocks5Switch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            checked: Boolean ->
-            if (!checked) {
-                appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
-                b.settingsActivitySocks5Desc.text =
-                    getString(R.string.settings_socks_forwarding_default_desc)
-                return@setOnCheckedChangeListener
-            }
-
-            if (!appConfig.canEnableSocks5Proxy()) {
-                showToastUiCentered(
-                    requireContext(),
-                    getString(R.string.settings_socks5_disabled_error),
-                    Toast.LENGTH_SHORT
-                )
-                b.settingsActivitySocks5Switch.isChecked = false
-                return@setOnCheckedChangeListener
-            }
-
-            showSocks5ProxyDialog()
-        }
-
-        b.settingsActivityOrbotImg.setOnClickListener { handleOrbotUiEvent() }
-
-        b.settingsActivityOrbotContainer.setOnClickListener { handleOrbotUiEvent() }
-
-        b.settingsActivityHttpProxyContainer.setOnClickListener {
-            b.settingsActivityHttpProxySwitch.isChecked =
-                !b.settingsActivityHttpProxySwitch.isChecked
-        }
-
-        b.settingsActivityHttpProxySwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            checked: Boolean ->
-            if (!checked) {
-                appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
-                b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
-                return@setOnCheckedChangeListener
-            }
-
-            if (!appConfig.canEnableHttpProxy()) {
-                showToastUiCentered(
-                    requireContext(),
-                    getString(R.string.settings_https_disabled_error),
-                    Toast.LENGTH_SHORT
-                )
-                b.settingsActivityHttpProxySwitch.isChecked = false
-                return@setOnCheckedChangeListener
-            }
-
-            showHttpProxyDialog()
-        }
+        b.settingsActivityVpnLockdownDesc.setOnClickListener { openVpnProfile(this) }
 
         b.settingsActivityThemeRl.setOnClickListener {
             enableAfterDelay(500, b.settingsActivityThemeRl)
@@ -519,6 +343,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         b.settingsActivityNotificationRl.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityNotificationRl)
             showNotificationActionDialog()
+        }
+
+        b.settingsActivityPcapRl.setOnClickListener {
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityPcapRl)
+            showPcapOptionsDialog()
         }
 
         b.settingsActivityIpRl.setOnClickListener {
@@ -536,7 +365,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             } else {
                 b.settingsActivityPtransSwitch.isChecked = false
                 showToastUiCentered(
-                    requireContext(),
+                    this,
                     getString(R.string.settings_protocol_translation_dns_inactive),
                     Toast.LENGTH_SHORT
                 )
@@ -561,10 +390,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             ->
             persistentState.biometricAuth = checked
         }
+
+        b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
     }
 
     private fun invokeChangeLocaleDialog() {
-        val alertBuilder = AlertDialog.Builder(requireContext())
+        val alertBuilder = AlertDialog.Builder(this)
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
@@ -597,7 +428,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(
-                requireContext(),
+                this,
                 getString(R.string.intent_launch_error, intent.data),
                 Toast.LENGTH_SHORT
             )
@@ -639,39 +470,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
 
     private fun invokeImportExport() {
         val bottomSheetFragment = BackupRestoreBottomSheetFragment()
-        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
-    }
-
-    private fun handleOrbotUiEvent() {
-        if (!FirewallManager.isOrbotInstalled()) {
-            showOrbotInstallDialog()
-            return
-        }
-
-        if (!appConfig.canEnableOrbotProxy()) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.settings_orbot_disabled_error),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        openOrbotBottomSheet()
-    }
-
-    private fun openOrbotBottomSheet() {
-        if (!VpnController.hasTunnel()) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.settings_socks5_vpn_disabled_error),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        val bottomSheetFragment = OrbotBottomSheetFragment()
-        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -680,7 +479,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     }
 
     private fun showThemeDialog() {
-        val alertBuilder = AlertDialog.Builder(requireContext())
+        val alertBuilder = AlertDialog.Builder(this)
         alertBuilder.setTitle(getString(R.string.settings_theme_dialog_title))
         val items =
             arrayOf(
@@ -699,7 +498,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             persistentState.theme = which
             when (which) {
                 Themes.SYSTEM_DEFAULT.id -> {
-                    if (requireActivity().isDarkThemeOn()) {
+                    if (isDarkThemeOn()) {
                         setThemeRecreate(R.style.AppTheme)
                     } else {
                         setThemeRecreate(R.style.AppThemeWhite)
@@ -720,7 +519,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     }
 
     private fun showIpDialog() {
-        val alertBuilder = AlertDialog.Builder(requireContext())
+        val alertBuilder = AlertDialog.Builder(this)
         alertBuilder.setTitle(getString(R.string.settings_ip_dialog_title))
         val items =
             arrayOf(
@@ -745,12 +544,49 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     }
 
     private fun setThemeRecreate(theme: Int) {
-        requireActivity().setTheme(theme)
-        requireActivity().recreate()
+        setTheme(theme)
+        recreate()
+    }
+
+    private fun showPcapOptionsDialog() {
+        val alertBuilder = AlertDialog.Builder(this)
+        alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
+        val items =
+            arrayOf(
+                getString(R.string.settings_pcap_dialog_option_1),
+                getString(R.string.settings_pcap_dialog_option_2),
+                getString(R.string.settings_pcap_dialog_option_3)
+            )
+        val checkedItem = persistentState.pcapMode
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            if (persistentState.pcapMode == which) {
+                return@setSingleChoiceItems
+            }
+
+            when (PcapMode.getPcapType(which)) {
+                PcapMode.NONE -> {
+                    b.settingsActivityPcapDesc.text =
+                        getString(R.string.settings_pcap_dialog_option_1)
+                    appConfig.setPcap(PcapMode.NONE.id)
+                }
+                PcapMode.LOGCAT -> {
+                    b.settingsActivityPcapDesc.text =
+                        getString(R.string.settings_pcap_dialog_option_2)
+                    appConfig.setPcap(PcapMode.LOGCAT.id, PcapMode.ENABLE_PCAP_LOGCAT)
+                }
+                PcapMode.EXTERNAL_FILE -> {
+                    b.settingsActivityPcapDesc.text =
+                        getString(R.string.settings_pcap_dialog_option_3)
+                    createAndSetPcapFile()
+                }
+            }
+        }
+        alertBuilder.create().show()
     }
 
     private fun showNotificationActionDialog() {
-        val alertBuilder = AlertDialog.Builder(requireContext())
+        val alertBuilder = AlertDialog.Builder(this)
         alertBuilder.setTitle(getString(R.string.settings_notification_dialog_title))
         val items =
             arrayOf(
@@ -799,124 +635,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
 
     override fun onResume() {
         super.onResume()
-        refreshOrbotUi()
         handleLockdownModeIfNeeded()
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
-        handleProxyUi()
-    }
-
-    // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
-    private fun handleProxyUi() {
-        val canEnableProxy = appConfig.canEnableProxy()
-
-        if (canEnableProxy) {
-            b.settingsActivitySocks5Rl.alpha = 1f
-            b.settingsActivityHttpProxyContainer.alpha = 1f
-            b.settingsActivityOrbotContainer.alpha = 1f
-        } else {
-            b.settingsActivitySocks5Rl.alpha = 0.5f
-            b.settingsActivityHttpProxyContainer.alpha = 0.5f
-            b.settingsActivityOrbotContainer.alpha = 0.5f
-        }
-        // Orbot
-        b.settingsActivityOrbotImg.isEnabled = canEnableProxy
-        b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
-        // SOCKS5
-        b.settingsActivitySocks5Switch.isEnabled = canEnableProxy
-        // HTTP Proxy
-        b.settingsActivityHttpProxySwitch.isEnabled = canEnableProxy
-    }
-
-    private fun showHttpProxyDialog() {
-        var isValid: Boolean
-        var host: String
-        var port = INVALID_PORT
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-        dialog.setTitle(getString(R.string.settings_http_proxy_dialog_title))
-        val dialogBinding = DialogSetHttpProxyBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.window?.attributes = lp
-
-        val applyURLBtn = dialogBinding.dialogHttpProxyOkBtn
-        val cancelURLBtn = dialogBinding.dialogHttpProxyCancelBtn
-        val hostAddressEditText = dialogBinding.dialogHttpProxyEditText
-        val portEditText = dialogBinding.dialogHttpProxyEditTextPort
-        val errorTxt = dialogBinding.dialogHttpProxyFailureText
-
-        val hostName = persistentState.httpProxyHostAddress
-        val portAddr = persistentState.httpProxyPort
-        if (hostName.isNotBlank()) {
-            hostAddressEditText.setText(hostName, TextView.BufferType.EDITABLE)
-        }
-        // TODO portAddress check for 0 is needed only for version v053f. Remove.
-        if (portAddr != INVALID_PORT || portAddr == UNSPECIFIED_PORT) {
-            portEditText.setText(portAddr.toString(), TextView.BufferType.EDITABLE)
-        } else {
-            portEditText.setText(Constants.HTTP_PROXY_PORT, TextView.BufferType.EDITABLE)
-        }
-        applyURLBtn.setOnClickListener {
-            host = hostAddressEditText.text.toString()
-            var isHostValid = true
-            try {
-                port = portEditText.text.toString().toInt()
-                isValid = Utilities.isValidLocalPort(port)
-                if (!isValid) {
-                    errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
-                    errorTxt.visibility = View.VISIBLE
-                }
-            } catch (e: NumberFormatException) {
-                Log.e(LOG_TAG_VPN, "Error: ${e.message}", e)
-                errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
-                errorTxt.visibility = View.VISIBLE
-                isValid = false
-            }
-
-            if (host.isBlank()) {
-                isHostValid = false
-                errorTxt.text = getString(R.string.settings_http_proxy_error_text3)
-                errorTxt.visibility = View.VISIBLE
-            }
-
-            if (isValid && isHostValid) {
-                errorTxt.visibility = View.INVISIBLE
-                io {
-                    appConfig.addProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
-                    appConfig.insertCustomHttpProxy(host, port)
-                }
-                dialog.dismiss()
-                Toast.makeText(
-                        requireContext(),
-                        getString(R.string.settings_http_proxy_toast_success),
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-                if (b.settingsActivityHttpProxySwitch.isChecked) {
-                    b.settingsActivityHttpProxyDesc.text =
-                        getString(R.string.settings_http_proxy_desc, host, port.toString())
-                }
-            }
-        }
-        cancelURLBtn.setOnClickListener {
-            dialog.dismiss()
-            appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
-            b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
-            b.settingsActivityHttpProxySwitch.isChecked = false
-        }
     }
 
     private fun showAllNetworksDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = AlertDialog.Builder(this)
         builder.setTitle(getString(R.string.settings_all_networks_dialog_title))
         builder.setMessage(getString(R.string.settings_all_networks_dialog_message))
         builder.setPositiveButton(getString(R.string.settings_all_networks_dialog_positive_btn)) {
@@ -936,189 +661,26 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
         builder.create().show()
     }
 
-    /** Prompt user to download the Orbot app based on the current BUILDCONFIG flavor. */
-    private fun showOrbotInstallDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(R.string.orbot_install_dialog_title)
-        builder.setMessage(R.string.orbot_install_dialog_message)
-        builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
-            handleOrbotInstall()
-        }
-        builder.setNegativeButton(getString(R.string.lbl_dismiss)) { dialog, _ -> dialog.dismiss() }
-        builder.setNeutralButton(getString(R.string.orbot_install_dialog_neutral)) { _, _ ->
-            launchOrbotWebsite()
-        }
-        builder.create().show()
-    }
-
-    private fun launchOrbotWebsite() {
-        val intent = Intent(Intent.ACTION_VIEW, getString(R.string.orbot_website_link).toUri())
-        startActivity(intent)
-    }
-
-    private fun handleOrbotInstall() {
-        startOrbotInstallActivity(orbotHelper.getIntentForDownload())
-    }
-
-    private fun startOrbotInstallActivity(intent: Intent?) {
-        if (intent == null) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.orbot_install_activity_error),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.orbot_install_activity_error),
-                Toast.LENGTH_SHORT
-            )
-        }
-    }
-
-    private fun showSocks5ProxyDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.window?.attributes = lp
-
-        val applyURLBtn = dialogBinding.dialogProxyApplyBtn
-        val cancelURLBtn = dialogBinding.dialogProxyCancelBtn
-        val ipAddressEditText: EditText = dialogBinding.dialogProxyEditIp
-        val portEditText: EditText = dialogBinding.dialogProxyEditPort
-        val appNameSpinner: Spinner = dialogBinding.dialogProxySpinnerAppname
-        val errorTxt: TextView = dialogBinding.dialogProxyErrorText
-        val userNameEditText: EditText = dialogBinding.dialogProxyEditUsername
-        val passwordEditText: EditText = dialogBinding.dialogProxyEditPassword
-        val udpBlockCheckBox: CheckBox = dialogBinding.dialogProxyUdpCheck
-
-        udpBlockCheckBox.isChecked = persistentState.udpBlockedSettings
-
-        val appNames: MutableList<String> = ArrayList()
-        appNames.add(getString(R.string.settings_app_list_default_app))
-        appNames.addAll(FirewallManager.getAllAppNames())
-        val proxySpinnerAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, appNames)
-        appNameSpinner.adapter = proxySpinnerAdapter
-        if (proxyEndpoint != null && !proxyEndpoint?.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(proxyEndpoint?.proxyIP, TextView.BufferType.EDITABLE)
-            portEditText.setText(proxyEndpoint?.proxyPort.toString(), TextView.BufferType.EDITABLE)
-            userNameEditText.setText(
-                proxyEndpoint?.userName.toString(),
-                TextView.BufferType.EDITABLE
-            )
-            if (
-                !proxyEndpoint?.proxyAppName.isNullOrBlank() &&
-                    proxyEndpoint?.proxyAppName != getString(R.string.settings_app_list_default_app)
-            ) {
-                val packageName = proxyEndpoint?.proxyAppName
-                val app = FirewallManager.getAppInfoByPackage(packageName)
-                var position = 0
-                for ((i, item) in appNames.withIndex()) {
-                    if (item == app?.appName) {
-                        position = i
-                    }
-                }
-                appNameSpinner.setSelection(position)
-            } else {
-                // no-op
-            }
-        } else {
-            ipAddressEditText.setText(Constants.SOCKS_DEFAULT_IP, TextView.BufferType.EDITABLE)
-            portEditText.setText(Constants.SOCKS_DEFAULT_PORT, TextView.BufferType.EDITABLE)
-        }
-
-        applyURLBtn.setOnClickListener {
-            var port = 0
-            var isValid: Boolean
-            var isIPValid = true
-            var isUDPBlock = false
-            val mode: String = getString(R.string.cd_dns_proxy_mode_external)
-            val appName: String = appNames[appNameSpinner.selectedItemPosition]
-            val appPackageName =
-                if (
-                    appName.isBlank() ||
-                        appName == getString(R.string.settings_app_list_default_app)
-                ) {
-                    appNames[0]
-                } else {
-                    FirewallManager.getPackageNameByAppName(appName)
-                }
-            val ip: String = ipAddressEditText.text.toString()
-
-            if (ip.isBlank()) {
-                isIPValid = false
-                errorTxt.text = getString(R.string.settings_http_proxy_error_text3)
-                errorTxt.visibility = View.VISIBLE
-            }
-
-            try {
-                port = portEditText.text.toString().toInt()
-                isValid =
-                    if (Utilities.isLanIpv4(ip)) {
-                        Utilities.isValidLocalPort(port)
-                    } else {
-                        Utilities.isValidPort(port)
-                    }
-                if (!isValid) {
-                    errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
-                }
-            } catch (e: NumberFormatException) {
-                Log.w(LOG_TAG_VPN, "Error: ${e.message}", e)
-                errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
-                isValid = false
-            }
-            if (udpBlockCheckBox.isChecked) {
-                isUDPBlock = true
-            }
-
-            val userName: String = userNameEditText.text.toString()
-            val password: String = passwordEditText.text.toString()
-            if (isValid && isIPValid) {
-                // Do the Socks5 Proxy setting there
-                persistentState.udpBlockedSettings = udpBlockCheckBox.isChecked
-                insertSocks5ProxyEndpointDB(
-                    mode,
-                    appPackageName,
-                    ip,
-                    port,
-                    userName,
-                    password,
-                    isUDPBlock
-                )
-                b.settingsActivitySocks5Desc.text =
-                    getString(R.string.settings_socks_forwarding_desc, ip, port.toString(), appName)
-                dialog.dismiss()
-            } else {
-                // no-op
-            }
-        }
-
-        cancelURLBtn.setOnClickListener {
-            b.settingsActivitySocks5Switch.isChecked = false
-            appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
-            b.settingsActivitySocks5Desc.text =
-                getString(R.string.settings_socks_forwarding_default_desc)
+    private fun showDefaultDnsDialog() {
+        val alertBuilder = AlertDialog.Builder(this)
+        alertBuilder.setTitle(getString(R.string.settings_default_dns_dialog_title))
+        val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
+        // get the index of the default dns url
+        // if the default dns url is not in the list, then select the first item
+        val checkedItem =
+            Constants.DEFAULT_DNS_LIST.firstOrNull { it.url == persistentState.defaultDnsUrl }
+                ?.let { Constants.DEFAULT_DNS_LIST.indexOf(it) }
+                ?: 0
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, pos ->
             dialog.dismiss()
+            // update the default dns url
+            persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
         }
-        dialog.show()
+        alertBuilder.create().show()
     }
 
     private fun registerForActivityResult() {
+        // app notification permission android 13
         if (!isAtleastT()) return
 
         // Sets up permissions request launcher.
@@ -1138,6 +700,45 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             }
     }
 
+    private fun showFileCreationErrorToast() {
+        showToastUiCentered(this, getString(R.string.pcap_failure_toast), Toast.LENGTH_SHORT)
+    }
+
+    private fun createAndSetPcapFile() {
+        try {
+            val file = makePcapFile()
+            if (file == null) {
+                showFileCreationErrorToast()
+                return
+            }
+            // set the file descriptor instead of fd, need to close the file descriptor
+            // after tunnel creation
+            appConfig.setPcap(PcapMode.EXTERNAL_FILE.id, file.absolutePath)
+        } catch (e: Exception) {
+            showFileCreationErrorToast()
+        }
+    }
+
+    private fun makePcapFile(): File? {
+        return try {
+            val sdf = SimpleDateFormat(BackupHelper.BACKUP_FILE_NAME_DATETIME, Locale.ROOT)
+            // create folder in DOWNLOADS
+            val downloadsDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            // create folder in DOWNLOADS/Rethink
+            val dir = File(downloadsDir, Constants.PCAP_FOLDER_NAME)
+            dir.mkdirs()
+            // filename format (Rethink_PCAP_DATE_FORMAT.pcap)
+            val pcapFileName: String =
+                Constants.PCAP_FILE_NAME_PART + sdf.format(Date()) + Constants.PCAP_FILE_EXTENSION
+            val file = File(dir, pcapFileName)
+            file
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error creating pcap file ${e.message}", e)
+            null
+        }
+    }
+
     private fun invokeNotificationPermission() {
         if (!isAtleastT()) {
             // notification permission is needed for version 13 or above
@@ -1154,7 +755,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
     }
 
     private fun invokeAndroidNotificationSetting() {
-        val packageName = requireContext().packageName
+        val packageName = this.packageName
         try {
             val intent = Intent()
             if (Utilities.isAtleastO()) {
@@ -1168,11 +769,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(
-                requireContext(),
+                this,
                 getString(R.string.notification_screen_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+            Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -1195,72 +796,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings_screen) {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun isNotificationPermissionGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun insertSocks5ProxyEndpointDB(
-        mode: String,
-        appName: String?,
-        ip: String,
-        port: Int,
-        userName: String,
-        password: String,
-        isUDPBlock: Boolean
-    ) {
-        if (appName == null) return
-
-        b.settingsActivitySocks5Switch.isEnabled = false
-        b.settingsActivitySocks5Switch.visibility = View.GONE
-        b.settingsActivitySocks5Progress.visibility = View.VISIBLE
-        delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
-            if (isAdded) {
-                b.settingsActivitySocks5Switch.isEnabled = true
-                b.settingsActivitySocks5Progress.visibility = View.GONE
-                b.settingsActivitySocks5Switch.visibility = View.VISIBLE
-            }
-        }
-        io {
-            val proxyName = Constants.SOCKS
-            val proxyEndpoint =
-                ProxyEndpoint(
-                    id = 0,
-                    proxyName,
-                    proxyMode = 1,
-                    mode,
-                    appName,
-                    ip,
-                    port,
-                    userName,
-                    password,
-                    isSelected = true,
-                    isCustom = true,
-                    isUDP = isUDPBlock,
-                    modifiedDataTime = 0L,
-                    latency = 0
-                )
-
-            appConfig.insertCustomSocks5Proxy(proxyEndpoint)
-        }
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {
         for (v in views) v.isEnabled = false
 
-        delay(ms, lifecycleScope) {
-            if (!isAdded) return@delay
-
-            for (v in views) v.isEnabled = true
-        }
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
+        delay(ms, lifecycleScope) { for (v in views) v.isEnabled = true }
     }
 }

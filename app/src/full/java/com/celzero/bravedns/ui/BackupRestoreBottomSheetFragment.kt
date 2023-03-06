@@ -273,7 +273,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
                 .setInputData(data.build())
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(RestoreAgent.TAG)
@@ -303,7 +303,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
                 .setInputData(data.build())
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(BackupAgent.TAG)

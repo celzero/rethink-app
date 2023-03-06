@@ -33,7 +33,6 @@ import android.view.Window
 import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -54,6 +53,7 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
+import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
@@ -226,23 +226,31 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private fun handleResponseIpsChip() {
         b.dnsBlockIpsChip.visibility = View.VISIBLE
         lightenUpChip(b.dnsBlockIpsChip, true)
-
-        if (transaction!!.responseIps.isEmpty()) {
-            b.dnsBlockIpsChip.text = getString(R.string.lbl_allowed)
+        if (
+            ResourceRecordTypes.mayContainIp(transaction!!.typeName) &&
+                transaction!!.responseIps == "--"
+        ) {
+            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }
 
-        val ips = transaction!!.responseIps.split(",")
-        val ipCount = ips.count()
+        try {
+            val ips = transaction!!.responseIps.split(",")
+            val ipCount = ips.count()
 
-        if (ipCount == 1) {
-            b.dnsBlockIpsChip.text = getString(R.string.lbl_allowed)
+            if (ipCount == 1) {
+                b.dnsBlockIpsChip.text = getString(R.string.lbl_allowed)
+                return
+            }
+
+            b.dnsBlockIpsChip.text =
+                getString(R.string.dns_btm_sheet_chip, (ipCount - 1).toString())
+
+            b.dnsBlockIpsChip.setOnClickListener { showIpsDialog() }
+        } catch (e: Exception) {
+            b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }
-
-        b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip, (ipCount - 1).toString())
-
-        b.dnsBlockIpsChip.setOnClickListener { showIpsDialog() }
     }
 
     private fun handleBlocklistChip() {
@@ -377,7 +385,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                 )
         }
         text = text.replace(",", ", ")
-        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        return updateHtmlEncodedText(text)
     }
 
     private fun displayDescription() {
@@ -444,7 +452,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
         if (!persistentState.fetchFavIcon || transaction!!.groundedQuery()) return
 
-        val trim = transaction!!.queryStr.dropLast(1)
+        val trim = transaction!!.queryStr.dropLastWhile { it == '.' }
 
         // no need to check in glide cache if the value is available in failed cache
         if (FavIconDownloader.isUrlAvailableInFailedCache(trim) != null) {

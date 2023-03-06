@@ -44,13 +44,13 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="15dp"
-            app:chipSurfaceColor="@null"
             android:padding="5dp"
             android:text="@string/bsct_app_info"
             android:textSize="@dimen/large_font_text_view"
             android:visibility="visible"
             app:chipEndPadding="5dp"
             app:chipStartPadding="5dp"
+            app:chipSurfaceColor="@null"
             app:shapeAppearance="@style/ShapeAppearance.LargeComponent" />
 
     </RelativeLayout>
@@ -143,8 +143,8 @@
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="2dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="2dp"
         android:orientation="vertical"
         android:padding="10dp">
@@ -152,8 +152,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
             android:paddingBottom="5dp"
             android:weightSum="1">
 
@@ -171,10 +171,10 @@
                 android:id="@+id/bs_conn_firewall_spinner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.4"
                 android:layout_gravity="center_vertical"
-                android:gravity="center_vertical"
+                android:layout_weight="0.4"
                 android:background="@drawable/spinner_outline"
+                android:gravity="center_vertical"
                 android:minWidth="100dp"
                 android:popupBackground="@drawable/spinner_outline_with_bg"
                 android:spinnerMode="dropdown"
@@ -231,8 +231,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
             android:paddingBottom="5dp"
             android:weightSum="1">
 
@@ -243,12 +243,54 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.6"
                 android:padding="5dp"
-                android:text="@string/bsct_block_app"
+                android:text="@string/bsct_block_ip"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/large_font_text_view" />
 
             <Spinner
                 android:id="@+id/bs_conn_ip_rule_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.4"
+                android:background="@drawable/spinner_outline"
+                android:popupBackground="@drawable/spinner_outline_with_bg"
+                android:spinnerMode="dropdown"
+                tools:listitem="@layout/spinner_item_firewall_status" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bs_conn_domain_rule_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/bs_conn_domain_txt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.6"
+                android:padding="5dp"
+                android:text="@string/bsct_block_domain"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <Spinner
+                android:id="@+id/bs_conn_domain_spinner"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

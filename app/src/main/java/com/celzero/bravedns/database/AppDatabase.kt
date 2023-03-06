@@ -588,6 +588,30 @@ abstract class AppDatabase : RoomDatabase() {
                         "CREATE TABLE 'CustomDomain' ( 'domain' TEXT NOT NULL, 'uid' INT NOT NULL,  'ips' TEXT NOT NULL, 'status' INTEGER NOT NULL, 'type' INTEGER NOT NULL, 'modifiedTs' INTEGER NOT NULL, 'deletedTs' INTEGER NOT NULL, 'version' INTEGER NOT NULL, PRIMARY KEY (domain, uid)) "
                     )
                     modifyAppInfo(database)
+                    modifyRethinkDnsUrls(database)
+                    updateDnscryptStamps(database)
+                }
+
+                private fun updateDnscryptStamps(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAFDE4NS4yMjguMTY4LjE2ODo4NDQzILysMvrVQ2kXHwgy1gdQJ8MgjO7w6OmflBjcd2Bl1I8pEWNsZWFuYnJvd3Npbmcub3Jn' where dnsCryptName = 'Cleanbrowsing Family' and id = 1"
+                    )
+                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20' where dnsCryptName = 'Adguard'  and id = 2")
+                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNTo1NDQzILgxXdexS27jIKRw3C7Wsao5jMnlhvhdRUXWuMm1AFq6ITIuZG5zY3J5cHQuZmFtaWx5Lm5zMS5hZGd1YXJkLmNvbQ' where dnsCryptName = 'Adguard Family'  and id = 3")
+                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAFDE0OS4xMTIuMTEyLjExMjo4NDQzIGfIR7jIdYzRICRVQ751Z0bfNN8dhMALjEcDaN-CHYY-GTIuZG5zY3J5cHQtY2VydC5xdWFkOS5uZXQ', dnsCryptName = 'Quad9 Security', dnsCryptExplanation = 'Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 - 149.112.112.9 - 149.112.112.112' where dnsCryptName = 'Cleanbrowsing Security'  and id = 4")
+                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAEzE0OS4xMTIuMTEyLjExOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA', dnsCryptExplanation = 'Quad9 (anycast) no-dnssec/no-log/no-filter/ecs 9.9.9.12 - 149.112.112.12' where dnsCryptName = 'Quad9' and id = 5")
+                }
+
+                private fun modifyRethinkDnsUrls(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "UPDATE RethinkDnsEndpoint set url = case when url = 'https://max.rethinkdns.com/1:EMABAADgIAA='  then 'https://max.rethinkdns.com/pec' else 'https://sky.rethinkdns.com/pec' end where name = 'RDNS Adult' and isCustom = 0"
+                    )
+                    database.execSQL(
+                        "UPDATE RethinkDnsEndpoint set url = case when url = 'https://max.rethinkdns.com/1:4AIAgAABAHAgAA=='  then 'https://max.rethinkdns.com/sec' else 'https://sky.rethinkdns.com/sec' end where name = 'RDNS Security' and isCustom = 0"
+                    )
+                    database.execSQL(
+                        "UPDATE RethinkDnsEndpoint set blocklistCount = 0 where isCustom = 0 and name != 'RDNS Plus'"
+                    )
                 }
 
                 private fun modifyAppInfo(database: SupportSQLiteDatabase) {
@@ -619,17 +643,8 @@ abstract class AppDatabase : RoomDatabase() {
     // https://stackoverflow.com/questions/49030258/how-to-vacuum-roomdatabase
     // https://stackoverflow.com/questions/50987119/backup-room-database
     fun checkPoint() {
-        appInfoDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dohEndpointsDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsCryptEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsCryptRelayEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        dnsProxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        proxyEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        customDomainEndpointDAO().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        customIpEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        rethinkEndpointDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        rethinkRemoteFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
-        rethinkLocalFileTagDao().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        appDatabaseRawQueries().checkpoint(SimpleSQLiteQuery(PRAGMA))
+        appDatabaseRawQueries().vacuum(SimpleSQLiteQuery("VACUUM"))
     }
 
     abstract fun appInfoDAO(): AppInfoDAO
@@ -645,6 +660,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun rethinkLocalFileTagDao(): RethinkLocalFileTagDao
     abstract fun localBlocklistPacksMapDao(): LocalBlocklistPacksMapDao
     abstract fun remoteBlocklistPacksMapDao(): RemoteBlocklistPacksMapDao
+    abstract fun appDatabaseRawQueries(): AppDatabaseRawQueryDao
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())

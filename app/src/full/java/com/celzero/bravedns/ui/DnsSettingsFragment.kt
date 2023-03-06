@@ -19,7 +19,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
@@ -33,7 +36,6 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
@@ -45,7 +47,7 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 
-class DnsConfigureFragment :
+class DnsSettingsFragment :
     Fragment(R.layout.fragment_dns_configure),
     LocalBlocklistsBottomSheet.OnBottomSheetDialogFragmentDismiss {
     private val b by viewBinding(FragmentDnsConfigureBinding::bind)
@@ -53,8 +55,17 @@ class DnsConfigureFragment :
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
 
+    private lateinit var animation: Animation
+
     companion object {
-        fun newInstance() = DnsConfigureFragment()
+        fun newInstance() = DnsSettingsFragment()
+        private const val REFRESH_TIMEOUT: Long = 4000
+
+        private const val ANIMATION_DURATION = 750L
+        private const val ANIMATION_REPEAT_COUNT = -1
+        private const val ANIMATION_PIVOT_VALUE = 0.5f
+        private const val ANIMATION_START_DEGREE = 0.0f
+        private const val ANIMATION_END_DEGREE = 360.0f
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,6 +84,8 @@ class DnsConfigureFragment :
     }
 
     private fun initView() {
+        // init animation
+        initAnimation()
         // display fav icon in dns logs
         b.dcFaviconSwitch.isChecked = persistentState.fetchFavIcon
         // prevent dns leaks
@@ -83,6 +96,8 @@ class DnsConfigureFragment :
         b.dcDownloaderSwitch.isChecked = persistentState.useCustomDownloadManager
         // enable per-app domain rules (dns alg)
         b.dcAlgSwitch.isChecked = persistentState.enableDnsAlg
+        // enable dns caching in tunnel
+        b.dcEnableCacheSwitch.isChecked = persistentState.enableDnsCache
 
         b.connectedStatusTitle.text = getConnectedDnsType()
     }
@@ -218,36 +233,10 @@ class DnsConfigureFragment :
     }
 
     private fun observeBraveMode() {
-        appConfig.getBraveModeObservable().observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            if (AppConfig.BraveMode.getMode(it).isDnsMode()) {
-                updateDnsOnlyModeUi()
-            }
-        }
-
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) { updateSelectedDns() }
     }
 
-    private fun updateDnsOnlyModeUi() {
-        // disable local-blocklist for dns-only mode
-        b.dcLocalBlocklistIcon.isEnabled = false
-        b.dcLocalBlocklistRl.isEnabled = false
-
-        b.dcLocalBlocklistRl.isClickable = false
-        b.dcLocalBlocklistIcon.isClickable = false
-
-        // disable prevent dns leaks in dns-only mode
-        b.dcPreventDnsLeaksSwitch.isClickable = false
-        b.dcPreventDnsLeaksSwitch.isEnabled = false
-    }
-
     private fun initClickListeners() {
-
-        b.dcCustomDomainRl.setOnClickListener {
-            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcCustomDomainRl)
-            openCustomDomainDialog()
-        }
 
         b.dcLocalBlocklistRl.setOnClickListener { openLocalBlocklist() }
 
@@ -319,6 +308,46 @@ class DnsConfigureFragment :
         b.dcDownloaderSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.useCustomDownloadManager = b
         }
+
+        b.dcEnableCacheRl.setOnClickListener {
+            b.dcEnableCacheSwitch.isChecked = !b.dcEnableCacheSwitch.isChecked
+        }
+
+        b.dcEnableCacheSwitch.setOnCheckedChangeListener { _, b ->
+            persistentState.enableDnsCache = b
+        }
+
+        b.dcRefresh.setOnClickListener {
+            b.dcRefresh.isEnabled = false
+            b.dcRefresh.animation = animation
+            b.dcRefresh.startAnimation(animation)
+            VpnController.refresh()
+            Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
+                if (isAdded) {
+                    b.dcRefresh.isEnabled = true
+                    b.dcRefresh.clearAnimation()
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.dc_refresh_toast),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initAnimation() {
+        animation =
+            RotateAnimation(
+                ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE
+            )
+        animation.repeatCount = ANIMATION_REPEAT_COUNT
+        animation.duration = ANIMATION_DURATION
     }
 
     // open local blocklist bottom sheet
@@ -363,17 +392,7 @@ class DnsConfigureFragment :
 
     private fun setNetworkDns() {
         // set network dns
-        io {
-            val sysDns = appConfig.getSystemDns()
-            appConfig.setSystemDns(sysDns.ipAddress, sysDns.port)
-        }
-    }
-
-    private fun openCustomDomainDialog() {
-        val intent = Intent(requireContext(), CustomDomainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        intent.putExtra(INTENT_UID, Constants.UID_EVERYBODY)
-        startActivity(intent)
+        io { appConfig.enableSystemDns() }
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {

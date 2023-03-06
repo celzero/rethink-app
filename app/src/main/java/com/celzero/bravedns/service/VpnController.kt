@@ -150,6 +150,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.isOn() == true
     }
 
+    fun refresh() {
+        braveVpnService?.refresh()
+    }
+
     fun hasTunnel(): Boolean {
         return braveVpnService?.hasTunnel() == true
     }

@@ -30,6 +30,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -59,19 +62,25 @@
             android:name=".ui.DnsListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.CustomIpActivity"
-            android:finishOnTaskLaunch="true" />
-        <activity
-            android:name=".ui.CustomDomainActivity"
+            android:name=".ui.CustomRulesActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.ConfigureRethinkBasicActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.ProxySettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.MiscSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.AppDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.DetailedStatisticsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.NetworkLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"

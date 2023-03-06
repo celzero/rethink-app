@@ -70,7 +70,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
         fun onBtmSheetDismiss()
     }
 
-    fun setDismissListener(listener: DnsConfigureFragment) {
+    fun setDismissListener(listener: DnsSettingsFragment) {
         dismissListener = listener
     }
 

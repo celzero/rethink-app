@@ -114,6 +114,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     companion object {
         fun newInstance() = SummaryStatisticsFragment()
+        private const val RECYCLER_ITEM_VIEW_HEIGHT = 420
     }
 
     private fun showAppNetworkActivity() {
@@ -143,7 +144,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssAppNetworkActivityRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppNetworkActivityRecyclerView.adapter = recyclerAdapter
     }
@@ -174,12 +175,18 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
     }
 
     private fun showMostContactedDomain() {
+        // if dns is not active then hide the view
+        if (!appConfig.getBraveMode().isDnsActive()) {
+            b.fssDomainAllowedLl.visibility = View.GONE
+            return
+        }
+
         b.fssContactedDomainRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssContactedDomainRecyclerView.layoutManager = layoutManager
@@ -204,12 +211,17 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedDomainRecyclerView.adapter = recyclerAdapter
     }
 
     private fun showBlockedDomains() {
+        // if dns is not active, hide the view
+        if (!appConfig.getBraveMode().isDnsActive()) {
+            b.fssDomainBlockedLl.visibility = View.GONE
+            return
+        }
         b.fssBlockedDomainRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssBlockedDomainRecyclerView.layoutManager = layoutManager
@@ -234,12 +246,18 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedDomainRecyclerView.adapter = recyclerAdapter
     }
 
     private fun showMostContactedIps() {
+        // if firewall is not active, hide the view
+        if (!appConfig.getBraveMode().isFirewallActive()) {
+            b.fssIpAllowedLl.visibility = View.GONE
+            return
+        }
+
         b.fssContactedIpsRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssContactedIpsRecyclerView.layoutManager = layoutManager
@@ -263,12 +281,18 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
     }
 
     private fun showBlockedIps() {
+        // if firewall is not active, hide the view
+        if (!appConfig.getBraveMode().isFirewallActive()) {
+            b.fssIpBlockedLl.visibility = View.GONE
+            return
+        }
+
         b.fssBlockedIpsRecyclerView.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(requireContext())
         b.fssBlockedIpsRecyclerView.layoutManager = layoutManager
@@ -292,7 +316,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (420 * scale + 0.5f)
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
     }
