@@ -45,6 +45,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DEFAULT_DNS_SERVER = "default_dns_server"
         const val PCAP_MODE = "pcap_mode"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
+        const val DNS_ALG = "dns_alg"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops

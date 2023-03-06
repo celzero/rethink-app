@@ -359,9 +359,9 @@ class BraveVPNService :
             }
 
             // by-pass dns firewall, go-through app specific ip and domain rules before applying
-            /*if (appStatus.bypassDnsFirewall()) {
+            if (appStatus.bypassDnsFirewall()) {
                 return FirewallRuleset.RULE1H
-            }*/
+            }
 
             // isolate mode
             if (appStatus.isolate()) {
@@ -1412,6 +1412,9 @@ class BraveVPNService :
                 // restart vpn to enable/disable pcap
                 io("pcap") { restartVpn(createNewTunnelOptsObj()) }
             }
+            PersistentState.DNS_ALG -> {
+                io("dns-alg") { updateDnsAlg() }
+            }
         }
     }
 
@@ -1450,15 +1453,6 @@ class BraveVPNService :
         updateTun(opts)
     }
 
-    private suspend fun updateDnsProxy(opts: AppConfig.TunnelOptions) {
-        val dnsProxyEndpoint = appConfig.getSelectedDnsProxyDetails()
-        if (dnsProxyEndpoint?.isInternal(this) == true) {
-            restartVpn(opts)
-        } else {
-            updateTun(opts)
-        }
-    }
-
     private fun spawnLocalBlocklistStampUpdate() {
         io("dnsStampUpdate") {
             VpnController.mutex.withLock {
@@ -1466,6 +1460,14 @@ class BraveVPNService :
 
                 vpnAdapter?.setBraveDnsStamp()
             }
+        }
+    }
+
+    private suspend fun updateDnsAlg() {
+        VpnController.mutex.withLock {
+            if (connectionMonitor == null) return@withLock
+
+            vpnAdapter?.setDnsAlg()
         }
     }
 
@@ -1957,7 +1959,7 @@ class BraveVPNService :
             }
         }
 
-        return if (appConfig.getBraveMode().isDnsFirewallMode() && persistentState.enableDnsAlg) {
+        return if (appConfig.getBraveMode().isDnsFirewallMode()) {
             Dnsx.Alg
         } else {
             if (persistentState.enableDnsCache) {

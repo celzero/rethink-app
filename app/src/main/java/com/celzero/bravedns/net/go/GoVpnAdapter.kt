@@ -110,6 +110,7 @@ class GoVpnAdapter(
 
             setTunnelMode(tunnelOptions)
             addTransport()
+            setDnsAlg()
             setBraveDnsBlocklistMode()
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
@@ -213,8 +214,7 @@ class GoVpnAdapter(
     private suspend fun createDnsProxyTransport(id: String): Transport? {
         try {
             val dnsProxy = appConfig.getSelectedDnsProxyDetails() ?: return null
-            val transport =
-                Intra.newDNSProxy(id, dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
+            val transport = Intra.newDNSProxy(id, dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
             Log.d(
                 LOG_TAG_VPN,
                 "create dns proxy transport with id: $id(${dnsProxy.proxyName}), ip: ${dnsProxy.proxyIP}, port: ${dnsProxy.proxyPort}"
@@ -227,19 +227,18 @@ class GoVpnAdapter(
         }
     }
 
-    private suspend fun createNetworkDnsTransport(id: String): Transport? {
-        try {
+    private fun createNetworkDnsTransport(id: String): Transport? {
+        return try {
             val systemDns = appConfig.getSystemDns()
-            val transport =
-                Intra.newDNSProxy(id, systemDns.ipAddress, systemDns.port.toString())
+            val transport = Intra.newDNSProxy(id, systemDns.ipAddress, systemDns.port.toString())
             Log.d(
                 LOG_TAG_VPN,
                 "create network dnsproxy transport with id: $id, url: ${systemDns.ipAddress}/${systemDns.port}, transport: $transport"
             )
-            return transport
+            transport
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy failure", e)
-            return null
+            null
         }
     }
 
@@ -488,26 +487,13 @@ class GoVpnAdapter(
             return
         }
         Log.i(LOG_TAG_VPN, "received update tun with opts: $tunnelOptions")
-        // Overwrite the DoH Transport with a new one, even if the URL has not changed.  This
-        // function is called on network changes, and it's important to switch to a fresh transport
-        // because the old transport may be using sockets on a deleted interface, which may block
-        // until they time out.
-        // val dohURL: String = getDohUrl()
         try {
-            // For invalid URL connection request.
-            // Check makeDohTransport, if it is not resolved don't close the tunnel.
-            // So handling the exception in makeDohTransport and not resetting the tunnel. Below is
-            // the exception thrown from Tun2socks.aar
-            // I/GoLog: Failed to read packet from TUN: read : bad file descriptor
-            // val defaultTransport: Transport = makeDefaultTransport(dohURL)
-
+            setTunnelMode(tunnelOptions)
             // add transport to resolver, no need to set default transport on updateTunnel
             addTransport()
-
-            setTunnelMode(tunnelOptions)
+            setDnsAlg()
             // Set brave dns to tunnel - Local/Remote
             setBraveDnsBlocklistMode()
-            setDnscryptResolversIfAny()
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
             tunnel?.disconnect()
@@ -515,7 +501,11 @@ class GoVpnAdapter(
         }
     }
 
-    private suspend fun getDefaultDohUrl(): String {
+    fun setDnsAlg() {
+        tunnel?.resolver?.gateway()?.translate(persistentState.enableDnsAlg)
+    }
+
+    private fun getDefaultDohUrl(): String {
         return persistentState.defaultDnsUrl.ifEmpty { Constants.DEFAULT_DNS_LIST[0].url }
     }
 
