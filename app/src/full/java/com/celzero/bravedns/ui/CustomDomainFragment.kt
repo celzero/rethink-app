@@ -36,15 +36,14 @@ import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
+import org.koin.android.ext.android.inject
 import java.net.MalformedURLException
 import java.util.regex.Pattern
-import org.koin.android.ext.android.inject
 
 class CustomDomainFragment :
     Fragment(R.layout.fragment_custom_domain), SearchView.OnQueryTextListener {

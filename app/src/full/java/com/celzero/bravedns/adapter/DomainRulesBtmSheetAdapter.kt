@@ -67,8 +67,7 @@ class DomainRulesBtmSheetAdapter(
 
             b.blockIcon.setOnClickListener {
                 if (
-                    DomainRulesManager.getDomainRule(domain, uid) ==
-                        DomainRulesManager.Status.BLOCK
+                    DomainRulesManager.getDomainRule(domain, uid) == DomainRulesManager.Status.BLOCK
                 ) {
                     applyDomainRule(domain, DomainRulesManager.Status.NONE)
                     noRuleUi()
@@ -80,8 +79,7 @@ class DomainRulesBtmSheetAdapter(
 
             b.trustIcon.setOnClickListener {
                 if (
-                    DomainRulesManager.getDomainRule(domain, uid) ==
-                        DomainRulesManager.Status.TRUST
+                    DomainRulesManager.getDomainRule(domain, uid) == DomainRulesManager.Status.TRUST
                 ) {
                     applyDomainRule(domain, DomainRulesManager.Status.NONE)
                     noRuleUi()

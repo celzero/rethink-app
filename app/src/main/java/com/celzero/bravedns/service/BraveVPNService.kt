@@ -2018,20 +2018,21 @@ class BraveVPNService :
         val ips = realIps?.split(",")?.toList() ?: emptyList()
         // use realIps; as of now, netstack uses the first ip
         // TODO: apply firewall rules on all real ips
-        val realDestIp = ips.first()
+        val realDestIp = ips.first().trim()
         var anyRealIpBlocked = false
 
         ips.forEach {
-            if (isUnspecifiedIp(it)) {
+            val ip = it.trim()
+            if (isUnspecifiedIp(ip)) {
                 // if `d` is blocked, then at least one of the real ips is unspecified
                 anyRealIpBlocked = true
             } else {
-                val ip = normalizeIp(it)
-                val countryCode: String? = Utilities.getCountryCode(ip, this)
+                val normalizeIp = normalizeIp(ip)
+                val countryCode: String? = Utilities.getCountryCode(normalizeIp, this)
                 val flag = getFlagIfPresent(countryCode)
                 val dnsCacheRecord =
                     FirewallManager.DnsCacheRecord(calculateTtl(0L), domains.first(), flag)
-                ipDomainLookup.put(it, dnsCacheRecord)
+                ipDomainLookup.put(ip, dnsCacheRecord)
             }
         }
 

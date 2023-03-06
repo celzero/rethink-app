@@ -44,13 +44,9 @@ private val appDownloadManagerModule = module {
     single { AppDownloadManager(androidContext(), get()) }
 }
 
-private val workerModule = module {
-    single { WorkScheduler(androidContext()) }
-}
+private val workerModule = module { single { WorkScheduler(androidContext()) } }
 
-private val schedulerModule = module {
-    single { ScheduleManager(androidContext()) }
-}
+private val schedulerModule = module { single { ScheduleManager(androidContext()) } }
 
 val AppModules: List<Module> by lazy {
     mutableListOf<Module>().apply {

@@ -31,7 +31,6 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.AppConnectionBottomSheet
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.removeBeginningTrailingCommas
@@ -115,7 +114,10 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             val bundle = Bundle()
             bundle.putInt(AppConnectionBottomSheet.UID, uid)
             bundle.putString(AppConnectionBottomSheet.IP_ADDRESS, appConn.ipAddress)
-            bundle.putString(AppConnectionBottomSheet.DOMAINS, beautifyDomainString(appConn.appOrDnsName ?: ""))
+            bundle.putString(
+                AppConnectionBottomSheet.DOMAINS,
+                beautifyDomainString(appConn.appOrDnsName ?: "")
+            )
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.dismissListener(adapter, absoluteAdapterPosition)
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)

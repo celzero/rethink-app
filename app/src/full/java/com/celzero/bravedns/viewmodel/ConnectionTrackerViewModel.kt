@@ -21,7 +21,6 @@ import androidx.paging.*
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.ConnectionTrackerFragment
-import kotlinx.coroutines.flow.Flow
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
     ViewModel() {

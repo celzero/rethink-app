@@ -42,7 +42,9 @@ import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.ui.*
+import com.celzero.bravedns.ui.AppInfoActivity
+import com.celzero.bravedns.ui.NetworkLogsActivity
+import com.celzero.bravedns.ui.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Utilities
@@ -200,11 +202,13 @@ class SummaryStatisticsAdapter(
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     // remove the trailing dot
-                    itemBinding.ssName.text = appConnection.appOrDnsName?.dropLastWhile { it == '.' }
+                    itemBinding.ssName.text =
+                        appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     // remove the trailing dot
-                    itemBinding.ssName.text = appConnection.appOrDnsName?.dropLastWhile { it == '.' }
+                    itemBinding.ssName.text =
+                        appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                     itemBinding.ssName.text = appConnection.ipAddress
@@ -288,10 +292,7 @@ class SummaryStatisticsAdapter(
             if (!handleVpnState()) return
 
             if (appConfig.getBraveMode().isDnsActive()) {
-                startActivity(
-                    NetworkLogsActivity.Tabs.DNS_LOGS.screen,
-                    appConnection.appOrDnsName
-                )
+                startActivity(NetworkLogsActivity.Tabs.DNS_LOGS.screen, appConnection.appOrDnsName)
             } else {
                 Utilities.showToastUiCentered(
                     context,
@@ -305,10 +306,7 @@ class SummaryStatisticsAdapter(
             if (!handleVpnState()) return
 
             if (appConfig.getBraveMode().isFirewallActive()) {
-                startActivity(
-                    NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
-                    appConnection.ipAddress
-                )
+                startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.ipAddress)
             } else {
                 Utilities.showToastUiCentered(
                     context,

@@ -124,6 +124,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             )
 
         appConfig.getBraveModeObservable().postValue(appConfig.getBraveMode().mode)
+        b.fhsCardRulesTv.text = getString(R.string.lbl_rules).replaceFirstChar(Char::titlecase)
     }
 
     private fun handleQuickSettingsChips() {
@@ -700,9 +701,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     }
                 val whiteListApps =
                     copy.filter { a ->
-                        a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id
-                         // || a.firewallStatus ==
-                           //     FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
+                        a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
+                            a.firewallStatus ==
+                                FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
                     }
                 val excludedApps =
                     copy.filter { a ->

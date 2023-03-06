@@ -160,6 +160,7 @@
                             android:visibility="visible" />
 
                         <TextView
+                            android:id="@+id/fhs_card_rules_tv"
                             style="@style/TextAppearance.Widget.HomeScreen.Title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -359,7 +360,7 @@
                             android:drawablePadding="-10dp"
                             android:gravity="center"
                             android:padding="5dp"
-                            android:text="Logs"
+                            android:text="@string/lbl_logs"
                             android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
                             app:drawableEndCompat="@drawable/ic_right_arrow_chip" />

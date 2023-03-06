@@ -39,7 +39,6 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private var isVpnActive: Boolean = false
 
-
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
         MOST_BLOCKED_APPS(1),

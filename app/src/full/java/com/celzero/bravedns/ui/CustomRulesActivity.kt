@@ -33,7 +33,6 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.android.ext.android.inject
-import java.util.*
 
 class CustomRulesActivity : AppCompatActivity(R.layout.activity_custom_rules) {
     private val b by viewBinding(ActivityCustomRulesBinding::bind)
@@ -86,8 +85,7 @@ class CustomRulesActivity : AppCompatActivity(R.layout.activity_custom_rules) {
                 -> // Styling each tab here
                 tab.text =
                     when (position) {
-                        Tabs.DOMAIN_RULES.screen ->
-                            getString(R.string.dc_custom_block_heading)
+                        Tabs.DOMAIN_RULES.screen -> getString(R.string.dc_custom_block_heading)
                         Tabs.IP_RULES.screen -> getString(R.string.univ_view_blocked_ip)
                         else -> getString(R.string.dc_custom_block_heading)
                     }

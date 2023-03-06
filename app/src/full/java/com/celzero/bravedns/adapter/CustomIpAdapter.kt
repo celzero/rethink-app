@@ -33,7 +33,6 @@ import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.CustomIpFragment
 import com.celzero.bravedns.ui.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
@@ -109,9 +108,7 @@ class CustomIpAdapter(private val context: Context) :
 
             b.customIpToggleGroup.addOnButtonCheckedListener(ipRulesGroupListener)
 
-            b.customIpEditIcon.setOnClickListener {
-                showEditIpDialog(customIp)
-            }
+            b.customIpEditIcon.setOnClickListener { showEditIpDialog(customIp) }
 
             b.customIpExpandIcon.setOnClickListener { toggleActionsUi() }
 
@@ -404,7 +401,8 @@ class CustomIpAdapter(private val context: Context) :
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setTitle(context.getString(R.string.ci_dialog_title))
-        val dBind = DialogAddCustomIpBinding.inflate((context as CustomRulesActivity).layoutInflater)
+        val dBind =
+            DialogAddCustomIpBinding.inflate((context as CustomRulesActivity).layoutInflater)
         dialog.setContentView(dBind.root)
 
         val lp = WindowManager.LayoutParams()

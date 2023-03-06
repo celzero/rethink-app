@@ -31,6 +31,7 @@
     <string name="lbl_action_required" translatable="true">Action Required</string>
     <string name="lbl_rules" translatable="true">rules</string>
     <string name="lbl_configure" translatable="true">Configure</string>
+    <string name="lbl_logs" translatable="true">Logs</string>
 
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
@@ -300,10 +301,11 @@
         1. <i>New feature</i>: Advanced DNS filtering; apply domain rules only when apps connect.<br/>
         2. <i>New feature</i>: Allow or deny domains per app.<br/>
         3. <i>New feature</i>: Allow or deny domains for all apps.<br/>
-        4. <i>New feature</i>: Packet capture (PCAP).<br/>
-        5. <i>New feature</i>: DNS Booster; coalesce requests, cache responses.<br/>
-        6. <i>New feature</i>: Edit domain and IP rules.<br/>
-        7. And other minor UI changes and bug fixes.<br/><br/>
+        4. <i>New feature</i>: Bypass both DNS and Firewall rules per app.<br/>
+        5. <i>New feature</i>: Packet capture (PCAP).<br/>
+        6. <i>New feature</i>: DNS Booster; coalesce requests, cache responses.<br/>
+        7. <i>New feature</i>: Edit domain and IP rules.<br/>
+        8. And other minor UI changes and bug fixes.<br/><br/>
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 

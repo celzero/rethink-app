@@ -32,7 +32,6 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.ui.CustomDomainFragment
 import com.celzero.bravedns.ui.CustomRulesActivity
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors

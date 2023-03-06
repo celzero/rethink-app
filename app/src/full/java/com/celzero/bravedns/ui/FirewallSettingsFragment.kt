@@ -37,8 +37,8 @@ import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Utilities
-import java.util.concurrent.TimeUnit
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class FirewallSettingsFragment : Fragment(R.layout.fragment_universal_firewall) {
     private val b by viewBinding(FragmentUniversalFirewallBinding::bind)
