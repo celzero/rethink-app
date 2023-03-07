@@ -357,6 +357,7 @@
                             android:visibility="visible" />
 
                         <TextView
+                            android:id="@+id/fhs_card_logs_tv"
                             style="@style/TextAppearance.Widget.HomeScreen.Title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

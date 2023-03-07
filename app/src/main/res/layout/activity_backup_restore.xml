@@ -180,14 +180,25 @@
                 android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
 
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingTop="20dp"
+            android:text="@string/brbs_backup_restore_desc"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/brbs_app_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingTop="20dp"
             android:textIsSelectable="true"
             android:textSize="@dimen/default_font_text_view"
             android:typeface="monospace" />
+
     </LinearLayout>
 </LinearLayout>
