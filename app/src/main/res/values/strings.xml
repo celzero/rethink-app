@@ -1017,7 +1017,7 @@
     <string name="firewall_rule_trusted_domain_desc" translatable="true"><![CDATA[This connection was allowed because the <i>domain</i> is set as Trusted domain.<br/><br/> To change go to <i>App-specific Firewall</i> screen.]]></string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true"><![CDATA[This connection was blocked because the <i>domain</i> is blocked by user-preferred DNS.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><![CDATA[This connection was blocked because the <i>domain</i> is set as blocked in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[This connection was blocked because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true"><![CDATA[This connection was allowed because the <i>domain</i> is set as trusted in Universal domain rules.<br/><br/> To change this behaviour go to <i>Configure DNS</i> tab.]]></string>
 
     <!-- New app install Notification -->
     <string name="new_app_bulk_notification_title" translatable="true">Attention</string>
