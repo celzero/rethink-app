@@ -25,7 +25,7 @@
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
     <string name="private_dns_dialog_heading">Вимкнути Приватний DNS</string>
     <string name="about_title_desc">Виявлення та блокування загроз мережевої безпеки</string>
-    <string name="accessibility_service_description">RethinkDNS використовує службу спеціальних можливостей для виявлення і блокування фонових додатків. RethinkDNS не збирає та не продає жодної інформації.</string>
+    <string name="accessibility_service_description">RethinkDNS використовує службу спеціальних можливостей для виявлення і блокування фонових застосунків. RethinkDNS не збирає та не продає жодної інформації.</string>
     <string name="slide_2_desc">RethinkDNS - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">дозволити</string>
@@ -33,11 +33,11 @@
     <string name="bypass_universal">універсальний обхід</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисніть, щоб змінити налаштування захисту</string>
     <string name="hybrid_mode_notification_title">Захищено! Підключено до DNS + Брандмауер.</string>
-    <string name="pause_mode_notification_title">Призупинено! Заблоковані додатки будуть продовжувати блокуватися брандмауером.</string>
+    <string name="pause_mode_notification_title">Призупинено! Заблоковані застосунки будуть продовжувати блокуватися брандмауером.</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">очікування</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">невдало</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">захищено</string>
-    <string name="status_app_error">помилка програми</string>
+    <string name="status_app_error">помилка застосунку</string>
     <string name="status_dns_error">помилка dns</string>
     <string name="status_dns_server_down">сервер dns не працює</string>
     <string name="status_no_internet">немає інтернету</string>
@@ -63,4 +63,209 @@
     <string name="dns_mode_info_title">DNS</string>
     <string name="firewall_rules">Правила мережі</string>
     <string name="firewall_mode_info_title">Брандмауер</string>
+    <string name="universal_firewall_explanation" translatable="true">Застосовувати правила брандмауера до всіх застосунків на основі подій пристрою, наприклад, брандмауер, коли пристрій заблоковано або коли певний застосунок не використовується.</string>
+    <string name="bsct_block" translatable="true">Блокувати, обходити, виключати, ізолювати <u>цей застосунок</u></string>
+    <string name="univ_firewall_dialog_message" translatable="true">Видалення цього правила дозволить будь-якому застосунку підключатися до цієї IP-адреси. Ви бажаєте продовжити\?</string>
+    <string name="refresh_complete" translatable="true">Повторну синхронізацію списку застосунків завершено.</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Налаштування проксі-сервера HTTP(S) є лише підказкою для застосунку, але вони можуть або не можуть використовувати його; однак такі браузери, як Chrome і Firefox, використовують їх. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">Пошук застосунків, IP-адрес, доменів</font></string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS та Брандмауер (за замовчуванням)</string>
+    <string name="app_mode_wireguard" translatable="true">VPN</string>
+    <string name="app_mode_choose" translatable="true">Виберіть режим</string>
+    <string name="orbot_http_desc" translatable="true">Рекомендує, щоб застосунки використовували HTTP-проксі Orbot.</string>
+    <string name="orbot_bs_status_2" translatable="true">HTTP-проксі встановлено (застосунки можуть його ігнорувати).</string>
+    <string name="orbot_app_issue" translatable="true">Не вдалося запустити Orbot. Він встановлений\?</string>
+    <string name="settings_check_update_heading" translatable="true">Перевірити наявність оновлень застосунку</string>
+    <string name="settings_check_update_desc" translatable="true">Автоматично перевіряти наявність оновлень застосунку раз на тиждень.</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">Увімкніть дозвіл на сповіщення для застосунку</string>
+    <string name="settings_theme_heading" translatable="true">Зовнішній вигляд</string>
+    <string name="settings_dns_proxy_dialog_app" translatable="true">Застосунок</string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Вибраний застосунок буде виключено з VPN, щоб вона могла встановлювати проксі-з’єднання від вашого імені.</string>
+    <string name="settings_app_list_default_app" translatable="true">Ніхто</string>
+    <string name="settings_theme_dialog_title" translatable="true">Зовнішній вигляд</string>
+    <string name="firewall_card_status_active" translatable="true">%1$s застосунків</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">Немає дозволу VPN, або інший застосунок працює в режимі постійно увімкненого VPN.</string>
+    <string name="about_app_update_check" translatable="true">Перевірити наявність оновлень застосунку</string>
+    <string name="about_app_contributors" translatable="true">Автори</string>
+    <string name="app_info_error" translatable="true">Не вдалося запустити інформацію про застосунок.</string>
+    <string name="ctbs_app_info_not_available_toast" translatable="true">Сторінку налаштувань застосунку не знайдено</string>
+    <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s інший(-і) застосунок(-ки)</string>
+    <string name="ctbs_block_other_apps" translatable="true">Правила, що застосовуються для %1$s, будуть також застосовні для інших застосунків %2$s</string>
+    <string name="univ_firewall_rule_1" translatable="true">Блокувати всі застосунки , коли пристрій заблоковано</string>
+    <string name="univ_firewall_rule_10" translatable="true">Блокувати всіх, крім заблокованих застосунків та IP-адрес</string>
+    <string name="univ_delete_firewall_dialog_message" translatable="true">Видалення цих правил дозволило б будь-якому застосунку підключатися до заблокованих на даний момент IP-адрес.</string>
+    <string name="dns_proxy_dialog_message" translatable="true">Назва застосунку: %1$s
+\n
+\nIP-адреса: %2$s
+\n
+\nНомер порту: %3$s</string>
+    <string name="dns_proxy_dialog_message_no_app" translatable="true">IP-адреса: %1$s
+\n
+\nНомер порту: %2$s</string>
+    <string name="fapps_filter_filter_heading" translatable="true">Тип</string>
+    <string name="fapps_filter_categories_heading" translatable="true">Категорії</string>
+    <string name="fapps_filter_clear_btn" translatable="true">Очистити</string>
+    <string name="fapps_filter_parent_installed" translatable="true">Встановлено</string>
+    <string name="fapps_filter_parent_system" translatable="true">Система</string>
+    <string name="fapps_firewall_filter_bypass_universal" translatable="true">Обійдено</string>
+    <string name="fapps_firewall_filter_excluded" translatable="true">Виключено</string>
+    <string name="fapps_unmetered_block_dialog_title" translatable="true">Блокувати на необмежених</string>
+    <string name="fapps_metered_block_dialog_message" translatable="true">Блокувати з\'єднання в мережі з обмеженням(мобільній мережі) для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_metered_block_dialog_title" translatable="true">Блокувати на обмежених</string>
+    <string name="fapps_metered_unblock_dialog_message" translatable="true">Дозволити з’єднання в обмеженій (мобільній) мережі для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_lockdown_hint" translatable="true">Vpn знаходиться в режимі блокування. Брандмауер не буде виконувати правила Обмежений /Необмежений.</string>
+    <string name="fapps_all_network_hint" translatable="true"><u>Використовувати всі мережі</u> увімкнено. Брандмауер не буде виконувати правила Обмежений / Необмежений.</string>
+    <string name="network_log_app_name_unknown" translatable="true">Невідомо</string>
+    <string name="network_log_app_name_unnamed" translatable="true">Без назви (%1$s)</string>
+    <string name="accessibility_notification_content" translatable="true">Служба доступності RethinkDNS зупинилася або вийшла з ладу. Більше не блокує фонові застосунки. Натисніть, щоб увімкнути знову.</string>
+    <string name="accessibility_failure_toast" translatable="true">Служба доступності RethinkDNS зупинилася або вийшла з ладу. Більше не блокує фонові застосунки.</string>
+    <string name="pause_desc" translatable="true">Примітка: %1$s заблоковані застосунки продовжуватимуть блокуватися брандмауером.</string>
+    <string name="firewall_rule_block_app" translatable="true">Застосунок заблоковано</string>
+    <string name="firewall_rule_foreground" translatable="true">Застосунок не використовується</string>
+    <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">Обхідний застосунок</string>
+    <string name="firewall_rule_new_app_desc" translatable="true">Цей застосунок встановив з\'єднання <i>вперше</i>.<br/><br/> Для зміни перейдіть на вкладку <i>Універсальні</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало цей <i>застосунок</i> при спробі підключення до <i>Необмеженої</i> мережі.<br/><br/> Щоб змінити, перейдіть на вкладку <i>Всі Застосунки</i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало цей <i>застосунок</i> при спробі підключення до <i>Обмеженої</i>мережі.<br/><br/> Щоб змінити, перейдіть на вкладку <i>Всі Застосунки</i>.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc" translatable="true">Встановлене користувачем універсальне правило брандмауера заблокувало цей <i>застосунок</i> при спробі підключення до <i>Обмеженої</i> мережі (Mobile).<br/><br/> Щоб змінити, перейдіть на вкладку <i>Універсальний</i>.</string>
+    <string name="firewall_rule_block_ip_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало <i>IP-адресу призначення</i> .<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>
+    <string name="firewall_rule_unknown_desc" translatable="true">Це з\'єднання було заблоковано брандмауером, оскільки не вдалося визначити джерело застосунку <i/> .<br/><br/> Щоб змінити цю поведінку, перейдіть на вкладку <i>Універсальний</i>.</string>
+    <string name="new_app_notification_content" translatable="true">RethinkDNS заблокував нещодавно встановлений застосунок, %1$s.</string>
+    <string name="new_app_notification_action_deny" translatable="true">Продовжувати блокувати</string>
+    <string name="new_app_notification_action_toast_deny" translatable="true">Відмовлено в підключенні до мережі для застосунку</string>
+    <string name="notif_dialog_pause_dialog_title" translatable="true">Застосунок призупинено!</string>
+    <string name="notif_dialog_pause_dialog_message" translatable="true">Застосунок у стані паузи, відновити, щоб продовжити</string>
+    <string name="notif_channel_desc_vpn_failure" translatable="true">Інформувати, коли RethinkDNS зупиняється на Android або в іншому VPN-застосунку</string>
+    <string name="category_name_sys_apps" translatable="true">Системні застосунки</string>
+    <string name="ada_noapp_dialog_title" translatable="true">Немає такого застосунку</string>
+    <string name="ada_noapp_dialog_message" translatable="true">Інформація про застосунок відсутня. Можливо, цей застосунок було видалено\?</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">Ок</string>
+    <string name="ada_firewall_status" translatable="true">Цей застосунок <b><i>%1$s</i> </b> .</string>
+    <string name="ada_ip_no_connection" translatable="true">Журналів мережі для цього застосунку немає.</string>
+    <string name="ada_app_status_allow" translatable="true">дозволено</string>
+    <string name="ada_app_status_block" translatable="true">заблоковано</string>
+    <string name="ada_app_status_block_wifi" translatable="true">блокується в необмежених мережах (wifi)</string>
+    <string name="ada_app_status_exclude" translatable="true">виключено з DNS та брандмауера</string>
+    <string name="ada_app_status_unknown" translatable="true">невідомо</string>
+    <string name="ada_firewall_title" translatable="true">правила брандмауера для цього застосунку</string>
+    <string name="ada_app_status_block_md" translatable="true">блокується в обмежених мережах (мобільних)</string>
+    <string name="ada_app_status_whitelist" translatable="true">буде обходити універсальні правила брандмауера</string>
+    <string name="ada_app_metered" translatable="true">Обмежено</string>
+    <string name="ada_network_log_title" translatable="true">мережевий журнал для цього застосунку</string>
+    <string name="ada_app_firewall" translatable="true">Брандмауер</string>
+    <string name="ada_app_unmetered" translatable="true">Необмежено</string>
+    <string name="ada_app_exclude" translatable="true">Виключити</string>
+    <string name="ada_app_dns_settings" translatable="true">Налаштування DNS</string>
+    <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Очистити всі журнали, пов\'язані з цим застосунком.</string>
+    <string name="bsac_block_toast" translatable="true">Блокування %1$s для цього застосунку</string>
+    <string name="bsac_unblock_toast" translatable="true">Розблоковано %1$s для цього застосунку</string>
+    <string name="brbs_backup_desc" translatable="true">Резервне копіювання налаштувань застосунків, журналів мережі та dns</string>
+    <string name="brbs_backup_dialog_message" translatable="true">Створює резервну копію налаштувань застосунку, журналів мережі та dns у файл. Це призведе до перезапуску VPN.</string>
+    <string name="brbs_restore_complete_toast" translatable="true">Відновлення завершено, перезапуск застосунку…</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).
+\n
+\nRethinkDNS не збирає жодної інформації та жодним чином не шпигує за вами.</string>
+    <string name="download_update_dialog_message" translatable="true">Нова версія застосунку доступна для завантаження з вебсайту. Ви бажаєте продовжити\?</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">Допоможіть перекласти цей застосунок</string>
+    <string name="settings_biometeric_heading" translatable="true">Увімкнути блокування застосунків</string>
+    <string name="settings_biometric_desc" translatable="true">Захистіть цей застосунок за допомогою блокування екрана</string>
+    <string name="apps_icon_content_desc" translatable="true">Іконка застосунку</string>
+    <string name="ct_bs_app_info_error" translatable="true">Інформація про застосунок не знайдено</string>
+    <string name="hsf_chip_appearance" translatable="true">Тема: %1$s</string>
+    <string name="about_bravedns_explantion" translatable="true">RethinkDNS — це найпростіший спосіб відстежувати активність застосунків, обходити інтернет-цензуру та брандмауери на вашому пристрої Android.</string>
+    <string name="about_app" translatable="true">застосунок</string>
+    <string name="about_settings_app_info" translatable="true">Інформація про застосунок</string>
+    <string name="about_app_translate" translatable="true">Перекласти</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">Ніхто</string>
+    <string name="dns_proxy_app" translatable="true">Застосунок</string>
+    <string name="fapps_firewall_filter_isolate" translatable="true">Ізольовано</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Дозволити / Блокувати в безлімітній мережі (Wi-Fi).</string>
+    <string name="fapps_info_metered_msg" translatable="true">Дозволити / Блокувати в обмеженій (мобільній) мережі.</string>
+    <string name="fapps_info_bypass_msg" translatable="true">Обхід універсальних правил брандмауера.</string>
+    <string name="fapps_info_isolate_msg" translatable="true">Блокувати всі, крім довірених IP-адрес.</string>
+    <string name="fapps_unblock_dialog_message" translatable="true">Дозволити підключення для застосунків <i>зі списку</i>\?</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">Обхідні застосунки</string>
+    <string name="fapps_bypass_block_dialog_message" translatable="true">Обійти універсальні правила брандмауера для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">Дозволити застосунки</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">Виключення застосунків</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Виключити застосунки <i>зі списку</i> з DNS і Брандмауера\?</string>
+    <string name="fapps_isolate_block_dialog_title" translatable="true">Ізолювати застосунки</string>
+    <string name="fapps_isolate_block_dialog_message" translatable="true">Ізолювати <i>перелічені</i> застосунки\?</string>
+    <string name="fapps_firewall_filter_desc" translatable="true">Показати застосунки <u>%1$s</u> %2$s</string>
+    <string name="fapps_firewall_filter_desc_category" translatable="true">Показати <u>%1$s</u> %2$s застосунки за категоріями: %3$s</string>
+    <string name="firewall_rule_block_app_new_install" translatable="true">Новий застосунок</string>
+    <string name="firewall_rule_block_app_exception" translatable="true">Помилка</string>
+    <string name="firewall_rule_block_ip" translatable="true">IP / Порт (Застосунок)</string>
+    <string name="firewall_rule_block_app_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало цей <i>застосунок</i>.<br/><br/> Щоб змінити, перейдіть на вкладку <i>Всі Застосунки</i>.</string>
+    <string name="firewall_rule_isolate_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало цей <i>застосунок</i> підключення до інших, ніж <i>обхідні IP-адреси</i>.<br/><br/> Для зміни перейдіть на вкладку <i>Всі Застосунки</i>.</string>
+    <string name="firewall_rule_trusted_ip_desc" translatable="true">Це з\'єднання було дозволено, оскільки <i>IP-адресу призначення</i> встановлено як Довірену IP-адресу.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc" translatable="true">Це з\'єднання було заблоковано через те, що <i>джерело застосунку</i> обійшло бажаний користувачем DNS.<br/><br/> Щоб змінити цю поведінку, перейдіть на сторінку <i>Універсальний</i>.</string>
+    <string name="new_app_bulk_notification_title" translatable="true">Увага</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc" translatable="true">Це з\'єднання було дозволено, тому що для <i>джерела застосунку</i> налаштовано <i>обхід універсальних</i>правил брандмауера.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>
+    <string name="category_name_non_app_sys" translatable="true">Системні служби</string>
+    <string name="category_name_installed" translatable="true">Встановлені застосунки</string>
+    <string name="ada_app_status_isolate" translatable="true">ізольовано; допускаються лише довірені IP-адреси</string>
+    <string name="ada_app_bypass_univ" translatable="true">Обхід Універсальний</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Відстежуйте мережеву активність і брандмауер будь-якого застосунку або IP-адреси.</string>
+    <string name="apps_info_title" translatable="true">Застосунки</string>
+    <string name="bsct_app_info" translatable="true">Інформація про застосунок</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">Пошук застосунків за uid, назвою</font></string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (економія заряду батареї)</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s Правила IP та портів</string>
+    <string name="hsf_start_dialog_message" translatable="true">Ви в одному кроці від безпечного та захищеного Android: миттєво переглядайте мережеву активність, блокуйте вебсайти, IP-адреси та застосунки, що погано поводяться.</string>
+    <string name="fapps_info_dialog_positive_btn" translatable="true">Ок</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Домен (Застосунок)</string>
+    <string name="firewall_rule_block_domain" translatable="true">Домен (Застосунок)</string>
+    <string name="app_mode_firewall" translatable="true">Брандмауер</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Служба доступності RethinkDNS зупинилася або вийшла з ладу. <i><b>Перейдіть до налаштувань і примусово зупиніть</b></i> RethinkDNS і запустіть його знову, щоб використовувати <i>Блокування будь-якого застосунку, яка не використовується</i>.
+\n
+\nRethinkDNS використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).</string>
+    <string name="always_on_dialog" translatable="true">«Завжди увімкнений VPN» увімкнено на цьому пристрої. Щоб запустити Rethink, перейдіть до Налаштувань та вимкніть «Завжди увімкнений VPN».</string>
+    <string name="bsct_block_app" translatable="true">Блокувати, довіряти <u>цю IP-адресу</u> для <u>цього застосунку</u></string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>№1</u>: блокує підключення застосунку до Інтернету.
+\n <u>№2</u>: блокує підключення будь-якого застосунку до певної IP-адреси.
+\n <u>#3</u>: блокує всі підключення, коли пристрій заблоковано (універсальний брандмауер).
+\n <u>№4</u>: блокує будь-який застосунок, який не використовується (універсальний брандмауер).
+\n <u>№5</u>: блокує з’єднання, якщо вихідний застосунок невідомий (універсальний брандмауер).
+\n <u>№6</u>: блокує весь трафік UDP, крім DNS (універсальний брандмауер).
+\n <u>№7</u>: блокувати підключення, коли DNS обходиться (універсальний брандмауер).</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Дозволити застосункам, які запитують, обходити брандмауер RethinkDNS за вимогою. Для належної роботи деяких застосунків для аудіо/відеоконференцій, як-от Zoom і WhatsApp, може знадобитися обхід на вимогу.</string>
+    <string name="settings_https_desc" translatable="true">Цей налаштування є лише рекомендацією, і можливо, застосунки проігнорують його. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;РА Фішер!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Нова функція&lt;/i&gt;: повністю новий екран статистики.&lt;br/&gt; 2. &lt;i&gt;Нова функція&lt;/i&gt; : захистіть цей застосунок за допомогою блокування екрана.&lt;br/&gt; 3. &lt;i&gt;Нова функція&lt;/i&gt;: виберіть потрібну мову в налаштуваннях застосунку.&lt;br/&gt; 4. &lt;i&gt;Нова функція&lt;/i&gt;: RDNS+ &lt; i&gt;Простий&lt;/i&gt; перегляд показує лише добре підібрані списки.&lt;br/&gt; 5. Перейменувати: режим &lt;i&gt;блокування застосунку&lt;/i&gt; тепер є режимом &lt;i&gt;ізоляції&lt;/i&gt;.&lt;br/&gt; 6 . Перейменування: &lt;i&gt;Обхід правил застосунку&lt;/i&gt; тепер називається &lt;i&gt;Довіра&lt;/i&gt; IP.&lt;br/&gt; 7. Виправлено збій, коли Rethink інстальовано в робочому профілі.&lt;br/&gt; 8. Зараз видалення спеціальних правил застосунку, коли застосунок видалено.&lt;br/&gt; 9. Інші незначні зміни інтерфейсу користувача та виправлення помилок.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/ translate&gt;Допоможіть перекласти цей застосунок&lt;/a&gt;</string>
+    <string name="orbot_explanation" translatable="true">Orbot – це безплатний застосунок-проксі, яка дає змогу іншим застосункам <u>безпечніше</u> використовувати Інтернет.
+\nOrbot використовує <u>Tor</u> для шифрування вашого Інтернет-трафіку, що допомагає вам <u>обійти цензуру</u> та захиститися від форм <u>мережевого спостереження</u>, які загрожують особистій свободі та конфіденційності.
+\n<u>TCP Proxy</u>: RethinkDNS пересилає до Orbot лише TCP-з’єднання всіх застосунків, крім виключених.
+\n<u>HTTP-проксі</u>: RethinkDNS <i>встановлює</i> HTTP-проксі, але не вимагає, щоб застосунки використовували його. Зазвичай такі браузери, як Chrome і Firefox, використовують його. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
+    <string name="settings_import_export_desc" translatable="true">Вручну створіть резервну копію або відновіть дані та налаштування застосунку.</string>
+    <string name="settings_socks_forwarding_desc_no_app" translatable="true">Переадресація на %1$s:%2$s</string>
+    <string name="univ_firewall_rule_6" translatable="true">Блокування нових встановлених застосунків за замовчуванням</string>
+    <string name="settings_orbot_notification_content" translatable="true">Помилка запуску Tor-as-a-Proxy. Відкрийте застосунок Orbot, щоб запустити його вручну.</string>
+    <string name="settings_all_networks_dialog_message" translatable="true">Якщо увімкнути, правила брандмауера застосунків для обмеженого (наприклад, мобільний) і без обмеження (наприклад, WiFi) не виконуватимуться.
+\n
+\nВи хочете продовжити\?</string>
+    <string name="settings_app_notification_a13_heading" translatable="true">Сповіщення застосунку</string>
+    <string name="notification_screen_error" translatable="true">Не вдалося запустити екран сповіщень застосунку.</string>
+    <string name="settings_custom_downloader_heading" translatable="true">Використовувати вбудований завантажувач</string>
+    <string name="contributors_list" translatable="true">&lt;i&gt;Rethink - проєкт з відкритим кодом&lt;/i&gt; завдячує своїм існуванням цим волонтерам, які присвячують незліченну кількість годин його розробці.&lt;br/&gt; &lt;br/&gt;🛡️Android застосунок&lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icons &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="univ_firewall_rule_2" translatable="true">Блокувати застосунки, які не використовуються</string>
+    <string name="univ_firewall_rule_3" translatable="true">Блокувати, якщо джерело застосунку невідоме</string>
+    <string name="fapps_info_dialog_message" translatable="true">Заблокувати підключення застосунків до Інтернету. Обмеження доступу до Інтернету допомагає запобігти невиправданому використанню даних, а також зберегти заряд акумулятора.</string>
+    <string name="fapps_info_exclude_msg" translatable="true">Виключити з DNS + брандмауера.</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Дозволити підключення до нелімітованої мережі (WiFi) для застосунків <i>зі списку</i>\?</string>
+    <string name="fapps_metered_unblock_dialog_title" translatable="true">Дозволити в обмеженому режимі</string>
+    <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Дозволити в необмеженому режимі</string>
+    <string name="fapps_unmetered_block_dialog_message" translatable="true">Блокувати з\'єднання в нелімітованій мережі (WiFi) для <i>перелічених</i> застосунків\?</string>
+    <string name="fapps_firewall_filter_hint" translatable="true">Застосовуйте правила до перелічених застосунків</string>
+    <string name="firewall_rule_foreground_desc" translatable="true">Це з’єднання було закрито, оскільки джерело застосунку було <i>не на передньому плані</i>.<br/><br/> Щоб змінити цю поведінку, перейдіть на вкладку <i>Універсальний</i>.</string>
+    <string name="ada_app_isolate" translatable="true">Ізолювати</string>
+    <string name="bsac_trust_toast" translatable="true">Довіряти %1$s цьому застосунку</string>
+    <string name="rt_dialog_message" translatable="true">Ви хочете застосувати нещодавно налаштовані списки блокування\?</string>
+    <string name="brbs_restore_dialog_message" translatable="true">Відновіть налаштування застосунку, мережеві та dns журнали з файлу резервної копії. Це призведе до перезапуску застосунку.</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало <i>домен</i>.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>
+    <string name="new_app_notification_action_toast_allow" translatable="true">Для застосунку дозволено підключення до мережі</string>
+    <string name="bsac_title_desc" translatable="true">Правила застосовуються лише до цього застосунку.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Це з\'єднання було дозволено, оскільки <i>домен</i> встановлено як Довірений домен.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>
+    <string name="new_app_bulk_notification_content" translatable="true">RethinkDNS заблокував %1$s нові застосунки. Натисніть, щоб переглянути або змінити.</string>
+    <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">більшість дозволених застосунків</string>
+    <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">більшість заблокованих застосунків</string>
 </resources>
