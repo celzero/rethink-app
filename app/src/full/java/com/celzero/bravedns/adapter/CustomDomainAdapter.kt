@@ -19,6 +19,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
+import android.util.Log
 import android.util.Patterns
 import android.view.*
 import android.widget.Toast
@@ -335,7 +336,17 @@ class CustomDomainAdapter(val context: Context) :
                 )
             dialog.setContentView(dBind.root)
 
-            var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
+            var selectedType: DomainRulesManager.DomainType =
+                DomainRulesManager.DomainType.getType(customDomain.type)
+
+            when (selectedType) {
+                DomainRulesManager.DomainType.DOMAIN -> {
+                    dBind.dacdDomainChip.isChecked = true
+                }
+                DomainRulesManager.DomainType.WILDCARD -> {
+                    dBind.dacdWildcardChip.isChecked = true
+                }
+            }
 
             dBind.dacdDomainEditText.setText(customDomain.domain)
 
