@@ -840,7 +840,6 @@
     <string name="firewall_status_bypass_dns_firewall" translatable="true">已绕过 DNS 与防火墙规则</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">当前VPN 处于仅 DNS模式或锁定模式运行时无法设置代理。<u>请移步 VPN 设置</u></string>
     <string name="settings_general_customize" translatable="true">自定义</string>
-    <string name="settings_default_dns_dialog_title" translatable="true">选择回落 DNS</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">关闭（默认）</string>
     <string name="settings_default_dns_desc" translatable="true">在极少数情况下，用户偏好的 DNS 无法确定时，将使用回落 DNS 。</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">输出至 Logcat</string>

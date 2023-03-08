@@ -832,7 +832,6 @@
     <string name="lbl_configure" translatable="true">Configurar</string>
     <string name="bypass_dns_firewall" translatable="true">omitir dns y cortafuegos</string>
     <string name="settings_general_customize" translatable="true">personalizar</string>
-    <string name="settings_default_dns_dialog_title" translatable="true">Seleccionar DNS alternativo</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Apagado (por defecto)</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Enviar a la carpeta de Descargas</string>

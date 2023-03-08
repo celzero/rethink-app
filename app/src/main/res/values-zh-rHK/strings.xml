@@ -828,7 +828,6 @@
     <string name="bsdl_block_desc" translatable="true">攔截、信任<u>呢個網域</u></string>
     <string name="settings_default_dns_heading" translatable="true">後備 DNS</string>
     <string name="settings_default_dns_desc" translatable="true">在極少數情況下，用戶偏好的 DNS 無法確定時，將使用後備 DNS 。</string>
-    <string name="settings_default_dns_dialog_title" translatable="true">揀後備 DNS</string>
     <string name="settings_pcap_heading" translatable="true">資料包捕獲</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">輸出到下載資料夾</string>
     <string name="pcap_failure_toast" translatable="true">創建 PCAP 檔時出錯，請重試！</string>

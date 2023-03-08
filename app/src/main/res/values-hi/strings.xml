@@ -809,7 +809,6 @@
     <string name="lbl_configure" translatable="true">कॉन्फ़िगर</string>
     <string name="lbl_logs" translatable="true">लॉग</string>
     <string name="settings_general_customize" translatable="true">अनुकूलित</string>
-    <string name="settings_default_dns_dialog_title" translatable="true">फॉलबैक डीएनएस चुने</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">बंद (डिफॉल्ट)</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s यूनीवर्सल नियम</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">पैकेट कैप्चर सक्रिय</string>
