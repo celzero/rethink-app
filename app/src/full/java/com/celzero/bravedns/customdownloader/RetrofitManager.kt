@@ -31,7 +31,8 @@ class RetrofitManager {
             DEFAULT,
             CLOUDFLARE,
             GOOGLE,
-            SYSTEM_DNS
+            SYSTEM_DNS,
+            FALLBACK_DNS
         }
 
         fun getBlocklistBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
@@ -41,15 +42,14 @@ class RetrofitManager {
         }
 
         fun okHttpClient(dnsType: OkHttpDnsType): OkHttpClient {
-            val okhttpClientBuilder = OkHttpClient.Builder()
-            okhttpClientBuilder.callTimeout(5, TimeUnit.MINUTES)
-            okhttpClientBuilder.connectTimeout(5, TimeUnit.MINUTES)
-            okhttpClientBuilder.readTimeout(20, TimeUnit.MINUTES)
-            okhttpClientBuilder.writeTimeout(20, TimeUnit.MINUTES)
-            okhttpClientBuilder.retryOnConnectionFailure(true)
+            val b = OkHttpClient.Builder()
+            b.connectTimeout(1, TimeUnit.MINUTES)
+            b.readTimeout(20, TimeUnit.MINUTES)
+            b.writeTimeout(5, TimeUnit.MINUTES)
+            b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
-            customDns(dnsType)?.let { okhttpClientBuilder.dns(it) }
-            return okhttpClientBuilder.build()
+            customDns(dnsType)?.let { b.dns(it) }
+            return b.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
@@ -92,6 +92,10 @@ class RetrofitManager {
                         .build()
                 }
                 OkHttpDnsType.SYSTEM_DNS -> {
+                    return Dns.SYSTEM
+                }
+                OkHttpDnsType.FALLBACK_DNS -> {
+                    // todo: return retrieved system dns
                     return null
                 }
             }

@@ -184,7 +184,8 @@ class BlocklistDownloadHelper {
                 0 -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
                 1 -> RetrofitManager.Companion.OkHttpDnsType.CLOUDFLARE
                 2 -> RetrofitManager.Companion.OkHttpDnsType.GOOGLE
-                else -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
+                3 -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
+                else -> RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS
             }
         }
 
