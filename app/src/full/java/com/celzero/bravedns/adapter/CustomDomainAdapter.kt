@@ -19,7 +19,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.util.Log
 import android.util.Patterns
 import android.view.*
 import android.widget.Toast
@@ -393,8 +392,8 @@ class CustomDomainAdapter(val context: Context) :
             lp.width = WindowManager.LayoutParams.MATCH_PARENT
             lp.height = WindowManager.LayoutParams.WRAP_CONTENT
             dialog.show()
-            dialog.setCancelable(false)
-            dialog.setCanceledOnTouchOutside(false)
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(true)
             dialog.window?.attributes = lp
 
             dBind.dacdUrlTitle.text = context.getString(R.string.cd_dialog_title)
@@ -417,7 +416,10 @@ class CustomDomainAdapter(val context: Context) :
                 handleDomain(dBind, selectedType, customDomain, DomainRulesManager.Status.TRUST)
             }
 
-            dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
+            dBind.dacdCancelBtn.setOnClickListener {
+                val status = DomainRulesManager.Status.getStatus(customDomain.status)
+                handleDomain(dBind, selectedType, customDomain, status)
+            }
             dialog.show()
         }
 
