@@ -156,8 +156,6 @@
     <string name="ada_app_exclude" translatable="true">Виключити</string>
     <string name="ada_app_dns_settings" translatable="true">Налаштування DNS</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Очистити всі журнали, пов\'язані з цим застосунком.</string>
-    <string name="bsac_block_toast" translatable="true">Блокування %1$s для цього застосунку</string>
-    <string name="bsac_unblock_toast" translatable="true">Розблоковано %1$s для цього застосунку</string>
     <string name="brbs_backup_desc" translatable="true">Резервне копіювання налаштувань застосунків, журналів мережі та dns</string>
     <string name="brbs_backup_dialog_message" translatable="true">Створює резервну копію налаштувань застосунку, журналів мережі та dns у файл. Це призведе до перезапуску VPN.</string>
     <string name="brbs_restore_complete_toast" translatable="true">Відновлення завершено, перезапуск застосунку…</string>
@@ -221,7 +219,6 @@
 \n
 \nRethinkDNS використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).</string>
     <string name="always_on_dialog" translatable="true">«Завжди увімкнений VPN» увімкнено на цьому пристрої. Щоб запустити Rethink, перейдіть до Налаштувань та вимкніть «Завжди увімкнений VPN».</string>
-    <string name="bsct_block_app" translatable="true">Блокувати, довіряти <u>цю IP-адресу</u> для <u>цього застосунку</u></string>
     <string name="bsct_conn_rule_explanation" translatable="true"><u>№1</u>: блокує підключення застосунку до Інтернету.
 \n <u>№2</u>: блокує підключення будь-якого застосунку до певної IP-адреси.
 \n <u>#3</u>: блокує всі підключення, коли пристрій заблоковано (універсальний брандмауер).
@@ -258,7 +255,6 @@
     <string name="fapps_firewall_filter_hint" translatable="true">Застосовуйте правила до перелічених застосунків</string>
     <string name="firewall_rule_foreground_desc" translatable="true">Це з’єднання було закрито, оскільки джерело застосунку було <i>не на передньому плані</i>.<br/><br/> Щоб змінити цю поведінку, перейдіть на вкладку <i>Універсальний</i>.</string>
     <string name="ada_app_isolate" translatable="true">Ізолювати</string>
-    <string name="bsac_trust_toast" translatable="true">Довіряти %1$s цьому застосунку</string>
     <string name="rt_dialog_message" translatable="true">Ви хочете застосувати нещодавно налаштовані списки блокування\?</string>
     <string name="brbs_restore_dialog_message" translatable="true">Відновіть налаштування застосунку, мережеві та dns журнали з файлу резервної копії. Це призведе до перезапуску застосунку.</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Встановлене користувачем правило брандмауера заблокувало <i>домен</i>.<br/><br/> Для зміни перейдіть на сторінку <i>Брандмауер для конкретного застосунку</i>.</string>

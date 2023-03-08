@@ -831,4 +831,7 @@
     <string name="lbl_domain_rules" translatable="true">Правила домена</string>
     <string name="cd_no_rules_text" translatable="true">Правила домена не найдены.</string>
     <string name="bsdl_block_desc" translatable="true">Блокировка, доверие к <u>этому домену</u></string>
+    <string name="lbl_rules" translatable="true">правила</string>
+    <string name="lbl_configure" translatable="true">Настроить</string>
+    <string name="lbl_logs" translatable="true">Логи</string>
 </resources>
