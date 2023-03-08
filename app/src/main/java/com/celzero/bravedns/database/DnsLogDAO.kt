@@ -30,17 +30,17 @@ interface DnsLogDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE) fun insertBatch(dnsLogs: List<DnsLog>)
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or responseIps like :searchString) order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by time desc"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or responseIps like :searchString) and isBlocked = 0 order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 order by time desc"
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or resolver like :searchString or responseIps like :searchString) and isBlocked = 1 order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by time desc"
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
