@@ -28,7 +28,6 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
-import com.celzero.bravedns.util.IpManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Utilities.Companion.calculateTtl
@@ -38,16 +37,13 @@ import com.celzero.bravedns.util.Utilities.Companion.makeAddressPair
 import com.celzero.bravedns.util.Utilities.Companion.normalizeIp
 import dnsx.Dnsx
 import dnsx.Summary
-import inet.ipaddr.HostName
-import inet.ipaddr.IPAddress
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.net.InetAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DnsLogTracker
 internal constructor(
@@ -256,7 +252,6 @@ internal constructor(
             }
         }
     }
-
 
     private fun fetchFavIcon(dnsLog: DnsLog) {
         if (!persistentState.fetchFavIcon || dnsLog.groundedQuery()) return

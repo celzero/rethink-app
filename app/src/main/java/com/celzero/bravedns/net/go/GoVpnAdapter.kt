@@ -462,9 +462,29 @@ class GoVpnAdapter(
                 // val transport = Intra.newDNSProxy("ID", dnsProxy.host, dnsProxy.port.toString())
                 // tunnel?.resolver?.addSystemDNS(transport)
                 tunnel?.setSystemDNS(dnsProxy.toNormalizedString())
+
+                // if system dns is set, then set the system dns to the tunnel
+                if (appConfig.getDnsType().isNetworkDns()) {
+                    val transport = createNetworkDnsTransport(Dnsx.Preferred)
+                    val blockFreeTransport = createNetworkDnsTransport(Dnsx.BlockFree)
+
+                    if (blockFreeTransport != null) {
+                        tunnel?.resolver?.add(blockFreeTransport)
+                    } else {
+                        Log.e(LOG_TAG_VPN, "setSystemDns: could not set block free dns")
+                    }
+
+                    if (transport != null) {
+                        tunnel?.resolver?.add(transport)
+                    } else {
+                        Log.e(LOG_TAG_VPN, "setSystemDns: could not set system dns")
+                    }
+                }
             } catch (e: Exception) {
                 Log.e(LOG_TAG_VPN, "setSystemDns: could not set system dns", e)
             }
+        } else {
+            Log.e(LOG_TAG_VPN, "setSystemDns: tunnel is null")
         }
     }
 

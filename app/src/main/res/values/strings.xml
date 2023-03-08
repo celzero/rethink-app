@@ -31,7 +31,7 @@
     <string name="lbl_action_required" translatable="true">Action Required</string>
     <string name="lbl_rules" translatable="true">rules</string>
     <string name="lbl_configure" translatable="true">Configure</string>
-    <string name="lbl_logs" translatable="true">Logs</string>
+    <string name="lbl_logs" translatable="true">logs</string>
 
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
@@ -409,7 +409,7 @@
     <string name="settings_custom_downloader_desc" translatable="true">If disabled, Android\'s built-in <i>Download Manager</i> is used</string>
 
     <string name="settings_import_export_heading" translatable="true">Backup &amp; Restore</string>
-    <string name="settings_import_export_desc" translatable="true">Manually back up or restore the app data and settings.</string>
+    <string name="settings_import_export_desc" translatable="true">Manually back up or restore app data and settings.</string>
 
     <string name="settings_app_notification_a13_heading" translatable="true">App Notification</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Enable notification permission for the app</string>
@@ -487,9 +487,8 @@
 
     <string name="settings_protocol_translation_dns_inactive" translatable="true">Switch to DNS/DNS+Firewall mode to enable this setting</string>
 
-    <string name="settings_default_dns_heading" translatable="true">Fallback DNS</string>
-    <string name="settings_default_dns_desc" translatable="true">In rare cases when user-preferred DNS could not be ascertained, Fallback DNS is used.</string>
-    <string name="settings_default_dns_dialog_title" translatable="true">Select Fallback DNS</string>
+    <string name="settings_default_dns_heading" translatable="true">Choose fallback DNS</string>
+    <string name="settings_default_dns_desc" translatable="true">In rare cases when user-preferred DNS could not be ascertained, fallback DNS is used.</string>
 
     <string name="settings_pcap_heading" translatable="true">Packet capture</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
@@ -1242,6 +1241,7 @@
     <string name="brbs_backup_desc" translatable="true">Backup app settings, network, and dns logs</string>
     <string name="brbs_restore_title" translatable="true">Restore</string>
     <string name="brbs_restore_desc" translatable="true">Restore from a backup file</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Doesn\'t work across app versions or devices</string>
 
     <string name="brbs_backup_dialog_title" translatable="true">Take backup</string>
     <string name="brbs_backup_dialog_message" translatable="true">Backs up app settings, network, and dns logs to a file. This will restart the VPN.</string>

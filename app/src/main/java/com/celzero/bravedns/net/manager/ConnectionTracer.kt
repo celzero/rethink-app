@@ -78,6 +78,7 @@ class ConnectionTracer(ctx: Context) {
             } else {
                 // no-op
             }
+            return uid
         } catch (secEx: SecurityException) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.message, secEx)
         }

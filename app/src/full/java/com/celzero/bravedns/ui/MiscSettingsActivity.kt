@@ -663,7 +663,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private fun showDefaultDnsDialog() {
         val alertBuilder = AlertDialog.Builder(this)
-        alertBuilder.setTitle(getString(R.string.settings_default_dns_dialog_title))
+        alertBuilder.setTitle(getString(R.string.settings_default_dns_heading))
         val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
         // get the index of the default dns url
         // if the default dns url is not in the list, then select the first item

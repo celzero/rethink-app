@@ -20,6 +20,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
+// TODO: Indexes for appName and dnsQuery
 @Entity(
     tableName = "ConnectionTracker",
     indices = [Index(value = arrayOf("ipAddress"), unique = false)]

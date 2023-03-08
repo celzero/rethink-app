@@ -273,7 +273,7 @@ class Constants {
             listOf(
                 DefaultDnsServer(0, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
                 DefaultDnsServer(1, "Google", "https://dns.google.com/dns-query", "DoH"),
-                DefaultDnsServer(2, "CloudFlare", "https://cloudflare-dns.com/dns-query", "DoH")
+                DefaultDnsServer(2, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
             )
 
         // pcap folder name

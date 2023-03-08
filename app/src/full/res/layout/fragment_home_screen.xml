@@ -57,7 +57,7 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.6666"
                 android:orientation="vertical">
 
@@ -115,7 +115,8 @@
             <LinearLayout
                 android:id="@+id/fhs_card_rules_ll"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:baselineAligned="true"
+                android:layout_height="match_parent"
                 android:layout_weight="0.3333"
                 android:orientation="vertical">
 
@@ -129,7 +130,7 @@
                     app:cardElevation="8dp"
                     app:cardUseCompatPadding="true">
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_corner_button_bg"
@@ -151,6 +152,7 @@
                             style="@style/TextAppearance.Widget.HomeScreen.Desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_below="@id/fhs_card_domain_rules_count"
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"
@@ -166,13 +168,15 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:drawablePadding="-10dp"
+                            android:layout_marginTop="5dp"
                             android:gravity="center"
+                            android:layout_below="@id/fhs_card_ip_rules_count"
                             android:padding="5dp"
                             android:text="@string/lbl_rules"
                             android:textColor="?attr/invertedPrimaryTextColor"
                             android:textSize="@dimen/large_font_text_view"
                             app:drawableEndCompat="@drawable/ic_right_arrow_chip" />
-                    </LinearLayout>
+                    </RelativeLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
         </LinearLayout>
@@ -353,6 +357,7 @@
                             android:visibility="visible" />
 
                         <TextView
+                            android:id="@+id/fhs_card_logs_tv"
                             style="@style/TextAppearance.Widget.HomeScreen.Title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

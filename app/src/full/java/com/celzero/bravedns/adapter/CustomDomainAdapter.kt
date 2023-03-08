@@ -335,7 +335,17 @@ class CustomDomainAdapter(val context: Context) :
                 )
             dialog.setContentView(dBind.root)
 
-            var selectedType: DomainRulesManager.DomainType = DomainRulesManager.DomainType.DOMAIN
+            var selectedType: DomainRulesManager.DomainType =
+                DomainRulesManager.DomainType.getType(customDomain.type)
+
+            when (selectedType) {
+                DomainRulesManager.DomainType.DOMAIN -> {
+                    dBind.dacdDomainChip.isChecked = true
+                }
+                DomainRulesManager.DomainType.WILDCARD -> {
+                    dBind.dacdWildcardChip.isChecked = true
+                }
+            }
 
             dBind.dacdDomainEditText.setText(customDomain.domain)
 
@@ -382,8 +392,8 @@ class CustomDomainAdapter(val context: Context) :
             lp.width = WindowManager.LayoutParams.MATCH_PARENT
             lp.height = WindowManager.LayoutParams.WRAP_CONTENT
             dialog.show()
-            dialog.setCancelable(false)
-            dialog.setCanceledOnTouchOutside(false)
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(true)
             dialog.window?.attributes = lp
 
             dBind.dacdUrlTitle.text = context.getString(R.string.cd_dialog_title)
@@ -406,7 +416,10 @@ class CustomDomainAdapter(val context: Context) :
                 handleDomain(dBind, selectedType, customDomain, DomainRulesManager.Status.TRUST)
             }
 
-            dBind.dacdCancelBtn.setOnClickListener { dialog.dismiss() }
+            dBind.dacdCancelBtn.setOnClickListener {
+                val status = DomainRulesManager.Status.getStatus(customDomain.status)
+                handleDomain(dBind, selectedType, customDomain, status)
+            }
             dialog.show()
         }
 

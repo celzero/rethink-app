@@ -125,6 +125,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         appConfig.getBraveModeObservable().postValue(appConfig.getBraveMode().mode)
         b.fhsCardRulesTv.text = getString(R.string.lbl_rules).replaceFirstChar(Char::titlecase)
+        b.fhsCardLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
     }
 
     private fun handleQuickSettingsChips() {

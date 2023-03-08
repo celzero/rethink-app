@@ -840,7 +840,6 @@
     <string name="firewall_status_bypass_dns_firewall" translatable="true">已繞過 DNS 與防火牆規則</string>
     <string name="settings_general_customize" translatable="true">自訂</string>
     <string name="settings_default_dns_desc" translatable="true">在極少數情況下，用戶偏好的 DNS 無法確定時，將使用後備 DNS 。</string>
-    <string name="settings_default_dns_dialog_title" translatable="true">選擇後備 DNS</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">關閉（默認）</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">已繞行應用</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">此連線因<i>網域</i>被通用網域規則信任而被放行。<br/><br/>若需變更此行爲，請移步 <i>DNS 配置</i>選項卡。</string>
