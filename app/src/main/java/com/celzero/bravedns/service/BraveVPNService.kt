@@ -39,7 +39,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnTrackerMetaData
@@ -370,6 +369,11 @@ class BraveVPNService :
 
             // should firewall rules by-pass universal firewall rules (previously whitelist)
             if (appStatus.bypassUniversal()) {
+                // bypass universal should block the domains that are blocked by dns (local/remote)
+                if (anyRealIpBlocked) {
+                    return FirewallRuleset.RULE2G
+                }
+
                 return if (dnsProxied(connInfo.destPort)) {
                     FirewallRuleset.RULE9
                 } else {
