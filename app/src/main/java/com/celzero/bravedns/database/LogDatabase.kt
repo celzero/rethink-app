@@ -28,7 +28,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.celzero.bravedns.util.Utilities
 
-@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 3, exportSchema = false)
+@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LogDatabase : RoomDatabase() {
 
@@ -60,6 +60,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .setJournalMode(JournalMode.AUTOMATIC)
                 .addCallback(roomCallback)
                 .addMigrations(MIGRATION_2_3)
+                .addMigrations(MIGRATION_3_4)
                 .build()
         }
 
@@ -147,6 +148,21 @@ abstract class LogDatabase : RoomDatabase() {
                 override fun migrate(database: SupportSQLiteDatabase) {
                     database.execSQL(
                         "ALTER TABLE DnsLogs add column resolverId TEXT DEFAULT '' NOT NULL"
+                    )
+                }
+            }
+
+        private val MIGRATION_3_4: Migration =
+            object : Migration(3, 4) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_dnslogs_responseips ON  DnsLogs(responseIps)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_connectiontracker_appname ON  ConnectionTracker(appName)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_connectiontracker_dnsquery ON  ConnectionTracker(dnsQuery)"
                     )
                 }
             }
