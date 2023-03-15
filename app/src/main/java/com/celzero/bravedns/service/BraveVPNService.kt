@@ -51,6 +51,7 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
