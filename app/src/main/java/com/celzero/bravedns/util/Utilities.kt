@@ -44,6 +44,7 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
@@ -351,6 +352,20 @@ class Utilities {
             }
         }
 
+        fun openUrl(context: Context, url: String) {
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                showToastUiCentered(
+                    context,
+                    context.getString(R.string.intent_launch_error, url),
+                    Toast.LENGTH_SHORT
+                )
+                Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+            }
+        }
+
         fun openNetworkSettings(context: Context) {
             try {
                 val intent = Intent(ACTION_WIRELESS_SETTINGS)
@@ -637,8 +652,7 @@ class Utilities {
         }
 
         fun isUnspecifiedIp(serverIp: String): Boolean {
-            return UNSPECIFIED_IP_IPV4 == serverIp ||
-                UNSPECIFIED_IP_IPV6 == serverIp
+            return UNSPECIFIED_IP_IPV4 == serverIp || UNSPECIFIED_IP_IPV6 == serverIp
         }
 
         fun calculateTtl(ttl: Long): Long {

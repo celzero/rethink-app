@@ -45,6 +45,7 @@ import com.celzero.bravedns.util.Constants.Companion.RETHINK_SEARCH_URL
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.Companion.openUrl
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -397,8 +398,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             // https://rethinkdns.com/search?s=<uri-encoded-stamp>
             this.dismiss()
             val url = RETHINK_SEARCH_URL + Uri.encode(persistentState.localBlocklistStamp)
-            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-            startActivity(intent)
+            openUrl(requireContext(), url)
         }
 
         b.lbbsDownload.setOnClickListener { showDownloadDialog(isRedownload = false) }

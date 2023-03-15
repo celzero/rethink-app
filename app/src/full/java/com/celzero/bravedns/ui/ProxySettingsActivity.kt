@@ -50,6 +50,7 @@ import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.delay
 import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
+import com.celzero.bravedns.util.Utilities.Companion.openUrl
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -169,8 +170,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun launchOrbotWebsite() {
-        val intent = Intent(Intent.ACTION_VIEW, getString(R.string.orbot_website_link).toUri())
-        startActivity(intent)
+        openUrl(this, getString(R.string.orbot_website_link))
     }
 
     private fun handleOrbotInstall() {
