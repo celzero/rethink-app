@@ -24,7 +24,10 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Entity(tableName = "DnsLogs", indices = [Index(value = arrayOf("queryStr", "responseIps"), unique = false)])
+@Entity(
+    tableName = "DnsLogs",
+    indices = [Index(value = arrayOf("queryStr", "responseIps"), unique = false)]
+)
 class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0

@@ -76,6 +76,8 @@ import com.google.common.net.InternetDomainName
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
+import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -85,8 +87,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.launch
-import xdns.Xdns
 
 class Utilities {
 

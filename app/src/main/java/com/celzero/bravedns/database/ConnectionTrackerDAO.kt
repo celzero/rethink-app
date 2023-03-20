@@ -122,6 +122,5 @@ interface ConnectionTrackerDAO {
     )
     fun getAllBlockedIps(): PagingSource<Int, AppConnection>
 
-    @Query("select count(*) from ConnectionTracker")
-    fun logsCount(): LiveData<Long>
+    @Query("select count(*) from ConnectionTracker") fun logsCount(): LiveData<Long>
 }

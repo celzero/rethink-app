@@ -19,7 +19,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.util.Patterns
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -39,8 +38,6 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
-import java.net.MalformedURLException
-import java.util.regex.Pattern
 
 class CustomDomainAdapter(val context: Context) :
     PagingDataAdapter<CustomDomain, CustomDomainAdapter.CustomDomainViewHolder>(DIFF_CALLBACK) {
@@ -459,7 +456,6 @@ class CustomDomainAdapter(val context: Context) :
                 status
             )
         }
-
 
         private fun insertDomain(
             domain: String,

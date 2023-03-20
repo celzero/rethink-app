@@ -16,14 +16,10 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -32,10 +28,8 @@ import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.util.Utilities.Companion.openUrl
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

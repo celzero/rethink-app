@@ -40,11 +40,11 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.copyWithStream
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
@@ -118,10 +118,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             if (processCompleted) {
                 if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "metadata is added to the temp dir")
             } else {
-                Log.w(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "failed to create metadata file, return failure"
-                )
+                Log.w(LOG_TAG_BACKUP_RESTORE, "failed to create metadata file, return failure")
                 return false
             }
 

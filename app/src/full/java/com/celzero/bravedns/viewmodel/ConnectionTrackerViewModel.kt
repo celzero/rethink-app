@@ -21,7 +21,6 @@ import androidx.paging.*
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.ui.ConnectionTrackerFragment
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
@@ -74,17 +73,13 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun getBlockedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
-            Pager(
-                    PagingConfig(LIVEDATA_PAGE_SIZE)
-                ) {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
-            Pager(
-                    PagingConfig(LIVEDATA_PAGE_SIZE)
-                ) {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getBlockedConnections("%$input%")
                 }
                 .liveData
@@ -94,17 +89,13 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun getAllowedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
-            Pager(
-                    PagingConfig(LIVEDATA_PAGE_SIZE)
-                ) {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
-            Pager(
-                    PagingConfig(LIVEDATA_PAGE_SIZE)
-                ) {
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getAllowedConnections("%$input%")
                 }
                 .liveData
