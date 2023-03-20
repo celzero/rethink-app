@@ -36,6 +36,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.service.FirewallManager.deletePackages
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.NotificationHandlerDialog
@@ -141,7 +142,7 @@ internal constructor(
                         }
                         .toHashSet()
 
-                FirewallManager.deletePackagesFromCache(packagesToDelete)
+                FirewallManager.deletePackages(packagesToDelete)
                 removeRulesRelatedToDeletedPackages(packagesToDelete)
 
                 Log.i(LOG_TAG_APP_DB, "remove: $packagesToDelete; insert: $packagesToAdd")
@@ -181,6 +182,7 @@ internal constructor(
     private suspend fun upsertApp(appTuple: FirewallManager.AppInfoTuple) {
         val appInfo = getAppInfo(appTuple.uid) ?: return
 
+        deletePackages(mutableSetOf(appTuple))
         insertApp(appInfo)
     }
 
