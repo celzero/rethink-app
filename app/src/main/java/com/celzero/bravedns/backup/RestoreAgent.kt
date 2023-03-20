@@ -17,6 +17,7 @@ package com.celzero.bravedns.backup
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageInfo
 import android.net.Uri
 import android.util.Log
 import androidx.preference.PreferenceManager
@@ -36,9 +37,9 @@ import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
+import java.io.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.*
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams), KoinComponent {
@@ -158,7 +159,6 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     // Restore database file stored at tempDir/nameOfFileToRestore.
-    // This method is inside my DBHelper class.
     private fun restoreDatabaseFile(tempDir: File): Boolean {
         checkPoint()
 
@@ -193,7 +193,30 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
 
         deleteResidue(tempDir)
+        // update app version after the restore process
+        updateLatestVersion()
         return true
+    }
+
+    private fun updateLatestVersion() {
+        if (isNewVersion()) {
+            persistentState.appVersion = getLatestVersion()
+            Log.i(LOG_TAG_BACKUP_RESTORE, "app version updated to ${persistentState.appVersion}")
+        } else {
+            Log.i(LOG_TAG_BACKUP_RESTORE, "no need to update app version")
+        }
+    }
+
+    private fun isNewVersion(): Boolean {
+        val versionStored = persistentState.appVersion
+        val version = getLatestVersion()
+        return (version != 0 && version != versionStored)
+    }
+
+    private fun getLatestVersion(): Int {
+        val pInfo: PackageInfo? =
+            Utilities.getPackageMetadata(context.packageManager, context.packageName)
+        return pInfo?.versionCode ?: 0
     }
 
     private fun checkPoint() {
@@ -204,6 +227,13 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun validateMetadata(tempDirectory: String?): Boolean {
+        // TODO: revisit this after v055 release
+        if (isMetadataCompatible(tempDirectory)) {
+            return true
+        } else {
+            // proceed with META_DATA_FILE validation
+        }
+
         val file = File(tempDirectory, METADATA_FILENAME)
         var stream: InputStream? = null
         return try {
@@ -230,9 +260,51 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
     }
 
+    private fun isMetadataCompatible(tempDirectory: String?): Boolean {
+
+        val minVersionSupported = 24
+
+        var input: ObjectInputStream? = null
+        val prefsBackupFile = File(tempDirectory, SHARED_PREFS_BACKUP_FILE_NAME)
+        try {
+            input = ObjectInputStream(FileInputStream(prefsBackupFile))
+
+            val pref: Map<String, *> = input.readObject() as Map<String, *>
+
+            for (e in pref.entries) {
+                val v: Any? = e.value
+                val key: String = e.key
+
+                if (key == PersistentState.APP_VERSION) {
+                    val appVersion = v as Int
+                    if (appVersion >= minVersionSupported) {
+                        Log.w(
+                            LOG_TAG_BACKUP_RESTORE,
+                            "app version is less than minAppVersion, proceed with restore"
+                        )
+                        return true
+                    } else {
+                        // no-op
+                    }
+                } else {
+                    // no-op
+                }
+            }
+            return false
+        } catch (e: Exception) {
+            Log.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "exception while restoring shared pref, reason? ${e.message}",
+                e
+            )
+            return false
+        }
+    }
+
     private fun isVersionSupported(metadata: String): Boolean {
         try {
             val minVersionSupported = 24
+
             if (!metadata.contains(VERSION)) return false
 
             val versionDetails = metadata.split("|")

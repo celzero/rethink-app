@@ -40,11 +40,11 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.Companion.copyWithStream
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
@@ -77,7 +77,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun startBackupProcess(backupFileUri: Uri): Boolean {
-        var successFull: Boolean
+        var processCompleted: Boolean
         try {
             val tempDir = getTempDir(context)
 
@@ -88,12 +88,11 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                     LOG_TAG_BACKUP_RESTORE,
                     "backup process, temp file dir: ${tempDir.path}, prefs backup file: ${prefsBackupFile.path}"
                 )
-            successFull = saveSharedPreferencesToFile(context, prefsBackupFile)
+            processCompleted = saveSharedPreferencesToFile(context, prefsBackupFile)
 
-            if (successFull) {
+            if (processCompleted) {
                 if (DEBUG)
                     Log.d(LOG_TAG_BACKUP_RESTORE, "shared pref backup is added to the temp dir")
-                filesToZip.add(prefsBackupFile)
             } else {
                 Log.w(
                     LOG_TAG_BACKUP_RESTORE,
@@ -102,22 +101,29 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 return false
             }
 
-            successFull = saveDatabasesToFile(tempDir.path)
+            processCompleted = saveDatabasesToFile(tempDir.path)
 
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "completed db backup to temp dir, isSuccessful? $successFull"
-                )
-            if (!successFull) {
+            if (processCompleted) {
+                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "database backup is added to the temp dir")
+            } else {
                 Log.w(
                     LOG_TAG_BACKUP_RESTORE,
-                    "failed to add database backup to temp dir (${tempDir.path}), return failure"
+                    "failed to add database to temp backup dir, return failure"
                 )
                 return false
             }
 
-            createMetaData(tempDir)
+            processCompleted = createMetaData(tempDir)
+
+            if (processCompleted) {
+                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "metadata is added to the temp dir")
+            } else {
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "failed to create metadata file, return failure"
+                )
+                return false
+            }
 
             return zipAndCopyToDestination(tempDir, backupFileUri)
         } catch (e: Exception) {
@@ -134,7 +140,8 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         }
     }
 
-    private fun createMetaData(backupDir: File) {
+    private fun createMetaData(backupDir: File): Boolean {
+        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "creating meta data file, path: ${backupDir.path}")
         var writer: FileWriter? = null
         val metadata = backupMetadata()
         try {
@@ -143,8 +150,16 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             writer.append(metadata)
             writer.flush()
             writer.close()
+            // add the metadata file to the list of files to be zipped
+            filesToZip.add(metadataFile)
+            return true
         } catch (e: Exception) {
-            Log.e(LOG_TAG_BACKUP_RESTORE, "exception during shared pref backup, ${e.message}", e)
+            Log.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "exception while creating meta data file, ${e.message}",
+                e
+            )
+            return false
         } finally {
             try {
                 if (writer != null) {
@@ -204,6 +219,10 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         val files = getRethinkDatabase(context)?.listFiles() ?: return false
 
         for (f in files) {
+            // skip journal files, they are not needed for restore
+            if (f.path.endsWith("-journal") || f.path.endsWith("-shm") || f.path.endsWith("-wal")) {
+                continue
+            }
             val databaseFile =
                 backUpDatabaseFile(f.absolutePath, constructDbFileName(path, f.name))
                     ?: return false
@@ -239,10 +258,11 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                     output.flush()
                     output.close()
                 }
-            } catch (e: IOException) {
+            } catch (ignored: IOException) {
                 // no-op
             }
         }
+        filesToZip.add(prefFile)
         return true
     }
 
