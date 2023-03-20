@@ -17,6 +17,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
@@ -25,6 +26,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import java.net.MalformedURLException
 import java.util.*
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.regex.Pattern
@@ -308,6 +310,22 @@ object DomainRulesManager : KoinComponent {
 
     fun getUniversalCustomDomainCount(): LiveData<Int> {
         return customDomainsRepository.getUniversalCustomDomainCount()
+    }
+
+    fun isValidDomain(url: String): Boolean {
+        return try {
+            Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()
+        } catch (ignored: MalformedURLException) { // ignored
+            false
+        }
+    }
+
+    fun isWildCardEntry(url: String): Boolean {
+        // regex to check if url is valid wildcard domain
+        // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
+        // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
+        val p = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
+        return p.matcher(url).matches()
     }
 
     private fun constructObject(
