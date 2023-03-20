@@ -66,7 +66,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     enum class DnsLogFilter(val id: Int) {
         ALL(0),
         ALLOWED(1),
-        BLOCKED(2)
+        BLOCKED(2),
+        MAYBE_BLOCKED(3)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -153,6 +154,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed = makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
+        val maybeBlocked =
+            makeChip(DnsLogFilter.MAYBE_BLOCKED.id, getString(R.string.lbl_maybe_blocked), false)
         val blocked =
             makeChip(
                 ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
@@ -162,6 +165,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         b.filterChipGroup.addView(all)
         b.filterChipGroup.addView(allowed)
+        b.filterChipGroup.addView(maybeBlocked)
         b.filterChipGroup.addView(blocked)
     }
 
@@ -200,6 +204,10 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
             }
             DnsLogFilter.BLOCKED.id -> {
                 filterType = DnsLogFilter.BLOCKED
+                viewModel.setFilter(filterValue, filterType)
+            }
+            DnsLogFilter.MAYBE_BLOCKED.id -> {
+                filterType = DnsLogFilter.MAYBE_BLOCKED
                 viewModel.setFilter(filterValue, filterType)
             }
         }

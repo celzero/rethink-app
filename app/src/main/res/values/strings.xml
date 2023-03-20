@@ -24,6 +24,7 @@
     <string name="lbl_dismiss" translatable="true">Dismiss</string>
     <string name="lbl_all" translatable="true">All</string>
     <string name="lbl_allowed" translatable="true">Allowed</string>
+    <string name="lbl_maybe_blocked" translatable="true">Maybe Blocked</string>
     <string name="lbl_blocked" translatable="true">Blocked</string>
     <string name="lbl_disabled" translatable="true">Disabled</string>
     <string name="lbl_domain" translatable="true">Domain</string>

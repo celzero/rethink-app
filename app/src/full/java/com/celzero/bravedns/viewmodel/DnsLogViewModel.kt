@@ -44,6 +44,9 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
             DnsLogFragment.DnsLogFilter.BLOCKED -> {
                 getBlockedDnsLogs(filter)
             }
+            DnsLogFragment.DnsLogFilter.MAYBE_BLOCKED -> {
+                getMaybeBlockedDnsLogs(filter)
+            }
         }
     }
 
@@ -64,6 +67,14 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     private fun getBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                 dnsLogDAO.getBlockedDnsLogsByName("%$filter%")
+            }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    private fun getMaybeBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                dnsLogDAO.getMaybeBlockedDnsLogsByName("%$filter%")
             }
             .liveData
             .cachedIn(viewModelScope)

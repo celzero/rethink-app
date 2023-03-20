@@ -35,7 +35,7 @@ interface DnsLogDAO {
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists = '' order by time desc"
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
@@ -43,6 +43,11 @@ interface DnsLogDAO {
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by time desc"
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query(
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists != '' order by time desc"
+    )
+    fun getMaybeBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query("delete from DNSLogs") fun clearAllData()
 
