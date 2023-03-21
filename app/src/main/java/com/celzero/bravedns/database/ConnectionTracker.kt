@@ -33,6 +33,7 @@ class ConnectionTracker {
     var protocol: Int = 0
     var isBlocked: Boolean = false
     var blockedByRule: String = ""
+    var blocklists: String = ""
     var flag: String = ""
     var dnsQuery: String? = null
     var timeStamp: Long = INIT_TIME_MS

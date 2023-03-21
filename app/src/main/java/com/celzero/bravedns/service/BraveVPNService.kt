@@ -24,7 +24,6 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
-import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -55,7 +54,6 @@ import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
@@ -78,6 +76,7 @@ import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
 import java.io.IOException
+import java.net.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -2049,6 +2048,7 @@ class BraveVPNService :
                 realDestIp,
                 dstPort,
                 protocol,
+                blocklists,
                 domains.first()
             )
         if (DEBUG) Log.d(LOG_TAG_VPN, "block-alg connInfo: $connInfo")
@@ -2068,6 +2068,10 @@ class BraveVPNService :
         blocklists: String = ""
     ): Boolean {
         // skip the block-ceremony for dns conns
+        Log.d(
+            LOG_TAG_VPN,
+            "process-firewall-request: $metadata, ${isDns(metadata.destPort)}, ${isVpnDns(metadata.destIP)}"
+        )
         if (isDns(metadata.destPort) && isVpnDns(metadata.destIP)) {
             if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule dns-request no-op on conn $metadata")
             return false
@@ -2075,13 +2079,8 @@ class BraveVPNService :
 
         val rule = firewall(metadata, anyRealIpBlocked)
 
-        // handle 2G rule as a special case, as it is has blocklists
-        if (rule.id == FirewallRuleset.RULE2G.id && blocklists.isNotEmpty()) {
-            if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule allow on conn $metadata")
-            metadata.blockedByRule = rule.id + "|" + blocklists
-        } else {
-            metadata.blockedByRule = rule.id
-        }
+        metadata.blockedByRule = rule.id
+        metadata.blocklists = blocklists
 
         val blocked = FirewallRuleset.ground(rule)
         metadata.isBlocked = blocked
@@ -2101,7 +2100,8 @@ class BraveVPNService :
         dstIp: String,
         dstPort: Int,
         protocol: Int,
-        _query: String
+        blocklists: String = "",
+        _query: String = ""
     ): ConnTrackerMetaData {
 
         // Ref: ipaddress doc:
@@ -2125,6 +2125,7 @@ class BraveVPNService :
             System.currentTimeMillis(),
             false, /*blocked?*/
             "", /*rule*/
+            blocklists,
             protocol,
             query
         )

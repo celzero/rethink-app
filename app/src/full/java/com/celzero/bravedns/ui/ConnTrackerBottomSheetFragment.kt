@@ -58,9 +58,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.*
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.*
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 
@@ -199,6 +199,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         }
 
         val rule = connectionInfo!!.blockedByRule
+        // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
             b.bsConnTrackAppKill.text =
                 getFirewallRule(FirewallRuleset.RULE2G.id)?.title?.let { getString(it) }
@@ -486,8 +487,14 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         if (blockedRule.contains(FirewallRuleset.RULE2G.id)) {
             val group: Multimap<String, String> = HashMultimap.create()
 
-            val startIndex = blockedRule.indexOfFirst { it == '|' }
-            val blocklists = blockedRule.substring(startIndex + 1).split(",")
+            val blocklists =
+                if (connectionInfo?.blocklists?.isEmpty() == true) {
+                    val startIndex = blockedRule.indexOfFirst { it == '|' }
+                    blockedRule.substring(startIndex + 1).split(",")
+                } else {
+                    connectionInfo?.blocklists?.split(",") ?: listOf()
+                }
+
             blocklists.forEach {
                 val items = it.split(":")
                 if (items.count() <= 1) return@forEach

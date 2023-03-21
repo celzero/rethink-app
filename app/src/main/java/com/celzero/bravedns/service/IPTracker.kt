@@ -49,6 +49,7 @@ internal constructor(
         connTracker.protocol = connTrackerMetaData.protocol
         connTracker.timeStamp = connTrackerMetaData.timestamp
         connTracker.blockedByRule = connTrackerMetaData.blockedByRule
+        connTracker.blocklists = connTrackerMetaData.blocklists
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         connTracker.dnsQuery = connTrackerMetaData.query
