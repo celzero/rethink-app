@@ -155,14 +155,16 @@ abstract class LogDatabase : RoomDatabase() {
         private val MIGRATION_3_4: Migration =
             object : Migration(3, 4) {
                 override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL("DROP INDEX IF EXISTS index_dnslogs_querystr")
+                    database.execSQL("DROP INDEX IF EXISTS index_connectiontracker_ipaddress")
                     database.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_dnslogs_responseips ON  DnsLogs(responseIps)"
+                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_queryStr_responseIps ON  DnsLogs(queryStr, responseIps)"
                     )
                     database.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_connectiontracker_appname ON  ConnectionTracker(appName)"
+                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_ipAddress_appName_dnsQuery ON  ConnectionTracker(ipAddress, appName, dnsQuery)"
                     )
                     database.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_connectiontracker_dnsquery ON  ConnectionTracker(dnsQuery)"
+                        "ALTER TABLE ConnectionTracker add column blocklists TEXT DEFAULT '' NOT NULL"
                     )
                 }
             }
