@@ -37,7 +37,7 @@
     <string name="alert_firewall_accessibility_exception">Falha ao abrir as configurações de acessibilidade. Tente mais tarde!</string>
     <string name="dns_query_clear_logs_message">Isto elimina os registos DNS do dispositivo. Esta operação não é reversível. Deseja prosseguir\?</string>
     <string name="bsct_app_info">Informações da aplicação</string>
-    <string name="bsct_block_ip"><u>Regras de IP</u> para <u>esta aplicação</u></string>
+    <string name="bsct_block_ip">Bloquear, confiar <u>este IP</u> para <u>esta aplicação</u></string>
     <string name="bsct_block">Regras de firewall para <u>esta aplicação</u></string>
     <string name="bsct_conn_desc_allowed">permitido em %1$s %2$s</string>
     <string name="always_on_dialog_positive_btn">Ir às configurações</string>
@@ -147,7 +147,7 @@
     <string name="bsct_conn_block_desc_device">%1$s bloqueado no dispositivo</string>
     <string name="bsct_conn_desc_blocked">bloqueado em %1$s %2$s</string>
     <string name="always_on_dialog_neutral">Configurações</string>
-    <string name="firewall_act_network_monitor_tab">Registos de rede</string>
+    <string name="firewall_act_network_monitor_tab">Rede</string>
     <string name="dns_act_configure_tab">Configurar</string>
     <string name="univ_firewall_dialog_title">Eliminar regra de IP\?</string>
     <string name="univ_firewall_dialog_message">A eliminação desta regra permitiria que qualquer aplicação se ligasse a este IP. Quer continuar\?</string>
@@ -268,7 +268,7 @@
     <string name="txt_home">Início</string>
     <string name="brave_dns_connect_mode_change_firewall">Escolha o modo.</string>
     <string name="brave_dns_connect_mode_change_dns">Escolha o modo.</string>
-    <string name="firewall_act_universal_tab">Universal</string>
+    <string name="firewall_act_universal_tab">universal</string>
     <string name="orbot_app_issue">Não foi possível iniciar o Orbot. Ele está instalado\?</string>
     <string name="settings_socks5_vpn_disabled_error">Inicie o RethinkDNS para prosseguir.</string>
     <string name="settings_https_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
@@ -829,4 +829,8 @@
     <string name="firewall_rule_trusted_domain" translatable="true">Domínio (aplicação)</string>
     <string name="firewall_rule_block_domain" translatable="true">Domínio (aplicação)</string>
     <string name="cd_no_rules_text" translatable="true">Não foi encontrada nenhuma regra de domínio.</string>
+    <string name="lbl_configure" translatable="true">Configurar</string>
+    <string name="bsct_block_domain" translatable="true">Bloquear, confiar <u>domínio(s)</u> para <u>esta aplicação</u></string>
+    <string name="lbl_logs" translatable="true">registros</string>
+    <string name="lbl_rules" translatable="true">regras</string>
 </resources>
