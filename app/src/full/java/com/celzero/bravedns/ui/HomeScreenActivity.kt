@@ -63,15 +63,15 @@ import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
+import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.io.File
-import java.util.*
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -630,7 +630,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
         builder.setMessage(message)
-        builder.setCancelable(true)
+        builder.setCancelable(false)
         if (
             message == getString(R.string.download_update_dialog_message_ok) ||
                 message == getString(R.string.download_update_dialog_failure_message) ||
@@ -644,14 +644,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } else {
             if (source == AppUpdater.InstallSource.STORE) {
                 builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) {
-                    _,
+                    dialogInterface,
                     _ ->
                     appUpdateManager.completeUpdate()
+                    dialogInterface.dismiss()
                 }
             } else {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { _, _
-                    ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) {
+                    dialogInterface,
+                    _ ->
                     initiateDownload()
+                    dialogInterface.dismiss()
                 }
             }
             builder.setNegativeButton(getString(R.string.hs_download_negative_default)) {
