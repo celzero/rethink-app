@@ -1,2 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="settings_title_desc" translatable="true">Isang lubos na nako-customize na DNS at Firewall</string>
+    <string name="about_title_desc" translatable="true">I-detect at harangan ang mga banta sa seguridad ng network</string>
+    <string name="txt_home" translatable="true">Tahanan</string>
+    <string name="title_about" translatable="true">Tungkol sa</string>
+    <string name="title_statistics" translatable="true">Mga istatistika</string>
+    <string name="pause_title_desc" translatable="true">umiidlip…</string>
+    <string name="accessibility_service_description" translatable="true">Ang Rethink ay gumagamit ng accessibility service upang makadetect at mag firewall ng mga background applications. Hindi nagkukolekta o nagbebenta ng anumang impormasyon ang Rethink.</string>
+    <string name="next" translatable="true">Sunod</string>
+    <string name="skip" translatable="true">Laktawan</string>
+    <string name="finish" translatable="true">Tapos na</string>
+    <string name="lbl_cancel" translatable="true">Kanselahin</string>
+    <string name="lbl_apply" translatable="true">I-apply</string>
+    <string name="lbl_dismiss" translatable="true">I-dismiss</string>
+    <string name="lbl_all" translatable="true">Lahat</string>
+    <string name="lbl_allowed" translatable="true">Pinapayagan</string>
+    <string name="lbl_blocked" translatable="true">Naka-block</string>
+    <string name="lbl_disabled" translatable="true">Naka-disable</string>
+    <string name="lbl_domain" translatable="true">Dominyo</string>
+    <string name="lbl_wildcard" translatable="true">Wildcard</string>
+    <string name="lbl_action_required" translatable="true">Kailangan ng Aksyon</string>
+    <string name="lbl_rules" translatable="true">mga patakaran</string>
+    <string name="lbl_configure" translatable="true">I-configure</string>
+    <string name="lbl_logs" translatable="true">mga talaan</string>
+    <string name="lbl_ip_rules" translatable="true">Mga Patakaran sa IP</string>
+    <string name="lbl_domain_rules" translatable="true">Mga Patakaran sa Domain</string>
+    <string name="slide_2_title" translatable="true">Maligayang bati</string>
+    <string name="slide_2_desc" translatable="true">Ang Rethink ay ang pinakamadaling paraan upang subaybayan ang aktibidad ng network, i-bypass ang Internet censorship, at maglagay ng firewall sa mga app sa iyong Android device.</string>
+    <string name="slide_1_title" translatable="true">libreng gamit at software na pwede mong baguhin</string>
+    <string name="slide_1_desc" translatable="true">Ang Rethink ay isang libreng software na sinusuportahan ng Mozilla Builders MVP program.</string>
+    <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
+    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="allow" translatable="true">pahintulutan</string>
+    <string name="block" translatable="true">harangan</string>
+    <string name="title_settings" translatable="true">Mga Kagustuhan</string>
+    <string name="pause_mode_notification_title" translatable="true">Hinto! Ang mga blocked na apps ay patuloy na magiging hindi maaaring mag-access dahil naka-firewall pa rin ang mga ito.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">Paghihintay</string>
+    <string name="exclude" translatable="true">ibukod</string>
+    <string name="isolate" translatable="true">ihiwalay</string>
+    <string name="bypass_universal" translatable="true">Ibypass ang universal</string>
+    <string name="universal_firewall_explanation" translatable="true">Mag-apply ng mga patakaran ng firewall sa lahat ng mga aplikasyon batay sa mga pangyayari sa device, halimbawa, mag-apply ng firewall kapag nakalock ang device o kapag hindi ginagamit ang partikular na app.</string>
+</resources>
