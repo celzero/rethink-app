@@ -834,7 +834,7 @@
     <string name="settings_pcap_heading" translatable="true">数据包捕获</string>
     <string name="lbl_rules" translatable="true">规则</string>
     <string name="lbl_configure" translatable="true">配置</string>
-    <string name="settings_default_dns_heading" translatable="true">回落 DNS</string>
+    <string name="settings_default_dns_heading" translatable="true">选择回落 DNS</string>
     <string name="lbl_logs" translatable="true">日志</string>
     <string name="bsct_block_domain" translatable="true">对<u>此应用</u>拦截、信任<u>此域名</u></string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">已绕过 DNS 与防火墙规则</string>
@@ -867,4 +867,5 @@
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器（实验性）</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">合并请求，缓存响应，弹性应对错误</string>
     <string name="ada_app_firewall" translatable="true">防火墙</string>
+    <string name="brbs_backup_restore_desc" translatable="true">无法跨版本跨设备使用</string>
 </resources>
