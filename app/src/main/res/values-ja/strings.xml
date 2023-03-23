@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_description" translatable="true">Rethink はバックグラウンドのアプリを検知してファイアウォールをするためにアクセシビリティサービスを利用します。 Rethink が情報を収集または販売することはありません。</string>
+    <string name="settings_title_desc" translatable="true">高度にカスタマイズ可能な DNS とファイアウォール</string>
+    <string name="about_title_desc" translatable="true">ネットワークセキュリティの脅威を検知してブロックする</string>
+    <string name="txt_home" translatable="true">ホーム</string>
+    <string name="next" translatable="true">次へ</string>
+    <string name="skip" translatable="true">スキップ</string>
+    <string name="finish" translatable="true">完了</string>
+    <string name="lbl_cancel" translatable="true">キャンセル</string>
+    <string name="lbl_allowed" translatable="true">許可済み</string>
+    <string name="lbl_disabled" translatable="true">無効</string>
+    <string name="lbl_domain" translatable="true">ドメイン</string>
+    <string name="lbl_wildcard" translatable="true">ワイルドカード</string>
+    <string name="lbl_action_required" translatable="true">アクションが必要</string>
+    <string name="lbl_rules" translatable="true">ルール</string>
+    <string name="lbl_configure" translatable="true">構成</string>
+    <string name="lbl_logs" translatable="true">ログ</string>
+    <string name="lbl_ip_rules" translatable="true">IP ルール</string>
+    <string name="lbl_domain_rules" translatable="true">ドメインルール</string>
+    <string name="slide_1_desc" translatable="true">Rethink はオープンソースソフトウェアで、 Mozilla Builder MVP Program に支援されています。</string>
+    <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
+    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="allow" translatable="true">許可</string>
+    <string name="untracked" translatable="true">未追跡</string>
+    <string name="firewall_mode_notification_title" translatable="true">保護されています！ファイアウォールに接続しています。</string>
+    <string name="hybrid_mode_notification_title" translatable="true">保護されています！ DNS とファイアウォールに接続しています。</string>
+    <string name="pause_mode_notification_title" translatable="true">一時停止しています！ブロックしたアプリはファイアウォールされます。</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">保護済み</string>
+    <string name="status_app_error" translatable="true">アプリエラー</string>
+    <string name="status_dns_error" translatable="true">DNS エラー</string>
+    <string name="status_dns_server_down" translatable="true">DNS サーバダウン</string>
+    <string name="status_protected_with_tor" translatable="true">Tor で保護されています</string>
+    <string name="status_protected_with_private_dns" translatable="true">プライベート DNS で保護されています</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">プロキシとプライベート DNS で保護されています</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">SOCKS5 とプライベート DNS で保護されています</string>
+    <string name="status_protected_with_proxy" translatable="true">プロキシで保護されています</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">プライベート DNS が有効</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">保護されていません</string>
+    <string name="dns_explanation_dns_connected" translatable="true">RethinkDNS に接続済み</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">ファイアウォールに接続済み</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="firewall_mode_info_title" translatable="true">ファイアウォール</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">全てのアプリと IP アドレスに対してネットワークアクティビティを監視しファイアウォールします。</string>
+    <string name="apps_info_title" translatable="true">アプリ</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + ファイアウォール</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">DNS リクエストを監視、ブロック、暗号化します。</string>
+    <string name="wireguard_mode_info_explanation_new" translatable="true">準備中。</string>
+    <string name="alert_permission_accessibility" translatable="true">権限 - アクセシビリティ</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">モードを選択してください。</string>
+    <string name="conn_track_clear_logs_title" translatable="true">全てのネットワークログを削除しますか？</string>
+    <string name="dns_query_clear_logs_title" translatable="true">すべての DNS ログを削除しますか？</string>
+    <string name="dns_query_clear_logs_message" translatable="true">デバイス上の DNS ログを削除します。この操作は元に戻せません。続行してよろしいですか？</string>
+    <string name="bsct_app_info" translatable="true">アプリ情報</string>
+    <string name="bsct_block_ip" translatable="true"><u>この IP</u> を <u>このアプリ</u> に対してブロック・信頼</string>
+    <string name="title_about" translatable="true">情報</string>
+    <string name="title_settings" translatable="true">設定</string>
+    <string name="title_statistics" translatable="true">統計</string>
+    <string name="lbl_apply" translatable="true">適用</string>
+    <string name="lbl_dismiss" translatable="true">削除</string>
+    <string name="lbl_all" translatable="true">全て</string>
+    <string name="lbl_blocked" translatable="true">ブロック済み</string>
+    <string name="slide_2_title" translatable="true">ようこそ</string>
+    <string name="isolate" translatable="true">隔離</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">警告: RethinkDNS は無効化されています</string>
+    <string name="slide_2_desc" translatable="true">Rethink はあなたの Android デバイスでネットワークアクティビティを監視し、インターネットの検閲を回避し、アプリをファイアウォールするための最も簡単な方法です。</string>
+    <string name="slide_1_title" translatable="true">無料でオープンソース</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">タップして保護設定を変更</string>
+    <string name="block" translatable="true">ブロック</string>
+    <string name="universal_firewall_explanation" translatable="true">デバイスのイベントに基づいて全てのアプリにファイアウォールを適用します。例えばデバイスがロックされている時や特定のアプリを使っていないときにファイアウォールします。</string>
+    <string name="exclude" translatable="true">除外</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">待機中</string>
+    <string name="bypass_dns_firewall" translatable="true">DNS とファイアウォールを回避</string>
+    <string name="dns_mode_notification_title" translatable="true">保護されています！高速で安全な DNS に接続しています。</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">失敗</string>
+    <string name="status_protected_with_socks5" translatable="true">SOCKS プロキシで保護されています</string>
+    <string name="status_no_internet" translatable="true">インターネット接続なし</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">Tor とプライベート DNS で保護されています</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">HTTP プロキシとプライベート DNS で保護されています</string>
+    <string name="status_protected_with_http" translatable="true">HTTP プロキシで保護されています</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">RethinkDNS とファイアウォールに接続済み</string>
+    <string name="notification_action_pause_vpn" translatable="true">一時停止</string>
+    <string name="notification_action_stop_vpn" translatable="true">停止</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">上記の全てに加えてインターネットの検閲を回避します。</string>
+    <string name="notification_action_resume_vpn" translatable="true">再開</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + ファイアウォール</string>
+    <string name="firewall_rules" translatable="true">ネットワークルール</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">アクティビティの設定を開けませんでした。また後ほどお試しください！</string>
+    <string name="conn_track_clear_logs_message" translatable="true">ネットワークログのみを削除し、ファイアウォールルールは削除しません。この操作は元に戻せません。続行してよろしいですか？</string>
+    <string name="default_dns_name" translatable="true">RDNS デフォルト</string>
+    <string name="custom_url_error_invalid_url" translatable="true">不正な URL</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">モードを選択してください。</string>
+</resources>
