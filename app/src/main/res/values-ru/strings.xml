@@ -851,7 +851,6 @@
     <string name="dc_refresh_toast" translatable="true">Обновление DNS завершено</string>
     <string name="settings_pcap_heading" translatable="true">Захват пакетов</string>
     <string name="settings_general_customize" translatable="true">персонализация</string>
-    <string name="settings_default_dns_dialog_title" translatable="true">Выбрать резервный DNS</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Невозможно настроить прокси, когда VPN работает в режиме Только DNS или в режиме блокировки. <u>Перейти к настройкам VPN</u></string>
     <string name="settings_default_dns_heading" translatable="true">Выберите резервный DNS</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Обходить приложения</string>
