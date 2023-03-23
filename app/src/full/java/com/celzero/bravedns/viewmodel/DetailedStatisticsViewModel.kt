@@ -23,6 +23,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.ui.SummaryStatisticsFragment
@@ -30,7 +31,8 @@ import com.celzero.bravedns.util.Constants
 
 class DetailedStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
-    private val dnsLogDAO: DnsLogDAO
+    private val dnsLogDAO: DnsLogDAO,
+    appConfig: AppConfig
 ) : ViewModel() {
     private var allowedNetworkActivity: MutableLiveData<String> = MutableLiveData()
     private var blockedNetworkActivity: MutableLiveData<String> = MutableLiveData()
@@ -82,14 +84,26 @@ class DetailedStatisticsViewModel(
 
     val getAllContactedDomains =
         Transformations.switchMap(allowedDomains) { _ ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getAllContactedDomains() }
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    if (appConfig.getBraveMode().isDnsMode()) {
+                        dnsLogDAO.getAllContactedDomains()
+                    } else {
+                        connectionTrackerDAO.getAllContactedDomains()
+                    }
+                }
                 .liveData
                 .cachedIn(viewModelScope)
         }
 
     val getAllBlockedDomains =
         Transformations.switchMap(blockedDomains) { _ ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getAllBlockedDomains() }
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    if (appConfig.getBraveMode().isDnsMode()) {
+                        dnsLogDAO.getAllBlockedDomains()
+                    } else {
+                        connectionTrackerDAO.getAllBlockedDomains()
+                    }
+                }
                 .liveData
                 .cachedIn(viewModelScope)
         }

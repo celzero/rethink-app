@@ -23,13 +23,15 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.util.Constants
 
 class SummaryStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
-    private val dnsLogDAO: DnsLogDAO
+    private val dnsLogDAO: DnsLogDAO,
+    private val appConfig: AppConfig
 ) : ViewModel() {
     private var networkActivity: MutableLiveData<String> = MutableLiveData()
     private var domains: MutableLiveData<String> = MutableLiveData()
@@ -64,7 +66,11 @@ class SummaryStatisticsViewModel(
     val getMostContactedDomains =
         Transformations.switchMap(domains) { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    dnsLogDAO.getMostContactedDomains()
+                    if (appConfig.getBraveMode().isDnsMode()) {
+                        dnsLogDAO.getMostContactedDomains()
+                    } else {
+                        connectionTrackerDAO.getMostContactedDomains()
+                    }
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -72,7 +78,13 @@ class SummaryStatisticsViewModel(
 
     val getMostBlockedDomains =
         Transformations.switchMap(domains) { _ ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getMostBlockedDomains() }
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    if (appConfig.getBraveMode().isDnsMode()) {
+                        dnsLogDAO.getMostBlockedDomains()
+                    } else {
+                        connectionTrackerDAO.getMostBlockedDomains()
+                    }
+                }
                 .liveData
                 .cachedIn(viewModelScope)
         }

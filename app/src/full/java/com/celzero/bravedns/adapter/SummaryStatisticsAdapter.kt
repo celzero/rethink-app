@@ -267,10 +267,18 @@ class SummaryStatisticsAdapter(
                         startAppInfoActivity(appConnection)
                     }
                     SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
-                        showDnsLogs(appConnection)
+                        if (appConfig.getBraveMode().isDnsMode()) {
+                            showDnsLogs(appConnection)
+                        } else {
+                            showNetworkLogs(appConnection, isDns = true)
+                        }
                     }
                     SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                        showDnsLogs(appConnection)
+                        if (appConfig.getBraveMode().isDnsMode()) {
+                            showDnsLogs(appConnection)
+                        } else {
+                            showNetworkLogs(appConnection, isDns = true)
+                        }
                     }
                     SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                         showNetworkLogs(appConnection)
@@ -302,11 +310,15 @@ class SummaryStatisticsAdapter(
             }
         }
 
-        private fun showNetworkLogs(appConnection: AppConnection) {
+        private fun showNetworkLogs(appConnection: AppConnection, isDns: Boolean = false) {
             if (!handleVpnState()) return
 
             if (appConfig.getBraveMode().isFirewallActive()) {
-                startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.ipAddress)
+                if (isDns) {
+                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.appOrDnsName)
+                } else {
+                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.ipAddress)
+                }
             } else {
                 Utilities.showToastUiCentered(
                     context,
