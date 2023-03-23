@@ -504,6 +504,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     fun checkForUpdate(
         isInteractive: AppUpdater.UserPresent = AppUpdater.UserPresent.NONINTERACTIVE
     ) {
+        // do not check for debug builds
+        if (BuildConfig.DEBUG) return
 
         // Check updates only for play store / website version. Not fDroid.
         if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
