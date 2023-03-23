@@ -9,7 +9,7 @@
     <string name="status_protected_with_tor">protegido com Tor</string>
     <string name="status_protected_with_private_dns">protegido com dns privado</string>
     <string name="status_protected_with_tor_private_dns">protegido com tor e dns privado</string>
-    <string name="slide_2_desc">O RethinkDNS é a forma mais fácil de monitorizar a atividade da rede, contornar a censura da Internet e bloquear com a firewall as aplicações no seu dispositivo Android.</string>
+    <string name="slide_2_desc">O RethinkDNS é a maneira mais fácil de monitorar a atividade da rede, contornar a censura na Internet e aplicativos de firewall em seu dispositivo Android</string>
     <string name="slide_1_title">Código livre e aberto</string>
     <string name="slide_1_desc">O RethinkDNS é um programa de código aberto apoiado pelo programa Mozilla Builders MVP.</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: RethinkDNS foi desativado</string>
@@ -229,10 +229,7 @@
     <string name="firewall_status_unknown">desconhecido</string>
     <string name="ct_bs_app_info_error">Informação da aplicação não foi encontrada</string>
     <string name="firewall_card_status_active">%1$s aplicações</string>
-    <string name="firewall_card_text_active">%1$s bloqueadas
-\n%2$s contornadas
-\n%3$s excluídas
-\n%4$s isoladas</string>
+    <string name="firewall_card_text_active">%1$s bloqueado, %2$s ignorado, %3$s excluído, %4$s isolado</string>
     <string name="dns_card_latency_active">Latência: %1$sms</string>
     <string name="dns_card_latency_inactive">Ativar o modo DNS.</string>
     <string name="apps_card_ips_count">%1$s regras IP/portas</string>
@@ -257,13 +254,13 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="conn_track_clear_logs_message">Isto só elimina os registos da rede, mas não as regras de firewall. Esta operação não é reversível. Quer prosseguir\?</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiado</string>
-    <string name="bypass_universal">contorno universal</string>
+    <string name="bypass_universal">desvio universal</string>
     <string name="app_name">RethinkDNS</string>
     <string name="title_about">Sobre</string>
     <string name="orbot_bs_status_trying_connect">A configurar o Orbot…</string>
     <string name="orbot_install_dialog_title">Instalar o Orbot\?</string>
     <string name="settings_network_all_networks_desc">Quando ativado, o RethinkDNS utiliza todas as redes disponíveis para se ligar à Internet. Caso contrário, utiliza a rede que estiver <i>ativada</i> pelo Android.</string>
-    <string name="settings_import_export_desc">Faça cópias de segurança ou restaure os dados e configurações da aplicação.</string>
+    <string name="settings_import_export_desc">Faça backup ou restaure manualmente os dados e configurações do aplicativo.</string>
     <string name="settings_title_desc">Um DNS e Firewall altamente personalizável</string>
     <string name="txt_home">Início</string>
     <string name="brave_dns_connect_mode_change_firewall">Escolha o modo.</string>
@@ -295,10 +292,10 @@
     <string name="settings_orbot_disabled_error">Desative o proxy HTTP(S) e/ou SOCKS5 para continuar com a configuração do Tor-como-proxy.</string>
     <string name="title_settings">Configurações</string>
     <string name="pause_title_desc">a tirar uma soneca…</string>
-    <string name="accessibility_service_description">O RethinkDNS usa o serviço de acessibilidade para detectar e proteger aplicações em segundo plano. O RethinkDNS não coleta nem vende nenhuma informação.</string>
+    <string name="accessibility_service_description">Rethink usa o serviço de acessibilidade para detectar e proteger aplicativos em segundo plano. A Rethink não coleta ou vende nenhuma informação.</string>
     <string name="orbot_both">Proxy TCP + HTTP</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="settings_lock_down_mode_desc">Não é possível permitir ignorar nem configurar proxies quando a VPN está no modo bloqueado. <u>Ir às configurações da VPN</u>.</string>
+    <string name="settings_lock_down_mode_desc">Não é possível permitir desviar quando a VPN está em execução no modo de bloqueio. <u>Vá para as configurações de VPN</u>.</string>
     <string name="settings_https_desc">Esta configuração é apenas uma recomendação e é possível que as aplicações a ignorem. As aplicações que utilizam proxy HTTP(S) ignorarão as regras da Firewall e do DNS.</string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_stop_dialog_message">O RethinkDNS parou de encaminhar conexões para o Orbot, mas o Orbot pode estar a ser executado em segundo plano.</string>
@@ -333,7 +330,7 @@
     <string name="settings_ptrans_heading">Forçar saída IPv4</string>
     <string name="orbot_title">Orbot e Proxies</string>
     <string name="settings_orbot_notification_content">Falha ao iniciar o Tor-como-proxy. Abra a aplicação Orbot para o iniciar manualmente.</string>
-    <string name="settings_custom_downloader_desc">Se estiver desativado, será usado o <i>Gestor de transferências</i> do Android.</string>
+    <string name="settings_custom_downloader_desc">Se desativado, o <i>Download Manager</i> integrado do Android é usado.</string>
     <string name="skip">Saltar</string>
     <string name="orbot_socks5_desc">Encaminha todas as conexões TCP para o Orbot.</string>
     <string name="orbot_stop_dialog_title">Intervenção manual necessária</string>
@@ -459,12 +456,12 @@
     <string name="bsdl_blocked_desc">%1$s bloqueado por %2$s</string>
     <string name="rt_chip_update_available">Atualização disponível</string>
     <string name="rethink_sky_desc">Mais de 280 localizações; maior tempo de atividade; resolvedor de stub em execução em cloudflare.com</string>
-    <string name="brbs_backup_desc">Fazer uma cópia de segurança das configurações da aplicação, rede e registos de DNS</string>
+    <string name="brbs_backup_desc">Configurações de backup de aplicativos, rede e logs de DNS</string>
     <string name="brbs_restore_desc">Restaurar de um ficheiro de cópia de segurança</string>
     <string name="brbs_restore_dialog_positive">Restaurar</string>
-    <string name="brbs_backup_dialog_message">Fazer cópia de segurança das configurações da aplicação, da rede e dos registos de DNS num ficheiro. Isto reiniciará a VPN.</string>
+    <string name="brbs_backup_dialog_message">Faz backup das configurações do aplicativo, da rede e dos logs de DNS em um arquivo. Isso reiniciará a VPN.</string>
     <string name="brbs_restore_dialog_title">Restaurar cópia de segurança</string>
-    <string name="brbs_restore_dialog_message">Restaurar as configurações da aplicação, rede e registos de DNS de um ficheiro de cópia de segurança. Isto reiniciará a aplicação.</string>
+    <string name="brbs_restore_dialog_message">Restaure as configurações do aplicativo, a rede e os logs de DNS de um arquivo de backup. Isso reiniciará o aplicativo.</string>
     <string name="brbs_backup_dialog_failure_message">Não foi possível fazer a cópia de segurança. Tentar novamente\?</string>
     <string name="brbs_backup_dialog_failure_positive">Repetir cópia de segurança</string>
     <string name="brbs_restore_complete_toast">Restauração concluída, a reiniciar a aplicação…</string>
@@ -475,7 +472,7 @@
     <string name="univ_firewall_rule_6">Bloquear aplicações recém-instaladas por padrão</string>
     <string name="univ_ip_delete_individual_positive">Eliminar</string>
     <string name="univ_ip_delete_dialog_positive">Eliminar tudo</string>
-    <string name="univ_view_blocked_ip_desc">Alterar as regras de IP / porta bloqueadas ou de confiança.</string>
+    <string name="univ_view_blocked_ip_desc">Modifique domínios bloqueados ou confiáveis, regras de IP/Porta.</string>
     <string name="univ_accessibility_dialog_negative">Negar</string>
     <string name="univ_delete_firewall_dialog_message">Ao eliminar estas regras irá permitir que qualquer aplicação se conecte aos IPs atualmente bloqueados.</string>
     <string name="network_log_app_name_unnamed">Sem nome (%1$s)</string>
@@ -558,7 +555,7 @@
     <string name="univ_firewall_rule_7">Bloquear IPv4 em IPv6 (experimental)</string>
     <string name="univ_firewall_rule_9">Bloquear em rede limitada (móvel)</string>
     <string name="univ_firewall_rule_10">Bloquear tudo, exceto aplicações e IPs contornados</string>
-    <string name="univ_view_blocked_ip">regras de ip e porta</string>
+    <string name="univ_view_blocked_ip">Regras de IP e porta</string>
     <string name="univ_ip_delete_individual_toast">%1$s eliminado.</string>
     <string name="univ_ip_delete_toast_success">Todas as regras de IP foram eliminadas.</string>
     <string name="univ_delete_firewall_dialog_title">Eliminar todas as regras de IP\?</string>
@@ -591,7 +588,7 @@
     <string name="fapps_metered_block_dialog_title">Bloquear em redes limitadas</string>
     <string name="fapps_metered_unblock_dialog_title">Permitir em redes limitadas</string>
     <string name="fapps_metered_unblock_dialog_message">Permitir conexões em rede limitada (móvel) para aplicações <i>na lista</i>\?</string>
-    <string name="fapps_firewall_filter_hint">Aplicar regras nas aplicações na lista</string>
+    <string name="fapps_firewall_filter_hint">Mostrando todos os aplicativos</string>
     <string name="fapps_firewall_filter_desc">A mostrar aplicações: <u>%1$s</u>, %2$s</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
@@ -675,7 +672,7 @@
     <string name="ci_dialog_error_invalid_ip">Endereço IP, sub-rede ou porta inválida.</string>
     <string name="ci_dialog_added_success">IP adicionado à lista</string>
     <string name="ci_header">Regras de IP e porta: %1$s</string>
-    <string name="ci_no_rules_text">Nenhuma regra de IP ou porta encontrada.</string>
+    <string name="ci_no_rules_text">Nenhuma regra de IP ou porta.</string>
     <string name="ci_bypass_universal_initial">CU</string>
     <string name="ci_bypass_universal_txt">Contorno universal</string>
     <string name="ci_blocked_initial">B</string>
@@ -810,7 +807,7 @@
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">ips mais bloqueados</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">Inicie o Rethink para continuar</string>
     <string name="settings_biometric_desc">Protege esta aplicação usando o bloqueio de ecrã</string>
-    <string name="ssv_see_more">mostrar tudo</string>
+    <string name="ssv_see_more">Mostre tudo</string>
     <string name="lbl_allowed" translatable="true">Permitidas</string>
     <string name="lbl_disabled" translatable="true">Desativadas</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Uma regra de firewall definida pelo utilizador bloqueou o <i>IP de destino</i>.<br/><br/> Para a alterar, vá ao ecrã da <i>Firewall específica da aplicação</i>.</string>
@@ -826,11 +823,48 @@
     <string name="lbl_action_required" translatable="true">Ação necessária</string>
     <string name="lbl_ip_rules" translatable="true">Regras de IP</string>
     <string name="lbl_domain_rules" translatable="true">Regras de domínio</string>
-    <string name="firewall_rule_trusted_domain" translatable="true">Domínio (aplicação)</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Domínio confiável (aplicativo)</string>
     <string name="firewall_rule_block_domain" translatable="true">Domínio (aplicação)</string>
-    <string name="cd_no_rules_text" translatable="true">Não foi encontrada nenhuma regra de domínio.</string>
+    <string name="cd_no_rules_text" translatable="true">Sem regras de domínio.</string>
     <string name="lbl_configure" translatable="true">Configurar</string>
     <string name="bsct_block_domain" translatable="true">Bloquear, confiar <u>domínio(s)</u> para <u>esta aplicação</u></string>
     <string name="lbl_logs" translatable="true">registros</string>
     <string name="lbl_rules" translatable="true">regras</string>
+    <string name="bypass_dns_firewall" translatable="true">ignorar dns e firewall</string>
+    <string name="settings_general_customize" translatable="true">customizar</string>
+    <string name="settings_default_dns_desc" translatable="true">Em casos raros, quando o DNS preferencial do usuário não pode ser verificado, o DNS alternativo é usado.</string>
+    <string name="settings_pcap_heading" translatable="true">captura de pacotes</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Captura de pacotes desativada</string>
+    <string name="cd_dns_alg_desc" translatable="true">Aplicar regras de domínio somente quando os aplicativos se conectarem</string>
+    <string name="cd_dns_alg_heading" translatable="true">Filtragem de DNS avançada (experimental)</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplicativo ignorado</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domínio (Univ)</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Esta conexão foi permitida porque o <i>aplicativo de origem</i> está definido para <i>ignorar as regras de DNS e firewall</i>.<br/><br/> Para alterar, vá para <i>Firewall específico do aplicativo </i> tela.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferencial do usuário.<br/><br/> Para alterar este comportamento, vá para a guia <i>Configurar DNS</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Esta conexão foi permitida porque o <i>domínio</i> está definido como confiável nas regras de domínio Universal.<br/><br/> Para alterar este comportamento, vá para a guia <i>Configurar DNS</i>.</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Solicitações unificadas, respostas em cache, tratamento de erros resiliente</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Desligado (padrão)</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Saída para Logcat</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">Saída para a pasta Downloads</string>
+    <string name="pcap_failure_toast" translatable="true">Erro ao criar arquivo pcap, tente novamente!</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">ignora as regras de DNS e firewall</string>
+    <string name="rules_card_domain_count" translatable="true">regras de domínio %1$s</string>
+    <string name="logs_card_network_count" translatable="true">%1$s conexões</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s consultas</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Captura de pacotes ativa</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Ignorar aplicativos</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domínio confiável (Univ)</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">irá ignorar o DNS universal e as regras de firewall</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Ignorar DNS e Firewall</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Não funciona em versões de aplicativos ou dispositivos</string>
+    <string name="ada_app_firewall" translatable="true">Firewall</string>
+    <string name="dc_refresh_toast" translatable="true">Atualização de DNS concluída</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Não é possível configurar proxies quando a VPN está sendo executada no modo somente DNS ou no modo de bloqueio. <u>Vá para as configurações de VPN</u></string>
+    <string name="settings_default_dns_heading" translatable="true">Escolha o DNS alternativo</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s regra(s) universal(is)</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Ignorar DNS universal e regras de firewall para aplicativos <i>listados</i>\?</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está definido como bloqueado nas regras de domínio Universal.<br/><br/> Para alterar este comportamento, vá para a guia <i>Configurar DNS</i>.</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">Amplificador de DNS (experimental)</string>
 </resources>
