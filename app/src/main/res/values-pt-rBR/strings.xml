@@ -789,4 +789,6 @@
     <string name="lbl_domain" translatable="true">Domínio</string>
     <string name="lbl_wildcard" translatable="true">Curinga</string>
     <string name="lbl_dismiss" translatable="true">Dispensar</string>
+    <string name="lbl_configure" translatable="true">Configure</string>
+    <string name="lbl_rules" translatable="true">regras</string>
 </resources>
