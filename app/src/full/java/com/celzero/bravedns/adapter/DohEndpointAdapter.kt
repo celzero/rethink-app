@@ -35,6 +35,8 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UIUtils.getDnsStatus
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -103,7 +105,7 @@ class DohEndpointAdapter(
                 "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}"
             )
             if (endpoint.isSelected) {
-                b.dohEndpointListUrlExplanation.text = context.getString(R.string.dns_connected)
+                b.dohEndpointListUrlExplanation.text = context.getString(getDnsStatus()).replaceFirstChar(Char::titlecase)
             }
 
             // Shows either the info/delete icon for the DoH entries.
@@ -166,11 +168,7 @@ class DohEndpointAdapter(
             builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
                 _: DialogInterface,
                 _: Int ->
-                Utilities.clipboardCopy(
-                    context,
-                    url,
-                    context.getString(R.string.copy_clipboard_label)
-                )
+                clipboardCopy(context, url, context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(
                     context,
                     context.getString(R.string.info_dialog_url_copy_toast_msg),
