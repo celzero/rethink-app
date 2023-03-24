@@ -50,7 +50,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.delay
+import com.celzero.bravedns.util.Utilities.delay
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat

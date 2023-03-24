@@ -19,7 +19,7 @@ package com.celzero.bravedns.service
 import android.text.TextUtils
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.P2QuantileEstimation
-import com.celzero.bravedns.util.Utilities.Companion.isUnspecifiedIp
+import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 
 /**
  * A class for tracking DNS transactions. This class counts the number of successful transactions,

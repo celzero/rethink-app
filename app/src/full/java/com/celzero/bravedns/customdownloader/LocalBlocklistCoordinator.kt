@@ -40,8 +40,8 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.blocklistDownloadBasePath
-import com.celzero.bravedns.util.Utilities.Companion.tempDownloadBasePath
+import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
+import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
 import dnsx.Dnsx
 import okhttp3.ResponseBody
 import org.koin.core.component.KoinComponent

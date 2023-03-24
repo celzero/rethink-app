@@ -47,8 +47,9 @@ import com.celzero.bravedns.ui.NetworkLogsActivity
 import com.celzero.bravedns.ui.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
+import com.celzero.bravedns.util.Utilities.isAtleastN
 
 class SummaryStatisticsAdapter(
     private val context: Context,
@@ -236,11 +237,11 @@ class SummaryStatisticsAdapter(
             val percentage = calculatePercentage(count)
             if (isBlocked) {
                 itemBinding.ssProgress.setIndicatorColor(
-                    Utilities.fetchToggleBtnColors(context, R.color.accentBad)
+                    fetchToggleBtnColors(context, R.color.accentBad)
                 )
             } else {
                 itemBinding.ssProgress.setIndicatorColor(
-                    Utilities.fetchToggleBtnColors(context, R.color.accentGood)
+                    fetchToggleBtnColors(context, R.color.accentGood)
                 )
             }
             if (isAtleastN()) {
@@ -315,9 +316,15 @@ class SummaryStatisticsAdapter(
 
             if (appConfig.getBraveMode().isFirewallActive()) {
                 if (isDns) {
-                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.appOrDnsName)
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.appOrDnsName
+                    )
                 } else {
-                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.ipAddress)
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.ipAddress
+                    )
                 }
             } else {
                 Utilities.showToastUiCentered(

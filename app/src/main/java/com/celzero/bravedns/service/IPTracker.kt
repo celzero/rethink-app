@@ -26,9 +26,9 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.IpManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
-import com.celzero.bravedns.util.Utilities.Companion.getFlag
-import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
+import com.celzero.bravedns.util.Utilities.getCountryCode
+import com.celzero.bravedns.util.Utilities.getFlag
+import com.celzero.bravedns.util.Utilities.getPackageInfoForUid
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent

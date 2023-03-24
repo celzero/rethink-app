@@ -29,8 +29,8 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
-import com.celzero.bravedns.util.Utilities.Companion.localBlocklistFileDownloadPath
+import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
+import com.celzero.bravedns.util.Utilities.localBlocklistFileDownloadPath
 import dnsx.Dnsx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

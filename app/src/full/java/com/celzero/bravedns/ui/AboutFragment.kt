@@ -55,13 +55,14 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.UIUtils.sendEmailIntent
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastR
-import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
-import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.isAtleastR
+import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -275,7 +276,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
         binding.desc.text =
-            Utilities.updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+            updateHtmlEncodedText(getString(R.string.whats_new_version_update))
         AlertDialog.Builder(requireContext())
             .setView(binding.root)
             .setTitle(getString(R.string.whats_dialog_title))
@@ -354,7 +355,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         )
 
         descText.movementMethod = LinkMovementMethod.getInstance()
-        descText.text = Utilities.updateHtmlEncodedText(getString(R.string.contributors_list))
+        descText.text = updateHtmlEncodedText(getString(R.string.contributors_list))
 
         okBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()

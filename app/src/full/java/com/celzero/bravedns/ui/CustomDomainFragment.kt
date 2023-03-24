@@ -40,7 +40,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.removeLeadingAndTrailingDots
+import com.celzero.bravedns.util.Utilities.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import org.koin.android.ext.android.inject
 

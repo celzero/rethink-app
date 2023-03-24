@@ -41,7 +41,7 @@ import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.ui.AppInfoActivity
 import com.celzero.bravedns.ui.AppInfoActivity.Companion.UID_INTENT_NAME
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.getIcon
+import com.celzero.bravedns.util.Utilities.getIcon
 import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter(

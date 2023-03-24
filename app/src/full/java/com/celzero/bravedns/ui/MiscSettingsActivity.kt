@@ -50,11 +50,11 @@ import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
-import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.isAtleastT
+import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException

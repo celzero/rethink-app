@@ -47,9 +47,10 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
@@ -248,7 +249,7 @@ class AppInfoActivity :
         b.aadConnDetailSearch.setOnQueryTextListener(this)
 
         b.aadAppInfoIcon.setOnClickListener {
-            Utilities.openAndroidAppInfo(this, appInfo.packageName)
+            openAndroidAppInfo(this, appInfo.packageName)
         }
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {

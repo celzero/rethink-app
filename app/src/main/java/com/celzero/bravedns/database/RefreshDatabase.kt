@@ -42,10 +42,10 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
-import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
-import com.celzero.bravedns.util.Utilities.Companion.isNonApp
+import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
+import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.celzero.bravedns.util.Utilities.isAtleastT
+import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable

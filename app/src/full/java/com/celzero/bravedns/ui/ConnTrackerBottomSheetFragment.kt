@@ -50,10 +50,10 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap

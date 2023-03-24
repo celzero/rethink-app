@@ -46,11 +46,12 @@ import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UIUtils.openUrl
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
-import com.celzero.bravedns.util.Utilities.Companion.openUrl
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,7 +97,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
         }
 
-        b.settingsActivityVpnLockdownDesc.setOnClickListener { Utilities.openVpnProfile(this) }
+        b.settingsActivityVpnLockdownDesc.setOnClickListener { openVpnProfile(this) }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener {
             _: CompoundButton,

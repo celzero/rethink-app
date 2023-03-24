@@ -34,8 +34,9 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.ui.CustomRulesActivity
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 
@@ -180,20 +181,20 @@ class CustomDomainAdapter(val context: Context) :
             return when (id) {
                 DomainRulesManager.Status.NONE -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextNeutral),
-                        Utilities.fetchColor(context, R.attr.chipBgColorNeutral)
+                        fetchColor(context, R.attr.chipTextNeutral),
+                        fetchColor(context, R.attr.chipBgColorNeutral)
                     )
                 }
                 DomainRulesManager.Status.BLOCK -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextNegative),
-                        Utilities.fetchColor(context, R.attr.chipBgColorNegative)
+                        fetchColor(context, R.attr.chipTextNegative),
+                        fetchColor(context, R.attr.chipBgColorNegative)
                     )
                 }
                 DomainRulesManager.Status.TRUST -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextPositive),
-                        Utilities.fetchColor(context, R.attr.chipBgColorPositive)
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
                     )
                 }
             }

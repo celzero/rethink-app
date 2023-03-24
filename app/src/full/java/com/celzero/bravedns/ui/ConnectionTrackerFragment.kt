@@ -34,7 +34,7 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
@@ -135,7 +135,7 @@ class ConnectionTrackerFragment :
 
                     if (dy > 0) {
                         b.connectionListScrollHeader.text =
-                            Utilities.formatToRelativeTime(requireContext(), tag)
+                            formatToRelativeTime(requireContext(), tag)
                         b.connectionListScrollHeader.visibility = View.VISIBLE
                     } else {
                         b.connectionListScrollHeader.visibility = View.GONE

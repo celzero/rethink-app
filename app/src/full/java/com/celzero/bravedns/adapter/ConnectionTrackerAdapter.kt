@@ -40,7 +40,7 @@ import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.getIcon
+import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
 import java.util.*
 

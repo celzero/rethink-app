@@ -34,10 +34,10 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.Companion.humanReadableTime
+import com.celzero.bravedns.util.UIUtils.humanReadableTime
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
     private val b by viewBinding(ActivityPauseBinding::bind)
