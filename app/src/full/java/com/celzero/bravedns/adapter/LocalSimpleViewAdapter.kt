@@ -31,7 +31,6 @@ import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

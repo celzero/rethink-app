@@ -905,14 +905,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         startActivity(intent)
     }
 
-    private fun getModeText(): String {
-        return when (appConfig.getBraveMode()) {
-            AppConfig.BraveMode.DNS -> getString(R.string.app_mode_dns)
-            AppConfig.BraveMode.FIREWALL -> getString(R.string.app_mode_firewall)
-            AppConfig.BraveMode.DNS_FIREWALL -> getString(R.string.app_mode_dns_firewall)
-        }
-    }
-
     private fun prepareAndStartVpn() {
         if (prepareVpnService()) {
             startVpnService()
@@ -1198,8 +1190,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 R.attr.primaryTextColor
             } else if (attr == R.color.primaryTextLight) {
                 R.attr.primaryTextColor
-            } else if (attr == R.color.primaryLightColorText) {
-                R.attr.primaryLightColorText
             } else {
                 R.attr.accentGood
             }
