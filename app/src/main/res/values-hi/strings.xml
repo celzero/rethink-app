@@ -826,7 +826,7 @@
     <string name="bypass_dns_firewall" translatable="true">डीएनएस और फ़ायरवॉल को बायपास करें</string>
     <string name="bsct_block_domain" translatable="true">ब्लॉक, विश्वास करें <u>इस डोमेन</u> पे <u>इस ऐप</u> के लिए</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">प्रॉक्सी सेट नहीं कर सकते जब वीपीएन सिर्फ डीएनएस या लॉकडाउन मोड में चल रहा है। <u>वीपीएन सेटिंग मे जाए</u></string>
-    <string name="settings_default_dns_heading" translatable="true">फॉलबैक डीएनएस</string>
+    <string name="settings_default_dns_heading" translatable="true">फॉलबैक डीएनएस चुनें</string>
     <string name="settings_default_dns_desc" translatable="true">कुछ दुर्लभ केस में जब यूज़र का पसंदीदा डीएनएस नहीं पता चलता, तब फॉलबैक डीएनएस का इस्तेमाल होता है।</string>
     <string name="settings_pcap_heading" translatable="true">पैकेट कैप्चर</string>
     <string name="settings_pcap_dialog_title" translatable="true">पीकैप</string>
@@ -844,6 +844,7 @@
     <string name="firewall_rule_dns_blocked" translatable="true">डीएनएस ब्लॉक्ड</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">इस कनेक्शन की इजाज़त दी गई क्योकीं <i>स्त्रोत ऐप</i> सेट किया गया है <i>डीएनएस और फायरवॉल नियमों को बायपास करने के लिए</i>।<br/><br/> बदलने के लिए जाए <i>ऐप-विशेष फायरवॉल</i> सक्रिन पे।</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">ये कनेक्शन ब्लॉक किया गया क्योकिं <i>डोमेन</i> ब्लॉक है यूज़र पसंदीदा डीएनएस के द्वारा। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।</string>
-    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">ये कनेक्शन ब्लॉक किया गया क्योकिं <i>डोमेन</i> विश्वसनिय है यूनीवर्सल डोमेन नियमों में। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">ये कनेक्शन अनुमति प्राप्त किया क्योकिं <i>डोमेन</i> विश्वसनिय है यूनीवर्सल डोमेन नियमों में। <br/><br/> बदलने के लिए जाए <i>डीएनएस कन्फिगर</i> टैब पे।</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">यूनीवर्सल डीएनएस और फायरवॉल नियमों को बायपास करेगा</string>
+    <string name="brbs_backup_restore_desc" translatable="true">सभी ऐप वर्जन और डिवाइस पे एक साथ काम नहीं करता</string>
 </resources>

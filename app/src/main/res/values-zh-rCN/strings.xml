@@ -196,7 +196,7 @@
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="hs_download_positive_website">访问网站</string>
     <string name="univ_firewall_rule_3">拦截未知应用</string>
-    <string name="univ_view_blocked_ip_desc">修改阻止或信任的域名、 IP / 端口规则。</string>
+    <string name="univ_view_blocked_ip_desc">修改拦截或信任的域名、 IP / 端口规则。</string>
     <string name="univ_delete_firewall_dialog_message">删除这些规则将允许任何应用连接这些目前被拦截的 IP 。</string>
     <string name="dns_crypt_relay_error_toast">未选择解析服务</string>
     <string name="firewall_rule_bypass_universal_ip">已绕行 IP</string>
@@ -235,7 +235,7 @@
     <string name="notif_channel_vpn_failure">VPN 未启用</string>
     <string name="cd_dialog_error_invalid_domain">无效 URL （域名）。</string>
     <string name="ci_dialog_edittext_hint">IP 地址、子网或端口</string>
-    <string name="ada_noapp_dialog_message">未找到指定应用的信息。此应用或许已被卸载\?</string>
+    <string name="ada_noapp_dialog_message">未找到指定应用的信息。此应用或许已被卸载。</string>
     <string name="rt_dialog_title">保存更改</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="title_settings">设置</string>
@@ -272,7 +272,7 @@
     <string name="configure_dns_connected_dns_proxy_status">DNS 代理</string>
     <string name="download_update_dialog_failure_title">似乎有什么出错了！</string>
     <string name="search_rethinkplus_file_tag"><font size="12">搜索屏蔽名单</font></string>
-    <string name="settings_lock_down_mode_desc">当前VPN 处于锁定模式时无法允许绕行。<u>请移步 VPN 设置</u>。</string>
+    <string name="settings_lock_down_mode_desc">VPN 处于闭关模式时无法允许绕行。<u>请移步 VPN 设置</u>。</string>
     <string name="orbot_status_arg_3">DNS 与 TCP</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="settings_http_proxy_desc">正转发至 %1$s:%2$s</string>
@@ -354,7 +354,7 @@
     <string name="univ_firewall_rule_2">拦截任何未使用的应用</string>
     <string name="dns_connected_rethink_plus">已连接。正使用 %1$s 个屏蔽名单</string>
     <string name="system_dns_connection_failure">无法确定当前的 DNS 服务器</string>
-    <string name="firewall_rule_block_udp_ntp">已阻止 UDP</string>
+    <string name="firewall_rule_block_udp_ntp">已拦截 UDP</string>
     <string name="category_name_others">其他</string>
     <string name="ci_bypass_universal_initial">绕</string>
     <string name="ci_bypass_universal_txt">无条件放行</string>
@@ -419,7 +419,7 @@
     <string name="fapps_firewall_filter_isolate">已隔离</string>
     <string name="fapps_all_network_hint"><u>使用所有可用网络</u>已启用。防火墙将不会遵守收费 / 非收费规则。</string>
     <string name="network_log_app_name_unnamed">未命名（ %1$s ）</string>
-    <string name="dns_proxy_connection_failure_lockdown">为 %2$s 而在锁定模式下排除 %1$s 可导致网络问题。</string>
+    <string name="dns_proxy_connection_failure_lockdown">为 %2$s 而在闭关模式下排除 %1$s 可导致网络问题。</string>
     <string name="firewall_rule_foreground_desc">此连接因原始应用<i>未处于前台</i>而被拦截。<br/><br/>若需变更此行为，请至<i>全局</i>选项卡。</string>
     <string name="new_app_bulk_notification_content">RethinkDNS 拦截了 %1$s 款新应用。轻触以查看或更改。</string>
     <string name="new_app_notification_action_toast_allow">放行应用网络连接</string>
@@ -482,7 +482,7 @@
     <string name="accessibility_failure_toast">RethinkDNS 的无障碍服务已停止或崩溃。现已不再拦截后台应用。</string>
     <string name="firewall_rule_no_rule">无规则</string>
     <string name="firewall_rule_exempt_app_bypass_univ">已绕行应用</string>
-    <string name="firewall_rule_global_lockdown">锁定模式</string>
+    <string name="firewall_rule_global_lockdown">闭关模式</string>
     <string name="firewall_rule_isolate_desc">一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>已绕行 IP </i>外的地址时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。</string>
     <string name="notif_dialog_pause_dialog_negative">忽略</string>
     <string name="notif_channel_desc_vpn_notification">在 Rethink 启用且在后台时提醒我</string>
@@ -623,9 +623,9 @@
 \n <u>#5</u>：阻止未知应用的连接（通用拦截规则）。
 \n <u>#6</u>：拦截除 DNS 外的所有 UDP 流量（通用拦截规则）。
 \n <u>#7</u>：拦截被绕过 DNS 的流量（通用拦截规则）。</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 无障碍功能服务已停止或崩溃。 <i><b>转到设置并强制停止</b></i> 重新思考 DNS 并再次启动它以使用<i>阻止任何未使用的应用</i>功能。
+    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 的无障碍服务已停止或崩溃。为继续使用<i>拦截来使用应用</i>功能，<i><b>请至系统设置，强制停止并再次启动</b></i> RethinkDNS 。
 \n
-\nRethinkDNS 使用无障碍功能服务来跟踪哪些应用程序正在使用（前台），哪些应用程序未在使用（后台）。</string>
+\nRethinkDNS 使用无障碍服务来关注正在使用的应用（前台）与未使用的应用（后台）。</string>
     <string name="status_protected_with_proxy">已由代理保护</string>
     <string name="dns_explanation_firewall_connected">已连接至防火墙</string>
     <string name="bsct_block_ip">对<u>此应用</u>拦截、信任<u>此 IP</u></string>
@@ -642,17 +642,17 @@
     <string name="download_update_dialog_failure_message">可能是我们的服务器下线了，或者是网络问题。请稍后重试。</string>
     <string name="settings_ip_network_heading">选择 IP 版本</string>
     <string name="hsf_blocklist_chip_text_no_data">启用 RDNS+</string>
-    <string name="hsf_exclude_error">VPN 锁定模式下无法排除</string>
+    <string name="hsf_exclude_error">VPN 闭关模式下无法排除</string>
     <string name="settings_https_desc">此设置并非强制性，且应用程序可能会将其忽略。使用 HTTP(S) 代理的应用会同时绕过防火墙与 DNS 规则。</string>
     <string name="hsf_start_dialog_message">您距安全的 Android 系统仅有一步之遥：即时查看网络活动，拦截网站、 IP 与不听话的应用。</string>
     <string name="app_info_error">无法打开应用信息。</string>
     <string name="doh_custom_url_remove_dialog_title">是否删除 DNS 端点？</string>
     <string name="cd_custom_doh_dialog_title">自定义服务器 URL</string>
     <string name="dns_crypt_relay_remove_dialog_title">是否删除此 DNSCrypt 中继？</string>
-    <string name="show_logs_disabled_network_message">连接日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i></string>
-    <string name="hsf_pause_lockdown_failure">无法暂停： RethinkDNS 正使用锁定模式</string>
+    <string name="show_logs_disabled_network_message">连接日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
+    <string name="hsf_pause_lockdown_failure">无法暂停： RethinkDNS 正使用闭关模式</string>
     <string name="refresh_complete">应用列表已重新同步完毕。</string>
-    <string name="show_logs_disabled_dns_message">DNS 请求日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i></string>
+    <string name="show_logs_disabled_dns_message">DNS 请求日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
     <string name="search_firewall_all_apps"><font size="12">以 UID / 应用名搜索应用</font></string>
     <string name="orbot_explanation">Orbot 是一款能让其他程序更<u>安全</u>地连接到互联网的免费代理应用。
 \nOrbot 使用 <u>Tor</u> 来加密您的网络流量，帮您<u>绕过网络审查</u>，并抵御威胁个人自由及隐私的<u>网络监视</u>。
@@ -663,7 +663,7 @@
     <string name="http_proxy_dialog_heading">设置 HTTP(S) 代理</string>
     <string name="http_proxy_dialog_desc">HTTP(S) 代理设置仅为对应用程序的一个提醒，它们可选择是否使用代理；但如 Chrome 及 Firefox 等的浏览器则会使用代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
-    <string name="whats_new_version_update">&lt;b&gt;超级充电！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新功能&lt;/i&gt;：高级DNS过滤； 仅在应用连接时应用域规则。&lt;br/&gt; 2. &lt;i&gt;新功能&lt;/i&gt;：允许或拒绝每个应用的域。&lt;br/&gt; 3. &lt;i&gt;新功能&lt;/i&gt;：允许或拒绝 &lt;br/&gt; 4. &lt;i&gt;新功能&lt;/i&gt;：绕过每个应用的 DNS 和防火墙规则。&lt;br/&gt; 5. &lt;i&gt;新功能&lt;/i&gt;：数据包捕获（PCAP ).&lt;br/&gt; 6. &lt;i&gt;新功能&lt;/i&gt;：DNS Booster； 合并请求、缓存响应。&lt;br/&gt; 7. &lt;i&gt;新功能&lt;/i&gt;：编辑域和 IP 规则。&lt;br/&gt; 8. 以及其他较小的 UI 更改和错误修复。&lt;br/&gt;&lt;br/ &gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译这个应用程序&lt;/a&gt;</string>
+    <string name="whats_new_version_update">因此应用管理上出现了混乱，如果不是英文则一直不会显示最新版本的内容。请暂将应用语言更换为英文再来看新内容。不便之处，敬请谅解。</string>
     <string name="about_website">访问 rethinkdns.com</string>
     <string name="settings_network_all_networks_desc">启用时， RethinkDNS 将使用所有可用的网络来连接至互联网。若未启用，则将使用 Android 认为<i>活跃</i>的网络。</string>
     <string name="settings_dns_proxy_dialog_app_desc">所选应用将被排除在 VPN 外，以允许其为您转发连接。</string>
@@ -696,10 +696,10 @@
     <string name="firewall_rule_block_ip_desc">一项用户定义的全局防火墙规则拦截了此<i>目标 IP </i><br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。</string>
     <string name="dc_local_block_enabled">已启用</string>
     <string name="rules_load_failure_reload">刷新</string>
-    <string name="hs_btm_sheet_lock_down">无法在 VPN 处于<i>锁定模式</i>时更换模式。轻触以<u>更改 VPN 设置</u>。</string>
+    <string name="hs_btm_sheet_lock_down">无法在 VPN 处于<i>闭关模式</i>时更换模式。轻触以<u>更改 VPN 设置</u>。</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="fapps_filter_parent_installed">已安装</string>
-    <string name="fapps_lockdown_hint">VPN 正处于锁定模式。防火墙将不会遵守收费 / 非收费规则。</string>
+    <string name="fapps_lockdown_hint">VPN 正处于闭关模式。防火墙将不会遵守收费 / 非收费规则。</string>
     <string name="dns_proxy_toast_parameter">DNS 代理</string>
     <string name="update_complete_action_snack">重启</string>
     <string name="firewall_rule_block_unmetered">非收费网络（ WiFi ）</string>
@@ -766,7 +766,7 @@
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有与此应用有联系的日志。</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">继续</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">拦截成人、盗版内容，线上赌博、约会及社交媒体。</string>
-    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">拦截色情软件、间谍软件及恐吓软件。</string>
+    <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">拦截吸睛软件、间谍软件及恐吓软件。</string>
     <string name="private_dns_dialog_heading">关闭私人 DNS</string>
     <string name="private_dns_dialog_desc">Rethink 的 DNS 设置已被 Android 的私人 DNS 覆盖。
 \n
@@ -794,7 +794,7 @@
     <string name="fapps_info_metered_msg">于收费网络（移动数据）放行/拦截。</string>
     <string name="fapps_info_bypass_msg">绕过通用防火墙规则。</string>
     <string name="fapps_info_exclude_msg">于 DNS 与防火墙中排除。</string>
-    <string name="fapps_info_isolate_msg">阻止所有除受信任的 IP 以外。</string>
+    <string name="fapps_info_isolate_msg">除信任 IP 外一概拦截。</string>
     <string name="fapps_bypass_block_dialog_title">绕过应用</string>
     <string name="fapps_bypass_block_dialog_message">是否对<i>已列出</i>应用绕过通用防火墙规则？</string>
     <string name="fapps_unblock_dialog_title">放行应用</string>
@@ -811,17 +811,17 @@
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">启动 Rethink 以继续</string>
     <string name="lbl_all" translatable="true">全部</string>
     <string name="lbl_blocked" translatable="true">拦截</string>
-    <string name="lbl_wildcard" translatable="true">通配符</string>
+    <string name="lbl_wildcard" translatable="true">通配</string>
     <string name="lbl_domain_rules" translatable="true">域名规则</string>
     <string name="lbl_cancel" translatable="true">取消</string>
     <string name="lbl_ip_rules" translatable="true">IP 规则</string>
     <string name="lbl_apply" translatable="true">应用</string>
     <string name="lbl_domain" translatable="true">域名</string>
     <string name="lbl_dismiss" translatable="true">忽略</string>
-    <string name="lbl_allowed" translatable="true">允许</string>
+    <string name="lbl_allowed" translatable="true">放行</string>
     <string name="lbl_action_required" translatable="true">需采取行动</string>
     <string name="lbl_disabled" translatable="true">禁用</string>
-    <string name="cd_no_rules_text" translatable="true">没有域名规则。</string>
+    <string name="cd_no_rules_text" translatable="true">无域名规则。</string>
     <string name="firewall_rule_trusted_domain" translatable="true">信任域名（应用）</string>
     <string name="firewall_rule_block_domain" translatable="true">域名（应用）</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">此连接因此<i>域名</i>被设置为信任域名而被放行。<br/><br/>若需更改，请移步<i>分应用防火墙</i>屏。</string>
@@ -834,11 +834,11 @@
     <string name="settings_pcap_heading" translatable="true">数据包捕获</string>
     <string name="lbl_rules" translatable="true">规则</string>
     <string name="lbl_configure" translatable="true">配置</string>
-    <string name="settings_default_dns_heading" translatable="true">回落 DNS</string>
+    <string name="settings_default_dns_heading" translatable="true">选择回落 DNS</string>
     <string name="lbl_logs" translatable="true">日志</string>
     <string name="bsct_block_domain" translatable="true">对<u>此应用</u>拦截、信任<u>此域名</u></string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">已绕过 DNS 与防火墙规则</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">当前VPN 处于仅 DNS模式或锁定模式运行时无法设置代理。<u>请移步 VPN 设置</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">VPN 处于仅 DNS 或闭关模式时无法设定代理。<u>请移步 VPN 设置</u>。</string>
     <string name="settings_general_customize" translatable="true">自定义</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">关闭（默认）</string>
     <string name="settings_default_dns_desc" translatable="true">在极少数情况下，用户偏好的 DNS 无法确定时，将使用回落 DNS 。</string>
@@ -867,4 +867,5 @@
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器（实验性）</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">合并请求，缓存响应，弹性应对错误</string>
     <string name="ada_app_firewall" translatable="true">防火墙</string>
+    <string name="brbs_backup_restore_desc" translatable="true">无法跨版本跨设备使用</string>
 </resources>

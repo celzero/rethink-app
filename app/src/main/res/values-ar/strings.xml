@@ -34,7 +34,7 @@
     <string name="rt_list_simple_btn_txt">بسيط</string>
     <string name="blocklist_update_check_not_required">قوائم الحظر موجودة بالفعل في أحدث إصدار.</string>
     <string name="settings_notification_desc2">DNS / DNS + جدار الحماية</string>
-    <string name="firewall_rule_block_ip_desc">قاعدة-مستخدم حظرت الـ <i> آي بي الوجهة </i>.<br /><br /> للتغيير غذهب إلى <i> شاشة جدار الحماية </i> الخاص-بالتطبيق.</string>
+    <string name="firewall_rule_block_ip_desc">قاعدة-مستخدم حظرت الـ <i> آي بي الوجهة </i>.<br/><br/> للتغيير غذهب إلى <i> شاشة جدار الحماية </i> الخاص-بالتطبيق.</string>
     <string name="build__flavor_website">موقع الكتروني</string>
     <string name="cd_dialog_title">أضف المجال</string>
     <string name="brbs_backup_dialog_failure_message">تعذر النسخ الاحتياطي. حاول مرة أخرى؟</string>
@@ -106,7 +106,7 @@
     <string name="settings_http_proxy_error_text2">المنفذ غير صالح</string>
     <string name="settings_vpn_heading">vpn</string>
     <string name="about_settings_app_info">معلومات التطبيق</string>
-    <string name="isolate">إغلاق</string>
+    <string name="isolate">عزل</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">تم تمكين نظام dns الخصوصي</string>
     <string name="ctbs_dialog_negative_btn">العودة</string>
     <string name="hsf_whats_new_chip_text">ما الجديد</string>
@@ -252,8 +252,8 @@
     <string name="system_dns_connection_failure">لا يمكن تحديد خادم DNS الحالي</string>
     <string name="firewall_rule_exempt_orbot_setup">إعداد Orbot</string>
     <string name="firewall_rule_no_rule_desc">لا توجد قواعد جدار حماية مطابقة لهذا الاتصال.</string>
-    <string name="firewall_rule_new_app_desc">قام هذا التطبيق بالاتصال للمرة <i> للمرة الأولى </i>. <br /> <br /> للتغيير ، انتقل إلى علامة التبويب <i> يونيفرسال </i>.</string>
-    <string name="firewall_rule_block_app_unmetered_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i> هذا عند محاولة الاتصال على شبكة <i> غير محدودة القياس </i>. <br /> <br /> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
+    <string name="firewall_rule_new_app_desc">قام هذا التطبيق بالاتصال للمرة <i> للمرة الأولى </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> يونيفرسال </i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i> هذا عند محاولة الاتصال على شبكة <i> غير محدودة القياس </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
     <string name="ci_dialog_desc">السماح (تجاوز) أو حظر عنوان IP ، شبكة IP الفرعية (النطاق) ، المنفذ. مثال: 10.10.10.10 ، 10.1.1. * ، 10.2.2 / 24 ، ffff :: / 104 ، [::]: 80 ، *. *: 80</string>
     <string name="notif_download_content_text">التنزيل قيد التقدم …</string>
     <string name="brbs_restore_dialog_positive">استعادة</string>
@@ -267,7 +267,7 @@
     <string name="search_rethinkplus_file_tag"><font size="12"> البحث في قوائم الحظر </font></string>
     <string name="app_mode_firewall">جدار الحماية</string>
     <string name="app_mode_dns_firewall">DNS وجدار الحماية (افتراضي)</string>
-    <string name="whats_dialog_title">ما الجديد في v053l</string>
+    <string name="whats_dialog_title">ما الجديد في v054</string>
     <string name="orbot_stop_dialog_negative">توقف عن Orbot</string>
     <string name="settings_http_proxy_error_text3">اسم المضيف فارغ</string>
     <string name="settings_socks_forwarding_default_desc">قم بإعادة توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
@@ -282,7 +282,7 @@
     <string name="univ_firewall_rule_1">حظر جميع التطبيقات عندما يكون الجهاز مقفلًا</string>
     <string name="fapps_filter_filter_heading">النوع</string>
     <string name="dns_proxy_connection_failure">خطأ في الاتصال بخادم DNS Proxy.</string>
-    <string name="firewall_rule_block_ip_univ_desc">حظرت قاعدة جدار الحماية التي وضعها المستخدم <i> الوجهة IP / المنفذ </i>. <br /> <br /> للتغيير ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
+    <string name="firewall_rule_block_ip_univ_desc">حظرت قاعدة جدار الحماية التي وضعها المستخدم <i> الوجهة IP / المنفذ </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="cd_remove_dialog_title">هل تريد حذف المجال؟</string>
     <string name="ada_app_status_unknown">غير معروف</string>
     <string name="bsdl_blocked_desc">تم حظر %1$s بواسطة %2$s</string>
@@ -463,7 +463,7 @@
     <string name="univ_ip_delete_toast_success">تم حذف جميع قواعد IP.</string>
     <string name="accessibility_failure_toast">توقفت خدمة إمكانية الوصول RethinkDNS أو تعطلت. لم يعد يحظر التطبيقات التي تعمل في الخلفية.</string>
     <string name="firewall_rule_isolate">تأمين (التطبيق)</string>
-    <string name="firewall_rule_block_app_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i>. <br /> <br /> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
+    <string name="firewall_rule_block_app_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
     <string name="new_app_bulk_notification_title">انتباه</string>
     <string name="cd_dialog_error_invalid_wildcard">بدل غير صالح.</string>
     <string name="brbs_backup_dialog_failure_positive">أعد محاولة النسخ الاحتياطي</string>
@@ -523,7 +523,7 @@
     <string name="fapps_firewall_filter_desc">إظهار تطبيقات <u> %1$s </u> %2$s</string>
     <string name="rules_load_failure_desc">لم يتم العثور على قواعد جدار الحماية</string>
     <string name="other_dns_list_tab3">وكيل DNS</string>
-    <string name="firewall_rule_block_app_mobile_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i> هذا عند محاولة الاتصال على شبكة <i> Metered </i>. <br /> <br /> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
+    <string name="firewall_rule_block_app_mobile_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم تطبيق <i> </i> هذا عند محاولة الاتصال على شبكة <i> Metered </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
     <string name="bsrf_sub_group_heading">المجموعة الفرعية</string>
     <string name="lbbs_configure">الضبط</string>
     <string name="brbs_title">النسخ الاحتياطي والاستعادة</string>
@@ -572,7 +572,7 @@
     <string name="fapps_filter_clear_btn">امسح</string>
     <string name="cd_doh_dialog_heading">أضف DNS عبر HTTPS</string>
     <string name="ctbs_app_info_not_available_toast">صفحة إعدادات التطبيق غير موجودة</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">حظرت قاعدة جدار الحماية الشاملة من قِبل المستخدم هذا التطبيق <i> </i> عند محاولة الاتصال على شبكة <i> Metered </i> (Mobile). <br /> <br /> للتغيير انتقل إلى <i> يونيفرسال </i> التبويب.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">حظرت قاعدة جدار الحماية الشاملة من قِبل المستخدم هذا التطبيق <i> </i> عند محاولة الاتصال على شبكة <i> Metered </i> (Mobile). <br/> <br/> للتغيير انتقل إلى <i> يونيفرسال </i> التبويب.</string>
     <string name="ci_no_rule_initial">ش</string>
     <string name="ada_app_metered">مقننة</string>
     <string name="univ_delete_firewall_dialog_message">سيسمح حذف هذه القواعد لأي تطبيق بالاتصال بعناوين IP المحظورة حاليًا.</string>
@@ -587,23 +587,23 @@
 \n2. تم تمكين إعداد <i> استخدام كافة الشبكات المتاحة </i>.</string>
     <string name="fapps_all_network_hint"><u> استخدام جميع الشبكات </u> ممكّن. لن يلتزم جدار الحماية بالقواعد المقننة / غير المقاسة.</string>
     <string name="firewall_rule_block_app_new_install">تطبيق جديد</string>
-    <string name="firewall_rule_device_lock_desc">تم حظر هذا الاتصال بسبب قفل جهاز <i> </i> في ذلك الوقت. <br /> <br /> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
-    <string name="firewall_rule_unknown_desc">تم جدار حماية هذا الاتصال لأنه تعذر تحديد التطبيق المصدر <i> </i>. <br /> <br /> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
+    <string name="firewall_rule_device_lock_desc">تم حظر هذا الاتصال بسبب قفل جهاز <i> </i> في ذلك الوقت. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
+    <string name="firewall_rule_unknown_desc">تم جدار حماية هذا الاتصال لأنه تعذر تحديد التطبيق المصدر <i> </i>. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">اتصال نظام أسماء النطاقات هذا تم توكيله وإعادة توجيه إلى نقطة نهاية نظام أسماء النطاقات المفضلة لدى المستخدم.&lt;br/&gt;&lt;br/&gt; للتغيير وقف &lt;i&gt; منع تسرب نظام أسماء النطاقات&lt;/i&gt; من شاشة تكوين نظام أسماء النطاقات&lt;i&gt;.</string>
-    <string name="firewall_rule_isolate_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم اتصال تطبيق <i> </i> هذا بخلاف <i> عناوين IP التي تم تجاوزها </i>. <br /> <br /> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">تم السماح بهذا الاتصال لأن التطبيق المصدر <i> </i> مضبوط على <i> تجاوز قواعد جدار الحماية العامة </i>. <br /> <br /> للتغيير انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
+    <string name="firewall_rule_isolate_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم اتصال تطبيق <i> </i> هذا بخلاف <i> عناوين IP التي تم تجاوزها </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> جميع التطبيقات </i>.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">تم السماح بهذا الاتصال لأن التطبيق المصدر <i> </i> مضبوط على <i> تجاوز قواعد جدار الحماية العامة </i>. <br/> <br/> للتغيير انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">تم السماح بهذا الاتصال لأن تهيئة <i>Tor-as-a-proxy بنقرة واحدة</i> من خلال Orbot كانت جارية.</string>
-    <string name="firewall_rule_block_http_desc">تم حظر هذا الاتصال لأنه من المحتمل أنه استخدم <i> HTTP غير آمن </i>. <br /> <br /> للتغيير انتقل إلى علامة التبويب <i> العالمي </i>.</string>
+    <string name="firewall_rule_block_http_desc">تم حظر هذا الاتصال لأنه من المحتمل أنه استخدم <i> HTTP غير آمن </i>. <br/> <br/> للتغيير انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="new_app_notification_action_toast_allow">الاتصال بالشبكة مسموح به للتطبيق</string>
     <string name="notif_dialog_pause_dialog_message">التطبيق في حالة الإيقاف المؤقت ، استأنف للمتابعة</string>
     <string name="notif_dialog_pause_dialog_positive">إستئناف</string>
-    <string name="firewall_rule_trusted_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين عنوان IP الوجهة <i> </i> لتجاوز جميع القواعد الخاصة بالتطبيق. <br /> <br /> للتغيير ، انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">تم حظر هذا الاتصال لأن التطبيق المصدر <i> </i> تجاوز DNS المفضل للمستخدم <br /> <br /> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
-    <string name="firewall_rule_global_lockdown_desc">تم حظر هذا الاتصال بسبب تعيين القفل العام. <br /> <br /> للتغيير انتقل إلى علامة التبويب <i> العالمي </i>.</string>
-    <string name="firewall_rule_block_udp_ntp_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم هذا الاتصال <i> UDP </i>. <br /> <br /> للتغيير ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
+    <string name="firewall_rule_trusted_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين عنوان IP الوجهة <i> </i> لتجاوز جميع القواعد الخاصة بالتطبيق. <br/> <br/> للتغيير ، انتقل إلى شاشة جدار الحماية <i> الخاصة بالتطبيق </i>.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">تم حظر هذا الاتصال لأن التطبيق المصدر <i> </i> تجاوز DNS المفضل للمستخدم <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">تم حظر هذا الاتصال بسبب تعيين القفل العام. <br/> <br/> للتغيير انتقل إلى علامة التبويب <i> العالمي </i>.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">حظرت قاعدة جدار الحماية التي حددها المستخدم هذا الاتصال <i> UDP </i>. <br/> <br/> للتغيير ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="ci_no_rules_text">لم يتم العثور على قواعد آي بي أو منفذ.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين <i>عنوان IP للوجهة</i> لتجاوز جميع قواعد جدار الحماية العالمية. <br /> <br /> للتغيير ، انتقل إلى <i>قواعد IP</i> في <i> عالمي </i> علامة التبويب.</string>
-    <string name="firewall_rule_foreground_desc">تم حظر جدار الحماية هذا الاتصال لأن التطبيق المصدر لم يكن <i> في المقدمة </i>. <br /> <br /> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> يونيفرسال </i>.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc">تم السماح بهذا الاتصال لأنه تم تعيين <i>عنوان IP للوجهة</i> لتجاوز جميع قواعد جدار الحماية العالمية. <br/> <br/> للتغيير ، انتقل إلى <i>قواعد IP</i> في <i> عالمي </i> علامة التبويب.</string>
+    <string name="firewall_rule_foreground_desc">تم حظر جدار الحماية هذا الاتصال لأن التطبيق المصدر لم يكن <i> في المقدمة </i>. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> يونيفرسال </i>.</string>
     <string name="cd_dialog_desc">عنوان URL مخصص (المجال) أو حرف بدل للسماح أو حظر. على سبيل المثال ، * .test.com ، test.com/test</string>
     <string name="ada_noapp_dialog_message">لم يتم العثور على معلومات التطبيق للتطبيق المحدد.</string>
     <string name="ada_noapp_dialog_positive">حسنًا</string>
@@ -666,7 +666,7 @@
     <string name="orbot_bs_status_2">تم تعيين وكيل HTTP (قد تتجاهله التطبيقات).</string>
     <string name="whats_new_version_update">&lt;b&gt;متعدد اللغات!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. إعادة دعم Android 6.&lt;br/&gt;2. تجديد RDNS + UI.&lt;br/&gt; 3. تجديد محرك الشبكة وجدار الحماية.&lt;br/&gt; 4. &lt;i&gt;ميزة جديدة&lt;/i&gt;: الترجمة لأكثر من 15 لغة&lt;br/&gt; 5. &lt;i&gt;ميزة جديدة&lt;/i&gt;: ايقونات متكيفة&lt;br/&gt; 6. &lt;i&gt;ميزة جديدة&lt;/i&gt;: إظهار أسماء النطاقات في سجلات شبكة التطبيق.&lt;br/&gt; 7. إصلاح الاشعارات المفقودة في Android 13.&lt;br/&gt; 8. إصلاح سلوك Orbot DNS المتضمن.&lt;br/&gt; 9. شاشة التطبيقات متاحة الآن في نمط DNS-only.&lt;br/&gt; 10. تحسينات كبيرة على مدير التنزيل المدمج.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;ساعدنا في ترجمة هذا التطبيق&lt;/a&gt;</string>
     <string name="bsct_block_ip">حظر ، تجاوز <u> عنوان IP هذا </u> لـ <u> هذا التطبيق </u></string>
-    <string name="bsct_block">حظر ، تجاوز ، استبعاد ، تأمين <u> هذا التطبيق </u></string>
+    <string name="bsct_block">حظر ، تجاوز ، استبعاد ، عزل <u> هذا التطبيق </u></string>
     <string name="orbot_both_desc">كل ما ورداعلاه.</string>
     <string name="orbot_stop_dialog_message">توقف RethinkDNS عن إعادة توجيه الاتصالات إلى Orbot ، ولكن ربما يعمل Orbot في الخلفية.</string>
     <string name="cd_dns_crypt_dialog_name">الاسم</string>
@@ -784,4 +784,32 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">حظر البرامج الضارة وبرامج الفدية وبرامج التشفير والمخادعين والتهديدات الأخرى.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">حظر مواقع البالغين والمحتوى المقرصن، مواقع المقامرة عبر الإنترنت والمواعدة، ووسائل التواصل الاجتماعي.</string>
     <string name="title_statistics">احصائيات</string>
+    <string name="lbl_rules" translatable="true">قواعد</string>
+    <string name="lbl_configure" translatable="true">تكوين</string>
+    <string name="lbl_domain_rules" translatable="true">قواعد النطاقات</string>
+    <string name="bypass_dns_firewall" translatable="true">تجاوزDNS وجدار الحماية</string>
+    <string name="bsct_block_domain" translatable="true">حظر ، تجاوز <u> النطاقات </u> من أجل <u> هذا التطبيق </u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">لا يمكن إعداد البروكسي عند تشغيل VPN في وضع DNS فقط أو وضع الإغلاق. <u> انتقل إلى إعدادات VPN </u></string>
+    <string name="settings_general_customize" translatable="true">تخصيص</string>
+    <string name="settings_locale_heading" translatable="true">غير اللغة</string>
+    <string name="settings_locale_desc" translatable="true">اختر لغتك المفضلة</string>
+    <string name="settings_locale_dialog_title" translatable="true">اختر لغتك المفضلة</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">ساعد في ترجمة هذا التطبيق</string>
+    <string name="settings_biometeric_heading" translatable="true">تفعيل قفل التطبيق</string>
+    <string name="settings_biometric_desc" translatable="true">قم بتأمين هذا التطبيق باستخدام قفل الشاشة</string>
+    <string name="lbl_logs" translatable="true">السجلات</string>
+    <string name="settings_default_dns_heading" translatable="true">أختر DNS الاحتياطي</string>
+    <string name="settings_pcap_heading" translatable="true">التقاط الحزم</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">معطل (إفتراضي)</string>
+    <string name="lbl_cancel" translatable="true">إلغاء</string>
+    <string name="lbl_apply" translatable="true">تطبيق</string>
+    <string name="lbl_all" translatable="true">جميع</string>
+    <string name="lbl_dismiss" translatable="true">رفض</string>
+    <string name="lbl_allowed" translatable="true">مسموح</string>
+    <string name="lbl_blocked" translatable="true">محظور</string>
+    <string name="lbl_disabled" translatable="true">معطل</string>
+    <string name="lbl_domain" translatable="true">نطاق</string>
+    <string name="lbl_action_required" translatable="true">الإجراء مطلوب</string>
+    <string name="lbl_ip_rules" translatable="true">قواعد IP</string>
 </resources>
