@@ -303,8 +303,8 @@
     <string name="always_on_dialog_stop_message">A VPN sempre ligada está ativada para Rethink app. Tem certeza que quer parar Rethink mesmo assim\?</string>
     <string name="always_on_dialog_positive">Parar</string>
     <string name="always_on_dialog_neutral">Configurações</string>
-    <string name="firewall_act_universal_tab">Universal</string>
-    <string name="firewall_act_network_monitor_tab">Registros da rede</string>
+    <string name="firewall_act_universal_tab">universal</string>
+    <string name="firewall_act_network_monitor_tab">Rede</string>
     <string name="dns_act_configure_tab">Configurar</string>
     <string name="univ_firewall_dialog_title">Apagar a regra do IP\?</string>
     <string name="univ_firewall_dialog_message">Ao apagar esta regra você permitiria a qualquer aplicativo conexão com este IP. Você quer continuar\?</string>
@@ -789,4 +789,8 @@
     <string name="lbl_domain" translatable="true">Domínio</string>
     <string name="lbl_wildcard" translatable="true">Curinga</string>
     <string name="lbl_dismiss" translatable="true">Dispensar</string>
+    <string name="lbl_configure" translatable="true">Configure</string>
+    <string name="lbl_rules" translatable="true">regras</string>
+    <string name="settings_locale_desc" translatable="true">Escolha o seu idioma preferido</string>
+    <string name="settings_locale_dialog_neutral" translatable="true">Ajude a traduzir este aplicativo</string>
 </resources>

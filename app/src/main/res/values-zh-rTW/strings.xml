@@ -843,7 +843,7 @@
     <string name="settings_pcap_dialog_option_1" translatable="true">關閉（默認）</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">已繞行應用</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">此連線因<i>網域</i>被通用網域規則信任而被放行。<br/><br/>若需變更此行爲，請移步 <i>DNS 配置</i>選項卡。</string>
-    <string name="settings_default_dns_heading" translatable="true">後備 DNS</string>
+    <string name="settings_default_dns_heading" translatable="true">選擇後備 DNS</string>
     <string name="settings_pcap_heading" translatable="true">資料包捕獲</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">輸出至 Logcat</string>
@@ -867,4 +867,5 @@
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器（實驗性）</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">合併請求、快取應答、彈性應對錯誤</string>
     <string name="ada_app_firewall" translatable="true">防火牆</string>
+    <string name="brbs_backup_restore_desc" translatable="true">無法跨版本跨設備使用</string>
 </resources>

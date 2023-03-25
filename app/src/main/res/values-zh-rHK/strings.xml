@@ -197,7 +197,7 @@
     <string name="settings_ptrans_desc">喺本地將出站嘅 IPv6 流量轉換做 IPv4 流量。在您連線到只有 IPv4 嘅網絡時用。</string>
     <string name="settings_allow_bypass_heading">允許繞行</string>
     <string name="settings_allow_bypass_desc">允許一啲 app 喺問過之後繞過 RethinkDNS 嘅防火牆。一啲例如 Zoom 同 Whatsapp 嘅音訊／視訊會議應用程式可能會需要呢個功能嚟正常運行。</string>
-    <string name="settings_lock_down_mode_desc">當 VPN 喺閉關模式時，冇得允許繞行。<u>請移步 VPN 設定</u>。</string>
+    <string name="settings_lock_down_mode_desc">當 VPN 喺閉關模式時，冇得允許繞行。<u>請去 VPN 設定</u>。</string>
     <string name="settings_proxy_header">代理</string>
     <string name="settings_socks5_heading">設定 SOCKS5 代理</string>
     <string name="settings_socks5_desc">將連線轉發去 SOCKS5 端點。</string>
@@ -787,20 +787,20 @@
     <string name="fapps_info_isolate_msg">除信任嘅 IP 之外一律攔截。</string>
     <string name="fapps_unblock_dialog_title">准許應用程式</string>
     <string name="fapps_exclude_block_dialog_title">被排除嘅應用程式</string>
-    <string name="fapps_exclude_block_dialog_message">由 DNS 同防火牆排除<i>列出嘅</i>應用程式？</string>
+    <string name="fapps_exclude_block_dialog_message">係咪由 DNS 同防火牆排除<i>列出嘅</i>應用程式？</string>
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">連線最多嘅網域</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">連線最多嘅 IP</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">攔截最多嘅 IP</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app">啓動 Rethink 以繼續</string>
     <string name="ssv_see_more">顯示所有</string>
-    <string name="fapps_unblock_dialog_message">對<i>列出嘅</i>應用程式准許連接？</string>
+    <string name="fapps_unblock_dialog_message">係咪放行來自<i>列出嘅</i>應用程式嘅連接？</string>
     <string name="fapps_info_unmetered_msg">喺唔收錢嘅網絡（WiFi）放行／攔截。</string>
     <string name="title_statistics">統計</string>
     <string name="hs_biometeric_title">解鎖 Rethink</string>
     <string name="fapps_bypass_block_dialog_title">繞行應用程式</string>
     <string name="settings_locale_dialog_title">揀您嘅語言</string>
     <string name="hs_biometeric_feature_not_supported">呢部設備唔支持或者禁用咗生物認證</string>
-    <string name="fapps_bypass_block_dialog_message">對<i>列出嘅</i>應用程式繞過全局防火牆規則？</string>
+    <string name="fapps_bypass_block_dialog_message">係咪對<i>列出嘅</i>應用程式繞過全局防火牆規則？</string>
     <string name="fapps_info_exclude_msg">由 DNS 同防火牆排除。</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">放行最多嘅應用程式</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">攔截最多嘅應用程式</string>
@@ -824,25 +824,25 @@
     <string name="lbl_ip_rules" translatable="true">IP 規則</string>
     <string name="firewall_rule_trusted_domain" translatable="true">信任網域（應用程式）</string>
     <string name="firewall_rule_block_domain" translatable="true">網域（應用程式）</string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">此連線因此<i>網域</i> 被設定爲信任網域而被放行。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">呢個連線因爲呢個<i>網域</i>被設定咗做信任嘅網域而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
     <string name="bsdl_block_desc" translatable="true">攔截、信任<u>呢個網域</u></string>
-    <string name="settings_default_dns_heading" translatable="true">後備 DNS</string>
-    <string name="settings_default_dns_desc" translatable="true">在極少數情況下，用戶偏好的 DNS 無法確定時，將使用後備 DNS 。</string>
+    <string name="settings_default_dns_heading" translatable="true">揀後備 DNS</string>
+    <string name="settings_default_dns_desc" translatable="true">喺極少數情況下，當確定唔到用戶偏好嘅 DNS 時，將會攞後備 DNS 嚟用。</string>
     <string name="settings_pcap_heading" translatable="true">資料包捕獲</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">輸出到下載資料夾</string>
-    <string name="pcap_failure_toast" translatable="true">創建 PCAP 檔時出錯，請重試！</string>
+    <string name="pcap_failure_toast" translatable="true">創建 PCAP 檔時出錯，請再試過！</string>
     <string name="rules_card_domain_count" translatable="true">%1$s 條網域規則</string>
     <string name="logs_card_network_count" translatable="true">%1$s 個連線</string>
     <string name="cd_dns_alg_heading" translatable="true">進階 DNS 過濾（實驗性）</string>
     <string name="cd_dns_alg_desc" translatable="true">只喺應用連線時套用應用程式規則</string>
-    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">是否爲<i>已列出</i>的應用繞行通用 DNS 與防火牆規則？</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">係咪爲<i>呢度列出嘅</i>應用程式繞行通用 DNS 同防火牆規則？</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS 攔截咗</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">繞過 DNS 同防火牆</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器（實驗性）</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">合併請求、快取應答、彈性應對錯誤</string>
     <string name="bypass_dns_firewall" translatable="true">繞行 DNS 同防火牆</string>
     <string name="lbl_rules" translatable="true">規則</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">VPN 處於僅 DNS 或閉關模式時無法設定代理。<u>請移步 VPN 設定</u>。</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">當 VPN 喺僅 DNS 或者閉關模式時，冇得設定代理。<u>請去 VPN 設定</u>。</string>
     <string name="settings_general_customize" translatable="true">自訂</string>
     <string name="lbl_configure" translatable="true">配置</string>
     <string name="lbl_logs" translatable="true">日誌</string>
@@ -862,4 +862,9 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">將會繞過通用 DNS 同防火牆規則</string>
     <string name="dc_refresh_toast" translatable="true">DNS 刷新完</string>
     <string name="ada_app_firewall" translatable="true">防火牆</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">呢個連線因爲<i>網域</i>被通用網域規則信任而被放行。<br/><br/>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">呢個連線因爲<i>來源應用程式</i>嘅<i>繞行 DNS 同防火牆</i>規則而被放行。<br/><br/>如果要改，請去<i>分應用防火牆</i>區。</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">呢個連線因爲<i>網域</i>被用戶偏好嘅 DNS 攔截咗。<br/><br/>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">呢個連線因爲<i>網域</i>被通用網域規則攔截而攔截咗。<br/><br/>如果要改呢個行爲，請去 <i>DNS 配置</i>選項卡。</string>
+    <string name="brbs_backup_restore_desc" translatable="true">冇得跨版本跨設備用</string>
 </resources>

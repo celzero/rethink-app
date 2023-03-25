@@ -11,12 +11,12 @@
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: RethinkDNS wurde deaktiviert</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
     <string name="universal_firewall_explanation">Anwendung von Firewall-Regeln auf alle Anwendungen auf der Grundlage von Geräteereignissen, z. B. Firewall, wenn das Gerät gesperrt ist oder wenn eine bestimmte Anwendung nicht verwendet wird.</string>
-    <string name="accessibility_service_description">RethinkDNS verwendet den VPN-Dienst, um Hintergrundanwendungen zu erkennen und abzuwehren. RethinkDNS sammelt oder verkauft keine Informationen.</string>
+    <string name="accessibility_service_description">Rethink verwendet den VPN-Dienst, um Hintergrundanwendungen zu erkennen und abzuwehren. Rethink sammelt oder verkauft keine Informationen.</string>
     <string name="next">Nächste</string>
     <string name="skip">Überspringen</string>
     <string name="finish">Fertig</string>
-    <string name="slide_2_desc">Als Firewall-App ist RethinkDNS der einfachste Weg, um Netzwerkaktivitäten zu überwachen und Internetzensur auf Ihrem Android-Gerät zu umgehen.</string>
-    <string name="slide_1_desc">RethinkDNS ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm unterstützt wird.</string>
+    <string name="slide_2_desc">Rethink ist der einfachste Weg, um Netzwerkaktivitäten zu überwachen, die Internetzensur zu umgehen und Firewall-Apps auf Ihrem Android-Gerät zu installieren.</string>
+    <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm unterstützt wird.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">blockiert</string>
     <string name="untracked">nicht verfolgt</string>
@@ -77,7 +77,7 @@
     <string name="always_on_dialog_stop_message">Always-on VPN ist für Rethink aktiviert. Sind Sie sicher, dass Sie Rethink trotzdem beenden wollen\?</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS führt VPN im <i>Sperr-</i> Modus aus. Ein Beenden würde zum Verlust der Internetverbindung für dieses Benutzerprofil führen. Möchten Sie trotzdem fortfahren\?</string>
     <string name="always_on_dialog_positive">Beenden</string>
-    <string name="firewall_act_network_monitor_tab">Netzwerk-Protokolle</string>
+    <string name="firewall_act_network_monitor_tab">Netzwerk</string>
     <string name="dns_act_configure_tab">Konfigurieren</string>
     <string name="doh_custom_url_remove_dialog_title">DoH-Endpunkt löschen\?</string>
     <string name="doh_custom_url_remove_dialog_message">Löschen Sie den Endpunkt DNS über Https aus der gespeicherten Konfiguration.</string>
@@ -119,7 +119,7 @@
 \nUm Rethink\'s DNS zu verwenden, gehen Sie zu den Android-Einstellungen und deaktivieren Sie \"Private DNS\".</string>
     <string name="dns_crypt_relay_remove_dialog_message">Löschen Sie das DNSCrypt-Relais aus der gespeicherten Konfiguration.</string>
     <string name="local_blocklist_download">Blocklisten herunterladen</string>
-    <string name="settings_lock_down_mode_desc">Kann keine Umgehung zulassen oder Proxys einrichten, wenn VPN im Lockdown-Modus läuft. <u>Gehen Sie zu den VPN-Einstellungen</u>.</string>
+    <string name="settings_lock_down_mode_desc">Kann keine Umgehung zulasse, wenn VPN im Lockdown-Modus läuft. <u>Gehen Sie zu den VPN-Einstellungen</u>.</string>
     <string name="local_blocklist_redownload">Aktuell!</string>
     <string name="blocklist_update_check_not_required">Die Blocklisten sind bereits auf dem neuesten Stand.</string>
     <string name="local_blocklist_redownload_desc">Die geräteinternen Blocklisten sind bereits auf dem neuesten Stand (%1$s).</string>
@@ -161,7 +161,7 @@
     <string name="search_custom_domains"><font size="12">Domänennamen suchen</font></string>
     <string name="search_rethinkplus_file_tag"><font size="12">Suche in Blocklisten</font></string>
     <string name="app_mode_choose">Modus wählen</string>
-    <string name="whats_dialog_title">Was ist neu in v053n</string>
+    <string name="whats_dialog_title">Was ist neu in v054</string>
     <string name="whats_new_version_update"><b>Maximale Anstrengung</b>
 \n
 \n 1. Einführung eines privateren Rethink-Resolvers, <i>Max</i>.
@@ -361,11 +361,11 @@
     <string name="settings_all_networks_dialog_positive_btn">Trotzdem aktivieren</string>
     <string name="settings_check_update_desc">Einmal pro Woche automatisch nach App-Updates suchen.</string>
     <string name="settings_check_update_heading">Nach App-Updates suchen</string>
-    <string name="settings_custom_downloader_desc">Wenn diese Funktion deaktiviert ist, wird der in Android integrierte <i>Download Manager</i> verwendet.</string>
+    <string name="settings_custom_downloader_desc">Wenn deaktiviert, wird der in Android integrierte <i>Download Manager</i> verwendet</string>
     <string name="settings_import_export_heading">Sichern und Wiederherstellen</string>
     <string name="bypass_universal">Universelle Umgehung</string>
     <string name="alert_firewall_accessibility_exception">Öffnen der Zugänglichkeitseinstellungen fehlgeschlagen. Versuchen Sie es später noch einmal!</string>
-    <string name="firewall_act_universal_tab">Universell</string>
+    <string name="firewall_act_universal_tab">universell</string>
     <string name="new_app_bulk_notification_title">Achtung</string>
     <string name="notif_channel_download">Download Warnung</string>
     <string name="notif_channel_desc_vpn_notification">Informieren, wenn RethinkDNS aktiv ist und im Hintergrund läuft</string>
@@ -391,7 +391,7 @@
     <string name="ci_dialog_error_invalid_ip">Ungültige IP-Adresse, Subnetz oder Port.</string>
     <string name="ci_dialog_added_success">IP der Liste hinzugefügt</string>
     <string name="ci_header">IP- &amp; Port-Regeln: %1$s</string>
-    <string name="ci_no_rules_text">Keine universellen IP-Blockierungs- oder Umgehungsregeln gefunden.</string>
+    <string name="ci_no_rules_text">Keine IP- oder Port-Regeln.</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">universelle Umgehung</string>
     <string name="ci_no_rule_initial">N</string>
@@ -533,10 +533,7 @@
     <string name="hsf_vpn_dialog_message">RethinkDNS benötigt die Erlaubnis, ein lokales VPN einzurichten, um die DNS-Anfragen des Geräts zu verschlüsseln, eine Netzwerküberwachung zu implementieren und Firewall-Regeln durchzusetzen.
 \n
 \nRethinkDNS sammelt keine Informationen und spioniert Sie in keiner Weise aus.</string>
-    <string name="firewall_card_text_active">%1$s blockiert
-\n%2$s umgangen
-\n%3$s ausgeschlossen
-\n%4$s isoliert</string>
+    <string name="firewall_card_text_active">%1$s blockiert, %2$s umgangen, %3$s ausgeschlossen, %4$s isoliert</string>
     <string name="firewall_card_text_inactive">Aktivieren Sie den Firewall-Modus.</string>
     <string name="dns_card_latency_active">Latenzzeit: %1$sms</string>
     <string name="hsf_vpn_dialog_header">Achtung!</string>
@@ -692,7 +689,7 @@
     <string name="univ_firewall_rule_8">Blockiere Port 80 (unsicherer HTTP) Verkehr</string>
     <string name="univ_firewall_rule_9">Blockiere mit Mobilendaten</string>
     <string name="univ_firewall_rule_10">Blockiere alles außer umgehende Apps und IPs</string>
-    <string name="univ_view_blocked_ip">IP- und Port-Regeln</string>
+    <string name="univ_view_blocked_ip">IP- &amp; Port-Regeln</string>
     <string name="cd_dns_proxy_error_text_3">Ungültiger Port</string>
     <string name="about_bug_report_desc">E-Mail-Absturzprotokolle</string>
     <string name="contributors_list">Das &lt;i&gt;Rethink Open Source Project&lt;/i&gt; verdankt seine Existenz den Freiwilligen die zahllose Stunden in die Entwicklung der APP gesteckt haben.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
@@ -716,7 +713,7 @@
     <string name="fapps_unmetered_block_dialog_message">Blockieren Sie Verbindungen im nicht gebührenpflichtigen Netzwerk (WiFi) für die auf <i>aufgeführten</i> Apps\?</string>
     <string name="fapps_unmetered_unblock_dialog_message">Erlauben Sie Verbindungen in einem nicht gebührenpflichtigen (WiFi-)Netzwerk für die auf <i>aufgelisteten Anwendungen</i>\?</string>
     <string name="fapps_metered_block_dialog_title">Sperre bei kostenpflichtigen</string>
-    <string name="fapps_firewall_filter_hint">Regeln auf aufgelistete Apps anwenden</string>
+    <string name="fapps_firewall_filter_hint">Alle Apps anzeigen</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_heading">Anmerkung</string>
@@ -798,7 +795,7 @@
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">meisterlaubte Apps</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">meistkontaktierte IPs</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">meistblockierte IPs</string>
-    <string name="ssv_see_more">alle anzeigen</string>
+    <string name="ssv_see_more">Alle anzeigen</string>
     <string name="fapps_bypass_block_dialog_message">Universelle Firewall-Regeln für <i>aufgelistete</i> Apps umgehen\?</string>
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">meistkontaktierte Domains</string>
     <string name="settings_locale_desc">Wählen Sie Ihre bevorzugte Sprache</string>
@@ -836,7 +833,33 @@
     <string name="lbl_ip_rules" translatable="true">Regeln IP</string>
     <string name="lbl_domain_rules" translatable="true">Domain-Regeln</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Zulassen auf nicht getakteten Verbindung</string>
-    <string name="firewall_rule_trusted_domain" translatable="true">Domain (App)</string>
-    <string name="cd_no_rules_text" translatable="true">Keine Domain Regeln gefunden.</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Vertrauenswürdige Domäne (App)</string>
+    <string name="cd_no_rules_text" translatable="true">Keine Domain-Regeln.</string>
     <string name="bsdl_block_desc" translatable="true">Blockieren, <u>dieser Domäne</u> vertrauen</string>
+    <string name="bypass_dns_firewall" translatable="true">DNS &amp; Firewall umgehen</string>
+    <string name="settings_general_customize" translatable="true">anpassen</string>
+    <string name="settings_default_dns_heading" translatable="true">Ausweich-DNS</string>
+    <string name="settings_pcap_heading" translatable="true">Paketerfassung</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s universelle Regel(n)</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s Abfragen</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Paketerfassung aktiv</string>
+    <string name="cd_dns_alg_heading" translatable="true">Erweiterte DNS-Filterung (experimentell)</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Apps umgehen</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS blockiert</string>
+    <string name="lbl_configure" translatable="true">Konfigurieren</string>
+    <string name="lbl_rules" translatable="true">Regeln</string>
+    <string name="lbl_logs" translatable="true">Protokolle</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">Ausgabe in den Ordner Downloads</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Aus (Standard)</string>
+    <string name="logs_card_network_count" translatable="true">%1$s Verbindungen</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">Umgangene App</string>
+    <string name="ada_app_firewall" translatable="true">Firewall</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Ausgabe an Logcat</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">umgeht DNS- und Firewall-Regeln</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Paketerfassung deaktiviert</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">DNS-Verstärker (experimentell)</string>
+    <string name="dc_refresh_toast" translatable="true">DNS-Aktualisierung abgeschlossen</string>
+    <string name="pcap_failure_toast" translatable="true">Fehler beim Erstellen der pcap-Datei, versuchen Sie es erneut!</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Funktioniert nicht über App-Versionen oder Geräte hinweg</string>
 </resources>
