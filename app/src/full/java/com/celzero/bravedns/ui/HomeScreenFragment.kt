@@ -793,7 +793,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return true
         }
 
-        if (VpnController.isAlwaysOn(requireContext())) {
+        // if always on is enabled and vpn is activated, show the dialog to stop the vpn #799
+        if (VpnController.isAlwaysOn(requireContext()) && isVpnActivated) {
             showAlwaysOnStopDialog()
             return true
         }
