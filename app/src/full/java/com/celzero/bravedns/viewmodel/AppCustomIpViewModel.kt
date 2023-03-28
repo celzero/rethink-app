@@ -34,7 +34,7 @@ class AppCustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
     }
 
     val customIpDetails =
-        Transformations.switchMap(filteredList) { input ->
+        filteredList.switchMap { input ->
             if (input.isNullOrBlank()) {
                 Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                         customIpDao.getAppWiseCustomIp(uid)

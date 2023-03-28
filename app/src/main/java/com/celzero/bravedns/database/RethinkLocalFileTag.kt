@@ -78,12 +78,9 @@ class RethinkLocalFileTag {
         this.isSelected = isSelected
     }
 
-    constructor()
-
-    fun fromContentValues(values: ContentValues?): RethinkLocalFileTag? {
-        if (values == null) return null
-        val a = values.valueSet()
-        a.forEach {
+    constructor(values: ContentValues?) {
+        val a = values?.valueSet()
+        a?.forEach {
             when (it.key) {
                 "value" -> value = it.value as Int
                 "uname" -> uname = it.value as String
@@ -117,19 +114,5 @@ class RethinkLocalFileTag {
                 }
             }
         }
-        return RethinkLocalFileTag(
-            value,
-            uname,
-            vname,
-            group,
-            subg,
-            pack,
-            level,
-            url,
-            show,
-            entries,
-            simpleTagId,
-            isSelected
-        )
     }
 }

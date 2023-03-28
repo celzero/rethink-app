@@ -31,7 +31,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
         filteredList.value = ""
     }
 
-    val dnsLogsList = Transformations.switchMap(filteredList) { input -> fetchDnsLogs(input) }
+    val dnsLogsList = filteredList.switchMap { input -> fetchDnsLogs(input) }
 
     private fun fetchDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return when (filterType) {

@@ -294,6 +294,18 @@ object Utilities {
         return vpnService?.isLockdownEnabled == true
     }
 
+     fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
+            try {
+                val toast = Toast.makeText(context, message, toastLength).show()
+            } catch (e: IllegalStateException) {
+                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            } catch (e: IllegalAccessException) {
+                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            } catch (e: IOException) {
+                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            }
+        }
+
     fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
         var metadata: PackageInfo? = null
 

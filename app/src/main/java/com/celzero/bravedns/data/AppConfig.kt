@@ -488,7 +488,7 @@ internal constructor(
         }
     }
 
-    suspend fun changeBraveMode(braveMode: Int) {
+    fun changeBraveMode(braveMode: Int) {
         persistentState.braveMode = braveMode
         braveModeObserver.postValue(braveMode)
         setDnsMode()
@@ -689,7 +689,7 @@ internal constructor(
         onDnsChange(DnsType.NETWORK_DNS)
     }
 
-    suspend fun updateSystemDnsServers(dnsServers: List<InetAddress>) {
+    fun updateSystemDnsServers(dnsServers: List<InetAddress>) {
         var dnsIp: String? = null
         val dnsPort = 0
 
@@ -970,7 +970,7 @@ internal constructor(
         return proxyEndpointRepository.getConnectedProxy()
     }
 
-    suspend fun insertCustomHttpProxy(host: String, port: Int) {
+    fun insertCustomHttpProxy(host: String, port: Int) {
         persistentState.httpProxyHostAddress = host
         persistentState.httpProxyPort = port
     }

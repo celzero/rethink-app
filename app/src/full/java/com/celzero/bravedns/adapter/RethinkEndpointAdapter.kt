@@ -204,8 +204,6 @@ class RethinkEndpointAdapter(
         }
 
         private fun openEditConfiguration(endpoint: RethinkDnsEndpoint) {
-            val stamp = getRemoteBlocklistStamp(endpoint.url)
-
             val intent = Intent(context, ConfigureRethinkBasicActivity::class.java)
             intent.putExtra(
                 ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_TYPE,

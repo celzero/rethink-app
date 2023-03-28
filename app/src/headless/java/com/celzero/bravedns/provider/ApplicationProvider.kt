@@ -82,7 +82,7 @@ class ApplicationProvider : ContentProvider() {
             Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
-        val appInfo = AppInfo().fromContentValues(values) ?: return null
+        val appInfo = AppInfo(values)
 
         val id = appInfoRepository.cpInsert(appInfo)
         // update the app info cache
@@ -120,7 +120,7 @@ class ApplicationProvider : ContentProvider() {
         }
 
         val context = context ?: return 0
-        val appInfo = AppInfo().fromContentValues(values) ?: return 0
+        val appInfo = AppInfo(values)
 
         if (selectionClause.isNullOrEmpty()) {
             val count = appInfoRepository.cpUpdate(appInfo)

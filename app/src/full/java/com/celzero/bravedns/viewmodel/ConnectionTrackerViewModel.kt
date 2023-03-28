@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.arch.core.util.Function
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.celzero.bravedns.database.ConnectionTracker
@@ -35,13 +34,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
         filterString.value = ""
     }
 
-    val connectionTrackerList =
-        Transformations.switchMap(
-            filterString,
-            (Function<String, LiveData<PagingData<ConnectionTracker>>> { input ->
-                fetchNetworkLogs(input)
-            })
-        )
+    val connectionTrackerList = filterString.switchMap { input -> fetchNetworkLogs(input) }
 
     fun setFilter(
         searchString: String,

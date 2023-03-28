@@ -15,10 +15,7 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
@@ -44,7 +41,7 @@ class SummaryStatisticsViewModel(
     }
 
     val getAllowedAppNetworkActivity =
-        Transformations.switchMap(networkActivity) { _ ->
+        networkActivity.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     // use dnsQuery as appName
                     connectionTrackerDAO.getAllowedAppNetworkActivity()
@@ -54,7 +51,7 @@ class SummaryStatisticsViewModel(
         }
 
     val getBlockedAppNetworkActivity =
-        Transformations.switchMap(networkActivity) { _ ->
+        networkActivity.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     // use dnsQuery as appName
                     connectionTrackerDAO.getBlockedAppNetworkActivity()
@@ -64,7 +61,7 @@ class SummaryStatisticsViewModel(
         }
 
     val getMostContactedDomains =
-        Transformations.switchMap(domains) { _ ->
+        domains.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     if (appConfig.getBraveMode().isDnsMode()) {
                         dnsLogDAO.getMostContactedDomains()
@@ -77,7 +74,7 @@ class SummaryStatisticsViewModel(
         }
 
     val getMostBlockedDomains =
-        Transformations.switchMap(domains) { _ ->
+        domains.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     if (appConfig.getBraveMode().isDnsMode()) {
                         dnsLogDAO.getMostBlockedDomains()
@@ -85,12 +82,10 @@ class SummaryStatisticsViewModel(
                         connectionTrackerDAO.getMostBlockedDomains()
                     }
                 }
-                .liveData
-                .cachedIn(viewModelScope)
-        }
+
 
     val getMostContactedIps =
-        Transformations.switchMap(ips) { _ ->
+        ips.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getMostContactedIps()
                 }
@@ -99,7 +94,7 @@ class SummaryStatisticsViewModel(
         }
 
     val getMostBlockedIps =
-        Transformations.switchMap(ips) { _ ->
+        ips.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getMostBlockedIps()
                 }

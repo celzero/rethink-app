@@ -44,6 +44,7 @@ import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
 
 /**
  * One-click Orbot setup.
@@ -129,7 +130,7 @@ class OrbotHelper(
 
     fun getIntentForDownload(): Intent? {
         if (isPlayStoreFlavour()) { // For play store
-            var intent = Intent(Intent.ACTION_VIEW)
+            val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(ORBOT_MARKET_URI)
 
             val pm = context.packageManager
@@ -324,42 +325,15 @@ class OrbotHelper(
             Log.i(LOG_TAG_VPN, "Initiate orbot start with type: $selectedProxyType")
 
             if (isTypeSocks5() && handleOrbotSocks5Update()) {
-                enableOrbotDns()
                 appConfig.addProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.ORBOT)
             } else if (isTypeHttp() && handleOrbotHttpUpdate()) {
                 appConfig.addProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.ORBOT)
             } else if (isTypeHttpSocks5() && handleOrbotSocks5Update() && handleOrbotHttpUpdate()) {
-                enableOrbotDns()
                 appConfig.addProxy(AppConfig.ProxyType.HTTP_SOCKS5, AppConfig.ProxyProvider.ORBOT)
             } else {
                 uiCtx { stopOrbot(isInteractive = true) }
             }
             persistentState.orbotConnectionStatus.postValue(false)
-        }
-    }
-
-    private fun enableOrbotDns() {
-        // removing this feature as part of https://github.com/celzero/rethink-app/issues/665
-        // fixme: consider enabling auto dns switch to Orbot dns
-        return
-
-        if (dnsPort == null) return
-
-        // no need to set dns if Android's private-dns is enabled
-        if (Utilities.isPrivateDnsActive(context)) return
-
-        // no need to set dns if Rethink's DNS/DNS+Firewall mode is not set
-        if (!appConfig.getBraveMode().isDnsActive()) return
-
-        io {
-            val endpoint = appConfig.getOrbotDnsProxyEndpoint() ?: return@io
-
-            // no-need to update, as database has same config and already selected
-            if (endpoint.proxyPort == dnsPort && endpoint.isSelected) return@io
-
-            endpoint.proxyPort = dnsPort!!
-            endpoint.isSelected = true
-            appConfig.handleOrbotDnsChange(endpoint)
         }
     }
 
@@ -426,17 +400,11 @@ class OrbotHelper(
 
     /** Get the data from the received intent from the Orbot and assign the values. */
     fun updateOrbotProxyData(data: Intent?) {
-        val socks5ProxyHost = data?.extras?.get(EXTRA_SOCKS_PROXY_HOST)
-        val socks5ProxyPort = data?.extras?.get(EXTRA_SOCKS_PROXY_PORT)
-        val httpsProxyHost = data?.extras?.get(EXTRA_HTTP_PROXY_HOST)
-        val httpsProxyPort = data?.extras?.get(EXTRA_HTTP_PROXY_PORT)
-        val dnsProxyPort = data?.extras?.get(EXTRA_DNS_PORT)
-
-        socks5Port = socks5ProxyPort as Int?
-        httpsPort = httpsProxyPort as Int?
-        socks5Ip = socks5ProxyHost as String?
-        httpsIp = httpsProxyHost as String?
-        dnsPort = dnsProxyPort as Int?
+        socks5Port = data?.getIntExtra(EXTRA_SOCKS_PROXY_PORT, 0)
+        httpsPort = data?.getIntExtra(EXTRA_HTTP_PROXY_PORT, 0)
+        socks5Ip = data?.getStringExtra(EXTRA_SOCKS_PROXY_HOST)
+        httpsIp = data?.getStringExtra(EXTRA_HTTP_PROXY_HOST)
+        dnsPort = data?.getIntExtra(EXTRA_DNS_PORT, 0)
 
         if (DEBUG)
             Log.d(

@@ -43,38 +43,9 @@ class AppInfo {
         return this.packageName.hashCode()
     }
 
-    constructor()
-
-    constructor(
-        packageName: String,
-        appName: String,
-        uid: Int,
-        isSystemApp: Boolean,
-        firewallStatus: Int,
-        appCategory: String,
-        wifiDataUsed: Long,
-        mobileDataUsed: Long,
-        metered: Int,
-        screenOffAllowed: Boolean,
-        backgroundAllowed: Boolean
-    ) {
-        this.packageName = packageName
-        this.appName = appName
-        this.uid = uid
-        this.isSystemApp = isSystemApp
-        this.firewallStatus = firewallStatus
-        this.appCategory = appCategory
-        this.wifiDataUsed = wifiDataUsed
-        this.mobileDataUsed = mobileDataUsed
-        this.connectionStatus = metered
-        this.screenOffAllowed = screenOffAllowed
-        this.backgroundAllowed = backgroundAllowed
-    }
-
-    fun fromContentValues(values: ContentValues?): AppInfo? {
-        if (values == null) return null
-        val a = values.valueSet()
-        a.forEach {
+    constructor(values: ContentValues?) {
+        val a = values?.valueSet()
+        a?.forEach {
             when (it.key) {
                 "packageName" -> packageName = it.value as String
                 "appName" -> appName = it.value as String
@@ -89,18 +60,31 @@ class AppInfo {
                 "backgroundAllowed" -> backgroundAllowed = (it.value as Int == 1)
             }
         }
-        return AppInfo(
-            packageName,
-            appName,
-            uid,
-            isSystemApp,
-            firewallStatus,
-            appCategory,
-            wifiDataUsed,
-            mobileDataUsed,
-            connectionStatus,
-            screenOffAllowed,
-            backgroundAllowed
-        )
+    }
+
+    constructor(
+        packageName: String,
+        appName: String,
+        uid: Int,
+        isSystemApp: Boolean,
+        firewallStatus: Int,
+        appCategory: String,
+        wifiDataUsed: Long,
+        mobileDataUsed: Long,
+        connectionStatus: Int,
+        screenOffAllowed: Boolean,
+        backgroundAllowed: Boolean
+    ) {
+        this.packageName = packageName
+        this.appName = appName
+        this.uid = uid
+        this.isSystemApp = isSystemApp
+        this.firewallStatus = firewallStatus
+        this.appCategory = appCategory
+        this.wifiDataUsed = wifiDataUsed
+        this.mobileDataUsed = mobileDataUsed
+        this.connectionStatus = connectionStatus
+        this.screenOffAllowed = screenOffAllowed
+        this.backgroundAllowed = backgroundAllowed
     }
 }

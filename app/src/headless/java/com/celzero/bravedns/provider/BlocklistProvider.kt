@@ -125,7 +125,7 @@ class BlocklistProvider : ContentProvider() {
         }
 
         Log.i(LOG_PROVIDER, "request to insert new blocklist, parameters $values")
-        val localFileTags = RethinkLocalFileTag().fromContentValues(values) ?: return null
+        val localFileTags = RethinkLocalFileTag(values)
         val id = localFileTagRepository.contentInsert(localFileTags)
         context?.contentResolver?.notifyChange(uri, null)
         return ContentUris.withAppendedId(uri, id)
@@ -180,7 +180,7 @@ class BlocklistProvider : ContentProvider() {
         }
 
         val context = context ?: return 0
-        val localFileTags = RethinkLocalFileTag().fromContentValues(values) ?: return 0
+        val localFileTags = RethinkLocalFileTag(values)
         val count = RethinkBlocklistManager.cpSelectFileTag(context, localFileTags)
         context.contentResolver?.notifyChange(uri, null)
         return count

@@ -64,8 +64,8 @@ class NonStoreAppUpdater(
 
                     override fun onResponse(call: Call, response: Response) {
                         try {
-                            val res = response.body?.string()
-                            if (res.isNullOrBlank()) {
+                            val res = response.body.string()
+                            if (res.isBlank()) {
                                 listener.onUpdateCheckFailed(
                                     AppUpdater.InstallSource.OTHER,
                                     isInteractive
