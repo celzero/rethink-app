@@ -34,7 +34,7 @@ class CustomDomainViewModel(private val customDomainDAO: CustomDomainDAO) : View
     }
 
     val customDomains =
-        Transformations.switchMap(filteredList) { input ->
+        filteredList.switchMap { input ->
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                     customDomainDAO.getDomainsLiveData(uid, "%$input%")
                 }

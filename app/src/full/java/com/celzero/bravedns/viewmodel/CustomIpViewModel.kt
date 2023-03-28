@@ -32,7 +32,7 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
     }
 
     val customIpDetails =
-        Transformations.switchMap(filteredList) { input ->
+        filteredList.switchMap { input ->
             if (uid != UID_EVERYBODY) {
                 getAppWise(uid, input)
             } else {

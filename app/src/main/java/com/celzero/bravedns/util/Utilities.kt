@@ -305,9 +305,7 @@ class Utilities {
 
         fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
             try {
-                val toast = Toast.makeText(context, message, toastLength)
-                toast.setGravity(Gravity.CENTER, 0, 0)
-                toast.show()
+                val toast = Toast.makeText(context, message, toastLength).show()
             } catch (e: IllegalStateException) {
                 Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
             } catch (e: IllegalAccessException) {

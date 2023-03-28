@@ -20,7 +20,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         filter.value = ""
     }
 
-    val appInfo = Transformations.switchMap(filter) { input: String -> getAppInfo(input) }
+    val appInfo = filter.switchMap { input: String -> getAppInfo(input) }
 
     fun setFilter(filters: FirewallAppFragment.Filters) {
         this.category.clear()

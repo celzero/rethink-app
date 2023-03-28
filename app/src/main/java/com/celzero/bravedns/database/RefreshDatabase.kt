@@ -274,7 +274,7 @@ internal constructor(
 
     private suspend fun insertUnknownApp(uid: Int) {
         val appDetail = AndroidUidConfig.fromFileSystemUid(uid)
-        val appInfo = AppInfo()
+        val appInfo = AppInfo(null)
 
         val appName =
             if (appDetail.uid == Constants.INVALID_UID) {
@@ -303,7 +303,7 @@ internal constructor(
         Log.i(LOG_TAG_APP_DB, "insert app: $appName")
 
         val isSystemApp = isSystemApp(appInfo)
-        val entry = AppInfo()
+        val entry = AppInfo(null)
 
         entry.appName = appName
 
