@@ -15,7 +15,7 @@ class AppConnectionsViewModel(private val connectionTrackerDAO: ConnectionTracke
         filter.value = ""
     }
 
-    val appNetworkLogs = Transformations.switchMap(filter) { input -> fetchNetworkLogs(uid, input) }
+    val appNetworkLogs = filter.switchMap { input -> fetchNetworkLogs(uid, input) }
 
     private fun fetchNetworkLogs(uid: Int, input: String): LiveData<PagingData<AppConnection>> {
         return if (input.isEmpty()) {

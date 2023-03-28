@@ -16,8 +16,8 @@
 package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -63,7 +63,7 @@ class DetailedStatisticsViewModel(
     }
 
     val getAllAllowedAppNetworkActivity =
-        Transformations.switchMap(allowedNetworkActivity) { _ ->
+        allowedNetworkActivity.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getAllAllowedAppNetworkActivity()
                 }
@@ -72,7 +72,7 @@ class DetailedStatisticsViewModel(
         }
 
     val getAllBlockedAppNetworkActivity =
-        Transformations.switchMap(blockedNetworkActivity) { _ ->
+        blockedNetworkActivity.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getAllBlockedAppNetworkActivity()
                 }
@@ -81,21 +81,21 @@ class DetailedStatisticsViewModel(
         }
 
     val getAllContactedDomains =
-        Transformations.switchMap(allowedDomains) { _ ->
+        allowedDomains.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getAllContactedDomains() }
                 .liveData
                 .cachedIn(viewModelScope)
         }
 
     val getAllBlockedDomains =
-        Transformations.switchMap(blockedDomains) { _ ->
+        blockedDomains.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getAllBlockedDomains() }
                 .liveData
                 .cachedIn(viewModelScope)
         }
 
     val getAllContactedIps =
-        Transformations.switchMap(allowedIps) { _ ->
+        allowedIps.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getAllContactedIps()
                 }
@@ -104,7 +104,7 @@ class DetailedStatisticsViewModel(
         }
 
     val getAllBlockedIps =
-        Transformations.switchMap(blockedIps) { _ ->
+        blockedIps.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getAllBlockedIps()
                 }

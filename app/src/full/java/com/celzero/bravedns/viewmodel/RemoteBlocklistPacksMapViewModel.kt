@@ -16,8 +16,8 @@
 package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -36,14 +36,11 @@ class RemoteBlocklistPacksMapViewModel(
     }
 
     val simpleTags =
-        Transformations.switchMap(
-            filter,
-            ({ input: String ->
-                Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                        remoteBlocklistPacksMapDao.getTags()
-                    }
-                    .liveData
-                    .cachedIn(viewModelScope)
-            })
-        )
+        filter.switchMap {
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    remoteBlocklistPacksMapDao.getTags()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 }

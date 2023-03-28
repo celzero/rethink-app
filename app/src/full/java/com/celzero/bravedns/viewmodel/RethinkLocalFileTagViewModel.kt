@@ -16,8 +16,8 @@
 package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -39,43 +39,37 @@ class RethinkLocalFileTagViewModel(private val rethinkLocalDao: RethinkLocalFile
     }
 
     val localFiletags =
-        Transformations.switchMap(
-            list,
-            ({ input: String ->
-                if (blocklistFilter != null) {
-                    val query = blocklistFilter?.query ?: "%%"
-                    val selected = getSelectedFilter()
-                    val subg = blocklistFilter?.subGroups ?: mutableSetOf()
+        list.switchMap { input: String ->
+            if (blocklistFilter != null) {
+                val query = blocklistFilter?.query ?: "%%"
+                val selected = getSelectedFilter()
+                val subg = blocklistFilter?.subGroups ?: mutableSetOf()
 
-                    if (subg.isNotEmpty()) {
-                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                                rethinkLocalDao.getLocalFileTagsSubg(query, selected, subg)
-                            }
-                            .liveData
-                            .cachedIn(viewModelScope)
-                    } else {
-                        Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                                rethinkLocalDao.getLocalFileTagsWithFilter(query, selected)
-                            }
-                            .liveData
-                            .cachedIn(viewModelScope)
-                    }
-                } else if (input.isBlank()) {
-                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { rethinkLocalDao.getLocalFileTags() }
+                if (subg.isNotEmpty()) {
+                    Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                            rethinkLocalDao.getLocalFileTagsSubg(query, selected, subg)
+                        }
                         .liveData
                         .cachedIn(viewModelScope)
                 } else {
                     Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                            rethinkLocalDao.getLocalFileTagsWithFilter(
-                                "%$input%",
-                                getSelectedFilter()
-                            )
+                            rethinkLocalDao.getLocalFileTagsWithFilter(query, selected)
                         }
                         .liveData
                         .cachedIn(viewModelScope)
                 }
-            })
-        )
+            } else if (input.isBlank()) {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { rethinkLocalDao.getLocalFileTags() }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                        rethinkLocalDao.getLocalFileTagsWithFilter("%$input%", getSelectedFilter())
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
+        }
 
     private fun getSelectedFilter(): MutableSet<Int> {
         if (

@@ -91,7 +91,7 @@ class DomainRuleProvider : ContentProvider() {
             Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("invalid uri, cannot update without ID$uri")
         }
-        val customDomain = CustomDomain().fromContentValues(values) ?: return null
+        val customDomain = CustomDomain(values)
 
         if (DEBUG)
             Log.d(
@@ -169,7 +169,7 @@ class DomainRuleProvider : ContentProvider() {
         }
 
         val context = context ?: return 0
-        val customDomain = CustomDomain().fromContentValues(values) ?: return 0
+        val customDomain = CustomDomain(values)
 
         if (selectionClause.isNullOrEmpty()) {
             val count = customDomainRepository.cpUpdate(customDomain)

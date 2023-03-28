@@ -183,7 +183,7 @@ class WorkScheduler(val context: Context) {
         WorkManager.getInstance(context)
             .enqueueUniquePeriodicWork(
                 BLOCKLIST_UPDATE_CHECK_JOB_TAG,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 blocklistUpdateCheck
             )
     }

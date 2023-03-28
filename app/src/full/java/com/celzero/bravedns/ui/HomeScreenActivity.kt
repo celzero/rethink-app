@@ -37,7 +37,6 @@ import androidx.preference.PreferenceManager
 import androidx.work.*
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
@@ -47,6 +46,7 @@ import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.*
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -63,15 +63,15 @@ import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
+import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.io.File
-import java.util.*
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -193,7 +193,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             BiometricPrompt.PromptInfo.Builder()
                 .setTitle(getString(R.string.hs_biometeric_title))
                 .setSubtitle(getString(R.string.hs_biometeric_desc))
-                .setDeviceCredentialAllowed(true)
+                .setAllowedAuthenticators(
+                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                )
                 .setConfirmationRequired(false)
                 .build()
 

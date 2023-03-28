@@ -16,8 +16,8 @@
 package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -37,7 +37,7 @@ class DnsCryptRelayEndpointViewModel(
     }
 
     val dnsCryptRelayEndpointList =
-        Transformations.switchMap(filteredList) { input ->
+        filteredList.switchMap { input ->
             if (input.isBlank()) {
                 Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                         dnsCryptRelayEndpointDAO.getDnsCryptRelayEndpointLiveData()

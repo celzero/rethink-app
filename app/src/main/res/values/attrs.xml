@@ -42,4 +42,5 @@
     <attr name="defaultToggleBtnTxt" format="reference" />
     <attr name="defaultToggleBtnBg" format="reference" />
     <attr name="selectedCardBg" format="reference"/>
+    <attr name="background" format="reference"/>
 </resources>
