@@ -61,7 +61,6 @@ class CustomDomain {
         }
     }
 
-    @Ignore
     constructor(
         domain: String,
         uid: Int,

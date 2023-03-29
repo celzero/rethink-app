@@ -49,7 +49,6 @@ class RethinkLocalFileTag {
         return this.value.hashCode()
     }
 
-    @Ignore
     constructor(
         value: Int,
         uname: String,
