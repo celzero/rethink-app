@@ -75,7 +75,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.launch
-import xdns.Xdns
+import java.net.URI
 
 object Utilities {
 
@@ -249,20 +249,6 @@ object Utilities {
     fun convertLongToTime(time: Long, template: String): String {
         val date = Date(time)
         return SimpleDateFormat(template, Locale.ENGLISH).format(date)
-    }
-
-    fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
-        try {
-            val toast = Toast.makeText(context, message, toastLength)
-            toast.setGravity(Gravity.CENTER, 0, 0)
-            toast.show()
-        } catch (e: IllegalStateException) {
-            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
-        } catch (e: IllegalAccessException) {
-            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
-        } catch (e: IOException) {
-            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
-        }
     }
 
     fun isLanIpv4(ipAddress: String): Boolean {
@@ -682,9 +668,18 @@ object Utilities {
     }
 
     fun getRemoteBlocklistStamp(url: String): String {
-        // Interacts with GO lib to fetch the stamp (Xdnx#getBlocklistStampFromURL)
         return try {
-            Xdns.getBlocklistStampFromURL(url)
+            // extract the path from the url string
+            // eg., https://dns.google/dns-query will result in /dns-query
+            val path = URI(url).path
+            Log.i("TEST", "path: $path")
+            // if the path contains a colon, then it is a valid stamp
+            if (path.contains(":")) {
+                // remove the leading slash from the path
+                path.trimEnd { it == '/' }
+            } else {
+                ""
+            }
         } catch (e: Exception) {
             Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
             ""
