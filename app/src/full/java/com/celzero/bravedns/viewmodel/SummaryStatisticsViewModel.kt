@@ -15,7 +15,10 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
@@ -82,7 +85,9 @@ class SummaryStatisticsViewModel(
                         connectionTrackerDAO.getMostBlockedDomains()
                     }
                 }
-
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 
     val getMostContactedIps =
         ips.switchMap { _ ->

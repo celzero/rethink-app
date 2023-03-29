@@ -91,6 +91,9 @@ class DetailedStatisticsViewModel(
                         connectionTrackerDAO.getAllContactedDomains()
                     }
                 }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 
     val getAllBlockedDomains =
         blockedDomains.switchMap { _ ->
@@ -101,6 +104,9 @@ class DetailedStatisticsViewModel(
                         connectionTrackerDAO.getAllBlockedDomains()
                     }
                 }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 
     val getAllContactedIps =
         allowedIps.switchMap { _ ->
