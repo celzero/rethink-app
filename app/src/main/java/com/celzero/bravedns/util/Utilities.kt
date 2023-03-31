@@ -225,9 +225,9 @@ object Utilities {
         val ip = ipAddress.toInetAddress()
 
         // no need to check if IP is not of type IPv6
-        if (!IpManager.isIpV6(ipAddress)) return ip
+        if (!IPUtil.isIpV6(ipAddress)) return ip
 
-        val ipv4 = IpManager.toIpV4(ipAddress)
+        val ipv4 = IPUtil.toIpV4(ipAddress)
 
         return if (ipv4 != null) {
             ipv4.toInetAddress()
@@ -734,5 +734,12 @@ object Utilities {
 
     fun isValidDnsPort(port: Int): Boolean {
         return port in 1..65535
+    }
+
+    fun getRandomString(length: Int) : String {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        return (1..length)
+            .map { allowedChars.random() }
+            .joinToString("")
     }
 }

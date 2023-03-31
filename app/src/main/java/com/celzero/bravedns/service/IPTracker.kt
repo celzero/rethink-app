@@ -23,6 +23,7 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
+import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.IpManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
@@ -71,9 +72,9 @@ internal constructor(
         val ipAddress = IPAddressString(ip).address ?: return inetAddress
 
         // no need to check if IP is not of type IPv6
-        if (!IpManager.isIpV6(ipAddress)) return inetAddress
+        if (!IPUtil.isIpV6(ipAddress)) return inetAddress
 
-        val ipv4 = IpManager.toIpV4(ipAddress)
+        val ipv4 = IPUtil.toIpV4(ipAddress)
 
         return if (ipv4 != null) {
             ipv4.toInetAddress()
