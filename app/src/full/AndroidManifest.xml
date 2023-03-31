@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns">
 
     <application
@@ -71,6 +70,9 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.MiscSettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.TunnelSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.AppDetailActivity"

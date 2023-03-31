@@ -34,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
 
@@ -46,8 +47,8 @@ object IpRulesManager : KoinComponent {
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
-    private var appIpRules: MutableMap<CacheKey, CustomIp> = hashMapOf()
-    private var wildCards: MutableMap<CacheKey, CustomIp> = hashMapOf()
+    private var appIpRules: ConcurrentHashMap<CacheKey, CustomIp> = ConcurrentHashMap()
+    private var wildCards: ConcurrentHashMap<CacheKey, CustomIp> = ConcurrentHashMap()
 
     // key-value object for ip look-up
     data class CacheKey(val hostName: HostName, val uid: Int)
@@ -309,8 +310,8 @@ object IpRulesManager : KoinComponent {
     fun deleteIpRulesByUid(uid: Int) {
         io {
             customIpRepository.deleteIpRulesByUid(uid)
-            appIpRules = appIpRules.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
-            wildCards = wildCards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
+            appIpRules = appIpRules.filterKeys { it.uid != uid } as ConcurrentHashMap<CacheKey, CustomIp>
+            wildCards = wildCards.filterKeys { it.uid != uid } as ConcurrentHashMap<CacheKey, CustomIp>
             ipRulesLookupCache.invalidateAll()
         }
     }

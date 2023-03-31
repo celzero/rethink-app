@@ -322,9 +322,12 @@
     <string name="settings_ptrans_heading" translatable="true">Force IPv4 egress</string>
     <string name="settings_ptrans_desc" translatable="true">Translate outbound IPv6 traffic to IPv4 on-device. Enable if you are connected to an IPv4-only network.</string>
 
-    <string name="settings_allow_bypass_heading" translatable="true">Allow Bypass</string>
-    <string name="settings_allow_bypass_desc" translatable="true">Allow requesting apps to bypass RethinkDNS firewall on-demand. Some audio/video conference apps like Zoom and WhatsApp may require an on-demand bypass to function properly.</string>
-    <string name="settings_lock_down_mode_desc" translatable="true">Cannot allow bypass when VPN is running in lockdown mode. <u>Go to VPN settings</u>.</string>
+    <string name="settings_allow_lan_heading">Do not route Private IPs</string>
+    <string name="settings_allow_lan_desc">Let LAN, Loopback, Link Local traffic bypass Rethink\'s VPN tunnel.</string>
+
+    <string name="settings_allow_bypass_heading" translatable="true">Enable network visibility</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Allow requesting apps to access all available networks. These apps may bypass Rethink\'s VPN tunnel on-demand. Some audio/video conference apps like Zoom and Meet may require this to function properly.</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Cannot allow bypasses when VPN is running in lockdown mode. <u>Go to VPN settings</u>.</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Cannot setup proxies when VPN is running in DNS only mode or lockdown mode. <u>Go to VPN settings</u></string>
     <string name="settings_proxy_header" translatable="true">proxy</string>
     <string name="settings_socks5_heading" translatable="true">Setup SOCKS5 Proxy</string>

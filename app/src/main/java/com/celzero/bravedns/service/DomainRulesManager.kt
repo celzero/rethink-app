@@ -33,6 +33,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.MalformedURLException
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.regex.Pattern
 import kotlin.concurrent.write
@@ -47,8 +48,8 @@ object DomainRulesManager : KoinComponent {
 
     data class CacheKey(val domain: String, val uid: Int)
 
-    var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
-    var wildcards: MutableMap<CacheKey, CustomDomain> = hashMapOf()
+    var domains: ConcurrentHashMap<CacheKey, CustomDomain> = ConcurrentHashMap()
+    var wildcards: ConcurrentHashMap<CacheKey, CustomDomain> = ConcurrentHashMap()
 
     // stores all the previous response sent
     private val domainLookupCache: Cache<CacheKey, Status> =
@@ -279,8 +280,8 @@ object DomainRulesManager : KoinComponent {
     fun deleteIpRulesByUid(uid: Int) {
         io {
             customDomainsRepository.deleteRulesByUid(uid)
-            domains = domains.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
-            wildcards = wildcards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
+            domains = domains.filterKeys { it.uid != uid } as ConcurrentHashMap<CacheKey, CustomDomain>
+            wildcards = wildcards.filterKeys { it.uid != uid } as ConcurrentHashMap<CacheKey, CustomDomain>
             domainLookupCache.invalidateAll()
         }
     }

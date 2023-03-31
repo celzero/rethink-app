@@ -28,9 +28,9 @@
             style="@style/TextAppearance.SubHeading.HomeScreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:alpha="0.5"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:alpha="0.5"
             android:text="@string/settings_title_desc" />
 
     </LinearLayout>
@@ -61,9 +61,9 @@
                 android:id="@+id/fs_dns_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/dns_mode_info_title"
                 android:layout_marginStart="15dp"
                 android:layout_toEndOf="@id/fs_dns_icon"
+                android:text="@string/dns_mode_info_title"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 
@@ -103,9 +103,9 @@
             <TextView
                 android:id="@+id/fs_firewall_tv"
                 android:layout_width="match_parent"
-                android:layout_toEndOf="@id/fs_firewall_icon"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/fs_firewall_icon"
                 android:text="@string/firewall_mode_info_title"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
@@ -148,9 +148,53 @@
                 android:id="@+id/fs_proxy_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:layout_toEndOf="@id/fs_proxy_icon"
                 android:text="@string/cd_custom_dns_proxy_name_default"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_right_arrow_white" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fs_vpn_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/fs_vpn_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_other_settings" />
+
+
+            <TextView
+                android:id="@+id/fs_vpn_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/fs_vpn_icon"
+                android:text="@string/settings_vpn_heading"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 
@@ -192,9 +236,9 @@
                 android:id="@+id/fs_others_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:layout_toEndOf="@id/fs_others_icon"
                 android:text="@string/title_settings"
-                android:layout_marginStart="15dp"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 

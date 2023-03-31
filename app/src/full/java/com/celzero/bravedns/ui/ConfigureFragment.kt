@@ -31,6 +31,7 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
         DNS,
         FIREWALL,
         PROXY,
+        VPN,
         OTHERS
     }
 
@@ -55,6 +56,11 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
             startActivity(ScreenType.PROXY)
         }
 
+        b.fsVpnCard.setOnClickListener {
+            // open vpn configuration
+            startActivity(ScreenType.VPN)
+        }
+
         b.fsOthersCard.setOnClickListener {
             // open others configuration
             startActivity(ScreenType.OTHERS)
@@ -67,6 +73,7 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
                 ScreenType.DNS -> Intent(requireContext(), DnsDetailActivity::class.java)
                 ScreenType.FIREWALL -> Intent(requireContext(), FirewallActivity::class.java)
                 ScreenType.PROXY -> Intent(requireContext(), ProxySettingsActivity::class.java)
+                ScreenType.VPN -> Intent(requireContext(), TunnelSettingsActivity::class.java)
                 ScreenType.OTHERS -> Intent(requireContext(), MiscSettingsActivity::class.java)
             }
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
