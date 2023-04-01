@@ -36,6 +36,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.FirewallManager.deletePackages
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -47,16 +48,16 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class RefreshDatabase
 internal constructor(
@@ -172,17 +173,23 @@ internal constructor(
         // if a non-app appears installed-apps group, then upsert its db entry
         // and give it a proper identity as retrieved from the package-manager
         val nonApps = trackedApps.filter { isNonApp(it.packageName) }.map { it.uid }.toSet()
-        installedApps.forEach {
+        installedApps.forEach { it ->
             if (nonApps.contains(it.uid)) {
-                upsertApp(it)
+                val prevPackageName = trackedApps.filter { i -> i.uid == it.uid }.map { it.packageName }
+                upsertApp(it, prevPackageName.first())
             }
         }
     }
 
-    private suspend fun upsertApp(appTuple: FirewallManager.AppInfoTuple) {
+    private suspend fun upsertApp(appTuple: FirewallManager.AppInfoTuple, prevPackageName : String) {
+        // do not upsert android and system apps
+        if (appTuple.uid == AndroidUidConfig.ANDROID.uid || appTuple.uid == AndroidUidConfig.SYSTEM.uid) {
+            return
+        }
+
         val appInfo = getAppInfo(appTuple.uid) ?: return
 
-        deletePackages(mutableSetOf(appTuple))
+        deletePackage(prevPackageName)
         insertApp(appInfo)
     }
 

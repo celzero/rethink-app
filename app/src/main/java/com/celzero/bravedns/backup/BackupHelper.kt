@@ -61,6 +61,9 @@ class BackupHelper {
         // intent scheme
         const val INTENT_SCHEME = "content"
 
+        // restart app after database restore
+        const val INTENT_RESTART_APP = "restartApp"
+
         // metadata constants
         // version
         const val VERSION = "version"

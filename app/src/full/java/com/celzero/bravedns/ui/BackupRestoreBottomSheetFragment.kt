@@ -42,6 +42,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_NAME_DATETIME
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_BACKUP_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
+import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_OCTET
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_XZIP
 import com.celzero.bravedns.backup.RestoreAgent
@@ -356,6 +357,7 @@ class BackupRestoreBottomSheetFragment : BottomSheetDialogFragment() {
         val intent = packageManager.getLaunchIntentForPackage(context.packageName)
         val componentName = intent!!.component
         val mainIntent = Intent.makeRestartActivityTask(componentName)
+        mainIntent.putExtra(INTENT_RESTART_APP, true)
         context.startActivity(mainIntent)
         Runtime.getRuntime().exit(0)
     }

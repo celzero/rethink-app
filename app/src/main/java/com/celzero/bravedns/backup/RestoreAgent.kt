@@ -21,7 +21,7 @@ import android.content.pm.PackageInfo
 import android.net.Uri
 import android.util.Log
 import androidx.preference.PreferenceManager
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
@@ -37,12 +37,12 @@ import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
+import java.io.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.*
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams), KoinComponent {
+    CoroutineWorker(context, workerParams), KoinComponent {
 
     private val logDatabase by inject<LogDatabase>()
     private val appDatabase by inject<AppDatabase>()
@@ -52,7 +52,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         const val TAG = "RestoreAgent"
     }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val restoreUri = Uri.parse(inputData.getString(DATA_BUILDER_RESTORE_URI))
         if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "begin restore process with file uri: $restoreUri")
         val result = startRestore(restoreUri)

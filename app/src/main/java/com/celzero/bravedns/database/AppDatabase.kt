@@ -640,6 +640,10 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "UPDATE AppInfo set firewallStatus = 5, connectionStatus = 3 where firewallStatus = 0"
                         )
+                        execSQL("UPDATE AppInfo set firewallStatus = 2, connectionStatus = 3 where firewallStatus = 2")
+                        execSQL("UPDATE AppInfo set firewallStatus = 3, connectionStatus = 3 where firewallStatus = 3")
+                        execSQL("UPDATE AppInfo set firewallStatus = 4, connectionStatus = 3 where firewallStatus = 4")
+                        execSQL("UPDATE AppInfo set firewallStatus = 7, connectionStatus = 3 where firewallStatus = 7")
                         execSQL("UPDATE AppInfo set firewallStatus = 5 where firewallStatus = 1")
                         execSQL("DROP TABLE AppInfo_backup")
                     }

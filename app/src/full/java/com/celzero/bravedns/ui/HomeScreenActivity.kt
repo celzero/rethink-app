@@ -41,9 +41,11 @@ import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
+import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
@@ -84,6 +86,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
+    private val refreshDatabase by inject<RefreshDatabase>()
 
     // support for biometric authentication
     private lateinit var executor: Executor
@@ -230,6 +233,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 getString(R.string.brbs_restore_no_uri_toast),
                 Toast.LENGTH_SHORT
             )
+        } else if (intent.getBooleanExtra(INTENT_RESTART_APP, false)) {
+            Log.i(LOG_TAG_UI, "Restart from restore, so refreshing app database...")
+            io {
+                refreshDatabase.refreshAppInfoDatabase()
+                IpRulesManager.loadIpRules()
+                DomainRulesManager.load()
+            }
         }
     }
 
