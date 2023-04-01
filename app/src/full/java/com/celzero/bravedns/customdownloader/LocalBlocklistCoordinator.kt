@@ -506,11 +506,11 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     }
 
     private suspend fun updatePersistenceOnCopySuccess(timestamp: Long) {
+        // recreate bravedns object ()
+        appConfig.recreateBraveDnsObj()
         persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
         // reset updatable time stamp
         persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
-        // recreate bravedns object ()
-        appConfig.recreateBraveDnsObj()
     }
 }
