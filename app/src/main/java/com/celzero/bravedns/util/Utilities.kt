@@ -33,7 +33,6 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
-import android.view.Gravity
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -66,16 +65,16 @@ import com.google.common.net.InternetDomainName
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.launch
-import java.net.URI
 
 object Utilities {
 
@@ -280,17 +279,17 @@ object Utilities {
         return vpnService?.isLockdownEnabled == true
     }
 
-     fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
-            try {
-                val toast = Toast.makeText(context, message, toastLength).show()
-            } catch (e: IllegalStateException) {
-                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
-            } catch (e: IllegalAccessException) {
-                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
-            } catch (e: IOException) {
-                Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
-            }
+    fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
+        try {
+            val toast = Toast.makeText(context, message, toastLength).show()
+        } catch (e: IllegalStateException) {
+            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+        } catch (e: IllegalAccessException) {
+            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+        } catch (e: IOException) {
+            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
         }
+    }
 
     fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
         var metadata: PackageInfo? = null
@@ -736,10 +735,8 @@ object Utilities {
         return port in 1..65535
     }
 
-    fun getRandomString(length: Int) : String {
+    fun getRandomString(length: Int): String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-        return (1..length)
-            .map { allowedChars.random() }
-            .joinToString("")
+        return (1..length).map { allowedChars.random() }.joinToString("")
     }
 }

@@ -31,8 +31,8 @@ import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.*
-import java.util.concurrent.TimeUnit
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settings) {
     private val b by viewBinding(ActivityTunnelSettingsBinding::bind)

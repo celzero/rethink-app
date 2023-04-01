@@ -275,8 +275,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val binding =
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
-        binding.desc.text =
-            updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+        binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
         AlertDialog.Builder(requireContext())
             .setView(binding.root)
             .setTitle(getString(R.string.whats_dialog_title))

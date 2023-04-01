@@ -41,7 +41,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -128,7 +127,8 @@ class RethinkEndpointAdapter(
 
             // show the status as it is if it is not connected
             if (status != R.string.dns_connected) {
-                b.rethinkEndpointListUrlExplanation.text = context.getString(status).replaceFirstChar(Char::titlecase)
+                b.rethinkEndpointListUrlExplanation.text =
+                    context.getString(status).replaceFirstChar(Char::titlecase)
                 return
             }
 

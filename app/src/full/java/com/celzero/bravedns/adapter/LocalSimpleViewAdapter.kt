@@ -145,21 +145,15 @@ class LocalSimpleViewAdapter(val context: Context) :
         private fun showLevelIndicator(mIconIndicator: TextView, level: Int) {
             when (level) {
                 0 -> {
-                    val color =
-                        fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
+                    val color = fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
                     mIconIndicator.setBackgroundColor(color)
                 }
                 1 -> {
-                    val color =
-                        fetchToggleBtnColors(
-                            context,
-                            R.color.firewallWhiteListToggleBtnTxt
-                        )
+                    val color = fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt)
                     mIconIndicator.setBackgroundColor(color)
                 }
                 2 -> {
-                    val color =
-                        fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt)
+                    val color = fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt)
                     mIconIndicator.setBackgroundColor(color)
                 }
                 else -> {

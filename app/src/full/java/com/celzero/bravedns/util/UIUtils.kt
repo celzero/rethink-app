@@ -207,7 +207,6 @@ object UIUtils {
         }
     }
 
-
     fun fetchColor(context: Context, attr: Int): Int {
         val typedValue = TypedValue()
         val a: TypedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(attr))

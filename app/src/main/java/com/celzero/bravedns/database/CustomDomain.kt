@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 import android.content.ContentValues
 import android.os.SystemClock
 import androidx.room.Entity
-import androidx.room.Ignore
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Constants
 

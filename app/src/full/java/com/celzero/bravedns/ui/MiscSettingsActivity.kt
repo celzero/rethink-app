@@ -45,12 +45,10 @@ import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
@@ -113,7 +111,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         } else {
             b.settingsBiometricRl.visibility = View.GONE
         }
-
 
         displayAppThemeUi()
         displayNotificationActionUi()
@@ -198,7 +195,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
     }
 
-
     private fun setupClickListeners() {
         b.settingsActivityEnableLogsRl.setOnClickListener {
             b.settingsActivityEnableLogsSwitch.isChecked =
@@ -232,7 +228,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.checkForAppUpdate = b
         }
 
-
         b.settingsActivityThemeRl.setOnClickListener {
             enableAfterDelay(500, b.settingsActivityThemeRl)
             showThemeDialog()
@@ -252,8 +247,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             showPcapOptionsDialog()
         }
 
-
-
         b.settingsActivityImportExportRl.setOnClickListener { invokeImportExport() }
 
         b.settingsActivityAppNotificationSwitch.setOnClickListener {
@@ -272,8 +265,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             ->
             persistentState.biometricAuth = checked
         }
-
-
     }
 
     private fun invokeChangeLocaleDialog() {
@@ -400,8 +391,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.create().show()
     }
 
-
-
     private fun setThemeRecreate(theme: Int) {
         setTheme(theme)
         recreate()
@@ -497,7 +486,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
     }
-
 
     private fun registerForActivityResult() {
         // app notification permission android 13

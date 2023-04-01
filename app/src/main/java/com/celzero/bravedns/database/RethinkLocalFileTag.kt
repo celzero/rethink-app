@@ -17,7 +17,6 @@ package com.celzero.bravedns.database
 
 import android.content.ContentValues
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "RethinkLocalFileTag")

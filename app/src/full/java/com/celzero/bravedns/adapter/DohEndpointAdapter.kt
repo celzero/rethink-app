@@ -105,7 +105,8 @@ class DohEndpointAdapter(
                 "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}"
             )
             if (endpoint.isSelected) {
-                b.dohEndpointListUrlExplanation.text = context.getString(getDnsStatus()).replaceFirstChar(Char::titlecase)
+                b.dohEndpointListUrlExplanation.text =
+                    context.getString(getDnsStatus()).replaceFirstChar(Char::titlecase)
             }
 
             // Shows either the info/delete icon for the DoH entries.

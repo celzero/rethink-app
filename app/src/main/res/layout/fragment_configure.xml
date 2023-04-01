@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerInParent="true"
-                android:src="@drawable/ic_other_settings" />
+                android:src="@drawable/ic_network_tunnel" />
 
             <TextView
                 android:id="@+id/fs_network_tv"

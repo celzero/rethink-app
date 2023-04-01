@@ -248,9 +248,7 @@ class AppInfoActivity :
 
         b.aadConnDetailSearch.setOnQueryTextListener(this)
 
-        b.aadAppInfoIcon.setOnClickListener {
-            openAndroidAppInfo(this, appInfo.packageName)
-        }
+        b.aadAppInfoIcon.setOnClickListener { openAndroidAppInfo(this, appInfo.packageName) }
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
