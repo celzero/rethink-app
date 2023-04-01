@@ -26,17 +26,16 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import java.net.MalformedURLException
+import java.util.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.regex.Pattern
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.net.MalformedURLException
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.util.regex.Pattern
-import kotlin.concurrent.write
 
 object DomainRulesManager : KoinComponent {
 
@@ -48,8 +47,8 @@ object DomainRulesManager : KoinComponent {
 
     data class CacheKey(val domain: String, val uid: Int)
 
-    var domains: ConcurrentHashMap<CacheKey, CustomDomain> = ConcurrentHashMap()
-    var wildcards: ConcurrentHashMap<CacheKey, CustomDomain> = ConcurrentHashMap()
+    var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
+    var wildcards: MutableMap<CacheKey, CustomDomain> = hashMapOf()
 
     // stores all the previous response sent
     private val domainLookupCache: Cache<CacheKey, Status> =
@@ -148,7 +147,8 @@ object DomainRulesManager : KoinComponent {
     fun status(d: String, uid: Int): Status {
         val domain = d.lowercase(Locale.ROOT)
         // return if the cache has the domain
-        domainLookupCache.getIfPresent(domain)?.let {
+        val key = CacheKey(domain, uid)
+        domainLookupCache.getIfPresent(key)?.let {
             return Status.getStatus(it.id)
         }
 
@@ -280,8 +280,8 @@ object DomainRulesManager : KoinComponent {
     fun deleteIpRulesByUid(uid: Int) {
         io {
             customDomainsRepository.deleteRulesByUid(uid)
-            domains = domains.filterKeys { it.uid != uid } as ConcurrentHashMap<CacheKey, CustomDomain>
-            wildcards = wildcards.filterKeys { it.uid != uid } as ConcurrentHashMap<CacheKey, CustomDomain>
+            domains = domains.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
+            wildcards = wildcards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
             domainLookupCache.invalidateAll()
         }
     }
