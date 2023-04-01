@@ -41,6 +41,8 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
     }
 
     private fun initView() {
+        b.fsNetworkTv.text = getString(R.string.lbl_network).replaceFirstChar(Char::titlecase)
+
         b.fsDnsCard.setOnClickListener {
             // open dns configuration
             startActivity(ScreenType.DNS)
@@ -56,7 +58,7 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
             startActivity(ScreenType.PROXY)
         }
 
-        b.fsVpnCard.setOnClickListener {
+        b.fsNetworkCard.setOnClickListener {
             // open vpn configuration
             startActivity(ScreenType.VPN)
         }

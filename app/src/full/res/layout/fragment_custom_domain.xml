@@ -23,10 +23,10 @@
             android:layout_marginTop="5dp"
             android:focusable="true"
             android:padding="5dp"
-            android:visibility="gone"
             android:text="@string/cd_dialog_header"
             android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view" />
+            android:textSize="@dimen/extra_large_font_text_view"
+            android:visibility="gone" />
 
         <RelativeLayout
             android:id="@+id/cda_no_rules_rl"
@@ -52,8 +52,8 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="220dp"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
                 android:layout_below="@id/cda_no_rules_text"
+                android:layout_centerHorizontal="true"
                 android:src="@drawable/illustrations_no_record" />
 
         </RelativeLayout>
@@ -108,6 +108,21 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/cda_trust_desc_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cda_search_container"
+                app:drawableStartCompat="@drawable/ic_info_white"
+                android:drawablePadding="10dp"
+                android:layout_marginBottom="10dp"
+                android:paddingStart="10dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="10dp"
+                android:text="@string/trusted_domains_desc"
+                android:textSize="@dimen/default_font_text_view" />
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
