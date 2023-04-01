@@ -167,10 +167,10 @@ class FirewallAppListAdapter(
                     showMobileDataUnused()
                     showWifiUnused()
                 }
-                /*FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
+                FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
                     showMobileDataUnused()
                     showWifiUnused()
-                }*/
+                }
                 else -> {
                     showWifiDisabled()
                     showMobileDataDisabled()
