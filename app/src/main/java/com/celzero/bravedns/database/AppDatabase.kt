@@ -42,7 +42,7 @@ import com.celzero.bravedns.util.Constants
             LocalBlocklistPacksMap::class,
             RemoteBlocklistPacksMap::class
         ],
-    version = 17,
+    version = 18,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -79,6 +79,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_14_15)
                 .addMigrations(MIGRATION_15_16)
                 .addMigrations(MIGRATION_16_17)
+                .addMigrations(MIGRATION_17_18)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -640,12 +641,40 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "UPDATE AppInfo set firewallStatus = 5, connectionStatus = 3 where firewallStatus = 0"
                         )
-                        execSQL("UPDATE AppInfo set firewallStatus = 2, connectionStatus = 3 where firewallStatus = 2")
-                        execSQL("UPDATE AppInfo set firewallStatus = 3, connectionStatus = 3 where firewallStatus = 3")
-                        execSQL("UPDATE AppInfo set firewallStatus = 4, connectionStatus = 3 where firewallStatus = 4")
-                        execSQL("UPDATE AppInfo set firewallStatus = 7, connectionStatus = 3 where firewallStatus = 7")
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 2, connectionStatus = 3 where firewallStatus = 2"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 3, connectionStatus = 3 where firewallStatus = 3"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 4, connectionStatus = 3 where firewallStatus = 4"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 7, connectionStatus = 3 where firewallStatus = 7"
+                        )
                         execSQL("UPDATE AppInfo set firewallStatus = 5 where firewallStatus = 1")
                         execSQL("DROP TABLE AppInfo_backup")
+                    }
+                }
+            }
+
+        private val MIGRATION_17_18: Migration =
+            object : Migration(17, 18) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    with(database) {
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 2, connectionStatus = 3 where firewallStatus = 2"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 3, connectionStatus = 3 where firewallStatus = 3"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 4, connectionStatus = 3 where firewallStatus = 4"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 7, connectionStatus = 3 where firewallStatus = 7"
+                        )
                     }
                 }
             }
