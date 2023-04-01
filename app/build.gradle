@@ -100,7 +100,7 @@ android {
 
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    def room_version = "2.5.0"
+    def room_version = "2.5.1"
     def paging_version = "3.1.1"
 
     implementation "com.google.guava:guava:31.1-jre"
@@ -121,7 +121,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     // For liveData implementation
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
@@ -136,7 +136,7 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.5.5'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.5.6'
     implementation 'com.google.android.material:material:1.8.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
@@ -168,11 +168,11 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.8'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
-    implementation 'com.github.celzero:firestack:89daaaffcc'
+    implementation 'com.github.celzero:firestack:e1a919d110'
     // implementation project(":tun2socks")
 
     // Work manager
-    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
 
     // for handling IP addresses and subnets, both IPv4 and IPv6
     // https://seancfoley.github.io/IPAddress/ipaddress.html
