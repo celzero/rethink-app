@@ -61,8 +61,8 @@ import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import org.koin.android.ext.android.inject
 import java.util.*
+import org.koin.android.ext.android.inject
 
 class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -275,17 +275,24 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             lightenUpChip(b.dnsBlockBlocklistChip, BlockType.NONE)
         }
 
+        // show blocklist chip
+        if (transaction!!.hasBlocklists()) {
+            showBlocklistChip()
+            return
+        }
+
         // show no-answer chip
         if (transaction!!.unansweredQuery()) {
             b.dnsBlockBlocklistChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }
 
-        if (!transaction!!.hasBlocklists()) {
-            b.dnsBlockBlocklistChip.text = getString(R.string.lbl_blocked)
-            return
-        }
+        // show chip as blocked
+        b.dnsBlockBlocklistChip.text = getString(R.string.lbl_blocked)
+        return
+    }
 
+    private fun showBlocklistChip() {
         val group: Multimap<String, String> = HashMultimap.create()
 
         transaction!!.getBlocklists().forEach {
