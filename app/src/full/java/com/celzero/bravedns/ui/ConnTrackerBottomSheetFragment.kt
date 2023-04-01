@@ -58,9 +58,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.*
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.*
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 
