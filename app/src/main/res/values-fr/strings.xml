@@ -365,7 +365,7 @@
     <string name="ctbs_app_other_apps">%1$s + %2$s autre(s) application(s)</string>
     <string name="about_bug_no_log_dialog_positive_btn">Envoyer le courriel</string>
     <string name="dns_connected_no_count">Connecté</string>
-    <string name="fapps_unmetered_unblock_dialog_title">Autoriser sur réseau sans abonnement</string>
+    <string name="fapps_unmetered_unblock_dialog_title">Autoriser sur réseau sans facturation à l\'usage</string>
     <string name="firewall_rule_exempt_app_bypass_univ">Appli avec exception(s)</string>
     <string name="firewall_rule_foreground_desc">Cette connexion était protégée par un pare-feu car l’application source <i>n’était pas au premier plan</i> .<br/><br/> Pour modifier cela, allez sur l’onglet <i>Global</i>.</string>
     <string name="firewall_rule_exempt_dns_proxied_desc">Cette connexion DNS a été redirigée et transmise au point de terminaison DNS spécifié par l’utilisateur.<br/><br/> Pour modifier cela, désactivez <i>Empêcher les fuites DNS</i> de l’écran DNS <i>Configurer</i>.</string>
@@ -643,7 +643,7 @@
     <string name="cd_dns_proxy_mode_internal">Interne</string>
     <string name="cd_doh_dialog_resolver_url">URL du résolveur</string>
     <string name="dns_btm_record_type">Type de requête : %1$s</string>
-    <string name="firewall_status_block_metered">bloqué sur les réseaux avec abonnement (mobiles)</string>
+    <string name="firewall_status_block_metered">bloqué sur les réseaux avec facturation à l\'usage (mobiles)</string>
     <string name="fapps_filter_parent_system">Système</string>
     <string name="fapps_unmetered_block_dialog_title">Bloquer sur réseau sans abonnement</string>
     <string name="fapps_metered_unblock_dialog_title">Autoriser sur réseau avec abonnement</string>
@@ -700,7 +700,7 @@
     <string name="dns_btm_resolved_crypt">résolu <u>anonymement</u> %1$s par %2$s</string>
     <string name="univ_firewall_rule_2">Bloquer les applications non utilisées</string>
     <string name="network_log_app_name_unknown">Inconnu</string>
-    <string name="univ_firewall_rule_9">Bloquer sur les réseaux avec abonnement (mobiles)</string>
+    <string name="univ_firewall_rule_9">Bloquer sur les réseaux avec facturation à l\'usage (mobiles)</string>
     <string name="update_complete_action_snack">REDÉMARRER</string>
     <string name="pause_text">en pause</string>
     <string name="firewall_rule_trusted_ip">IP avec exception (Appli)</string>
