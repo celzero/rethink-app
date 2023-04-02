@@ -9,7 +9,7 @@
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="notification_action_resume_vpn">REPRENDRE</string>
     <string name="slide_1_title">Libre et Open Source</string>
-    <string name="slide_1_desc">RethinkDNS est un logiciel open source soutenu par le programme Mozilla Builders MVP.</string>
+    <string name="slide_1_desc">Rethink est un logiciel open source soutenu par le programme Mozilla Builders MVP.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">bloquer</string>
     <string name="isolate">confiner</string>
@@ -95,12 +95,12 @@
     <string name="always_on_dialog_stop_message">Le paramètre VPN permanent est activé pour RethinkDNS. Êtes-vous sûr de vouloir arrêter RethinkDNS \?</string>
     <string name="about_title_desc">Détecter et bloquer les menaces réseau</string>
     <string name="finish">Finir</string>
-    <string name="slide_2_desc">RethinkDNS est le moyen le plus simple pour surveiller l’activité réseau, contourner la censure sur Internet et mettre en place un pare-feu sur votre appareil Android.</string>
+    <string name="slide_2_desc">Rethink est le moyen le plus simple pour surveiller l’activité réseau, contourner la censure sur Internet et mettre en place un pare-feu sur votre appareil Android.</string>
     <string name="skip">Passer</string>
     <string name="slide_2_title">Bienvenue</string>
     <string name="settings_title_desc">Un DNS et pare-feu hautement configurable</string>
     <string name="next">Suivant</string>
-    <string name="accessibility_service_description">RethinkDNS utilise le service d’accessibilité pour détecter et filtrer les applications en arrière-plan. RethinkDNS ne collecte ni ne vend aucune information.</string>
+    <string name="accessibility_service_description">Rethink utilise le service d’accessibilité pour détecter et filtrer les applications en arrière-plan. Rethink ne collecte ni ne vend aucune information.</string>
     <string name="doh_custom_url_remove_dialog_title">Supprimer le point de terminaison DoH \?</string>
     <string name="refresh_complete">Re-synchronisation de la liste des applications terminée.</string>
     <string name="doh_custom_url_remove_dialog_message">Supprimer le point de terminaison DNS over HTTPS de la configuration sauvegardée.</string>
@@ -116,10 +116,10 @@
     <string name="download_update_dialog_trylater_title">Impossible d’appliquer la mise à jour actuellement</string>
     <string name="download_update_dialog_trylater_message">La mise à jour ne peut être appliquée pour le moment, veuillez réessayer plus tard.</string>
     <string name="settings_enable_logs">Activer la journalisation embarquée sur l’appareil</string>
-    <string name="whats_new_version_update">&lt;b&gt;RA Fisher !&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Nouvel écran de statistiques.&lt;br/&gt; 2. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Sécurisez cette appli en utilisant le verrouillage de l\'écran.&lt;br/&gt; 3. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Choisissez votre langue préférée dans les paramètres de l\'appli.&lt;br/&gt; 4. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : La vue &lt;i&gt;Simple&lt;/i&gt; RDNS+ ne montre que les listes les mieux conçues.&lt;br/&gt; 5. Renommage : &lt;i&gt;Contourner les règles de l\'appli&lt;/i&gt; est maintenant appelé &lt;i&gt;Faire confiance&lt;/i&gt;.&lt;br/&gt; 6. Correction d\'un crash lorsque Rethink est installé dans un profil de travail.&lt;br/&gt; 7. Suppression des règles spécifiques aux applications lorsque l\'appli est désinstallée.&lt;br/&gt; 8. Et d\'autres modifications mineures de l\'interface utilisateur et des corrections de bogues.&lt;br/&gt;&lt;br/&gt; &lt;a href=https ://svc.rethinkdns.com/r/translate&gt;Aidez-nous à traduire cette application&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Super Chargé!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Filtrage DNS avancé ; appliquez les règles de domaine uniquement lorsque les applications se connectent.&lt;br/&gt; 2. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Autoriser ou refuser des domaines par application.&lt;br/&gt; 3. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Autoriser ou refuser des domaines pour toutes les applications.&lt;br/&gt; 4. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Contournez les règles DNS et de pare-feu par application. 5. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Capture de paquets (PCAP).&lt;br/&gt; 6. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : DNS Booster ; fusionnez les demandes, mettez en cache les réponses.&lt;br/&gt; 7. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Modifier les règles de domaine et d\'IP.&lt;br/&gt; 8. Et autres modifications mineures de l\'interface utilisateur et corrections de bogues.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Aidez à la traduction de cette application&lt;/a&gt;</string>
     <string name="settings_ptrans_desc">Traduit le trafic sortant IPv6 en IPv4 sur l’appareil. Activez cette option si vous êtes connecté à un réseau uniquement IPv4.</string>
     <string name="settings_allow_bypass_desc">Autorisez les applications à contourner le pare-feu de RethinkDNS à la demande. Certaines applications de conférence audio/vidéo comme Zoom et WhatsApp peuvent nécessiter cela pour fonctionner correctement.</string>
-    <string name="settings_lock_down_mode_desc">Impossible de configurer un proxy ou d’autoriser le contournement du VPN lorsque celui-ci fonctionne en mode confinement. <u>Accéder aux paramètres VPN d’Android</u>.</string>
+    <string name="settings_lock_down_mode_desc">Impossible de configurer VPN lorsque celui-ci fonctionne en mode confinement. <u>Accéder aux paramètres VPN d’Android</u>.</string>
     <string name="settings_https_desc">Ce paramètre n’est qu’une recommandation, certaines applications pourraient l’ignorer. Les applications utilisant le proxy HTTP(S) contourneront les règles du pare-feu et du DNS.</string>
     <string name="orbot_http_desc">Recommande que les applications utilisent le proxy HTTP d’Orbot.</string>
     <string name="orbot_bs_status_2">Le proxy HTTP est défini (des applications pourraient l’ignorer).</string>
@@ -137,7 +137,7 @@
     <string name="settings_import_export_heading">Sauvegarder &amp; Restaurer</string>
     <string name="settings_dns_proxy_dialog_port_number">Numéro de port</string>
     <string name="settings_socks5_dialog_hint_ip">Adresse IP</string>
-    <string name="settings_theme_dialog_themes_4">Sombre</string>
+    <string name="settings_theme_dialog_themes_4">Sombre AMOLED</string>
     <string name="orbot_install_activity_error">Quelque chose s’est mal passé, essayez plus tard</string>
     <string name="settings_socks_forwarding_default_desc">Transférer les connexions vers le point de terminaison SOCKS5.</string>
     <string name="settings_orbot_desc">Orbot en mode non-vpn avec HTTPS/SOCKS5.</string>
@@ -194,10 +194,7 @@
     <string name="settings_protocol_translation_dns_inactive">Passez en mode DNS/DNS+Pare-feu pour activer ce paramètre</string>
     <string name="firewall_status_whitelisted">contourne les règles du pare-feu global</string>
     <string name="firewall_card_status_active">%1$s applis</string>
-    <string name="firewall_card_text_active">%1$s bloquée(s)
-\n%2$s avec exception(s)
-\n%3$s exclue(s)
-\n%4$s confinée(s)</string>
+    <string name="firewall_card_text_active">%1$s bloquée(s), %2$s avec exception(s), %3$s exclue(s), %4$s confinée(s)</string>
     <string name="firewall_status_isolate">confinée</string>
     <string name="firewall_card_text_inactive">Activez le mode pare-feu.</string>
     <string name="dns_card_latency_active">Latence : %1$sms</string>
@@ -234,7 +231,7 @@
     <string name="info_dialog_rethink_toast_msg">Copié en tant qu’URL RDNS+ DNS over HTTPS</string>
     <string name="brbs_restore_dialog_message">Restaure les paramètres de l’application ainsi que les journaux réseau et DNS à partir d’un fichier de sauvegarde. Cela va redémarrer l’application.</string>
     <string name="brbs_restore_dialog_failure_message">Impossible de restaurer. Essayez à nouveau \?</string>
-    <string name="contributors_list">Le &lt;i&gt;projet libre et open source Rethink&lt;/i&gt; doit son existence à ces bénévoles qui consacrent d’innombrables heures à son développement.&lt;br/&gt; &lt;br/&gt;🛡️ Application Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Moteur réseau &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Résolveur &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Modérateurs de la communauté &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Géo-localisation IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traductions &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icônes &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Serveurs de compilation &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">Le &lt;i&gt;projet libre et open source Rethink&lt;/i&gt; doit son existence à ces bénévoles qui consacrent d’innombrables heures à son développement.&lt;br/&gt; &lt;br/&gt;🛡️ Application Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Moteur réseau &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Résolveur &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Modérateurs de la communauté &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Géo-localisation IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Traductions &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icônes &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Serveurs de compilation &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="orbot_explanation">Orbot est une application proxy gratuite qui permet à d’autres applications d’utiliser Internet de manière plus <u>sûre</u> .
 \nOrbot utilise <u>Tor</u> pour chiffrer votre trafic Internet, ce qui vous aide à <u>contourner la censure</u> et à vous défendre contre les formes de <u>surveillance du réseau</u> qui menacent les libertés individuelles et la vie privée.
 \n<u>Proxy TCP</u> : RethinkDNS transmet à Orbot les connexions TCP de toutes les applications sauf celles qui sont exclues.
@@ -335,7 +332,7 @@
     <string name="dns_log_dialog_positive">Supprimer les journaux</string>
     <string name="settings_http_proxy_dialog_title">URL du serveur personnalisé</string>
     <string name="dns_btm_resolved_doh_no_server">résolu %1$s</string>
-    <string name="univ_view_blocked_ip">règles IP &amp; port</string>
+    <string name="univ_view_blocked_ip">règles IP &amp; Port</string>
     <string name="univ_ip_delete_individual_positive">Supprimer</string>
     <string name="univ_accessibility_dialog_negative">Refuser</string>
     <string name="fapps_firewall_filter_excluded">Exclues</string>
@@ -412,7 +409,7 @@
     <string name="brbs_backup_dialog_failure_positive">Retenter la sauvegarde</string>
     <string name="notif_dialog_pause_dialog_title">Application en pause !</string>
     <string name="dc_rethink_dns">DNS Rethink</string>
-    <string name="fapps_firewall_filter_hint">Appliquer les règles aux applications listées</string>
+    <string name="fapps_firewall_filter_hint">Montrer toutes les apps</string>
     <string name="about_settings">système</string>
     <string name="univ_firewall_dialog_title">Supprimer la règle IP \?</string>
     <string name="blocklist_update_check_failure">Un problème est survenu. Essayez à nouveau plus tard !</string>
@@ -471,7 +468,7 @@
     <string name="brbs_restore_dialog_failure_positive">Retenter la restauration</string>
     <string name="brbs_restore_complete_toast">Restauration terminée, redémarrage de l’application…</string>
     <string name="about_app">app</string>
-    <string name="hs_download_positive_play_store">Achever la mise à jour</string>
+    <string name="hs_download_positive_play_store">Mise à jour complète</string>
     <string name="notif_channel_vpn_failure">VPN inactif</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="hsf_uptime">(actif %1$s ; protocoles : %2$s ; type : %3$s)</string>
@@ -620,7 +617,7 @@
     <string name="about_settings_notification">Paramètres de notification</string>
     <string name="hsf_start_dialog_positive">Commencer</string>
     <string name="univ_firewall_rule_4">Bloquer l’UDP sauf pour le DNS et le NTP</string>
-    <string name="univ_view_blocked_ip_desc">Gérer les règles globales de blocage ou d’exception des IP / ports.</string>
+    <string name="univ_view_blocked_ip_desc">Gérer les règles globales de blocage ou d’exception des deomaines, IP / ports.</string>
     <string name="dns_delete_positive">Supprimer</string>
     <string name="ada_app_unmetered">Sans abonnement</string>
     <string name="rules_load_failure_desc">Aucune règle de pare-feu trouvée</string>
@@ -635,10 +632,10 @@
     <string name="notif_channel_desc_vpn_notification">Informer lorsque RethinkDNS est actif et fonctionne en arrière-plan</string>
     <string name="notif_channel_desc_firewall_alerts">Alerte sur les erreurs et anomalies du pare-feu</string>
     <string name="cd_remove_dialog_title">Supprimer le domaine \?</string>
-    <string name="ci_no_rules_text">Aucune règle IP ou port n’a été trouvée.</string>
+    <string name="ci_no_rules_text">Aucune règle IP ou Port.</string>
     <string name="ada_app_status_whitelist">contournera les règles du pare-feu global</string>
     <string name="rt_list_adv_btn_txt">avancé</string>
-    <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
+    <string name="cd_dns_crypt_dialog_stamp">Tampon</string>
     <string name="dc_dns_leaks_desc">Si activé, RethinkDNS capturera tous les paquets sur le port 53 et les transmettra à un point de terminaison DNS défini par l’utilisateur</string>
     <string name="dns_crypt_relay_remove_dialog_title">Supprimer le relais DNSCrypt \?</string>
     <string name="settings_socks5_heading">Configuration du proxy SOCKS5</string>
@@ -688,7 +685,7 @@
     <string name="rt_edit_dialog_positive">Éditer</string>
     <string name="rethink_sky_desc">280+ emplacements ; uptime plus élevé ; ébauche de résolveur fonctionnant sur cloudflare.com</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
-    <string name="settings_custom_downloader_desc">Si désactivé, le <i>Gestionnaire de téléchargement</i> d’Android sera utilisé.</string>
+    <string name="settings_custom_downloader_desc">Si désactivé, le <i>Gestionnaire de téléchargement</i> d’Android sera utilisé</string>
     <string name="hsf_start_dialog_header">Commencer %1$s</string>
     <string name="build__flavor_play_store">play</string>
     <string name="dns_proxy_remove_success">Proxy DNS supprimé.</string>
@@ -697,7 +694,7 @@
     <string name="app_mode_choose">Choisir le mode</string>
     <string name="about_docs">Lire la documentation</string>
     <string name="cd_dns_proxy_error_text_2">La plage de ports doit être comprise entre 1024 et 65535</string>
-    <string name="firewall_act_universal_tab">Global</string>
+    <string name="firewall_act_universal_tab">global</string>
     <string name="cd_custom_doh_dialog_title">URL du serveur personnalisé</string>
     <string name="dns_btm_sheet_chip_no_answer">Sans réponse</string>
     <string name="dns_btm_resolved_crypt">résolu <u>anonymement</u> %1$s par %2$s</string>
@@ -724,10 +721,10 @@
     <string name="firewall_rule_global_lockdown">Confinée (Global)</string>
     <string name="univ_firewall_rule_1">Bloquer toutes les applications lorsque l’appareil est verrouillé</string>
     <string name="dns_proxy_name">Nom du proxy</string>
-    <string name="firewall_act_network_monitor_tab">Journaux du réseau</string>
+    <string name="firewall_act_network_monitor_tab">Réseau</string>
     <string name="dns_crypt_url_remove_success">Résolveur DNSCrypt supprimé.</string>
     <string name="local_blocklist_download">Télécharger les listes de blocage</string>
-    <string name="whats_dialog_title">Quoi de neuf dans la v053n</string>
+    <string name="whats_dialog_title">Quoi de neuf dans la v054</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_stop_dialog_neutral">Changer de DNS</string>
@@ -810,7 +807,7 @@
     <string name="hs_biometeric_feature_not_supported">L\'authentification biométrique n\'est pas prise en charge ou est désactivée sur cet appareil</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">applications les plus autorisées</string>
     <string name="hs_biometeric_error">Erreur lors de l\'authentification biométrique</string>
-    <string name="ssv_see_more">tout afficher</string>
+    <string name="ssv_see_more">Tout afficher</string>
     <string name="firewall_rule_block_domain" translatable="true">Domaine (Appli)</string>
     <string name="lbl_cancel" translatable="true">Annuler</string>
     <string name="lbl_apply" translatable="true">Appliquer</string>
@@ -824,9 +821,50 @@
     <string name="lbl_ip_rules" translatable="true">Règles IP</string>
     <string name="lbl_wildcard" translatable="true">Caractère joker</string>
     <string name="lbl_domain_rules" translatable="true">Règles de domaines</string>
-    <string name="firewall_rule_trusted_domain" translatable="true">Domaine (Appli)</string>
-    <string name="cd_no_rules_text" translatable="true">Aucune règle de domaine n\'a été trouvée.</string>
+    <string name="firewall_rule_trusted_domain" translatable="true">Domaine de confiance (Appli)</string>
+    <string name="cd_no_rules_text" translatable="true">Aucune règles de domaine.</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Cette connexion a été autorisée car <i>le domaine</i> est autorisé.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Une règle de pare-feu définie par l’utilisateur a bloqué le <i>domaine</i>.<br/><br/> Pour la modifier, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="bsdl_block_desc" translatable="true">Bloquer, tolérer <u>ce domaine</u></string>
+    <string name="lbl_rules" translatable="true">règles</string>
+    <string name="lbl_configure" translatable="true">Configurer</string>
+    <string name="lbl_logs" translatable="true">journaux</string>
+    <string name="bypass_dns_firewall" translatable="true">contourner dns &amp; firewall</string>
+    <string name="bsct_block_domain" translatable="true">Bloquer, faire confiance à <u> ce domaine</u> pour <u>cette applicaation</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Impossible de configurer les proxies lorsque le VPN fonctionne en mode DNS uniquement ou en mode verrouillage. <u>Allez dans les paramètres VPN</u></string>
+    <string name="settings_general_customize" translatable="true">personnaliser</string>
+    <string name="settings_default_dns_heading" translatable="true">Choisissez le DNS de secours</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Capture de paquets désactivée</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domaine (Univ)</string>
+    <string name="settings_default_dns_desc" translatable="true">Dans de rares cas où le DNS préféré de l\'utilisateur n\'a pas pu être déterminé, le DNS de secours est utilisé.</string>
+    <string name="settings_pcap_heading" translatable="true">Capture de paquets</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Sortie vers Logcat</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Désactivé (par défaut)</string>
+    <string name="pcap_failure_toast" translatable="true">Erreur de création du fichier pcap, réessayez !</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">contourne les règles des DNS et des pare-feu</string>
+    <string name="cd_dns_alg_heading" translatable="true">Filtrage DNS avancé (expérimental)</string>
+    <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Exceptions</string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Contourner les règles du pare-feu DNS universel &amp; pour les applications <i>listées</i> \?</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">App. contournée</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqué</string>
+    <string name="ada_app_firewall" translatable="true">Pare-feu</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Contourner le DNS et le pare-feu</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">Booster DNS (expérimental)</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Coalescence des demandes, mise en cache des réponses, traitement résilient des erreurs</string>
+    <string name="dc_refresh_toast" translatable="true">Rafraîchissement DNS terminé</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Ne fonctionne pas quelle que soit la version de l\'application ou l\'appareil utilisé</string>
+    <string name="settings_pcap_dialog_option_3" translatable="true">Sortie vers le dossier Téléchargements</string>
+    <string name="firewall_card_universal_rules" translatable="true">%1$s règle(s) universelle(s)</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s règles du domaine</string>
+    <string name="logs_card_network_count" translatable="true">%1$s connexions</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s demandes de renseignements</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Capture de paquets active</string>
+    <string name="cd_dns_alg_desc" translatable="true">Appliquer les règles de domaine uniquement lorsque les applications se connectent</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domaine de confiance (Univ)</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme bloqué dans les règles de domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est bloqué par le DNS préféré de l\'utilisateur.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">contournera les règles universelles de DNS et de pare-feu</string>
 </resources>
