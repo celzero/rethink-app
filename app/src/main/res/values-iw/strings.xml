@@ -1,2 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="about_title_desc" translatable="true">זיהוי וחסום איומי אבטחת רשת</string>
+    <string name="txt_home" translatable="true">בית</string>
+    <string name="next" translatable="true">הבא</string>
+    <string name="skip" translatable="true">דלג</string>
+    <string name="lbl_cancel" translatable="true">בטל</string>
+    <string name="lbl_apply" translatable="true">החלה</string>
+    <string name="lbl_dismiss" translatable="true">התעלם</string>
+    <string name="lbl_all" translatable="true">הכול</string>
+    <string name="lbl_allowed" translatable="true">מאופשר</string>
+    <string name="lbl_blocked" translatable="true">נחסם</string>
+    <string name="slide_2_title" translatable="true">ברוך הבא</string>
+    <string name="block" translatable="true">חסום</string>
+    <string name="isolate" translatable="true">לְבוּדֵד</string>
+    <string name="dns_mode_notification_title" translatable="true">מוּגָן! מחובר ל-DNS מהיר ומאובטח.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">מוּגָן! מחובר ל-DNS + חומת אש.</string>
+    <string name="pause_mode_notification_title" translatable="true">מושהה! אפליקציות חסומות ימשיכו להיות חסומות חומת אש.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">ממתין</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">נכשל</string>
+    <string name="status_app_error" translatable="true">שגיאה באפליקציה</string>
+    <string name="status_dns_error" translatable="true">שגיאת dns</string>
+    <string name="status_dns_server_down" translatable="true">שרת dns מושבת</string>
+    <string name="status_protected_with_tor" translatable="true">מוגן עם Tor</string>
+    <string name="status_protected_with_private_dns" translatable="true">מוגן עם dns פרטי</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">מוגן עם DNS פרטי &amp; Tor</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">מוגן עם פרוקסי ו-DNS פרטי</string>
+    <string name="status_protected_with_proxy" translatable="true">מוגן עם פרוקסי</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">DNS פרטי מופעל</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">לא מוגן</string>
+    <string name="notification_action_stop_vpn" translatable="true">עצור</string>
+    <string name="notification_action_pause_vpn" translatable="true">הַשהה</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + חומת אש</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="firewall_rules" translatable="true">כללי רשת</string>
+    <string name="firewall_mode_info_title" translatable="true">חומת אש</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">עקוב אחר פעילות הרשת וחומת אש בכל אפליקציה או כתובת IP.</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + חומת אש</string>
+    <string name="wireguard_mode_info_explanation_new" translatable="true">בקרוב…</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">פתיחת הגדרות הנגישות נכשלה. נסה שוב מאוחר יותר!</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">בחר מצב.</string>
+    <string name="custom_url_error_invalid_url" translatable="true">כתובת האתר לא תקינה</string>
+    <string name="bsct_app_info" translatable="true">מידע אפליקציה</string>
+    <string name="bsct_block_ip" translatable="true">חסום, סמוך על <u>IP זה</u> עבור <u>אפליקציה זו</u></string>
+    <string name="bsct_block" translatable="true">חסום, עוקף, אי הכללה, בידוד <u>האפליקציה הזו</u></string>
+    <string name="bsct_conn_block_desc" translatable="true">חסום %1$s על ידי %2$s</string>
+    <string name="title_about" translatable="true">אודות</string>
+    <string name="finish" translatable="true">סיום</string>
+    <string name="title_settings" translatable="true">הגדרות</string>
+    <string name="firewall_mode_notification_title" translatable="true">מוּגָן! מחובר לחומת האש.</string>
+    <string name="allow" translatable="true">התר</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">הקש כדי לשנות את הגדרת ההגנה</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">מוּגָן</string>
+    <string name="status_no_internet" translatable="true">אין אינטרנט</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">מחובר לחומת אש</string>
+    <string name="universal_firewall_explanation" translatable="true">החל כללי חומת אש על כל היישומים המבוססים על אירועי מכשיר, למשל, חומת אש כשהמכשיר נעול או כאשר אפליקציה מסוימת אינה בשימוש.</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">בחר מצב.</string>
+</resources>
