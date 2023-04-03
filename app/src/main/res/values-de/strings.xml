@@ -820,7 +820,7 @@
     <string name="lbl_blocked" translatable="true">Geblockt</string>
     <string name="lbl_disabled" translatable="true">Deaktiviert</string>
     <string name="lbl_action_required" translatable="true">Aktion erforderlich</string>
-    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="lbl_domain" translatable="true">Domäne</string>
     <string name="fapps_info_unmetered_msg" translatable="true">Zulassen / Blockieren im Netzwerk ohne Zähler (WiFi).</string>
     <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS durch Proxy geleitet</string>
     <string name="firewall_rule_block_domain" translatable="true">Domain (App)</string>
@@ -862,4 +862,19 @@
     <string name="dc_refresh_toast" translatable="true">DNS-Aktualisierung abgeschlossen</string>
     <string name="pcap_failure_toast" translatable="true">Fehler beim Erstellen der pcap-Datei, versuchen Sie es erneut!</string>
     <string name="brbs_backup_restore_desc" translatable="true">Funktioniert nicht über App-Versionen oder Geräte hinweg</string>
+    <string name="bsct_block_domain" translatable="true">Blockiere, vertraue <u>Domain(s)</u> für <u>diese App</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Proxies können nicht aufgesetzt werden, während VPN in DNS only- oder Lockdown-Modus läuft. <u>Gehe zu VPN-Einstellungen</u></string>
+    <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Sollen universelle DNS- &amp; Firewall-Regeln für <i>aufgelisteten</i> Apps umgangen werden\?</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domänen wird vertraut (Univ)</string>
+    <string name="firewall_rule_dns_blocked_desc" translatable="true">Diese Verbindung wurde blockiert, da die <i>Domäne</i> von der nutzerbevorzugten DNS blockiert wird.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
+    <string name="ada_app_bypass_dns_firewall" translatable="true">Umgehe DNS &amp; Firewall</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Vereine Anfragen, cache Antworten, robuste Fehlerbehandlung</string>
+    <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Diese Verbindung wurde blockiert, da die <i>Domäne</i> in den universellen Domäne-Regeln als blockiert gesetzt wurde.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">wird universelle DNS- &amp; Firewall-Regeln umgehen</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s Domäne-Regeln</string>
+    <string name="cd_dns_alg_desc" translatable="true">Wende Domäne-Regeln nur beim Verbinden von Apps an</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domäne (Univ)</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Diese Verbindung wurde erlaubt, da die Einstellungen der <i>Quellapp</i> das <i>Umgehen von DNS- und Firewall-Regeln</i> erlauben.<br/><br/> Um das zu ändern, gehe zur <i>App-spezifischen Firewall</i>-Seite.</string>
+    <string name="settings_default_dns_desc" translatable="true">In seltenen Fällen kann die vom Nutzer bevorzugte DNS nicht ermittelt werden. Dann wird die Reserve-DNS verwendet.</string>
+    <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Diese Verbindung wurde erlaubt, da die <i>Domäne</i> in den universellen Domäne-Regeln als wird-vertraut gesetzt wurde.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
 </resources>
