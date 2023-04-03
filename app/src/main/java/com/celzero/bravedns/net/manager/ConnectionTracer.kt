@@ -19,7 +19,6 @@ class ConnectionTracer(ctx: Context) {
     companion object {
         private const val CACHE_BUILDER_WRITE_EXPIRE_SEC: Long = 300
         private const val CACHE_BUILDER_MAX_SIZE: Long = 1000
-        private const val PER_USER_RANGE = 100000
     }
     private val cm: ConnectivityManager
     private val uidCache: Cache<String, Int>
@@ -73,10 +72,6 @@ class ConnectionTracer(ctx: Context) {
         val key = makeCacheKey(protocol, local, remote, destPort)
         try {
             uid = cm.getConnectionOwnerUid(protocol, local, remote)
-            // Returns the app id for a given uid, stripping out the user id from it.
-            // TODO: revisit this logic for multi-user support
-            // http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#224
-            // uid %= PER_USER_RANGE
 
             if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "UID from getConnectionOwnerUid(): $uid")
             if (uid != Constants.INVALID_UID) {
