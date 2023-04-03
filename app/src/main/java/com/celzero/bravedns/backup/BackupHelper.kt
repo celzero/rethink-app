@@ -140,8 +140,8 @@ class BackupHelper {
             return true
         }
 
-        fun getFileNameFromPath(file: File): String {
-            return file.path.substring(file.path.lastIndexOf("/") + 1)
+        fun getFileNameFromPath(file: String): String {
+            return file.substring(file.lastIndexOf("/") + 1)
         }
     }
 }

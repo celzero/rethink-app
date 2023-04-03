@@ -40,18 +40,22 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.copyWithStream
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import com.celzero.bravedns.util.Utilities.isAtleastT
 import java.io.*
+import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import java.nio.file.Paths
+import java.util.zip.ZipFile
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
 class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams), KoinComponent {
 
-    var filesToZip: MutableList<File> = ArrayList()
+    var filesPathToZip: MutableList<String> = ArrayList()
     private val persistentState by inject<PersistentState>()
 
     companion object {
@@ -131,14 +135,23 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             )
             return false
         } finally {
-            for (file in filesToZip) {
+            for (filePath in filesPathToZip) {
+                val file = File(filePath)
                 deleteResidue(file)
             }
+            filesPathToZip.clear()
         }
     }
 
     private fun createMetaData(backupDir: File): Boolean {
         if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "creating meta data file, path: ${backupDir.path}")
+        // check if the file exists already, if yes, delete it
+        val file = File(backupDir, METADATA_FILENAME)
+        if (file.exists()) {
+            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "metadata file exists, deleting it")
+            file.delete()
+            filesPathToZip.remove(file.absolutePath)
+        }
         var writer: FileWriter? = null
         val metadata = backupMetadata()
         try {
@@ -148,7 +161,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
             writer.flush()
             writer.close()
             // add the metadata file to the list of files to be zipped
-            filesToZip.add(metadataFile)
+            filesPathToZip.add(metadataFile.absolutePath)
             return true
         } catch (e: Exception) {
             Log.e(
@@ -174,7 +187,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun zipAndCopyToDestination(tempDir: File, destUri: Uri): Boolean {
-        val bZipSucceeded: Boolean = zip(filesToZip, tempDir.path)
+        val bZipSucceeded: Boolean = zip(filesPathToZip, tempDir.path)
 
         Log.i(
             LOG_TAG_BACKUP_RESTORE,
@@ -225,7 +238,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                     ?: return false
             if (DEBUG)
                 Log.d(LOG_TAG_BACKUP_RESTORE, "file ${databaseFile.name} added to backup dir")
-            filesToZip.add(databaseFile)
+            filesPathToZip.add(databaseFile.absolutePath)
         }
 
         return true
@@ -259,7 +272,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 // no-op
             }
         }
-        filesToZip.add(prefFile)
+        filesPathToZip.add(prefFile.absolutePath)
         return true
     }
 
@@ -277,8 +290,9 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         return null
     }
 
-    private fun zip(files: List<File>, zipDirectory: String): Boolean {
+    private fun zip(files: List<String>, zipDirectory: String): Boolean {
         val outputFileName = zipDirectory + File.separator + TEMP_ZIP_FILE_NAME
+        if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "files: $files, output: $outputFileName")
         return try {
             val dest = FileOutputStream(outputFileName)
             val out = ZipOutputStream(BufferedOutputStream(dest))
@@ -295,7 +309,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                     out.write(data, 0, count)
                 }
                 origin.close()
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip, path: ${file.path}")
+                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip, path: ${file}")
             }
             out.close()
             out.close()
