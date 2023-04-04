@@ -40,15 +40,11 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.copyWithStream
-import com.celzero.bravedns.util.Utilities.isAtleastT
 import java.io.*
-import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.nio.file.Paths
-import java.util.zip.ZipFile
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
@@ -296,20 +292,20 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         return try {
             val dest = FileOutputStream(outputFileName)
             val out = ZipOutputStream(BufferedOutputStream(dest))
-            val BUFFER = 80000
+            val bufferSize = 80000
             var origin: BufferedInputStream
-            val data = ByteArray(BUFFER)
+            val data = ByteArray(bufferSize)
             for (file in files) {
                 val fi = FileInputStream(file)
-                origin = BufferedInputStream(fi, BUFFER)
+                origin = BufferedInputStream(fi, bufferSize)
                 val entry = ZipEntry(getFileNameFromPath(file))
                 out.putNextEntry(entry)
                 var count: Int
-                while (origin.read(data, 0, BUFFER).also { count = it } != -1) {
+                while (origin.read(data, 0, bufferSize).also { count = it } != -1) {
                     out.write(data, 0, count)
                 }
                 origin.close()
-                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip, path: ${file}")
+                if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "$file added to zip, path: $file")
             }
             out.close()
             out.close()

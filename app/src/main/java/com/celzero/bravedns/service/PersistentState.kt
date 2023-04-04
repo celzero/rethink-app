@@ -249,6 +249,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // private ips, default false (route private ips to tunnel)
     var privateIps by booleanPref("private_ips").withDefault<Boolean>(false)
 
+    // biometric last auth time
+    var biometricAuthTime by longPref("biometric_auth_time").withDefault<Long>(INIT_TIME_MS)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()

@@ -135,7 +135,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         observeAppState()
 
-        if (persistentState.biometricAuth) {
+        if (persistentState.biometricAuth && !isAppRunningOnTv()) {
             biometricPrompt()
         }
     }
@@ -151,6 +151,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun biometricPrompt() {
+        // return if the biometric authentication is already done within the last 15 minutes
+        // fixme - #324 - move the 15 minutes to a configurable value
+        if (persistentState.biometricAuthTime + TimeUnit.MINUTES.toMillis(15) > System.currentTimeMillis()) {
+            Log.i(LOG_TAG_UI, "Biometric authentication already done at ${persistentState.biometricAuthTime} , skipping")
+            return
+        }
+
         // ref: https://developer.android.com/training/sign-in/biometric-auth
         executor = ContextCompat.getMainExecutor(this)
         biometricPrompt =
@@ -176,6 +183,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         result: BiometricPrompt.AuthenticationResult
                     ) {
                         super.onAuthenticationSucceeded(result)
+                        persistentState.biometricAuthTime = System.currentTimeMillis()
                         Log.i(LOG_TAG_UI, "Biometric authentication succeeded")
                     }
 
