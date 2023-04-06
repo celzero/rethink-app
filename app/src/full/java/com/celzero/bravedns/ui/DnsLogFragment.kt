@@ -22,6 +22,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -111,41 +115,45 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         b.queryListCardViewTop.visibility = View.VISIBLE
 
         b.recyclerQuery.setHasFixedSize(true)
-        layoutManager = CustomLinearLayoutManager(requireContext())
+        layoutManager = LinearLayoutManager(requireContext())
         b.recyclerQuery.layoutManager = layoutManager
 
         val recyclerAdapter = DnsQueryAdapter(requireContext(), persistentState.fetchFavIcon)
-        viewModel.dnsLogsList.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.dnsLogsList.observe(viewLifecycleOwner) {
+                    recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+                }
+            }
         }
         b.recyclerQuery.adapter = recyclerAdapter
 
         val scrollListener =
-            object : RecyclerView.OnScrollListener() {
+        object : RecyclerView.OnScrollListener() {
 
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0).tag == null) return
+                if (recyclerView.getChildAt(0).tag == null) return
 
-                    val tag: Long = recyclerView.getChildAt(0).tag as Long
+                val tag: Long = recyclerView.getChildAt(0).tag as Long
 
-                    if (dy > 0) {
-                        b.queryListRecyclerScrollHeader.text =
-                            formatToRelativeTime(requireContext(), tag)
-                        b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
-                    } else {
-                        b.queryListRecyclerScrollHeader.visibility = View.GONE
-                    }
-                }
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        b.queryListRecyclerScrollHeader.visibility = View.GONE
-                    }
+                if (dy > 0) {
+                    b.queryListRecyclerScrollHeader.text =
+                        formatToRelativeTime(requireContext(), tag)
+                    b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
+                } else {
+                    b.queryListRecyclerScrollHeader.visibility = View.GONE
                 }
             }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    b.queryListRecyclerScrollHeader.visibility = View.GONE
+                }
+            }
+        }
         b.recyclerQuery.addOnScrollListener(scrollListener)
     }
 

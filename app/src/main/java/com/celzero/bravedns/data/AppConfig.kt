@@ -68,7 +68,6 @@ internal constructor(
     companion object {
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
 
-        private const val PROXY_MODE_ORBOT = 10L
         private const val ORBOT_DNS = "Orbot"
     }
 
@@ -608,16 +607,6 @@ internal constructor(
     }
 
     suspend fun handleDnsProxyChanges(dnsProxyEndpoint: DnsProxyEndpoint) {
-        // if the prev connection was not dns proxy, then remove the connection status from database
-        if (getDnsType() != DnsType.DNS_PROXY) {
-            removeConnectionStatus()
-        }
-
-        dnsProxyEndpointRepository.update(dnsProxyEndpoint)
-        onDnsChange(DnsType.DNS_PROXY)
-    }
-
-    suspend fun handleOrbotDnsChange(dnsProxyEndpoint: DnsProxyEndpoint) {
         // if the prev connection was not dns proxy, then remove the connection status from database
         if (getDnsType() != DnsType.DNS_PROXY) {
             removeConnectionStatus()

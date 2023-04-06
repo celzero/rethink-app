@@ -67,13 +67,16 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     private fun getBlockedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules)
+                    if (input.isBlank())
+                        connectionTrackerDAO.getBlockedConnectionsFiltered(filterRules)
+                    else connectionTrackerDAO.getBlockedConnectionsFiltered("%$input%", filterRules)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    connectionTrackerDAO.getBlockedConnections("%$input%")
+                    if (input.isBlank()) connectionTrackerDAO.getBlockedConnections()
+                    else connectionTrackerDAO.getBlockedConnections("%$input%")
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -83,13 +86,16 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     private fun getAllowedNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return if (filterRules.isNotEmpty()) {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules)
+                    if (input.isBlank())
+                        connectionTrackerDAO.getAllowedConnectionsFiltered(filterRules)
+                    else connectionTrackerDAO.getAllowedConnectionsFiltered("%$input%", filterRules)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         } else {
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                    connectionTrackerDAO.getAllowedConnections("%$input%")
+                    if (input.isBlank()) connectionTrackerDAO.getAllowedConnections()
+                    else connectionTrackerDAO.getAllowedConnections("%$input%")
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -98,7 +104,8 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun getAllNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                connectionTrackerDAO.getConnectionTrackerByName("%$input%")
+                if (input.isBlank()) connectionTrackerDAO.getConnectionTrackerByName()
+                else connectionTrackerDAO.getConnectionTrackerByName("%$input%")
             }
             .liveData
             .cachedIn(viewModelScope)

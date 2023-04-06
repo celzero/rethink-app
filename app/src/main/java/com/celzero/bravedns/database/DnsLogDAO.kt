@@ -28,20 +28,31 @@ interface DnsLogDAO {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE) fun insertBatch(dnsLogs: List<DnsLog>)
 
+    @Query("select * from DNSLogs order by time desc") fun getAllDnsLogs(): PagingSource<Int, DnsLog>
+
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by time desc"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists = '' order by time desc")
+    fun getAllowedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists = '' order by time desc"
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
+    @Query("select * from DNSLogs where isBlocked = 1 order by time desc")
+    fun getBlockedDnsLogs(): PagingSource<Int, DnsLog>
+
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by time desc"
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists != '' order by time desc")
+    fun getMaybeBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists != '' order by time desc"
