@@ -105,9 +105,6 @@ class BraveVPNService :
         private const val MAIN_CHANNEL_ID = "vpn"
         private const val WARNING_CHANNEL_ID = "warning"
 
-        // maximum time delay before sending block connection response
-        val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
-
         // notification request codes
         private const val NOTIF_ACTION_MODE_RESUME = 98
         private const val NOTIF_ACTION_MODE_PAUSE = 99
@@ -1791,8 +1788,10 @@ class BraveVPNService :
                 newBuilder().setSession("RethinkDNS").setMtu(VPN_INTERFACE_MTU)
 
             val has6 = route6()
-            // implemented icmp
-            val has4 = route4()
+            // always add ipv4 to the route, even though there is no ipv4 address
+            // ICMPv6 is not handled in underlying tun2socks, so add ipv4 route even if the
+            // selected protocol type is ipv6
+            val has4 = true || route4()
 
             Log.i(LOG_TAG_VPN, "Building vpn for v4?$has4, v6?$has6")
             // setup the gateway addr
