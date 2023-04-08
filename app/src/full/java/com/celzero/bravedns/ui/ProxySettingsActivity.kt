@@ -52,11 +52,11 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -109,6 +109,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 return@setOnCheckedChangeListener
             }
 
+            if (!appConfig.canEnableProxy()) {
+                b.settingsActivitySocks5Switch.isChecked = false
+                return@setOnCheckedChangeListener
+            }
+
             if (!appConfig.canEnableSocks5Proxy()) {
                 showToastUiCentered(
                     this,
@@ -137,6 +142,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             if (!checked) {
                 appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivityHttpProxyDesc.text = getString(R.string.settings_https_desc)
+                return@setOnCheckedChangeListener
+            }
+
+            if (!appConfig.canEnableProxy()) {
+                b.settingsActivityHttpProxySwitch.isChecked = false
                 return@setOnCheckedChangeListener
             }
 
