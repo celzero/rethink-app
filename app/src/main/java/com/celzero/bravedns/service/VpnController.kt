@@ -138,6 +138,7 @@ object VpnController : KoinComponent {
         braveVpnService?.signalStopService(true)
         braveVpnService = null
         onConnectionStateChanged(connectionState)
+        persistentState.setVpnEnabled(false)
     }
 
     fun state(): VpnState {

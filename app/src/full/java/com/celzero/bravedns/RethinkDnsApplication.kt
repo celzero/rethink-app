@@ -1,11 +1,14 @@
 package com.celzero.bravedns
 
 import android.app.Application
+import android.net.VpnService
 import android.os.StrictMode
 import android.util.Log
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -45,6 +48,19 @@ class RethinkDnsApplication : Application() {
         // database refresh is used in both headless and main project
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()
+
+        /**
+         * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
+         * crashes/updates it goes into red waiting state. This causes confusion to the users also
+         * requires click of START button twice to start the app. FIX : The check for the controller
+         * state. If persistence state has vpn enabled and the VPN is not connected then the start will
+         * be initiated.
+         */
+        val state = VpnController.state()
+        if (state.activationRequested && !state.on) {
+            Log.i(LoggerConstants.LOG_TAG_VPN, "start VPN (previous state)")
+            if (VpnService.prepare(this) == null) VpnController.start(this)
+        } else VpnController.stop(this)
     }
 
     private fun turnOnStrictMode() {

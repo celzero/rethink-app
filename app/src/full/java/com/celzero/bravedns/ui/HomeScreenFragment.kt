@@ -820,7 +820,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     override fun onResume() {
         super.onResume()
         handleShimmer()
-        maybeAutoStart()
         updateCardsUi()
         syncDnsStatus()
         handleQuickSettingsChips()
@@ -1047,20 +1046,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         .show()
                 }
             }
-    }
-
-    /**
-     * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
-     * crashes/updates it goes into red waiting state. This causes confusion to the users also
-     * requires click of START button twice to start the app. FIX : The check for the controller
-     * state. If persistence state has vpn enabled and the VPN is not connected then the start will
-     * be initiated.
-     */
-    private fun maybeAutoStart() {
-        if (isVpnActivated && !VpnController.state().on) {
-            Log.i(LOG_TAG_VPN, "start VPN (previous state)")
-            prepareAndStartVpn()
-        }
     }
 
     // Sets the UI DNS status on/off.
