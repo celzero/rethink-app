@@ -108,11 +108,11 @@ dependencies {
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
     // new version 2.0.0 need minimum of gradle plugin 7.4.0-alpha10
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
     fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10"
     fullImplementation 'androidx.appcompat:appcompat:1.7.0-alpha02'
-    fullImplementation 'androidx.core:core-ktx:1.9.0'
+    fullImplementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -150,6 +150,9 @@ dependencies {
     implementation('com.github.bumptech.glide:glide:4.15.1') {
         exclude group: 'glide-parent'
     }
+    implementation('com.github.bumptech.glide:okhttp3-integration:4.15.1') {
+        exclude group: 'glide-parent'
+    }
     // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
     kapt 'com.github.bumptech.glide:compiler:4.15.1'
 
@@ -183,6 +186,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
