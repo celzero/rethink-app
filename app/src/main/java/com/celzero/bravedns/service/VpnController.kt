@@ -39,7 +39,7 @@ object VpnController : KoinComponent {
 
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
-    private val persistentState by inject<PersistentState>()
+    val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
     var controllerScope: CoroutineScope? = null
         private set
