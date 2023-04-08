@@ -10,6 +10,7 @@
         android:largeHeap="true"
         android:localeConfig="@xml/locale_config"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
         android:theme="@style/AppThemeInitial">
         <meta-data

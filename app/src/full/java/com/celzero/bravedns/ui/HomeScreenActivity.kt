@@ -33,6 +33,8 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -64,24 +66,20 @@ import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
+import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.io.File
-import java.util.*
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
-
-    private lateinit var configureFragment: ConfigureFragment
-    private lateinit var homeScreenFragment: HomeScreenFragment
-    private lateinit var aboutFragment: AboutFragment
-    private lateinit var statisticsFragment: SummaryStatisticsFragment
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
@@ -114,18 +112,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
         updateNewVersion()
 
-        if (savedInstanceState == null) {
-            homeScreenFragment = HomeScreenFragment()
-            supportFragmentManager
-                .beginTransaction()
-                .replace(
-                    R.id.fragment_container,
-                    homeScreenFragment,
-                    homeScreenFragment.javaClass.simpleName
-                )
-                .commit()
-        }
-
         setupNavigationItemSelectedListener()
 
         // handle intent receiver for backup/restore
@@ -153,8 +139,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private fun biometricPrompt() {
         // return if the biometric authentication is already done within the last 15 minutes
         // fixme - #324 - move the 15 minutes to a configurable value
-        if (persistentState.biometricAuthTime + TimeUnit.MINUTES.toMillis(15) > System.currentTimeMillis()) {
-            Log.i(LOG_TAG_UI, "Biometric authentication already done at ${persistentState.biometricAuthTime} , skipping")
+        if (
+            persistentState.biometricAuthTime + TimeUnit.MINUTES.toMillis(15) >
+                System.currentTimeMillis()
+        ) {
+            Log.i(
+                LOG_TAG_UI,
+                "Biometric authentication already done at ${persistentState.biometricAuthTime} , skipping"
+            )
             return
         }
 
@@ -718,59 +710,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun setupNavigationItemSelectedListener() {
-        b.navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_home_screen -> {
-                    homeScreenFragment = HomeScreenFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            homeScreenFragment,
-                            homeScreenFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-                R.id.navigation_settings -> {
-                    configureFragment = ConfigureFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            configureFragment,
-                            configureFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-                R.id.navigation_statistics -> {
-                    statisticsFragment = SummaryStatisticsFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            statisticsFragment,
-                            statisticsFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-                R.id.navigation_about -> {
-                    aboutFragment = AboutFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            aboutFragment,
-                            aboutFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-            }
-            false
-        }
+        val navController = this.findNavController(R.id.fragment_container)
+        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
+        btmNavView.setupWithNavController(navController)
     }
 
     private fun io(f: suspend () -> Unit) {
