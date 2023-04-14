@@ -69,7 +69,6 @@ class RetrofitManager {
                                 getByIp("2620:fe::fe")
                             )
                             .includeIPv6(true)
-                            .post(true)
                             .build()
                     }
                     OkHttpDnsType.CLOUDFLARE -> {
@@ -83,7 +82,6 @@ class RetrofitManager {
                                 getByIp("2606:4700:4700::1001")
                             )
                             .includeIPv6(true)
-                            .post(true)
                             .build()
                     }
                     OkHttpDnsType.GOOGLE -> {
@@ -96,7 +94,6 @@ class RetrofitManager {
                                 getByIp("2001:4860:4860:0:0:0:0:8888"),
                                 getByIp("2001:4860:4860:0:0:0:0:8844")
                             )
-                            .post(true)
                             .includeIPv6(true)
                             .build()
                     }

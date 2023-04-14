@@ -247,7 +247,7 @@ class DnsSettingsFragment :
         }
 
         b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
-            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
             persistentState.enableDnsAlg = enabled
         }
 

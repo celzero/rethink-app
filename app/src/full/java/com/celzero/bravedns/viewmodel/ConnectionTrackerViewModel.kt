@@ -15,10 +15,12 @@
  */
 package com.celzero.bravedns.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.ui.ConnectionTrackerFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 

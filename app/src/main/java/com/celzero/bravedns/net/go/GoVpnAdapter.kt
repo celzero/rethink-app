@@ -81,7 +81,7 @@ class GoVpnAdapter(
         try {
             if (DEBUG) {
                 // 0 - verbose, 1 - debug, 2 - info, 3 - warn, 4 - error, 5 - fatal
-                Tun2socks.logLevel(0)
+                Tun2socks.logLevel(2)
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as

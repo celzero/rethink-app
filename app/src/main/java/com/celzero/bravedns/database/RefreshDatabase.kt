@@ -39,6 +39,7 @@ import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_AL
 import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
@@ -423,6 +424,9 @@ internal constructor(
     private fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
         // no need to notify if the Universal setting is off
         if (!persistentState.getBlockNewlyInstalledApp()) return
+
+        // no need to notify if the vpn is not on
+        if (!VpnController.isOn()) return
 
         if (app.packageName.isEmpty()) {
             app.packageName = FirewallManager.getPackageNameByUid(app.uid) ?: ""
