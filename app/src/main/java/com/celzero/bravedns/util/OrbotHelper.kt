@@ -36,14 +36,14 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
-import com.celzero.bravedns.util.Utilities.Companion.getBroadcastPendingIntent
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
-import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import java.util.concurrent.TimeUnit
+import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
+import com.celzero.bravedns.util.Utilities.getBroadcastPendingIntent
+import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.celzero.bravedns.util.Utilities.isAtleastT
+import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 
 /**
  * One-click Orbot setup.

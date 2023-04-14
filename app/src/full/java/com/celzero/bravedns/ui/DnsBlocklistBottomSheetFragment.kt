@@ -18,8 +18,6 @@ package com.celzero.bravedns.ui
 import android.app.Dialog
 import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spanned
@@ -55,9 +53,9 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
@@ -93,6 +91,14 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         return b.root
     }
 
+    // enum to represent the status of the domain in the chip (ui)
+    enum class BlockType(val id: Int) {
+        ALLOWED(0),
+        BLOCKED(1),
+        MAYBE_BLOCKED(2),
+        NONE(3)
+    }
+
     private fun isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
@@ -126,7 +132,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         displayDnsTransactionDetails()
         displayRecordTypeChip()
         setupClickListeners()
-        updateRulesUi(Constants.UID_EVERYBODY, transaction!!.queryStr)
+        updateRulesUi(transaction!!.queryStr)
     }
 
     private fun getResponseIp(): String {
@@ -134,9 +140,9 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         return ips[0]
     }
 
-    private fun updateRulesUi(uid: Int, domain: String) {
+    private fun updateRulesUi(domain: String) {
         val d = domain.dropLastWhile { it == '.' }
-        val status = DomainRulesManager.status(d, uid)
+        val status = DomainRulesManager.status(d, Constants.UID_EVERYBODY)
         b.bsdlDomainRuleSpinner.setSelection(status.id)
     }
 
@@ -214,7 +220,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
         displayDescription()
 
-        if (transaction!!.groundedQuery()) {
+        if (transaction!!.groundedQuery() || transaction!!.hasBlocklists()) {
             handleBlocklistChip()
             b.dnsBlockIpsChip.visibility = View.GONE
             return
@@ -225,7 +231,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun handleResponseIpsChip() {
         b.dnsBlockIpsChip.visibility = View.VISIBLE
-        lightenUpChip(b.dnsBlockIpsChip, true)
+        lightenUpChip(b.dnsBlockIpsChip, BlockType.ALLOWED)
         if (
             ResourceRecordTypes.mayContainIp(transaction!!.typeName) &&
                 transaction!!.responseIps == "--"
@@ -260,7 +266,20 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         b.dnsBlockBlocklistChip.visibility = View.VISIBLE
-        lightenUpChip(b.dnsBlockBlocklistChip, false)
+
+        if (transaction!!.isBlocked) {
+            lightenUpChip(b.dnsBlockBlocklistChip, BlockType.BLOCKED)
+        } else if (transaction!!.hasBlocklists()) {
+            lightenUpChip(b.dnsBlockBlocklistChip, BlockType.MAYBE_BLOCKED)
+        } else {
+            lightenUpChip(b.dnsBlockBlocklistChip, BlockType.NONE)
+        }
+
+        // show blocklist chip
+        if (transaction!!.hasBlocklists()) {
+            showBlocklistChip()
+            return
+        }
 
         // show no-answer chip
         if (transaction!!.unansweredQuery()) {
@@ -268,11 +287,12 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             return
         }
 
-        if (!transaction!!.hasBlocklists()) {
-            b.dnsBlockBlocklistChip.text = getString(R.string.lbl_blocked)
-            return
-        }
+        // show chip as blocked
+        b.dnsBlockBlocklistChip.text = getString(R.string.lbl_blocked)
+        return
+    }
 
+    private fun showBlocklistChip() {
         val group: Multimap<String, String> = HashMultimap.create()
 
         transaction!!.getBlocklists().forEach {
@@ -295,27 +315,28 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     // ref chip transparency:
     // https://github.com/material-components/material-components-android/issues/367
     // Chips also have a chipSurfaceColor attribute that you can set to change that surface color.
-    private fun lightenUpChip(chip: Chip, isPositive: Boolean) {
-        if (isPositive) {
-            chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
-            val colorFilter =
-                PorterDuffColorFilter(
-                    fetchColor(requireContext(), R.attr.chipTextPositive),
-                    PorterDuff.Mode.SRC_IN
-                )
-            chip.chipBackgroundColor =
-                ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorPositive))
-            chip.chipIcon?.colorFilter = colorFilter
-        } else {
-            chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
-            val colorFilter =
-                PorterDuffColorFilter(
-                    fetchColor(requireContext(), R.attr.chipTextNegative),
-                    PorterDuff.Mode.SRC_IN
-                )
-            chip.chipBackgroundColor =
-                ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
-            chip.chipIcon?.colorFilter = colorFilter
+    private fun lightenUpChip(chip: Chip, type: BlockType) {
+        when (type) {
+            BlockType.BLOCKED -> {
+                chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
+                chip.chipBackgroundColor =
+                    ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
+            }
+            BlockType.ALLOWED -> {
+                chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
+                chip.chipBackgroundColor =
+                    ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorPositive))
+            }
+            BlockType.MAYBE_BLOCKED -> {
+                chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextNeutral))
+                chip.chipBackgroundColor =
+                    ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNeutral))
+            }
+            BlockType.NONE -> {
+                chip.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
+                chip.chipBackgroundColor =
+                    ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
+            }
         }
     }
 

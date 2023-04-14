@@ -18,6 +18,7 @@ package com.celzero.bravedns.net.go
 
 import android.content.Context
 import android.content.res.Resources
+import android.net.ProxyInfo
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
@@ -31,10 +32,10 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.blocklistFile
-import com.celzero.bravedns.util.Utilities.Companion.isValidDnsPort
-import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.blocklistFile
+import com.celzero.bravedns.util.Utilities.isValidDnsPort
+import com.celzero.bravedns.util.Utilities.remoteBlocklistFile
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import dnsx.Transport
@@ -42,15 +43,15 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
-import java.io.IOException
+import ipn.Ipn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import settings.Settings
 import tun2socks.Tun2socks
+import java.io.IOException
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -80,7 +81,7 @@ class GoVpnAdapter(
         try {
             if (DEBUG) {
                 // 0 - verbose, 1 - debug, 2 - info, 3 - warn, 4 - error, 5 - fatal
-                Tun2socks.logLevel(1)
+                Tun2socks.logLevel(2)
             }
 
             // TODO : #321 As of now the app fallback on an unmaintained url. Requires a rewrite as
@@ -90,18 +91,17 @@ class GoVpnAdapter(
             val transport: Transport = makeDefaultTransport(dohURL)
             Log.i(
                 LOG_TAG_VPN,
-                "Connect tunnel with url $tunFd dnsMode: ${tunnelOptions.tunDnsMode}, blockMode: ${tunnelOptions.tunFirewallMode}, proxyMode: ${tunnelOptions.tunProxyMode}, fake dns: ${tunnelOptions.fakeDns}, mtu:${tunnelOptions.mtu}, pcap: ${tunnelOptions.pcapFilePath}"
+                "Connect tunnel with url $tunFd dnsMode: ${tunnelOptions.tunDnsMode}, blockMode: ${tunnelOptions.tunFirewallMode}, proxyMode: ${tunnelOptions.tunProxyMode}, fake dns: ${tunnelOptions.fakeDns}, mtu:${tunnelOptions.mtu}, pcap: ${tunnelOptions.pcapFilePath}, preferredEngine: ${tunnelOptions.preferredEngine.getPreferredEngine()}"
             )
 
             if (tunFd == null) return
-
-            setPreferredEngine(tunnelOptions)
 
             tunnel =
                 Tun2socks.connectIntraTunnel(
                     tunFd!!.fd.toLong(),
                     tunnelOptions.pcapFilePath, // fd for pcap logging
                     tunnelOptions.mtu.toLong(),
+                    tunnelOptions.preferredEngine.getPreferredEngine(),
                     tunnelOptions.fakeDns,
                     transport,
                     tunnelOptions.blocker,
@@ -117,14 +117,6 @@ class GoVpnAdapter(
             tunnel?.disconnect()
             tunnel = null
         }
-    }
-
-    private fun setPreferredEngine(tunnelOptions: TunnelOptions) {
-        Log.i(
-            LOG_TAG_VPN,
-            "Preferred engine name:${tunnelOptions.preferredEngine.name},id: ${tunnelOptions.preferredEngine.getPreferredEngine()}"
-        )
-        Tun2socks.preferredEngine(tunnelOptions.preferredEngine.getPreferredEngine())
     }
 
     private suspend fun addTransport() {
@@ -184,7 +176,7 @@ class GoVpnAdapter(
     private suspend fun createDohTransport(id: String): Transport? {
         val doh = appConfig.getDOHDetails()
         val url = doh?.dohURL
-        val transport = Intra.newDoHTransport(id, url, "", null)
+        val transport = Intra.newDoHTransport(id, url, "")
         Log.i(
             LOG_TAG_VPN,
             "create doh transport with id: $id (${doh?.dohName}), url: $url, transport: $transport"
@@ -246,10 +238,11 @@ class GoVpnAdapter(
         return try {
             val rethinkDns = appConfig.getRemoteRethinkEndpoint()
             val url = rethinkDns?.url
-            val transport = Intra.newDoHTransport(Dnsx.Preferred, url, "", null)
+            val ips: String = getIpString(context, url)
+            val transport = Intra.newDoHTransport(Dnsx.Preferred, url, ips)
             Log.i(
                 LOG_TAG_VPN,
-                "create doh transport with id: ${Dnsx.Preferred}(${rethinkDns?.name}), url: $url, transport: $transport"
+                "create doh transport with id: ${Dnsx.Preferred}(${rethinkDns?.name}), url: $url, transport: $transport, ips: $ips"
             )
             transport
         } catch (e: Exception) {
@@ -261,10 +254,11 @@ class GoVpnAdapter(
     private suspend fun createBlockFreeTransport(): Transport? {
         return try {
             val url = appConfig.getBlockFreeRethinkEndpoint()
-            val transport = Intra.newDoHTransport(Dnsx.BlockFree, url, "", null)
+            val ips: String = getIpString(context, url)
+            val transport = Intra.newDoHTransport(Dnsx.BlockFree, url, ips)
             Log.i(
                 LOG_TAG_VPN,
-                "create doh transport with id: ${Dnsx.BlockFree}, url: $url, transport: $transport"
+                "create doh transport with id: ${Dnsx.BlockFree}, url: $url, transport: $transport, ips: $ips"
             )
             transport
         } catch (e: Exception) {
@@ -278,18 +272,17 @@ class GoVpnAdapter(
             tunnel?.setTunMode(
                 tunnelOptions.tunDnsMode.mode,
                 tunnelOptions.tunFirewallMode.mode,
-                Settings.ProxyModeSOCKS5,
                 tunnelOptions.ptMode.id
             )
         } else {
             tunnel?.setTunMode(
                 tunnelOptions.tunDnsMode.mode,
                 tunnelOptions.tunFirewallMode.mode,
-                tunnelOptions.tunProxyMode.mode,
                 tunnelOptions.ptMode.id
             )
         }
         setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
+        setHttpProxyIfNeeded(tunnelOptions.tunProxyMode)
     }
 
     private fun setBraveDnsBlocklistMode() {
@@ -357,13 +350,23 @@ class GoVpnAdapter(
      * TODO - Move these code to common place and set the tunnel mode and other parameters. Return
      * the tunnel to the adapter.
      */
-    private fun setProxyMode(userName: String?, password: String?, ipAddress: String?, port: Int) {
+    private fun setProxyMode(
+        tunProxyMode: AppConfig.TunProxyMode,
+        userName: String?,
+        password: String?,
+        ipAddress: String?,
+        port: Int
+    ) {
         try {
-            tunnel?.startProxy(userName, password, ipAddress, port.toString())
-            Log.i(
-                LOG_TAG_VPN,
-                "Proxy mode set: $userName$ipAddress$port with tunnel proxyoptions: ${tunnel?.proxyOptions}"
-            )
+            val url = constructSocks5ProxyUrl(userName, password, ipAddress, port)
+            val id =
+                if (tunProxyMode.isTunProxyOrbot()) {
+                    Ipn.OrbotS5
+                } else {
+                    Ipn.SOCKS5
+                }
+            val result = tunnel?.proxies?.addProxy(id, url)
+            Log.i(LOG_TAG_VPN, "Proxy mode set with tunnel url($id): $url, result: $result")
         } catch (e: Exception) {
             Log.e(
                 LOG_TAG_VPN,
@@ -371,6 +374,26 @@ class GoVpnAdapter(
                 e
             )
         }
+    }
+
+    private fun constructSocks5ProxyUrl(
+        userName: String?,
+        password: String?,
+        ipAddress: String?,
+        port: Int
+    ): String {
+        val proxyUrl = StringBuilder()
+        proxyUrl.append("socks5://")
+        if (!userName.isNullOrEmpty() && !password.isNullOrEmpty()) {
+            proxyUrl.append(userName)
+            proxyUrl.append(":")
+            proxyUrl.append(password)
+            proxyUrl.append("@")
+        }
+        proxyUrl.append(ipAddress)
+        proxyUrl.append(":")
+        proxyUrl.append(port)
+        return proxyUrl.toString()
     }
 
     private fun showDnscryptConnectionFailureToast() {
@@ -406,8 +429,36 @@ class GoVpnAdapter(
             Log.w(LOG_TAG_VPN, "could not fetch socks5 details for proxyMode: $tunProxyMode")
             return
         }
-        setProxyMode(socks5.userName, socks5.password, socks5.proxyIP, socks5.proxyPort)
+        setProxyMode(
+            tunProxyMode,
+            socks5.userName,
+            socks5.password,
+            socks5.proxyIP,
+            socks5.proxyPort
+        )
         Log.i(LOG_TAG_VPN, "Socks5 mode set: " + socks5.proxyIP + "," + socks5.proxyPort)
+    }
+
+    private fun setHttpProxyIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
+        if (!tunProxyMode.isTunProxyHttps()) return
+
+        val httpProxy: ProxyInfo? = appConfig.getHttpProxyInfo()
+        if (httpProxy == null) {
+            Log.w(LOG_TAG_VPN, "could not fetch http proxy details for proxyMode: $tunProxyMode")
+            return
+        }
+        val httpProxyUrl = constructHttpsProxyUrl(httpProxy)
+        tunnel?.proxies?.addProxy(Ipn.HTTP1, httpProxyUrl)
+        Log.i(LOG_TAG_VPN, "Http mode set with url: $httpProxyUrl")
+    }
+
+    private fun constructHttpsProxyUrl(p: ProxyInfo): String {
+        val proxyUrl = StringBuilder()
+        proxyUrl.append("https://")
+        proxyUrl.append(p.host)
+        proxyUrl.append(":")
+        proxyUrl.append(p.port)
+        return proxyUrl.toString()
     }
 
     fun hasTunnel(): Boolean {
@@ -440,7 +491,7 @@ class GoVpnAdapter(
     @Throws(Exception::class)
     private fun makeDefaultTransport(url: String?): Transport {
         val dohIPs: String = getIpString(context, url)
-        return Intra.newDoHTransport(Dnsx.Default, url, dohIPs, null)
+        return Intra.newDoHTransport(Dnsx.Default, url, dohIPs)
     }
 
     fun setSystemDns() {
@@ -584,12 +635,14 @@ class GoVpnAdapter(
         }
 
         fun getIpString(context: Context?, url: String?): String {
+            if (url == null) return ""
+
             val res: Resources? = context?.resources
             val urls: Array<out String>? = res?.getStringArray(R.array.urls)
             val ips: Array<out String>? = res?.getStringArray(R.array.ips)
             if (urls == null) return ""
             for (i in urls.indices) {
-                if (urls[i].contains((url.toString()))) {
+                if (url.contains((urls[i]))) {
                     if (ips != null) return ips[i]
                 }
             }

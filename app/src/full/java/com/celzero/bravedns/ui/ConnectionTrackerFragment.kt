@@ -23,7 +23,10 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -34,10 +37,11 @@ import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -94,12 +98,14 @@ class ConnectionTrackerFragment :
         b.connectionCardViewTop.visibility = View.VISIBLE
 
         b.recyclerConnection.setHasFixedSize(true)
-        layoutManager = CustomLinearLayoutManager(requireContext())
+        layoutManager = LinearLayoutManager(requireContext())
         b.recyclerConnection.layoutManager = layoutManager
         val recyclerAdapter = ConnectionTrackerAdapter(requireContext())
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            viewModel.connectionTrackerList.observe(viewLifecycleOwner) { it ->
-                recyclerAdapter.submitData(lifecycle, it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.connectionTrackerList.observe(viewLifecycleOwner) { it ->
+                    recyclerAdapter.submitData(lifecycle, it)
+                }
             }
         }
         b.recyclerConnection.adapter = recyclerAdapter
@@ -135,7 +141,7 @@ class ConnectionTrackerFragment :
 
                     if (dy > 0) {
                         b.connectionListScrollHeader.text =
-                            Utilities.formatToRelativeTime(requireContext(), tag)
+                            formatToRelativeTime(requireContext(), tag)
                         b.connectionListScrollHeader.visibility = View.VISIBLE
                     } else {
                         b.connectionListScrollHeader.visibility = View.GONE

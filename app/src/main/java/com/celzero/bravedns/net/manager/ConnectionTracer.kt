@@ -6,7 +6,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
-import com.celzero.bravedns.util.AndroidUidConfig.Companion.isUidAppRange
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.google.common.cache.Cache
@@ -43,9 +43,10 @@ class ConnectionTracer(ctx: Context) {
         destIp: String,
         destPort: Int
     ): Int {
+        var uid = Constants.INVALID_UID
         // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) {
-            return Constants.MISSING_UID
+            return uid
         }
         val local: InetSocketAddress
         val remote: InetSocketAddress
@@ -64,29 +65,24 @@ class ConnectionTracer(ctx: Context) {
                 }
         } catch (ignored: IllegalArgumentException) {
             // InetSocketAddress throws IllegalArgumentException or SecurityException
-            return Constants.MISSING_UID
+            return uid
         } catch (ignored: SecurityException) {
-            return Constants.MISSING_UID
+            return uid
         }
-        var uid = Constants.INVALID_UID
         val key = makeCacheKey(protocol, local, remote, destPort)
         try {
             uid = cm.getConnectionOwnerUid(protocol, local, remote)
-            // Cache only uid's in app range
-            if (isUidAppRange(uid)) {
+
+            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "UID from getConnectionOwnerUid(): $uid")
+            if (uid != Constants.INVALID_UID) {
                 uidCache.put(key, uid)
-            } else {
-                // no-op
+                return uid
             }
-            return uid
         } catch (secEx: SecurityException) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "NETWORK_STACK permission - " + secEx.message, secEx)
         }
         // If the uid is not in connectivity manager, then return the uid from cache.
-        try {
-            return uidCache.getIfPresent(key)!!
-        } catch (ignored: Exception) {}
-
+        uid = uidCache.getIfPresent(key) ?: Constants.INVALID_UID
         return uid
     }
 

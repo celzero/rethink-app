@@ -35,8 +35,7 @@
         android:memtagMode="off"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppThemeInitial"
-        tools:replace="android:icon, android:roundIcon">
+        android:theme="@style/AppThemeInitial">
 
         <activity
             android:name=".ui.PrepareVpnActivity"

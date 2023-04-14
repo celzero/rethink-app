@@ -44,18 +44,31 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
             DnsLogFragment.DnsLogFilter.BLOCKED -> {
                 getBlockedDnsLogs(filter)
             }
+            DnsLogFragment.DnsLogFilter.MAYBE_BLOCKED -> {
+                getMaybeBlockedDnsLogs(filter)
+            }
         }
     }
 
     private fun getAllDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) { dnsLogDAO.getDnsLogsByName("%$filter%") }
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                if (filter.isEmpty()) {
+                    dnsLogDAO.getAllDnsLogs()
+                } else {
+                    dnsLogDAO.getDnsLogsByName("%$filter%")
+                }
+            }
             .liveData
             .cachedIn(viewModelScope)
     }
 
     private fun getAllowedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsLogDAO.getAllowedDnsLogsByName("%$filter%")
+                if (filter.isEmpty()) {
+                    dnsLogDAO.getAllowedDnsLogs()
+                } else {
+                    dnsLogDAO.getAllowedDnsLogsByName("%$filter%")
+                }
             }
             .liveData
             .cachedIn(viewModelScope)
@@ -63,7 +76,23 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 
     private fun getBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
         return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                dnsLogDAO.getBlockedDnsLogsByName("%$filter%")
+                if (filter.isEmpty()) {
+                    dnsLogDAO.getBlockedDnsLogs()
+                } else {
+                    dnsLogDAO.getBlockedDnsLogsByName("%$filter%")
+                }
+            }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    private fun getMaybeBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                if (filter.isEmpty()) {
+                    dnsLogDAO.getMaybeBlockedDnsLogs()
+                } else {
+                    dnsLogDAO.getMaybeBlockedDnsLogsByName("%$filter%")
+                }
             }
             .liveData
             .cachedIn(viewModelScope)

@@ -33,6 +33,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -154,11 +155,7 @@ class DnsProxyEndpointAdapter(
             _: DialogInterface,
             _: Int ->
             if (ip != null) {
-                Utilities.clipboardCopy(
-                    context,
-                    ip,
-                    context.getString(R.string.copy_clipboard_label)
-                )
+                clipboardCopy(context, ip, context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(
                     context,
                     context.getString(R.string.info_dialog_copy_toast_msg),

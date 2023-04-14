@@ -19,7 +19,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.util.Patterns
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -32,13 +31,14 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
+import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.ui.CustomRulesActivity
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
-import java.net.MalformedURLException
-import java.util.regex.Pattern
 
 class CustomDomainAdapter(val context: Context) :
     PagingDataAdapter<CustomDomain, CustomDomainAdapter.CustomDomainViewHolder>(DIFF_CALLBACK) {
@@ -181,20 +181,20 @@ class CustomDomainAdapter(val context: Context) :
             return when (id) {
                 DomainRulesManager.Status.NONE -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextNeutral),
-                        Utilities.fetchColor(context, R.attr.chipBgColorNeutral)
+                        fetchColor(context, R.attr.chipTextNeutral),
+                        fetchColor(context, R.attr.chipBgColorNeutral)
                     )
                 }
                 DomainRulesManager.Status.BLOCK -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextNegative),
-                        Utilities.fetchColor(context, R.attr.chipBgColorNegative)
+                        fetchColor(context, R.attr.chipTextNegative),
+                        fetchColor(context, R.attr.chipBgColorNegative)
                     )
                 }
                 DomainRulesManager.Status.TRUST -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextPositive),
-                        Utilities.fetchColor(context, R.attr.chipBgColorPositive)
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
                     )
                 }
             }
@@ -456,23 +456,6 @@ class CustomDomainAdapter(val context: Context) :
                 prevDomain,
                 status
             )
-        }
-
-        private fun isValidDomain(url: String): Boolean {
-            return try {
-                Patterns.WEB_URL.matcher(url).matches() ||
-                    Patterns.DOMAIN_NAME.matcher(url).matches()
-            } catch (ignored: MalformedURLException) { // ignored
-                false
-            }
-        }
-
-        private fun isWildCardEntry(url: String): Boolean {
-            // ref: https://regex101.com/r/wG1nZ3/2
-            // https://stackoverflow.com/questions/26302101/regular-expression-for-wildcard-domain-validation
-            // valid entries: *.test.com, test.com, abc.test.com
-            val pattern = Pattern.compile("^(([\\w\\d]+\\.)|(\\*\\.))+[\\w\\d]+\$")
-            return pattern.matcher(url).find()
         }
 
         private fun insertDomain(

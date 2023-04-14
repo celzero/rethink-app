@@ -61,7 +61,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     data class NetworkProperties(val network: Network, val linkProperties: LinkProperties)
 
     init {
-        connectivityManager.registerNetworkCallback(networkRequest, this)
+        try {
+            connectivityManager.registerNetworkCallback(networkRequest, this)
+        } catch (e: Exception) {
+            Log.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
+        }
         this.handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
         this.handlerThread.start()
         this.serviceHandler = NetworkRequestHandler(context, handlerThread.looper, networkListener)

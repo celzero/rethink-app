@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.data.AppConnection
 
 @Dao
@@ -29,20 +28,36 @@ interface DnsLogDAO {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE) fun insertBatch(dnsLogs: List<DnsLog>)
 
+    @Query("select * from DNSLogs order by time desc") fun getAllDnsLogs(): PagingSource<Int, DnsLog>
+
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by time desc"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists = '' order by time desc")
+    fun getAllowedDnsLogs(): PagingSource<Int, DnsLog>
+
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists = '' order by time desc"
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query("select * from DNSLogs where isBlocked = 1 order by time desc")
+    fun getBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by time desc"
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists != '' order by time desc")
+    fun getMaybeBlockedDnsLogs(): PagingSource<Int, DnsLog>
+
+    @Query(
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists != '' order by time desc"
+    )
+    fun getMaybeBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query("delete from DNSLogs") fun clearAllData()
 
@@ -68,6 +83,5 @@ interface DnsLogDAO {
     )
     fun getAllBlockedDomains(): PagingSource<Int, AppConnection>
 
-    @Query("select count(*) from DNSLogs")
-    fun logsCount(): LiveData<Long>
+    @Query("select count(*) from DNSLogs") fun logsCount(): LiveData<Long>
 }

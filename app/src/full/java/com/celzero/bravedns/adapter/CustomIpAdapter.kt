@@ -35,10 +35,11 @@ import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
-import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
-import com.celzero.bravedns.util.Utilities.Companion.getFlag
+import com.celzero.bravedns.util.Utilities.getCountryCode
+import com.celzero.bravedns.util.Utilities.getFlag
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import inet.ipaddr.HostName
@@ -211,26 +212,26 @@ class CustomIpAdapter(private val context: Context) :
             return when (id) {
                 IpRulesManager.IpRuleStatus.NONE -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextNeutral),
-                        Utilities.fetchColor(context, R.attr.chipBgColorNeutral)
+                        fetchColor(context, R.attr.chipTextNeutral),
+                        fetchColor(context, R.attr.chipBgColorNeutral)
                     )
                 }
                 IpRulesManager.IpRuleStatus.BLOCK -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextNegative),
-                        Utilities.fetchColor(context, R.attr.chipBgColorNegative)
+                        fetchColor(context, R.attr.chipTextNegative),
+                        fetchColor(context, R.attr.chipBgColorNegative)
                     )
                 }
                 IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextPositive),
-                        Utilities.fetchColor(context, R.attr.chipBgColorPositive)
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
                     )
                 }
                 IpRulesManager.IpRuleStatus.TRUST -> {
                     ToggleBtnUi(
-                        Utilities.fetchColor(context, R.attr.chipTextPositive),
-                        Utilities.fetchColor(context, R.attr.chipBgColorPositive)
+                        fetchColor(context, R.attr.chipTextPositive),
+                        fetchColor(context, R.attr.chipBgColorPositive)
                     )
                 }
             }

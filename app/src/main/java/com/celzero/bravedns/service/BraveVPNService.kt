@@ -23,7 +23,6 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
-import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -37,7 +36,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnTrackerMetaData
@@ -50,46 +48,49 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.calculateTtl
-import com.celzero.bravedns.util.Utilities.Companion.getAccentColor
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
-import com.celzero.bravedns.util.Utilities.Companion.isMissingOrInvalidUid
-import com.celzero.bravedns.util.Utilities.Companion.isUnspecifiedIp
-import com.celzero.bravedns.util.Utilities.Companion.normalizeIp
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.calculateTtl
+import com.celzero.bravedns.util.Utilities.getAccentColor
+import com.celzero.bravedns.util.Utilities.isAtleastN
+import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
+import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
+import com.celzero.bravedns.util.Utilities.normalizeIp
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.common.collect.Sets
 import dnsx.Dnsx
 import dnsx.Summary
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
+import intra.ICMPSummary
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Blocker
+import ipn.Ipn
 import java.io.IOException
+import java.net.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Controller
 
 class BraveVPNService :
     VpnService(),
     ConnectionMonitor.NetworkListener,
-    Blocker,
+    Controller,
     Listener,
     OnSharedPreferenceChangeListener {
 
@@ -101,9 +102,6 @@ class BraveVPNService :
 
         private const val MAIN_CHANNEL_ID = "vpn"
         private const val WARNING_CHANNEL_ID = "warning"
-
-        // maximum time delay before sending block connection response
-        val DELAY_FIREWALL_RESPONSE_MS: Long = TimeUnit.SECONDS.toMillis(30)
 
         // notification request codes
         private const val NOTIF_ACTION_MODE_RESUME = 98
@@ -240,30 +238,25 @@ class BraveVPNService :
         }
     }
 
-    override fun block(protocol: Int, _uid: Long, src: String, dest: String): Boolean {
-        handleVpnLockdownStateAsync()
-
-        val first = HostName(src)
-        val second = HostName(dest)
-
-        val srcIp = if (first.address == null) "" else first.address.toString()
-        val srcPort = first.port ?: 0
-        val dstIp = if (second.address == null) "" else second.address.toString()
-        val dstPort = second.port ?: 0
-
-        val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
+    private fun block(
+        protocol: Int,
+        uid: Int,
+        srcIp: String,
+        srcPort: Int,
+        dstIp: String,
+        dstPort: Int
+    ): Boolean {
 
         // print the invalid destination ip received
         // 64:ff9b:1:DA19:0100: or 100.
         if (dstIp.startsWith("64:ff9b:1:DA19:0100:") || dstIp.startsWith("100.")) {
             Log.e(
                 LOG_TAG_VPN,
-                "invalid destination ip received:  protocol: $protocol, uid: $uid, src: $src, dest: $dest, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort"
+                "invalid destination ip received:  protocol: $protocol, uid: $uid, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort"
             )
         }
 
-        val connInfo =
-            createConnTrackerMetaData(uid, srcIp, srcPort, dstIp, dstPort, protocol, _query = "")
+        val connInfo = createConnTrackerMetaData(uid, srcIp, srcPort, dstIp, dstPort, protocol)
         if (DEBUG) Log.d(LOG_TAG_VPN, "block: $connInfo")
         return processFirewallRequest(connInfo)
     }
@@ -368,6 +361,11 @@ class BraveVPNService :
 
             // should firewall rules by-pass universal firewall rules (previously whitelist)
             if (appStatus.bypassUniversal()) {
+                // bypass universal should block the domains that are blocked by dns (local/remote)
+                if (anyRealIpBlocked) {
+                    return FirewallRuleset.RULE2G
+                }
+
                 return if (dnsProxied(connInfo.destPort)) {
                     FirewallRuleset.RULE9
                 } else {
@@ -891,12 +889,6 @@ class BraveVPNService :
         // re-hydrate exclude-apps incase it has changed in the interim
         excludedApps = FirewallManager.getExcludedApps()
 
-        if (isAtleastQ()) {
-            if (appConfig.canEnableProxy() && appConfig.isCustomHttpProxyEnabled()) {
-                getHttpProxyInfo()?.let { builder.setHttpProxy(it) }
-            }
-        }
-
         try {
             if (!VpnController.isVpnLockdown() && isAppPaused()) {
                 val nonFirewalledApps = FirewallManager.getNonFirewalledAppsPackageNames()
@@ -1045,18 +1037,6 @@ class BraveVPNService :
 
     private fun makeOrbotStartStatusObserver(): Observer<Boolean> {
         return Observer<Boolean> { settingUpOrbot.set(it) }
-    }
-
-    private fun getHttpProxyInfo(): ProxyInfo? {
-        val proxyInfo: ProxyInfo?
-        val host = persistentState.httpProxyHostAddress
-        val port = persistentState.httpProxyPort
-        Log.i(LOG_TAG_VPN, "Http proxy enabled - builder updated with $host, $port")
-        if (host.isNotEmpty() && port != INVALID_PORT) {
-            proxyInfo = ProxyInfo.buildDirectProxy(host, port)
-            return proxyInfo
-        }
-        return null
     }
 
     private fun updateNotificationBuilder(): NotificationCompat.Builder {
@@ -1339,6 +1319,9 @@ class BraveVPNService :
             PersistentState.LOCAL_BLOCK_LIST -> {
                 io("local-blocklist") { updateTun(createNewTunnelOptsObj()) }
             }
+            PersistentState.LOCAL_BLOCK_LIST_UPDATE -> {
+                io("local-blocklist-update") { updateTun(createNewTunnelOptsObj()) }
+            }
             PersistentState.BACKGROUND_MODE -> {
                 if (persistentState.getBlockAppWhenBackground()) {
                     registerAccessibilityServiceState()
@@ -1353,6 +1336,10 @@ class BraveVPNService :
             PersistentState
                 .REMOTE_BLOCK_LIST_STAMP -> { // update tunnel on remote blocklist stamp change.
                 io("remote-blocklist") { updateTun(createNewTunnelOptsObj()) }
+            }
+            PersistentState.REMOTE_BLOCKLIST_UPDATE -> {
+                // update tunnel on remote blocklist update
+                io("remote-blocklist-update") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.DNS_CHANGE -> {
                 /*
@@ -1411,6 +1398,10 @@ class BraveVPNService :
             }
             PersistentState.DNS_ALG -> {
                 io("dns-alg") { updateDnsAlg() }
+            }
+            PersistentState.PRIVATE_IPS -> {
+                // restart vpn to enable/disable route lan traffic
+                io("route_lan_traffic") { restartVpn(createNewTunnelOptsObj()) }
             }
         }
     }
@@ -1778,7 +1769,9 @@ class BraveVPNService :
                 newBuilder().setSession("RethinkDNS").setMtu(VPN_INTERFACE_MTU)
 
             val has6 = route6()
-            // fixme: always add ipv4 routes until ICMP handling is implemented; see: #554
+            // always add ipv4 to the route, even though there is no ipv4 address
+            // ICMPv6 is not handled in underlying tun2socks, so add ipv4 route even if the
+            // selected protocol type is ipv6
             val has4 = true || route4()
 
             Log.i(LOG_TAG_VPN, "Building vpn for v4?$has4, v6?$has6")
@@ -1864,12 +1857,85 @@ class BraveVPNService :
     }
 
     private fun addRoute6(b: Builder): Builder {
-        b.addRoute(Constants.UNSPECIFIED_IP_IPV6, Constants.UNSPECIFIED_PORT)
+        if (persistentState.privateIps) {
+            Log.i(LOG_TAG_VPN, "addRoute6: privateIps is true, adding routes")
+            // exclude LAN traffic, add only unicast routes
+            // add only unicast routes
+            // range 0000:0000:0000:0000:0000:0000:0000:0000-
+            // 0000:0000:0000:0000:ffff:ffff:ffff:ffff
+            b.addRoute("::1", 64)
+            b.addRoute("2000::", 3) // 2000:: - 3fff::
+            b.addRoute("4000::", 3) // 4000:: - 5fff::
+            b.addRoute("6000::", 3) // 6000:: - 7fff::
+            b.addRoute("8000::", 3) // 8000:: - 9fff::
+            b.addRoute("a000::", 3) // a000:: - bfff::
+            b.addRoute("c000::", 3) // c000:: - dfff::
+            b.addRoute("e000::", 4) // e000:: - efff::
+            b.addRoute("f000::", 5) // f000:: - f7ff::
+            // b.addRoute("f800::", 6) // unicast routes
+            // b.addRoute("fe00::", 9) // unicast routes
+            // b.addRoute("ff00::", 8) // multicast routes
+            // not considering 100::/64 and other reserved ranges
+        } else {
+            // no need to exclude LAN traffic, add default route which is ::/0
+            Log.i(LOG_TAG_VPN, "addRoute6: privateIps is false, adding default route")
+            b.addRoute(Constants.UNSPECIFIED_IP_IPV6, Constants.UNSPECIFIED_PORT)
+        }
+
         return b
     }
 
     private fun addRoute4(b: Builder): Builder {
-        b.addRoute(Constants.UNSPECIFIED_IP_IPV4, Constants.UNSPECIFIED_PORT)
+        if (persistentState.privateIps) {
+            Log.i(LOG_TAG_VPN, "addRoute4: privateIps is true, adding routes")
+            // https://developer.android.com/reference/android/net/VpnService.Builder.html#addRoute(java.lang.String,%20int)
+            // Adds a route to the VPN's routing table. The VPN will forward all traffic to the
+            // destination through the VPN interface. The destination is specified by address and
+            // prefixLength.
+            // ref: github.com/celzero/rethink-app/issues/26
+            // github.com/M66B/NetGuard/blob/master/app/src/main/java/eu/faircode/netguard/ServiceSinkhole.java#L1276-L1353
+            val ipsToExclude: MutableList<IPUtil.CIDR> = ArrayList()
+
+            // loopback
+            ipsToExclude.add(IPUtil.CIDR("127.0.0.0", 8))
+            // lan: tools.ietf.org/html/rfc1918
+            ipsToExclude.add(IPUtil.CIDR("10.0.0.0", 8))
+            ipsToExclude.add(IPUtil.CIDR("172.16.0.0", 12))
+            ipsToExclude.add(IPUtil.CIDR("192.168.0.0", 16))
+            // link local
+            ipsToExclude.add(IPUtil.CIDR("169.254.0.0", 16))
+            // Broadcast
+            ipsToExclude.add(IPUtil.CIDR("224.0.0.0", 3))
+
+            ipsToExclude.sort()
+
+            try {
+                var start: InetAddress? = InetAddress.getByName(Constants.UNSPECIFIED_IP_IPV4)
+                ipsToExclude.forEach { exclude ->
+                    val include = IPUtil.toCIDR(start, IPUtil.minus1(exclude.start)!!)
+                    include?.forEach {
+                        try {
+                            it.address?.let { it1 -> b.addRoute(it1, it.prefix) }
+                        } catch (ex: Exception) {
+                            Log.e(LOG_TAG_VPN, "exception while adding route: ${ex.message}", ex)
+                        }
+                    }
+                    start = IPUtil.plus1(exclude.end)
+                }
+            } catch (ex: SocketException) {
+                Log.e(LOG_TAG_VPN, "addRoute4: ${ex.message}", ex)
+            } catch (ex: UnknownHostException) {
+                Log.e(LOG_TAG_VPN, "addRoute4: ${ex.message}", ex)
+            }
+            b.addRoute("10.111.222.1", 32) // add route for the gateway
+            b.addRoute("10.111.222.2", 32) // add route for the router
+            b.addRoute("10.111.222.3", 32) // add route for the dns
+        } else {
+            Log.i(LOG_TAG_VPN, "addRoute4: privateIps is false, adding default route")
+            // no need to exclude LAN traffic, add default route which is 0.0.0.0/0
+            b.addRoute(Constants.UNSPECIFIED_IP_IPV4, Constants.UNSPECIFIED_PORT)
+        }
+
         return b
     }
 
@@ -1960,15 +2026,22 @@ class BraveVPNService :
         netLogTracker.processDnsLog(summary)
     }
 
+    override fun onICMPClosed(summary: ICMPSummary?) {
+        // no-op
+        // TODO: implement ICMP
+    }
+
     override fun onTCPSocketClosed(summary: TCPSocketSummary?) {
         // no-op
+        // TODO: update connection tracker with the summary
     }
 
     override fun onUDPSocketClosed(summary: UDPSocketSummary?) {
         // no-op
+        // TODO: update connection tracker with the summary
     }
 
-    override fun blockAlg(
+    override fun flow(
         protocol: Int,
         _uid: Long,
         src: String,
@@ -1976,8 +2049,108 @@ class BraveVPNService :
         realIps: String?,
         d: String?,
         blocklists: String
+    ): String {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "flow: $_uid, $src, $dest, $realIps, $d, $blocklists")
+        handleVpnLockdownStateAsync()
+
+        val first = HostName(src)
+        val second = HostName(dest)
+
+        val srcIp = if (first.address == null) "" else first.address.toString()
+        val srcPort = first.port ?: 0
+        val dstIp = if (second.address == null) "" else second.address.toString()
+        val dstPort = second.port ?: 0
+
+        val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
+
+        val rule =
+            if (realIps?.isEmpty() == true || d?.isEmpty() == true) {
+                block(protocol, uid, srcIp, srcPort, dstIp, dstPort)
+            } else {
+                blockAlg(protocol, uid, src, dest, realIps, d, blocklists)
+            }
+
+        // generate a random 8 character string for connectionId
+        val connectionId = Utilities.getRandomString(8)
+
+        if (rule) {
+            // return Ipn.Block, no need to check for other rules
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: received rule: block, returning Ipn.Block, $connectionId, $uid"
+                )
+            return getFlowResponseString(Ipn.Block, connectionId, uid)
+        }
+
+        // check for other proxy rules
+
+        // if no proxy is enabled, return Ipn.Base
+        if (!appConfig.isProxyEnabled()) {
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: no proxy enabled, returning Ipn.Base, $connectionId, $uid"
+                )
+            return getFlowResponseString(Ipn.Base, connectionId, uid)
+        }
+
+        // chose socks5 proxy over http proxy
+        if (appConfig.isOrbotProxyEnabled()) {
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: received rule: orbot, returning Ipn.OrbotS5, $connectionId, $uid"
+                )
+            return getFlowResponseString(Ipn.OrbotS5, connectionId, uid)
+        }
+
+        if (appConfig.isCustomSocks5Enabled()) {
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: received rule: http, returning Ipn.SOCKS5, $connectionId, $uid"
+                )
+            return getFlowResponseString(Ipn.SOCKS5, connectionId, uid)
+        }
+
+        if (appConfig.isCustomHttpProxyEnabled()) {
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: received rule: http, returning Ipn.HTTP1, $connectionId, $uid"
+                )
+            return getFlowResponseString(Ipn.HTTP1, connectionId, uid)
+        }
+
+        if (DEBUG)
+            Log.d(LOG_TAG_VPN, "flow: no proxy enabled, returning Ipn.Base, $connectionId, $uid")
+        return getFlowResponseString(Ipn.Base, connectionId, uid)
+    }
+
+    private fun getFlowResponseString(proxyId: String, connectionId: String, uid: Int): String {
+        // "proxyId, connectionId, uid"
+        return StringBuilder()
+            .apply {
+                append(proxyId)
+                append(",")
+                append(connectionId)
+                append(",")
+                append(uid)
+            }
+            .toString()
+    }
+
+    private fun blockAlg(
+        protocol: Int,
+        uid: Int,
+        src: String,
+        dest: String,
+        realIps: String?,
+        d: String?,
+        blocklists: String
     ): Boolean {
-        Log.d(LOG_TAG_VPN, "block-alg: $_uid, $src, $dest, $realIps, $d, $blocklists")
+        Log.d(LOG_TAG_VPN, "block-alg: $uid, $src, $dest, $realIps, $d, $blocklists")
         if (d == null) return true
 
         val domains: Set<String> = d.split(",").toSet()
@@ -1991,10 +2164,9 @@ class BraveVPNService :
 
         val srcIp = if (first.address == null) "" else first.address.toString()
         val srcPort = first.port ?: 0
+        // ignore dstIp, use realIps instead
         val dstIp = if (second.address == null) "" else second.address.toString()
         val dstPort = second.port ?: 0
-
-        val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
 
         val ips = realIps?.split(",")?.toList() ?: emptyList()
         // use realIps; as of now, netstack uses the first ip
@@ -2020,11 +2192,12 @@ class BraveVPNService :
         val connInfo =
             createConnTrackerMetaData(
                 uid,
-                src,
+                srcIp,
                 srcPort,
                 realDestIp,
                 dstPort,
                 protocol,
+                blocklists,
                 domains.first()
             )
         if (DEBUG) Log.d(LOG_TAG_VPN, "block-alg connInfo: $connInfo")
@@ -2044,6 +2217,10 @@ class BraveVPNService :
         blocklists: String = ""
     ): Boolean {
         // skip the block-ceremony for dns conns
+        Log.d(
+            LOG_TAG_VPN,
+            "process-firewall-request: $metadata, ${isDns(metadata.destPort)}, ${isVpnDns(metadata.destIP)}"
+        )
         if (isDns(metadata.destPort) && isVpnDns(metadata.destIP)) {
             if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule dns-request no-op on conn $metadata")
             return false
@@ -2051,13 +2228,8 @@ class BraveVPNService :
 
         val rule = firewall(metadata, anyRealIpBlocked)
 
-        // handle 2G rule as a special case, as it is has blocklists
-        if (rule.id == FirewallRuleset.RULE2G.id && blocklists.isNotEmpty()) {
-            if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule allow on conn $metadata")
-            metadata.blockedByRule = rule.id + "|" + blocklists
-        } else {
-            metadata.blockedByRule = rule.id
-        }
+        metadata.blockedByRule = rule.id
+        metadata.blocklists = blocklists
 
         val blocked = FirewallRuleset.ground(rule)
         metadata.isBlocked = blocked
@@ -2077,7 +2249,8 @@ class BraveVPNService :
         dstIp: String,
         dstPort: Int,
         protocol: Int,
-        _query: String
+        blocklists: String = "",
+        _query: String = ""
     ): ConnTrackerMetaData {
 
         // Ref: ipaddress doc:
@@ -2101,6 +2274,7 @@ class BraveVPNService :
             System.currentTimeMillis(),
             false, /*blocked?*/
             "", /*rule*/
+            blocklists,
             protocol,
             query
         )
