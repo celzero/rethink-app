@@ -17,7 +17,6 @@
 package com.celzero.bravedns.service
 
 import android.app.*
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -30,7 +29,6 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock.elapsedRealtime
-import android.service.quicksettings.TileService.requestListeningState
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
@@ -77,16 +75,16 @@ import inet.ipaddr.IPAddressString
 import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Blocker
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Blocker
 
 class BraveVPNService :
     VpnService(),
@@ -1261,7 +1259,6 @@ class BraveVPNService :
                 // call this *after* a new vpn is created #512
                 observeChanges()
             }
-            updateQuickSettingsTile()
         }
         return Service.START_REDELIVER_INTENT
     }
@@ -1479,21 +1476,6 @@ class BraveVPNService :
         Log.i(LOG_TAG_VPN, "Stop Foreground")
     }
 
-    private fun updateQuickSettingsTile() {
-        if (VERSION.SDK_INT >= VERSION_CODES.N) {
-            try {
-                requestListeningState(this, ComponentName(this, BraveTileService::class.java))
-            } catch (e: NullPointerException) { // https://github.com/celzero/rethink-app/issues/626
-                Log.e(LOG_TAG_VPN, "Error updating tile service, component is null", e)
-            } catch (e: SecurityException) {
-                Log.e(LOG_TAG_VPN, "Error updating tile service, package does not match", e)
-            } catch (
-                e: IllegalArgumentException) { // if the user of the context is not the current user
-                Log.e(LOG_TAG_VPN, "Error updating tile service, invalid user context", e)
-            }
-        }
-    }
-
     private fun stopVpnAdapter() {
         io("stopVpn") {
             VpnController.mutex.withLock {
@@ -1709,7 +1691,6 @@ class BraveVPNService :
         }
 
         persistentState.setVpnEnabled(false)
-        updateQuickSettingsTile()
         stopPauseTimer()
 
         unobserveOrbotStartStatus()

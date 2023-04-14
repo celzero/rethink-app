@@ -16,37 +16,40 @@ limitations under the License.
 
 package com.celzero.bravedns.service
 
-import android.content.ComponentName
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
-import android.os.IBinder
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import com.celzero.bravedns.ui.PrepareVpnActivity
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-class BraveTileService : TileService() {
+class BraveTileService : TileService(), LifecycleOwner {
+    override val lifecycle = LifecycleRegistry(this)
+
+    override fun onCreate() {
+        VpnController.persistentState.vpnEnabledLiveData.observe(this, this::updateTile)
+    }
+
+    private fun updateTile(requested: Boolean) {
+        // Fix detected null pointer exception. Intra #415
+        qsTile?.apply {
+            state = if (requested) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+            updateTile()
+        }
+    }
 
     override fun onStartListening() {
-        val vpnState: VpnState = VpnController.state()
+        updateTile(VpnController.state().activationRequested)
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+    }
 
-        // Fix detected null pointer exception. Intra #415
-        val tile =
-            if (qsTile == null) {
-                return
-            } else {
-                qsTile
-            }
-
-        if (vpnState.activationRequested) {
-            tile.state = Tile.STATE_ACTIVE
-        } else {
-            tile.state = Tile.STATE_INACTIVE
-        }
-
-        tile.updateTile()
+    override fun onStopListening() {
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
     }
 
     override fun onClick() {
@@ -65,12 +68,5 @@ class BraveTileService : TileService() {
                 startActivityAndCollapse(intent)
             }
         }
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-
-        // Update tile state on boot.
-        requestListeningState(this, ComponentName(this, BraveTileService::class.java))
-        return super.onBind(intent)
     }
 }
