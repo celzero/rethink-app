@@ -174,6 +174,7 @@ class DomainRuleProvider : ContentProvider() {
         if (selectionClause.isNullOrEmpty()) {
             val count = customDomainRepository.cpUpdate(customDomain)
             context.contentResolver?.notifyChange(uri, null)
+            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateCache(customDomain) }
             return count
         } else if (selectionClause.contains("uid") || selectionClause.contains("packageName")) {
             val c = selectionClause.count { it == '?' }
@@ -195,8 +196,7 @@ class DomainRuleProvider : ContentProvider() {
                 "selection ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status} clause: $clause"
             )
             val count = customDomainRepository.cpUpdate(customDomain, clause)
-            // update the app info cache
-            CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateCache(customDomain) }
             context.contentResolver?.notifyChange(uri, null)
             return count
         } else {
