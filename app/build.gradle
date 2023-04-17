@@ -52,6 +52,8 @@ android {
 
     compileOptions {
         coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildTypes {
@@ -100,7 +102,7 @@ android {
 
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    def room_version = "2.5.0"
+    def room_version = "2.5.1"
     def paging_version = "3.1.1"
 
     implementation "com.google.guava:guava:31.1-jre"
@@ -108,11 +110,11 @@ dependencies {
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
     // new version 2.0.0 need minimum of gradle plugin 7.4.0-alpha10
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
-    fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10"
+    fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20"
     fullImplementation 'androidx.appcompat:appcompat:1.7.0-alpha02'
-    fullImplementation 'androidx.core:core-ktx:1.9.0'
+    fullImplementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -121,7 +123,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     // For liveData implementation
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
@@ -136,7 +138,7 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.5.5'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.5.6'
     implementation 'com.google.android.material:material:1.8.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
@@ -157,22 +159,22 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core features
-    implementation "io.insert-koin:koin-core:3.3.3"
+    implementation "io.insert-koin:koin-core:3.4.0"
     // Koin main features for Android (Scope,ViewModel ...)
-    implementation "io.insert-koin:koin-android:3.3.3"
+    implementation "io.insert-koin:koin-android:3.4.0"
 
     implementation 'hu.autsoft:krate:2.0.0'
 
     // To use only without reflection variants of viewBinding
-    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.8'
-    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.8'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
     implementation 'com.github.celzero:firestack:89daaaffcc'
     // implementation project(":tun2socks")
 
     // Work manager
-    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
 
     // for handling IP addresses and subnets, both IPv4 and IPv6
     // https://seancfoley.github.io/IPAddress/ipaddress.html

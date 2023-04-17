@@ -12,7 +12,6 @@
     <!-- Allows applications to change network connectivity state -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Android 11 introduces changes related to package visibility. These changes affect
     apps only if they target Android 11.
     https://developer.android.com/training/package-visibility -->
@@ -22,7 +21,6 @@
     <!-- Allows the app to perform actions across different users on the device. -->
     <uses-permission
         android:name="android.permission.INTERACT_ACROSS_USERS"
-        android:protectionLevel="signature"
         tools:ignore="ProtectedPermissions" />
 
     <!-- https://github.com/celzero/rethink-app/issues/786 set memtagMode to off -->

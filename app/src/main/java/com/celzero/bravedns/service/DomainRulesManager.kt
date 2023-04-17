@@ -98,7 +98,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     // update the cache with the domain and its status based on the domain type
-    private fun updateCache(cd: CustomDomain) {
+    fun updateCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
                 val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)

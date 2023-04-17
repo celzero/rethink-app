@@ -39,7 +39,6 @@ import android.text.TextUtils.SimpleStringSplitter
 import android.text.format.DateUtils
 import android.util.Log
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -592,7 +591,7 @@ class Utilities {
         }
 
         fun isHeadlessFlavour(): Boolean {
-            return BuildConfig.FLAVOR_releaseChannel == FLAVOR_HEADLESS
+            return BuildConfig.FLAVOR_releaseType == FLAVOR_HEADLESS
         }
 
         fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
@@ -635,8 +634,7 @@ class Utilities {
         }
 
         fun isUnspecifiedIp(serverIp: String): Boolean {
-            return UNSPECIFIED_IP_IPV4 == serverIp ||
-                UNSPECIFIED_IP_IPV6 == serverIp
+            return UNSPECIFIED_IP_IPV4 == serverIp || UNSPECIFIED_IP_IPV6 == serverIp
         }
 
         fun calculateTtl(ttl: Long): Long {

@@ -92,7 +92,7 @@ object FirewallManager : KoinComponent {
                         ISOLATE
                     }
                     BYPASS_DNS_FIREWALL.id -> {
-                       BYPASS_DNS_FIREWALL
+                        BYPASS_DNS_FIREWALL
                     }
                     else -> {
                         NONE
@@ -173,6 +173,26 @@ object FirewallManager : KoinComponent {
         }
 
         companion object {
+            fun getStatus(id: Int): ConnectionStatus {
+                return when (id) {
+                    BOTH.id -> {
+                        BOTH
+                    }
+                    UNMETERED.id -> {
+                        UNMETERED
+                    }
+                    METERED.id -> {
+                        METERED
+                    }
+                    ALLOW.id -> {
+                        ALLOW
+                    }
+                    else -> {
+                        ALLOW
+                    }
+                }
+            }
+
             fun getStatusByLabel(id: Int): ConnectionStatus {
                 return when (id) {
                     0 -> {
