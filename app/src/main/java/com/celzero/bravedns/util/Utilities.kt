@@ -36,6 +36,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.PackageManagerCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
@@ -281,7 +282,7 @@ object Utilities {
 
     fun showToastUiCentered(context: Context, message: String, toastLength: Int) {
         try {
-            val toast = Toast.makeText(context, message, toastLength).show()
+            Toast.makeText(context, message, toastLength).show()
         } catch (e: IllegalStateException) {
             Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
         } catch (e: IllegalAccessException) {
@@ -293,7 +294,6 @@ object Utilities {
 
     fun getPackageMetadata(pm: PackageManager, pi: String): PackageInfo? {
         var metadata: PackageInfo? = null
-
         try {
             metadata =
                 if (isAtleastT()) {
@@ -671,14 +671,10 @@ object Utilities {
             // extract the path from the url string
             // eg., https://dns.google/dns-query will result in /dns-query
             val path = URI(url).path
-            Log.i("TEST", "path: $path")
-            // if the path contains a colon, then it is a valid stamp
-            if (path.contains(":")) {
-                // remove the leading slash from the path
-                path.trimEnd { it == '/' }
-            } else {
-                ""
-            }
+            // remove the trailing and leading slashes from the path
+            // eg., /dns-query will result in dns-query
+            // earlier check of : will not work as now remote stamp can contain sec/rec
+            return path.trimStart { it == '/' }.trimEnd { it == '/' }
         } catch (e: Exception) {
             Log.w(LOG_TAG_DNS, "failure fetching stamp from Go ${e.message}", e)
             ""
