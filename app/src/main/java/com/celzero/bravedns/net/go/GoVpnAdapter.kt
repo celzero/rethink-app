@@ -548,12 +548,14 @@ class GoVpnAdapter(
         // changes made in connectTunnel()
         if (tunFd == null) {
             // Adapter is closed.
+            Log.e(LOG_TAG_VPN, "updateTun: tunFd is null, returning")
             return
         }
 
         if (tunnel == null) {
             // Attempt to re-create the tunnel.  Creation may have failed originally because the DoH
             // server could not be reached.  This will update the DoH URL as well.
+            Log.w(LOG_TAG_VPN, "updateTun: tunnel is null, calling connectTunnel")
             connectTunnel(tunnelOptions)
             return
         }
@@ -604,7 +606,10 @@ class GoVpnAdapter(
 
     fun setBraveDnsStamp() {
         try {
-            if (tunnel == null) return
+            if (tunnel == null) {
+                Log.e(LOG_TAG_VPN, "tunnel is null, not setting brave dns stamp")
+                return
+            }
 
             if (tunnel?.resolver?.rdnsLocal != null) {
                 tunnel?.resolver?.rdnsLocal?.stamp = persistentState.localBlocklistStamp
@@ -630,7 +635,10 @@ class GoVpnAdapter(
             scope: CoroutineScope,
             tunFd: ParcelFileDescriptor?
         ): GoVpnAdapter? {
-            if (tunFd == null) return null
+            if (tunFd == null) {
+                Log.e(LOG_TAG_VPN, "establish: tunFd is null")
+                return null
+            }
             return GoVpnAdapter(context, scope, tunFd)
         }
 
