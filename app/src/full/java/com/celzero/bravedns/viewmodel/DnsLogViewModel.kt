@@ -17,6 +17,7 @@ package com.celzero.bravedns.viewmodel
 
 import androidx.lifecycle.*
 import androidx.paging.*
+import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.ui.DnsLogFragment
@@ -26,6 +27,15 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
     private var filterType = DnsLogFragment.DnsLogFilter.ALL
+    private val pagingConfig =
+            PagingConfig(
+                enablePlaceholders = true,
+                prefetchDistance = 3,
+                initialLoadSize = LIVEDATA_PAGE_SIZE * 2,
+                maxSize = LIVEDATA_PAGE_SIZE * 2,
+                pageSize = LIVEDATA_PAGE_SIZE,
+                jumpThreshold = 5
+            )
 
     init {
         filteredList.value = ""
@@ -51,7 +61,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getAllDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+        return Pager(pagingConfig) {
                 if (filter.isEmpty()) {
                     dnsLogDAO.getAllDnsLogs()
                 } else {
@@ -63,7 +73,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getAllowedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+        return Pager(pagingConfig) {
                 if (filter.isEmpty()) {
                     dnsLogDAO.getAllowedDnsLogs()
                 } else {
@@ -75,7 +85,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+        return Pager(pagingConfig) {
                 if (filter.isEmpty()) {
                     dnsLogDAO.getBlockedDnsLogs()
                 } else {
@@ -87,7 +97,7 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
     }
 
     private fun getMaybeBlockedDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
-        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+        return Pager(pagingConfig) {
                 if (filter.isEmpty()) {
                     dnsLogDAO.getMaybeBlockedDnsLogs()
                 } else {
