@@ -264,7 +264,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
 
         val minVersionSupported = 24
 
-        var input: ObjectInputStream? = null
+        val input: ObjectInputStream?
         val prefsBackupFile = File(tempDirectory, SHARED_PREFS_BACKUP_FILE_NAME)
         try {
             input = ObjectInputStream(FileInputStream(prefsBackupFile))

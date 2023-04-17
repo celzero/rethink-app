@@ -36,12 +36,10 @@ import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject

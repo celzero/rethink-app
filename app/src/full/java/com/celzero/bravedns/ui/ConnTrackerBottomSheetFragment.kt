@@ -481,7 +481,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val desc = dialogBinding.infoRulesDialogRulesDesc
         val icon = dialogBinding.infoRulesDialogRulesIcon
         icon.visibility = View.VISIBLE
-        var headingText = ""
+        val headingText: String
         var descText: Spanned
 
         if (blockedRule.contains(FirewallRuleset.RULE2G.id)) {

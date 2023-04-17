@@ -70,12 +70,12 @@ import com.celzero.bravedns.viewmodel.RethinkRemoteFileTagViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
+import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {

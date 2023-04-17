@@ -262,18 +262,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         }
     }
 
-    private fun getUrlForStamp(stamp: String): String {
-        return getRethinkBaseUrl() + stamp
-    }
-
-    private fun getRethinkBaseUrl(): String {
-        return if (b.radioMax.isChecked) {
-            RETHINK_BASE_URL_MAX
-        } else {
-            RETHINK_BASE_URL_SKY
-        }
-    }
-
     private fun initObservers() {
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
         // observer for custom download manager worker
@@ -405,45 +393,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             getString(R.string.download_update_dialog_message_success),
             Toast.LENGTH_SHORT
         )
-    }
-
-    private fun insertRethinkEndpoint(name: String, url: String, count: Int) {
-        io {
-            var dohName: String = name
-            if (name.isBlank()) {
-                dohName = url
-            }
-            val endpoint =
-                RethinkDnsEndpoint(
-                    dohName,
-                    url,
-                    uid = Constants.MISSING_UID,
-                    desc = "",
-                    isActive = false,
-                    isCustom = true,
-                    latency = 0,
-                    count,
-                    modifiedDataTime = INIT_TIME_MS
-                )
-            appConfig.insertReplaceEndpoint(endpoint)
-            endpoint.isActive = true
-            appConfig.handleRethinkChanges(endpoint)
-        }
-    }
-
-    // check that the URL is a plausible DOH server: https with a domain, a path (at least "/"),
-    // and no query parameters or fragment.
-    private fun checkUrl(url: String): Boolean {
-        return try {
-            val parsed = URL(url)
-            parsed.protocol == "https" &&
-                parsed.host.isNotEmpty() &&
-                parsed.path.isNotEmpty() &&
-                parsed.query == null &&
-                parsed.ref == null
-        } catch (e: MalformedURLException) {
-            false
-        }
     }
 
     private fun io(f: suspend () -> Unit) {
