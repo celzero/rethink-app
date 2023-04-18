@@ -17,3 +17,12 @@
 .cxx
 local.properties
 app/src/headless/assets
+/.knownPackages
+/*.patch
+/build-tools
+/emulator
+/licenses
+/patcher
+/platform-tools
+/platforms
+/tools

@@ -25,48 +25,51 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.PrepareVpnActivity
+import com.celzero.bravedns.util.Utilities
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 class BraveTileService : TileService(), LifecycleOwner {
     override val lifecycle = LifecycleRegistry(this)
 
     override fun onCreate() {
+        super.onCreate()
         VpnController.persistentState.vpnEnabledLiveData.observe(this, this::updateTile)
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
     }
 
-    private fun updateTile(requested: Boolean) {
-        // Fix detected null pointer exception. Intra #415
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    }
+
+    private fun updateTile(enabled: Boolean) {
         qsTile?.apply {
-            state = if (requested) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+            state = if (enabled) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
             updateTile()
         }
     }
 
-    override fun onStartListening() {
-        updateTile(VpnController.state().activationRequested)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
-    }
-
-    override fun onStopListening() {
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-    }
-
     override fun onClick() {
+        super.onClick()
         val vpnState: VpnState = VpnController.state()
 
-        if (vpnState.activationRequested) {
+        if (vpnState.on) {
             VpnController.stop(this)
+        } else if (VpnService.prepare(this) == null) {
+            // Start VPN service when VPN permission has been granted.
+            VpnController.start(this)
         } else {
-            if (VpnService.prepare(this) == null) {
-                // Start VPN service when VPN permission has been granted.
-                VpnController.start(this)
-            } else {
-                // Open Main activity when VPN permission has not been granted.
-                val intent = Intent(this, PrepareVpnActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivityAndCollapse(intent)
-            }
+            // Open Main activity when VPN permission has not been granted.
+            val intent =
+                if (Utilities.isHeadlessFlavour()) {
+                    Intent(this, PrepareVpnActivity::class.java)
+                } else {
+                    Intent(this, HomeScreenActivity::class.java)
+                }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivityAndCollapse(intent)
         }
     }
 }

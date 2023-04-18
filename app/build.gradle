@@ -52,6 +52,8 @@ android {
 
     compileOptions {
         coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildTypes {
@@ -110,7 +112,7 @@ dependencies {
     // new version 2.0.0 need minimum of gradle plugin 7.4.0-alpha10
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
-    fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10"
+    fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20"
     fullImplementation 'androidx.appcompat:appcompat:1.7.0-alpha02'
     fullImplementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.preference:preference-ktx:1.2.0'
@@ -160,15 +162,15 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core features
-    implementation "io.insert-koin:koin-core:3.3.3"
+    implementation "io.insert-koin:koin-core:3.4.0"
     // Koin main features for Android (Scope,ViewModel ...)
-    implementation "io.insert-koin:koin-android:3.3.3"
+    implementation "io.insert-koin:koin-android:3.4.0"
 
     implementation 'hu.autsoft:krate:2.0.0'
 
     // To use only without reflection variants of viewBinding
-    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.8'
-    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.8'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
+    fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
     implementation 'com.github.celzero:firestack:7b80bf27af'

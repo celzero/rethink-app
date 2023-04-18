@@ -33,6 +33,7 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
+import android.util.TypedValue
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
@@ -481,7 +482,7 @@ object Utilities {
     }
 
     fun isHeadlessFlavour(): Boolean {
-        return BuildConfig.FLAVOR_releaseChannel == FLAVOR_HEADLESS
+        return BuildConfig.FLAVOR_releaseType == FLAVOR_HEADLESS
     }
 
     fun getApplicationInfo(context: Context, packageName: String): ApplicationInfo? {
