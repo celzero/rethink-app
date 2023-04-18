@@ -2,12 +2,12 @@
 <resources>
     <!-- Each DOH server is defined by a URL (which is the actual DOH endpoint).  However, Google DNS
      was previously configured by domain, in early versions of Intra.-->
-    <string name="url0" translatable="false">https://basic.rethinkdns.com/dns-query</string>
+    <string name="url0" translatable="false">https://basic.rethinkdns.com/</string>
     <string name="ips0" translatable="false">172.67.162.27,104.21.10.13</string>
-    <string name="url1" translatable="false">https://sky.rethinkdns.com/dns-query</string>
+    <string name="url1" translatable="false">https://sky.rethinkdns.com/</string>
     <string name="ips1" translatable="false">104.21.10.13,172.67.162.27,2606:4700:9c6d:a03c:1ca:0:81d4:fa9a</string>
-    <string name="url2" translatable="false">https://max.rethinkdns.com/dns-query</string>
+    <string name="url2" translatable="false">https://max.rethinkdns.com/</string>
     <string name="ips2" translatable="false">137.66.7.89,2a09:8280:1::1:7432</string>
-    <string name="url3" translatable="false">https://zero.rethinkdns.com/dns-query</string>
+    <string name="url3" translatable="false">https://zero.rethinkdns.com/</string>
     <string name="ips3" translatable="false">104.21.10.13,172.67.162.27</string>
 </resources>

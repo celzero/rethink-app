@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_home_screen"
+        android:id="@+id/homeScreenFragment"
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/txt_home" />
     <item
-        android:id="@+id/navigation_statistics"
+        android:id="@+id/summaryStatisticsFragment"
         android:icon="@drawable/ic_statistics"
         android:title="@string/title_statistics" />
     <item
-        android:id="@+id/navigation_settings"
+        android:id="@+id/configureFragment"
         android:icon="@drawable/ic_settings"
         android:title="@string/lbl_configure" />
     <item
-        android:id="@+id/navigation_about"
+        android:id="@+id/aboutFragment"
         android:icon="@drawable/ic_about"
         android:title="@string/title_about" />
 </menu>

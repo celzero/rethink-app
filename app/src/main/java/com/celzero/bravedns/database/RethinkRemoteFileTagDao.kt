@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.data.FileTag
 
 @Dao

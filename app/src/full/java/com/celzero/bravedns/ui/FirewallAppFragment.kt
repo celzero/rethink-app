@@ -41,6 +41,7 @@ import com.celzero.bravedns.databinding.FragmentFirewallAppListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
@@ -221,7 +222,7 @@ class FirewallAppFragment :
         val firewallLabel = filter.firewallFilter.getLabel(requireContext())
         if (filter.categoryFilters.isEmpty()) {
             b.firewallAppLabelTv.text =
-                Utilities.updateHtmlEncodedText(
+                updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc,
                         firewallLabel.lowercase(),
@@ -230,7 +231,7 @@ class FirewallAppFragment :
                 )
         } else {
             b.firewallAppLabelTv.text =
-                Utilities.updateHtmlEncodedText(
+                updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc_category,
                         firewallLabel.lowercase(),

@@ -42,7 +42,7 @@ import com.celzero.bravedns.util.Constants
             LocalBlocklistPacksMap::class,
             RemoteBlocklistPacksMap::class
         ],
-    version = 17,
+    version = 18,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -79,6 +79,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_14_15)
                 .addMigrations(MIGRATION_15_16)
                 .addMigrations(MIGRATION_16_17)
+                .addMigrations(MIGRATION_17_18)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -596,10 +597,18 @@ abstract class AppDatabase : RoomDatabase() {
                     database.execSQL(
                         "update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAFDE4NS4yMjguMTY4LjE2ODo4NDQzILysMvrVQ2kXHwgy1gdQJ8MgjO7w6OmflBjcd2Bl1I8pEWNsZWFuYnJvd3Npbmcub3Jn' where dnsCryptName = 'Cleanbrowsing Family' and id = 1"
                     )
-                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20' where dnsCryptName = 'Adguard'  and id = 2")
-                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNTo1NDQzILgxXdexS27jIKRw3C7Wsao5jMnlhvhdRUXWuMm1AFq6ITIuZG5zY3J5cHQuZmFtaWx5Lm5zMS5hZGd1YXJkLmNvbQ' where dnsCryptName = 'Adguard Family'  and id = 3")
-                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAFDE0OS4xMTIuMTEyLjExMjo4NDQzIGfIR7jIdYzRICRVQ751Z0bfNN8dhMALjEcDaN-CHYY-GTIuZG5zY3J5cHQtY2VydC5xdWFkOS5uZXQ', dnsCryptName = 'Quad9 Security', dnsCryptExplanation = 'Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 - 149.112.112.9 - 149.112.112.112' where dnsCryptName = 'Cleanbrowsing Security'  and id = 4")
-                    database.execSQL("update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAEzE0OS4xMTIuMTEyLjExOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA', dnsCryptExplanation = 'Quad9 (anycast) no-dnssec/no-log/no-filter/ecs 9.9.9.12 - 149.112.112.12' where dnsCryptName = 'Quad9' and id = 5")
+                    database.execSQL(
+                        "update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20' where dnsCryptName = 'Adguard'  and id = 2"
+                    )
+                    database.execSQL(
+                        "update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNTo1NDQzILgxXdexS27jIKRw3C7Wsao5jMnlhvhdRUXWuMm1AFq6ITIuZG5zY3J5cHQuZmFtaWx5Lm5zMS5hZGd1YXJkLmNvbQ' where dnsCryptName = 'Adguard Family'  and id = 3"
+                    )
+                    database.execSQL(
+                        "update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAFDE0OS4xMTIuMTEyLjExMjo4NDQzIGfIR7jIdYzRICRVQ751Z0bfNN8dhMALjEcDaN-CHYY-GTIuZG5zY3J5cHQtY2VydC5xdWFkOS5uZXQ', dnsCryptName = 'Quad9 Security', dnsCryptExplanation = 'Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 - 149.112.112.9 - 149.112.112.112' where dnsCryptName = 'Cleanbrowsing Security'  and id = 4"
+                    )
+                    database.execSQL(
+                        "update DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAEzE0OS4xMTIuMTEyLjExOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA', dnsCryptExplanation = 'Quad9 (anycast) no-dnssec/no-log/no-filter/ecs 9.9.9.12 - 149.112.112.12' where dnsCryptName = 'Quad9' and id = 5"
+                    )
                 }
 
                 private fun modifyRethinkDnsUrls(database: SupportSQLiteDatabase) {
@@ -632,8 +641,40 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "UPDATE AppInfo set firewallStatus = 5, connectionStatus = 3 where firewallStatus = 0"
                         )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 2, connectionStatus = 3 where firewallStatus = 2"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 3, connectionStatus = 3 where firewallStatus = 3"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 4, connectionStatus = 3 where firewallStatus = 4"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 7, connectionStatus = 3 where firewallStatus = 7"
+                        )
                         execSQL("UPDATE AppInfo set firewallStatus = 5 where firewallStatus = 1")
                         execSQL("DROP TABLE AppInfo_backup")
+                    }
+                }
+            }
+
+        private val MIGRATION_17_18: Migration =
+            object : Migration(17, 18) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    with(database) {
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 2, connectionStatus = 3 where firewallStatus = 2"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 3, connectionStatus = 3 where firewallStatus = 3"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 4, connectionStatus = 3 where firewallStatus = 4"
+                        )
+                        execSQL(
+                            "UPDATE AppInfo set firewallStatus = 7, connectionStatus = 3 where firewallStatus = 7"
+                        )
                     }
                 }
             }

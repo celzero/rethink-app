@@ -16,6 +16,7 @@
 package com.celzero.bravedns.data
 
 import android.content.Context
+import android.net.ProxyInfo
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -35,15 +36,15 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.getDnsPort
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
+import com.celzero.bravedns.util.Utilities.getDnsPort
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
-import java.net.InetAddress
-import protect.Blocker
+import protect.Controller
 import settings.Settings
+import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -67,7 +68,6 @@ internal constructor(
     companion object {
         private var connectedDns: MutableLiveData<String> = MutableLiveData()
 
-        private const val PROXY_MODE_ORBOT = 10L
         private const val ORBOT_DNS = "Orbot"
     }
 
@@ -122,7 +122,7 @@ internal constructor(
         val tunFirewallMode: TunFirewallMode,
         val tunProxyMode: TunProxyMode,
         val ptMode: ProtoTranslationMode,
-        val blocker: Blocker,
+        val blocker: Controller,
         val listener: Listener,
         val fakeDns: String,
         val preferredEngine: InternetProtocol,
@@ -222,18 +222,23 @@ internal constructor(
         DNS_PORT(Settings.DNSModePort)
     }
 
-    enum class TunProxyMode(val mode: Long) {
-        NONE(Settings.ProxyModeNone),
-        HTTPS(Settings.ProxyModeHTTPS),
-        SOCKS5(Settings.ProxyModeSOCKS5),
-        ORBOT(PROXY_MODE_ORBOT);
+    // TODO: untangle the mess of proxy modes and providers
+    enum class TunProxyMode {
+        NONE,
+        HTTPS,
+        SOCKS5,
+        ORBOT;
 
         fun isTunProxyOrbot(): Boolean {
-            return mode == ORBOT.mode
+            return this == ORBOT
         }
 
         fun isTunProxySocks5(): Boolean {
-            return mode == SOCKS5.mode
+            return this == SOCKS5
+        }
+
+        fun isTunProxyHttps(): Boolean {
+            return this == HTTPS
         }
     }
 
@@ -419,6 +424,17 @@ internal constructor(
         return proxyEndpointRepository.getConnectedOrbotProxy()
     }
 
+    fun getHttpProxyInfo(): ProxyInfo? {
+        val proxyInfo: ProxyInfo?
+        val host = persistentState.httpProxyHostAddress
+        val port = persistentState.httpProxyPort
+        if (host.isNotEmpty() && port != Constants.INVALID_PORT) {
+            proxyInfo = ProxyInfo.buildDirectProxy(host, port)
+            return proxyInfo
+        }
+        return null
+    }
+
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getSelectedProxy()
     }
@@ -519,7 +535,7 @@ internal constructor(
     }
 
     fun newTunnelOptions(
-        blocker: Blocker,
+        blocker: Controller,
         listener: Listener,
         fakeDns: String,
         preferredEngine: InternetProtocol,
@@ -591,16 +607,6 @@ internal constructor(
     }
 
     suspend fun handleDnsProxyChanges(dnsProxyEndpoint: DnsProxyEndpoint) {
-        // if the prev connection was not dns proxy, then remove the connection status from database
-        if (getDnsType() != DnsType.DNS_PROXY) {
-            removeConnectionStatus()
-        }
-
-        dnsProxyEndpointRepository.update(dnsProxyEndpoint)
-        onDnsChange(DnsType.DNS_PROXY)
-    }
-
-    suspend fun handleOrbotDnsChange(dnsProxyEndpoint: DnsProxyEndpoint) {
         // if the prev connection was not dns proxy, then remove the connection status from database
         if (getDnsType() != DnsType.DNS_PROXY) {
             removeConnectionStatus()

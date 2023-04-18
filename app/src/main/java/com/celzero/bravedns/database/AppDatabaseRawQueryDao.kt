@@ -16,17 +16,13 @@
 package com.celzero.bravedns.database
 
 import androidx.room.Dao
-import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface AppDatabaseRawQueryDao {
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 
-    @RawQuery
-    fun vacuum(supportSQLiteQuery: SupportSQLiteQuery): Int
-
+    @RawQuery fun vacuum(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

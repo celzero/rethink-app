@@ -38,8 +38,9 @@ import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -115,9 +116,22 @@ class RethinkEndpointAdapter(
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
 
+            updateBlocklistStatusText(endpoint)
+        }
+
+        private fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
             if (!endpoint.isActive) return
 
             // show blocklist count and status as connected if endpoint is active
+            val status = UIUtils.getDnsStatus()
+
+            // show the status as it is if it is not connected
+            if (status != R.string.dns_connected) {
+                b.rethinkEndpointListUrlExplanation.text =
+                    context.getString(status).replaceFirstChar(Char::titlecase)
+                return
+            }
+
             if (endpoint.blocklistCount > 0) {
                 b.rethinkEndpointListUrlExplanation.text =
                     context.getString(
@@ -125,8 +139,7 @@ class RethinkEndpointAdapter(
                         endpoint.blocklistCount.toString()
                     )
             } else {
-                b.rethinkEndpointListUrlExplanation.text =
-                    context.getString(R.string.dns_connected_no_count)
+                b.rethinkEndpointListUrlExplanation.text = context.getString(status)
             }
         }
 
@@ -176,7 +189,7 @@ class RethinkEndpointAdapter(
             builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
                 _: DialogInterface,
                 _: Int ->
-                Utilities.clipboardCopy(
+                clipboardCopy(
                     context,
                     endpoint.url,
                     context.getString(R.string.copy_clipboard_label)

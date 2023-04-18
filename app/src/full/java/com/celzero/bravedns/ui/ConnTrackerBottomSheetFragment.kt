@@ -50,10 +50,10 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.getIcon
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.Utilities.getIcon
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
@@ -199,6 +199,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         }
 
         val rule = connectionInfo!!.blockedByRule
+        // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
             b.bsConnTrackAppKill.text =
                 getFirewallRule(FirewallRuleset.RULE2G.id)?.title?.let { getString(it) }
@@ -480,14 +481,20 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val desc = dialogBinding.infoRulesDialogRulesDesc
         val icon = dialogBinding.infoRulesDialogRulesIcon
         icon.visibility = View.VISIBLE
-        var headingText = ""
+        val headingText: String
         var descText: Spanned
 
         if (blockedRule.contains(FirewallRuleset.RULE2G.id)) {
             val group: Multimap<String, String> = HashMultimap.create()
 
-            val startIndex = blockedRule.indexOfFirst { it == '|' }
-            val blocklists = blockedRule.substring(startIndex + 1).split(",")
+            val blocklists =
+                if (connectionInfo?.blocklists?.isEmpty() == true) {
+                    val startIndex = blockedRule.indexOfFirst { it == '|' }
+                    blockedRule.substring(startIndex + 1).split(",")
+                } else {
+                    connectionInfo?.blocklists?.split(",") ?: listOf()
+                }
+
             blocklists.forEach {
                 val items = it.split(":")
                 if (items.count() <= 1) return@forEach

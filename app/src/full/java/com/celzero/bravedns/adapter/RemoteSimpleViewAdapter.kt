@@ -29,7 +29,8 @@ import com.celzero.bravedns.database.RemoteBlocklistPacksMap
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistSimpleBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,9 +92,9 @@ class RemoteSimpleViewAdapter(val context: Context) :
 
         private fun setCardBackground(card: CardView, isSelected: Boolean) {
             if (isSelected) {
-                card.setCardBackgroundColor(Utilities.fetchColor(context, R.attr.selectedCardBg))
+                card.setCardBackgroundColor(fetchColor(context, R.attr.selectedCardBg))
             } else {
-                card.setCardBackgroundColor(Utilities.fetchColor(context, R.attr.background))
+                card.setCardBackgroundColor(fetchColor(context, R.attr.background))
             }
         }
 
@@ -143,21 +144,15 @@ class RemoteSimpleViewAdapter(val context: Context) :
         private fun showLevelIndicator(mIconIndicator: TextView, level: Int) {
             when (level) {
                 0 -> {
-                    val color =
-                        Utilities.fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
+                    val color = fetchToggleBtnColors(context, R.color.firewallNoRuleToggleBtnBg)
                     mIconIndicator.setBackgroundColor(color)
                 }
                 1 -> {
-                    val color =
-                        Utilities.fetchToggleBtnColors(
-                            context,
-                            R.color.firewallWhiteListToggleBtnTxt
-                        )
+                    val color = fetchToggleBtnColors(context, R.color.firewallWhiteListToggleBtnTxt)
                     mIconIndicator.setBackgroundColor(color)
                 }
                 2 -> {
-                    val color =
-                        Utilities.fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt)
+                    val color = fetchToggleBtnColors(context, R.color.firewallBlockToggleBtnTxt)
                     mIconIndicator.setBackgroundColor(color)
                 }
                 else -> {
