@@ -62,7 +62,7 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import org.koin.android.ext.android.inject
-import java.util.*
+import java.util.Locale
 
 class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null

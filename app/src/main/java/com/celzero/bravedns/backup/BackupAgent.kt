@@ -40,11 +40,20 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.copyWithStream
-import java.io.*
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.FileWriter
+import java.io.IOException
+import java.io.InputStream
+import java.io.ObjectOutputStream
+import java.io.OutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b

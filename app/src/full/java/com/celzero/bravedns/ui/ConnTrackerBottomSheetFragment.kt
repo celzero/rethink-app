@@ -43,9 +43,13 @@ import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
-import com.celzero.bravedns.service.*
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.getLabelForStatus
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.FirewallRuleset.Companion.getFirewallRule
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
@@ -60,7 +64,7 @@ import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.*
+import java.util.Locale
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 

@@ -36,9 +36,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
@@ -49,17 +55,26 @@ import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
-import com.celzero.bravedns.service.*
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.*
+import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
@@ -68,15 +83,15 @@ import com.celzero.bravedns.util.Utilities.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import java.util.*
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.io.File
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -90,10 +105,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
-    object GlobalVariable {
-        var DEBUG = BuildConfig.DEBUG
-    }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {

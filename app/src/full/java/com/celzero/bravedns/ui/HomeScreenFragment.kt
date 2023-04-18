@@ -47,6 +47,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
@@ -54,7 +55,6 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN

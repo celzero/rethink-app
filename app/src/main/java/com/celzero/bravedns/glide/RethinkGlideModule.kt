@@ -29,10 +29,9 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.module.AppGlideModule
-import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
-import org.koin.core.definition.Kind
 import java.io.InputStream
+import java.util.concurrent.TimeUnit
 
 /**
  * Defines the options to use when initializing Glide within an application. As of now, limit for
@@ -70,7 +69,7 @@ class RethinkGlideModule : AppGlideModule() {
     }
 
     // handle com.bumptech.glide.Registry$NoModelLoaderAvailableException for kotlin.Unit
-    inner class UnitModelLoaderFactory: ModelLoaderFactory<Unit, InputStream> {
+    inner class UnitModelLoaderFactory : ModelLoaderFactory<Unit, InputStream> {
         override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Unit, InputStream> {
             return object : ModelLoader<Unit, InputStream> {
                 override fun handles(model: Unit): Boolean {
@@ -91,6 +90,5 @@ class RethinkGlideModule : AppGlideModule() {
         override fun teardown() {
             // no-op
         }
-
     }
 }

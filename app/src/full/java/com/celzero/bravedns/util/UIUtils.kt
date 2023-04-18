@@ -15,7 +15,11 @@
  */
 package com.celzero.bravedns.util
 
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.res.TypedArray
 import android.net.Uri
 import android.os.Build
@@ -32,7 +36,9 @@ import androidx.core.text.HtmlCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.VpnController
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.TimeZone
 
 object UIUtils {
 

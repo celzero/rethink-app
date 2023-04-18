@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.DnsProxyEndpointAdapter
 import com.celzero.bravedns.data.AppConfig
@@ -184,8 +185,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
 
             if (isPortValid && isIpValid) {
                 // Do the DNS Proxy setting there
-                if (HomeScreenActivity.GlobalVariable.DEBUG)
-                    Log.d(LoggerConstants.LOG_TAG_UI, "new value inserted into DNSProxy")
+                if (DEBUG) Log.d(LoggerConstants.LOG_TAG_UI, "new value inserted into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appPackageName, ip, port)
                 dialog.dismiss()
             } else {
@@ -231,7 +231,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                     latency = 0
                 )
             appConfig.insertDnsproxyEndpoint(dnsProxyEndpoint)
-            if (HomeScreenActivity.GlobalVariable.DEBUG)
+            if (DEBUG)
                 Log.d(LoggerConstants.LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
         }
     }

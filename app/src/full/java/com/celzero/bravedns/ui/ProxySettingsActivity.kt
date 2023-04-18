@@ -26,7 +26,13 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -52,11 +58,11 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)

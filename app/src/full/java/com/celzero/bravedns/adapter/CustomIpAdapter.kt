@@ -19,7 +19,11 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.text.format.DateUtils
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible

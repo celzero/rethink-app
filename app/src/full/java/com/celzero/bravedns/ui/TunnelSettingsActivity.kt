@@ -30,7 +30,11 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityTunnelSettingsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.*
+import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
 

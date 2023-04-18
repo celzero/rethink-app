@@ -32,24 +32,21 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkEndpointAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.FragmentRethinkListBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.UID
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
@@ -61,8 +58,6 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.net.MalformedURLException
-import java.net.URL
 
 class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private val b by viewBinding(FragmentRethinkListBinding::bind)

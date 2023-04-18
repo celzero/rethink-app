@@ -20,7 +20,6 @@ import android.content.Context
 import android.os.SystemClock
 import android.util.Log
 import com.bumptech.glide.load.engine.executor.GlideExecutor
-import com.bumptech.glide.util.Executors
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
@@ -42,8 +41,7 @@ import dnsx.Summary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
-import java.util.concurrent.Executor
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern

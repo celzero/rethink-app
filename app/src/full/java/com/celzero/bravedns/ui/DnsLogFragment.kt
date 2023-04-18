@@ -35,7 +35,6 @@ import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
@@ -129,31 +128,31 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         b.recyclerQuery.adapter = recyclerAdapter
 
         val scrollListener =
-        object : RecyclerView.OnScrollListener() {
+            object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-                if (recyclerView.getChildAt(0).tag == null) return
+                    if (recyclerView.getChildAt(0).tag == null) return
 
-                val tag: Long = recyclerView.getChildAt(0).tag as Long
+                    val tag: Long = recyclerView.getChildAt(0).tag as Long
 
-                if (dy > 0) {
-                    b.queryListRecyclerScrollHeader.text =
-                        formatToRelativeTime(requireContext(), tag)
-                    b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
-                } else {
-                    b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    if (dy > 0) {
+                        b.queryListRecyclerScrollHeader.text =
+                            formatToRelativeTime(requireContext(), tag)
+                        b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
+                    } else {
+                        b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    }
+                }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        b.queryListRecyclerScrollHeader.visibility = View.GONE
+                    }
                 }
             }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    b.queryListRecyclerScrollHeader.visibility = View.GONE
-                }
-            }
-        }
         b.recyclerQuery.addOnScrollListener(scrollListener)
     }
 

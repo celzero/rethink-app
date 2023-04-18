@@ -33,11 +33,9 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.text.TextUtils.SimpleStringSplitter
 import android.util.Log
-import android.util.TypedValue
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.PackageManagerCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
@@ -75,7 +73,8 @@ import java.io.OutputStream
 import java.net.InetAddress
 import java.net.URI
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 object Utilities {

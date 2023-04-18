@@ -42,7 +42,7 @@ import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
-import java.util.*
+import java.util.Locale
 
 class ConnectionTrackerAdapter(private val context: Context) :
     PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
