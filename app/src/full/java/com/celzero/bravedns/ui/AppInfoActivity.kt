@@ -30,6 +30,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -84,6 +85,8 @@ class AppInfoActivity :
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
+
+    private var showBypassToolTip: Boolean = true
 
     companion object {
         const val UID_INTENT_NAME = "UID"
@@ -254,7 +257,16 @@ class AppInfoActivity :
 
         b.aadAppInfoIcon.setOnClickListener { openAndroidAppInfo(this, appInfo.packageName) }
 
+        TooltipCompat.setTooltipText(b.aadAppSettingsBypassDnsFirewall, getString(R.string.bypass_dns_firewall_tooltip))
+
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
+            // show the tooltip only once when app is not bypassed (dns + firewall) earlier
+            if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
+                b.aadAppSettingsBypassDnsFirewall.performLongClick()
+                showBypassToolTip = false
+                return@setOnClickListener
+            }
+
             if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
                 updateFirewallStatus(
                     FirewallManager.FirewallStatus.NONE,

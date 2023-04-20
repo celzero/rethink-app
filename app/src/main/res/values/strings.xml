@@ -1158,6 +1158,8 @@
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Clear all logs related to this application.</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen" translatable="true">Proceed</string>
 
+    <string name="bypass_dns_firewall_tooltip">Bypass DNS Firewall will work only if selected DNS is set to Rethink\'s DNS</string>
+
     <!-- app info bottom sheet -->
     <string name="bsac_title_desc" translatable="true">Rules apply to this app only.</string>
 

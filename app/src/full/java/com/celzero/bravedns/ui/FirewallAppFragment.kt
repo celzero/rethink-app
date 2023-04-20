@@ -28,6 +28,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -60,6 +61,8 @@ class FirewallAppFragment :
     private val refreshDatabase by inject<RefreshDatabase>()
 
     private var layoutManager: RecyclerView.LayoutManager? = null
+
+    private var showBypassToolTip = true
 
     private lateinit var animation: Animation
 
@@ -319,7 +322,16 @@ class FirewallAppFragment :
             )
         }
 
+        TooltipCompat.setTooltipText(b.ffaToggleAllBypassDnsFirewall, getString(R.string.bypass_dns_firewall_tooltip))
+
         b.ffaToggleAllBypassDnsFirewall.setOnClickListener {
+            // show tooltip once the user clicks on the button
+            if (showBypassToolTip) {
+                showBypassToolTip = false
+                b.ffaToggleAllBypassDnsFirewall.performLongClick()
+                return@setOnClickListener
+            }
+
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.BYPASS_DNS_FIREWALL),
                 getBulkActionDialogMessage(BlockType.BYPASS_DNS_FIREWALL),
