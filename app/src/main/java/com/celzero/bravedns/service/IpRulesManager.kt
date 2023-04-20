@@ -37,7 +37,8 @@ import org.koin.core.component.inject
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
 
-object IpRulesManager : KoinComponent {
+object
+IpRulesManager : KoinComponent {
 
     private val customIpRepository by inject<CustomIpRepository>()
     private val persistentState by inject<PersistentState>()
