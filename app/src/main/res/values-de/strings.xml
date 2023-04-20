@@ -828,7 +828,7 @@
     <string name="bsdl_block_desc" translatable="true">Blockieren, <u>dieser Domäne</u> vertrauen</string>
     <string name="bypass_dns_firewall" translatable="true">DNS &amp; Firewall umgehen</string>
     <string name="settings_general_customize" translatable="true">anpassen</string>
-    <string name="settings_default_dns_heading" translatable="true">Ausweich-DNS</string>
+    <string name="settings_default_dns_heading" translatable="true">Ausweich-DNS auswählen</string>
     <string name="settings_pcap_heading" translatable="true">Paketerfassung</string>
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s universelle Regel(n)</string>
