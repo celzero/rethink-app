@@ -11,11 +11,11 @@
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: RethinkDNS wurde deaktiviert</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
     <string name="universal_firewall_explanation">Anwendung von Firewall-Regeln auf alle Anwendungen auf der Grundlage von Geräteereignissen, z. B. Firewall, wenn das Gerät gesperrt ist oder wenn eine bestimmte Anwendung nicht verwendet wird.</string>
-    <string name="accessibility_service_description">Rethink verwendet den VPN-Dienst, um Hintergrundanwendungen zu erkennen und abzuwehren. Rethink sammelt oder verkauft keine Informationen.</string>
+    <string name="accessibility_service_description">Rethink verwendet den Dienst für Barrierefreiheit, um Hintergrundanwendungen zu erkennen und per Firewall einzudämmen. Rethink erfaßt und verkauft keine Daten.</string>
     <string name="next">Nächste</string>
     <string name="skip">Überspringen</string>
     <string name="finish">Fertig</string>
-    <string name="slide_2_desc">Rethink ist der einfachste Weg, um Netzwerkaktivitäten zu überwachen, die Internetzensur zu umgehen und Firewall-Apps auf Ihrem Android-Gerät zu installieren.</string>
+    <string name="slide_2_desc">Rethink ist das einfachste Mittel, um Netzwerkaktivitäten zu überwachen, Internetzensur zu umgehen und Apps auf Ihrem Android-Gerät mit einer Firewall einzudämmen.</string>
     <string name="slide_1_desc">Rethink ist eine Open-Source-Software, die vom Mozilla Builders MVP-Programm unterstützt wird.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="block">blockiert</string>
@@ -57,10 +57,10 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="dns_firewall_mode_info_explanation_new">Alle oben genannten Möglichkeiten + Umgehung der Internetzensur.</string>
     <string name="wireguard_mode_info_explanation_new">Demnächst verfügbar.</string>
-    <string name="alert_permission_accessibility">Erlaubnis - Zugänglichkeit</string>
-    <string name="alert_firewall_accessibility_explanation">RethinkDNS verwendet den VPN-Dienst, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).
+    <string name="alert_permission_accessibility">Erlaubnis - Barrierefreiheit</string>
+    <string name="alert_firewall_accessibility_explanation">RethinkDNS verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).
 \n
-\nRethinkDNS sammelt keine Informationen und spioniert Sie in keiner Weise aus.</string>
+\nRethinkDNS erfaßt keine Daten und spioniert Sie in keiner Weise aus.</string>
     <string name="brave_dns_connect_mode_change_firewall">Modus wählen.</string>
     <string name="brave_dns_connect_mode_change_dns">Modus wählen.</string>
     <string name="default_dns_name">RDNS Standard</string>
@@ -162,17 +162,7 @@
     <string name="search_rethinkplus_file_tag"><font size="12">Suche in Blocklisten</font></string>
     <string name="app_mode_choose">Modus wählen</string>
     <string name="whats_dialog_title">Was ist neu in v054</string>
-    <string name="whats_new_version_update"><b>Maximale Anstrengung</b>
-\n
-\n 1. Einführung eines privateren Rethink-Resolvers, <i>Max</i>.
-\n 2. IPv6 als experimentell kennzeichnen; standardmäßig zu IPv4 wechseln.
-\n 3. <i>Neue Funktion</i>: Sichern und Wiederherstellen von App-Einstellungen.
-\n 4. <i>Neue Funktion</i>: App-Sperrmodus.
-\n 5. <i>Neue Funktion</i>: Universeller Sperrmodus.
-\n 6. <i>Neue Funktion</i>: Anwendung von Firewall-Regeln auf Portnummern.
-\n 7. <i>Neue Funktion</i>: Anwendung von App-Firewall-Regeln in Stapeln.
-\n 8. Kleine Aktualisierung der Benutzeroberfläche.
-\n 9. Andere Speicher- und Absturzbehebungen.</string>
+    <string name="whats_new_version_update">&lt;b&gt;Turbogeladen!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Neue Funktion&lt;/i&gt;: Erweiterte DNS-Filterung; Domänenregeln nur anwenden, wenn Apps eine Verbindung herstellen.&lt;br/&gt; 2. &lt;i&gt;Neue Funktion&lt;/i&gt;: Domänen per App zulassen oder sperren.&lt;br/&gt; 3. &lt;i&gt;Neue Funktion&lt;/i&gt;: Domänen für alle Apps zulassen oder sperren.&lt;br/&gt; 4. &lt;i&gt;Neue Funktion&lt;/i&gt;: Umgehung von sowohl DNS- als auch Firewall-Regeln per App.&lt;br/&gt; 5. &lt;i&gt;Neue Funktion&lt;/i&gt;: Packet capture (PCAP).&lt;br/&gt; 6. &lt;i&gt;Neue Funktion&lt;/i&gt;: DNS Booster; Anfragenbündelung, Cache-Antworten.&lt;br/&gt; 7. &lt;i&gt;Neue Funktion&lt;/i&gt;: Bearbeiten von Domain- und IP-Regeln.&lt;br/&gt; 8. Und andere kleinere Benutzeroberflächen-Änderungen und Fehlerbehebungen.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Helfen Sie uns dies App zu übersetzen&lt;/a&gt;</string>
     <string name="connection_http3">HTTP3</string>
     <string name="relative_time_today">Heute</string>
     <string name="app_mode_dns_firewall">DNS und Firewall (Standard)</string>
@@ -200,7 +190,7 @@
     <string name="orbot_install_dialog_neutral">Webseite</string>
     <string name="settings_socks5_disabled_error">Verbunden mit Orbot. Schalten Sie es aus, um fortzufahren.</string>
     <string name="settings_autostart_bootup_desc">Starten Sie beim Einschalten des Geräts RethinkDNS, wenn es vor dem Herunterfahren gelaufen ist.</string>
-    <string name="slide_1_title">Frei und quelloffen</string>
+    <string name="slide_1_title">Kostenlos und quelloffen</string>
     <string name="settings_ptrans_heading">IPv4-Ausgang erzwingen</string>
     <string name="settings_socks5_heading">SOCKS5-Proxy einrichten</string>
     <string name="orbot_none_desc">Keine der oben genannten Möglichkeiten.</string>
@@ -227,9 +217,9 @@
     <string name="orbot_stop_dialog_negative">Orbot stoppen</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
-    <string name="allow">erlaubt</string>
+    <string name="allow">erlauben</string>
     <string name="settings_allow_bypass_heading">Umgehung zulassen</string>
-    <string name="settings_title_desc">Eine hochgradig anpassbare DNS und Firewall</string>
+    <string name="settings_title_desc">Eine hochgradig anpaßbare DNS und Firewall</string>
     <string name="slide_2_title">Willkommen</string>
     <string name="exclude">ausschließen</string>
     <string name="bsct_app_info">App-Informationen</string>
@@ -284,11 +274,11 @@
     <string name="firewall_rule_block_app_exception">Fehler</string>
     <string name="firewall_rule_block_dns_bypass">DNS umgangen</string>
     <string name="firewall_rule_exempt_app_bypass_univ">umgangene App</string>
-    <string name="firewall_rule_block_app_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert diese <i>App</i>.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
-    <string name="firewall_rule_new_app_desc">Diese App hat die Verbindung zum <i>ersten Mal</i> hergestellt.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universal</i>.</string>
-    <string name="firewall_rule_block_app_mobile_desc">Eine vom Benutzer eingestellte Firewall-Regel blockiert diese <i>App</i> beim Versuch, eine Verbindung zum <i>Gezählt</i> Netzwerk herzustellen.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
-    <string name="firewall_rule_block_ip_univ_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert die <i>Ziel-IP / Port</i>.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_block_ip_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert die <i>Ziel-IP</i>.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.</string>
+    <string name="firewall_rule_block_app_desc">Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> blockiert.<br/><br/>Zur Änderung die Registerkarte <i>Alle Apps</i> benutzen.</string>
+    <string name="firewall_rule_new_app_desc">Diese App hat die Verbindung zum <i>ersten Mal</i> hergestellt.<br/><br/> Zur Änderung die Registerkarte <i>Universal</i> benutzen.</string>
+    <string name="firewall_rule_block_app_mobile_desc">Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> beim Versuch, eine Verbindung zum <i>Gezählt</i> Netzwerk herzustellen, blockiert.<br/><br/> Zur Änderung die Registerkarte <i>Alle Apps</i> benutzen.</string>
+    <string name="firewall_rule_block_ip_univ_desc">Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP / Port</i> blockiert.<br/><br/>Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
+    <string name="firewall_rule_block_ip_desc">Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP</i> blockiert.<br/><br/>Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
     <string name="settings_app_notification_a13_desc">Benachrichtigungserlaubnis für die App aktivieren</string>
     <string name="settings_http_proxy_error_text4">Verbindung mit dem Host fehlgeschlagen. Versuchen Sie es erneut.</string>
     <string name="settings_ip_dialog_ipv46">Auto (experimentell)</string>
@@ -297,18 +287,18 @@
     <string name="settings_dns_proxy_dialog_app_desc">Die gewählte Anwendung wird vom VPN ausgeschlossen, damit es in Ihrem Namen Verbindungen projizieren kann.</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimentell)</string>
     <string name="apps_icon_content_desc">Anwendungssymbol</string>
-    <string name="accessibility_notification_content">Der RethinkDNS-VPN Dienst wurde angehalten oder ist abgestürzt. Im Hintergrund laufende Anwendungen werden nicht mehr blockiert. Tippen Sie auf , um ihn wieder zu aktivieren.</string>
+    <string name="accessibility_notification_content">Der RethinkDNS-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Im Hintergrund laufende Anwendungen werden nicht mehr blockiert. Tippen Sie den Bildschirm an, um ihn wieder zu aktivieren.</string>
     <string name="firewall_rule_block_univ_ip">IP / Port (Universell)</string>
     <string name="firewall_rule_device_lock">Gerät gesperrt</string>
-    <string name="firewall_rule_block_app_unmetered_desc">Eine vom Benutzer eingestellte Firewall-Regel blockiert diese <i>App</i> beim Versuch, eine Verbindung mit <i>Ungezählt</i> Netzwerk herzustellen.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
-    <string name="firewall_rule_block_app_univ_mobile_desc">Eine vom Benutzer eingestellte universelle Firewall-Regel blockiert diese <i>App</i> beim Versuch, eine Verbindung mit <i>Gezählt</i> (Mobil) Netzwerk herzustellen.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_device_lock_desc">Diese Verbindung wurde gesperrt, weil <i>Gerät zu diesem Zeitpunkt</i> gesperrt war.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_bypass_universal_ip_desc">Diese Verbindung wurde zugelassen, weil die &lt;i&gt;Ziel-IP&lt;/i&gt; so eingestellt ist, dass sie alle universellen Firewall-Regeln umgeht.&lt;br/&gt;&lt;br/&gt; Um dies zu ändern, gehen Sie zu &lt;i&gt;IP-Regeln&lt;i&gt; auf der Registerkarte &lt;i&gt;Universell&lt;/i&gt;.</string>
-    <string name="firewall_rule_foreground_desc">Diese Verbindung wurde gesperrt, weil die Quelle der Anwendung <i>sich nicht im Vordergrund befand</i>.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_block_dns_bypass_desc">Diese Verbindung wurde blockiert, weil die <i>Quelle der App</i> den vom Benutzer bevorzugten DNS umgangen hat.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_block_udp_ntp_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert diese <i>UDP</i> Verbindung.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_block_http_desc">Diese Verbindung wurde blockiert, weil sie wahrscheinlich <i>unsicheres HTTP</i> verwendet hat.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_exempt_app_bypass_univ_desc">Diese Verbindung wurde zugelassen, weil die <i>Quelle der Anwendung</i> so eingestellt ist, dass <i>die universellen</i> Firewall-Regeln umgeht.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.</string>
+    <string name="firewall_rule_block_app_unmetered_desc">Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> beim Versuch, eine Verbindung mit <i>Ungezählt</i> Netzwerk herzustellen, blockiert.<br/><br/> Zur Änderung die Registerkarte <i>Alle Apps</i> benutzen.</string>
+    <string name="firewall_rule_block_app_univ_mobile_desc">Eine benutzerdefinierte universelle Firewall-Regel hat diese <i>App</i> beim Versuch, eine Verbindung mit <i>Gezählt</i> (Mobil) Netzwerk herzustellen, blockiert.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
+    <string name="firewall_rule_device_lock_desc">Diese Verbindung wurde durch die Firewall gesperrt, weil das <i>Gerät zu diesem Zeitpunkt</i> gesperrt war.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
+    <string name="firewall_rule_bypass_universal_ip_desc">Diese Verbindung wurde zugelassen, weil die &lt;i&gt;Ziel-IP&lt;/i&gt; für die Umgehung aller universellen Firewall-Regeln definiert ist.&lt;br/&gt;&lt;br/&gt; Zur Änderung &lt;i&gt;IP-Regeln&lt;i&gt; auf der Registerkarte &lt;i&gt;Universell&lt;/i&gt; benutzen.</string>
+    <string name="firewall_rule_foreground_desc">Diese Verbindung wurde durch die Firewall gesperrt, weil die Ursprungs-App <i>sich nicht im Vordergrund befand</i>.<br/><br/> Um dieses Verhalten zu ändern die Registerkarte <i>Universell</i> benutzen.</string>
+    <string name="firewall_rule_block_dns_bypass_desc">Diese Verbindung wurde blockiert, weil die <i>Ursprungs-App</i> den vom Benutzer bevorzugten DNS umgangen hat.<br/><br/> Um dieses Verhalten zu ändern, die Registerkarte <i>Universell</i> verwenden.</string>
+    <string name="firewall_rule_block_udp_ntp_desc">Eine benutzerdefinierte Firewall-Regel hat diese <i>UDP</i> Verbindung blockiert.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
+    <string name="firewall_rule_block_http_desc">Diese Verbindung wurde blockiert, weil sie wahrscheinlich <i>unsicheres HTTP</i> verwendet hat.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
+    <string name="firewall_rule_exempt_app_bypass_univ_desc">Diese Verbindung wurde zugelassen, weil die <i>Ursprungs-App</i> für die <i>Umgehung der universellen</i> Firewall-Regeln eingestellt ist.<br/><br/> Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
     <string name="settings_all_networks_dialog_message">Wenn diese Option aktiviert ist, werden App-Firewall-Regeln für gebührenpflichtige Verbindungen (z. B. mobiles Datenvolumen) und nicht gebührenpflichtige Verbindungen (z. B. Wlan) nicht beachtet.
 \n
 \nMöchten Sie fortfahren\?</string>
@@ -340,7 +330,7 @@
     <string name="settings_selected_theme">Aktuelles Farbschema: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">Wechseln Sie in den Modus DNS/DNS+Firewall, um diese Einstellung zu aktivieren</string>
     <string name="firewall_status_allow">erlaubt</string>
-    <string name="accessibility_failure_toast">Der RethinkDNS-VPN Dienst wurde angehalten oder ist abgestürzt. Anwendungen im Hintergrund werden nicht mehr blockiert.</string>
+    <string name="accessibility_failure_toast">Der RethinkDNS-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Anwendungen im Hintergrund werden nicht mehr blockiert.</string>
     <string name="coming_soon_toast">demnächst</string>
     <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn VPN <i>gesperrt ist</i>. Tippen Sie auf <u>, um die VPN-Einstellungen zu bearbeiten</u>.</string>
     <string name="firewall_rule_block_ip">IP/ Port (App)</string>
@@ -351,11 +341,11 @@
     <string name="firewall_rule_block_udp_ntp">UDP geblockt</string>
     <string name="firewall_rule_global_lockdown">totale Sperrung</string>
     <string name="firewall_rule_no_rule_desc">Für diese Verbindung gibt es keine passenden Firewall-Regeln.</string>
-    <string name="firewall_rule_isolate_desc">Eine vom Benutzer festgelegte Firewall-Regel blockiert diese <i>App</i> Verbindung zu anderen als <i>umgangenen IPs</i>.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Alle Apps</i>.</string>
-    <string name="firewall_rule_trusted_ip_desc">Diese Verbindung wurde zugelassen, weil die <i>Ziel-IP</i> so eingestellt ist, dass alle app-spezifischen Regeln umgangen werden.<br/><br/> Zum Ändern gehen Sie zum Bildschirm <i>App-spezifische Firewall</i>.</string>
-    <string name="firewall_rule_unknown_desc">Diese Verbindung wurde gesperrt, weil die <i>Quelle der App</i> nicht ermittelt werden konnte.<br/><br/> Um dieses Verhalten zu ändern, gehen Sie auf die Registerkarte <i>Universell</i>.</string>
-    <string name="firewall_rule_exempt_dns_proxied_desc">Diese DNS-Verbindung wurde durch einen Proxy vermittelt und an den vom Benutzer bevorzugten DNS-Endpunkt weitergeleitet.<br/><br/> So ändern Sie die Deaktivierung von <i>DNS-Lecks verhindern</i> im Bildschirm DNS <i>Konfigurieren</i>.</string>
-    <string name="firewall_rule_exempt_orbot_setup_desc">Diese Verbindung wurde zugelassen, weil <i>mit einem Klick Tor-as-a-proxy</i> über Orbot eingerichtet wurde.</string>
+    <string name="firewall_rule_isolate_desc">Eine benutzerdefinierte Firewall-Regel hat die Verbindung dieser <i>App</i> zu anderen als den <i>zugelassenen (umgehen) IPs</i> blockiert. <br/><br/> Zur Änderung die Registerkarte <i>Alle Apps</i> benutzen.</string>
+    <string name="firewall_rule_trusted_ip_desc">Diese Verbindung wurde zugelassen, weil die <i>Ziel-IP</i> als vertrauenswürdige IP definiert ist.<br/><br/> Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
+    <string name="firewall_rule_unknown_desc">Diese Verbindung wurde durch die Firewall gesperrt, weil die <i>Ursprungs-App</i> nicht ermittelt werden konnte.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> verwenden.</string>
+    <string name="firewall_rule_exempt_dns_proxied_desc">Diese DNS-Verbindung wurde durch einen Proxy vermittelt und an den vom Benutzer bevorzugten DNS-Endpunkt weitergeleitet.<br/><br/> Zur Änderung <i>DNS-Lecks verhindern</i> im Bildschirm DNS <i>Konfigurieren</i> deaktivieren.</string>
+    <string name="firewall_rule_exempt_orbot_setup_desc">Diese Verbindung wurde zugelassen, weil <i>Tor-as-a-proxy (Orbot)</i> aktiv war.</string>
     <string name="settings_import_export_desc">Manuelles Sichern oder Wiederherstellen der App-Daten und Einstellungen.</string>
     <string name="settings_custom_downloader_heading">In-App-Downloader verwenden</string>
     <string name="settings_all_networks_dialog_positive_btn">Trotzdem aktivieren</string>
@@ -364,7 +354,7 @@
     <string name="settings_custom_downloader_desc">Wenn deaktiviert, wird der in Android integrierte <i>Download Manager</i> verwendet</string>
     <string name="settings_import_export_heading">Sichern und Wiederherstellen</string>
     <string name="bypass_universal">Universelle Umgehung</string>
-    <string name="alert_firewall_accessibility_exception">Öffnen der Zugänglichkeitseinstellungen fehlgeschlagen. Versuchen Sie es später noch einmal!</string>
+    <string name="alert_firewall_accessibility_exception">Öffnen der Einstellungen für Barrierefreiheit fehlgeschlagen. Versuchen Sie es später noch einmal!</string>
     <string name="firewall_act_universal_tab">universell</string>
     <string name="new_app_bulk_notification_title">Achtung</string>
     <string name="notif_channel_download">Download Warnung</string>
@@ -463,7 +453,7 @@
     <string name="cd_toast_deleted">Domäne aus der benutzerdefinierten Liste entfernt</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="cd_remove_dialog_message">Löschen Sie die Domäne aus den gespeicherten Konfiguration.</string>
-    <string name="ci_dialog_desc">IP-Adresse, IP-Subnetz (Bereich), Port zulassen (umgehen) oder sperren. Beispiel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, *.*:80</string>
+    <string name="ci_dialog_desc">IP-Adresse, IP-Subnetz (Bereich), Port zulassen (umgehen) oder sperren. Beispiel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80,[10.1.0.0/16]:80, *.*:80</string>
     <string name="ada_app_status_exclude">ist von DNS und Firewall ausgeschlossen</string>
     <string name="ada_firewall_title">Firewall-Regeln für diese Anwendung</string>
     <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Fortfahren</string>
@@ -475,13 +465,13 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Malware, Ransomware (Erpressersoftware), Kryptoware, Phisher und andere Bedrohungen.</string>
     <string name="brbs_restore_desc">Aus Sicherungsdatei wiederherstellen</string>
     <string name="brbs_backup_desc">Sichern von Anwendungseinstellungen, Netzwerk- und DNS-Protokollen</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Der RethinkDNS- VPN Dienst wurde angehalten oder ist abgestürzt. <i><b>Gehen Sie zu Einstellungen und erzwingen Sie das Anhalten</b></i> RethinkDNS und starten Sie es erneut, um die Funktion <i>Sperrung aller nicht genutzten Anwendungen</i> zu verwenden.
+    <string name="alert_firewall_accessibility_regrant_explanation">Der RethinkDNS- Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Gehen Sie zu Einstellungen und erzwingen Sie das Beenden</b></i> von RethinkDNS und starten Sie es erneut, um die Funktion <i>Sperrung aller nicht genutzten Anwendungen</i> zu verwenden.
 \n
-\nRethinkDNS verwendet den Eingabehilfedienst, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht in Gebrauch sind (im Hintergrund).</string>
+\nRethinkDNS verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
     <string name="firewall_status_isolate">isoliert</string>
     <string name="firewall_status_excluded">von DNS und Firewall ausgeschlossen</string>
     <string name="firewall_status_whitelisted">umgeht die universellen Firewall-Regeln</string>
-    <string name="firewall_rule_global_lockdown_desc">Diese Verbindung wurde blockiert, weil die universelle Sperre eingestellt ist.<br/><br/> Zum Ändern gehen Sie auf die Registerkarte <i>Universell</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">Diese Verbindung wurde blockiert, weil die universelle Sperre eingestellt ist.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
     <string name="new_app_bulk_notification_content">RethinkDNS blockiert %1$s neue Anwendungen. Tippen Sie auf , um sie anzuzeigen oder zu ändern.</string>
     <string name="new_app_notification_content">RethinkDNS blockierte die kürzlich installierte App, %1$s.</string>
     <string name="new_app_notification_action_deny">Weiter blockieren</string>
@@ -692,7 +682,7 @@
     <string name="univ_view_blocked_ip">IP- &amp; Port-Regeln</string>
     <string name="cd_dns_proxy_error_text_3">Ungültiger Port</string>
     <string name="about_bug_report_desc">E-Mail-Absturzprotokolle</string>
-    <string name="contributors_list">Das &lt;i&gt;Rethink Open Source Project&lt;/i&gt; verdankt seine Existenz den Freiwilligen die zahllose Stunden in die Entwicklung der APP gesteckt haben.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/harish83a&gt;harish83a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">Das &lt;i&gt;Rethink Open Source Project&lt;/i&gt; verdankt seine Existenz den Freiwilligen die zahllose Stunden in die Entwicklung der APP gesteckt haben.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="dc_custom_dns_radio">Andere DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_entries">%1$s Einträge »</string>
@@ -736,7 +726,7 @@
     <string name="dc_other_settings_heading">Fortgeschritten</string>
     <string name="dc_custom_block_heading">Domain Regeln</string>
     <string name="dc_check_update_heading">Aufforderung zur Aktualisierung der Blockliste</string>
-    <string name="univ_view_blocked_ip_desc">Blockierte oder vertrauenswürdige IP-/Port-Regeln ändern.</string>
+    <string name="univ_view_blocked_ip_desc">Blockierte oder vertrauenswürdige Domänen- und IP-/Port-Regeln ändern.</string>
     <string name="univ_ip_delete_individual_toast">%1$s gelöscht.</string>
     <string name="univ_ip_delete_dialog_positive">Alle löschen</string>
     <string name="univ_ip_delete_toast_success">Alle IP-Regeln wurden gelöscht.</string>
@@ -823,15 +813,15 @@
     <string name="lbl_domain" translatable="true">Domäne</string>
     <string name="fapps_info_unmetered_msg" translatable="true">Zulassen / Blockieren im Netzwerk ohne Zähler (WiFi).</string>
     <string name="firewall_rule_exempt_dns_proxied" translatable="true">DNS durch Proxy geleitet</string>
-    <string name="firewall_rule_block_domain" translatable="true">Domain (App)</string>
-    <string name="firewall_rule_block_domain_desc" translatable="true">Eine vom Benutzer festgelegte Firewallregel blockierte die <i>Domäne</i>.<br/><br/> Um dies zu ändern, gehen Sie zum <i>Bildschirm App-spezifische Firewall.</i></string>
-    <string name="firewall_rule_trusted_domain_desc" translatable="true">Diese Verbindung wurde zugelassen, da die Domäne als vertrauenswürdige <i>Domäne</i> festgelegt ist.<br/><br/> Um dies zu ändern, gehen Sie zum <i>Bildschirm App-spezifische Firewall.</i></string>
+    <string name="firewall_rule_block_domain" translatable="true">Domäne (App)</string>
+    <string name="firewall_rule_block_domain_desc" translatable="true">Eine benutzerdefinierte Firewallregel hat die <i>Domäne</i> blockiert.<br/><br/>Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
+    <string name="firewall_rule_trusted_domain_desc" translatable="true">Diese Verbindung wurde zugelassen, weil die <i>Domäne</i> als vertrauenswürdige Domäne definiert ist.<br/><br/>Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
     <string name="lbl_cancel" translatable="true">Abbrechen</string>
     <string name="lbl_apply" translatable="true">Akzeptieren</string>
     <string name="lbl_dismiss" translatable="true">Verwerfen</string>
     <string name="lbl_all" translatable="true">Alle</string>
-    <string name="lbl_ip_rules" translatable="true">Regeln IP</string>
-    <string name="lbl_domain_rules" translatable="true">Domain-Regeln</string>
+    <string name="lbl_ip_rules" translatable="true">IP-Regeln</string>
+    <string name="lbl_domain_rules" translatable="true">Domäne-Regeln</string>
     <string name="fapps_unmetered_unblock_dialog_title" translatable="true">Zulassen auf nicht getakteten Verbindung</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Vertrauenswürdige Domäne (App)</string>
     <string name="cd_no_rules_text" translatable="true">Keine Domain-Regeln.</string>
@@ -865,7 +855,7 @@
     <string name="bsct_block_domain" translatable="true">Blockiere, vertraue <u>Domain(s)</u> für <u>diese App</u></string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Proxies können nicht aufgesetzt werden, während VPN in DNS only- oder Lockdown-Modus läuft. <u>Gehe zu VPN-Einstellungen</u></string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Sollen universelle DNS- &amp; Firewall-Regeln für <i>aufgelisteten</i> Apps umgangen werden\?</string>
-    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domänen wird vertraut (Univ)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Vertrauenswürdige Domäne (Univ)</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Diese Verbindung wurde blockiert, da die <i>Domäne</i> von der nutzerbevorzugten DNS blockiert wird.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Umgehe DNS &amp; Firewall</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Vereine Anfragen, cache Antworten, robuste Fehlerbehandlung</string>
@@ -874,7 +864,7 @@
     <string name="rules_card_domain_count" translatable="true">%1$s Domäne-Regeln</string>
     <string name="cd_dns_alg_desc" translatable="true">Wende Domäne-Regeln nur beim Verbinden von Apps an</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Domäne (Univ)</string>
-    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Diese Verbindung wurde erlaubt, da die Einstellungen der <i>Quellapp</i> das <i>Umgehen von DNS- und Firewall-Regeln</i> erlauben.<br/><br/> Um das zu ändern, gehe zur <i>App-spezifischen Firewall</i>-Seite.</string>
+    <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Diese Verbindung wurde erlaubt, weil die <i>Urspungs-App</i> für die <i>Umgehung von DNS- und Firewall-Regeln</i> eingestellt ist.<br/><br/> Zur Änderung den Bildschirm <i>App-spezifischen Firewall</i> verwenden.</string>
     <string name="settings_default_dns_desc" translatable="true">In seltenen Fällen kann die vom Nutzer bevorzugte DNS nicht ermittelt werden. Dann wird die Reserve-DNS verwendet.</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Diese Verbindung wurde erlaubt, da die <i>Domäne</i> in den universellen Domäne-Regeln als wird-vertraut gesetzt wurde.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
 </resources>
