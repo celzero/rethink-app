@@ -421,7 +421,7 @@ object RethinkBlocklistManager : KoinComponent {
         }
 
         val dir =
-            Utilities.remoteBlocklistFile(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+            Utilities.blocklistDir(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
                 ?: return null
         val file =
             Utilities.blocklistFile(dir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
@@ -453,7 +453,7 @@ object RethinkBlocklistManager : KoinComponent {
         }
 
         val dir =
-            Utilities.remoteBlocklistFile(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+            Utilities.blocklistDir(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
                 ?: return null
         val file =
             Utilities.blocklistFile(dir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
