@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_DEFAULT
 import com.celzero.bravedns.database.RethinkDnsEndpoint.Companion.RETHINK_PLUS
 import com.celzero.bravedns.util.Constants.Companion.MISSING_UID

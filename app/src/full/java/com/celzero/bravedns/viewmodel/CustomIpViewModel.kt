@@ -15,8 +15,16 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import androidx.lifecycle.*
-import androidx.paging.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpDao
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE

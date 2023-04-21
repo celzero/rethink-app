@@ -22,6 +22,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -31,8 +35,7 @@ import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.Utilities.Companion.formatToRelativeTime
+import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.CoroutineScope
@@ -66,7 +69,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     enum class DnsLogFilter(val id: Int) {
         ALL(0),
         ALLOWED(1),
-        BLOCKED(2)
+        BLOCKED(2),
+        MAYBE_BLOCKED(3)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -110,12 +114,16 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         b.queryListCardViewTop.visibility = View.VISIBLE
 
         b.recyclerQuery.setHasFixedSize(true)
-        layoutManager = CustomLinearLayoutManager(requireContext())
+        layoutManager = LinearLayoutManager(requireContext())
         b.recyclerQuery.layoutManager = layoutManager
 
         val recyclerAdapter = DnsQueryAdapter(requireContext(), persistentState.fetchFavIcon)
-        viewModel.dnsLogsList.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.dnsLogsList.observe(viewLifecycleOwner) {
+                    recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+                }
+            }
         }
         b.recyclerQuery.adapter = recyclerAdapter
 
@@ -153,6 +161,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         val all = makeChip(DnsLogFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed = makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
+        val maybeBlocked =
+            makeChip(DnsLogFilter.MAYBE_BLOCKED.id, getString(R.string.lbl_maybe_blocked), false)
         val blocked =
             makeChip(
                 ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
@@ -162,6 +172,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
         b.filterChipGroup.addView(all)
         b.filterChipGroup.addView(allowed)
+        b.filterChipGroup.addView(maybeBlocked)
         b.filterChipGroup.addView(blocked)
     }
 
@@ -200,6 +211,10 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
             }
             DnsLogFilter.BLOCKED.id -> {
                 filterType = DnsLogFilter.BLOCKED
+                viewModel.setFilter(filterValue, filterType)
+            }
+            DnsLogFilter.MAYBE_BLOCKED.id -> {
+                filterType = DnsLogFilter.MAYBE_BLOCKED
                 viewModel.setFilter(filterValue, filterType)
             }
         }

@@ -22,10 +22,15 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.CompoundButton
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -47,9 +52,10 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
@@ -79,6 +85,8 @@ class AppInfoActivity :
 
     private var appStatus = FirewallManager.FirewallStatus.NONE
     private var connStatus = FirewallManager.ConnectionStatus.ALLOW
+
+    private var showBypassToolTip: Boolean = true
 
     companion object {
         const val UID_INTENT_NAME = "UID"
@@ -247,11 +255,18 @@ class AppInfoActivity :
 
         b.aadConnDetailSearch.setOnQueryTextListener(this)
 
-        b.aadAppInfoIcon.setOnClickListener {
-            Utilities.openAndroidAppInfo(this, appInfo.packageName)
-        }
+        b.aadAppInfoIcon.setOnClickListener { openAndroidAppInfo(this, appInfo.packageName) }
+
+        TooltipCompat.setTooltipText(b.aadAppSettingsBypassDnsFirewall, getString(R.string.bypass_dns_firewall_tooltip))
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
+            // show the tooltip only once when app is not bypassed (dns + firewall) earlier
+            if (showBypassToolTip && appStatus == FirewallManager.FirewallStatus.NONE) {
+                b.aadAppSettingsBypassDnsFirewall.performLongClick()
+                showBypassToolTip = false
+                return@setOnClickListener
+            }
+
             if (appStatus == FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL) {
                 updateFirewallStatus(
                     FirewallManager.FirewallStatus.NONE,

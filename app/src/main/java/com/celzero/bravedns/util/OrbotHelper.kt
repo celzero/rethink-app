@@ -18,7 +18,11 @@ package com.celzero.bravedns.util
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.VpnService
@@ -36,14 +40,18 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
-import com.celzero.bravedns.util.Utilities.Companion.getBroadcastPendingIntent
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
-import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
+import com.celzero.bravedns.util.Utilities.getBroadcastPendingIntent
+import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.celzero.bravedns.util.Utilities.isAtleastT
+import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.*
 
 /**
  * One-click Orbot setup.

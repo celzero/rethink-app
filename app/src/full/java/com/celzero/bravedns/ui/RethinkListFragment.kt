@@ -32,27 +32,24 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.RethinkEndpointAdapter
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.FragmentRethinkListBinding
 import com.celzero.bravedns.download.AppDownloadManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_TYPE
 import com.celzero.bravedns.ui.ConfigureRethinkBasicActivity.Companion.UID
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_MAX
-import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
@@ -61,8 +58,6 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.net.MalformedURLException
-import java.net.URL
 
 class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private val b by viewBinding(FragmentRethinkListBinding::bind)
@@ -262,18 +257,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
         }
     }
 
-    private fun getUrlForStamp(stamp: String): String {
-        return getRethinkBaseUrl() + stamp
-    }
-
-    private fun getRethinkBaseUrl(): String {
-        return if (b.radioMax.isChecked) {
-            RETHINK_BASE_URL_MAX
-        } else {
-            RETHINK_BASE_URL_SKY
-        }
-    }
-
     private fun initObservers() {
         val workManager = WorkManager.getInstance(requireContext().applicationContext)
         // observer for custom download manager worker
@@ -405,45 +388,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             getString(R.string.download_update_dialog_message_success),
             Toast.LENGTH_SHORT
         )
-    }
-
-    private fun insertRethinkEndpoint(name: String, url: String, count: Int) {
-        io {
-            var dohName: String = name
-            if (name.isBlank()) {
-                dohName = url
-            }
-            val endpoint =
-                RethinkDnsEndpoint(
-                    dohName,
-                    url,
-                    uid = Constants.MISSING_UID,
-                    desc = "",
-                    isActive = false,
-                    isCustom = true,
-                    latency = 0,
-                    count,
-                    modifiedDataTime = INIT_TIME_MS
-                )
-            appConfig.insertReplaceEndpoint(endpoint)
-            endpoint.isActive = true
-            appConfig.handleRethinkChanges(endpoint)
-        }
-    }
-
-    // check that the URL is a plausible DOH server: https with a domain, a path (at least "/"),
-    // and no query parameters or fragment.
-    private fun checkUrl(url: String): Boolean {
-        return try {
-            val parsed = URL(url)
-            parsed.protocol == "https" &&
-                parsed.host.isNotEmpty() &&
-                parsed.path.isNotEmpty() &&
-                parsed.query == null &&
-                parsed.ref == null
-        } catch (e: MalformedURLException) {
-            false
-        }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -16,12 +16,10 @@
 package com.celzero.bravedns.adapter
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +28,8 @@ import com.celzero.bravedns.database.RethinkRemoteFileTag
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.ui.RethinkBlocklistFragment
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.openUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,10 +90,7 @@ class RemoteAdvancedViewAdapter(val context: Context) :
 
             b.crpCard.setOnClickListener { toggleCheckbox(!b.crpCheckBox.isChecked, filetag) }
 
-            b.crpDescEntriesTv.setOnClickListener {
-                val intent = Intent(Intent.ACTION_VIEW, filetag.url[0].toUri())
-                context.startActivity(intent)
-            }
+            b.crpDescEntriesTv.setOnClickListener { openUrl(context, filetag.url[0]) }
         }
 
         private fun displayMetaData(filetag: RethinkRemoteFileTag) {

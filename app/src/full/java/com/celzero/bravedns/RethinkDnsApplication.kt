@@ -53,8 +53,8 @@ class RethinkDnsApplication : Application() {
          * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
          * crashes/updates it goes into red waiting state. This causes confusion to the users also
          * requires click of START button twice to start the app. FIX : The check for the controller
-         * state. If persistence state has vpn enabled and the VPN is not connected then the start will
-         * be initiated.
+         * state. If persistence state has vpn enabled and the VPN is not connected then the start
+         * will be initiated.
          */
         val state = VpnController.state()
         if (state.activationRequested && !state.on) {

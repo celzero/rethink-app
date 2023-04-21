@@ -37,9 +37,9 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.fetchColor
-import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -247,7 +247,7 @@ class DnsSettingsFragment :
         }
 
         b.dcAlgSwitch.setOnCheckedChangeListener { _: CompoundButton, enabled: Boolean ->
-            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcFaviconSwitch)
+            enableAfterDelay(TimeUnit.SECONDS.toMillis(1), b.dcAlgSwitch)
             persistentState.enableDnsAlg = enabled
         }
 

@@ -26,10 +26,15 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
@@ -47,10 +52,12 @@ import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UIUtils.openUrl
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastQ
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,7 +103,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
         }
 
-        b.settingsActivityVpnLockdownDesc.setOnClickListener { Utilities.openVpnProfile(this) }
+        b.settingsActivityVpnLockdownDesc.setOnClickListener { openVpnProfile(this) }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener {
             _: CompoundButton,
@@ -105,6 +112,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 appConfig.removeProxy(AppConfig.ProxyType.SOCKS5, AppConfig.ProxyProvider.CUSTOM)
                 b.settingsActivitySocks5Desc.text =
                     getString(R.string.settings_socks_forwarding_default_desc)
+                return@setOnCheckedChangeListener
+            }
+
+            if (!appConfig.canEnableProxy()) {
+                b.settingsActivitySocks5Switch.isChecked = false
                 return@setOnCheckedChangeListener
             }
 
@@ -139,6 +151,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 return@setOnCheckedChangeListener
             }
 
+            if (!appConfig.canEnableProxy()) {
+                b.settingsActivityHttpProxySwitch.isChecked = false
+                return@setOnCheckedChangeListener
+            }
+
             if (!appConfig.canEnableHttpProxy()) {
                 showToastUiCentered(
                     this,
@@ -169,8 +186,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun launchOrbotWebsite() {
-        val intent = Intent(Intent.ACTION_VIEW, getString(R.string.orbot_website_link).toUri())
-        startActivity(intent)
+        openUrl(this, getString(R.string.orbot_website_link))
     }
 
     private fun handleOrbotInstall() {
