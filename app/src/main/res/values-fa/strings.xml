@@ -27,7 +27,7 @@
     <string name="dns_mode_info_explanation_new">درخواست های DNS را نظارت، مسدود و رمزگذاری کنید.</string>
     <string name="dns_firewall_mode_info_explanation_new">همه موارد بالا + دور زدن سانسور اینترنت.</string>
     <string name="universal_firewall_explanation">قوانین فایروال را بر روی همه برنامه ها بر اساس رویدادهای دستگاه اعمال کنید، به عنوان مثال، فایروال زمانی که دستگاه قفل است یا زمانی که یک برنامه خاص در حال استفاده نیست.</string>
-    <string name="accessibility_service_description">RethinkDNS از سرویس دسترس‌پذیری برای شناسایی و فایروال برنامه های پس زمینه استفاده می کند. RethinkDNS هیچ اطلاعاتی را جمع آوری یا نمی فروشد.</string>
+    <string name="accessibility_service_description">RethinkDNS از سرویس دسترس پذیری برای شناسایی و فایروال برنامه های پس زمینه استفاده می کند. RethinkDNS هیچ اطلاعاتی را جمع آوری یا نمی فروشد.</string>
     <string name="status_protected_with_http_private_dns">محافظت شده با پروکسی http و dns خصوصی</string>
     <string name="slide_2_desc">RethinkDNS ساده ترین راه برای نظارت بر فعالیت شبکه، دور زدن سانسور اینترنت و برنامه های فایروال در دستگاه اندرویدی شما است.</string>
     <string name="slide_1_desc">RethinkDNS یک نرم افزار متن باز است که توسط برنامه Mozilla Builders MVP حمایت می شود.</string>
@@ -50,8 +50,32 @@
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">برای تغییر تنظیمات حفاظت ضربه بزنید</string>
     <string name="notification_action_dns_mode">DNS</string>
     <string name="wireguard_mode_info_explanation_new">به زودی.</string>
-    <string name="skip">ردکردن</string>
+    <string name="skip">رد شدن</string>
     <string name="apps_info_title">برنامه ها</string>
     <string name="rdns_plus">RDNS پلاس</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">خصوصی dns فعال است</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns خصوصی فعال است</string>
+    <string name="status_protected_with_http" translatable="true">محافظت شده با http proxy</string>
+    <string name="lbl_rules" translatable="true">قوانین</string>
+    <string name="lbl_configure" translatable="true">پیکربندی</string>
+    <string name="lbl_logs" translatable="true">گزارشها</string>
+    <string name="lbl_domain_rules" translatable="true">قوانین دامنه</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">شکست خوردن</string>
+    <string name="dns_explanation_dns_connected" translatable="true">به RethinkDNS متصل شد</string>
+    <string name="title_statistics" translatable="true">آمار</string>
+    <string name="lbl_dismiss" translatable="true">نادیده گرفتن</string>
+    <string name="lbl_all" translatable="true">همه</string>
+    <string name="lbl_allowed" translatable="true">اجازه داده شده</string>
+    <string name="lbl_blocked" translatable="true">مسدود شده</string>
+    <string name="lbl_disabled" translatable="true">غیرفعال شده</string>
+    <string name="lbl_action_required" translatable="true">اقدام لازم است</string>
+    <string name="lbl_ip_rules" translatable="true">قوانین IP</string>
+    <string name="lbl_domain" translatable="true">دامنه</string>
+    <string name="lbl_cancel" translatable="true">لغو</string>
+    <string name="lbl_apply" translatable="true">اعمال</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">به فایروال وصل شد</string>
+    <string name="status_no_internet" translatable="true">بدون اینترنت</string>
+    <string name="status_protected_with_proxy" translatable="true">محافظت شده با پروکسی</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">حفاظت شده</string>
+    <string name="pause_title_desc" translatable="true">ایجاد وقفه …</string>
+    <string name="hybrid_mode_notification_title" translatable="true">حفاظت شده! به DNS + فایروال متصل است.</string>
 </resources>

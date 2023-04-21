@@ -8,4 +8,21 @@
     <string name="settings_theme_heading">രൂപം</string>
     <string name="wireguard_mode_info_explanation_new">ഉടൻ വരുന്നു.</string>
     <string name="title_settings">ക്രമീകരണങ്ങൾ</string>
+    <string name="txt_home" translatable="true">പൂമുഖം</string>
+    <string name="block" translatable="true">തടയുക</string>
+    <string name="exclude" translatable="true">ഒഴിവാക്കുക</string>
+    <string name="lbl_rules" translatable="true">നിയമങ്ങൾ</string>
+    <string name="pause_title_desc" translatable="true">ഉറങ്ങുന്നു…</string>
+    <string name="skip" translatable="true">ഒഴിവാക്കുക</string>
+    <string name="allow" translatable="true">അനുവദിക്കുക</string>
+    <string name="isolate" translatable="true">ഒറ്റപ്പെടുത്തുക</string>
+    <string name="title_about" translatable="true">കുറിച്ച്</string>
+    <string name="lbl_cancel" translatable="true">റദ്ദാക്കുക</string>
+    <string name="lbl_apply" translatable="true">പ്രയോഗിക്കുക</string>
+    <string name="lbl_dismiss" translatable="true">പിരിച്ചുവിടുക</string>
+    <string name="lbl_all" translatable="true">എല്ലാം</string>
+    <string name="lbl_allowed" translatable="true">അനുവദിച്ചത്</string>
+    <string name="lbl_blocked" translatable="true">തടഞ്ഞു</string>
+    <string name="lbl_disabled" translatable="true">അപ്രാപ്തമാക്കി</string>
+    <string name="lbl_action_required" translatable="true">നടപടി ആവശ്യമാണ്</string>
 </resources>
