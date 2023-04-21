@@ -579,23 +579,22 @@ object Utilities {
         }
     }
 
-    fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
-        val remoteDir =
-            remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
-                ?: return false
-        val remoteFile =
-            blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
-                ?: return false
-        if (remoteFile.exists()) {
-            return true
+        fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
+            val remoteDir =
+                blocklistDir(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+                    ?: return false
+            val remoteFile =
+                blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
+                    ?: return false
+            if (remoteFile.exists()) {
+                return true
+            }
+
+            return false
         }
 
-        return false
-    }
-
-    fun remoteBlocklistFile(ctx: Context?, which: String, timestamp: Long): File? {
-        if (ctx == null) return null
-
+        fun blocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
+            if (ctx == null) return null
         return try {
             File(blocklistDownloadBasePath(ctx, which, timestamp))
         } catch (e: IOException) {
