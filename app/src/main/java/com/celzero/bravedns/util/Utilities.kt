@@ -711,7 +711,7 @@ class Utilities {
 
         fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
             val remoteDir =
-                remoteBlocklistFile(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+                blocklistDir(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
                     ?: return false
             val remoteFile =
                 blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
@@ -723,7 +723,7 @@ class Utilities {
             return false
         }
 
-        fun remoteBlocklistFile(ctx: Context?, which: String, timestamp: Long): File? {
+        fun blocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
             if (ctx == null) return null
 
             return try {

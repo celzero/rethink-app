@@ -33,7 +33,7 @@ import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_F
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.Companion.blocklistFile
 import com.celzero.bravedns.util.Utilities.Companion.isValidDnsPort
-import com.celzero.bravedns.util.Utilities.Companion.remoteBlocklistFile
+import com.celzero.bravedns.util.Utilities.Companion.blocklistDir
 import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
 import dnsx.BraveDNS
 import dnsx.Dnsx
@@ -313,7 +313,7 @@ class GoVpnAdapter(
         if (DEBUG) Log.d(LOG_TAG_VPN, "init remote bravedns mode")
         try {
             val remoteDir =
-                remoteBlocklistFile(
+                blocklistDir(
                     context,
                     REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     persistentState.remoteBlocklistTimestamp
