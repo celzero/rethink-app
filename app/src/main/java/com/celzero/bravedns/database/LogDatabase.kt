@@ -158,10 +158,10 @@ abstract class LogDatabase : RoomDatabase() {
                     database.execSQL("DROP INDEX IF EXISTS index_dnslogs_querystr")
                     database.execSQL("DROP INDEX IF EXISTS index_connectiontracker_ipaddress")
                     database.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_queryStr_responseIps ON  DnsLogs(queryStr, responseIps)"
+                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_queryStr_responseIps_isBlocked_blockLists ON  DnsLogs(queryStr, responseIps, isBlocked, blockLists)"
                     )
                     database.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_ipAddress_appName_dnsQuery ON  ConnectionTracker(ipAddress, appName, dnsQuery)"
+                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_ipAddress_appName_dnsQuery_blockedByRule ON  ConnectionTracker(ipAddress, appName, dnsQuery, blockedByRule)"
                     )
                     database.execSQL(
                         "ALTER TABLE ConnectionTracker add column blocklists TEXT DEFAULT '' NOT NULL"
