@@ -349,7 +349,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun removeThisMethod() {
         // for version v03k
-        changeDefaultInternetProtocol()
         removeKeyFromSharedPref()
         changeDefaultToMax()
 
@@ -380,11 +379,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (isPlayStoreFlavour()) return
 
         io { appConfig.switchRethinkDnsToMax() }
-    }
-
-    private fun changeDefaultInternetProtocol() {
-        // (v053k) change the internet protocol version to IPv4 as default
-        persistentState.internetProtocolType = InternetProtocol.IPv4.id
     }
 
     private fun removeKeyFromSharedPref() {

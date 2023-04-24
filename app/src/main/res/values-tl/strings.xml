@@ -26,7 +26,7 @@
     <string name="lbl_ip_rules" translatable="true">Mga Patakaran sa IP</string>
     <string name="lbl_domain_rules" translatable="true">Mga Patakaran sa Domain</string>
     <string name="slide_2_title" translatable="true">Maligayang pagdating</string>
-    <string name="slide_2_desc" translatable="true">Ang Rethink ay ang pinakamadaling paraan upang subaybayan ang aktibidad ng network, i-bypass ang Internet censorship, at maglagay ng firewall sa mga app sa iyong Android device.</string>
+    <string name="slide_2_desc" translatable="true">Ang Rethink ay ang pinakamadaling paraan upang magmonitor ng network activity, mag-bypass ng Internet censorship, at firewall apps sa iyong Android device.</string>
     <string name="slide_1_title" translatable="true">Libre at Open Source</string>
     <string name="slide_1_desc" translatable="true">Ang Rethink ay isang open source na software na sinusuportahan ng programa ng Mozilla Builders MVP.</string>
     <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
@@ -34,11 +34,11 @@
     <string name="allow" translatable="true">pahintulutan</string>
     <string name="block" translatable="true">harangan</string>
     <string name="title_settings" translatable="true">Mga Setting</string>
-    <string name="pause_mode_notification_title" translatable="true">Hinto! Ang mga blocked na apps ay patuloy na magiging hindi maaaring mag-access dahil naka-firewall pa rin ang mga ito.</string>
-    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">Paghihintay</string>
+    <string name="pause_mode_notification_title" translatable="true">Paused! Ang mga blocked apps ay magpapatuloy na naka-firewall.</string>
+    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">naghihintay</string>
     <string name="exclude" translatable="true">ibukod</string>
     <string name="isolate" translatable="true">ihiwalay</string>
-    <string name="bypass_universal" translatable="true">Ibypass ang universal</string>
+    <string name="bypass_universal" translatable="true">lusutan ang pangkalahatan</string>
     <string name="universal_firewall_explanation" translatable="true">Mag-apply ng mga patakaran ng firewall sa lahat ng mga aplikasyon batay sa mga pangyayari sa device, halimbawa, mag-apply ng firewall kapag nakalock ang device o kapag hindi ginagamit ang partikular na app.</string>
     <string name="firewall_act_universal_tab" translatable="true">pangkalahatan</string>
     <string name="search_universal_ips" translatable="true"><font size="12">Maghanap ng mga IP</font></string>
@@ -62,4 +62,73 @@
 \n<u>#7</u>: Nagbabawal ng mga koneksyon kapag ang DNS ay hindi sinusunod (Universal Firewall).</string>
     <string name="firewall_rule_block_ip_univ_desc" translatable="true">Isang user-set na firewall rule ang nag-block sa <i>destination IP / Port</i>.<br/><br/> Upang baguhin, pumunta sa tab na <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">Pinapayagan ang koneksyong ito dahil ang <i>destination IP</i> ay nakatakda upang makaiwas sa lahat ng pangkalahatang patakaran ng firewall.<br/><br/> Upang baguhin, pumunta sa <i>IP Rules</i> sa tab na <i>Universal</i>.</string>
+    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">protektado</string>
+    <string name="hybrid_mode_notification_title" translatable="true">Nakaseguro! Nakakonekta sa DNS + Firewall.</string>
+    <string name="status_app_error" translatable="true">error ng aplikasyon</string>
+    <string name="untracked" translatable="true">hindi nasusundan</string>
+    <string name="bypass_dns_firewall" translatable="true">Lusutan ang DNS at firewall</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">Paalala: Na-deactivate na ang RethinkDNS</string>
+    <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">Pindutin upang baguhin ang mga setting ng proteksyon</string>
+    <string name="dns_mode_notification_title" translatable="true">Nakasegurong nakakabit sa mabilis at ligtas na DNS.</string>
+    <string name="firewall_mode_notification_title" translatable="true">Nakaseguro! Nakakonekta sa Firewall.</string>
+    <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]" translatable="true">nabibigo</string>
+    <string name="notification_action_dns_firewall_mode" translatable="true">DNS + Firewall</string>
+    <string name="dns_mode_info_title" translatable="true">DNS</string>
+    <string name="firewall_mode_info_title" translatable="true">Firewall</string>
+    <string name="notification_action_dns_mode" translatable="true">DNS</string>
+    <string name="firewall_rules" translatable="true">Mga Patakaran sa Network</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">Private DNS ay pinagana</string>
+    <string name="dns_explanation_dns_connected" translatable="true">Nakakonekta sa RethinkDNS</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">Nakakonekta sa Firewall</string>
+    <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">hindi protektado</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Nakakonekta sa RethinkDNS at Firewall</string>
+    <string name="notification_action_resume_vpn" translatable="true">IPAGPATULOY</string>
+    <string name="notification_action_pause_vpn" translatable="true">PAUSE</string>
+    <string name="notification_action_stop_vpn" translatable="true">ITIGIL</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">Bantayan ang aktibidad ng network at paganahin ang firewall para sa anumang app o IP address.</string>
+    <string name="apps_info_title" translatable="true">Mga aplikasyon</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + Firewall</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Bantayan, hadlangan, at mag-encrypt ng mga DNS request.</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Lahat ng nasa itaas + bypass ang Internet censorship.</string>
+    <string name="wireguard_mode_info_explanation_new" translatable="true">Malapit na.</string>
+    <string name="alert_permission_accessibility" translatable="true">Pahintulot - Accessibility</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Ang RethinkDNS ay gumagamit ng accessibility service upang matukoy kung aling mga apps ang kasalukuyang ginagamit (foreground) at kung alin ang hindi ginagamit (background).
+\n
+\nHindi nagsusumikap ang RethinkDNS na mangolekta ng anumang impormasyon o maniktik sa inyo sa anumang paraan.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Nakapagpapahinto o bumagsak na ang serbisyong pang-accessibility ng RethinkDNS. <i><b>Pumunta sa Settings at Force Stop</b></i> RethinkDNS at simulan itong muli upang magamit ang feature na <i>I-block ang anumang app na hindi ginagamit</i>.
+\n
+\nGinagamit ng RethinkDNS ang serbisyong pang-accessibility upang ma-track kung aling mga app ang ginagamit (foreground) at kung alin ang hindi (background).</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Pagkabigo sa pagbukas ng Settings ng Accessibility. Subukan muli mamaya!</string>
+    <string name="always_on_dialog_neutral" translatable="true">Mga Settings</string>
+    <string name="private_dns_dialog_heading" translatable="true">I-off ang Pribadong DNS</string>
+    <string name="private_dns_dialog_desc" translatable="true">Ang mga setting ng DNS ng Rethink ay na-override ng Pribadong DNS ng Android.
+\n
+\nPara gamitin ang Rethink\'s DNS pumunta sa Android Settings at i-off ang \"Private DNS.\"</string>
+    <string name="private_dns_dialog_positive" translatable="true">Pumunta sa Mga Setting</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Network</string>
+    <string name="dns_act_configure_tab" translatable="true">I-configure</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Tanggalin ang IP Rule\?</string>
+    <string name="univ_firewall_dialog_message" translatable="true">Pagtanggal ng patakaran na ito ay magpapahintulot sa anumang app na kumonekta sa IP na ito. Gusto mo bang magpatuloy\?</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">I-delete ang endpoint ng DoH\?</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Tinanggal ang endpoint.</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Alisin ang endpoint ng DNS over Https mula sa nakalagay na konfigurasyon.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt resolver\?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Tanggalin ang DNSCrypt resolver mula sa mga na-save na konfigurasyon.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">Ang DNSCrypt resolver ay tinanggal.</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Tanggalin ang DNSCrypt Relay\?</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Tanggalin ang DNSCrypt relay mula sa naka-save na konfigurasyon.</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">Ang DNSCrypt Relay ay tinanggal.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Tanggalin ang DNS Proxy\?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Tanggalin ang DNS Proxy mula sa naka-save na konfigurasyon.</string>
+    <string name="dns_proxy_remove_success" translatable="true">Tinanggal ang DNS Proxy.</string>
+    <string name="local_blocklist_download" translatable="true">I-download ang Mga Blocklist</string>
+    <string name="local_blocklist_download_desc" translatable="true">Mag-download ng mga blocklist (mga 60MB) para magamit ang feature na ito\?</string>
+    <string name="local_blocklist_redownload" translatable="true">Napapanahon!</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">Ang mga blocklist sa device ay nasa pinakabagong bersyon na v%1$s.</string>
+    <string name="blocklist_update_check_failure" translatable="true">May nangyaring mali. Pakisubukan muli mamaya!</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Ang mga blocklist ay nasa pinakabagong bersyon na.</string>
+    <string name="refresh_complete" translatable="true">Kumpleto na ang muling pag-sync ng listahan ng app.</string>
+    <string name="show_logs_disabled_network_message" translatable="true">Ang pag-log ng koneksyon ay hindi pinagana. Upang muling paganahin, pumunta sa <i>Mga Setting</i> at i-on ang <i>Paganahin ang on-device na pag-log.</i></string>
+    <string name="show_logs_disabled_dns_message" translatable="true">Ang pag-log ng kahilingan sa DNS ay hindi pinagana. Upang muling paganahin, pumunta sa <i>Mga Setting</i> at i-on ang <i>Paganahin ang on-device na pag-log.</i></string>
+    <string name="settings_enable_logs" translatable="true">Paganahin ang on-device na pag-log</string>
 </resources>
