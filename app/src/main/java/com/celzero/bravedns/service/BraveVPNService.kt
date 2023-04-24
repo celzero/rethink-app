@@ -1857,7 +1857,7 @@ class BraveVPNService :
                 } else {
                     val activeNetwork = underlyingNetworks?.allNet?.first()
                     underlyingNetworks?.ipv6Net?.forEach {
-                        if (it.network == activeNetwork && it.isReachable) return true
+                        if (it.network == activeNetwork) return true
                     }
                     false
                 }
@@ -1909,7 +1909,7 @@ class BraveVPNService :
                             LOG_TAG_VPN,
                             "IPv4 network: ${it.network.networkHandle}, ${it.isReachable}"
                         )
-                        if (it.network == activeNetwork && it.isReachable) {
+                        if (it.network == activeNetwork) {
                             Log.i(LOG_TAG_VPN, "IPv4 network is reachable")
                             return true
                         }

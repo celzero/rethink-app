@@ -33,6 +33,7 @@ import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
@@ -40,7 +41,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.TimeUnit
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
@@ -72,7 +72,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         const val MSG_LINK_PROPERTY = 3
     }
 
-    data class NetworkLinkProperties(val network: Network, val linkProperties: LinkProperties)
+    data class NetworkLinkProperties(
+        val network: Network,
+        val linkProperties: LinkProperties,
+        val useActive: Boolean
+    )
 
     init {
         try {
@@ -153,7 +157,14 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     }
 
     private fun handlePropertyChange(network: Network, linkedProperties: LinkProperties) {
-        val message = constructLinkedPropertyMessage(MSG_LINK_PROPERTY, network, linkedProperties)
+        // negate useMultipleNetworks so that the message is sent to check to use active network
+        val message =
+            constructLinkedPropertyMessage(
+                MSG_LINK_PROPERTY,
+                network,
+                linkedProperties,
+                !persistentState.useMultipleNetworks
+            )
         serviceHandler?.removeMessages(MSG_LINK_PROPERTY, null)
         serviceHandler?.sendMessage(message)
     }
@@ -175,9 +186,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     private fun constructLinkedPropertyMessage(
         what: Int,
         network: Network,
-        linkedProperties: LinkProperties
+        linkedProperties: LinkProperties,
+        useActive: Boolean
     ): Message {
-        val networkLinkProperties = NetworkLinkProperties(network, linkedProperties)
+        val networkLinkProperties = NetworkLinkProperties(network, linkedProperties, useActive)
         val message = Message.obtain()
         message.what = what
         message.obj = networkLinkProperties
@@ -261,7 +273,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
             if (isNewNetwork || isForceUpdate) {
                 currentNetworks = newNetworks
-                repopulateTrackedNetworks(currentNetworks)
+                repopulateTrackedNetworks(useActive = true, currentNetworks)
                 informListener(requireAllNetworks = false, isActiveNetworkMetered)
             }
         }
@@ -281,7 +293,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
             if (isNewNetwork || isForceUpdate) {
                 currentNetworks = newNetworks
-                repopulateTrackedNetworks(currentNetworks)
+                repopulateTrackedNetworks(useActive = false, currentNetworks)
 
                 informListener(requireAllNetworks = true, isActiveNetworkMetered)
             }
@@ -324,6 +336,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         private fun processLinkPropertyChange(networkLinkProperties: NetworkLinkProperties) {
             val linkProperties = networkLinkProperties.linkProperties
             val network = networkLinkProperties.network
+            val useActive = networkLinkProperties.useActive
 
             // do not add network if there is no internet/is VPN
             if (hasInternet(network) == false || isVPN(network) == true) {
@@ -338,17 +351,27 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
                 if (address.isIPv6) {
                     trackedIpv6Networks.add(
-                        NetworkIcmpProperty(network, checkIpv6Reachability(network))
+                        NetworkIcmpProperty(
+                            network,
+                            //
+                            if (useActive) true else checkIpv6Reachability(network)
+                        )
                     )
                 } else {
                     trackedIpv4Networks.add(
-                        NetworkIcmpProperty(network, checkIpv4Reachability(network))
+                        NetworkIcmpProperty(
+                            network,
+                            if (useActive) true else checkIpv4Reachability(network)
+                        )
                     )
                 }
             }
         }
 
-        private fun repopulateTrackedNetworks(networkIcmpProperties: LinkedHashSet<Network>) {
+        private fun repopulateTrackedNetworks(
+            useActive: Boolean,
+            networkIcmpProperties: LinkedHashSet<Network>
+        ) {
             val ipv6: MutableSet<NetworkIcmpProperty> = mutableSetOf()
             val ipv4: MutableSet<NetworkIcmpProperty> = mutableSetOf()
 
@@ -363,9 +386,19 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     val address = IPAddressString(prop.address.hostAddress?.toString())
 
                     if (address.isIPv6) {
-                        ipv6.add(NetworkIcmpProperty(property, checkIpv6Reachability(property)))
+                        ipv6.add(
+                            NetworkIcmpProperty(
+                                property,
+                                if (useActive) true else checkIpv6Reachability(property)
+                            )
+                        )
                     } else {
-                        ipv4.add(NetworkIcmpProperty(property, checkIpv4Reachability(property)))
+                        ipv4.add(
+                            NetworkIcmpProperty(
+                                property,
+                                if (useActive) true else checkIpv4Reachability(property)
+                            )
+                        )
                     }
                 }
             }
