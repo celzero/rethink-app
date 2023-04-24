@@ -16,14 +16,28 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
-import android.net.*
-import android.os.*
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.TrafficStats
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.Looper
+import android.os.Message
+import android.os.SystemClock
 import android.system.OsConstants.RT_SCOPE_UNIVERSE
 import android.util.Log
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.selects.select
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
@@ -58,7 +72,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         const val MSG_LINK_PROPERTY = 3
     }
 
-    data class NetworkProperties(val network: Network, val linkProperties: LinkProperties)
+    data class NetworkLinkProperties(val network: Network, val linkProperties: LinkProperties)
 
     init {
         try {
@@ -163,21 +177,23 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         network: Network,
         linkedProperties: LinkProperties
     ): Message {
-        val networkProperties = NetworkProperties(network, linkedProperties)
+        val networkLinkProperties = NetworkLinkProperties(network, linkedProperties)
         val message = Message.obtain()
         message.what = what
-        message.obj = networkProperties
+        message.obj = networkLinkProperties
         return message
     }
 
     data class UnderlyingNetworks(
         val allNet: Set<Network>?,
-        val ipv4Net: Set<Network>,
-        val ipv6Net: Set<Network>,
+        val ipv4Net: Set<NetworkIcmpProperty>,
+        val ipv6Net: Set<NetworkIcmpProperty>,
         val useActive: Boolean,
         var isActiveNetworkMetered: Boolean,
         var lastUpdated: Long
     )
+
+    data class NetworkIcmpProperty(val network: Network, val isReachable: Boolean)
 
     // Handles the network messages from the callback from the connectivity manager
     private class NetworkRequestHandler(
@@ -192,8 +208,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         // in the 0th index is preferred over the one at 1st index, and so on.
         var currentNetworks: LinkedHashSet<Network> = linkedSetOf()
 
-        var trackedIpv4Networks: MutableSet<Network> = mutableSetOf()
-        var trackedIpv6Networks: MutableSet<Network> = mutableSetOf()
+        var trackedIpv4Networks: MutableSet<NetworkIcmpProperty> = mutableSetOf()
+        var trackedIpv6Networks: MutableSet<NetworkIcmpProperty> = mutableSetOf()
 
         var connectivityManager: ConnectivityManager =
             context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
@@ -213,7 +229,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     processAllNetworks(isForceUpdate)
                 }
                 MSG_LINK_PROPERTY -> {
-                    val netProps = msg.obj as NetworkProperties
+                    val netProps = msg.obj as NetworkLinkProperties
                     processLinkPropertyChange(netProps)
                 }
             }
@@ -285,7 +301,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         currentNetworks,
                         trackedIpv4Networks,
                         trackedIpv6Networks,
-                        !requireAllNetworks,
+                        !requireAllNetworks, // use multiple network is negated for active network
                         isActiveNetworkMetered,
                         SystemClock.elapsedRealtime()
                     )
@@ -305,9 +321,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 NetworkCapabilities.TRANSPORT_CELLULAR) == true */
         }
 
-        private fun processLinkPropertyChange(networkProperties: NetworkProperties) {
-            val linkProperties = networkProperties.linkProperties
-            val network = networkProperties.network
+        private fun processLinkPropertyChange(networkLinkProperties: NetworkLinkProperties) {
+            val linkProperties = networkLinkProperties.linkProperties
+            val network = networkLinkProperties.network
 
             // do not add network if there is no internet/is VPN
             if (hasInternet(network) == false || isVPN(network) == true) {
@@ -321,20 +337,24 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 val address = IPAddressString(it.address.hostAddress?.toString())
 
                 if (address.isIPv6) {
-                    trackedIpv6Networks.add(network)
+                    trackedIpv6Networks.add(
+                        NetworkIcmpProperty(network, checkIpv6Reachability(network))
+                    )
                 } else {
-                    trackedIpv4Networks.add(network)
+                    trackedIpv4Networks.add(
+                        NetworkIcmpProperty(network, checkIpv4Reachability(network))
+                    )
                 }
             }
         }
 
-        private fun repopulateTrackedNetworks(networks: LinkedHashSet<Network>) {
-            val ipv6: MutableSet<Network> = mutableSetOf()
-            val ipv4: MutableSet<Network> = mutableSetOf()
+        private fun repopulateTrackedNetworks(networkIcmpProperties: LinkedHashSet<Network>) {
+            val ipv6: MutableSet<NetworkIcmpProperty> = mutableSetOf()
+            val ipv4: MutableSet<NetworkIcmpProperty> = mutableSetOf()
 
-            networks.forEach { network ->
+            networkIcmpProperties.forEach { property ->
                 val linkProperties =
-                    connectivityManager.getLinkProperties(network) ?: return@forEach
+                    connectivityManager.getLinkProperties(property) ?: return@forEach
 
                 linkProperties.linkAddresses.forEach inner@{ prop ->
                     // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
@@ -343,9 +363,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     val address = IPAddressString(prop.address.hostAddress?.toString())
 
                     if (address.isIPv6) {
-                        ipv6.add(network)
+                        ipv6.add(NetworkIcmpProperty(property, checkIpv6Reachability(property)))
                     } else {
-                        ipv4.add(network)
+                        ipv4.add(NetworkIcmpProperty(property, checkIpv4Reachability(property)))
                     }
                 }
             }
@@ -404,6 +424,73 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             return newNetworks
         }
 
+        private fun checkIpv4Reachability(network: Network): Boolean = runBlocking {
+            coroutineScope {
+                // execute isReachable on series of IP addresses and return true if any of them is
+                // reachable
+                val ipAddresses =
+                    listOf(
+                        "216.239.32.27", // google org
+                        "104.16.132.229", // cloudflare
+                        "44.235.246.155" // mozilla
+                    )
+                // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
+                // select the first reachable IP address and return true if any of them is reachable
+                // else return false
+                select<Boolean> {
+                        async { isReachable(network, ipAddresses[0]) }.onAwait { it }
+                        async { isReachable(network, ipAddresses[1]) }.onAwait { it }
+                        async { isReachable(network, ipAddresses[2]) }.onAwait { it }
+                    }
+                    .also { coroutineContext.cancelChildren() }
+            }
+        }
+
+        private fun checkIpv6Reachability(network: Network): Boolean = runBlocking {
+            coroutineScope {
+                // execute isReachable on series of IP addresses and return true if any of them is
+                // reachable
+                val ipAddresses =
+                    listOf(
+                        "2001:4860:4802:32::1b", // google org
+                        "2606:4700::6810:84e5", // cloudflare
+                        "2606:4700:3033::ac43:a21b" // rethinkdns
+                    )
+                // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
+                // select the first reachable IP address and return true if any of them is reachable
+                // else return false
+                select<Boolean> {
+                        async { isReachable(network, ipAddresses[0]) }.onAwait { it }
+                        async { isReachable(network, ipAddresses[1]) }.onAwait { it }
+                        async { isReachable(network, ipAddresses[2]) }.onAwait { it }
+                    }
+                    .also { coroutineContext.cancelChildren() }
+            }
+        }
+
+        private fun isReachable(network: Network, host: String): Boolean {
+            try {
+                // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
+                TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
+                // https://developer.android.com/reference/java/net/InetAddress#isReachable(int)
+                // the getByName() call on a network will bind the socket to the network
+                // in which case the isReachable() call will use the network to check reachability
+                // we are using isReachable(timeout) instead of isReachable(NI, ttl, timeout)
+                // because there is no way to get the network interface for a network
+                val isReachable = network.getByName(host).isReachable(1000)
+
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_CONNECTION,
+                        "isReachable for $host, network: ${network.networkHandle}: $isReachable"
+                    )
+                return isReachable
+            } catch (e: Exception) {
+                Log.e(LOG_TAG_CONNECTION, "caught during isReachable: ${e.message}")
+            }
+            return false
+        }
+
         private fun hasInternet(network: Network): Boolean? {
             // TODO: consider checking for NET_CAPABILITY_NOT_SUSPENDED, NET_CAPABILITY_VALIDATED?
             return connectivityManager
@@ -415,6 +502,15 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             return connectivityManager
                 .getNetworkCapabilities(network)
                 ?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        }
+
+        // convert long to int, if the value is out of range return 10000
+        private fun Long.toIntOrDefault(): Int {
+            return if (this < Int.MIN_VALUE || this > Int.MAX_VALUE) {
+                10000
+            } else {
+                this.toInt()
+            }
         }
     }
 }

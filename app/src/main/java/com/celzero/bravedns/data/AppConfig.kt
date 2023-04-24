@@ -207,6 +207,10 @@ internal constructor(
             return this == DNS_PROXY
         }
 
+        fun isRethinkRemote(): Boolean {
+            return this == RETHINK_REMOTE
+        }
+
         fun isNetworkDns(): Boolean {
             return this == NETWORK_DNS
         }

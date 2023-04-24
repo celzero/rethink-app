@@ -33,9 +33,11 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
 import androidx.annotation.GuardedBy
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnTrackerMetaData
@@ -48,7 +50,6 @@ import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.ui.HomeScreenActivity
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
@@ -58,7 +59,6 @@ import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.calculateTtl
 import com.celzero.bravedns.util.Utilities.getAccentColor
-import com.celzero.bravedns.util.Utilities.isAtleastN
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
@@ -186,16 +186,19 @@ class BraveVPNService :
         try {
 
             // allNet is always sorted, first network is always the active network
-            underlyingNetworks?.allNet?.forEach { network ->
-                if (underlyingNetworks?.ipv4Net?.contains(network) == true) {
-                    pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-                    if (pfd == null) return
+            underlyingNetworks?.allNet?.forEach { networkProps ->
+                underlyingNetworks?.ipv4Net?.forEach {
+                    if (it.network == networkProps && it.isReachable) {
+                        pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
+                        if (pfd == null) return
 
-                    network.bindSocket(pfd!!.fileDescriptor)
-                    return
-                } else {
-                    // no-op is ok, fd is auto-bound to active network
+                        networkProps.bindSocket(pfd!!.fileDescriptor)
+                        return
+                    } else {
+                        // no-op
+                    }
                 }
+                // no-op is ok, fd is auto-bound to active network
             }
         } catch (e: IOException) {
             Log.e(
@@ -217,16 +220,19 @@ class BraveVPNService :
 
         var pfd: ParcelFileDescriptor? = null
         try {
-            underlyingNetworks?.allNet?.forEach { network ->
-                if (underlyingNetworks?.ipv6Net?.contains(network) == true) {
-                    pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
-                    if (pfd == null) return
+            underlyingNetworks?.allNet?.forEach { networkProps ->
+                underlyingNetworks?.ipv6Net?.forEach {
+                    if (it.network == networkProps && it.isReachable) {
+                        pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
+                        if (pfd == null) return
 
-                    network.bindSocket(pfd!!.fileDescriptor)
-                    return
-                } else {
-                    // no-op is ok, fd is auto-bound to active network
+                        Log.i(LOG_TAG_VPN, "bind6: network is reachable via ICMP")
+                        networkProps.bindSocket(pfd!!.fileDescriptor)
+                    } else {
+                        // no-op
+                    }
                 }
+                // no-op is ok, fd is auto-bound to active network
             }
         } catch (e: IOException) {
             Log.e(
@@ -1287,7 +1293,7 @@ class BraveVPNService :
     private suspend fun updateTun(tunnelOptions: AppConfig.TunnelOptions) {
         VpnController.mutex.withLock {
             // Connection monitor can be null if onDestroy() of service
-            // is called, in that case no need to call updateServerConnection()
+            // is called, in that case no need to call updateTun()
             if (connectionMonitor == null) {
                 Log.w(LOG_TAG_VPN, "skip update-tun, connection-monitor missing")
                 return@withLock
@@ -1694,11 +1700,9 @@ class BraveVPNService :
 
         Log.w(LOG_TAG_VPN, "Destroying VPN service")
 
-        if (isAtleastN()) {
-            stopForeground(STOP_FOREGROUND_DETACH)
-        } else {
-            stopForeground(true)
-        }
+        // stop foreground service will take care of stopping the service for both
+        // version >= 24 and < 24
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
     }
 
     private fun startPauseTimer() {
@@ -1768,13 +1772,21 @@ class BraveVPNService :
             var builder: VpnService.Builder =
                 newBuilder().setSession("RethinkDNS").setMtu(VPN_INTERFACE_MTU)
 
-            val has6 = route6()
+            var has6 = route6()
             // always add ipv4 to the route, even though there is no ipv4 address
             // ICMPv6 is not handled in underlying tun2socks, so add ipv4 route even if the
             // selected protocol type is ipv6
-            val has4 = true || route4()
+            var has4 = route4()
 
             Log.i(LOG_TAG_VPN, "Building vpn for v4?$has4, v6?$has6")
+
+            if (!has4 && !has6) {
+                // no route available for both v4 and v6, add all routes
+                Log.i(LOG_TAG_VPN, "No route available for v4 and v6, adding all routes")
+                has4 = true
+                has6 = true
+            }
+
             // setup the gateway addr
             if (has4) {
                 builder = addAddress4(builder)
@@ -1823,11 +1835,31 @@ class BraveVPNService :
                 // simply check whether there are ANY v6 networks available; otherwise, if the vpn
                 // must only use the active-network (always the first network in allNet), then check
                 // if active-network has v6 connectivity (that is, it must be present in ipv6Net).
+                // check if isReachable is true, if not, don't need to add route for v6 (return false)
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "underlyingNetworks: ${underlyingNetworks?.useActive}, ${underlyingNetworks?.ipv6Net?.size}"
+                    )
                 if (underlyingNetworks?.useActive != true) {
-                    underlyingNetworks?.ipv6Net?.size != 0
+                    if (underlyingNetworks?.ipv6Net?.size == 0) {
+                        Log.i(LOG_TAG_VPN, "No IPv6 networks available")
+                        return false
+                    }
+
+                    underlyingNetworks?.ipv6Net?.forEach {
+                        if (it.isReachable) {
+                            Log.i(LOG_TAG_VPN, "IPv6 network is reachable")
+                            return true
+                        }
+                    }
+                    return false
                 } else {
                     val activeNetwork = underlyingNetworks?.allNet?.first()
-                    underlyingNetworks?.ipv6Net?.contains(activeNetwork) == true
+                    underlyingNetworks?.ipv6Net?.forEach {
+                        if (it.network == activeNetwork && it.isReachable) return true
+                    }
+                    false
                 }
             }
         }
@@ -1846,11 +1878,43 @@ class BraveVPNService :
                 // simply check whether there are ANY v4 networks available; otherwise, if the vpn
                 // must only use the active-network (always the first network in allNet), then check
                 // if active-network has v4 connectivity (that is, it must be present in ipv4Net).
+                // check if isReachable is true, if not, don't need to add route for v4 (return false)
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "underlyingNetworks: ${underlyingNetworks?.useActive}, ${underlyingNetworks?.ipv4Net?.size}"
+                    )
                 if (underlyingNetworks?.useActive != true) {
-                    underlyingNetworks?.ipv4Net?.size != 0
+                    if (underlyingNetworks?.ipv4Net?.size == 0) {
+                        Log.i(LOG_TAG_VPN, "No IPv4 networks available")
+                        return false
+                    }
+
+                    underlyingNetworks?.ipv4Net?.forEach {
+                        if (DEBUG)
+                            Log.d(
+                                LOG_TAG_VPN,
+                                "IPv4 network: ${it.network.networkHandle}, ${it.isReachable}"
+                            )
+                        if (it.isReachable) {
+                            Log.i(LOG_TAG_VPN, "IPv4 network is reachable")
+                            return true
+                        }
+                    }
+                    return false
                 } else {
                     val activeNetwork = underlyingNetworks?.allNet?.first()
-                    underlyingNetworks?.ipv4Net?.contains(activeNetwork) == true
+                    underlyingNetworks?.ipv4Net?.forEach {
+                        Log.i(
+                            LOG_TAG_VPN,
+                            "IPv4 network: ${it.network.networkHandle}, ${it.isReachable}"
+                        )
+                        if (it.network == activeNetwork && it.isReachable) {
+                            Log.i(LOG_TAG_VPN, "IPv4 network is reachable")
+                            return true
+                        }
+                    }
+                    return false
                 }
             }
         }
@@ -1863,7 +1927,7 @@ class BraveVPNService :
             // add only unicast routes
             // range 0000:0000:0000:0000:0000:0000:0000:0000-
             // 0000:0000:0000:0000:ffff:ffff:ffff:ffff
-            b.addRoute("::1", 64)
+            b.addRoute("0000::", 64)
             b.addRoute("2000::", 3) // 2000:: - 3fff::
             b.addRoute("4000::", 3) // 4000:: - 5fff::
             b.addRoute("6000::", 3) // 6000:: - 7fff::
@@ -1994,27 +2058,73 @@ class BraveVPNService :
             return suggestedId.ifEmpty { Dnsx.Preferred }
         }
 
-        // check for global domain rules in dns only mode
-        // for other modes, block/blockalg call takes care of global rules
-        // TODO; come up with a implementation to handle all the app modes
         if (appConfig.getBraveMode().isDnsMode()) {
-            when (DomainRulesManager.getDomainRule(query, UID_EVERYBODY)) {
-                // TODO: return Preferred for now
-                DomainRulesManager.Status.TRUST -> return Dnsx.BlockFree
-                DomainRulesManager.Status.BLOCK -> return Dnsx.BlockAll
-                else -> {} // no-op, fall-through;
-            }
+            val res = getDnsxForDnsMode(query)
+            if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns): dnsx: $res")
+            return res
         }
 
-        return if (appConfig.getBraveMode().isDnsFirewallMode()) {
-            Dnsx.Alg
-        } else {
-            if (persistentState.enableDnsCache) {
-                Dnsx.CT + Dnsx.Preferred
-            } else {
-                Dnsx.Preferred
-            }
+        if (appConfig.getBraveMode().isDnsFirewallMode()) {
+            val res = getDnsxForDnsFirewallMode(query)
+            if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns+Firewall): dnsx: $res")
+            return res
         }
+
+        Log.e(LOG_TAG_VPN, "onQuery: unknown mode ${appConfig.getBraveMode()}, returning default")
+        return if (persistentState.enableDnsCache) {
+            Dnsx.CT + Dnsx.Preferred
+        } else {
+            Dnsx.Preferred
+        }
+    }
+
+    // function to decide which Dnsx to return on Dns only mode
+    private fun getDnsxForDnsMode(query: String): String {
+        // check for global domain rules
+        when (DomainRulesManager.getDomainRule(query, UID_EVERYBODY)) {
+            // TODO: return Preferred for now
+            DomainRulesManager.Status.TRUST -> return Dnsx.BlockFree
+            DomainRulesManager.Status.BLOCK -> return Dnsx.BlockAll
+            else -> {} // no-op, fall-through;
+        }
+
+        return if (persistentState.enableDnsCache) {
+            Dnsx.CT + Dnsx.Preferred
+        } else {
+            Dnsx.Preferred
+        }
+    }
+
+    // function to decide which Dnsx to return on DnsFirewall mode
+    private fun getDnsxForDnsFirewallMode(query: String): String {
+        // if any app is bypassed (dns + firewall) and if local blocklist enabled or remote dns
+        // is rethink then return Alg so that the decision is made by in flow() function
+        if (FirewallManager.isAnyAppBypassesBoth() && isRethinkEnabled()) {
+            return Dnsx.Alg
+        } else {
+            // no-op
+        }
+
+        val isTrusted = DomainRulesManager.isDomainTrusted(query)
+        if (isTrusted) {
+            // return Alg so that the decision is made by in flow() function
+            return Dnsx.Alg
+        } else {
+            // no-op
+        }
+
+        // if the domain is not trusted or any app is not bypassed, return preferred or CT+preferred
+        // so that if the domain is blocked by upstream then no need to do any further processing
+        return if (persistentState.enableDnsCache) {
+            Dnsx.CT + Dnsx.Preferred
+        } else {
+            Dnsx.Preferred
+        }
+    }
+
+    private fun isRethinkEnabled(): Boolean {
+        // check if remote or local rethink is enabled
+        return appConfig.getDnsType().isRethinkRemote() || persistentState.blocklistEnabled
     }
 
     override fun onResponse(summary: Summary?) {

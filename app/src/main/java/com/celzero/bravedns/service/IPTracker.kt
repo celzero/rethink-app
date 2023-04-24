@@ -40,6 +40,10 @@ internal constructor(
     private val context: Context
 ) : KoinComponent {
 
+    companion object {
+        private const val PER_USER_RANGE = 100000
+    }
+
     suspend fun makeConnectionTracker(connTrackerMetaData: ConnTrackerMetaData): ConnectionTracker {
         val connTracker = ConnectionTracker()
         connTracker.ipAddress = connTrackerMetaData.destIP
@@ -82,7 +86,11 @@ internal constructor(
         }
     }
 
-    private suspend fun fetchApplicationName(uid: Int): String {
+    private suspend fun fetchApplicationName(_uid: Int): String {
+        // Returns the app id (base uid) for a given uid, stripping out the user id from it.
+        // http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#224
+        val uid = _uid % PER_USER_RANGE
+
         if (uid == INVALID_UID) {
             return context.getString(R.string.network_log_app_name_unknown)
         }
