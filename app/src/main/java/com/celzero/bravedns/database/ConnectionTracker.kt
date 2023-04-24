@@ -22,7 +22,13 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 
 @Entity(
     tableName = "ConnectionTracker",
-    indices = [Index(value = arrayOf("ipAddress", "appName", "dnsQuery"), unique = false)]
+    indices =
+        [
+            Index(
+                value = arrayOf("ipAddress", "appName", "dnsQuery", "blockedByRule"),
+                unique = false
+            )
+        ]
 )
 class ConnectionTracker {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
