@@ -32,9 +32,9 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.blocklistFile
 import com.celzero.bravedns.util.Utilities.isValidDnsPort
-import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import dnsx.BraveDNS
 import dnsx.Dnsx
@@ -44,6 +44,7 @@ import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
 import ipn.Ipn
+import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +52,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
-import java.io.IOException
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -121,28 +121,28 @@ class GoVpnAdapter(
 
     private suspend fun addTransport() {
         var transport: Transport? = null
+        // TODO: #321 As of now there is no block free transport for dns types other than Rethink.
+        // introduce block free transport for other dns types when there is a UI to configure the
+        // block free transport
         var blockFreeTransport: Transport? = null
 
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
                 transport = createDohTransport(Dnsx.Preferred)
-                blockFreeTransport = createDohTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.DNSCRYPT -> {
                 transport = createDNSCryptTransport(Dnsx.Preferred)
-                blockFreeTransport = createDNSCryptTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 transport = createDnsProxyTransport(Dnsx.Preferred)
-                blockFreeTransport = createDnsProxyTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.NETWORK_DNS -> {
                 transport = createNetworkDnsTransport(Dnsx.Preferred)
-                blockFreeTransport = createNetworkDnsTransport(Dnsx.BlockFree)
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 transport = createRethinkDnsTransport()
                 // only rethink has different stamp for block free transport
+                // create a new transport for block free
                 blockFreeTransport = createBlockFreeTransport()
             }
         }
@@ -156,9 +156,11 @@ class GoVpnAdapter(
                 "add blockfree transport to resolver, addr: ${blockFreeTransport.addr}, $added"
             )
         } else {
-            Log.e(
+            // remove the block free transport from the resolver
+            val removed = tunnel?.resolver?.remove(Dnsx.BlockFree)
+            Log.i(
                 LOG_TAG_VPN,
-                "blockfree transport is null for dns type: ${appConfig.getDnsType()}"
+                "blockfree transport is null for current dns type: ${appConfig.getDnsType()}, so remove the block free transport from the resolver if any, $removed"
             )
         }
 
