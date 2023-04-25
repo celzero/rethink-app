@@ -281,7 +281,7 @@
     <string name="search_custom_domains" translatable="true"><font size="12">Search domain names</font></string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Search blocklists</font></string>
 
-  <string name="trusted_domains_desc" translatable="true">The trusted domain rule will be honoured if the remote DNS is <u>Rethink\'s DNS</u> or the <u>DNS which does not block queries</u>.</string>
+    <string name="trusted_domains_desc" translatable="true">The trusted domain rule will be honoured if the remote DNS is <u>Rethink\'s DNS</u>.</string>
 
     <string name="app_mode_dns_low_battery" translatable="true">DNS (battery saver)</string>
     <string name="app_mode_dns" translatable="true">DNS</string>
@@ -423,6 +423,17 @@
 
     <string name="settings_theme_heading" translatable="true">Appearance</string>
     <string name="settings_theme_desc" translatable="true">Dark/light theme</string>
+
+    <string name="settings_go_log_heading" translatable="false">Tun2socks logger</string>
+    <string name="settings_go_log_desc" translatable="false">Choose log level for Tun2socks</string>
+
+    <string name="settings_gologger_dialog_title" translatable="false">Select logger level</string>
+    <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
+    <string name="settings_gologger_dialog_option_2" translatable="false">Debug</string>
+    <string name="settings_gologger_dialog_option_3" translatable="false">Info</string>
+    <string name="settings_gologger_dialog_option_4" translatable="false">Warn</string>
+    <string name="settings_gologger_dialog_option_5" translatable="false">Error</string>
+
 
     <string name="settings_http_proxy_desc" translatable="true">Forwarding to %1$s:%2$s</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Custom Server URL</string>

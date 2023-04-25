@@ -24,6 +24,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
+import com.celzero.bravedns.BuildConfig.DEBUG
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -44,6 +45,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -113,6 +115,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
 
         displayAppThemeUi()
+        displayGoLoggerUi()
         displayNotificationActionUi()
         displayPcapUi()
     }
@@ -195,6 +198,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
     }
 
+    private fun displayGoLoggerUi() {
+        if (DEBUG) {
+            b.settingsGoLogRl.visibility = View.VISIBLE
+        } else {
+            b.settingsGoLogRl.visibility = View.GONE
+        }
+    }
+
     private fun setupClickListeners() {
         b.settingsActivityEnableLogsRl.setOnClickListener {
             b.settingsActivityEnableLogsSwitch.isChecked =
@@ -231,6 +242,11 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityThemeRl.setOnClickListener {
             enableAfterDelay(500, b.settingsActivityThemeRl)
             showThemeDialog()
+        }
+
+        b.settingsGoLogRl.setOnClickListener {
+            enableAfterDelay(500, b.settingsGoLogRl)
+            showGoLoggerDialog()
         }
 
         // Ideally this property should be part of VPN category / section.
@@ -387,6 +403,31 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                     setThemeRecreate(R.style.AppThemeTrueBlack)
                 }
             }
+        }
+        alertBuilder.create().show()
+    }
+
+    private fun showGoLoggerDialog() {
+        // show dialog with logger options, change log level in GoVpnAdapter based on selection
+        val alertBuilder = AlertDialog.Builder(this)
+        alertBuilder.setTitle(getString(R.string.settings_gologger_dialog_title))
+        val items =
+            arrayOf(
+                getString(R.string.settings_gologger_dialog_option_1),
+                getString(R.string.settings_gologger_dialog_option_2),
+                getString(R.string.settings_gologger_dialog_option_3),
+                getString(R.string.settings_gologger_dialog_option_4),
+                getString(R.string.settings_gologger_dialog_option_5)
+            )
+        val checkedItem = persistentState.goLoggerLevel.toInt()
+        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
+            dialog.dismiss()
+            if (persistentState.goLoggerLevel.toInt() == which) {
+                return@setSingleChoiceItems
+            }
+
+            persistentState.goLoggerLevel = which.toLong()
+            GoVpnAdapter.setLogLevel(which)
         }
         alertBuilder.create().show()
     }

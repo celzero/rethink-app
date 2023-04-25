@@ -261,6 +261,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // biometric last auth time
     var biometricAuthTime by longPref("biometric_auth_time").withDefault<Long>(INIT_TIME_MS)
 
+    // go logger level, default 2 -> info
+    var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
