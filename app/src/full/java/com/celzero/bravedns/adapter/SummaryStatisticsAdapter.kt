@@ -50,6 +50,8 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
+import kotlin.math.log10
+import kotlin.math.log2
 
 class SummaryStatisticsAdapter(
     private val context: Context,
@@ -100,7 +102,9 @@ class SummaryStatisticsAdapter(
         holder.bind(appNetworkActivity)
     }
 
-    private fun calculatePercentage(value: Int): Int {
+    private fun calculatePercentage(c: Int): Int {
+        val value = (log2(c.toDouble()) * 100).toInt()
+        // maxValue will be based on the count returned by the database query (order by count desc)
         if (value > maxValue) {
             maxValue = value
         }
