@@ -137,13 +137,9 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
 
                     val tag: Long = recyclerView.getChildAt(0).tag as Long
 
-                    if (dy > 0) {
-                        b.queryListRecyclerScrollHeader.text =
-                            formatToRelativeTime(requireContext(), tag)
-                        b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
-                    } else {
-                        b.queryListRecyclerScrollHeader.visibility = View.GONE
-                    }
+                    b.queryListRecyclerScrollHeader.text =
+                        formatToRelativeTime(requireContext(), tag)
+                    b.queryListRecyclerScrollHeader.visibility = View.VISIBLE
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

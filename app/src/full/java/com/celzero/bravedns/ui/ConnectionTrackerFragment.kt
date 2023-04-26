@@ -137,13 +137,8 @@ class ConnectionTrackerFragment :
 
                     val tag: Long = recyclerView.getChildAt(0).tag as Long
 
-                    if (dy > 0) {
-                        b.connectionListScrollHeader.text =
-                            formatToRelativeTime(requireContext(), tag)
-                        b.connectionListScrollHeader.visibility = View.VISIBLE
-                    } else {
-                        b.connectionListScrollHeader.visibility = View.GONE
-                    }
+                    b.connectionListScrollHeader.text = formatToRelativeTime(requireContext(), tag)
+                    b.connectionListScrollHeader.visibility = View.VISIBLE
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
