@@ -31,34 +31,35 @@ interface DnsLogDAO {
     // replace order by timeStamp desc with order by id desc, as order by timeStamp desc is building
     // the query with temporary index on the table. This is causing the query to be slow.
     // ref: https://stackoverflow.com/a/50776662 (auto covering index)
-    @Query("select * from DNSLogs order by id desc") fun getAllDnsLogs(): PagingSource<Int, DnsLog>
+    // LIMIT 35000 to avoid the query to be slow
+    @Query("select * from DNSLogs order by id desc LIMIT 35000") fun getAllDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by id desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by id desc LIMIT 35000"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc")
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc LIMIT 35000")
     fun getAllowedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists = '' order by id desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists = '' order by id desc LIMIT 35000"
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 1 order by time desc")
+    @Query("select * from DNSLogs where isBlocked = 1 order by time desc LIMIT 35000")
     fun getBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by id desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by id desc LIMIT 35000"
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc")
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc LIMIT 35000")
     fun getMaybeBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists != '' order by id desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists != '' order by id desc LIMIT 35000"
     )
     fun getMaybeBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 

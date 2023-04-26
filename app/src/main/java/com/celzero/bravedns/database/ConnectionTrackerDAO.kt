@@ -36,19 +36,20 @@ interface ConnectionTrackerDAO {
     // the query with temporary index on the table. This is causing the query to be slow.
     // ref: https://stackoverflow.com/a/50776662 (auto covering index)
     // explain QUERY plan SELECT * from ConnectionTracker ORDER by timeStamp desc
-    @Query("select * from ConnectionTracker order by id desc")
+    // add LIMIT 35000 to the query to avoid the query to be slow
+    @Query("select * from ConnectionTracker order by id desc LIMIT 35000")
     fun getConnectionTrackerByName(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc"
+        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc LIMIT 35000"
     )
     fun getConnectionTrackerByName(query: String): PagingSource<Int, ConnectionTracker>
 
-    @Query("select * from ConnectionTracker where isBlocked = 1 order by id desc")
+    @Query("select * from ConnectionTracker where isBlocked = 1 order by id desc LIMIT 35000")
     fun getBlockedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and isBlocked = 1 order by id desc"
+        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and isBlocked = 1 order by id desc LIMIT 35000"
     )
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
@@ -66,12 +67,12 @@ interface ConnectionTrackerDAO {
     fun getAppConnectionsCount(uid: Int): LiveData<Int>
 
     @Query(
-        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc"
+        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 order by id desc LIMIT 35000"
     )
     fun getBlockedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc"
+        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc LIMIT 35000"
     )
     fun getBlockedConnectionsFiltered(
         query: String,
@@ -85,20 +86,20 @@ interface ConnectionTrackerDAO {
     @Query("DELETE FROM ConnectionTracker WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc"
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc LIMIT 35000"
     )
     fun getAllowedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
-    @Query("select * from ConnectionTracker where isBlocked = 0 order by id desc")
+    @Query("select * from ConnectionTracker where isBlocked = 0 order by id desc LIMIT 35000")
     fun getAllowedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and blockedByRule in (:filter) order by id desc"
+        "select * from ConnectionTracker where isBlocked = 0 and blockedByRule in (:filter) order by id desc LIMIT 35000"
     )
     fun getAllowedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by id desc"
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by id desc LIMIT 35000"
     )
     fun getAllowedConnectionsFiltered(
         query: String,
