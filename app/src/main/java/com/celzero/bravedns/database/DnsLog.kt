@@ -29,10 +29,10 @@ import java.util.Locale
     tableName = "DnsLogs",
     indices =
         [
-            Index(
-                value = arrayOf("queryStr", "responseIps", "isBlocked", "blockLists"),
-                unique = false
-            )
+            Index(value = arrayOf("queryStr"), unique = false),
+            Index(value = arrayOf("responseIps"), unique = false),
+            Index(value = arrayOf("isBlocked"), unique = false),
+            Index(value = arrayOf("blockLists"), unique = false),
         ]
 )
 class DnsLog {

@@ -24,10 +24,10 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
     tableName = "ConnectionTracker",
     indices =
         [
-            Index(
-                value = arrayOf("ipAddress", "appName", "dnsQuery", "blockedByRule"),
-                unique = false
-            )
+            Index(value = arrayOf("ipAddress"), unique = false),
+            Index(value = arrayOf("appName"), unique = false),
+            Index(value = arrayOf("dnsQuery"), unique = false),
+            Index(value = arrayOf("blockedByRule"), unique = false),
         ]
 )
 class ConnectionTracker {
