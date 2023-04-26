@@ -19,8 +19,8 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.service.FirewallManager.GlobalVariable.appInfos

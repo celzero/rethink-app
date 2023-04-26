@@ -1,3 +1,5 @@
+import com.android.build.gradle.tasks.GenerateBuildConfig_Decorated
+
 plugins {
     // to download blocklists for the headless variant
     id "de.undercouch.download" version "5.3.0"
@@ -18,19 +20,17 @@ try {
     keystoreProperties['storePassword'] = ''
 }
 
-// stackoverflow.com/a/28661942
-// stackoverflow.com/a/22743664
-tasks.whenTaskAdded { t ->
-    if (t.name.toLowerCase().contains('headless')) {
-        // this task maybe added more than once, but downloads happen only once
-        t.dependsOn downloadBlocklists
-    }
-}
-
 android {
     compileSdkVersion 33
     // https://developer.android.com/studio/build/configure-app-module
     namespace 'com.celzero.bravedns'
+
+    defaultConfig {
+        applicationId "com.celzero.bravedns"
+        minSdkVersion 23
+        targetSdkVersion 33
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
 
     signingConfigs {
         config {
@@ -39,21 +39,6 @@ android {
             storeFile file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
         }
-    }
-
-    defaultConfig {
-        applicationId "com.celzero.bravedns"
-        minSdkVersion 23
-        targetSdkVersion 33
-        versionCode 27 // for version name 054a
-        versionName "054a"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    compileOptions {
-        coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildTypes {
@@ -69,6 +54,25 @@ android {
             initWith buildTypes.debug
         }
     }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kapt {
+        correctErrorTypes true
+    }
+
+    packagingOptions {
+        doNotStrip "**/*.so"
+    }
+
     flavorDimensions "releaseChannel", "releaseType"
     productFlavors {
         play {
@@ -90,14 +94,21 @@ android {
         }
     }
 
-    buildFeatures {
-        viewBinding true
+    tasks.whenTaskAdded { task ->
+        if (task.name.toLowerCase().contains('headless')) {
+            task.dependsOn downloadBlocklists
+            if (task.class == GenerateBuildConfig_Decorated) {
+                task.enabled false
+            }
+        }
     }
 
-    kapt {
-        correctErrorTypes true
-    }
+}
 
+configurations {
+    download {
+        transitive false
+    }
 }
 
 dependencies {
@@ -130,6 +141,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+    download "androidx.room:room-paging:$room_version"
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
@@ -159,10 +171,13 @@ dependencies {
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
     // Koin core features
+    download "io.insert-koin:koin-core:3.2.0"
     implementation "io.insert-koin:koin-core:3.4.0"
     // Koin main features for Android (Scope,ViewModel ...)
+    download "io.insert-koin:koin-android:3.2.0"
     implementation "io.insert-koin:koin-android:3.4.0"
 
+    download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
 
     // To use only without reflection variants of viewBinding
@@ -170,6 +185,7 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
+    download 'com.github.celzero:firestack:89daaaffcc'
     implementation 'com.github.celzero:firestack:89daaaffcc'
     // implementation project(":tun2socks")
 
@@ -178,6 +194,7 @@ dependencies {
 
     // for handling IP addresses and subnets, both IPv4 and IPv6
     // https://seancfoley.github.io/IPAddress/ipaddress.html
+    download 'com.github.seancfoley:ipaddress:5.4.0'
     implementation 'com.github.seancfoley:ipaddress:5.4.0'
 
     testImplementation 'junit:junit:4.13.2'
@@ -189,6 +206,19 @@ dependencies {
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
+}
+
+task downloadDependencies(type: Copy) {
+    from configurations.download
+    into "libs"
+}
+
+task unzipJNI(type: Copy) {
+    dependsOn downloadDependencies
+    fileTree(dir: 'libs', includes: ['**/*.aar']).each { zipFile ->
+        from zipTree(zipFile).matching({ include 'jni/**' })
+    }
+    into "libs"
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903

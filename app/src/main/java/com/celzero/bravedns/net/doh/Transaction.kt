@@ -17,7 +17,7 @@
 package com.celzero.bravedns.net.doh
 
 import dnsx.Dnsx
-import java.util.*
+import java.util.Calendar
 
 class Transaction {
 

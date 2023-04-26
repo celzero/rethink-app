@@ -9,7 +9,7 @@
     <attr name="chipTextColor" format="reference" />
     <attr name="invertedPrimaryTextColor" format="reference" />
     <attr name="textColorAccentBad" format="reference" />
-    <attr name="fabBackgroundColor" format="reference" />/
+    <attr name="fabBackgroundColor" format="reference" />
     <attr name="homeScreenBtnBackground" format="reference" />
     <attr name="svgStrokeColor" format="reference" />
     <attr name="svgFillColor" format="reference" />

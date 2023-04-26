@@ -1,12 +1,9 @@
 package com.celzero.bravedns
 
 import android.app.Application
-import android.os.StrictMode
-import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
+import android.content.pm.ApplicationInfo
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.util.LocalBlocklistUtil
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -28,8 +25,15 @@ import org.koin.core.context.startKoin
  * limitations under the License.
  */
 class RethinkDnsApplication : Application() {
+    companion object {
+        var DEBUG: Boolean = false
+    }
+
     override fun onCreate() {
         super.onCreate()
+
+        DEBUG =
+            applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == ApplicationInfo.FLAG_DEBUGGABLE
 
         startKoin {
             if (DEBUG) androidLogger()

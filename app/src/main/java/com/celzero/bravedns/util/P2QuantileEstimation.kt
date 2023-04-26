@@ -15,7 +15,7 @@
  */
 package com.celzero.bravedns.util
 
-import java.util.*
+import java.util.Arrays
 import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sign
