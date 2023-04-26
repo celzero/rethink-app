@@ -16,7 +16,6 @@
 package com.celzero.bravedns.database
 
 import androidx.room.Dao
-import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 

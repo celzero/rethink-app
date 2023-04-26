@@ -19,7 +19,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.*
 import com.celzero.bravedns.service.PersistentState
@@ -196,10 +196,10 @@ internal constructor(
 
         fun isValidDnsType(): Boolean {
             return this == DOH ||
-                this == DNSCRYPT ||
-                this == DNS_PROXY ||
-                this == RETHINK_REMOTE ||
-                this == NETWORK_DNS
+                    this == DNSCRYPT ||
+                    this == DNS_PROXY ||
+                    this == RETHINK_REMOTE ||
+                    this == NETWORK_DNS
         }
 
         companion object {
@@ -336,9 +336,11 @@ internal constructor(
                 PcapMode.NONE -> {
                     ""
                 }
+
                 PcapMode.LOGCAT -> {
                     "0"
                 }
+
                 PcapMode.EXTERNAL_FILE -> {
                     path
                 }
@@ -439,17 +441,20 @@ internal constructor(
                 connectedDns.postValue(endpoint.dohName)
                 persistentState.connectedDnsName = endpoint.dohName
             }
+
             DnsType.DNSCRYPT -> {
                 val endpoint = getConnectedDnscryptServer()
                 connectedDns.postValue(endpoint.dnsCryptName)
                 persistentState.connectedDnsName = endpoint.dnsCryptName
             }
+
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
 
                 connectedDns.postValue(endpoint.proxyName)
                 persistentState.connectedDnsName = endpoint.proxyName
             }
+
             DnsType.RETHINK_REMOTE -> {
                 val endpoint = getRemoteRethinkEndpoint() ?: return
 
@@ -457,6 +462,7 @@ internal constructor(
                 persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
                 persistentState.connectedDnsName = endpoint.name
             }
+
             DnsType.NETWORK_DNS -> {
                 connectedDns.postValue(context.getString(R.string.network_dns))
                 persistentState.connectedDnsName = context.getString(R.string.network_dns)
@@ -466,10 +472,10 @@ internal constructor(
 
     private fun isValidDnsType(dt: DnsType): Boolean {
         return (dt == DnsType.DOH ||
-            dt == DnsType.DNSCRYPT ||
-            dt == DnsType.DNS_PROXY ||
-            dt == DnsType.RETHINK_REMOTE ||
-            dt == DnsType.NETWORK_DNS)
+                dt == DnsType.DNSCRYPT ||
+                dt == DnsType.DNS_PROXY ||
+                dt == DnsType.RETHINK_REMOTE ||
+                dt == DnsType.NETWORK_DNS)
     }
 
     suspend fun switchRethinkDnsToMax() {
@@ -704,6 +710,7 @@ internal constructor(
                     }
                 }
             }
+
             InternetProtocol.IPv6 -> {
                 run loop@{
                     dnsServers.forEach {
@@ -714,6 +721,7 @@ internal constructor(
                     }
                 }
             }
+
             InternetProtocol.IPv46 -> {
                 dnsIp = dnsServers[0].hostAddress
             }
@@ -748,16 +756,20 @@ internal constructor(
             DnsType.DOH -> {
                 doHEndpointRepository.removeConnectionStatus()
             }
+
             DnsType.DNSCRYPT -> {
                 dnsCryptEndpointRepository.removeConnectionStatus()
                 dnsCryptRelayEndpointRepository.removeConnectionStatus()
             }
+
             DnsType.DNS_PROXY -> {
                 dnsProxyEndpointRepository.removeConnectionStatus()
             }
+
             DnsType.RETHINK_REMOTE -> {
                 rethinkDnsEndpointRepository.removeConnectionStatus()
             }
+
             DnsType.NETWORK_DNS -> {
                 // no-op, no need to remove connection status
             }
@@ -902,9 +914,11 @@ internal constructor(
             ProxyType.HTTP.name -> {
                 return TunProxyMode.HTTPS
             }
+
             ProxyType.SOCKS5.name -> {
                 return TunProxyMode.SOCKS5
             }
+
             ProxyType.HTTP_SOCKS5.name -> {
                 // FIXME: tunnel does not support both http and socks5 at once.
                 return TunProxyMode.SOCKS5
@@ -951,19 +965,19 @@ internal constructor(
     fun canEnableSocks5Proxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         return canEnableProxy() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+                (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
     }
 
     fun canEnableHttpProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         return canEnableProxy() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+                (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
     }
 
     fun canEnableOrbotProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         return canEnableProxy() &&
-            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
+                (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
     }
 
     suspend fun getConnectedSocks5Proxy(): ProxyEndpoint? {

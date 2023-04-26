@@ -24,8 +24,12 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities
-import hu.autsoft.krate.*
+import hu.autsoft.krate.SimpleKrate
+import hu.autsoft.krate.booleanPref
 import hu.autsoft.krate.default.withDefault
+import hu.autsoft.krate.intPref
+import hu.autsoft.krate.longPref
+import hu.autsoft.krate.stringPref
 import org.koin.core.component.KoinComponent
 
 class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {

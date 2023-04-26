@@ -1,10 +1,10 @@
 package com.celzero.bravedns
 
 import android.app.Application
+import android.content.pm.ApplicationInfo
 import android.net.VpnService
 import android.os.StrictMode
 import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.VpnController
@@ -31,9 +31,14 @@ import org.koin.core.context.startKoin
  * limitations under the License.
  */
 class RethinkDnsApplication : Application() {
+    companion object {
+        var DEBUG: Boolean = false
+    }
 
     override fun onCreate() {
         super.onCreate()
+
+        DEBUG = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == ApplicationInfo.FLAG_DEBUGGABLE
 
         turnOnStrictMode()
 

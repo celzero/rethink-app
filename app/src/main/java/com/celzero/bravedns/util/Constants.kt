@@ -176,7 +176,7 @@ class Constants {
         // data-time format used as part of network log adapter
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
-        // constants generated as part of BuildConfig.FLAVORS (playstore/fdroid/website)
+        // constants generated as part of com.celzero.bravedns.BuildConfig.FLAVORS (playstore/fdroid/website)
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"

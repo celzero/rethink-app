@@ -46,8 +46,8 @@ import androidx.core.content.getSystemService
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
@@ -74,6 +74,8 @@ import com.google.common.net.InternetDomainName
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
+import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -83,8 +85,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_YEAR
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.launch
-import xdns.Xdns
 
 class Utilities {
 
@@ -135,7 +135,7 @@ class Utilities {
                     )
                 if (
                     enabledServiceInfo.packageName == context.packageName &&
-                        enabledServiceInfo.name == service.name
+                    enabledServiceInfo.name == service.name
                 ) {
                     return true
                 }
@@ -294,7 +294,7 @@ class Utilities {
             c2.time = day
             if (
                 c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
-                    c1.get(DAY_OF_YEAR) == c2.get(DAY_OF_YEAR)
+                c1.get(DAY_OF_YEAR) == c2.get(DAY_OF_YEAR)
             ) {
                 return true
             }
@@ -669,8 +669,8 @@ class Utilities {
 
         fun localBlocklistFileDownloadPath(ctx: Context, which: String, timestamp: Long): String {
             return blocklistDownloadBasePath(ctx, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp) +
-                File.separator +
-                which
+                    File.separator +
+                    which
         }
 
         fun oldLocalBlocklistDownloadDir(ctx: Context, timestamp: Long): String {
@@ -865,6 +865,7 @@ class Utilities {
 
         enum class PrivateDnsMode {
             NONE, // The setting is "Off" or "Opportunistic", and the DNS connection is not using
+
             // TLS.
             UPGRADED, // The setting is "Opportunistic", and the DNS connection has upgraded to TLS.
             STRICT // The setting is "Strict".
