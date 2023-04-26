@@ -1835,7 +1835,8 @@ class BraveVPNService :
                 // simply check whether there are ANY v6 networks available; otherwise, if the vpn
                 // must only use the active-network (always the first network in allNet), then check
                 // if active-network has v6 connectivity (that is, it must be present in ipv6Net).
-                // check if isReachable is true, if not, don't need to add route for v6 (return false)
+                // check if isReachable is true, if not, don't need to add route for v6 (return
+                // false)
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
@@ -1878,7 +1879,8 @@ class BraveVPNService :
                 // simply check whether there are ANY v4 networks available; otherwise, if the vpn
                 // must only use the active-network (always the first network in allNet), then check
                 // if active-network has v4 connectivity (that is, it must be present in ipv4Net).
-                // check if isReachable is true, if not, don't need to add route for v4 (return false)
+                // check if isReachable is true, if not, don't need to add route for v4 (return
+                // false)
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
@@ -2052,20 +2054,25 @@ class BraveVPNService :
     private fun ui(f: suspend () -> Unit) =
         vpnScope.launch { withContext(Dispatchers.Main) { f() } }
 
-    override fun onQuery(query: String?, suggestedId: String): String {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery: rcvd query: $query, suggested_id: $suggestedId")
-        if (query == null) {
-            return suggestedId.ifEmpty { Dnsx.Preferred }
+    override fun onQuery(fqdn: String?, qtype: Long, suggestedId: String?): String? {
+        // queryType: see ResourceRecordTypes.kt
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_VPN,
+                "onQuery: rcvd query: $fqdn, qtype: $qtype, suggested_id: $suggestedId"
+            )
+        if (fqdn == null) {
+            return suggestedId?.ifEmpty { Dnsx.Preferred }
         }
 
         if (appConfig.getBraveMode().isDnsMode()) {
-            val res = getDnsxForDnsMode(query)
+            val res = getDnsxForDnsMode(fqdn)
             if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns): dnsx: $res")
             return res
         }
 
         if (appConfig.getBraveMode().isDnsFirewallMode()) {
-            val res = getDnsxForDnsFirewallMode(query)
+            val res = getDnsxForDnsFirewallMode(fqdn)
             if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns+Firewall): dnsx: $res")
             return res
         }
@@ -2079,42 +2086,38 @@ class BraveVPNService :
     }
 
     // function to decide which Dnsx to return on Dns only mode
-    private fun getDnsxForDnsMode(query: String): String {
+    private fun getDnsxForDnsMode(fqdn: String): String {
         // check for global domain rules
-        when (DomainRulesManager.getDomainRule(query, UID_EVERYBODY)) {
+        when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
             // TODO: return Preferred for now
             DomainRulesManager.Status.TRUST -> return Dnsx.BlockFree
             DomainRulesManager.Status.BLOCK -> return Dnsx.BlockAll
             else -> {} // no-op, fall-through;
         }
 
-        return if (persistentState.enableDnsCache) {
-            Dnsx.CT + Dnsx.Preferred
-        } else {
-            Dnsx.Preferred
-        }
+        return getPreferredDnsx()
     }
 
     // function to decide which Dnsx to return on DnsFirewall mode
-    private fun getDnsxForDnsFirewallMode(query: String): String {
-        // if any app is bypassed (dns + firewall) and if local blocklist enabled or remote dns
-        // is rethink then return Alg so that the decision is made by in flow() function
-        if (FirewallManager.isAnyAppBypassesBoth() && isRethinkEnabled()) {
-            return Dnsx.Alg
-        } else {
-            // no-op
-        }
-
-        val isTrusted = DomainRulesManager.isDomainTrusted(query)
-        if (isTrusted) {
+    private fun getDnsxForDnsFirewallMode(fqdn: String): String {
+        return if (!isRethinkEnabled()) {
+            // if rethink is not enabled then return preferred or CT+Preferred
+            getPreferredDnsx()
+        } else if (FirewallManager.isAnyAppBypassesDns()) {
+            // if any app is bypassed (dns + firewall) and if local blocklist enabled or remote dns
+            // is rethink then return Alg so that the decision is made by in flow() function
+            Dnsx.Alg
+        } else if (DomainRulesManager.isDomainTrusted(fqdn)) {
             // return Alg so that the decision is made by in flow() function
-            return Dnsx.Alg
+            Dnsx.Alg
         } else {
-            // no-op
+            // if the domain is not trusted and no app is bypassed then return preferred or CT+preferred
+            // so that if the domain is blocked by upstream then no need to do any further processing
+            getPreferredDnsx()
         }
+    }
 
-        // if the domain is not trusted or any app is not bypassed, return preferred or CT+preferred
-        // so that if the domain is blocked by upstream then no need to do any further processing
+    private fun getPreferredDnsx(): String {
         return if (persistentState.enableDnsCache) {
             Dnsx.CT + Dnsx.Preferred
         } else {
@@ -2123,8 +2126,8 @@ class BraveVPNService :
     }
 
     private fun isRethinkEnabled(): Boolean {
-        // check if remote or local rethink is enabled
-        return appConfig.getDnsType().isRethinkRemote() || persistentState.blocklistEnabled
+        // check if remote rethink is enabled
+        return appConfig.getDnsType().isRethinkRemote()
     }
 
     override fun onResponse(summary: Summary?) {

@@ -157,7 +157,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     }
 
     private fun handlePropertyChange(network: Network, linkedProperties: LinkProperties) {
-        // negate useMultipleNetworks so that the message is sent to check to use active network
+        // negate useMultipleNetworks so that the message obj has use active network
         val message =
             constructLinkedPropertyMessage(
                 MSG_LINK_PROPERTY,
@@ -353,7 +353,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     trackedIpv6Networks.add(
                         NetworkIcmpProperty(
                             network,
-                            //
+                            // isReachable is not used when useActive is true
                             if (useActive) true else checkIpv6Reachability(network)
                         )
                     )
@@ -361,6 +361,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     trackedIpv4Networks.add(
                         NetworkIcmpProperty(
                             network,
+                            // isReachable is not used when useActive is true
                             if (useActive) true else checkIpv4Reachability(network)
                         )
                     )
@@ -389,6 +390,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         ipv6.add(
                             NetworkIcmpProperty(
                                 property,
+                                // isReachable is not used when useActive is true
                                 if (useActive) true else checkIpv6Reachability(property)
                             )
                         )
@@ -396,6 +398,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         ipv4.add(
                             NetworkIcmpProperty(
                                 property,
+                                // isReachable is not used when useActive is true
                                 if (useActive) true else checkIpv4Reachability(property)
                             )
                         )

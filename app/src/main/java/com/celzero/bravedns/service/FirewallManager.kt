@@ -356,7 +356,7 @@ object FirewallManager : KoinComponent {
     }
 
     // any app is bypassed both dns and firewall
-    fun isAnyAppBypassesBoth(): Boolean {
+    fun isAnyAppBypassesDns(): Boolean {
         lock.read {
             return appInfos.values().any { it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id }
         }
