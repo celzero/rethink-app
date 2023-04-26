@@ -175,6 +175,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/bsdl_domain_rule_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_blocked_desc"
@@ -211,6 +212,19 @@
                 tools:listitem="@layout/spinner_item_firewall_status" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/bsdl_trusted_domains_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/trusted_domains_desc"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical"
+            android:textColor="?attr/chipTextNegative"
+            android:fontFamily="monospace"
+            android:textSize="@dimen/small_font_text_view"
+            android:layout_below="@id/bsdl_domain_rule_ll"/>
 
         <TextView
             android:id="@+id/dns_block_blocked_desc"

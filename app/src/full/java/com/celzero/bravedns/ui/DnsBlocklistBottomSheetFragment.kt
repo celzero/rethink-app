@@ -41,6 +41,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
@@ -74,6 +75,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private var transaction: DnsLog? = null
 
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -144,6 +146,12 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         val d = domain.dropLastWhile { it == '.' }
         val status = DomainRulesManager.status(d, Constants.UID_EVERYBODY)
         b.bsdlDomainRuleSpinner.setSelection(status.id)
+
+        if (showTrustDomainTip(status)) {
+            b.bsdlTrustedDomainsDesc.visibility = View.VISIBLE
+        } else {
+            b.bsdlTrustedDomainsDesc.visibility = View.GONE
+        }
     }
 
     private fun displayRecordTypeChip() {
@@ -190,6 +198,12 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                         return
                     }
 
+                    if (showTrustDomainTip(status)) {
+                        b.bsdlTrustedDomainsDesc.visibility = View.VISIBLE
+                    } else {
+                        b.bsdlTrustedDomainsDesc.visibility = View.GONE
+                    }
+
                     applyDnsRule(status)
                 }
 
@@ -227,6 +241,13 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         handleResponseIpsChip()
+    }
+
+    // show the trusted domains description only if the domain is in the trust list and selected
+    // dns type is not rethink
+    private fun showTrustDomainTip(status: DomainRulesManager.Status): Boolean {
+        return status == DomainRulesManager.Status.TRUST &&
+            !appConfig.getDnsType().isRethinkRemote()
     }
 
     private fun handleResponseIpsChip() {

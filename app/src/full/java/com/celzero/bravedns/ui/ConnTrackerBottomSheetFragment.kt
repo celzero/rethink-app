@@ -39,6 +39,7 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
@@ -62,9 +63,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.Locale
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 
@@ -75,6 +76,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         get() = _binding!!
 
     private var connectionInfo: ConnectionTracker? = null
+    private val appConfig by inject<AppConfig>()
 
     companion object {
         const val INSTANCE_STATE_IPDETAILS = "IPDETAILS"
@@ -162,13 +164,24 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         if (domain.isNullOrEmpty() || uid == null) {
             b.bsConnDnsCacheText.visibility = View.GONE
             b.bsConnDomainRuleLl.visibility = View.GONE
+            b.bsConnTrustedMsg.visibility = View.GONE
             return
         }
 
-        b.bsConnDomainSpinner.setSelection(DomainRulesManager.getDomainRule(domain, uid).id)
-
+        val status = DomainRulesManager.getDomainRule(domain, uid)
+        b.bsConnDomainSpinner.setSelection(status.id)
         b.bsConnDnsCacheText.visibility = View.VISIBLE
         b.bsConnDnsCacheText.text = connectionInfo!!.dnsQuery
+
+        if (showTrustDomainTip(status)) {
+            b.bsConnTrustedMsg.visibility = View.VISIBLE
+        } else {
+            b.bsConnTrustedMsg.visibility = View.GONE
+        }
+    }
+
+    private fun showTrustDomainTip(status: DomainRulesManager.Status): Boolean {
+        return status == DomainRulesManager.Status.TRUST && !appConfig.getDnsType().isRethinkRemote()
     }
 
     private fun updateConnDetailsChip() {
@@ -409,6 +422,13 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                         } == fid
                     )
                         return
+
+
+                    if (showTrustDomainTip(fid))  {
+                        b.bsConnTrustedMsg.visibility = View.VISIBLE
+                    } else {
+                        b.bsConnTrustedMsg.visibility = View.GONE
+                    }
 
                     applyDomainRule(fid)
                 }
