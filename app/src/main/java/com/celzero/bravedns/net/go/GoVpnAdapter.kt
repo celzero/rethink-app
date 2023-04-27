@@ -52,7 +52,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
-import java.io.IOException
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with

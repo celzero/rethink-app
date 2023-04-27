@@ -27,7 +27,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.google.common.util.concurrent.ListenableFuture

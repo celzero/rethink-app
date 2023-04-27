@@ -66,7 +66,6 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.launch
-import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
