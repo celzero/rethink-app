@@ -23,12 +23,12 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.IpManager
+import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL_LOG
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
-import com.celzero.bravedns.util.Utilities.Companion.getFlag
-import com.celzero.bravedns.util.Utilities.Companion.getPackageInfoForUid
+import com.celzero.bravedns.util.Utilities.getCountryCode
+import com.celzero.bravedns.util.Utilities.getFlag
+import com.celzero.bravedns.util.Utilities.getPackageInfoForUid
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent
@@ -40,6 +40,10 @@ internal constructor(
     private val context: Context
 ) : KoinComponent {
 
+    companion object {
+        private const val PER_USER_RANGE = 100000
+    }
+
     suspend fun makeConnectionTracker(connTrackerMetaData: ConnTrackerMetaData): ConnectionTracker {
         val connTracker = ConnectionTracker()
         connTracker.ipAddress = connTrackerMetaData.destIP
@@ -49,6 +53,7 @@ internal constructor(
         connTracker.protocol = connTrackerMetaData.protocol
         connTracker.timeStamp = connTrackerMetaData.timestamp
         connTracker.blockedByRule = connTrackerMetaData.blockedByRule
+        connTracker.blocklists = connTrackerMetaData.blocklists
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         connTracker.dnsQuery = connTrackerMetaData.query
@@ -70,9 +75,9 @@ internal constructor(
         val ipAddress = IPAddressString(ip).address ?: return inetAddress
 
         // no need to check if IP is not of type IPv6
-        if (!IpManager.isIpV6(ipAddress)) return inetAddress
+        if (!IPUtil.isIpV6(ipAddress)) return inetAddress
 
-        val ipv4 = IpManager.toIpV4(ipAddress)
+        val ipv4 = IPUtil.toIpV4(ipAddress)
 
         return if (ipv4 != null) {
             ipv4.toInetAddress()
@@ -81,7 +86,11 @@ internal constructor(
         }
     }
 
-    private suspend fun fetchApplicationName(uid: Int): String {
+    private suspend fun fetchApplicationName(_uid: Int): String {
+        // Returns the app id (base uid) for a given uid, stripping out the user id from it.
+        // http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#224
+        val uid = _uid % PER_USER_RANGE
+
         if (uid == INVALID_UID) {
             return context.getString(R.string.network_log_app_name_unknown)
         }

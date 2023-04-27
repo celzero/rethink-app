@@ -19,6 +19,7 @@ import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Constants
 
 @Dao
@@ -56,4 +57,8 @@ interface CustomDomainDAO {
 
     @Query("update CustomDomain set status = :status where :clause")
     fun cpUpdate(status: Int, clause: String): Int
+
+    // DomainRulesManager.Status.TRUST -> 2
+    @Query("select * from CustomDomain where status = 2")
+    fun getAllTrustedDomains(): List<CustomDomain>
 }

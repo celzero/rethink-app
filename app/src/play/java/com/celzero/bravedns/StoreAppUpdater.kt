@@ -33,6 +33,10 @@ class StoreAppUpdater(context: Context) : AppUpdater {
         AppUpdateManagerFactory.create(context)
     }
 
+    companion object {
+        private const val APP_UPDATE_REQUEST_CODE = 20023
+    }
+
     override fun checkForAppUpdate(isInteractive: AppUpdater.UserPresent, activity: Activity,
                                    listener: AppUpdater.InstallStateListener) {
         Log.i(LOG_TAG, "Beginning update check.")
@@ -58,7 +62,7 @@ class StoreAppUpdater(context: Context) : AppUpdater {
                 Log.i(LOG_TAG, "Update available, starting flexible update")
                 try {
                     appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE,
-                                                              activity, 1)
+                                                              activity, APP_UPDATE_REQUEST_CODE)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
                     Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)
@@ -68,7 +72,7 @@ class StoreAppUpdater(context: Context) : AppUpdater {
                 Log.i(LOG_TAG, "Update available, starting immediate update")
                 try {
                     appUpdateManager.startUpdateFlowForResult(appUpdateInfo,
-                                                              AppUpdateType.IMMEDIATE, activity, 1)
+                                                              AppUpdateType.IMMEDIATE, activity, APP_UPDATE_REQUEST_CODE)
                 } catch (e: IntentSender.SendIntentException) {
                     unregisterListener(listener)
                     Log.e(LOG_TAG, "SendIntentException: ${e.message} ", e)

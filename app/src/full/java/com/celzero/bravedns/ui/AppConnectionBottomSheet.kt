@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetAppConnectionsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
@@ -33,7 +34,7 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
@@ -45,6 +46,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
 
     // listener to inform dataset change to the adapter
     private var dismissListener: OnBottomSheetDialogFragmentDismiss? = null
@@ -113,11 +115,11 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         }
         b.bsacIpAddressTv.text = ipAddress
 
-        b.bsacIpRuleTxt.text = Utilities.updateHtmlEncodedText(getString(R.string.bsct_block_ip))
-        b.bsacDomainRuleTxt.text =
-            Utilities.updateHtmlEncodedText(getString(R.string.bsct_block_domain))
+        b.bsacIpRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_ip))
+        b.bsacDomainRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
 
         setupRecycler()
+        updateTrustedTipUi()
     }
 
     private fun setupRecycler() {
@@ -134,6 +136,14 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
         val recyclerAdapter = DomainRulesBtmSheetAdapter(requireContext(), uid, list)
         b.bsacDomainList.adapter = recyclerAdapter
+    }
+
+    private fun updateTrustedTipUi() {
+        if (domains.isEmpty() || !appConfig.getDnsType().isRethinkRemote()) {
+            b.bsacTrustTip.visibility = View.VISIBLE
+        } else {
+            b.bsacTrustTip.visibility = View.GONE
+        }
     }
 
     private fun setRulesUi() {

@@ -264,7 +264,12 @@ class Constants {
         // intent extra name for uid
         const val INTENT_UID = "UID"
 
-        data class DefaultDnsServer(val id: Int, val name: String, val url: String, val type: String)
+        data class DefaultDnsServer(
+            val id: Int,
+            val name: String,
+            val url: String,
+            val type: String
+        )
 
         const val BLOCK_FREE_DNS_MAX = "https://max.rethinkdns.com/dns-query"
         const val BLOCK_FREE_DNS_SKY = "https://sky.rethinkdns.com/dns-query"

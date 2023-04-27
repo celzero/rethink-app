@@ -65,6 +65,9 @@ class BackupHelper {
         // intent scheme
         const val INTENT_SCHEME = "content"
 
+        // restart app after database restore
+        const val INTENT_RESTART_APP = "restartApp"
+
         // metadata constants
         // version
         const val VERSION = "version"
@@ -141,8 +144,8 @@ class BackupHelper {
             return true
         }
 
-        fun getFileNameFromPath(file: File): String {
-            return file.path.substring(file.path.lastIndexOf("/") + 1)
+        fun getFileNameFromPath(file: String): String {
+            return file.substring(file.lastIndexOf("/") + 1)
         }
     }
 }

@@ -34,16 +34,16 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Multimap
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 object FirewallManager : KoinComponent {
 
@@ -270,7 +270,7 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun deletePackagesFromCache(packagesToDelete: Set<AppInfoTuple>) {
+    fun deletePackages(packagesToDelete: Set<AppInfoTuple>) {
         lock.write {
             packagesToDelete.forEach { tuple ->
                 appInfos
@@ -282,6 +282,19 @@ object FirewallManager : KoinComponent {
         io {
             // Delete the uninstalled apps from database
             appInfoRepository.deleteByPackageName(packagesToDelete.map { it.packageName })
+        }
+    }
+
+    fun deletePackage(packageName: String) {
+        lock.write {
+            appInfos
+                .values()
+                .filter { it.packageName == packageName }
+                .forEach { appInfos.remove(it.uid, it) }
+        }
+        io {
+            // Delete the uninstalled apps from database
+            appInfoRepository.deleteByPackageName(listOf(packageName))
         }
     }
 
@@ -339,6 +352,13 @@ object FirewallManager : KoinComponent {
                 .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
                 .map { it.packageName }
                 .toMutableSet()
+        }
+    }
+
+    // any app is bypassed both dns and firewall
+    fun isAnyAppBypassesDns(): Boolean {
+        lock.read {
+            return appInfos.values().any { it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id }
         }
     }
 

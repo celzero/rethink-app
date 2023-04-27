@@ -17,6 +17,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
@@ -25,6 +26,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import java.net.MalformedURLException
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -45,6 +47,9 @@ object DomainRulesManager : KoinComponent {
     private const val CACHE_MAX_SIZE = 10000L
 
     data class CacheKey(val domain: String, val uid: Int)
+
+    var trustedDomains: MutableSet<String> = hashSetOf()
+    var trustedWildcards: MutableSet<String> = hashSetOf()
 
     var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
     var wildcards: MutableMap<CacheKey, CustomDomain> = hashMapOf()
@@ -99,16 +104,23 @@ object DomainRulesManager : KoinComponent {
     }
 
     // update the cache with the domain and its status based on the domain type
-    fun updateCache(cd: CustomDomain) {
+    private fun updateCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                val d = cd.domain.lowercase(Locale.ROOT)
+                val key = CacheKey(d, cd.uid)
                 lock.write { domains[key] = cd }
+                if (cd.status == Status.TRUST.id) {
+                    lock.write { trustedDomains.add(d) }
+                }
             }
             DomainType.WILDCARD -> {
                 val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
                 val key = CacheKey(d, cd.uid)
                 lock.write { wildcards[key] = cd }
+                if (cd.status == Status.TRUST.id) {
+                    lock.write { trustedWildcards.add(d) }
+                }
             }
         }
         domainLookupCache.invalidateAll()
@@ -141,12 +153,33 @@ object DomainRulesManager : KoinComponent {
                 }
             }
         }
+
+        val trustedDomainsList = customDomainsRepository.getAllTrustedDomains()
+        if (trustedDomainsList.isEmpty()) {
+            Log.w(LOG_TAG_DNS, "no trusted domains found in db")
+            return
+        }
+
+        // sort the trusted domains based on the length of the domain
+        val trustedDomainsSorted = trustedDomainsList.sortedByDescending { selector(it.domain) }
+        trustedDomainsSorted.forEach { cd ->
+            when (DomainType.getType(cd.type)) {
+                DomainType.DOMAIN -> {
+                    trustedDomains.add(cd.domain.lowercase(Locale.ROOT))
+                }
+                DomainType.WILDCARD -> {
+                    val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
+                    trustedWildcards.add(d)
+                }
+            }
+        }
     }
 
     fun status(d: String, uid: Int): Status {
         val domain = d.lowercase(Locale.ROOT)
         // return if the cache has the domain
-        domainLookupCache.getIfPresent(domain)?.let {
+        val key = CacheKey(domain, uid)
+        domainLookupCache.getIfPresent(key)?.let {
             return Status.getStatus(it.id)
         }
 
@@ -193,6 +226,26 @@ object DomainRulesManager : KoinComponent {
                 return Status.NONE
             }
         return Status.getStatus(d.status)
+    }
+
+    fun isDomainTrusted(_domain: String?): Boolean {
+        if (_domain == null) {
+            return false
+        }
+
+        val domain = _domain.lowercase(Locale.ROOT)
+        if (trustedDomains.contains(domain)) {
+            return true
+        }
+
+        trustedWildcards.forEach {
+            val pattern = Pattern.compile(it)
+            if (pattern.matcher(domain).matches()) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private fun updateLookupCache(domain: String, uid: Int, status: Status) {
@@ -287,13 +340,20 @@ object DomainRulesManager : KoinComponent {
     private fun removeFromCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                val key = CacheKey(cd.domain, cd.uid)
+                val d = cd.domain.lowercase(Locale.ROOT)
+                val key = CacheKey(d, cd.uid)
                 lock.write { domains.remove(key) }
+                if (cd.status == Status.TRUST.id) {
+                    lock.write { trustedDomains.remove(d) }
+                }
             }
             DomainType.WILDCARD -> {
-                val d = constructWildCardString(cd.domain)
+                val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
                 val key = CacheKey(d, cd.uid)
                 lock.write { wildcards.remove(key) }
+                if (cd.status == Status.TRUST.id) {
+                    lock.write { trustedWildcards.remove(d) }
+                }
             }
         }
         domainLookupCache.invalidateAll()
@@ -309,6 +369,22 @@ object DomainRulesManager : KoinComponent {
 
     fun getUniversalCustomDomainCount(): LiveData<Int> {
         return customDomainsRepository.getUniversalCustomDomainCount()
+    }
+
+    fun isValidDomain(url: String): Boolean {
+        return try {
+            Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()
+        } catch (ignored: MalformedURLException) { // ignored
+            false
+        }
+    }
+
+    fun isWildCardEntry(url: String): Boolean {
+        // regex to check if url is valid wildcard domain
+        // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
+        // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
+        val p = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
+        return p.matcher(url).matches()
     }
 
     private fun constructObject(

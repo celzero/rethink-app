@@ -19,12 +19,12 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.LoggerConstants
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.*
+import java.util.Calendar
 
 class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters), KoinComponent {
@@ -36,8 +36,7 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
     }
 
     override suspend fun doWork(): Result {
-        if (HomeScreenActivity.GlobalVariable.DEBUG)
-            Log.d(LoggerConstants.LOG_TAG_SCHEDULER, "starting purge-database job")
+        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_SCHEDULER, "starting purge-database job")
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, NUMBER_OF_DAYS_TO_PURGE)
         val date = calendar.time.time

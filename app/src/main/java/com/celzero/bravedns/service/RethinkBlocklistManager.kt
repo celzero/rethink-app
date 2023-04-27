@@ -159,10 +159,7 @@ object RethinkBlocklistManager : KoinComponent {
                             return@forEachIndexed
                         }
                         val level = l.level?.elementAt(index) ?: 2
-                        packsBlocklistMapping.put(
-                            PacksMappingKey(s, level),
-                            l.value
-                        )
+                        packsBlocklistMapping.put(PacksMappingKey(s, level), l.value)
                     }
                 }
 
@@ -242,10 +239,7 @@ object RethinkBlocklistManager : KoinComponent {
                         }
                         // if the level is empty, then set the level to 2 (assume highest) #756
                         val level = r.level?.elementAt(index) ?: 2
-                        packsBlocklistMapping.put(
-                            PacksMappingKey(s, level),
-                            r.value
-                        )
+                        packsBlocklistMapping.put(PacksMappingKey(s, level), r.value)
                     }
                 }
                 dbFileTagRemote.add(r)

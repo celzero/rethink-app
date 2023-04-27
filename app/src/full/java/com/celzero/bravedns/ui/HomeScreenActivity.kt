@@ -27,44 +27,66 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.NavigationRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
+import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
-import com.celzero.bravedns.service.*
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
-import com.celzero.bravedns.util.*
+import com.celzero.bravedns.service.AppUpdater
+import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.IpRulesManager
+import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
+import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.Companion.blocklistDownloadBasePath
-import com.celzero.bravedns.util.Utilities.Companion.getPackageMetadata
-import com.celzero.bravedns.util.Utilities.Companion.isPlayStoreFlavour
-import com.celzero.bravedns.util.Utilities.Companion.isWebsiteFlavour
-import com.celzero.bravedns.util.Utilities.Companion.oldLocalBlocklistDownloadDir
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
+import com.celzero.bravedns.util.Utilities.getPackageMetadata
+import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
+import com.celzero.bravedns.util.Utilities.oldLocalBlocklistDownloadDir
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
-import java.util.*
+import java.util.Calendar
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -76,23 +98,15 @@ import org.koin.android.ext.android.inject
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 
-    private lateinit var configureFragment: ConfigureFragment
-    private lateinit var homeScreenFragment: HomeScreenFragment
-    private lateinit var aboutFragment: AboutFragment
-    private lateinit var statisticsFragment: SummaryStatisticsFragment
-
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
+    private val refreshDatabase by inject<RefreshDatabase>()
 
     // support for biometric authentication
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
-    object GlobalVariable {
-        var DEBUG = BuildConfig.DEBUG
-    }
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
@@ -111,18 +125,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         }
         updateNewVersion()
 
-        if (savedInstanceState == null) {
-            homeScreenFragment = HomeScreenFragment()
-            supportFragmentManager
-                .beginTransaction()
-                .replace(
-                    R.id.fragment_container,
-                    homeScreenFragment,
-                    homeScreenFragment.javaClass.simpleName
-                )
-                .commit()
-        }
-
         setupNavigationItemSelectedListener()
 
         // handle intent receiver for backup/restore
@@ -132,7 +134,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
         observeAppState()
 
-        if (persistentState.biometricAuth) {
+        if (persistentState.biometricAuth && !isAppRunningOnTv()) {
             biometricPrompt()
         }
     }
@@ -148,6 +150,19 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun biometricPrompt() {
+        // return if the biometric authentication is already done within the last 15 minutes
+        // fixme - #324 - move the 15 minutes to a configurable value
+        if (
+            persistentState.biometricAuthTime + TimeUnit.MINUTES.toMillis(15) >
+                System.currentTimeMillis()
+        ) {
+            Log.i(
+                LOG_TAG_UI,
+                "Biometric authentication already done at ${persistentState.biometricAuthTime} , skipping"
+            )
+            return
+        }
+
         // ref: https://developer.android.com/training/sign-in/biometric-auth
         executor = ContextCompat.getMainExecutor(this)
         biometricPrompt =
@@ -173,6 +188,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         result: BiometricPrompt.AuthenticationResult
                     ) {
                         super.onAuthenticationSucceeded(result)
+                        persistentState.biometricAuthTime = System.currentTimeMillis()
                         Log.i(LOG_TAG_UI, "Biometric authentication succeeded")
                     }
 
@@ -230,6 +246,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 getString(R.string.brbs_restore_no_uri_toast),
                 Toast.LENGTH_SHORT
             )
+        } else if (intent.getBooleanExtra(INTENT_RESTART_APP, false)) {
+            Log.i(LOG_TAG_UI, "Restart from restore, so refreshing app database...")
+            io {
+                refreshDatabase.refreshAppInfoDatabase()
+                IpRulesManager.loadIpRules()
+                DomainRulesManager.load()
+            }
         }
     }
 
@@ -501,6 +524,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     fun checkForUpdate(
         isInteractive: AppUpdater.UserPresent = AppUpdater.UserPresent.NONINTERACTIVE
     ) {
+        // do not check for debug builds
+        if (BuildConfig.DEBUG) return
 
         // Check updates only for play store / website version. Not fDroid.
         if (!isPlayStoreFlavour() && !isWebsiteFlavour()) {
@@ -625,7 +650,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
         builder.setMessage(message)
-        builder.setCancelable(true)
+        builder.setCancelable(false)
         if (
             message == getString(R.string.download_update_dialog_message_ok) ||
                 message == getString(R.string.download_update_dialog_failure_message) ||
@@ -639,14 +664,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         } else {
             if (source == AppUpdater.InstallSource.STORE) {
                 builder.setPositiveButton(getString(R.string.hs_download_positive_play_store)) {
-                    _,
+                    dialogInterface,
                     _ ->
                     appUpdateManager.completeUpdate()
+                    dialogInterface.dismiss()
                 }
             } else {
-                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) { _, _
-                    ->
+                builder.setPositiveButton(getString(R.string.hs_download_positive_website)) {
+                    dialogInterface,
+                    _ ->
                     initiateDownload()
+                    dialogInterface.dismiss()
                 }
             }
             builder.setNegativeButton(getString(R.string.hs_download_negative_default)) {
@@ -689,59 +717,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun setupNavigationItemSelectedListener() {
-        b.navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_home_screen -> {
-                    homeScreenFragment = HomeScreenFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            homeScreenFragment,
-                            homeScreenFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-                R.id.navigation_settings -> {
-                    configureFragment = ConfigureFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            configureFragment,
-                            configureFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-                R.id.navigation_statistics -> {
-                    statisticsFragment = SummaryStatisticsFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            statisticsFragment,
-                            statisticsFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-                R.id.navigation_about -> {
-                    aboutFragment = AboutFragment()
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragment_container,
-                            aboutFragment,
-                            aboutFragment.javaClass.simpleName
-                        )
-                        .commit()
-                    return@setOnItemSelectedListener true
-                }
-            }
-            false
-        }
+        val navController = this.findNavController(R.id.fragment_container)
+        val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
+        btmNavView.setupWithNavController(navController)
     }
 
     private fun io(f: suspend () -> Unit) {

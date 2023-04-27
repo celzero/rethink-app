@@ -24,6 +24,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
+import com.celzero.bravedns.BuildConfig.DEBUG
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -44,17 +45,16 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
+import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
-import com.celzero.bravedns.util.Utilities.Companion.isFdroidFlavour
-import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.isAtleastT
+import com.celzero.bravedns.util.Utilities.isFdroidFlavour
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -80,31 +80,18 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun initView() {
-        b.settingsActivityAllowBypassProgress.visibility = View.GONE
 
         if (isFdroidFlavour()) {
             b.settingsActivityCheckUpdateRl.visibility = View.GONE
         }
 
-        // allow apps part of the vpn to request networks outside of it, effectively letting it
-        // bypass the vpn itself
-        b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
-        // use all internet-capable networks, not just the active network, as underlying transports
-        // for the vpn tunnel
-        b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // enable logs
         b.settingsActivityEnableLogsSwitch.isChecked = persistentState.logsEnabled
         // Auto start app after reboot
         b.settingsActivityAutoStartSwitch.isChecked = persistentState.prefAutoStartBootUp
         // check for app updates
         b.settingsActivityCheckUpdateSwitch.isChecked = persistentState.checkForAppUpdate
-        // for protocol translation, enable only on DNS/DNS+Firewall mode
-        if (appConfig.getBraveMode().isDnsActive()) {
-            b.settingsActivityPtransSwitch.isChecked = persistentState.protocolTranslationType
-        } else {
-            persistentState.protocolTranslationType = false
-            b.settingsActivityPtransSwitch.isChecked = false
-        }
+
         // for app locale (default system/user selected locale)
         if (isAtleastT()) {
             val currentAppLocales: LocaleList =
@@ -127,8 +114,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsBiometricRl.visibility = View.GONE
         }
 
-        displayInternetProtocolUi()
         displayAppThemeUi()
+        displayGoLoggerUi()
         displayNotificationActionUi()
         displayPcapUi()
     }
@@ -211,54 +198,12 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
     }
 
-    private fun displayInternetProtocolUi() {
-        b.settingsActivityIpRl.isEnabled = true
-        when (persistentState.internetProtocolType) {
-            InternetProtocol.IPv4.id -> {
-                b.genSettingsIpDesc.text =
-                    getString(
-                        R.string.settings_selected_ip_desc,
-                        getString(R.string.settings_ip_text_ipv4)
-                    )
-                b.settingsActivityPtransRl.visibility = View.GONE
-            }
-            InternetProtocol.IPv6.id -> {
-                b.genSettingsIpDesc.text =
-                    getString(
-                        R.string.settings_selected_ip_desc,
-                        getString(R.string.settings_ip_text_ipv6)
-                    )
-                b.settingsActivityPtransRl.visibility = View.VISIBLE
-            }
-            InternetProtocol.IPv46.id -> {
-                b.genSettingsIpDesc.text =
-                    getString(
-                        R.string.settings_selected_ip_desc,
-                        getString(R.string.settings_ip_text_ipv46)
-                    )
-                b.settingsActivityPtransRl.visibility = View.GONE
-            }
-            else -> {
-                b.genSettingsIpDesc.text =
-                    getString(
-                        R.string.settings_selected_ip_desc,
-                        getString(R.string.settings_ip_text_ipv4)
-                    )
-                b.settingsActivityPtransRl.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun handleLockdownModeIfNeeded() {
-        val isLockdown = VpnController.isVpnLockdown()
-        if (isLockdown) {
-            b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
-            b.settingsActivityAllowBypassRl.alpha = 0.5f
+    private fun displayGoLoggerUi() {
+        if (DEBUG) {
+            b.settingsGoLogRl.visibility = View.VISIBLE
         } else {
-            b.settingsActivityVpnLockdownDesc.visibility = View.GONE
-            b.settingsActivityAllowBypassRl.alpha = 1f
+            b.settingsGoLogRl.visibility = View.GONE
         }
-        b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
     }
 
     private fun setupClickListeners() {
@@ -294,46 +239,14 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             persistentState.checkForAppUpdate = b
         }
 
-        b.settingsActivityAllNetworkRl.setOnClickListener {
-            b.settingsActivityAllNetworkSwitch.isChecked =
-                !b.settingsActivityAllNetworkSwitch.isChecked
-        }
-
-        b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            b: Boolean ->
-            if (b) {
-                showAllNetworksDialog()
-            } else {
-                persistentState.useMultipleNetworks = b
-            }
-        }
-
-        b.settingsActivityAllowBypassRl.setOnClickListener {
-            b.settingsActivityAllowBypassSwitch.isChecked =
-                !b.settingsActivityAllowBypassSwitch.isChecked
-        }
-
-        b.settingsActivityAllowBypassSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            checked: Boolean ->
-            persistentState.allowBypass = checked
-            b.settingsActivityAllowBypassSwitch.isEnabled = false
-            b.settingsActivityAllowBypassSwitch.visibility = View.INVISIBLE
-            b.settingsActivityAllowBypassProgress.visibility = View.VISIBLE
-
-            delay(TimeUnit.SECONDS.toMillis(1L), lifecycleScope) {
-                b.settingsActivityAllowBypassSwitch.isEnabled = true
-                b.settingsActivityAllowBypassProgress.visibility = View.GONE
-                b.settingsActivityAllowBypassSwitch.visibility = View.VISIBLE
-            }
-        }
-
-        b.settingsActivityVpnLockdownDesc.setOnClickListener { openVpnProfile(this) }
-
         b.settingsActivityThemeRl.setOnClickListener {
             enableAfterDelay(500, b.settingsActivityThemeRl)
             showThemeDialog()
+        }
+
+        b.settingsGoLogRl.setOnClickListener {
+            enableAfterDelay(500, b.settingsGoLogRl)
+            showGoLoggerDialog()
         }
 
         // Ideally this property should be part of VPN category / section.
@@ -348,28 +261,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityPcapRl.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityPcapRl)
             showPcapOptionsDialog()
-        }
-
-        b.settingsActivityIpRl.setOnClickListener {
-            enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityIpRl)
-            showIpDialog()
-        }
-
-        b.settingsActivityPtransRl.setOnClickListener {
-            b.settingsActivityPtransSwitch.isChecked = !b.settingsActivityPtransSwitch.isChecked
-        }
-
-        b.settingsActivityPtransSwitch.setOnCheckedChangeListener { _, isSelected ->
-            if (appConfig.getBraveMode().isDnsActive()) {
-                persistentState.protocolTranslationType = isSelected
-            } else {
-                b.settingsActivityPtransSwitch.isChecked = false
-                showToastUiCentered(
-                    this,
-                    getString(R.string.settings_protocol_translation_dns_inactive),
-                    Toast.LENGTH_SHORT
-                )
-            }
         }
 
         b.settingsActivityImportExportRl.setOnClickListener { invokeImportExport() }
@@ -390,8 +281,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             ->
             persistentState.biometricAuth = checked
         }
-
-        b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
     }
 
     private fun invokeChangeLocaleDialog() {
@@ -518,27 +407,27 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         alertBuilder.create().show()
     }
 
-    private fun showIpDialog() {
+    private fun showGoLoggerDialog() {
+        // show dialog with logger options, change log level in GoVpnAdapter based on selection
         val alertBuilder = AlertDialog.Builder(this)
-        alertBuilder.setTitle(getString(R.string.settings_ip_dialog_title))
+        alertBuilder.setTitle(getString(R.string.settings_gologger_dialog_title))
         val items =
             arrayOf(
-                getString(R.string.settings_ip_dialog_ipv4),
-                getString(R.string.settings_ip_dialog_ipv6),
-                getString(R.string.settings_ip_dialog_ipv46)
+                getString(R.string.settings_gologger_dialog_option_1),
+                getString(R.string.settings_gologger_dialog_option_2),
+                getString(R.string.settings_gologger_dialog_option_3),
+                getString(R.string.settings_gologger_dialog_option_4),
+                getString(R.string.settings_gologger_dialog_option_5)
             )
-        val checkedItem = persistentState.internetProtocolType
+        val checkedItem = persistentState.goLoggerLevel.toInt()
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
-            // return if already selected item is same as current item
-            if (persistentState.internetProtocolType == which) {
+            if (persistentState.goLoggerLevel.toInt() == which) {
                 return@setSingleChoiceItems
             }
 
-            val protocolType = InternetProtocol.getInternetProtocol(which)
-            persistentState.internetProtocolType = protocolType.id
-
-            displayInternetProtocolUi()
+            persistentState.goLoggerLevel = which.toLong()
+            GoVpnAdapter.setLogLevel(which)
         }
         alertBuilder.create().show()
     }
@@ -635,48 +524,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     override fun onResume() {
         super.onResume()
-        handleLockdownModeIfNeeded()
         // app notification permission android 13
         showEnableNotificationSettingIfNeeded()
-    }
-
-    private fun showAllNetworksDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(getString(R.string.settings_all_networks_dialog_title))
-        builder.setMessage(getString(R.string.settings_all_networks_dialog_message))
-        builder.setPositiveButton(getString(R.string.settings_all_networks_dialog_positive_btn)) {
-            dialog,
-            _ ->
-            b.settingsActivityAllNetworkSwitch.isChecked = true
-            persistentState.useMultipleNetworks = true
-            dialog.dismiss()
-        }
-
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
-            b.settingsActivityAllNetworkSwitch.isChecked = false
-            persistentState.useMultipleNetworks = false
-            dialog.dismiss()
-        }
-        builder.setCancelable(false)
-        builder.create().show()
-    }
-
-    private fun showDefaultDnsDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
-        alertBuilder.setTitle(getString(R.string.settings_default_dns_heading))
-        val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
-        // get the index of the default dns url
-        // if the default dns url is not in the list, then select the first item
-        val checkedItem =
-            Constants.DEFAULT_DNS_LIST.firstOrNull { it.url == persistentState.defaultDnsUrl }
-                ?.let { Constants.DEFAULT_DNS_LIST.indexOf(it) }
-                ?: 0
-        alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, pos ->
-            dialog.dismiss()
-            // update the default dns url
-            persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
-        }
-        alertBuilder.create().show()
     }
 
     private fun registerForActivityResult() {
