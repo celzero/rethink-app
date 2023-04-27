@@ -19,8 +19,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
-import com.bumptech.glide.load.engine.executor.GlideExecutor
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository

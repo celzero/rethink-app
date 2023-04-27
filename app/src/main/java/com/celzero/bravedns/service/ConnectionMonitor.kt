@@ -29,7 +29,7 @@ import android.os.Message
 import android.os.SystemClock
 import android.system.OsConstants.RT_SCOPE_UNIVERSE
 import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString

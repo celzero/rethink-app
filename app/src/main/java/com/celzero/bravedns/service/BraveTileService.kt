@@ -30,18 +30,10 @@ import com.celzero.bravedns.ui.PrepareVpnActivity
 import com.celzero.bravedns.util.Utilities
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-class BraveTileService : TileService(), LifecycleOwner {
-    override val lifecycle = LifecycleRegistry(this)
+class BraveTileService : TileService() {
 
     override fun onCreate() {
-        super.onCreate()
-        VpnController.persistentState.vpnEnabledLiveData.observe(this, this::updateTile)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        VpnController.persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
     }
 
     private fun updateTile(enabled: Boolean) {

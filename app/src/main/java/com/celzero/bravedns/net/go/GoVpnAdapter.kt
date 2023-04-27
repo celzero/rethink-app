@@ -22,8 +22,8 @@ import android.net.ProxyInfo
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
@@ -52,6 +52,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
+import java.io.IOException
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with

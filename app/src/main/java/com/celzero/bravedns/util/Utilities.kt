@@ -39,8 +39,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfoRepository.Companion.NO_PACKAGE
 import com.celzero.bravedns.net.doh.CountryMap
 import com.celzero.bravedns.service.BraveVPNService
@@ -66,6 +66,7 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.launch
+import xdns.Xdns
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -107,6 +108,7 @@ object Utilities {
             fqdn
         }
     }
+
 
     fun isAccessibilityServiceEnabled(
         context: Context,

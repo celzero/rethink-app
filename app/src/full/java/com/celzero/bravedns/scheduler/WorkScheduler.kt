@@ -18,6 +18,7 @@ package com.celzero.bravedns.scheduler
 
 import android.content.Context
 import android.util.Log
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import androidx.work.BackoffPolicy
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy

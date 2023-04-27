@@ -27,8 +27,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.RetrofitManager.Companion.getBlocklistBaseBuilder
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.download.BlocklistDownloadHelper

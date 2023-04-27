@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.celzero.bravedns"
+    android:versionCode="27"
+    android:versionName="v054a"> <!-- 27(v054a) -->
+
+    <uses-sdk
+        android:minSdkVersion="23"
+        android:targetSdkVersion="33"
+        tools:ignore="GradleOverrides" />
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
