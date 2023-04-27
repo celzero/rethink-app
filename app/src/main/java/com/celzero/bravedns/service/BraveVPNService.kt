@@ -48,7 +48,6 @@ import com.celzero.bravedns.net.go.GoVpnAdapter.Companion.establish
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
-import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
@@ -57,13 +56,11 @@ import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIB
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.calculateTtl
 import com.celzero.bravedns.util.Utilities.getAccentColor
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
-import com.celzero.bravedns.util.Utilities.normalizeIp
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.common.collect.Sets
 import dnsx.Dnsx
@@ -282,17 +279,6 @@ class BraveVPNService :
         }
     }
 
-    private fun getDomainName(ip: String): String {
-        val now = System.currentTimeMillis()
-        val domain = ipDomainLookup.getIfPresent(ip) ?: return ""
-
-        return if (domain.ttl >= now) {
-            domain.fqdn
-        } else {
-            ""
-        }
-    }
-
     /** Checks if incoming connection is blocked by any user-set firewall rule */
     private fun firewall(
         connInfo: ConnTrackerMetaData,
@@ -449,8 +435,8 @@ class BraveVPNService :
                 return FirewallRuleset.RULE9
             }
 
-            // whether the destination ip was resolved by the dns set by the user
-            if (dnsBypassed(connInfo.destIP)) {
+            // if connInfo.query is empty, then it is not resolved by user set dns
+            if (dnsBypassed(connInfo.query)) {
                 return FirewallRuleset.RULE7
             }
         } catch (iex: Exception) {
@@ -494,11 +480,11 @@ class BraveVPNService :
             isDns(port))
     }
 
-    private fun dnsBypassed(destIp: String): Boolean {
+    private fun dnsBypassed(query: String): Boolean {
         return if (!persistentState.getDisallowDnsBypass()) {
             false
         } else {
-            unresolvedIp(destIp)
+            query.isEmpty()
         }
     }
 
@@ -551,16 +537,6 @@ class BraveVPNService :
         Thread.sleep(minWaitMs + remainingWaitMs)
 
         return false
-    }
-
-    private fun unresolvedIp(ip: String): Boolean {
-        val resolvedIp = testWithBackoff {
-            val now = System.currentTimeMillis()
-            val ttl = ipDomainLookup.getIfPresent(ip)?.ttl ?: Long.MIN_VALUE
-            ttl >= now
-        }
-
-        return !resolvedIp
     }
 
     private fun udpBlocked(uid: Int, protocol: Int, port: Int): Boolean {
@@ -2111,8 +2087,10 @@ class BraveVPNService :
             // return Alg so that the decision is made by in flow() function
             Dnsx.Alg
         } else {
-            // if the domain is not trusted and no app is bypassed then return preferred or CT+preferred
-            // so that if the domain is blocked by upstream then no need to do any further processing
+            // if the domain is not trusted and no app is bypassed then return preferred or
+            // CT+preferred
+            // so that if the domain is blocked by upstream then no need to do any further
+            // processing
             getPreferredDnsx()
         }
     }
@@ -2285,22 +2263,9 @@ class BraveVPNService :
         // use realIps; as of now, netstack uses the first ip
         // TODO: apply firewall rules on all real ips
         val realDestIp = ips.first().trim()
-        var anyRealIpBlocked = false
 
-        ips.forEach {
-            val ip = it.trim()
-            if (isUnspecifiedIp(ip)) {
-                // if `d` is blocked, then at least one of the real ips is unspecified
-                anyRealIpBlocked = true
-            } else {
-                val normalizeIp = normalizeIp(ip)
-                val countryCode: String? = Utilities.getCountryCode(normalizeIp, this)
-                val flag = getFlagIfPresent(countryCode)
-                val dnsCacheRecord =
-                    FirewallManager.DnsCacheRecord(calculateTtl(0L), domains.first(), flag)
-                ipDomainLookup.put(ip, dnsCacheRecord)
-            }
-        }
+        // if `d` is blocked, then at least one of the real ips is unspecified
+        val anyRealIpBlocked = !ips.none { isUnspecifiedIp(it.trim()) }
 
         val connInfo =
             createConnTrackerMetaData(
@@ -2315,13 +2280,6 @@ class BraveVPNService :
             )
         if (DEBUG) Log.d(LOG_TAG_VPN, "block-alg connInfo: $connInfo")
         return processFirewallRequest(connInfo, anyRealIpBlocked, blocklists)
-    }
-
-    private fun getFlagIfPresent(hostAddress: String?): String {
-        if (hostAddress == null) {
-            return this.getString(R.string.unicode_warning_sign)
-        }
-        return ipDomainLookup.getIfPresent(hostAddress)?.flag ?: Utilities.getFlag(hostAddress)
     }
 
     private fun processFirewallRequest(
@@ -2363,14 +2321,11 @@ class BraveVPNService :
         dstPort: Int,
         protocol: Int,
         blocklists: String = "",
-        _query: String = ""
+        query: String = ""
     ): ConnTrackerMetaData {
 
         // Ref: ipaddress doc:
         // https://seancfoley.github.io/IPAddress/ipaddress.html#host-name-or-address-with-port-or-service-name
-
-        val query = _query.ifEmpty { getDomainName(dstIp) }
-
         if (DEBUG)
             Log.d(
                 LOG_TAG_VPN,

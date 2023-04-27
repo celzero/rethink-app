@@ -52,18 +52,6 @@ object FirewallManager : KoinComponent {
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
-    data class DnsCacheRecord(val ttl: Long, val fqdn: String, val flag: String?)
-
-    private const val CACHE_BUILDER_MAX_SIZE = 10000L
-    private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
-
-    // TODO: check for the usages and remove if not used
-    val ipDomainLookup: Cache<String, DnsCacheRecord> =
-        CacheBuilder.newBuilder()
-            .maximumSize(CACHE_BUILDER_MAX_SIZE)
-            .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_HRS, TimeUnit.HOURS)
-            .build()
-
     // Below are the firewall rule set
     // app-status | connection-status |  Rule
     // none       |    ALLOW          |  allow

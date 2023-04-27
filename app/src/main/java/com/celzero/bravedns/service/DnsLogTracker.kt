@@ -19,13 +19,13 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
+import com.bumptech.glide.load.engine.executor.GlideExecutor
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
@@ -152,24 +152,6 @@ internal constructor(
                             destination.hostAddress == UNSPECIFIED_IP_IPV6
 
                     dnsLog.flag = getFlagIfPresent(countryCode)
-
-                    // no need to add dns record to cache if the record id is Dnsx.Alg
-                    // as it is not a valid record
-                    if (transaction.id != Dnsx.Alg) {
-                        addresses.forEach {
-                            if (it.isEmpty()) return@forEach
-
-                            val dnsCacheRecord =
-                                FirewallManager.DnsCacheRecord(
-                                    calculateTtl(transaction.ttl),
-                                    transaction.name,
-                                    dnsLog.flag
-                                )
-                            ipDomainLookup.put(it, dnsCacheRecord)
-                        }
-                    } else {
-                        // no-op
-                    }
                 } else {
                     // no ip address found
                     dnsLog.flag =
@@ -194,7 +176,7 @@ internal constructor(
         if (hostAddress == null) {
             return context.getString(R.string.unicode_warning_sign)
         }
-        return ipDomainLookup.getIfPresent(hostAddress)?.flag ?: getFlag(hostAddress)
+        return getFlag(hostAddress)
     }
 
     suspend fun insertBatch(dnsLogs: List<DnsLog>) {
