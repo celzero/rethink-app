@@ -52,10 +52,6 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         return customDomainDAO.getAppWiseDomainRulesCount(Constants.UID_EVERYBODY)
     }
 
-    fun getAllTrustedDomains(): List<CustomDomain> {
-        return customDomainDAO.getAllDomains()
-    }
-
     fun cpInsert(customDomain: CustomDomain): Long {
         return customDomainDAO.insert(customDomain)
     }

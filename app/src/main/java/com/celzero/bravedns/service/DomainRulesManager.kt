@@ -26,6 +26,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import dnsx.Dnsx
 import java.net.MalformedURLException
 import java.util.Calendar
 import java.util.Locale
@@ -48,11 +49,10 @@ object DomainRulesManager : KoinComponent {
 
     data class CacheKey(val domain: String, val uid: Int)
 
-    var trustedDomains: MutableSet<String> = hashSetOf()
-    var trustedWildcards: MutableSet<String> = hashSetOf()
-
     var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
-    var wildcards: MutableMap<CacheKey, CustomDomain> = hashMapOf()
+    var trustedDomains: MutableSet<String> = hashSetOf()
+    var trie: dnsx.CritBit = Dnsx.newCritBit()
+    private val trustedTrie: dnsx.CritBit = Dnsx.newCritBit()
 
     // stores all the previous response sent
     private val domainLookupCache: Cache<CacheKey, Status> =
@@ -115,22 +115,23 @@ object DomainRulesManager : KoinComponent {
                 }
             }
             DomainType.WILDCARD -> {
-                val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
-                val key = CacheKey(d, cd.uid)
-                lock.write { wildcards[key] = cd }
+                // key is combination of domain and uid as String separated by a delimiter ,
+                val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                trie.set(key, cd.status.toString())
                 if (cd.status == Status.TRUST.id) {
-                    lock.write { trustedWildcards.add(d) }
+                    trustedTrie.set(key, cd.status.toString())
                 }
             }
         }
         domainLookupCache.invalidateAll()
     }
 
-    suspend fun load() {
-        if (domains.isNotEmpty() || wildcards.isNotEmpty()) {
-            return
-        }
+    private fun getTrieKey(_domain: String, uid: Int): String {
+        val domain = _domain.removePrefix("*").removeSuffix("*")
+        return domain.lowercase(Locale.ROOT) + "," + uid
+    }
 
+    suspend fun load() {
         val customDomains = customDomainsRepository.getAllCustomDomains()
         if (customDomains.isEmpty()) {
             Log.w(LOG_TAG_DNS, "no custom domains found in db")
@@ -145,31 +146,16 @@ object DomainRulesManager : KoinComponent {
                 DomainType.DOMAIN -> {
                     val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
                     domains[key] = cd
+                    if (cd.status == Status.TRUST.id) {
+                        trustedDomains.add(cd.domain.lowercase(Locale.ROOT))
+                    }
                 }
                 DomainType.WILDCARD -> {
-                    val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
-                    val key = CacheKey(d, cd.uid)
-                    wildcards[key] = cd
-                }
-            }
-        }
-
-        val trustedDomainsList = customDomainsRepository.getAllTrustedDomains()
-        if (trustedDomainsList.isEmpty()) {
-            Log.w(LOG_TAG_DNS, "no trusted domains found in db")
-            return
-        }
-
-        // sort the trusted domains based on the length of the domain
-        val trustedDomainsSorted = trustedDomainsList.sortedByDescending { selector(it.domain) }
-        trustedDomainsSorted.forEach { cd ->
-            when (DomainType.getType(cd.type)) {
-                DomainType.DOMAIN -> {
-                    trustedDomains.add(cd.domain.lowercase(Locale.ROOT))
-                }
-                DomainType.WILDCARD -> {
-                    val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
-                    trustedWildcards.add(d)
+                    val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                    trie.set(key, cd.status.toString())
+                    if (cd.status == Status.TRUST.id) {
+                        trustedTrie.set(key, cd.status.toString())
+                    }
                 }
             }
         }
@@ -205,18 +191,14 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun matchesWildcard(domain: String, uid: Int): Status {
-        wildcards.forEach {
-            if (it.key.uid != uid) {
-                return@forEach
-            }
+        val key = getTrieKey(domain.lowercase(Locale.ROOT), uid)
+        val match = trie.getAny(key)
 
-            val pattern = Pattern.compile(it.key.domain)
-            if (pattern.matcher(domain).matches()) {
-                return Status.getStatus(it.value.status)
-            }
+        if (match.isNullOrEmpty()) {
+            return Status.NONE
         }
 
-        return Status.NONE
+        return Status.getStatus(match.toInt())
     }
 
     fun getDomainRule(domain: String, uid: Int): Status {
@@ -229,7 +211,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     fun isDomainTrusted(_domain: String?): Boolean {
-        if (_domain == null) {
+        if (_domain.isNullOrEmpty()) {
             return false
         }
 
@@ -238,14 +220,15 @@ object DomainRulesManager : KoinComponent {
             return true
         }
 
-        trustedWildcards.forEach {
-            val pattern = Pattern.compile(it)
-            if (pattern.matcher(domain).matches()) {
-                return true
-            }
+        if (
+            domainLookupCache.getIfPresent(CacheKey(domain, Constants.UID_EVERYBODY))?.id ==
+                Status.TRUST.id
+        ) {
+            return true
         }
 
-        return false
+        val key = getTrieKey(domain, Constants.UID_EVERYBODY)
+        return trustedTrie.hasAny(key)
     }
 
     private fun updateLookupCache(domain: String, uid: Int, status: Status) {
@@ -330,9 +313,18 @@ object DomainRulesManager : KoinComponent {
 
     fun deleteIpRulesByUid(uid: Int) {
         io {
+            // find the domains that are for the uid and remove them from domains
+            val domainsToDelete = domains.filterKeys { it.uid == uid }.toMutableMap()
+            // find the domains that are in delete list and remove them from trusted domains
+            val trustedDomainsToDelete = domainsToDelete.filterValues { it.status == Status.TRUST.id }
+
             customDomainsRepository.deleteRulesByUid(uid)
-            domains = domains.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
-            wildcards = wildcards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
+            domains.entries.removeAll(domainsToDelete.entries)
+            trustedDomains.removeAll(trustedDomainsToDelete.keys.map { it.domain.lowercase(Locale.ROOT) }
+                .toSet())
+            val rulesDeleted = trie.delAll(uid.toString())
+            val trustedRulesDeleted = trustedTrie.delAll(uid.toString())
+            Log.i(LOG_TAG_DNS, "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie")
             domainLookupCache.invalidateAll()
         }
     }
@@ -348,23 +340,14 @@ object DomainRulesManager : KoinComponent {
                 }
             }
             DomainType.WILDCARD -> {
-                val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
-                val key = CacheKey(d, cd.uid)
-                lock.write { wildcards.remove(key) }
+                val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                trie.del(key)
                 if (cd.status == Status.TRUST.id) {
-                    lock.write { trustedWildcards.remove(d) }
+                    trustedTrie.del(key)
                 }
             }
         }
         domainLookupCache.invalidateAll()
-    }
-
-    private fun constructWildCardString(d: String): String {
-        // replaces the . from the input to [\\.], as regEx will treat . as spl
-        val temp = d.replace(".", "[\\\\.]")
-        // add ^ and $ in the start and end
-        // replace * with .* (regEx format)
-        return "^" + temp.replace("*", ".*") + "$"
     }
 
     fun getUniversalCustomDomainCount(): LiveData<Int> {

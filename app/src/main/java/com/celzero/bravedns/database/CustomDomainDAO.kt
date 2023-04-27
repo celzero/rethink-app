@@ -58,7 +58,4 @@ interface CustomDomainDAO {
     @Query("update CustomDomain set status = :status where :clause")
     fun cpUpdate(status: Int, clause: String): Int
 
-    // DomainRulesManager.Status.TRUST -> 2
-    @Query("select * from CustomDomain where status = 2")
-    fun getAllTrustedDomains(): List<CustomDomain>
 }
