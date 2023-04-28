@@ -115,6 +115,7 @@ prebuilt_etc {
     sub_dir: "permissions",
     src: "com.celzero.bravedns.xml",
     filename_from_src: true,
+}
 
 prebuilt_etc {
     name: "com.celzero.bravedns_whitelist",
