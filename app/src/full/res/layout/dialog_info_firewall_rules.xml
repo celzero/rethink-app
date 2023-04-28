@@ -14,13 +14,6 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/info_rules_dialog_cancel_img"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="end"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
-
         <TextView
             android:id="@+id/info_rules_dialog_rules_desc"
             style="@style/Widget.AppCompat.TextView.SpinnerItem"

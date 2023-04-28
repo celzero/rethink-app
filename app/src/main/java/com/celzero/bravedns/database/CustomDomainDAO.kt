@@ -19,7 +19,6 @@ import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.Constants
 
 @Dao

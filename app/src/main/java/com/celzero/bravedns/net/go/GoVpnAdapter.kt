@@ -44,7 +44,6 @@ import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
 import ipn.Ipn
-import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,6 +51,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
+import java.io.IOException
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with

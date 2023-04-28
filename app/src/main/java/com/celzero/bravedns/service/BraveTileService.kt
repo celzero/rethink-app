@@ -22,9 +22,6 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.PrepareVpnActivity
 import com.celzero.bravedns.util.Utilities

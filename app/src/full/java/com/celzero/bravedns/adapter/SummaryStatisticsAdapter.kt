@@ -50,7 +50,6 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
-import kotlin.math.log10
 import kotlin.math.log2
 
 class SummaryStatisticsAdapter(
