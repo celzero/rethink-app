@@ -495,8 +495,6 @@ class FirewallAppFragment :
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }
-        val v = view.findViewById<AppCompatImageView>(R.id.info_rules_dialog_cancel_img)
-        v.setOnClickListener { builder.create().dismiss() }
         builder.setCancelable(true)
         builder.create().show()
     }
