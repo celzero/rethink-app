@@ -289,5 +289,8 @@ class Constants {
 
         // pcap file extension
         const val PCAP_FILE_EXTENSION = ".pcap"
+
+        // max logs to retrieve from the database, used in the log fragment
+        const val MAX_LOGS = 35000
     }
 }
