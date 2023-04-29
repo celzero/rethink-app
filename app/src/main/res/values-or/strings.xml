@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_statistics" translatable="true">ପରିସଂଖ୍ୟାନ</string>
+    <string name="title_about" translatable="true">ଵିଷୟରେ</string>
+    <string name="title_settings" translatable="true">ସେଟିଂ</string>
+    <string name="txt_home" translatable="true">ଗୃହ</string>
+    <string name="skip" translatable="true">ବାଦ୍ ଦିଅ</string>
+</resources>

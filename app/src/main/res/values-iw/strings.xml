@@ -215,4 +215,5 @@
     <string name="univ_ip_delete_toast_success" translatable="true">מחק את כל כללי ה-IP.</string>
     <string name="univ_delete_firewall_dialog_message" translatable="true">מחיקת כללים אלה תאפשר לכל אפליקציה להתחבר לכתובות ה-IP החסומות כעת.</string>
     <string name="dns_connected_no_count" translatable="true">מחובר</string>
+    <string name="title_statistics" translatable="true">סטטיסטיקות</string>
 </resources>
