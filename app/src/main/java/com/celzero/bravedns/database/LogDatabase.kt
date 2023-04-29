@@ -155,16 +155,32 @@ abstract class LogDatabase : RoomDatabase() {
         private val MIGRATION_3_4: Migration =
             object : Migration(3, 4) {
                 override fun migrate(database: SupportSQLiteDatabase) {
-                    database.execSQL("DROP INDEX IF EXISTS index_dnslogs_querystr")
-                    database.execSQL("DROP INDEX IF EXISTS index_connectiontracker_ipaddress")
-                    database.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_queryStr_responseIps_isBlocked_blockLists ON  DnsLogs(queryStr, responseIps, isBlocked, blockLists)"
-                    )
-                    database.execSQL(
-                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_ipAddress_appName_dnsQuery_blockedByRule ON  ConnectionTracker(ipAddress, appName, dnsQuery, blockedByRule)"
-                    )
                     database.execSQL(
                         "ALTER TABLE ConnectionTracker add column blocklists TEXT DEFAULT '' NOT NULL"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_queryStr ON DnsLogs(queryStr)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_responseIps ON DnsLogs(responseIps)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_isBlocked ON DnsLogs(isBlocked)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_DnsLogs_blockLists ON DnsLogs(blockLists)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_ipAddress ON ConnectionTracker(ipAddress)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_appName ON ConnectionTracker(appName)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_dnsQuery ON ConnectionTracker(dnsQuery)"
+                    )
+                    database.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_blockedByRule ON ConnectionTracker(blockedByRule)"
                     )
                 }
             }
