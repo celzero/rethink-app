@@ -187,8 +187,8 @@ dependencies {
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
 
-    download 'com.github.celzero:firestack:9edb8c2de3'
-    implementation 'com.github.celzero:firestack:9edb8c2de3'
+    download 'com.github.celzero:firestack:4576e99a96'
+    implementation 'com.github.celzero:firestack:4576e99a96'
     // implementation project(":tun2socks")
 
     // Work manager

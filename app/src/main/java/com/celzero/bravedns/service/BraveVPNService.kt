@@ -2042,27 +2042,23 @@ class BraveVPNService :
         }
 
         if (appConfig.getBraveMode().isDnsMode()) {
-            val res = getDnsxForDnsMode(fqdn)
+            val res = getTransportIdForDnsMode(fqdn)
             if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns): dnsx: $res")
             return res
         }
 
         if (appConfig.getBraveMode().isDnsFirewallMode()) {
-            val res = getDnsxForDnsFirewallMode(fqdn)
+            val res = getTransportIdForDnsFirewallMode(fqdn)
             if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns+Firewall): dnsx: $res")
             return res
         }
 
-        Log.e(LOG_TAG_VPN, "onQuery: unknown mode ${appConfig.getBraveMode()}, returning default")
-        return if (persistentState.enableDnsCache) {
-            Dnsx.CT + Dnsx.Preferred
-        } else {
-            Dnsx.Preferred
-        }
+        Log.e(LOG_TAG_VPN, "onQuery: unknown mode ${appConfig.getBraveMode()}, returning preferred")
+        return getPreferredTransportId()
     }
 
-    // function to decide which Dnsx to return on Dns only mode
-    private fun getDnsxForDnsMode(fqdn: String): String {
+    // function to decide which transport id to return on Dns only mode
+    private fun getTransportIdForDnsMode(fqdn: String): String {
         // check for global domain rules
         when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
             // TODO: return Preferred for now
@@ -2071,14 +2067,14 @@ class BraveVPNService :
             else -> {} // no-op, fall-through;
         }
 
-        return getPreferredDnsx()
+        return getPreferredTransportId()
     }
 
-    // function to decide which Dnsx to return on DnsFirewall mode
-    private fun getDnsxForDnsFirewallMode(fqdn: String): String {
+    // function to decide which transport id to return on DnsFirewall mode
+    private fun getTransportIdForDnsFirewallMode(fqdn: String): String {
         return if (!isRethinkEnabled()) {
             // if rethink is not enabled then return preferred or CT+Preferred
-            getPreferredDnsx()
+            getPreferredTransportId()
         } else if (FirewallManager.isAnyAppBypassesDns()) {
             // if any app is bypassed (dns + firewall) and if local blocklist enabled or remote dns
             // is rethink then return Alg so that the decision is made by in flow() function
@@ -2091,11 +2087,11 @@ class BraveVPNService :
             // CT+preferred
             // so that if the domain is blocked by upstream then no need to do any further
             // processing
-            getPreferredDnsx()
+            getPreferredTransportId()
         }
     }
 
-    private fun getPreferredDnsx(): String {
+    private fun getPreferredTransportId(): String {
         return if (persistentState.enableDnsCache) {
             Dnsx.CT + Dnsx.Preferred
         } else {

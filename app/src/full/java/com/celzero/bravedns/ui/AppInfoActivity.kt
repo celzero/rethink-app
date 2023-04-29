@@ -257,7 +257,13 @@ class AppInfoActivity :
 
         b.aadAppInfoIcon.setOnClickListener { openAndroidAppInfo(this, appInfo.packageName) }
 
-        TooltipCompat.setTooltipText(b.aadAppSettingsBypassDnsFirewall, getString(R.string.bypass_dns_firewall_tooltip))
+        TooltipCompat.setTooltipText(
+            b.aadAppSettingsBypassDnsFirewall,
+            getString(
+                R.string.bypass_dns_firewall_tooltip,
+                getString(R.string.ada_app_bypass_dns_firewall)
+            )
+        )
 
         b.aadAppSettingsBypassDnsFirewall.setOnClickListener {
             // show the tooltip only once when app is not bypassed (dns + firewall) earlier
