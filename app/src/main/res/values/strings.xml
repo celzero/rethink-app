@@ -300,16 +300,14 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_dialog_title" translatable="true">What\'s new in v054</string>
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Super-Charged!</b><br/><br/>
-        1. <i>New feature</i>: Advanced DNS filtering; apply domain rules only when apps connect.<br/>
-        2. <i>New feature</i>: Allow or deny domains per app.<br/>
-        3. <i>New feature</i>: Allow or deny domains for all apps.<br/>
-        4. <i>New feature</i>: Bypass both DNS and Firewall rules per app.<br/>
-        5. <i>New feature</i>: Packet capture (PCAP).<br/>
-        6. <i>New feature</i>: DNS Booster; coalesce requests, cache responses.<br/>
-        7. <i>New feature</i>: Edit domain and IP rules.<br/>
-        8. And other minor UI changes and bug fixes.<br/><br/>
+    <string name="whats_dialog_title" translatable="true">What\'s new in v054b</string>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>LAN party!</b><br/><br/>
+        1. <i>New feature</i>: Exclude Private IPs (LAN / link-local).<br/>
+        2. Make "Bypass DNS & Firewall" setting work.<br/>
+        3. Show "Maybe Blocked" in DNS Logs for domains that may be blocked by the Firewall.<br/>
+        4. Show adaptive icon where supported.<br/>
+        5. Bio-metric authentication prompts once every 15 minutes.<br/>
+        6. 6 other UI and performance improvements.<br/><br/>
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 
