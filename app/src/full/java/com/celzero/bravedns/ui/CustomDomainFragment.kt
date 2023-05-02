@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Patterns
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -35,15 +34,15 @@ import com.celzero.bravedns.adapter.CustomDomainAdapter
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
+import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
+import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.removeLeadingAndTrailingDots
+import com.celzero.bravedns.util.Utilities.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import org.koin.android.ext.android.inject
-import java.net.MalformedURLException
-import java.util.regex.Pattern
 
 class CustomDomainFragment :
     Fragment(R.layout.fragment_custom_domain), SearchView.OnQueryTextListener {
@@ -249,22 +248,6 @@ class CustomDomainFragment :
         }
 
         insertDomain(removeLeadingAndTrailingDots(url), selectedType, status)
-    }
-
-    private fun isValidDomain(url: String): Boolean {
-        return try {
-            Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()
-        } catch (ignored: MalformedURLException) { // ignored
-            false
-        }
-    }
-
-    private fun isWildCardEntry(url: String): Boolean {
-        // ref: https://regex101.com/r/wG1nZ3/2
-        // https://stackoverflow.com/questions/26302101/regular-expression-for-wildcard-domain-validation
-        // valid entries: *.test.com, test.com, abc.test.com
-        val pattern = Pattern.compile("^(([\\w\\d]+\\.)|(\\*\\.))+[\\w\\d]+\$")
-        return pattern.matcher(url).find()
     }
 
     private fun insertDomain(

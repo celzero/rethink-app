@@ -40,13 +40,18 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.blocklistDownloadBasePath
-import com.celzero.bravedns.util.Utilities.Companion.tempDownloadBasePath
+import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
+import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
 import dnsx.Dnsx
 import okhttp3.ResponseBody
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.*
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
@@ -505,12 +510,12 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         )
     }
 
-    private suspend fun updatePersistenceOnCopySuccess(timestamp: Long) {
+    private fun updatePersistenceOnCopySuccess(timestamp: Long) {
+        // recreate bravedns object ()
+        appConfig.recreateBraveDnsObj()
         persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
         // reset updatable time stamp
         persistentState.newestLocalBlocklistTimestamp = INIT_TIME_MS
-        // recreate bravedns object ()
-        appConfig.recreateBraveDnsObj()
     }
 }

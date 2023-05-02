@@ -32,6 +32,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -111,7 +113,7 @@ class DnsCryptEndpointAdapter(
 
             b.dnsCryptEndpointListUrlExplanation.text =
                 if (endpoint.isSelected) {
-                    context.getString(R.string.dns_connected)
+                    context.getString(UIUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
                 } else {
                     ""
                 }
@@ -168,11 +170,7 @@ class DnsCryptEndpointAdapter(
             builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
                 _: DialogInterface,
                 _: Int ->
-                Utilities.clipboardCopy(
-                    context,
-                    url,
-                    context.getString(R.string.copy_clipboard_label)
-                )
+                clipboardCopy(context, url, context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(
                     context,
                     context.getString(R.string.info_dialog_url_copy_toast_msg),

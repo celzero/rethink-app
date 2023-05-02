@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns"
-    android:versionCode="27"
-    android:versionName="v054a"> <!-- 27(v054a) -->
+    android:versionCode="28"
+    android:versionName="v054b"> <!-- 28(v054b) -->
 
     <uses-sdk
         android:minSdkVersion="23"
@@ -41,8 +41,7 @@
         android:memtagMode="off"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppThemeInitial"
-        tools:replace="android:icon, android:roundIcon">
+        android:theme="@style/AppThemeInitial">
 
         <activity
             android:name=".ui.PrepareVpnActivity"

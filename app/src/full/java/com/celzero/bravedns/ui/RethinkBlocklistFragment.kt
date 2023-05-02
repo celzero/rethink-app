@@ -57,12 +57,12 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.fetchToggleBtnColors
-import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
-import com.celzero.bravedns.util.Utilities.Companion.hasLocalBlocklists
-import com.celzero.bravedns.util.Utilities.Companion.hasRemoteBlocklists
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
+import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
+import com.celzero.bravedns.util.Utilities.hasRemoteBlocklists
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.LocalBlocklistPacksMapViewModel
 import com.celzero.bravedns.viewmodel.RemoteBlocklistPacksMapViewModel
 import com.celzero.bravedns.viewmodel.RethinkLocalFileTagViewModel
@@ -212,12 +212,12 @@ class RethinkBlocklistFragment :
     private fun updateFilteredTxtUi(filter: Filters) {
         if (filter.subGroups.isEmpty()) {
             b.lbAdvancedFilterLabelTv.text =
-                Utilities.updateHtmlEncodedText(
+                updateHtmlEncodedText(
                     getString(R.string.rt_filter_desc, filter.filterSelected.name.lowercase())
                 )
         } else {
             b.lbAdvancedFilterLabelTv.text =
-                Utilities.updateHtmlEncodedText(
+                updateHtmlEncodedText(
                     getString(
                         R.string.rt_filter_desc_subgroups,
                         filter.filterSelected.name.lowercase(),

@@ -25,8 +25,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// TODO: Indexes for responseIps
-@Entity(tableName = "DnsLogs", indices = [Index(value = arrayOf("queryStr"), unique = false)])
+@Entity(
+    tableName = "DnsLogs",
+    indices =
+        [
+            Index(value = arrayOf("queryStr"), unique = false),
+            Index(value = arrayOf("responseIps"), unique = false),
+            Index(value = arrayOf("isBlocked"), unique = false),
+            Index(value = arrayOf("blockLists"), unique = false),
+        ]
+)
 class DnsLog {
 
     @PrimaryKey(autoGenerate = true) var id: Int = 0

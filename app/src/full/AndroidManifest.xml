@@ -7,14 +7,14 @@
     <application
         android:name=".RethinkDnsApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:localeConfig="@xml/locale_config"
-        android:roundIcon="@drawable/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
-        android:theme="@style/AppThemeInitial"
-        tools:replace="android:icon, android:roundIcon">
+        android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
@@ -73,6 +73,9 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.MiscSettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.TunnelSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.AppDetailActivity"

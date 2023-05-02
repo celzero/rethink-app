@@ -22,10 +22,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 @Dao
 interface LogDatabaseRawQueryDao {
 
-    @RawQuery
-    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    @RawQuery fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
 
-    @RawQuery
-    fun vacuum(supportSQLiteQuery: SupportSQLiteQuery): Int
-
+    @RawQuery fun vacuum(supportSQLiteQuery: SupportSQLiteQuery): Int
 }

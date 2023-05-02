@@ -29,21 +29,18 @@ import com.celzero.bravedns.service.FirewallManager.GlobalVariable.foregroundUid
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.OrbotHelper
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Multimap
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 object FirewallManager : KoinComponent {
 
@@ -51,18 +48,6 @@ object FirewallManager : KoinComponent {
     private val lock = ReentrantReadWriteLock()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
-
-    data class DnsCacheRecord(val ttl: Long, val fqdn: String, val flag: String?)
-
-    private const val CACHE_BUILDER_MAX_SIZE = 10000L
-    private val CACHE_BUILDER_WRITE_EXPIRE_HRS = TimeUnit.DAYS.toHours(3L)
-
-    // TODO: check for the usages and remove if not used
-    val ipDomainLookup: Cache<String, DnsCacheRecord> =
-        CacheBuilder.newBuilder()
-            .maximumSize(CACHE_BUILDER_MAX_SIZE)
-            .expireAfterWrite(CACHE_BUILDER_WRITE_EXPIRE_HRS, TimeUnit.HOURS)
-            .build()
 
     // Below are the firewall rule set
     // app-status | connection-status |  Rule
@@ -270,7 +255,7 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun deletePackagesFromCache(packagesToDelete: Set<AppInfoTuple>) {
+    fun deletePackages(packagesToDelete: Set<AppInfoTuple>) {
         lock.write {
             packagesToDelete.forEach { tuple ->
                 appInfos
@@ -282,6 +267,19 @@ object FirewallManager : KoinComponent {
         io {
             // Delete the uninstalled apps from database
             appInfoRepository.deleteByPackageName(packagesToDelete.map { it.packageName })
+        }
+    }
+
+    fun deletePackage(packageName: String) {
+        lock.write {
+            appInfos
+                .values()
+                .filter { it.packageName == packageName }
+                .forEach { appInfos.remove(it.uid, it) }
+        }
+        io {
+            // Delete the uninstalled apps from database
+            appInfoRepository.deleteByPackageName(listOf(packageName))
         }
     }
 
@@ -339,6 +337,13 @@ object FirewallManager : KoinComponent {
                 .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
                 .map { it.packageName }
                 .toMutableSet()
+        }
+    }
+
+    // any app is bypassed both dns and firewall
+    fun isAnyAppBypassesDns(): Boolean {
+        lock.read {
+            return appInfos.values().any { it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id }
         }
     }
 

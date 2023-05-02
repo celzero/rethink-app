@@ -17,6 +17,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
@@ -25,16 +26,18 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import java.util.Calendar
-import java.util.Locale
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.util.regex.Pattern
-import kotlin.concurrent.write
+import dnsx.Dnsx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.MalformedURLException
+import java.util.Calendar
+import java.util.Locale
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.regex.Pattern
+import kotlin.concurrent.write
 
 object DomainRulesManager : KoinComponent {
 
@@ -47,7 +50,9 @@ object DomainRulesManager : KoinComponent {
     data class CacheKey(val domain: String, val uid: Int)
 
     var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
-    var wildcards: MutableMap<CacheKey, CustomDomain> = hashMapOf()
+    var trustedDomains: MutableSet<String> = hashSetOf()
+    var trie: dnsx.CritBit = Dnsx.newCritBit()
+    private val trustedTrie: dnsx.CritBit = Dnsx.newCritBit()
 
     // stores all the previous response sent
     private val domainLookupCache: Cache<CacheKey, Status> =
@@ -99,26 +104,34 @@ object DomainRulesManager : KoinComponent {
     }
 
     // update the cache with the domain and its status based on the domain type
-    fun updateCache(cd: CustomDomain) {
+    private fun updateCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                val d = cd.domain.lowercase(Locale.ROOT)
+                val key = CacheKey(d, cd.uid)
                 lock.write { domains[key] = cd }
+                if (cd.status == Status.TRUST.id) {
+                    lock.write { trustedDomains.add(d) }
+                }
             }
             DomainType.WILDCARD -> {
-                val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
-                val key = CacheKey(d, cd.uid)
-                lock.write { wildcards[key] = cd }
+                // key is combination of domain and uid as String separated by a delimiter ,
+                val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                trie.set(key, cd.status.toString())
+                if (cd.status == Status.TRUST.id) {
+                    trustedTrie.set(key, cd.status.toString())
+                }
             }
         }
         domainLookupCache.invalidateAll()
     }
 
-    suspend fun load() {
-        if (domains.isNotEmpty() || wildcards.isNotEmpty()) {
-            return
-        }
+    private fun getTrieKey(_domain: String, uid: Int): String {
+        val domain = _domain.removePrefix("*").removeSuffix("*")
+        return domain.lowercase(Locale.ROOT) + "," + uid
+    }
 
+    suspend fun load() {
         val customDomains = customDomainsRepository.getAllCustomDomains()
         if (customDomains.isEmpty()) {
             Log.w(LOG_TAG_DNS, "no custom domains found in db")
@@ -133,11 +146,16 @@ object DomainRulesManager : KoinComponent {
                 DomainType.DOMAIN -> {
                     val key = CacheKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
                     domains[key] = cd
+                    if (cd.status == Status.TRUST.id) {
+                        trustedDomains.add(cd.domain.lowercase(Locale.ROOT))
+                    }
                 }
                 DomainType.WILDCARD -> {
-                    val d = constructWildCardString(cd.domain.lowercase(Locale.ROOT))
-                    val key = CacheKey(d, cd.uid)
-                    wildcards[key] = cd
+                    val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                    trie.set(key, cd.status.toString())
+                    if (cd.status == Status.TRUST.id) {
+                        trustedTrie.set(key, cd.status.toString())
+                    }
                 }
             }
         }
@@ -146,7 +164,8 @@ object DomainRulesManager : KoinComponent {
     fun status(d: String, uid: Int): Status {
         val domain = d.lowercase(Locale.ROOT)
         // return if the cache has the domain
-        domainLookupCache.getIfPresent(domain)?.let {
+        val key = CacheKey(domain, uid)
+        domainLookupCache.getIfPresent(key)?.let {
             return Status.getStatus(it.id)
         }
 
@@ -172,18 +191,14 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun matchesWildcard(domain: String, uid: Int): Status {
-        wildcards.forEach {
-            if (it.key.uid != uid) {
-                return@forEach
-            }
+        val key = getTrieKey(domain.lowercase(Locale.ROOT), uid)
+        val match = trie.getAny(key)
 
-            val pattern = Pattern.compile(it.key.domain)
-            if (pattern.matcher(domain).matches()) {
-                return Status.getStatus(it.value.status)
-            }
+        if (match.isNullOrEmpty()) {
+            return Status.NONE
         }
 
-        return Status.NONE
+        return Status.getStatus(match.toInt())
     }
 
     fun getDomainRule(domain: String, uid: Int): Status {
@@ -193,6 +208,27 @@ object DomainRulesManager : KoinComponent {
                 return Status.NONE
             }
         return Status.getStatus(d.status)
+    }
+
+    fun isDomainTrusted(_domain: String?): Boolean {
+        if (_domain.isNullOrEmpty()) {
+            return false
+        }
+
+        val domain = _domain.lowercase(Locale.ROOT)
+        if (trustedDomains.contains(domain)) {
+            return true
+        }
+
+        if (
+            domainLookupCache.getIfPresent(CacheKey(domain, Constants.UID_EVERYBODY))?.id ==
+                Status.TRUST.id
+        ) {
+            return true
+        }
+
+        val key = getTrieKey(domain, Constants.UID_EVERYBODY)
+        return trustedTrie.hasAny(key)
     }
 
     private fun updateLookupCache(domain: String, uid: Int, status: Status) {
@@ -277,9 +313,18 @@ object DomainRulesManager : KoinComponent {
 
     fun deleteIpRulesByUid(uid: Int) {
         io {
+            // find the domains that are for the uid and remove them from domains
+            val domainsToDelete = domains.filterKeys { it.uid == uid }.toMutableMap()
+            // find the domains that are in delete list and remove them from trusted domains
+            val trustedDomainsToDelete = domainsToDelete.filterValues { it.status == Status.TRUST.id }
+
             customDomainsRepository.deleteRulesByUid(uid)
-            domains = domains.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
-            wildcards = wildcards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomDomain>
+            domains.entries.removeAll(domainsToDelete.entries)
+            trustedDomains.removeAll(trustedDomainsToDelete.keys.map { it.domain.lowercase(Locale.ROOT) }
+                .toSet())
+            val rulesDeleted = trie.delAll(uid.toString())
+            val trustedRulesDeleted = trustedTrie.delAll(uid.toString())
+            Log.i(LOG_TAG_DNS, "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie")
             domainLookupCache.invalidateAll()
         }
     }
@@ -287,28 +332,42 @@ object DomainRulesManager : KoinComponent {
     private fun removeFromCache(cd: CustomDomain) {
         when (DomainType.getType(cd.type)) {
             DomainType.DOMAIN -> {
-                val key = CacheKey(cd.domain, cd.uid)
+                val d = cd.domain.lowercase(Locale.ROOT)
+                val key = CacheKey(d, cd.uid)
                 lock.write { domains.remove(key) }
+                if (cd.status == Status.TRUST.id) {
+                    lock.write { trustedDomains.remove(d) }
+                }
             }
             DomainType.WILDCARD -> {
-                val d = constructWildCardString(cd.domain)
-                val key = CacheKey(d, cd.uid)
-                lock.write { wildcards.remove(key) }
+                val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+                trie.del(key)
+                if (cd.status == Status.TRUST.id) {
+                    trustedTrie.del(key)
+                }
             }
         }
         domainLookupCache.invalidateAll()
     }
 
-    private fun constructWildCardString(d: String): String {
-        // replaces the . from the input to [\\.], as regEx will treat . as spl
-        val temp = d.replace(".", "[\\\\.]")
-        // add ^ and $ in the start and end
-        // replace * with .* (regEx format)
-        return "^" + temp.replace("*", ".*") + "$"
-    }
-
     fun getUniversalCustomDomainCount(): LiveData<Int> {
         return customDomainsRepository.getUniversalCustomDomainCount()
+    }
+
+    fun isValidDomain(url: String): Boolean {
+        return try {
+            Patterns.WEB_URL.matcher(url).matches() || Patterns.DOMAIN_NAME.matcher(url).matches()
+        } catch (ignored: MalformedURLException) { // ignored
+            false
+        }
+    }
+
+    fun isWildCardEntry(url: String): Boolean {
+        // regex to check if url is valid wildcard domain
+        // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
+        // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
+        val p = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
+        return p.matcher(url).matches()
     }
 
     private fun constructObject(

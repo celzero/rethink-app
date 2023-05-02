@@ -19,7 +19,12 @@ import okhttp3.internal.concurrent.TaskRunner
 import okhttp3.internal.http2.Http2
 import java.io.Closeable
 import java.util.concurrent.CopyOnWriteArraySet
-import java.util.logging.*
+import java.util.logging.ConsoleHandler
+import java.util.logging.Handler
+import java.util.logging.Level
+import java.util.logging.LogRecord
+import java.util.logging.Logger
+import java.util.logging.SimpleFormatter
 import kotlin.reflect.KClass
 
 object OkHttpDebugLogging {

@@ -21,7 +21,7 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit

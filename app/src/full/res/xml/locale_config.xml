@@ -11,6 +11,7 @@
     <locale android:name="hi" /> <!-- Hindi -->
     <locale android:name="in" /> <!-- Indonesian -->
     <locale android:name="it" /> <!-- Italian -->
+    <locale android:name="ja" /> <!-- Japanese -->
     <locale android:name="lt" /> <!-- Lithuanian -->
     <locale android:name="pt-BR" /> <!-- Portuguese (Brazil) -->
     <locale android:name="pt-PT" /> <!-- Portuguese (Portugal) -->

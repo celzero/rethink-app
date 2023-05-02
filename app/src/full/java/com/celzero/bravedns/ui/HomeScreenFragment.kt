@@ -47,6 +47,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
@@ -54,28 +55,27 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.Utilities.Companion.delay
-import com.celzero.bravedns.util.Utilities.Companion.getPrivateDnsMode
-import com.celzero.bravedns.util.Utilities.Companion.getRemoteBlocklistStamp
-import com.celzero.bravedns.util.Utilities.Companion.isOtherVpnHasAlwaysOn
-import com.celzero.bravedns.util.Utilities.Companion.isPrivateDnsActive
-import com.celzero.bravedns.util.Utilities.Companion.openNetworkSettings
-import com.celzero.bravedns.util.Utilities.Companion.openVpnProfile
-import com.celzero.bravedns.util.Utilities.Companion.sendEmailIntent
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
-import com.celzero.bravedns.util.Utilities.Companion.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.openNetworkSettings
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.UIUtils.sendEmailIntent
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.Utilities.delay
+import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
+import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
+import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
+import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -793,7 +793,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return true
         }
 
-        if (VpnController.isAlwaysOn(requireContext())) {
+        // if always on is enabled and vpn is activated, show the dialog to stop the vpn #799
+        if (VpnController.isAlwaysOn(requireContext()) && isVpnActivated) {
             showAlwaysOnStopDialog()
             return true
         }
@@ -901,14 +902,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
         startActivity(intent)
-    }
-
-    private fun getModeText(): String {
-        return when (appConfig.getBraveMode()) {
-            AppConfig.BraveMode.DNS -> getString(R.string.app_mode_dns)
-            AppConfig.BraveMode.FIREWALL -> getString(R.string.app_mode_firewall)
-            AppConfig.BraveMode.DNS_FIREWALL -> getString(R.string.app_mode_dns_firewall)
-        }
     }
 
     private fun prepareAndStartVpn() {
@@ -1056,7 +1049,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         var statusId: Int
         var colorId: Int
         // val explanationId: Int
-        val privateDnsMode: Utilities.Companion.PrivateDnsMode = getPrivateDnsMode(requireContext())
+        val privateDnsMode: Utilities.PrivateDnsMode = getPrivateDnsMode(requireContext())
 
         if (appConfig.getBraveMode().isFirewallMode()) {
             status.connectionState = BraveVPNService.State.WORKING
@@ -1110,7 +1103,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             colorId = fetchTextColor(R.color.accentBad)
             statusId =
                 when (privateDnsMode) {
-                    Utilities.Companion.PrivateDnsMode.STRICT -> R.string.status_strict
+                    Utilities.PrivateDnsMode.STRICT -> R.string.status_strict
                     else -> R.string.status_exposed
                 }
         }
@@ -1182,8 +1175,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 R.attr.primaryTextColor
             } else if (attr == R.color.primaryTextLight) {
                 R.attr.primaryTextColor
-            } else if (attr == R.color.primaryLightColorText) {
-                R.attr.primaryLightColorText
             } else {
                 R.attr.accentGood
             }
