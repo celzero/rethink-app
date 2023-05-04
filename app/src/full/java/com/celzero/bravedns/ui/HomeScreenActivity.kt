@@ -479,6 +479,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         if (!isNewVersion()) return
 
         val version = getLatestVersion()
+        Log.i(LOG_TAG_UI, "New version detected, updating the app version, version: $version")
         persistentState.appVersion = version
         persistentState.showWhatsNewChip = true
 

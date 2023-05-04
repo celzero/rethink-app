@@ -117,7 +117,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
             b.aboutWhatsNew.text =
-                getString(R.string.about_whats_new, getString(R.string.about_version, version))
+                getString(R.string.about_whats_new, version)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
