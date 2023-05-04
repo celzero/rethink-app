@@ -61,7 +61,7 @@
     <string name="always_on_dialog_heading">禁用永久連線的 VPN</string>
     <string name="always_on_dialog_positive_btn">前往設定</string>
     <string name="always_on_dialog_stop_message">永久連線的 VPN 已對 Rethink 啓用。您是否仍想要停止 Rethink ？</string>
-    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS 正以<i>閉關</i>模式運行 VPN 。將其停止會致本使用者失去互聯網連線。您是否仍要繼續？</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink 正以<i>閉關</i>模式運行 VPN 。將其停止會致本使用者失去互聯網連線。您是否仍要繼續？</string>
     <string name="always_on_dialog_positive">停止</string>
     <string name="always_on_dialog_neutral">設定</string>
     <string name="firewall_act_universal_tab">通用</string>
@@ -113,11 +113,11 @@
     <string name="info_dialog_url_copy_toast_msg">已複製 URL</string>
     <string name="info_dialog_rethink_toast_msg">已作爲 RDNS+ DNS-over-HTTPS URL 複製</string>
     <string name="settings_enable_logs_desc">於本地儲存 DNS 與防火牆日誌。</string>
-    <string name="whats_dialog_title">v054 的新內容</string>
+    <string name="whats_dialog_title">v054b 的新內容</string>
     <string name="settings_ip_network_desc">在不同互聯網協定版本中選擇。</string>
     <string name="settings_ptrans_heading">強制 IPv4 出站</string>
     <string name="settings_ptrans_desc">於本地將出站的 IPv6 流量轉換爲 IPv4 流量。在您連線至僅有 IPv4 的網路時使用。</string>
-    <string name="settings_allow_bypass_heading">允許繞行</string>
+    <string name="settings_allow_bypass_heading">於網路可見</string>
     <string name="orbot_http">HTTP 代理</string>
     <string name="orbot_http_desc">推薦應用程式使用 Orbot 的 HTTP 代理。</string>
     <string name="orbot_both">TCP + HTTP 代理</string>
@@ -133,29 +133,29 @@
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
 \n%2$s</string>
-    <string name="orbot_stop_dialog_message">RethinkDNS 已停止向 Orbot 轉送連線，但 Orbot 可能仍於背景運行。</string>
-    <string name="orbot_stop_dialog_dns_message">RethinkDNS 已設定爲將 DNS 請求轉送至 Orbot 。請按需更改。</string>
+    <string name="orbot_stop_dialog_message">Rethink 已停止向 Orbot 轉送連線，但 Orbot 可能仍於背景運行。</string>
+    <string name="orbot_stop_dialog_dns_message">Rethink 已設定爲將 DNS 請求轉送至 Orbot 。請按需更改。</string>
     <string name="orbot_stop_dialog_negative">停止 Orbot</string>
     <string name="orbot_install_dialog_title">是否安裝 Orbot ？</string>
     <string name="settings_orbot_heading">設定 Orbot</string>
     <string name="settings_orbot_install_desc">輕觸此處以安裝 Orbot</string>
     <string name="settings_socks5_disabled_error">已連線至 Orbot 。請先將其關閉。</string>
-    <string name="settings_socks5_vpn_disabled_error">啓動 RethinkDNS 以繼續。</string>
+    <string name="settings_socks5_vpn_disabled_error">啓動 Rethink 以繼續。</string>
     <string name="settings_orbot_disabled_error">關閉 HTTP(S) 與/或 SOCKS5 代理以繼續設定 Tor 代理。</string>
     <string name="settings_https_disabled_error">已連線至 Orbot 。請先將其關閉。</string>
     <string name="settings_orbot_notification_content">啓動 Tor 代理失敗。請手動開啓 Orbot 應用。</string>
     <string name="settings_orbot_notification_action">打開 Orbot</string>
     <string name="settings_general_header">一般設定</string>
     <string name="settings_autostart_bootup_heading">裝置啓動時自啓（實驗性）</string>
-    <string name="settings_autostart_bootup_desc">若在關機前 RethinkDNS 在運行，在開機時則自動啓動。</string>
-    <string name="settings_network_all_networks_desc">啓用時， RethinkDNS 將使用所有可用的網路來連線至互聯網。若未啓用，則將使用 Android 認爲<i>活躍</i>的網路。</string>
+    <string name="settings_autostart_bootup_desc">Rethink 若在關機前運行，開機時則自動啓動。</string>
+    <string name="settings_network_all_networks_desc">啓用時， Rethink 將使用所有可用的網路來連線至互聯網。若未啓用，則將使用 Android 認爲<i>活躍</i>的網路。</string>
     <string name="settings_all_networks_dialog_message">啓用時，應用防火牆規則將不會考慮網路爲計費（如行動數據）或非計費（如 WiFi ）。
 \n
 \n您是否想要繼續？</string>
     <string name="allow">放行</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">輕觸以更改防護設定</string>
     <string name="slide_1_desc">Rethink 爲一款受 Mozilla Builders MVP 計劃資助與支持的開放原始碼軟體。</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">警告： RethinkDNS 已被停用</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">警告： Rethink 已被停用</string>
     <string name="block">攔截</string>
     <string name="alert_permission_accessibility">權限 - 無障礙設定</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected">已連線至 RethinkDNS 與防火牆</string>
@@ -175,13 +175,13 @@
     <string name="dns_firewall_mode_info_explanation_new">上述所有功能及繞過互聯網審查。</string>
     <string name="wireguard_mode_info_explanation_new">即將推出。</string>
     <string name="dns_mode_notification_title">已保護！已連線至快速且安全的 DNS 。</string>
-    <string name="alert_firewall_accessibility_explanation">RethinkDNS 使用無障礙服務來追蹤正在使用的應用（前景）與未使用的應用（背景）。
+    <string name="alert_firewall_accessibility_explanation">Rethink 使用無障礙服務來追蹤正在使用的應用（前景）與未使用的應用（背景）。
 \n
-\nRethinkDNS 並不會收集任何資料，且不會以任何方式監視您。</string>
+\nRethink 並不會收集任何資料，且不會以任何方式監視您。</string>
     <string name="brave_dns_connect_mode_change_dns">選擇模式。</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS 的無障礙服務已停止或崩潰。爲繼續使用<i>攔截未使用應用</i>的功能，<i><b>請至系統設定，強制停止並再次啓動</b></i> RethinkDNS 。
+    <string name="alert_firewall_accessibility_regrant_explanation">Rethink 的無障礙服務已停止或崩潰。爲繼續使用<i>攔截未使用應用</i>的功能，<i><b>請至系統設定，強制停止並再次啓動</b></i> Rethink 。
 \n
-\nRethinkDNS 使用無障礙服務來追蹤正在使用的應用（前景）與未使用的應用（背景）。</string>
+\nRethink 使用無障礙服務來追蹤正在使用的應用（前景）與未使用的應用（背景）。</string>
     <string name="bsct_conn_block_desc">由 %2$s 攔截 %1$s</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某應用連線至互聯網。
 \n <u>#2</u>：阻止任意應用連線至某特定 IP 。
@@ -204,10 +204,10 @@
     <string name="app_mode_choose">選擇模式</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_heading">選擇 IP 版本</string>
-    <string name="settings_allow_bypass_desc">允許應用按需請求繞過 RethinkDNS 的防火牆。一些如 Zoom 和 Whatsapp 的音訊/視訊會議應用可能會需要按需繞行以正常運行。</string>
+    <string name="settings_allow_bypass_desc">允許應用請求訪問所有可用網路。這些應用可能按需繞過 RethinkDNS 的 VPN 隧道。一些如 Zoom 和 Meet 的音訊/視訊會議應用可能會需要此功能以正常運行。</string>
     <string name="settings_proxy_header">代理</string>
     <string name="settings_socks5_heading">設定 SOCKS5 代理</string>
-    <string name="settings_lock_down_mode_desc">VPN 處於閉關模式時無法允許繞行。<u>請移步 VPN 設定</u>。</string>
+    <string name="settings_lock_down_mode_desc">某些選項在 VPN 處於閉關模式時不可用。<u>請移步 VPN 設定</u>。</string>
     <string name="orbot_install_dialog_neutral">網站</string>
     <string name="settings_socks5_desc">將連線轉送至 SOCKS5 端點。</string>
     <string name="settings_https_heading">設定 HTTP(S) 代理</string>
@@ -229,7 +229,7 @@
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>
-    <string name="whats_new_version_update">&lt;b&gt;功能滿載！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;進階 DNS 過濾；僅在應用連線時套用網域規則。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：分應用放行或攔截網域。&lt;br/&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：爲所有應用放行或攔截網域。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;分應用繞行 DNS 與防火牆規則。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：資料包捕獲（ PCAP ）。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：DNS 加速器；合併請求，快取應答。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：編輯網域與 IP 規則。&lt;br/&gt; 8. 其他微小的 UI 變動與漏洞修復。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫助翻譯此應用&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;本地派對！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：排除專有 IP （局域網 / 本地鏈路）。&lt;br/&gt; 2. 修復「繞行 DNS 與防火牆」設定。&lt;br/&gt; 3. 在 DNS 日誌內爲可能已被防火牆攔截的網域顯示「或已攔截」。&lt;br/&gt; 4. 於支援處顯示自適應圖示。&lt;br/&gt; 5. 每一刻鐘提示生物認證。&lt;br/&gt; 6. 其他六項 UI 與性能改進。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;協助翻譯此應用&lt;/a&gt;</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
@@ -240,7 +240,7 @@
     <string name="hs_download_positive_website">訪問網站</string>
     <string name="hsf_proxy_chip_text">已啓用代理</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
-    <string name="dc_rethink_dns_radio">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="firewall_rule_unknown_desc">此連線因無法得知<i>來源應用</i>而被攔截。<br/><br/>若需變更此行爲，請至<i>全局</i>選項卡。</string>
     <string name="new_app_bulk_notification_title">注意</string>
     <string name="cd_dialog_header">自訂網域：%1$s</string>
@@ -299,7 +299,7 @@
     <string name="lbbs_heading">配置逾 195 個攔截清單</string>
     <string name="firewall_rule_block_udp_ntp_desc">一項用戶定義的防火牆規則攔截了此 <i>UDP</i> 連線。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">此連線因<i>來源應用</i>被設爲<i>無條件放行</i>而放行。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
-    <string name="new_app_bulk_notification_content">RethinkDNS 攔截了 %1$s 款新應用。輕觸以查看或更改。</string>
+    <string name="new_app_bulk_notification_content">Rethink 攔截了 %1$s 款新應用。輕觸以查看或更改。</string>
     <string name="new_app_notification_action_toast_allow">放行應用網路連線</string>
     <string name="notif_dialog_pause_dialog_message">應用已被暫停，爲繼續請先恢復</string>
     <string name="notif_channel_desc_firewall_alerts">在防火牆錯誤與異常時提醒我</string>
@@ -320,9 +320,10 @@
     <string name="rbl_security">安全</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="rethink_max_desc">逾 50 處地點；更私密；於 fly.io 運行的遞歸解析服務</string>
-    <string name="settings_ip_dialog_ipv46">自動（實驗性）</string>
+    <string name="settings_ip_dialog_ipv46">自動（實驗性）
+\n發送連線檢查以確保網路可訪問性。</string>
     <string name="firewall_status_allow">已放行</string>
-    <string name="new_app_notification_content">RethinkDNS 攔截了新安裝的應用程式， %1$s 。</string>
+    <string name="new_app_notification_content">Rethink 攔截了新安裝的應用程式， %1$s 。</string>
     <string name="category_name_sys_apps">系統應用</string>
     <string name="category_name_others">其他</string>
     <string name="ci_dialog_title">添加 IP / 埠規則</string>
@@ -447,7 +448,7 @@
     <string name="settings_notification_desc3">無</string>
     <string name="settings_notification_dialog_option_1">"
 \n暫停 / 停止（默認）：
-\n顯示兩個按鈕來快速暫停與停止 RethinkDNS 。"</string>
+\n顯示兩個按鈕來快速暫停與停止 Rethink 。"</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + 防火牆：
 \n顯示兩個按鈕來快速在節電的 DNS 模式和普通的 DNS + 防火牆模式間切換。"</string>
@@ -477,9 +478,9 @@
     <string name="hsf_uptime">（自%1$s啓動；協定：%2$s；類型：%3$s）</string>
     <string name="hsf_downtime">（自%1$s起停用）</string>
     <string name="hsf_vpn_dialog_header">注意！</string>
-    <string name="hsf_vpn_dialog_message">RethinkDNS 需要設定本地 VPN 的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。
+    <string name="hsf_vpn_dialog_message">Rethink 需要設定本地 VPN 的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。
 \n
-\nRethinkDNS 並不會收集任何資料，且不會以任何方式監視您。</string>
+\nRethink 並不會收集任何資料，且不會以任何方式監視您。</string>
     <string name="hsf_vpn_dialog_positive">繼續</string>
     <string name="hsf_vpn_prepare_failure">可能是丟失 VPN 權限，亦可能是另一應用正處於永久連線 VPN 模式中。</string>
     <string name="hsf_start_dialog_message">您距安全的 Android 系統僅有一步之遙：即時查看網路活動，攔截網站、 IP 與不聽話的應用。</string>
@@ -493,8 +494,8 @@
     <string name="hsf_whats_new_remove_text">關閉中……</string>
     <string name="hsf_blocklist_updating_text">啓動中……</string>
     <string name="hsf_chip_appearance">主題：%1$s</string>
-    <string name="hsf_pause_vpn_failure">無法暫停： RethinkDNS 未啓用</string>
-    <string name="hsf_pause_lockdown_failure">無法暫停： RethinkDNS 正使用閉關模式</string>
+    <string name="hsf_pause_vpn_failure">無法暫停： Rethink 未激活</string>
+    <string name="hsf_pause_lockdown_failure">無法暫停： Rethink 正處於閉關模式</string>
     <string name="dc_block_heading">規則</string>
     <string name="dc_other_dns_heading">類型</string>
     <string name="dc_other_settings_heading">進階</string>
@@ -505,11 +506,11 @@
     <string name="dc_custom_block_heading">網域規則</string>
     <string name="dc_dns_website_heading">於 DNS 日誌中展示網站圖示（實驗性）</string>
     <string name="dc_dns_website_desc">從 <i>nextdns.io</i> 與 <i>duckduckgo.com</i> 獲取網站圖示。約佔用 350 MB 磁碟空間</string>
-    <string name="dc_dns_leaks_desc">若啓用， RethinkDNS 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
+    <string name="dc_dns_leaks_desc">若啓用， Rethink 將捕獲埠 53 上的所有數據包，並將其轉送至您設定的 DNS 端點</string>
     <string name="dc_check_update_heading">攔截清單更新時提示</string>
     <string name="dc_check_update_desc">每<i>三</i>天檢查有無攔截清單更新</string>
-    <string name="about_bravedns_explantion">RethinkDNS 是在 Android 裝置上最易使用的監測網路活動、繞過互聯網審查與攔截應用程式的防火牆軟體。</string>
-    <string name="about_bravedns_whoarewe">RethinkDNS 是一項自由且開放原始碼的專案，由來自亞馬遜、 IBM 與 Scientific Games 的前工程師領導。</string>
+    <string name="about_bravedns_explantion">Rethink 是在 Android 裝置上最易使用的監測網路活動、繞過互聯網審查與攔截應用程式的防火牆軟體。</string>
+    <string name="about_bravedns_whoarewe">Rethink 是一項自由且開放原始碼的專案，由來自亞馬遜、 IBM 與 Scientific Games 的前工程師領導。</string>
     <string name="about_bravedns_toreport_text">幫助與反饋</string>
     <string name="about_bug_report_desc">電郵傳送崩潰日誌</string>
     <string name="about_join_telegram">Telegram</string>
@@ -533,14 +534,14 @@
     <string name="about_settings_notification">通知設定</string>
     <string name="about_whats_new">%1$s 的新內容</string>
     <string name="about_twitter">在 Twitter 上追蹤我們</string>
-    <string name="about_mozilla">RethinkDNS 爲 Mozilla Builders MVP 計劃的一部分。</string>
+    <string name="about_mozilla">Rethink 爲 Mozilla Builders MVP 計劃的一部分。</string>
     <string name="about_app_update_check">檢查應用更新</string>
     <string name="about_app_contributors">作者</string>
     <string name="about_dialog_positive_button">一起出發</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_to_string">mailto:</string>
-    <string name="about_mail_subject">[RethinkDNS]:</string>
-    <string name="about_mail_bugreport_subject">[RethinkDns]: Bug report</string>
+    <string name="about_mail_subject">[Rethink]:</string>
+    <string name="about_mail_bugreport_subject">[Rethink]: Bug report</string>
     <string name="about_mail_bugreport_text">將此封電郵發送至： hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title">選擇電郵供應商</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
@@ -698,8 +699,8 @@
     <string name="settings_local_blocklist_in_use">正使用 %1$s 個攔截清單</string>
     <string name="settings_local_blocklist_dialog_positive">下載</string>
     <string name="settings_local_blocklist_version">版本： v%1$s</string>
-    <string name="accessibility_notification_content">RethinkDNS 的無障礙服務已停止或崩潰。現已不再攔截背景應用。輕觸以重新啓用。</string>
-    <string name="accessibility_failure_toast">RethinkDNS 的無障礙服務已停止或崩潰。現已不再攔截背景應用。</string>
+    <string name="accessibility_notification_content">Rethink 的無障礙服務已停止或崩潰。現已不再攔截背景應用。輕觸以重新啓用。</string>
+    <string name="accessibility_failure_toast">Rethink 的無障礙服務已停止或崩潰。現已不再攔截背景應用。</string>
     <string name="coming_soon_toast">即將推出</string>
     <string name="pause_text">已暫停</string>
     <string name="pause_desc">注意： %1$s 個已攔截的應用將會繼續被攔截。</string>
@@ -738,7 +739,7 @@
     <string name="brbs_restore_dialog_message">從單個備份檔案中恢復應用設定、網路日誌與 DNS 日誌。這將重啓應用。</string>
     <string name="hsf_start_dialog_header">啓動 %1$s</string>
     <string name="dc_dns_leaks_heading">防止 DNS 洩漏</string>
-    <string name="settings_notification_desc">與 RethinkDNS 的通知一同顯示的行爲按鈕：%1$s</string>
+    <string name="settings_notification_desc">與 Rethink 的通知一同顯示的行爲按鈕：%1$s</string>
     <string name="about_privacy_policy">閱覽隱私政策</string>
     <string name="hsf_notification_permission_failure">於設定區啓用通知權限</string>
     <string name="ada_firewall_title">此應用防火牆規則</string>
@@ -777,7 +778,7 @@
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s 個攔截清單</string>
     <string name="settings_locale_desc">選擇您的語言</string>
     <string name="settings_locale_dialog_title">選擇您的語言</string>
-    <string name="hs_biometeric_desc">使用生物識別驗證解鎖 RethinkDNS</string>
+    <string name="hs_biometeric_desc">使用生物識別驗證解鎖 Rethink</string>
     <string name="hs_biometeric_failed">生物識別認證失敗</string>
     <string name="fapps_info_unmetered_msg">於非計費網路（ WiFi ）放行/攔截。</string>
     <string name="fapps_info_exclude_msg">於 DNS 與防火牆中排除。</string>
@@ -851,7 +852,7 @@
     <string name="firewall_card_universal_rules" translatable="true">%1$s 項通用規則</string>
     <string name="logs_card_network_count" translatable="true">%1$s 個連線</string>
     <string name="logs_card_dns_count" translatable="true">%1$s 個查詢</string>
-    <string name="cd_dns_alg_desc" translatable="true">僅在應用連線時套用應用規則</string>
+    <string name="cd_dns_alg_desc" translatable="true">爲 DNS 請求指定唯一 IP</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">資料包捕獲已禁用</string>
     <string name="cd_dns_alg_heading" translatable="true">進階 DNS 過濾（實驗性）</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">資料包捕獲已啓用</string>
@@ -868,4 +869,10 @@
     <string name="dc_setting_dns_cache_desc" translatable="true">合併請求、快取應答、彈性應對錯誤</string>
     <string name="ada_app_firewall" translatable="true">防火牆</string>
     <string name="brbs_backup_restore_desc" translatable="true">無法跨版本跨設備使用</string>
+    <string name="lbl_maybe_blocked" translatable="true">或已攔截</string>
+    <string name="settings_allow_lan_heading" translatable="true">勿路由專有 IP （實驗性）</string>
+    <string name="settings_allow_lan_desc" translatable="true">將 LAN 、環回與本地鏈路路由排除於 Rethink 的 VPN 隧道外。</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s 僅於 Rethink 的 DNS 上生效</string>
+    <string name="lbl_network" translatable="true">網路</string>
+    <string name="trusted_domains_desc" translatable="true">信任網域規則僅於 <u>Rethink 的 DNS</u> 生效。</string>
 </resources>
