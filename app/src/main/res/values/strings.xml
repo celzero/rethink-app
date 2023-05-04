@@ -663,8 +663,8 @@
     <string name="about_mozilla_alumni_link" translatable="false">https://builders.mozilla.community/alumni.html</string>
     <string name="about_translate_link" translatable="false">https://svc.rethinkdns.com/r/translate</string>
     <string name="about_privacy_policy_link" translatable="false">https://www.rethinkdns.com/privacy</string>
-    <string name="about_version" translatable="true">v%1$s</string>
-    <string name="about_version_install_source" translatable="true">v%1$s (%2$s)</string>
+    <string name="about_version" translatable="false">%1$s</string> <!-- remove this string name="about_version" translatable="false">v%1$s</string> -->
+    <string name="about_version_install_source" translatable="false">%1$s (%2$s)</string>
     <string name="about_dialog_neutral_button" translatable="true">Suggest features</string>
 
     <string name="app_info_error" translatable="true">Could not launch App info.</string>

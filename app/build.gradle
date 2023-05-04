@@ -89,6 +89,10 @@ android {
         }
         full {
             dimension "releaseType"
+            // getPackageInfo().versionCode not returning the correct value (in prod builds) when
+            // value is set in AndroidManifest.xml so setting it here
+            versionCode=28
+            versionName="v054b"
         }
     }
 
