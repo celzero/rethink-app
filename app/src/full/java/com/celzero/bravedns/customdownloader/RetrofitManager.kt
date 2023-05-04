@@ -18,13 +18,13 @@ package com.celzero.bravedns.customdownloader
 import android.util.Log
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
-import java.net.InetAddress
-import java.util.concurrent.TimeUnit
 
 class RetrofitManager {
 
@@ -40,7 +40,7 @@ class RetrofitManager {
         fun getBlocklistBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient(dnsType).newBuilder().build())
+                .client(okHttpClient(dnsType))
         }
 
         fun okHttpClient(dnsType: OkHttpDnsType): OkHttpClient {
@@ -50,17 +50,17 @@ class RetrofitManager {
             b.writeTimeout(5, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
-            customDns(dnsType)?.let { b.dns(it) }
+            customDns(dnsType, b.build())?.let { b.dns(it) }
             return b.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
-        private fun customDns(dnsType: OkHttpDnsType): Dns? {
+        private fun customDns(dnsType: OkHttpDnsType, bootstrapClient: OkHttpClient): Dns? {
             try {
                 when (dnsType) {
                     OkHttpDnsType.DEFAULT -> {
                         return DnsOverHttps.Builder()
-                            .client(OkHttpClient().newBuilder().build())
+                            .client(bootstrapClient)
                             .url("https://dns.quad9.net/dns-query".toHttpUrl())
                             .bootstrapDnsHosts(
                                 getByIp("9.9.9.9"),
@@ -73,7 +73,7 @@ class RetrofitManager {
                     }
                     OkHttpDnsType.CLOUDFLARE -> {
                         return DnsOverHttps.Builder()
-                            .client(OkHttpClient().newBuilder().build())
+                            .client(bootstrapClient)
                             .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
                             .bootstrapDnsHosts(
                                 getByIp("1.1.1.1"),
@@ -86,7 +86,7 @@ class RetrofitManager {
                     }
                     OkHttpDnsType.GOOGLE -> {
                         return DnsOverHttps.Builder()
-                            .client(OkHttpClient().newBuilder().build())
+                            .client(bootstrapClient)
                             .url("https://dns.google/dns-query".toHttpUrl())
                             .bootstrapDnsHosts(
                                 getByIp("8.8.8.8"),

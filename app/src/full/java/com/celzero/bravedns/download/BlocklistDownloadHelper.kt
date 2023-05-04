@@ -156,7 +156,7 @@ class BlocklistDownloadHelper {
                         timestamp,
                         vcode
                     )
-
+                Log.i(LOG_TAG_DOWNLOAD, "downloadAvailabilityCheck: $response, $retryCount, $vcode, $timestamp")
                 if (response?.isSuccessful == true) {
                     val r = response.body()?.toString()?.let { JSONObject(it) }
                     return processCheckDownloadResponse(r)
@@ -164,6 +164,7 @@ class BlocklistDownloadHelper {
                     retryIfRequired(timestamp, vcode, retryCount)
                 }
             } catch (ignored: Exception) {
+                Log.w(LOG_TAG_DOWNLOAD, "exception in checkBlocklistUpdate: ${ignored.message}", ignored)
                 retryIfRequired(timestamp, vcode, retryCount)
             }
             return null
