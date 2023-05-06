@@ -72,10 +72,6 @@ import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
 import ipn.Ipn
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Controller
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -83,6 +79,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Controller
 
 class BraveVPNService :
     VpnService(),
@@ -1366,6 +1366,7 @@ class BraveVPNService :
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.INTERNET_PROTOCOL -> {
+                connectionMonitor?.onUserPreferenceChanged()
                 io("Internet-protocol-change") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROTOCOL_TRANSLATION -> {
@@ -1832,11 +1833,17 @@ class BraveVPNService :
                     }
                     return false
                 } else {
-                    val activeNetwork = underlyingNetworks?.allNet?.first()
+                    val activeNetwork = connectivityManager.activeNetwork ?: return false
                     underlyingNetworks?.ipv6Net?.forEach {
-                        if (it.network == activeNetwork) return true
+                        if (it.network == activeNetwork && it.isReachable) {
+                            Log.i(
+                                LOG_TAG_VPN,
+                                "Active network is reachable for IPv6: ${it.network.networkHandle}, ${activeNetwork.networkHandle}"
+                            )
+                            return true
+                        }
                     }
-                    false
+                    return false
                 }
             }
         }
@@ -1881,13 +1888,13 @@ class BraveVPNService :
                     }
                     return false
                 } else {
-                    val activeNetwork = underlyingNetworks?.allNet?.first()
+                    val activeNetwork = connectivityManager.activeNetwork ?: return false
                     underlyingNetworks?.ipv4Net?.forEach {
                         Log.i(
                             LOG_TAG_VPN,
                             "IPv4 network: ${it.network.networkHandle}, ${it.isReachable}"
                         )
-                        if (it.network == activeNetwork) {
+                        if (it.network == activeNetwork && it.isReachable) {
                             Log.i(LOG_TAG_VPN, "IPv4 network is reachable")
                             return true
                         }
@@ -2084,9 +2091,8 @@ class BraveVPNService :
             Dnsx.Alg
         } else {
             // if the domain is not trusted and no app is bypassed then return preferred or
-            // CT+preferred
-            // so that if the domain is blocked by upstream then no need to do any further
-            // processing
+            // CT+preferred so that if the domain is blocked by upstream then no need to do
+            // any further processing
             getPreferredTransportId()
         }
     }

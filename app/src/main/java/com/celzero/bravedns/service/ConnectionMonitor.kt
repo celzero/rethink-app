@@ -30,9 +30,11 @@ import android.os.SystemClock
 import android.system.OsConstants.RT_SCOPE_UNIVERSE
 import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
@@ -40,7 +42,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.TimeUnit
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
@@ -72,11 +73,16 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         const val MSG_LINK_PROPERTY = 3
     }
 
+    // data class that holds the below information for handlers to process the link properties
+    // changes
     data class NetworkLinkProperties(
         val network: Network,
         val linkProperties: LinkProperties,
-        val useActive: Boolean
+        val isAuto: Boolean
     )
+
+    // data class that holds the below information for handlers to process the network changes
+    data class HandlerObj(val isForceUpdate: Boolean, val isAuto: Boolean)
 
     init {
         try {
@@ -141,15 +147,18 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      */
     fun onVpnStart() {
         Log.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
+        val isAuto = InternetProtocol.isAuto(persistentState.internetProtocolType)
         handleNetworkChange(isForceUpdate = true)
     }
 
     private fun handleNetworkChange(isForceUpdate: Boolean = false) {
+        val isAuto = InternetProtocol.isAuto(persistentState.internetProtocolType)
         val message =
             constructNetworkMessage(
                 if (persistentState.useMultipleNetworks) MSG_ADD_ALL_NETWORKS
                 else MSG_ADD_ACTIVE_NETWORK,
-                isForceUpdate
+                isForceUpdate,
+                isAuto
             )
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
@@ -158,13 +167,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
     private fun handlePropertyChange(network: Network, linkedProperties: LinkProperties) {
         // negate useMultipleNetworks so that the message obj has use active network
+        val isAuto = InternetProtocol.isAuto(persistentState.internetProtocolType)
         val message =
-            constructLinkedPropertyMessage(
-                MSG_LINK_PROPERTY,
-                network,
-                linkedProperties,
-                !persistentState.useMultipleNetworks
-            )
+            constructLinkedPropertyMessage(MSG_LINK_PROPERTY, network, linkedProperties, isAuto)
         serviceHandler?.removeMessages(MSG_LINK_PROPERTY, null)
         serviceHandler?.sendMessage(message)
     }
@@ -173,10 +178,15 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
      * Constructs the message object for Network handler. Add the active network to the message
      * object in case of setUnderlying network has only active networks.
      */
-    private fun constructNetworkMessage(what: Int, isForceUpdate: Boolean): Message {
+    private fun constructNetworkMessage(
+        what: Int,
+        isForceUpdate: Boolean,
+        isAuto: Boolean
+    ): Message {
+        val handlerObj = HandlerObj(isForceUpdate, isAuto)
         val message = Message.obtain()
         message.what = what
-        message.obj = isForceUpdate
+        message.obj = handlerObj
         return message
     }
 
@@ -230,15 +240,15 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         override fun handleMessage(msg: Message) {
             // isForceUpdate - true if onUserPreferenceChanged is changes, the messages should be
             // processed forcefully regardless of the current and new networks.
-            val isForceUpdate: Boolean
+            val handlerObj: HandlerObj
             when (msg.what) {
                 MSG_ADD_ACTIVE_NETWORK -> {
-                    isForceUpdate = msg.obj as Boolean
-                    processActiveNetwork(isForceUpdate)
+                    handlerObj = msg.obj as HandlerObj
+                    processActiveNetwork(handlerObj)
                 }
                 MSG_ADD_ALL_NETWORKS -> {
-                    isForceUpdate = msg.obj as Boolean
-                    processAllNetworks(isForceUpdate)
+                    handlerObj = msg.obj as HandlerObj
+                    processAllNetworks(handlerObj)
                 }
                 MSG_LINK_PROPERTY -> {
                     val netProps = msg.obj as NetworkLinkProperties
@@ -251,7 +261,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
          * tracks the changes in active network. Set the underlying network if the current active
          * network is different from already assigned one unless the force update is required.
          */
-        private fun processActiveNetwork(isForceUpdate: Boolean) {
+        private fun processActiveNetwork(handlerObj: HandlerObj) {
             val newActiveNetwork = connectivityManager.activeNetwork
             val networkCapabilities = connectivityManager.getNetworkCapabilities(newActiveNetwork)
             // set active network's connection status
@@ -268,18 +278,18 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                                     networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "Cellular"
                                     else -> "Unknown"
                                 }
-                            }, Is new network? $isNewNetwork, is force update? $isForceUpdate"
+                            }, Is new network? $isNewNetwork, is force update? ${handlerObj.isForceUpdate}, is auto? ${handlerObj.isAuto}"
             )
 
-            if (isNewNetwork || isForceUpdate) {
+            if (isNewNetwork || handlerObj.isForceUpdate) {
                 currentNetworks = newNetworks
-                repopulateTrackedNetworks(useActive = true, currentNetworks)
+                repopulateTrackedNetworks(handlerObj.isAuto, currentNetworks)
                 informListener(requireAllNetworks = false, isActiveNetworkMetered)
             }
         }
 
         /** Adds all the available network to the underlying network. */
-        private fun processAllNetworks(isForceUpdate: Boolean) {
+        private fun processAllNetworks(handlerObj: HandlerObj) {
             val newActiveNetwork = connectivityManager.activeNetwork
             // set active network's connection status
             val isActiveNetworkMetered = isConnectionMetered()
@@ -288,12 +298,12 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
             Log.i(
                 LOG_TAG_CONNECTION,
-                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks},${newNetworks}. isNewNetwork: $isNewNetwork, force update is $isForceUpdate"
+                "process message MESSAGE_AVAILABLE_NETWORK, ${currentNetworks},${newNetworks}. isNewNetwork: $isNewNetwork, force update is ${handlerObj.isForceUpdate}, is auto? ${handlerObj.isAuto}"
             )
 
-            if (isNewNetwork || isForceUpdate) {
+            if (isNewNetwork || handlerObj.isForceUpdate) {
                 currentNetworks = newNetworks
-                repopulateTrackedNetworks(useActive = false, currentNetworks)
+                repopulateTrackedNetworks(handlerObj.isAuto, currentNetworks)
 
                 informListener(requireAllNetworks = true, isActiveNetworkMetered)
             }
@@ -336,7 +346,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         private fun processLinkPropertyChange(networkLinkProperties: NetworkLinkProperties) {
             val linkProperties = networkLinkProperties.linkProperties
             val network = networkLinkProperties.network
-            val useActive = networkLinkProperties.useActive
+            val isAuto = networkLinkProperties.isAuto
 
             // do not add network if there is no internet/is VPN
             if (hasInternet(network) == false || isVPN(network) == true) {
@@ -345,7 +355,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
             linkProperties.linkAddresses.forEach {
                 // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
-                if (it.scope != RT_SCOPE_UNIVERSE) return@forEach
+                // if auto mode is enabled, do not check for RT_SCOPE_UNIVERSE as we are checking
+                // reachability of the network
+                if (!isAuto && it.scope != RT_SCOPE_UNIVERSE) return@forEach
 
                 val address = IPAddressString(it.address.hostAddress?.toString())
 
@@ -353,16 +365,16 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     trackedIpv6Networks.add(
                         NetworkIcmpProperty(
                             network,
-                            // isReachable is not used when useActive is true
-                            if (useActive) true else checkIpv6Reachability(network)
+                            // if auto mode is enabled, check for ipv6 reachability
+                            if (isAuto) checkIpv6Reachability(network) else true
                         )
                     )
                 } else {
                     trackedIpv4Networks.add(
                         NetworkIcmpProperty(
                             network,
-                            // isReachable is not used when useActive is true
-                            if (useActive) true else checkIpv4Reachability(network)
+                            // if auto mode is enabled, check for ipv4 reachability
+                            if (isAuto) checkIpv4Reachability(network) else true
                         )
                     )
                 }
@@ -370,7 +382,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         }
 
         private fun repopulateTrackedNetworks(
-            useActive: Boolean,
+            isAuto: Boolean,
             networkIcmpProperties: LinkedHashSet<Network>
         ) {
             val ipv6: MutableSet<NetworkIcmpProperty> = mutableSetOf()
@@ -382,7 +394,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
                 linkProperties.linkAddresses.forEach inner@{ prop ->
                     // fixme: remove RT_SCOPE_UNIVERSE check once ICMP handling is added; see: #553
-                    if (prop.scope != RT_SCOPE_UNIVERSE) return@inner
+                    // if auto mode is enabled, do not check for RT_SCOPE_UNIVERSE as we are
+                    // checking reachability of the network
+                    if (!isAuto && prop.scope != RT_SCOPE_UNIVERSE) return@inner
 
                     val address = IPAddressString(prop.address.hostAddress?.toString())
 
@@ -390,16 +404,16 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         ipv6.add(
                             NetworkIcmpProperty(
                                 property,
-                                // isReachable is not used when useActive is true
-                                if (useActive) true else checkIpv6Reachability(property)
+                                // if auto mode is enabled, check for ipv4 reachability
+                                if (isAuto) checkIpv6Reachability(property) else true
                             )
                         )
                     } else {
                         ipv4.add(
                             NetworkIcmpProperty(
                                 property,
-                                // isReachable is not used when useActive is true
-                                if (useActive) true else checkIpv4Reachability(property)
+                                // if auto mode is enabled, check for ipv4 reachability
+                                if (isAuto) checkIpv4Reachability(property) else true
                             )
                         )
                     }
