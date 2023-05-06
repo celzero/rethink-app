@@ -17,7 +17,7 @@
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="about_dialog_neutral_button">Sugerir características</string>
-    <string name="about_mail_bugreport_subject">[RethinkDns]: Informe de errores</string>
+    <string name="about_mail_bugreport_subject">[Rethink]: Informe de errores</string>
     <string name="about_mail_bugreport_share_title">Seleccione el proveedor de correo electrónico</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
@@ -37,15 +37,15 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;¡Supercargado!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva función&lt;/i&gt;: filtrado de DNS avanzado; aplica reglas de dominio sólo cuando las aplicaciones se conectan.&lt;br/&gt; 2. &lt;i&gt;Nueva función&lt;/i&gt;: Permitir o denegar dominios por aplicación.&lt;br/&gt; 3. &lt;i&gt;Nueva función&lt;/i&gt;: Permitir o denegar dominios para todas las aplicaciones.&lt;br/&gt; 4. &lt;i&gt;Nueva función&lt;/i&gt;: Omitir las reglas de DNS y cortafuegos por aplicación.&lt;br/&gt; 5. &lt;i&gt;Nueva función&lt;/i&gt;: Captura de paquetes (PCAP).&lt;br/&gt; 6. &lt;i&gt;Nueva función&lt;/i&gt;: Refuerzo DNS; fusiona peticiones, cachea respuestas.&lt;br/&gt; 7. &lt;i&gt;Nueva función&lt;/i&gt;: Editar reglas de dominio e IP.&lt;br/&gt; 8. Y otros cambios menores en la interfaz de usuario y corrección de errores.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
-    <string name="dc_dns_leaks_desc">Cuando está activado, RethinkDNS captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
+    <string name="whats_new_version_update">&lt;b&gt;¡Fiesta en la red local!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva función&lt;/i&gt;: Excluir IPs Privadas (LAN / link-local).&lt;br/&gt; 2. Hacer que funcione el ajuste Omitir DNS y Cortafuegos.&lt;br/&gt; 3. Mostrar posibles bloqueos en los registros DNS para los dominios que pueden estar bloqueados por el cortafuegos.&lt;br/&gt; 4. Mostrar icono adaptativo cuando sea compatible.&lt;br/&gt; 5. Avisos de autenticación biométrica una vez cada 15 minutos.&lt;br/&gt; 6. Otras mejoras en la interfaz de usuario y el rendimiento.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
     <string name="about_settings_vpn_profile">Perfil de la VPN</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="always_on_dialog_heading">Desactivar la VPN siempre activa</string>
     <string name="always_on_dialog_stop_heading">VPN siempre activa</string>
-    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS está ejecutando la VPN en el modo <i>Aislamiento</i>. Si se detiene, se perderá la conectividad a Internet en este perfil de usuario. ¿Desea continuar de todas formas\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink está ejecutando la VPN en modo <i>Aislamiento</i>. Detenerlo provocaría la pérdida de conectividad a Internet en este perfil de usuario. ¿Desea continuar de todas formas\?</string>
     <string name="firewall_act_universal_tab">universal</string>
     <string name="always_on_dialog_neutral">Ajustes</string>
     <string name="univ_firewall_dialog_title">¿Borrar la regla IP\?</string>
@@ -82,7 +82,8 @@
     <string name="settings_dns_proxy_dialog_password">Contraseña</string>
     <string name="settings_dns_proxy_dialog_positive_btn">configurar</string>
     <string name="settings_socks5_dialog_hint_port">Puerto</string>
-    <string name="settings_ip_dialog_ipv46">Automático (en pruebas)</string>
+    <string name="settings_ip_dialog_ipv46">Auto (experimental)
+\nse envían comprobaciones de conectividad para determinar la accesibilidad.</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_ip_text_ipv46">Automático</string>
     <string name="settings_theme_dialog_themes_4">Negro</string>
@@ -92,7 +93,7 @@
     <string name="settings_notification_desc2">DNS / DNS + Cortafuegos</string>
     <string name="settings_selected_ip_desc">%1$s</string>
     <string name="settings_notification_heading">Elija la acción de notificación</string>
-    <string name="settings_notification_desc">Botones de acción para mostrar con la notificación de RethinkDNS: %1$s</string>
+    <string name="settings_notification_desc">Botones de acción para mostrar con la notificación de Rethink: %1$s</string>
     <string name="firewall_status_whitelisted">omite las reglas universales del cortafuegos</string>
     <string name="firewall_status_isolate">aislada</string>
     <string name="settings_protocol_translation_dns_inactive">Cambie al modo DNS/DNS+Cortafuegos para activar esta configuración</string>
@@ -103,17 +104,17 @@
     <string name="firewall_status_block_metered">bloqueado en redes con límites (móvil)</string>
     <string name="firewall_status_unknown">desconocido</string>
     <string name="ct_bs_app_info_error">Información de la aplicación no encontrada</string>
-    <string name="hsf_vpn_dialog_message">RethinkDNS necesita permiso para configurar una VPN local para cifrar las solicitudes de DNS del dispositivo, implementar un monitor de red y aplicar las reglas del cortafuegos.
+    <string name="hsf_vpn_dialog_message">Rethink necesita permiso para configurar una VPN local para cifrar las solicitudes de DNS del dispositivo, implementar un monitor de red y aplicar las reglas del cortafuegos.
 \n
-\nRethinkDNS no recoge ninguna información ni te espía de ninguna manera.</string>
+\nRethink no recoge ninguna información ni le espía de ninguna manera.</string>
     <string name="dc_local_block_heading">Listas de bloqueo en el dispositivo</string>
     <string name="dc_local_block_desc_1">Elija entre más de 195 listas de bloqueo. Pulse aquí para descargar o configurar las listas de bloqueo.</string>
     <string name="dc_custom_block_heading">Reglas de dominio</string>
     <string name="dc_check_update_heading">Aviso sobre las actualizaciones de la lista de bloqueo</string>
-    <string name="about_bravedns_whoarewe">RethinkDNS es un proyecto gratuito y de código abierto, dirigido por exingenieros de Amazon, IBM y Scientific Games.</string>
+    <string name="about_bravedns_whoarewe">Rethink es un proyecto gratuito y de código abierto, dirigido por ex-ingenieros de Amazon, IBM y Scientific Games.</string>
     <string name="about_bravedns_toreport_text">ayuda y comentarios</string>
     <string name="about_bug_report_desc">Registros de fallos del correo electrónico</string>
-    <string name="about_bravedns_explantion">RethinkDNS es la forma más sencilla de supervisar la actividad de las aplicaciones, eludir la censura en Internet y utilizar cortafuegos en su dispositivo Android.</string>
+    <string name="about_bravedns_explantion">Rethink es la forma más sencilla de supervisar la actividad de las aplicaciones, eludir la censura en Internet y utilizar cortafuegos en su dispositivo Android.</string>
     <string name="about_bug_no_log_dialog_message">No se han podido obtener los registros de fallos. ¿Quiere informar manualmente de su error\?</string>
     <string name="about_privacy_policy">Normativa de privacidad</string>
     <string name="about_connect">contacto</string>
@@ -152,7 +153,7 @@
     <string name="universal_firewall_explanation">Aplique reglas de cortafuegos en todas las aplicaciones en función de los eventos del dispositivo, p.ej., bloqueándolas cuando el dispositivo está bloqueado o cuando una determinada aplicación no está en uso.</string>
     <string name="notification_action_resume_vpn">REANUDAR</string>
     <string name="notification_action_pause_vpn">PAUSAR</string>
-    <string name="notification_action_stop_vpn">PARAR</string>
+    <string name="notification_action_stop_vpn">DETENER</string>
     <string name="notification_action_dns_mode">DNS</string>
     <string name="notification_action_dns_firewall_mode">DNS + Cortafuegos</string>
     <string name="dns_mode_info_title">DNS</string>
@@ -270,8 +271,8 @@
     <string name="update_complete_action_snack">REINICIAR</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueo en uso</string>
     <string name="settings_local_blocklist_dialog_positive">Descargar</string>
-    <string name="accessibility_notification_content">El servicio de accesibilidad de RethinkDNS se ha detenido o ha fallado. Ya no bloquea las aplicaciones en segundo plano. Pulse para volver a activarlo.</string>
-    <string name="accessibility_failure_toast">El servicio de accesibilidad de RethinkDNS se ha detenido o ha fallado. Ya no se bloquean las aplicaciones en segundo plano.</string>
+    <string name="accessibility_notification_content">El servicio de accesibilidad de Rethink se ha detenido o ha fallado. Ya no bloquea las aplicaciones en segundo plano. Pulse para volver a activarlo.</string>
+    <string name="accessibility_failure_toast">El servicio de accesibilidad de Rethink se ha detenido o ha fallado. Ya no se bloquean las aplicaciones en segundo plano.</string>
     <string name="coming_soon_toast">próximamente</string>
     <string name="pause_text">pausado</string>
     <string name="pause_desc">Nota: %1$s de las aplicaciones bloqueadas seguirán siendo supervisadas por el cortafuegos.</string>
@@ -302,13 +303,13 @@
     <string name="firewall_rule_block_ip_desc">Una regla del cortafuegos activada por el usuario ha bloqueado la <i>IP destino</i> .<br/><br/> Para cambiarla vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.</string>
     <string name="firewall_rule_foreground_desc">Esta conexión estaba bloqueada porque la aplicación de origen <i>no esta en primer plano</i>.<br/><br/> Para cambiar este comportamiento vaya a la pestaña <i>Universal</i>.</string>
     <string name="firewall_rule_unknown_desc">Esta conexión fue bloqueada porque no se pudo determinar la <i>aplicación de origen</i>.<br/><br/> Para cambiar este comportamiento, vaya a la pestaña <i>Universal</i>.</string>
-    <string name="new_app_bulk_notification_content">RethinkDNS bloqueó %1$s nuevas aplicaciones. Pulse para ver o modificar.</string>
-    <string name="new_app_notification_content">RethinkDNS bloqueó la aplicación recientemente instalada, %1$s.</string>
+    <string name="new_app_bulk_notification_content">Rethink bloqueó %1$s nuevas aplicaciones. Pulse para ver o modificar.</string>
+    <string name="new_app_notification_content">Rethink bloqueó la aplicación recientemente instalada, %1$s.</string>
     <string name="notif_channel_vpn_failure">VPN inactiva</string>
     <string name="notif_channel_vpn_notification">VPN activa</string>
     <string name="new_app_notification_action_toast_deny">Conexión de red denegada para la aplicación</string>
-    <string name="notif_channel_desc_vpn_failure">Informar cuando RethinkDNS es detenido por Android o por otra aplicación VPN</string>
-    <string name="notif_channel_desc_vpn_notification">Informar cuando RethinkDNS está activo y funcionando en segundo plano</string>
+    <string name="notif_channel_desc_vpn_failure">Informar cuando Rethink es detenido por Android o por otra aplicación VPN</string>
+    <string name="notif_channel_desc_vpn_notification">Informar cuando Rethink está activo y funcionando en segundo plano</string>
     <string name="notif_channed_desc_download">Alerta sobre el progreso de la descarga para las listas de bloqueo en el dispositivo</string>
     <string name="category_name_sys_components">Componentes del sistema</string>
     <string name="notif_channel_desc_firewall_alerts">Alerta sobre errores y anomalías del cortafuegos</string>
@@ -434,7 +435,7 @@
     <string name="settings_enable_logs_desc">Almacenar los registros de DNS y Cortafuegos localmente en el dispositivo.</string>
     <string name="settings_enable_logs">Activar el registro en el dispositivo</string>
     <string name="app_mode_choose">Elija el modo</string>
-    <string name="whats_dialog_title">Novedades en la v054</string>
+    <string name="whats_dialog_title">Novedades en la v054b</string>
     <string name="settings_app_notification_a13_desc">Habilita el permiso de notificación para la aplicación</string>
     <string name="settings_theme_heading">Apariencia</string>
     <string name="settings_theme_desc">Tema oscuro/claro</string>
@@ -450,8 +451,8 @@
     <string name="settings_notification_desc3">Ninguno</string>
     <string name="settings_notification_dialog_title">Elija la acción de notificación</string>
     <string name="settings_notification_dialog_option_1">"
-\nPausar / Parar (por defecto):
-\nMuestra dos botones, para pausar y detener rápidamente RethinkDNS."</string>
+\nPausar / Detener (por defecto):
+\nMuestra dos botones, para pausar y detener rápidamente Rethink."</string>
     <string name="settings_notification_dialog_option_3">"
 \nNinguno:
 \nNo muestra ningún botón.
@@ -461,7 +462,7 @@
     <string name="dns_card_latency_inactive">Activar el modo DNS.</string>
     <string name="apps_card_ips_count">%1$s Reglas de IP y puerto</string>
     <string name="hsf_start_btn_state">iniciar</string>
-    <string name="hsf_stop_btn_state">parar</string>
+    <string name="hsf_stop_btn_state">detener</string>
     <string name="hsf_uptime">(activo %1$s; protos: %2$s; tipo: %3$s)</string>
     <string name="hsf_vpn_dialog_header">¡Atención!</string>
     <string name="hsf_vpn_dialog_positive">Proceder</string>
@@ -472,19 +473,19 @@
     <string name="hsf_start_dialog_positive">Iniciar</string>
     <string name="hsf_whats_new_chip_text">Novedades</string>
     <string name="hsf_proxy_chip_text">Proxy activo</string>
-    <string name="hsf_pause_lockdown_failure">No se puede pausar: RethinkDNS está en modo de aislamiento</string>
-    <string name="hsf_blocklist_chip_text_no_data">Activar RethinkDNS+</string>
+    <string name="hsf_pause_lockdown_failure">No se puede pausar: Rethink está en modo de aislamiento</string>
+    <string name="hsf_blocklist_chip_text_no_data">Activar RDNS+</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy eliminado</string>
     <string name="hsf_proxy_chip_remove_text">Parando…</string>
     <string name="hsf_whats_new_remove_text">Cerrando…</string>
     <string name="hsf_blocklist_updating_text">Activando…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
-    <string name="hsf_pause_vpn_failure">No se puede pausar: RethinkDNS no está activo</string>
+    <string name="hsf_pause_vpn_failure">No se puede pausar: Rethink no está activo</string>
     <string name="dc_other_dns_heading">tipo</string>
     <string name="dc_custom_dns_radio">Otros DNS</string>
     <string name="hsf_exclude_error">La exclusión no es posible en el modo de aislamiento VPN</string>
     <string name="dc_dns_website_heading">Mostrar el icono del sitio web en los registros de DNS (en pruebas)</string>
-    <string name="dc_rethink_dns_radio">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_entries">%1$s entradas »</string>
     <string name="dc_dns_leaks_heading">Evitar las fugas de DNS</string>
     <string name="dc_check_update_desc">Comprueba las actualizaciones de la lista de bloqueo una vez cada <i>tres</i> días</string>
@@ -500,13 +501,13 @@
     <string name="about_sponsor_link_text">Patrocinadores</string>
     <string name="about_email">Envíenos un correo electrónico</string>
     <string name="about_settings_notification">Configuración de notificaciones</string>
-    <string name="about_mozilla">RethinkDNS forma parte del programa Mozilla Builders MVP.</string>
+    <string name="about_mozilla">Rethink forma parte del programa Mozilla Builders MVP.</string>
     <string name="about_app_update_check">Buscar actualizaciones de la aplicación</string>
     <string name="about_app_translate">Traducir</string>
     <string name="about_dialog_positive_button">Vamos</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_to_string">a:</string>
-    <string name="about_mail_subject">[RethinkDNS]:</string>
+    <string name="about_mail_subject">[Rethink]:</string>
     <string name="app_info_error">No se pudo iniciar la información de la aplicación.</string>
     <string name="vpn_profile_error">No se pudo iniciar el perfil VPN.</string>
     <string name="about_twitter">Síganos en Twitter</string>
@@ -624,7 +625,7 @@
     <string name="hsf_downtime">(inactivo desde %1$s)</string>
     <string name="fav_icon">icono_favorito</string>
     <string name="dns_connected_rethink_plus">Conectado. %1$s listas de bloqueo en uso</string>
-    <string name="settings_notification_desc1">Pausar / Parar (por defecto)</string>
+    <string name="settings_notification_desc1">Pausar / Detener (por defecto)</string>
     <string name="configure_dns_connected_dns_proxy_status">Proxy DNS</string>
     <string name="dc_block_heading">reglas</string>
     <string name="new_app_notification_action_deny">Seguir bloqueando</string>
@@ -656,14 +657,14 @@
     <string name="orbot_app_issue">No se puede lanzar Orbot. ¿Está instalado\?</string>
     <string name="orbot_stop_dialog_negative">Detener Orbot</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">fallando</string>
-    <string name="orbot_stop_dialog_dns_message">RethinkDNS está configurado para reenviar las consultas DNS a Orbot. Cámbielo según sea necesario.</string>
+    <string name="orbot_stop_dialog_dns_message">Rethink está configurado para reenviar las consultas DNS a Orbot. Cámbielo según sea necesario.</string>
     <string name="orbot_install_dialog_title">¿Instalar Orbot\?</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">Advertencia: RethinkDNS ha sido desactivado</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Advertencia: Rethink ha sido desactivado</string>
     <string name="hybrid_mode_notification_title">¡Protegido! Conectado mediante DNS + Cortafuegos.</string>
     <string name="settings_ptrans_desc">Traduce el tráfico IPv6 saliente a IPv4 en el dispositivo. Habilite esta opción si está conectado a una red de sólo IPv4.</string>
     <string name="orbot_bs_status_1">Reenviando las conexiones de %1$s a Orbot.</string>
     <string name="orbot_bs_status_2">El proxy HTTP está configurado (las aplicaciones pueden ignorarlo).</string>
-    <string name="settings_socks5_vpn_disabled_error">Inicie RethinkDNS para continuar.</string>
+    <string name="settings_socks5_vpn_disabled_error">Inicie Rethink para continuar.</string>
     <string name="pause_title_desc">esperando…</string>
     <string name="settings_network_all_networks">Utilizar todas las redes disponibles (en pruebas)</string>
     <string name="settings_https_heading">Configurar el proxy HTTP(S)</string>
@@ -675,7 +676,7 @@
     <string name="settings_ip_network_heading">Elija la versión de IP</string>
     <string name="orbot_install_dialog_message">Orbot lleva las características y funcionalidades de Tor a Android.</string>
     <string name="orbot_install_dialog_neutral">sitio web</string>
-    <string name="settings_autostart_bootup_desc">Al encender el dispositivo, inicia RethinkDNS si estaba funcionando antes de apagar.</string>
+    <string name="settings_autostart_bootup_desc">Al encender el dispositivo, se iniciará Rethink si se estaba ejecutando antes de apagarlo.</string>
     <string name="settings_check_update_desc">Comprueba automáticamente las actualizaciones de la aplicación una vez a la semana.</string>
     <string name="settings_https_desc">Esta configuración es sólo una recomendación y es posible que las aplicaciones la ignoren. Las aplicaciones que utilicen el proxy HTTP(S) omitirán las reglas del Cortafuegos y del DNS.</string>
     <string name="status_dns_error">error de dns</string>
@@ -687,11 +688,11 @@
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_title">Orbot y Proxies</string>
-    <string name="settings_allow_bypass_desc">Permitir que las aplicaciones que lo soliciten omitan el cortafuegos de RethinkDNS bajo demanda. Algunas aplicaciones de audio/vídeo conferencia como Zoom y WhatsApp pueden requerir una omisión bajo demanda para funcionar correctamente.</string>
-    <string name="settings_lock_down_mode_desc">No se puede permitir la omisión cuando la VPN se ejecuta en modo de aislamiento. <u>Vaya a la configuración de VPN</u>.</string>
+    <string name="settings_allow_bypass_desc">Permite a las aplicaciones solicitantes acceder a todas las redes disponibles. Estas aplicaciones pueden eludir el túnel VPN bajo demanda de Rethink. Algunas aplicaciones de audio/vídeo conferencia como Zoom y Meet pueden requerir esto para funcionar correctamente.</string>
+    <string name="settings_lock_down_mode_desc">Ciertas opciones están desactivadas cuando la VPN está en modo aislamiento. <u>Ver los ajustes de la VPN</u>.</string>
     <string name="settings_ip_network_desc">Elija entre las versiones del Protocolo de Internet.</string>
     <string name="orbot_none">Ninguna (por defecto)</string>
-    <string name="orbot_stop_dialog_message">RethinkDNS ha dejado de reenviar conexiones a Orbot, pero Orbot puede estar funcionando en segundo plano.</string>
+    <string name="orbot_stop_dialog_message">Rethink ha dejado de reenviar conexiones a Orbot, pero Orbot podría estar funcionando en segundo plano.</string>
     <string name="settings_orbot_desc">Orbot en modo no-vpn con HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc">Pulse aquí para instalar Orbot</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
@@ -708,19 +709,19 @@
     <string name="settings_general_header">general</string>
     <string name="settings_ptrans_heading">Forzar la salida de IPv4</string>
     <string name="orbot_bs_status_4">Configuración de Tor-como-un-Proxy (Orbot) con un solo clic.</string>
-    <string name="settings_network_all_networks_desc">Cuando está activado, RethinkDNS utiliza todas las redes disponibles para conectarse a Internet. Si no, utiliza la red que Android considere <i>activa</i>.</string>
+    <string name="settings_network_all_networks_desc">Cuando está activado, Rethink utiliza todas las redes disponibles para conectarse a Internet. Si no, utiliza la red que Android considere <i>activa</i>.</string>
     <string name="settings_custom_downloader_desc">Si se desactiva, se utilizará el <i>Administrador de descargas</i> integrado en Android</string>
     <string name="orbot_explanation">Orbot es una aplicación proxy libre que permite a otras aplicaciones utilizar Internet de forma más <u>segura</u>.
 \nOrbot utiliza <u>Tor</u> para cifrar su tráfico de Internet, lo que le ayuda a <u>evitar la censura</u> y defenderse contra las formas de <u>vigilancia de la red</u> que amenazan la libertad y la privacidad personal.
-\n<u>Proxy TCP</u>: RethinkDNS solo reenvía a Orbot las conexiones TCP de todas las aplicaciones excepto las excluidas de Orbot.
-\n<u>Proxy HTTP</u>: RethinkDNS <i>configura</i> el proxy HTTP pero no obliga a las aplicaciones a utilizarlo. Normalmente, navegadores como Chrome y Firefox lo utilizan. Las aplicaciones que utilicen el proxy HTTP(S) omitirán tanto las reglas del Cortafuegos como las del DNS.</string>
+\n<u>Proxy TCP</u>: Rethink solo reenvía a Orbot las conexiones TCP de todas las aplicaciones excepto las excluidas de Orbot.
+\n<u>Proxy HTTP</u>: Rethink <i>configura</i> el proxy HTTP pero no obliga a las aplicaciones a utilizarlo. Normalmente, navegadores como Chrome y Firefox lo utilizan. Las aplicaciones que utilicen el proxy HTTP(S) omitirán tanto las reglas del Cortafuegos como las del DNS.</string>
     <string name="orbot_both">Proxy HTTP + TCP</string>
     <string name="orbot_both_desc">Todas las anteriores.</string>
     <string name="orbot_install_activity_error">Algo salió mal, inténtalo después de un tiempo</string>
     <string name="orbot_socks5_desc">Reenvía todas las conexiones TCP a Orbot.</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="settings_all_networks_dialog_title">¡Atención!</string>
-    <string name="settings_allow_bypass_heading">Permitir omisión</string>
+    <string name="settings_allow_bypass_heading">Habilitar la visibilidad de la red</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (en pruebas)</string>
     <string name="search_universal_ips"><font size="12">Buscar IPs</font></string>
     <string name="title_about">Acerca de</string>
@@ -733,12 +734,12 @@
     <string name="firewall_mode_notification_title">¡Protegido! Conectado al Cortafuegos.</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">protegido</string>
     <string name="status_protected_with_tor">protegido con tor</string>
-    <string name="alert_firewall_accessibility_explanation">RethinkDNS utiliza el servicio de accesibilidad para rastrear qué aplicaciones están en uso (primer plano) frente a las que no están en uso (segundo plano).
+    <string name="alert_firewall_accessibility_explanation">Rethink utiliza el servicio de accesibilidad para rastrear qué aplicaciones están en uso (primer plano) frente a las que no están en uso (segundo plano).
 \n
-\nRethinkDNS no recopila ninguna información ni le espía de ninguna manera.</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">El servicio de accesibilidad de RethinkDNS se ha detenido o ha fallado. <i><b>Vaya a Ajustes y fuerce la detención de</b></i> RethinkDNS e inícielo de nuevo para usar la función <i>Bloquear cualquier aplicación que no esté en uso</i>.
+\nRethink no recopila ninguna información ni le espía de ninguna manera.</string>
+    <string name="alert_firewall_accessibility_regrant_explanation">El servicio de accesibilidad de Rethink se ha detenido o ha fallado. <i><b>Vaya a Ajustes y fuerce la detención de</b></i> Rethink e inicielo de nuevo para usar la función <i>Bloquear cualquier aplicación que no esté en uso</i>.
 \n
-\nRethinkDNS utiliza el servicio de accesibilidad para rastrear las aplicaciones que están en uso (en primer plano) frente a las que no están en uso (en segundo plano).</string>
+\nRethink utiliza el servicio de accesibilidad para rastrear las aplicaciones que están en uso (en primer plano) frente a las que no están en uso (en segundo plano).</string>
     <string name="alert_firewall_accessibility_exception">Fallo al abrir los Ajustes de accesibilidad. ¡Vuelva a intentarlo de nuevo!</string>
     <string name="bsct_block">Bloquear, omitir, excluir, aislar <u>esta aplicación</u></string>
     <string name="bsct_conn_block_desc">bloqueado %1$s por %2$s</string>
@@ -757,7 +758,7 @@
     <string name="always_on_dialog_stop_message">La VPN siempre activa está activada para Rethink. ¿Está seguro que quiere detener Rethink de todos modos\?</string>
     <string name="univ_firewall_dialog_message">Eliminar esta regla permitiría a cualquier aplicación conectarse a esta IP. ¿Desea continuar\?</string>
     <string name="firewall_act_network_monitor_tab">Red</string>
-    <string name="always_on_dialog_positive">Parar</string>
+    <string name="always_on_dialog_positive">Detener</string>
     <string name="dns_act_configure_tab">Configurar</string>
     <string name="dns_crypt_url_remove_success">Servidor de resoluciones DNSCrypt borrado.</string>
     <string name="dns_crypt_url_remove_dialog_message">Borra el servidor de resoluciones DNSCrypt de la configuración guardada.</string>
@@ -800,7 +801,7 @@
     <string name="settings_locale_dialog_neutral">Ayude a traducir esta aplicación</string>
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">IPs más bloqueadas</string>
     <string name="hs_biometeric_title">Desbloquear Rethink</string>
-    <string name="hs_biometeric_desc">Utilice la autenticación biométrica para desbloquear RethinkDNS</string>
+    <string name="hs_biometeric_desc">Utilice la autenticación biométrica para desbloquear Rethink</string>
     <string name="fapps_unblock_dialog_title">Permitir aplicaciones</string>
     <string name="fapps_exclude_block_dialog_title">Excluir aplicaciones</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">dominios más bloqueados</string>
@@ -839,7 +840,7 @@
     <string name="logs_card_network_count" translatable="true">%1$s conexiones</string>
     <string name="logs_card_dns_count" translatable="true">%1$s consultas</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Captura de paquetes activada</string>
-    <string name="cd_dns_alg_desc" translatable="true">Aplicar reglas de dominio sólo cuando las aplicaciones se conectan</string>
+    <string name="cd_dns_alg_desc" translatable="true">Asignar una IP única por solicitud DNS</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Dominio (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Se permitió esta conexión porque la <i>aplicación de origen</i> está configurada para <i>omitir las reglas de dns y cortafuegos</i>.<br/><br/> Para cambiar, vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.</string>
@@ -869,4 +870,10 @@
     <string name="dc_setting_dns_cache_desc" translatable="true">Fusionar peticiones, respuestas en caché, gestión de errores resistentes</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">No se pueden configurar proxies cuando la VPN se ejecuta en modo solo DNS o en modo bloqueo. <u>Ir a la configuración de VPN</u></string>
     <string name="brbs_backup_restore_desc" translatable="true">No funciona en todas las versiones de la aplicación ni en todos los dispositivos</string>
+    <string name="settings_allow_lan_heading" translatable="true">No enrutar IPs privadas (experimental)</string>
+    <string name="settings_allow_lan_desc" translatable="true">Excluir rutas LAN, loopback, link-local del túnel VPN de Rethink.</string>
+    <string name="trusted_domains_desc" translatable="true">La regla de dominio de confianza sólo funciona con el DNS de <u>Rethink</u>.</string>
+    <string name="lbl_network" translatable="true">red</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s funciona sólo con el DNS de Rethink</string>
+    <string name="lbl_maybe_blocked" translatable="true">Posiblemente bloqueado</string>
 </resources>

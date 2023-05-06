@@ -8,7 +8,7 @@
     <string name="pause_title_desc">Pausieren…</string>
     <string name="txt_home">Startseite</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: RethinkDNS wurde deaktiviert</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: Rethink wurde deaktiviert</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
     <string name="universal_firewall_explanation">Anwendung von Firewall-Regeln auf alle Anwendungen auf der Grundlage von Geräteereignissen, z. B. Firewall, wenn das Gerät gesperrt ist oder wenn eine bestimmte Anwendung nicht verwendet wird.</string>
     <string name="accessibility_service_description">Rethink verwendet den Dienst für Barrierefreiheit, um Hintergrundanwendungen zu erkennen und per Firewall einzudämmen. Rethink erfaßt und verkauft keine Daten.</string>
@@ -867,4 +867,7 @@
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Diese Verbindung wurde erlaubt, weil die <i>Urspungs-App</i> für die <i>Umgehung von DNS- und Firewall-Regeln</i> eingestellt ist.<br/><br/> Zur Änderung den Bildschirm <i>App-spezifischen Firewall</i> verwenden.</string>
     <string name="settings_default_dns_desc" translatable="true">In seltenen Fällen kann die vom Nutzer bevorzugte DNS nicht ermittelt werden. Dann wird die Reserve-DNS verwendet.</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Diese Verbindung wurde erlaubt, da die <i>Domäne</i> in den universellen Domäne-Regeln als wird-vertraut gesetzt wurde.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
+    <string name="lbl_maybe_blocked" translatable="true">Vielleicht geblockt</string>
+    <string name="lbl_network" translatable="true">Netzwerk</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
 </resources>
