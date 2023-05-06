@@ -143,8 +143,8 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun updateRulesUi(domain: String) {
-        val d = domain.dropLastWhile { it == '.' }
-        val status = DomainRulesManager.status(d, Constants.UID_EVERYBODY)
+        val d = domain.dropLastWhile { it == '.' }.lowercase()
+        val status = DomainRulesManager.getDomainRule(d, Constants.UID_EVERYBODY)
         b.bsdlDomainRuleSpinner.setSelection(status.id)
 
         if (showTrustDomainTip(status)) {
