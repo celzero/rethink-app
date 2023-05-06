@@ -122,7 +122,6 @@ dependencies {
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
-    // new version 2.0.0 need minimum of gradle plugin 7.4.0-alpha10
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
     fullImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20"
@@ -191,8 +190,8 @@ dependencies {
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
 
-    download 'com.github.celzero:firestack:4576e99a96'
-    implementation 'com.github.celzero:firestack:4576e99a96'
+    download 'com.github.celzero:firestack:37b6b37c99'
+    implementation 'com.github.celzero:firestack:37b6b37c99'
     // implementation project(":tun2socks")
 
     // Work manager
