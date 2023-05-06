@@ -300,7 +300,7 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_dialog_title" translatable="true">What\'s new in v054b</string>
+    <string name="whats_dialog_title" translatable="true">What\'s new in v054c</string>
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>LAN party!</b><br/><br/>
         1. <i>New feature</i>: Exclude Private IPs (LAN / link-local).<br/>
         2. Make "Bypass DNS & Firewall" setting work.<br/>
