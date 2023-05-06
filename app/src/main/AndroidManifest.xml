@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.celzero.bravedns"
-    android:versionCode="28"
-    android:versionName="v054b"> <!-- 28(v054b) -->
+    android:versionCode="29"
+    android:versionName="v054c"> <!-- 29(v054c) -->
 
     <uses-sdk
         android:minSdkVersion="23"
