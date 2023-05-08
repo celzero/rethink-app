@@ -66,7 +66,7 @@
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">防火牆</string>
     <string name="settings_enable_logs">啓用本地日誌</string>
-    <string name="whats_dialog_title">v054b 嘅新內容</string>
+    <string name="whats_dialog_title">v054c 嘅新內容</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
     <string name="orbot_http">HTTP 代理</string>
     <string name="whats_new_version_update">&lt;b&gt;本地派對！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：排除私專有 IP （局域網 / 本地鏈路）。&lt;br/&gt; 2. 修復「繞行 DNS 同防火牆」設定。&lt;br/&gt; 3. 喺 DNS 日誌入面爲可能已被防火牆攔截嘅網域顯示「或已攔截」。&lt;br/&gt; 4. 喺支援處顯示自適應圖示。&lt;br/&gt; 5. 每三個字提示生物認證。&lt;br/&gt; 6. 其他六項 UI 同性能改進。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
@@ -858,7 +858,7 @@
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">資料包捕獲禁用咗</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">資料包捕獲啓用咗</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">信任網域（通用）</string>
-    <string name="firewall_rule_bypass_dns_firewall" translatable="true">已繞行應用</string>
+    <string name="firewall_rule_bypass_dns_firewall" translatable="true">繞過咗 App</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">網域（通用）</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">將會繞過通用 DNS 同防火牆規則</string>
     <string name="dc_refresh_toast" translatable="true">DNS 刷新完</string>
