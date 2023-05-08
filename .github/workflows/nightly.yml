@@ -1,0 +1,62 @@
+name: Nightly
+
+on:
+  workflow_dispatch: # to be able to run it manually
+  schedule:
+    - cron: '0 0 * * *' # once a day
+
+jobs:
+  evaluateChanges:
+    name: Evaluate changes for run or skipping nightly build
+    runs-on: ubuntu-latest
+    outputs:
+      SHOULD_BUILD: ${{ steps.check.outputs.shouldBuild }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Check
+        id: check
+        run: |
+          if [[ $(git rev-list --after="24 hours" main) ]]; then
+            echo shouldBuild=true >> $GITHUB_OUTPUT
+          else
+            echo shouldBuild=false >> $GITHUB_OUTPUT
+          fi
+
+
+  build:
+    name: Generate Nightly Build
+    runs-on: ubuntu-latest
+    needs: evaluateChanges
+    if: needs.evaluateChanges.outputs.SHOULD_BUILD == 'true'
+    env:
+      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      SCHEDULED_BUILD_VARIANT: ${{ vars.SCHEDULED_BUILD_VARIANT }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build and send apks to telegram
+        if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT && env.TELEGRAM_TOKEN
+        run: |
+          for TASK in $SCHEDULED_BUILD_VARIANT; do
+            ./gradlew $TASK
+            apk_path="$(find . -type f -iname *.apk)"
+            echo $apk_path
+            curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
+              -F chat_id="$TELEGRAM_CHAT_ID" \
+              -F "caption=Size: $(ls -l --block-size=K "$apk_path" | awk '{ print $5 }')" \
+              -F parse_mode=HTML \
+              -F document=@"$apk_path"
+            rm "$apk_path"
+          done

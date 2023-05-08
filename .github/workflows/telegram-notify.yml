@@ -1,0 +1,41 @@
+name: Notify
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    name: Notify via Telegram
+    runs-on: ubuntu-latest
+    env: 
+      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+    steps:
+      - name: Notify
+        if: env.TELEGRAM_CHAT_ID && env.TELEGRAM_TOKEN
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+          TEMPLATE: '.[] | "<a href=\"\(.url)\">\(.id[:8])</a> • <a href=\"https://github.com/\(.author.username | @html)\">\(.author.username | @html)</a>
+
+          \(.message | gsub("(?<a>[<>&\"])"; .a|@html))
+
+          "'
+        run: |
+          (
+            printenv COMMITS | jq -r "$TEMPLATE"
+            printf '@RethinkDNS_Channel'
+          ) | \
+          jq -R --slurp '{
+            text: .,
+            disable_web_page_preview: true,
+            chat_id: "$TELEGRAM_CHAT_ID",
+            parse_mode: "HTML"
+          }' | \
+          curl -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage \
+            -H 'Content-Type: application/json' \
+            --data-binary @-

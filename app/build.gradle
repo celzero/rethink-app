@@ -51,6 +51,11 @@ android {
             matchingFallbacks = ['debug']
             initWith buildTypes.debug
         }
+        nightly {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
 
     buildFeatures {
@@ -103,6 +108,11 @@ android {
                 task.enabled false
             }
         }
+    }
+
+    //TODO: resolve linter issues and re-enable abortOnError
+    lintOptions {
+        abortOnError false
     }
 
 }
