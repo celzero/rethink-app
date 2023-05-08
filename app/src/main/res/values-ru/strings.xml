@@ -284,7 +284,7 @@
     <string name="info_dialog_rethink_toast_msg">Скопировано как URL RDNS+ DNS-over-HTTPS</string>
     <string name="settings_enable_logs_desc">Сохранять журналы DNS и брандмауэра локально на устройстве.</string>
     <string name="settings_enable_logs">Включить логгирование на устройстве</string>
-    <string name="whats_dialog_title">Что нового в v054b</string>
+    <string name="whats_dialog_title">Что нового в v054c</string>
     <string name="relative_time_today">Сегодня</string>
     <string name="relative_time_yesterday">Вчера</string>
     <string name="app_mode_choose">Выбор режима</string>
