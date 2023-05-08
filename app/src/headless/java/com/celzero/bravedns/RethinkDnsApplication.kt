@@ -1,11 +1,9 @@
 package com.celzero.bravedns
 
 import android.app.Application
-import android.os.StrictMode
-import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
+import android.content.pm.ApplicationInfo
 import com.celzero.bravedns.scheduler.ScheduleManager
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
+import com.celzero.bravedns.util.LocalBlocklistUtil
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -27,15 +25,25 @@ import org.koin.core.context.startKoin
  * limitations under the License.
  */
 class RethinkDnsApplication : Application() {
+    companion object {
+        var DEBUG: Boolean = false
+    }
+
     override fun onCreate() {
         super.onCreate()
+
+        DEBUG =
+            applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == ApplicationInfo.FLAG_DEBUGGABLE
 
         startKoin {
             if (DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
+        // copy the file from assets to local dir if not present
+        LocalBlocklistUtil(this).init()
         // database refresh is used in both headless and main project
-         get<ScheduleManager>().scheduleDatabaseRefreshJob()
+        get<ScheduleManager>().scheduleDatabaseRefreshJob()
+
     }
 }

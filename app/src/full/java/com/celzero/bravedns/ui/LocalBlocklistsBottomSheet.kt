@@ -28,7 +28,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -44,7 +43,11 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_SEARCH_URL
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -227,7 +230,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             builder.setMessage(
                 getString(
                     R.string.local_blocklist_redownload_desc,
-                    Utilities.convertLongToTime(
+                    convertLongToTime(
                         persistentState.localBlocklistTimestamp,
                         Constants.TIME_FORMAT_2
                     )
@@ -338,9 +341,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun enableBlocklistUi() {
         b.lbbsEnable.text = getString(R.string.lbbs_enabled)
-        b.lbbsEnable.setTextColor(
-            Utilities.fetchToggleBtnColors(requireContext(), R.color.accentGood)
-        )
+        b.lbbsEnable.setTextColor(fetchToggleBtnColors(requireContext(), R.color.accentGood))
         b.lbbsHeading.text =
             getString(
                 R.string.settings_local_blocklist_in_use,
@@ -359,9 +360,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
     private fun disableBlocklistUi() {
         b.lbbsEnable.text = getString(R.string.lbl_disabled)
-        b.lbbsEnable.setTextColor(
-            Utilities.fetchToggleBtnColors(requireContext(), R.color.accentBad)
-        )
+        b.lbbsEnable.setTextColor(fetchToggleBtnColors(requireContext(), R.color.accentBad))
         b.lbbsHeading.text = getString(R.string.lbbs_heading)
         setDrawable(R.drawable.ic_cross, b.lbbsEnable)
 
@@ -381,7 +380,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
 
         b.lbbsCopy.setOnClickListener {
             val url = Constants.RETHINK_BASE_URL_SKY + persistentState.localBlocklistStamp
-            Utilities.clipboardCopy(
+            clipboardCopy(
                 requireContext(),
                 url,
                 requireContext().getString(R.string.copy_clipboard_label)
@@ -397,8 +396,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
             // https://rethinkdns.com/search?s=<uri-encoded-stamp>
             this.dismiss()
             val url = RETHINK_SEARCH_URL + Uri.encode(persistentState.localBlocklistStamp)
-            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-            startActivity(intent)
+            openUrl(requireContext(), url)
         }
 
         b.lbbsDownload.setOnClickListener { showDownloadDialog(isRedownload = false) }

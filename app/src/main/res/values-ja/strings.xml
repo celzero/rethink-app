@@ -616,4 +616,5 @@
     <string name="about_join_telegram" translatable="true">Telegram</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">バグ報告</string>
     <string name="about_website" translatable="true">rethinkdns.comをご覧ください</string>
+    <string name="bypass_universal" translatable="true">迷惑なリンク短縮サービスをバイパス</string>
 </resources>

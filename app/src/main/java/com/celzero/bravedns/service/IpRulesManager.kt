@@ -1,18 +1,18 @@
 /*
-Copyright 2020 RethinkDNS and its authors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright 2020 RethinkDNS and its authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.celzero.bravedns.service
 
 import android.content.Context
@@ -22,22 +22,23 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.IpManager
+import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.write
 
-object IpRulesManager : KoinComponent {
+object
+IpRulesManager : KoinComponent {
 
     private val customIpRepository by inject<CustomIpRepository>()
     private val persistentState by inject<PersistentState>()
@@ -53,7 +54,7 @@ object IpRulesManager : KoinComponent {
     data class CacheKey(val hostName: HostName, val uid: Int)
 
     // stores the response for the look-up request from the BraveVpnService
-    private val ipRulesLookupCache: Cache<CacheKey, IpRuleStatus> =
+    private val resultsCache: Cache<CacheKey, IpRuleStatus> =
         CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
 
     enum class IPRuleType(val id: Int) {
@@ -121,7 +122,7 @@ object IpRulesManager : KoinComponent {
 
             // remove the ip address from local list
             removeLocalCache(customIp)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -134,7 +135,7 @@ object IpRulesManager : KoinComponent {
             val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
             customIpRepository.insert(customIpObj)
             updateLocalCache(customIpObj)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -148,7 +149,7 @@ object IpRulesManager : KoinComponent {
             customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -162,7 +163,7 @@ object IpRulesManager : KoinComponent {
             customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -176,7 +177,7 @@ object IpRulesManager : KoinComponent {
             customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -216,7 +217,7 @@ object IpRulesManager : KoinComponent {
             customIp.modifiedDateTime = System.currentTimeMillis()
             customIpRepository.update(customIp)
             updateLocalCache(customIp)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -229,19 +230,18 @@ object IpRulesManager : KoinComponent {
             }
 
         // check if the ip address is already available in the cache
-        val cacheKey = CacheKey(ip, uid)
-        ipRulesLookupCache.getIfPresent(cacheKey)?.let {
+        val key = CacheKey(ip, uid)
+        resultsCache.getIfPresent(key)?.let {
             // return only if both ip and app(uid) matches
             return it
         }
 
-        val key = CacheKey(ip, uid)
         if (appIpRules.contains(key)) {
             val customIp = appIpRules[key]
 
             if (customIp != null) {
                 val status = IpRuleStatus.getStatus(customIp.status)
-                ipRulesLookupCache.put(CacheKey(ip, uid), status)
+                resultsCache.put(key, status)
                 return status
             }
         }
@@ -250,38 +250,40 @@ object IpRulesManager : KoinComponent {
 
         // status is not NONE, return the obtained status
         if (status != IpRuleStatus.NONE) {
-            ipRulesLookupCache.put(CacheKey(ip, uid), status)
+            resultsCache.put(key, status)
+            return status
+        }
+
+        if (port != null) {
+            status = hasRule(uid, ip.address.toNormalizedString(), null)
+            resultsCache.put(key, status)
             return status
         }
 
         // no need to carry out below checks if ip is not IPv6
-        if (!IpManager.isIpV6(ip.address) && !isIpv6ToV4FilterRequired()) {
-            ipRulesLookupCache.put(CacheKey(ip, uid), status)
+        if (!IPUtil.isIpV6(ip.address) && !isIpv6ToV4FilterRequired()) {
+            resultsCache.put(key, status)
             return status
         }
 
         // for IPv4 address in IPv6
         var ipv4: IPAddress? = null
-        if (IpManager.canMakeIpv4(ip.address)) {
-            ipv4 = IpManager.toIpV4(ip.address)
+        if (IPUtil.canMakeIpv4(ip.address)) {
+            ipv4 = IPUtil.toIpV4(ip.address)
         }
 
         if (ipv4 != null) {
             status = hasRule(uid, ipv4.toNormalizedString(), ip.port)
             // status is not NONE, return the obtained status
             if (status != IpRuleStatus.NONE) {
-                ipRulesLookupCache.put(CacheKey(ip, uid), status)
+                resultsCache.put(key, status)
                 return status
             }
         } else {
             // no-op
         }
 
-        if (port != null) {
-            status = hasRule(uid, ip.address.toNormalizedString(), null)
-        }
-
-        ipRulesLookupCache.put(CacheKey(ip, uid), status)
+        resultsCache.put(key, status)
         return status
     }
 
@@ -311,7 +313,7 @@ object IpRulesManager : KoinComponent {
             customIpRepository.deleteIpRulesByUid(uid)
             appIpRules = appIpRules.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
             wildCards = wildCards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -326,6 +328,7 @@ object IpRulesManager : KoinComponent {
             val subnetMap =
                 rules.sortedByDescending { selector(it.getCustomIpAddress().asAddressString()) }
             subnetMap.forEach {
+                // isAnyLocal is true for rules like 0.0.0.0:443
                 if (
                     it.getCustomIpAddress().address.isMultiple ||
                         it.getCustomIpAddress().address.isAnyLocal
@@ -400,7 +403,7 @@ object IpRulesManager : KoinComponent {
             val customIpObj = constructCustomIpObject(uid, hostName, status)
             customIpRepository.insert(customIpObj)
             updateLocalCache(customIpObj)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -413,7 +416,7 @@ object IpRulesManager : KoinComponent {
             val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
             customIpRepository.insert(customIpObj)
             updateLocalCache(customIpObj)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 
@@ -423,7 +426,7 @@ object IpRulesManager : KoinComponent {
             val customIpObj = constructCustomIpObject(prevIp.uid, hostName, status)
             customIpRepository.insert(customIpObj)
             updateLocalCache(customIpObj)
-            ipRulesLookupCache.invalidateAll()
+            resultsCache.invalidateAll()
         }
     }
 

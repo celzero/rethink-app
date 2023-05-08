@@ -26,8 +26,8 @@ import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -41,6 +41,7 @@ import com.celzero.bravedns.databinding.FragmentFirewallAppListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
@@ -59,6 +60,8 @@ class FirewallAppFragment :
     private val refreshDatabase by inject<RefreshDatabase>()
 
     private var layoutManager: RecyclerView.LayoutManager? = null
+
+    private var showBypassToolTip = true
 
     private lateinit var animation: Animation
 
@@ -221,7 +224,7 @@ class FirewallAppFragment :
         val firewallLabel = filter.firewallFilter.getLabel(requireContext())
         if (filter.categoryFilters.isEmpty()) {
             b.firewallAppLabelTv.text =
-                Utilities.updateHtmlEncodedText(
+                updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc,
                         firewallLabel.lowercase(),
@@ -230,7 +233,7 @@ class FirewallAppFragment :
                 )
         } else {
             b.firewallAppLabelTv.text =
-                Utilities.updateHtmlEncodedText(
+                updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc_category,
                         firewallLabel.lowercase(),
@@ -318,7 +321,16 @@ class FirewallAppFragment :
             )
         }
 
+        TooltipCompat.setTooltipText(b.ffaToggleAllBypassDnsFirewall, getString(R.string.bypass_dns_firewall_tooltip))
+
         b.ffaToggleAllBypassDnsFirewall.setOnClickListener {
+            // show tooltip once the user clicks on the button
+            if (showBypassToolTip) {
+                showBypassToolTip = false
+                b.ffaToggleAllBypassDnsFirewall.performLongClick()
+                return@setOnClickListener
+            }
+
             showBulkRulesUpdateDialog(
                 getBulkActionDialogTitle(BlockType.BYPASS_DNS_FIREWALL),
                 getBulkActionDialogMessage(BlockType.BYPASS_DNS_FIREWALL),
@@ -482,8 +494,6 @@ class FirewallAppFragment :
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }
-        val v = view.findViewById<AppCompatImageView>(R.id.info_rules_dialog_cancel_img)
-        v.setOnClickListener { builder.create().dismiss() }
         builder.setCancelable(true)
         builder.create().show()
     }

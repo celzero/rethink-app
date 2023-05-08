@@ -57,7 +57,7 @@ class RemoteFileTagUtil : KoinComponent {
 
         private fun makeFile(context: Context, timestamp: Long): File? {
             val dir =
-                Utilities.remoteBlocklistFile(
+                Utilities.blocklistDir(
                     context,
                     Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     timestamp

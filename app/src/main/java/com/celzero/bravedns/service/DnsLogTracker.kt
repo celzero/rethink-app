@@ -19,25 +19,22 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.os.SystemClock
 import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.service.FirewallManager.ipDomainLookup
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.ResourceRecordTypes
-import com.celzero.bravedns.util.Utilities.Companion.calculateTtl
-import com.celzero.bravedns.util.Utilities.Companion.getCountryCode
-import com.celzero.bravedns.util.Utilities.Companion.getFlag
-import com.celzero.bravedns.util.Utilities.Companion.makeAddressPair
-import com.celzero.bravedns.util.Utilities.Companion.normalizeIp
-import dnsx.Dnsx
+import com.celzero.bravedns.util.Utilities.getCountryCode
+import com.celzero.bravedns.util.Utilities.getFlag
+import com.celzero.bravedns.util.Utilities.makeAddressPair
+import com.celzero.bravedns.util.Utilities.normalizeIp
 import dnsx.Summary
-import java.util.*
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -152,24 +149,6 @@ internal constructor(
                             destination.hostAddress == UNSPECIFIED_IP_IPV6
 
                     dnsLog.flag = getFlagIfPresent(countryCode)
-
-                    // no need to add dns record to cache if the record id is Dnsx.Alg
-                    // as it is not a valid record
-                    if (transaction.id != Dnsx.Alg) {
-                        addresses.forEach {
-                            if (it.isEmpty()) return@forEach
-
-                            val dnsCacheRecord =
-                                FirewallManager.DnsCacheRecord(
-                                    calculateTtl(transaction.ttl),
-                                    transaction.name,
-                                    dnsLog.flag
-                                )
-                            ipDomainLookup.put(it, dnsCacheRecord)
-                        }
-                    } else {
-                        // no-op
-                    }
                 } else {
                     // no ip address found
                     dnsLog.flag =
@@ -187,7 +166,6 @@ internal constructor(
         }
 
         fetchFavIcon(dnsLog)
-
         return dnsLog
     }
 
@@ -195,7 +173,7 @@ internal constructor(
         if (hostAddress == null) {
             return context.getString(R.string.unicode_warning_sign)
         }
-        return ipDomainLookup.getIfPresent(hostAddress)?.flag ?: getFlag(hostAddress)
+        return getFlag(hostAddress)
     }
 
     suspend fun insertBatch(dnsLogs: List<DnsLog>) {
@@ -259,6 +237,8 @@ internal constructor(
         if (isDgaDomain(dnsLog.queryStr)) return
 
         if (DEBUG) Log.d(LOG_TAG_DNS_LOG, "Glide - fetchFavIcon() -${dnsLog.queryStr}")
+
+        // fetch fav icon in background using glide
         FavIconDownloader(context, dnsLog.queryStr).run()
     }
 

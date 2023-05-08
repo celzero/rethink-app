@@ -33,11 +33,11 @@
         <LinearLayout
             android:id="@+id/connection_screen_ll"
             android:layout_width="0dp"
-            android:paddingTop="5dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:orientation="vertical"
+            android:paddingTop="5dp"
             android:weightSum="1">
 
             <LinearLayout
@@ -64,11 +64,11 @@
                         android:ellipsize="start"
                         android:fontFamily="sans-serif-light"
                         android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="2"
                         android:paddingStart="8dp"
                         android:paddingEnd="10dp"
                         android:scrollHorizontally="true"
                         android:singleLine="false"
-                        android:maxLines="2"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
@@ -93,9 +93,7 @@
                         android:singleLine="true"
                         android:textAppearance="@android:style/TextAppearance.Material.Subhead"
                         android:textSize="@dimen/mini_font_text_view"
-                        android:textStyle="bold"
-                        tools:text="17:54:11" />
-
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -127,8 +125,8 @@
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
                 android:gravity="center"
-                android:paddingBottom="10dp"
                 android:orientation="horizontal"
+                android:paddingBottom="10dp"
                 android:weightSum="1">
 
                 <LinearLayout
@@ -150,7 +148,7 @@
                         android:maxLines="1"
                         android:paddingStart="8dp"
                         android:paddingEnd="10dp"
-                        android:text="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/large_font_text_view"
                         android:typeface="monospace" />
 
@@ -159,17 +157,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:alpha="0.7"
                         android:ellipsize="end"
-                        android:fontFamily="sans-serif-light"
                         android:focusable="true"
                         android:focusableInTouchMode="true"
-                        android:alpha="0.7"
+                        android:fontFamily="sans-serif-light"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:maxLines="1"
                         android:paddingStart="8dp"
                         android:paddingEnd="10dp"
                         android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                        android:text="?attr/primaryLightColorText"
+                        android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
                 </LinearLayout>
 
@@ -188,7 +186,7 @@
                         android:layout_gravity="center"
                         android:fontFamily="sans-serif-condensed"
                         android:singleLine="true"
-                        android:text="?attr/primaryTextColor"
+                        android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/default_font_text_view" />
                 </LinearLayout>
 

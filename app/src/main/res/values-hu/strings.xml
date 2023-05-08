@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RethinkDNS</string>
+    <string name="title_about" translatable="true">About</string>
 </resources>

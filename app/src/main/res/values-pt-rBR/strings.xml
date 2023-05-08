@@ -54,7 +54,7 @@
     <string name="hsf_start_dialog_message">Você está a um passo de ter um Android seguro e protegido: veja instantaneamente atividade da rede, bloqueie sites, IPs e apps suspeitos.</string>
     <string name="hsf_proxy_chip_text">Proxy ativo</string>
     <string name="hsf_whats_new_chip_text">Novidades</string>
-    <string name="dc_entries">%1$s entradas 🔗</string>
+    <string name="dc_entries">%1$s entradas »</string>
     <string name="hsf_proxy_chip_removed_toast">Proxy removido</string>
     <string name="dc_local_block_heading">Listas de bloqueio no dispositivo</string>
     <string name="hsf_proxy_chip_remove_text">Parando…</string>
@@ -63,8 +63,8 @@
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="hsf_blocklist_updating_text">Ativando…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
-    <string name="dc_local_block_desc_1">Escolha entre mais de 185 listas de bloqueio. Toque aqui para baixar ou configurar listas de bloqueio.</string>
-    <string name="dc_custom_block_heading">Permitir ou negar domínios individuais</string>
+    <string name="dc_local_block_desc_1">Escolha entre mais de 195 listas de bloqueio. Toque aqui para baixar ou configurar listas de bloqueio.</string>
+    <string name="dc_custom_block_heading">Regras de domínio</string>
     <string name="dc_block_heading">regras</string>
     <string name="dc_other_settings_heading">avançado</string>
     <string name="dc_dns_website_heading">Mostrar ícone de site em registros do DNS (experimental)</string>
@@ -176,7 +176,7 @@
     <string name="app_name">RethinkDNS</string>
     <string name="title_settings">Configurações</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
-    <string name="accessibility_service_description">RethinkDNS usa o serviço de acessibilidade para detectar e implementar firewall para aplicativos em segundo plano. RethinkDNS não coleta nem vende qualquer tipo de informação.</string>
+    <string name="accessibility_service_description">Rethink usa o serviço de acessibilidade para detectar e implementar firewall para aplicativos em segundo plano. Rethink não coleta nem vende qualquer tipo de informação.</string>
     <string name="always_on_dialog_lockdown_stop_message">RethinkDNS está executando a VPN no modo <i>restrito</i>. Ao interrompê-lo você perderá a conexão com a internet neste perfil de usuário. Você quer continuar mesmo assim\?</string>
     <string name="orbot_none">Nenhum (padrão)</string>
     <string name="orbot_app_issue">Não foi possível iniciar o Orbot. Está instalado\?</string>
@@ -245,9 +245,9 @@
     <string name="skip">Pular</string>
     <string name="finish">Concluir</string>
     <string name="slide_2_title">Boas-vindas</string>
-    <string name="slide_2_desc">RethinkDNS é a melhor maneira de monitorar as atividades da rede, contornar a censura da internet e implementar um firewall para os apps em seu dispositivo Android.</string>
+    <string name="slide_2_desc">Rethink é a melhor maneira de monitorar as atividades da rede, contornar a censura da internet e implementar um firewall para os apps em seu dispositivo Android.</string>
     <string name="slide_1_title">Gratuito e de software livre</string>
-    <string name="slide_1_desc">RethinkDNS é um software livre apoiado pelo programa MVP do Mozilla Builders.</string>
+    <string name="slide_1_desc">Rethink é um software livre apoiado pelo programa MVP do Mozilla Builders.</string>
     <string name="allow">permitir</string>
     <string name="bypass_universal">Autorização universal</string>
     <string name="exclude">excluir</string>
@@ -294,7 +294,7 @@
     <string name="dns_query_clear_logs_title">Apagar todos os registros do DNS\?</string>
     <string name="dns_query_clear_logs_message">Isso apaga os registros do DNS no dispositivo. Esta operação é irreversível. Você quer continuar\?</string>
     <string name="bsct_app_info">Detalhes do app</string>
-    <string name="bsct_block_ip">Bloqueie, contorne <u>este IP</u> para <u>este aplicativo</u></string>
+    <string name="bsct_block_ip">Bloquear, confiar <u>este IP</u> para <u>este aplicativo</u></string>
     <string name="bsct_conn_block_desc">%1$s bloqueado por %2$s</string>
     <string name="bsct_conn_block_desc_device">%1$s bloqueado no dispositivo</string>
     <string name="bsct_conn_desc_blocked">bloqueado em %1$s %2$s</string>
@@ -352,7 +352,7 @@
     <string name="settings_enable_logs_desc">Armazene os registros do DNS e Firewall localmente no dispositivo.</string>
     <string name="settings_enable_logs">Ativar registros no dispositivo</string>
     <string name="app_mode_choose">Escolha o modo</string>
-    <string name="whats_dialog_title">O que há de novo na versão v053l</string>
+    <string name="whats_dialog_title">O que há de novo na v054</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_desc">Escolha entre as versões do Protocolos de internet.</string>
     <string name="settings_ptrans_heading">Forçar IPv4 egress</string>
@@ -408,7 +408,7 @@
     <string name="settings_custom_downloader_heading">Use downloader do app</string>
     <string name="settings_custom_downloader_desc">Se desativado, será usado <i>Gerenciador de downloads</i> integrado no Android.</string>
     <string name="settings_import_export_heading">Backup e restauração</string>
-    <string name="settings_import_export_desc">Faça backup ou restauração manual de dados e configurações do app.</string>
+    <string name="settings_import_export_desc">Faça backup ou restaure os dados e configurações da aplicação.</string>
     <string name="settings_http_proxy_desc">Encaminhando para %1$s:%2$s</string>
     <string name="settings_http_proxy_dialog_title">URL personalizada de servidor</string>
     <string name="settings_http_proxy_error_text1">A faixa de portas deve ser entre 1024-65535</string>
@@ -549,7 +549,7 @@
     <string name="univ_firewall_rule_7">Bloqueie IPv4 em IPv6 (experimental)</string>
     <string name="univ_firewall_rule_8">Bloqueie tráfego na porta 80 (HTTP inseguro)</string>
     <string name="univ_firewall_rule_9">Bloqueie na rede com franquia de dados (móvel)</string>
-    <string name="univ_view_blocked_ip">regras de ip e porta</string>
+    <string name="univ_view_blocked_ip">Regras de IP e porta</string>
     <string name="univ_view_blocked_ip_desc">Modifique regras de IP/Portas bloqueadas ou contornadas.</string>
     <string name="univ_ip_delete_individual_positive">Apagar</string>
     <string name="univ_ip_delete_individual_toast">%1$s apagado.</string>
@@ -793,4 +793,33 @@
     <string name="lbl_rules" translatable="true">regras</string>
     <string name="settings_locale_desc" translatable="true">Escolha o seu idioma preferido</string>
     <string name="settings_locale_dialog_neutral" translatable="true">Ajude a traduzir este aplicativo</string>
+    <string name="lbl_logs" translatable="true">registros</string>
+    <string name="bypass_dns_firewall" translatable="true">ignorar dns e firewall</string>
+    <string name="bsct_block_domain" translatable="true">Bloquear, confiar <u>domínio(s)</u> para <u>este aplicativo</u></string>
+    <string name="settings_general_customize" translatable="true">personalizar</string>
+    <string name="settings_pcap_heading" translatable="true">Captura de pacotes</string>
+    <string name="settings_default_dns_heading" translatable="true">Escolha o DNS alternativo</string>
+    <string name="settings_pcap_dialog_option_1" translatable="true">Desativado (padrão)</string>
+    <string name="settings_locale_heading" translatable="true">Alterar idioma</string>
+    <string name="settings_locale_dialog_title" translatable="true">Escolha o seu idioma preferido</string>
+    <string name="settings_biometeric_heading" translatable="true">Ativar bloqueio da aplicação</string>
+    <string name="hs_biometeric_title" translatable="true">Desbloquear o Rethink</string>
+    <string name="hs_biometeric_error" translatable="true">Erro de autenticação biométrica</string>
+    <string name="hs_biometeric_failed" translatable="true">Falha na autenticação biométrica</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s regras de domínio</string>
+    <string name="logs_card_network_count" translatable="true">%1$s conexões</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s consultas</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Captura de pacotes desativada</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Captura de pacotes ativa</string>
+    <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Saída para Logcat</string>
+    <string name="fapps_unblock_dialog_title" translatable="true">Permitir aplicações</string>
+    <string name="fapps_exclude_block_dialog_title" translatable="true">Excluir aplicações</string>
+    <string name="fapps_info_unmetered_msg" translatable="true">Permitir / bloquear em rede ilimitada (wi-fi).</string>
+    <string name="fapps_bypass_block_dialog_title" translatable="true">Ignorar aplicações</string>
+    <string name="fapps_info_bypass_msg" translatable="true">Ignora as regras universais de firewall.</string>
+    <string name="fapps_info_metered_msg" translatable="true">Permitir / bloquear na rede limitada (móvel).</string>
+    <string name="fapps_info_exclude_msg" translatable="true">Excluir do DNS + Firewall.</string>
+    <string name="cd_dns_alg_desc" translatable="true">Aplicar regras de domínio apenas quando as aplicações se conectarem</string>
+    <string name="cd_dns_alg_heading" translatable="true">Filtragem de DNS avançada (experimental)</string>
 </resources>

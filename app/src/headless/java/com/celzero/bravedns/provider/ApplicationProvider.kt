@@ -125,6 +125,8 @@ class ApplicationProvider : ContentProvider() {
         if (selectionClause.isNullOrEmpty()) {
             val count = appInfoRepository.cpUpdate(appInfo)
             context.contentResolver?.notifyChange(uri, null)
+            // update the app info cache
+            CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
             return count
         } else if (selectionClause.contains("uid") || selectionClause.contains("packageName")) {
             val c = selectionClause.count { it == '?' }

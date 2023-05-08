@@ -17,12 +17,13 @@ package com.celzero.bravedns.backup
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageInfo
 import android.net.Uri
 import android.util.Log
 import androidx.preference.PreferenceManager
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper.Companion.DATA_BUILDER_RESTORE_URI
 import com.celzero.bravedns.backup.BackupHelper.Companion.METADATA_FILENAME
 import com.celzero.bravedns.backup.BackupHelper.Companion.SHARED_PREFS_BACKUP_FILE_NAME
@@ -38,10 +39,14 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTOR
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.ObjectInputStream
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams), KoinComponent {
+    CoroutineWorker(context, workerParams), KoinComponent {
 
     private val logDatabase by inject<LogDatabase>()
     private val appDatabase by inject<AppDatabase>()
@@ -51,7 +56,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         const val TAG = "RestoreAgent"
     }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val restoreUri = Uri.parse(inputData.getString(DATA_BUILDER_RESTORE_URI))
         if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "begin restore process with file uri: $restoreUri")
         val result = startRestore(restoreUri)
@@ -158,7 +163,6 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     // Restore database file stored at tempDir/nameOfFileToRestore.
-    // This method is inside my DBHelper class.
     private fun restoreDatabaseFile(tempDir: File): Boolean {
         checkPoint()
 
@@ -193,7 +197,30 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
 
         deleteResidue(tempDir)
+        // update app version after the restore process
+        updateLatestVersion()
         return true
+    }
+
+    private fun updateLatestVersion() {
+        if (isNewVersion()) {
+            persistentState.appVersion = getLatestVersion()
+            Log.i(LOG_TAG_BACKUP_RESTORE, "app version updated to ${persistentState.appVersion}")
+        } else {
+            Log.i(LOG_TAG_BACKUP_RESTORE, "no need to update app version")
+        }
+    }
+
+    private fun isNewVersion(): Boolean {
+        val versionStored = persistentState.appVersion
+        val version = getLatestVersion()
+        return (version != 0 && version != versionStored)
+    }
+
+    private fun getLatestVersion(): Int {
+        val pInfo: PackageInfo? =
+            Utilities.getPackageMetadata(context.packageManager, context.packageName)
+        return pInfo?.versionCode ?: 0
     }
 
     private fun checkPoint() {
@@ -204,6 +231,13 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     }
 
     private fun validateMetadata(tempDirectory: String?): Boolean {
+        // TODO: revisit this after v055 release
+        if (isMetadataCompatible(tempDirectory)) {
+            return true
+        } else {
+            // proceed with META_DATA_FILE validation
+        }
+
         val file = File(tempDirectory, METADATA_FILENAME)
         var stream: InputStream? = null
         return try {
@@ -230,9 +264,51 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
         }
     }
 
+    private fun isMetadataCompatible(tempDirectory: String?): Boolean {
+
+        val minVersionSupported = 24
+
+        val input: ObjectInputStream?
+        val prefsBackupFile = File(tempDirectory, SHARED_PREFS_BACKUP_FILE_NAME)
+        try {
+            input = ObjectInputStream(FileInputStream(prefsBackupFile))
+
+            val pref: Map<String, *> = input.readObject() as Map<String, *>
+
+            for (e in pref.entries) {
+                val v: Any? = e.value
+                val key: String = e.key
+
+                if (key == PersistentState.APP_VERSION) {
+                    val appVersion = v as Int
+                    if (appVersion >= minVersionSupported) {
+                        Log.w(
+                            LOG_TAG_BACKUP_RESTORE,
+                            "app version is less than minAppVersion, proceed with restore"
+                        )
+                        return true
+                    } else {
+                        // no-op
+                    }
+                } else {
+                    // no-op
+                }
+            }
+            return false
+        } catch (e: Exception) {
+            Log.e(
+                LOG_TAG_BACKUP_RESTORE,
+                "exception while restoring shared pref, reason? ${e.message}",
+                e
+            )
+            return false
+        }
+    }
+
     private fun isVersionSupported(metadata: String): Boolean {
         try {
             val minVersionSupported = 24
+
             if (!metadata.contains(VERSION)) return false
 
             val versionDetails = metadata.split("|")

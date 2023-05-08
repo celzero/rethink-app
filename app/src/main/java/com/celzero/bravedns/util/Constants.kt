@@ -124,8 +124,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v054)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1677707762437
+        // default filetag.json for remote blocklist (stored in assets folder) (v054c)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1682978161602
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"
@@ -176,7 +176,7 @@ class Constants {
         // data-time format used as part of network log adapter
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
-        // constants generated as part of BuildConfig.FLAVORS (playstore/fdroid/website)
+        // constants generated as part of com.celzero.bravedns.BuildConfig.FLAVORS (playstore/fdroid/website)
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
@@ -264,7 +264,12 @@ class Constants {
         // intent extra name for uid
         const val INTENT_UID = "UID"
 
-        data class DefaultDnsServer(val id: Int, val name: String, val url: String, val type: String)
+        data class DefaultDnsServer(
+            val id: Int,
+            val name: String,
+            val url: String,
+            val type: String
+        )
 
         const val BLOCK_FREE_DNS_MAX = "https://max.rethinkdns.com/dns-query"
         const val BLOCK_FREE_DNS_SKY = "https://sky.rethinkdns.com/dns-query"
@@ -284,5 +289,8 @@ class Constants {
 
         // pcap file extension
         const val PCAP_FILE_EXTENSION = ".pcap"
+
+        // max logs to retrieve from the database, used in the log fragment
+        const val MAX_LOGS = 35000
     }
 }

@@ -24,8 +24,12 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities
-import hu.autsoft.krate.*
+import hu.autsoft.krate.SimpleKrate
+import hu.autsoft.krate.booleanPref
 import hu.autsoft.krate.default.withDefault
+import hu.autsoft.krate.intPref
+import hu.autsoft.krate.longPref
+import hu.autsoft.krate.stringPref
 import org.koin.core.component.KoinComponent
 
 class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
@@ -35,6 +39,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val ALLOW_BYPASS = "allow_bypass"
         const val LOCAL_BLOCK_LIST = "enable_local_list"
         const val LOCAL_BLOCK_LIST_STAMP = "local_block_list_stamp"
+        const val LOCAL_BLOCK_LIST_UPDATE = "local_block_list_downloaded_time"
         const val PROXY_TYPE = "proxy_proxytype"
         const val NETWORK = "add_all_networks_to_vpn"
         const val NOTIFICATION_ACTION = "notification_action"
@@ -45,7 +50,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DEFAULT_DNS_SERVER = "default_dns_server"
         const val PCAP_MODE = "pcap_mode"
         const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
+        const val REMOTE_BLOCKLIST_UPDATE = "remote_block_list_downloaded_time"
         const val DNS_ALG = "dns_alg"
+        const val APP_VERSION = "app_version"
+        const val PRIVATE_IPS = "private_ips"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -88,7 +96,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         booleanPref("block_unknown_connections").withDefault<Boolean>(false)
 
     // whether user has enable on-device blocklists
-    var blocklistEnabled by booleanPref("enable_local_list").withDefault<Boolean>(false)
+    var blocklistEnabled by
+        booleanPref("enable_local_list").withDefault<Boolean>(Utilities.isHeadlessFlavour())
 
     // the version (which is a unix timestamp) of the current rethinkdns+ remote blocklist files
     var remoteBlocklistTimestamp by
@@ -129,7 +138,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var numberOfBlockedRequests by longPref("dns_blocked_request").withDefault<Long>(0)
 
     // whether to block connections from apps not in the foreground
-    private var _blockAppWhenBackground by booleanPref("background_mode").withDefault<Boolean>(false)
+    private var _blockAppWhenBackground by
+        booleanPref("background_mode").withDefault<Boolean>(false)
 
     // whether to check for app updates once-a-week (on website / play-store builds)
     var checkForAppUpdate by booleanPref("check_for_app_update").withDefault<Boolean>(true)
@@ -178,8 +188,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     private var _blockNewlyInstalledApp by booleanPref("block_new_app").withDefault<Boolean>(false)
 
     // user setting to use custom download manager or android's default download manager
+    // default: false, i.e., use android's default download manager
     var useCustomDownloadManager by
-        booleanPref("use_custom_download_managet").withDefault<Boolean>(true)
+        booleanPref("use_custom_download_managet").withDefault<Boolean>(false)
 
     // custom download manager's last generated id
     var customDownloaderLastGeneratedId by
@@ -199,7 +210,11 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user-preferred Internet Protocol type, default IPv4
     var internetProtocolType by
-        intPref(INTERNET_PROTOCOL).withDefault<Int>(InternetProtocol.IPv4.id)
+        intPref(INTERNET_PROTOCOL)
+            .withDefault<Int>(
+                if (!Utilities.isHeadlessFlavour()) InternetProtocol.IPv4.id
+                else InternetProtocol.IPv46.id
+            )
 
     // user-preferred 6to4 protocol translation, on IPv6 mode (default: PTMODEAUTO)
     var protocolTranslationType by booleanPref(PROTOCOL_TRANSLATION).withDefault<Boolean>(false)
@@ -208,7 +223,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var filterIpv4inIpv6 by booleanPref("filter_ip4_ipv6").withDefault<Boolean>(true)
 
     // universal firewall settings to block all http connections
-    private var _blockHttpConnections by booleanPref("block_http_connections").withDefault<Boolean>(false)
+    private var _blockHttpConnections by
+        booleanPref("block_http_connections").withDefault<Boolean>(false)
 
     // universal firewall settings to block all metered connections
     private var _blockMeteredConnections by
@@ -238,6 +254,15 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // dns caching in tunnel
     var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(false)
+
+    // private ips, default false (route private ips to tunnel)
+    var privateIps by booleanPref("private_ips").withDefault<Boolean>(false)
+
+    // biometric last auth time
+    var biometricAuthTime by longPref("biometric_auth_time").withDefault<Long>(INIT_TIME_MS)
+
+    // go logger level, default 2 -> info
+    var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
@@ -271,17 +296,18 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     private fun setUniversalRulesCount() {
-        val list = listOf  (
-            _blockHttpConnections,
-            _blockMeteredConnections,
-            _universalLockdown,
-            _blockNewlyInstalledApp,
-            _disallowDnsBypass,
-            _udpBlocked,
-            _blockUnknownConnections,
-            _blockAppWhenBackground,
-            _blockWhenDeviceLocked
-        )
+        val list =
+            listOf(
+                _blockHttpConnections,
+                _blockMeteredConnections,
+                _universalLockdown,
+                _blockNewlyInstalledApp,
+                _disallowDnsBypass,
+                _udpBlocked,
+                _blockUnknownConnections,
+                _blockAppWhenBackground,
+                _blockWhenDeviceLocked
+            )
         universalRulesCount.postValue(list.count { it })
     }
 
@@ -370,5 +396,4 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     fun getBlockWhenDeviceLocked(): Boolean {
         return _blockWhenDeviceLocked
     }
-
 }

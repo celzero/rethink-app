@@ -22,11 +22,10 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +61,7 @@ class DomainRuleProvider : ContentProvider() {
         selection: String?,
         selectionArgs: Array<out String>?,
         sortOrder: String?
-    ): Cursor? {
+    ): Cursor {
         if (!isValidRequest(uri)) {
             Log.e(LoggerConstants.LOG_PROVIDER, "invalid uri, cannot update without ID: $uri")
             throw java.lang.IllegalArgumentException("Invalid URI, cannot update without ID$uri")
@@ -174,6 +173,7 @@ class DomainRuleProvider : ContentProvider() {
         if (selectionClause.isNullOrEmpty()) {
             val count = customDomainRepository.cpUpdate(customDomain)
             context.contentResolver?.notifyChange(uri, null)
+            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateCache(customDomain) }
             return count
         } else if (selectionClause.contains("uid") || selectionClause.contains("packageName")) {
             val c = selectionClause.count { it == '?' }
@@ -195,8 +195,7 @@ class DomainRuleProvider : ContentProvider() {
                 "selection ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status} clause: $clause"
             )
             val count = customDomainRepository.cpUpdate(customDomain, clause)
-            // update the app info cache
-            CoroutineScope(Dispatchers.IO).launch { FirewallManager.reloadAppList() }
+            CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateCache(customDomain) }
             context.contentResolver?.notifyChange(uri, null)
             return count
         } else {

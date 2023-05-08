@@ -25,8 +25,8 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetHomeScreenBinding
 import com.celzero.bravedns.service.PersistentState
@@ -34,8 +34,8 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.showToastUiCentered
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -162,9 +162,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             )
         }
 
-        b.bsHomeScreenVpnLockdownDesc.setOnClickListener {
-            Utilities.openVpnProfile(requireContext())
-        }
+        b.bsHomeScreenVpnLockdownDesc.setOnClickListener { openVpnProfile(requireContext()) }
     }
 
     // disable dns and firewall mode, show user that vpn in lockdown mode indicator if needed

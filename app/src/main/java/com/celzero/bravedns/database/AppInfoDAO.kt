@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 import android.database.Cursor
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface AppInfoDAO {

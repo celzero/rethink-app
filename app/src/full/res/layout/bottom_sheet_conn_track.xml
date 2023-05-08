@@ -304,6 +304,18 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/bs_conn_trusted_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/trusted_domains_desc"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_vertical"
+        android:textColor="?attr/chipTextNegative"
+        android:fontFamily="monospace"
+        android:textSize="@dimen/small_font_text_view" />
+
+    <TextView
         android:id="@+id/bs_conn_blocked_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

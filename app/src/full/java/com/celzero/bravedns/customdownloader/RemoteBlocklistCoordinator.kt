@@ -146,7 +146,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
     private fun makeFile(timestamp: Long): File? {
         try {
             val dir =
-                Utilities.remoteBlocklistFile(
+                Utilities.blocklistDir(
                     context,
                     Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     timestamp

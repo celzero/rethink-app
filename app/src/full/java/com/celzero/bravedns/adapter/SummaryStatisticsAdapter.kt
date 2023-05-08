@@ -47,8 +47,10 @@ import com.celzero.bravedns.ui.NetworkLogsActivity
 import com.celzero.bravedns.ui.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastN
+import com.celzero.bravedns.util.Utilities.isAtleastN
+import kotlin.math.log2
 
 class SummaryStatisticsAdapter(
     private val context: Context,
@@ -99,7 +101,9 @@ class SummaryStatisticsAdapter(
         holder.bind(appNetworkActivity)
     }
 
-    private fun calculatePercentage(value: Int): Int {
+    private fun calculatePercentage(c: Int): Int {
+        val value = (log2(c.toDouble()) * 100).toInt()
+        // maxValue will be based on the count returned by the database query (order by count desc)
         if (value > maxValue) {
             maxValue = value
         }
@@ -236,11 +240,11 @@ class SummaryStatisticsAdapter(
             val percentage = calculatePercentage(count)
             if (isBlocked) {
                 itemBinding.ssProgress.setIndicatorColor(
-                    Utilities.fetchToggleBtnColors(context, R.color.accentBad)
+                    fetchToggleBtnColors(context, R.color.accentBad)
                 )
             } else {
                 itemBinding.ssProgress.setIndicatorColor(
-                    Utilities.fetchToggleBtnColors(context, R.color.accentGood)
+                    fetchToggleBtnColors(context, R.color.accentGood)
                 )
             }
             if (isAtleastN()) {
@@ -267,10 +271,18 @@ class SummaryStatisticsAdapter(
                         startAppInfoActivity(appConnection)
                     }
                     SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
-                        showDnsLogs(appConnection)
+                        if (appConfig.getBraveMode().isDnsMode()) {
+                            showDnsLogs(appConnection)
+                        } else {
+                            showNetworkLogs(appConnection, isDns = true)
+                        }
                     }
                     SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                        showDnsLogs(appConnection)
+                        if (appConfig.getBraveMode().isDnsMode()) {
+                            showDnsLogs(appConnection)
+                        } else {
+                            showNetworkLogs(appConnection, isDns = true)
+                        }
                     }
                     SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                         showNetworkLogs(appConnection)
@@ -302,11 +314,21 @@ class SummaryStatisticsAdapter(
             }
         }
 
-        private fun showNetworkLogs(appConnection: AppConnection) {
+        private fun showNetworkLogs(appConnection: AppConnection, isDns: Boolean = false) {
             if (!handleVpnState()) return
 
             if (appConfig.getBraveMode().isFirewallActive()) {
-                startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.ipAddress)
+                if (isDns) {
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.appOrDnsName
+                    )
+                } else {
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.ipAddress
+                    )
+                }
             } else {
                 Utilities.showToastUiCentered(
                     context,

@@ -1,0 +1,126 @@
+android_app {
+    name: "Rethink",
+    manifest: "app/src/main/AndroidManifest.xml",
+    additional_manifests: ["app/src/headless/AndroidManifest.xml"],
+    srcs: [
+        "app/src/main/**/*.kt",
+        "app/src/main/**/*.java",
+        "app/src/headless/**/*.kt",
+        "app/src/headless/**/*.java",
+    ],
+    asset_dirs: [
+        "app/src/main/assets",
+        "app/src/headless/assets",
+    ],
+    resource_dirs: ["app/src/main/res"],
+
+    certificate: "testkey",
+    privileged: true,
+    platform_apis: true,
+    system_ext_specific: true,
+
+    plugins: [
+        "androidx.room_room-compiler-plugin",
+        "glide-annotation-processor",
+    ],
+
+    required: [
+        "privapp_whitelist_com.celzero.bravedns",
+        "com.celzero.bravedns_whitelist",
+    ],
+
+    jni_libs: ["libgojni"],
+
+    static_libs: [
+        "androidx.activity_activity-ktx",
+        "androidx.appcompat_appcompat",
+        "androidx.paging_paging-runtime",
+        "androidx.preference_preference",
+        "androidx.room_room-paging",
+        "androidx.work_work-runtime-ktx",
+        "com.google.android.material_material",
+        "firestack",
+        "glide-prebuilt",
+        "glide-disklrucache-prebuilt",
+        "glide-annotation-and-compiler-prebuilt",
+        "gson-prebuilt-jar",
+        "guava",
+        "ipaddress",
+        "koin-android",
+        "koin-core",
+        "krate",
+    ],
+}
+
+android_library_import {
+    name: "androidx.room_room-paging",
+    aars: ["app/libs/room-paging*.aar"],
+}
+
+android_library_import {
+    name: "firestack",
+    aars: ["app/libs/firestack*.aar"],
+    extract_jni: true,
+}
+
+android_library_import {
+    name: "koin-android",
+    aars: ["app/libs/koin-android*.aar"],
+}
+
+android_library_import {
+    name: "krate",
+    aars: ["app/libs/krate*.aar"],
+}
+
+cc_prebuilt_library_shared {
+    name: "libgojni",
+
+    target: {
+        android_arm64: {
+            srcs: ["app/libs/jni/arm64-v8a/libgojni.so"],
+        },
+        android_arm: {
+            srcs: ["app/libs/jni/armeabi-v7a/libgojni.so"],
+        },
+        android_x86: {
+            srcs: ["app/libs/jni/x86/libgojni.so"],
+        },
+        android_x86_64: {
+            srcs: ["app/libs/jni/x86_64/libgojni.so"],
+        },
+    },
+
+    shared_libs: [
+        "libandroid",
+        "liblog"
+    ],
+
+    system_ext_specific: true,
+}
+
+java_import {
+    name: "ipaddress",
+    jars: ["app/libs/ipaddress*.jar"],
+}
+
+java_import {
+    name: "koin-core",
+    jars: ["app/libs/koin-core*.jar"],
+}
+
+prebuilt_etc {
+    name: "privapp_whitelist_com.celzero.bravedns",
+    system_ext_specific: true,
+    sub_dir: "permissions",
+    src: "com.celzero.bravedns.xml",
+    filename_from_src: true,
+}
+
+prebuilt_etc {
+    name: "com.celzero.bravedns_whitelist",
+    system_ext_specific: true,
+    sub_dir: "sysconfig",
+    src: "com.celzero.bravedns_whitelist.xml",
+    filename_from_src: true,
+}

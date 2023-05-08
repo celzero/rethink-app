@@ -19,7 +19,6 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 
 @Dao

@@ -17,11 +17,21 @@ package com.celzero.bravedns.glide
 
 import android.content.Context
 import android.util.Log
+import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
+import com.bumptech.glide.Registry
 import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.bumptech.glide.load.engine.cache.LruResourceCache
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.ModelLoader
+import com.bumptech.glide.load.model.ModelLoaderFactory
+import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.module.AppGlideModule
+import okhttp3.OkHttpClient
+import java.io.InputStream
+import java.util.concurrent.TimeUnit
 
 /**
  * Defines the options to use when initializing Glide within an application. As of now, limit for
@@ -40,7 +50,45 @@ class RethinkGlideModule : AppGlideModule() {
         // Lowering disk-cache means an increase in data use (some reported, 600MB+)
         val diskCacheSizeBytes = 1024 * 1024 * 350 // 350 MB
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
-
         builder.setLogLevel(Log.ERROR)
+    }
+
+    override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
+        super.registerComponents(context, glide, registry)
+        val client: OkHttpClient =
+            OkHttpClient.Builder()
+                .readTimeout(20, TimeUnit.SECONDS)
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .build()
+
+        val factory: OkHttpUrlLoader.Factory = OkHttpUrlLoader.Factory(client)
+        registry.replace(GlideUrl::class.java, java.io.InputStream::class.java, factory)
+        // handle com.bumptech.glide.Registry$NoModelLoaderAvailableException:
+        // Failed to find any ModelLoaders registered for model class: class kotlin.Unit
+        registry.replace(Unit::class.java, InputStream::class.java, UnitModelLoaderFactory())
+    }
+
+    // handle com.bumptech.glide.Registry$NoModelLoaderAvailableException for kotlin.Unit
+    inner class UnitModelLoaderFactory : ModelLoaderFactory<Unit, InputStream> {
+        override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Unit, InputStream> {
+            return object : ModelLoader<Unit, InputStream> {
+                override fun handles(model: Unit): Boolean {
+                    return true
+                }
+
+                override fun buildLoadData(
+                    model: Unit,
+                    width: Int,
+                    height: Int,
+                    options: com.bumptech.glide.load.Options
+                ): ModelLoader.LoadData<InputStream>? {
+                    return null
+                }
+            }
+        }
+
+        override fun teardown() {
+            // no-op
+        }
     }
 }

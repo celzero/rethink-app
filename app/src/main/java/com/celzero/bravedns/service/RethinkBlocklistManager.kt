@@ -20,7 +20,14 @@ import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.data.FileTagDeserializer
-import com.celzero.bravedns.database.*
+import com.celzero.bravedns.database.LocalBlocklistPacksMap
+import com.celzero.bravedns.database.LocalBlocklistPacksMapRepository
+import com.celzero.bravedns.database.RemoteBlocklistPacksMap
+import com.celzero.bravedns.database.RemoteBlocklistPacksMapRepository
+import com.celzero.bravedns.database.RethinkLocalFileTag
+import com.celzero.bravedns.database.RethinkLocalFileTagRepository
+import com.celzero.bravedns.database.RethinkRemoteFileTag
+import com.celzero.bravedns.database.RethinkRemoteFileTagRepository
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -152,10 +159,7 @@ object RethinkBlocklistManager : KoinComponent {
                             return@forEachIndexed
                         }
                         val level = l.level?.elementAt(index) ?: 2
-                        packsBlocklistMapping.put(
-                            PacksMappingKey(s, level),
-                            l.value
-                        )
+                        packsBlocklistMapping.put(PacksMappingKey(s, level), l.value)
                     }
                 }
 
@@ -235,10 +239,7 @@ object RethinkBlocklistManager : KoinComponent {
                         }
                         // if the level is empty, then set the level to 2 (assume highest) #756
                         val level = r.level?.elementAt(index) ?: 2
-                        packsBlocklistMapping.put(
-                            PacksMappingKey(s, level),
-                            r.value
-                        )
+                        packsBlocklistMapping.put(PacksMappingKey(s, level), r.value)
                     }
                 }
                 dbFileTagRemote.add(r)
@@ -421,7 +422,7 @@ object RethinkBlocklistManager : KoinComponent {
         }
 
         val dir =
-            Utilities.remoteBlocklistFile(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+            Utilities.blocklistDir(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
                 ?: return null
         val file =
             Utilities.blocklistFile(dir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
@@ -453,7 +454,7 @@ object RethinkBlocklistManager : KoinComponent {
         }
 
         val dir =
-            Utilities.remoteBlocklistFile(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
+            Utilities.blocklistDir(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
                 ?: return null
         val file =
             Utilities.blocklistFile(dir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null

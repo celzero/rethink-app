@@ -19,7 +19,6 @@ import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.util.Constants
 
 @Dao
@@ -57,4 +56,5 @@ interface CustomDomainDAO {
 
     @Query("update CustomDomain set status = :status where :clause")
     fun cpUpdate(status: Int, clause: String): Int
+
 }

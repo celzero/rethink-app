@@ -17,15 +17,15 @@ package com.celzero.bravedns.download
 
 import android.content.Context
 import android.util.Log
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.customdownloader.IBlocklistDownload
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.Utilities.Companion.blocklistCanonicalPath
-import com.celzero.bravedns.util.Utilities.Companion.deleteRecursive
+import com.celzero.bravedns.util.Utilities.blocklistCanonicalPath
+import com.celzero.bravedns.util.Utilities.deleteRecursive
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.converter.gson.GsonConverterFactory
@@ -156,7 +156,7 @@ class BlocklistDownloadHelper {
                         timestamp,
                         vcode
                     )
-
+                Log.i(LOG_TAG_DOWNLOAD, "downloadAvailabilityCheck: $response, $retryCount, $vcode, $timestamp")
                 if (response?.isSuccessful == true) {
                     val r = response.body()?.toString()?.let { JSONObject(it) }
                     return processCheckDownloadResponse(r)
@@ -164,6 +164,7 @@ class BlocklistDownloadHelper {
                     retryIfRequired(timestamp, vcode, retryCount)
                 }
             } catch (ignored: Exception) {
+                Log.w(LOG_TAG_DOWNLOAD, "exception in checkBlocklistUpdate: ${ignored.message}", ignored)
                 retryIfRequired(timestamp, vcode, retryCount)
             }
             return null

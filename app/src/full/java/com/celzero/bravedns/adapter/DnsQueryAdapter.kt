@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -34,8 +35,8 @@ import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.FavIconDownloader
@@ -43,6 +44,7 @@ import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.DnsBlocklistBottomSheetFragment
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.google.gson.Gson
 
 class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
@@ -100,6 +102,13 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         private fun displayLogEntryHint(dnsLog: DnsLog) {
             if (dnsLog.isBlocked) {
                 b.queryLogIndicator.visibility = View.VISIBLE
+                b.queryLogIndicator.setBackgroundColor(
+                    ContextCompat.getColor(context, R.color.colorRed_A400)
+                )
+            } else if (dnsLog.blockLists.isNotEmpty()) {
+                b.queryLogIndicator.visibility = View.VISIBLE
+                val color = fetchColor(context, R.attr.chipTextNeutral)
+                b.queryLogIndicator.setBackgroundColor(color)
             } else {
                 b.queryLogIndicator.visibility = View.INVISIBLE
             }

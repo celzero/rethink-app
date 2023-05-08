@@ -31,20 +31,22 @@ import androidx.annotation.GuardedBy
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
+import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
-import com.celzero.bravedns.util.Utilities.Companion.getActivityPendingIntent
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastO
-import com.celzero.bravedns.util.Utilities.Companion.isAtleastT
-import com.celzero.bravedns.util.Utilities.Companion.isNonApp
+import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
+import com.celzero.bravedns.util.Utilities.isAtleastO
+import com.celzero.bravedns.util.Utilities.isAtleastT
+import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -141,7 +143,7 @@ internal constructor(
                         }
                         .toHashSet()
 
-                FirewallManager.deletePackagesFromCache(packagesToDelete)
+                FirewallManager.deletePackages(packagesToDelete)
                 removeRulesRelatedToDeletedPackages(packagesToDelete)
 
                 Log.i(LOG_TAG_APP_DB, "remove: $packagesToDelete; insert: $packagesToAdd")
@@ -171,16 +173,27 @@ internal constructor(
         // if a non-app appears installed-apps group, then upsert its db entry
         // and give it a proper identity as retrieved from the package-manager
         val nonApps = trackedApps.filter { isNonApp(it.packageName) }.map { it.uid }.toSet()
-        installedApps.forEach {
+        installedApps.forEach { it ->
             if (nonApps.contains(it.uid)) {
-                upsertApp(it)
+                val prevPackageName =
+                    trackedApps.filter { i -> i.uid == it.uid }.map { it.packageName }
+                upsertApp(it, prevPackageName.first())
             }
         }
     }
 
-    private suspend fun upsertApp(appTuple: FirewallManager.AppInfoTuple) {
+    private suspend fun upsertApp(appTuple: FirewallManager.AppInfoTuple, prevPackageName: String) {
+        // do not upsert android and system apps
+        if (
+            appTuple.uid == AndroidUidConfig.ANDROID.uid ||
+                appTuple.uid == AndroidUidConfig.SYSTEM.uid
+        ) {
+            return
+        }
+
         val appInfo = getAppInfo(appTuple.uid) ?: return
 
+        deletePackage(prevPackageName)
         insertApp(appInfo)
     }
 
@@ -411,6 +424,9 @@ internal constructor(
     private fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
         // no need to notify if the Universal setting is off
         if (!persistentState.getBlockNewlyInstalledApp()) return
+
+        // no need to notify if the vpn is not on
+        if (!VpnController.isOn()) return
 
         if (app.packageName.isEmpty()) {
             app.packageName = FirewallManager.getPackageNameByUid(app.uid) ?: ""

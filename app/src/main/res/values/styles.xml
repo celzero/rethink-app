@@ -99,7 +99,7 @@
         <item name="colorSwitchThumbNormal">@color/colorSwitchThumbNormalLight</item>
         <item name="controlActivated">@color/colorControlActivatedLight</item>
         <item name="controlActivatedBad">@color/colorControlActivatedBadLight</item>
-        <item name="android:navigationBarColor">@color/navBarColorLight</item>
+        <item name="android:navigationBarColor">@color/switchNormalLight</item>
         <item name="colorSurface">@color/colorSurfaceLight</item>
 
         <item name="chipStyle">@style/Widget.MaterialComponents.Chip.Action</item>

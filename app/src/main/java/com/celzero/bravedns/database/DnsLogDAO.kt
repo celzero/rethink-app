@@ -19,8 +19,8 @@ package com.celzero.bravedns.database
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.celzero.bravedns.data.AppConnection
+import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
 
 @Dao
 interface DnsLogDAO {
@@ -29,45 +29,64 @@ interface DnsLogDAO {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE) fun insertBatch(dnsLogs: List<DnsLog>)
 
+    // replace order by timeStamp desc with order by id desc, as order by timeStamp desc is building
+    // the query with temporary index on the table. This is causing the query to be slow.
+    // ref: https://stackoverflow.com/a/50776662 (auto covering index)
+    // LIMIT 35000 to avoid the query to be slow
+    @Query("select * from DNSLogs order by id desc LIMIT $MAX_LOGS") fun getAllDnsLogs(): PagingSource<Int, DnsLog>
+
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by id desc LIMIT $MAX_LOGS"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc LIMIT $MAX_LOGS")
+    fun getAllowedDnsLogs(): PagingSource<Int, DnsLog>
+
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists = '' order by id desc LIMIT $MAX_LOGS"
     )
     fun getAllowedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
+    @Query("select * from DNSLogs where isBlocked = 1 order by time desc LIMIT $MAX_LOGS")
+    fun getBlockedDnsLogs(): PagingSource<Int, DnsLog>
+
     @Query(
-        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by time desc"
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
+
+    @Query("select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS")
+    fun getMaybeBlockedDnsLogs(): PagingSource<Int, DnsLog>
+
+    @Query(
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS"
+    )
+    fun getMaybeBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
     @Query("delete from DNSLogs") fun clearAllData()
 
     @Query("delete from DNSLogs where time < :date") fun purgeDnsLogsByDate(date: Long)
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(queryStr) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' group by queryStr order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' group by queryStr order by count desc LIMIT 7"
     )
     fun getMostContactedDomains(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(queryStr) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' group by queryStr order by count desc"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' group by queryStr order by count desc"
     )
     fun getAllContactedDomains(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(queryStr) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 group by queryStr order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 group by queryStr order by count desc LIMIT 7"
     )
     fun getMostBlockedDomains(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(queryStr) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 group by queryStr order by count desc"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 group by queryStr order by count desc"
     )
     fun getAllBlockedDomains(): PagingSource<Int, AppConnection>
 
-    @Query("select count(*) from DNSLogs")
-    fun logsCount(): LiveData<Long>
+    @Query("select count(id) from DNSLogs") fun logsCount(): LiveData<Long>
 }

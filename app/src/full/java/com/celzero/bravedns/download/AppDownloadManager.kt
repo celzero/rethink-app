@@ -22,7 +22,13 @@ import android.net.Uri
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.workDataOf
+import com.celzero.bravedns.BuildConfig.DEBUG
 import com.celzero.bravedns.customdownloader.LocalBlocklistCoordinator
 import com.celzero.bravedns.customdownloader.RemoteBlocklistCoordinator
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.checkBlocklistUpdate
@@ -32,7 +38,6 @@ import com.celzero.bravedns.download.DownloadConstants.Companion.FILE_TAG
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager.DownloadType
-import com.celzero.bravedns.ui.HomeScreenActivity.GlobalVariable.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_ADM
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
@@ -74,7 +79,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(ts, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(LOG_TAG_DNS, "blocklist update is check response is null for ${type.name}")
+            Log.w(LOG_TAG_DNS, "blocklist update is check response is null for ${type.name}, ts: $ts, app version: ${persistentState.appVersion}")
             downloadRequired.postValue(DownloadManagerStatus.FAILURE)
             return
         }
@@ -158,7 +163,7 @@ class AppDownloadManager(
         val response = checkBlocklistUpdate(currentTs, persistentState.appVersion, retryCount = 0)
         // if received response for update is null
         if (response == null) {
-            Log.w(LOG_TAG_DNS, "local blocklist update check is null")
+            Log.w(LOG_TAG_DNS, "local blocklist update check is null, ts: $currentTs, app version: ${persistentState.appVersion}")
             return DownloadManagerStatus.FAILURE
         }
 
