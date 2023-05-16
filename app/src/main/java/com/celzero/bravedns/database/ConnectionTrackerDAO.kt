@@ -26,9 +26,9 @@ interface ConnectionTrackerDAO {
 
     @Update fun update(connectionTracker: ConnectionTracker)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(connectionTracker: ConnectionTracker)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(connectionTracker: ConnectionTracker)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
 
     @Delete fun delete(connectionTracker: ConnectionTracker)

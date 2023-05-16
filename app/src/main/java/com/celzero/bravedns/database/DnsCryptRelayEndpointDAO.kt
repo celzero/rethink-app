@@ -23,7 +23,7 @@ interface DnsCryptRelayEndpointDAO {
 
     @Update fun update(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
 
     @Delete fun delete(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint)
