@@ -70,12 +70,12 @@ import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -821,10 +821,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     override fun onResume() {
         super.onResume()
         handleShimmer()
+        maybeAutoStartVpn()
         updateCardsUi()
         syncDnsStatus()
         handleQuickSettingsChips()
         handleLockdownModeIfNeeded()
+    }
+
+    /**
+     * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
+     * crashes/updates it goes into red waiting state. This causes confusion to the users also
+     * requires click of START button twice to start the app. FIX : The check for the controller
+     * state. If persistence state has vpn enabled and the VPN is not connected then the start will
+     * be initiated.
+     */
+    private fun maybeAutoStartVpn() {
+        if (isVpnActivated && !VpnController.state().on) {
+            Log.i(LOG_TAG_VPN, "start VPN (previous state)")
+            prepareAndStartVpn()
+        }
     }
 
     // set the app mode to dns+firewall mode when vpn in lockdown state

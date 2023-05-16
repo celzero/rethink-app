@@ -53,19 +53,6 @@ class RethinkDnsApplication : Application() {
         // database refresh is used in both headless and main project
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()
-
-        /**
-         * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
-         * crashes/updates it goes into red waiting state. This causes confusion to the users also
-         * requires click of START button twice to start the app. FIX : The check for the controller
-         * state. If persistence state has vpn enabled and the VPN is not connected then the start
-         * will be initiated.
-         */
-        val state = VpnController.state()
-        if (state.activationRequested && !state.on) {
-            Log.i(LoggerConstants.LOG_TAG_VPN, "start VPN (previous state)")
-            if (VpnService.prepare(this) == null) VpnController.start(this)
-        } else VpnController.stop(this)
     }
 
     private fun turnOnStrictMode() {

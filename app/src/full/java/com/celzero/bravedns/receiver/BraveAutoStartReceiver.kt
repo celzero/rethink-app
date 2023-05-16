@@ -54,7 +54,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
                 try {
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {
-                    Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode.")
+                    Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
                     return
                 }
 
@@ -62,10 +62,6 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
                 VpnController.start(context)
                 return
             }
-
-            val startIntent = Intent(context, HomeScreenActivity::class.java)
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(startIntent)
         }
     }
 }
