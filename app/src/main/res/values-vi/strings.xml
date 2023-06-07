@@ -30,14 +30,14 @@
     <string name="status_dns_error" translatable="true">Lỗi DNS</string>
     <string name="status_no_internet" translatable="true">Không có kết nối internet</string>
     <string name="status_protected_with_tor" translatable="true">Đã được bảo vệ với Tor</string>
-    <string name="status_protected_with_private_dns" translatable="true">Đã được bảo vệ với DNS riêng</string>
-    <string name="status_protected_with_tor_private_dns" translatable="true">Đã được bảo vệ bởi Tor &amp; private DNS</string>
+    <string name="status_protected_with_private_dns" translatable="true">Đã được bảo vệ với DNS riêng tư.</string>
+    <string name="status_protected_with_tor_private_dns" translatable="true">Đã được bảo vệ bởi Tor &amp; DNS riêng tư.</string>
     <string name="status_protected_with_socks5_private_dns" translatable="true">Đã được bảo vệ bởi socks5 &amp; private DNS</string>
     <string name="status_protected_with_http_private_dns" translatable="true">Đã được bảo vệ bởi các http proxy &amp; private DNS</string>
     <string name="status_protected_with_socks5" translatable="true">Đã được bảo vệ bởi socks5 proxy</string>
     <string name="status_protected_with_http" translatable="true">Đã được bảo vệ bởi http proxy</string>
     <string name="status_protected_with_proxy" translatable="true">Đã được bảo vệ bởi proxy</string>
-    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">private DNS đã được kích hoạt</string>
+    <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted." translatable="true">DNS riêng tư đã được kích hoạt</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">Chưa được bảo vệ</string>
     <string name="dns_explanation_firewall_connected" translatable="true">Đã kết nối với tường lửa</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">Đã kết nối với RethinkDNS và tường lửa</string>
@@ -64,7 +64,7 @@
     <string name="hybrid_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối đến DNS + tường lửa</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">đang chờ</string>
     <string name="status_dns_server_down" translatable="true">Máy chủ DNS đang ngưng hoạt động</string>
-    <string name="status_protected_with_proxy_private_dns" translatable="true">Đã được bảo vệ bởi proxy &amp; private DNS</string>
+    <string name="status_protected_with_proxy_private_dns" translatable="true">"Đã được bảo vệ bởi Proxy &amp;  DNS riêng tư"</string>
     <string name="dns_explanation_dns_connected" translatable="true">Đã kết nối với RethinkDNS</string>
     <string name="notification_action_pause_vpn" translatable="true">NGƯNG</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
@@ -73,7 +73,7 @@
     <string name="accessibility_service_description" translatable="true">Rethink sử dụng dịch vụ trợ năng để phát hiện và tường lửa các ứng dụng nền. Rethink không thu thập hoặc bán bất kỳ thông tin nào.</string>
     <string name="lbl_dismiss" translatable="true">Bỏ qua</string>
     <string name="lbl_wildcard" translatable="true">Ký tự đại diện</string>
-    <string name="lbl_action_required" translatable="true">Cần hành động</string>
+    <string name="lbl_action_required" translatable="true">Hoạt động cần thiết</string>
     <string name="lbl_ip_rules" translatable="true">Quy tắc IP</string>
     <string name="lbl_domain_rules" translatable="true">Quy tắc tên miền</string>
     <string name="isolate" translatable="true">Cách ly</string>
@@ -101,7 +101,7 @@
     <string name="private_dns_dialog_heading" translatable="true">Tắt DNS riêng</string>
     <string name="private_dns_dialog_desc" translatable="true">Cài đặt DNS của Rethink bị DNS riêng của Android ghi đè.
 \n
-\nĐể sử dụng DNS của Rethink, hãy chuyển đến Cài đặt Android và tắt \"DNS riêng\".</string>
+\nĐể sử dụng DNS của Rethink, hãy chuyển đến Cài đặt Android và tắt \"DNS riêng tư\".</string>
     <string name="private_dns_dialog_positive" translatable="true">Chuyển đến Cài đặt</string>
     <string name="firewall_act_universal_tab" translatable="true">Chung</string>
     <string name="firewall_act_network_monitor_tab" translatable="true">Nhật ký mạng</string>
@@ -131,7 +131,7 @@
 \n
 \nRethinkDNS sử dụng dịch vụ trợ năng để theo dõi xem những nào ứng dụng đang được sử dụng trực tiếp (foreground) và những ứng dụng nào đang không được sử dụng trực tiếp/chạy ngầm (background).</string>
     <string name="bsct_conn_desc_allowed" translatable="true">đã được cho phép trên %1$s %2$s</string>
-    <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkDNS đang chạy VPN ở chế độ <i>Lockdown</i>. Dừng nó sẽ dẫn đến mất kết nối Internet trên hồ sơ người dùng này. Bạn có muốn tiếp tục không\?</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">RethinkDNS đang chạy VPN ở chế độ <i>Lockdown</i>. Nếu dừng nó sẽ dẫn đến mất kết nối Internet trên hồ sơ người dùng này. Bạn có muốn tiếp tục không\?</string>
     <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: Chặn ứng dụng kết nối với Internet.
 \n <u>#2</u>: Chặn bất kỳ ứng dụng nào kết nối với một IP cụ thể.
 \n <u>#3</u>: Chặn tất cả các kết nối khi thiết bị đang khóa màn (Tường lửa chung).
@@ -178,7 +178,7 @@
     <string name="relative_time_yesterday" translatable="true">Hôm qua</string>
     <string name="settings_ip_network_heading" translatable="true">Chọn phiên bản IP</string>
     <string name="settings_ip_network_desc" translatable="true">Chọn giữa các phiên bản Giao thức Internet.</string>
-    <string name="settings_allow_bypass_heading" translatable="true">Cho phép bỏ qua</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Kích hoạt khả năng hiển thị mạng</string>
     <string name="settings_proxy_header" translatable="true">proxy</string>
     <string name="settings_socks5_heading" translatable="true">Thiết lập proxy SOCKS5</string>
     <string name="settings_socks5_desc" translatable="true">Chuyển tiếp kết nối đến điểm cuối SOCKS5.</string>
@@ -248,7 +248,7 @@
     <string name="settings_theme_dialog_themes_3" translatable="true">Tối</string>
     <string name="settings_ip_dialog_title" translatable="true">Chọn phiên bản IP</string>
     <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (thử nghiệm)</string>
-    <string name="settings_ip_dialog_ipv46" translatable="true">Tự động (thử nghiệm)</string>
+    <string name="settings_ip_dialog_ipv46" translatable="true">Kiểm tra kết nối tự động (thử nghiệm) được gửi để xác định khả năng tiếp cận.</string>
     <string name="settings_ip_text_ipv4" translatable="true">IPv4</string>
     <string name="settings_ip_text_ipv46" translatable="true">Tự động</string>
     <string name="settings_notification_heading" translatable="true">Chọn hành động thông báo</string>
@@ -285,7 +285,7 @@
     <string name="firewall_card_text_active" translatable="true">%1$s bị chặn
 \n%2$s bỏ qua
 \n%3$s bị loại trừ
-\n%4$s bị cách ly</string>
+\n%4$s riêng biệt</string>
     <string name="dns_card_latency_active" translatable="true">Độ trễ: %1$sms</string>
     <string name="dns_card_latency_inactive" translatable="true">Kích hoạt chế độ DNS.</string>
     <string name="apps_card_ips_count" translatable="true">%1$s Quy tắc IP &amp; Cổng</string>
@@ -298,8 +298,8 @@
     <string name="download_update_dialog_trylater_message" translatable="true">Không thể thực hiện cập nhật ngay bây giờ, vui lòng thử lại sau.</string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Tìm kiếm danh sách chặn</font></string>
     <string name="whats_dialog_title" translatable="true">Có gì mới trong phiên bản 053n</string>
-    <string name="whats_new_version_update" translatable="true">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Tính năng mới&lt;/i&gt;: Màn hình Thống kê hoàn toàn mới.&lt;br/&gt; 2. &lt;i&gt;Tính năng mới&lt;/i&gt; : Bảo mật ứng dụng này bằng khóa màn hình.&lt;br/&gt; 3. &lt;i&gt;Tính năng mới&lt;/i&gt;: Chọn ngôn ngữ ưa thích của bạn từ cài đặt ứng dụng.&lt;br/&gt; 4. &lt;i&gt;Tính năng mới&lt;/i&gt;: RDNS+ &lt; Chế độ xem i&gt;Đơn giản&lt;/i&gt; chỉ hiển thị các danh sách được sắp xếp hợp lý.&lt;br/&gt; 5. Đổi tên: Chế độ &lt;i&gt;Khóa ứng dụng&lt;/i&gt; hiện là chế độ &lt;i&gt;Cô lập&lt;/i&gt;.&lt;br/&gt; 6 . Đổi tên: &lt;i&gt;Bỏ qua các quy tắc của ứng dụng&lt;/i&gt; hiện được gọi là IP &lt;i&gt;Trust&lt;/i&gt;.&lt;br/&gt; 7. Khắc phục sự cố khi Rethink được cài đặt trong Hồ sơ công việc.&lt;br/&gt; 8. Bây giờ xóa các quy tắc dành riêng cho ứng dụng khi gỡ cài đặt ứng dụng.&lt;br/&gt; 9. Và các bản sửa lỗi và thay đổi nhỏ khác về giao diện người dùng.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/ translate&gt;Help translate this app&lt;/a&gt;</string>
-    <string name="settings_allow_bypass_desc" translatable="true">Cho phép các ứng dụng yêu cầu vượt qua tường lửa RethinkDNS theo yêu cầu. Một số ứng dụng hội nghị âm thanh/video như Zoom và WhatsApp có thể yêu cầu bỏ qua theo yêu cầu để hoạt động bình thường.</string>
+    <string name="whats_new_version_update" translatable="true">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Tính năng mới&lt;/i&gt;: Màn hình Thống kê hoàn toàn mới.&lt;br/&gt; 2. &lt;i&gt;Tính năng mới&lt;/i&gt; : Bảo mật ứng dụng này bằng khóa màn hình.&lt;br/&gt; 3. &lt;i&gt;Tính năng mới&lt;/i&gt;: Chọn ngôn ngữ ưa thích của bạn từ cài đặt ứng dụng.&lt;br/&gt; 4. &lt;i&gt;Tính năng mới&lt;/i&gt;: RDNS+ &lt; Chế độ xem i&gt;Đơn giản&lt;/i&gt; chỉ hiển thị các danh sách được sắp xếp hợp lý.&lt;br/&gt; 5. Đổi tên: Chế độ &lt;i&gt;Khóa ứng dụng&lt;/i&gt; hiện là chế độ &lt;i&gt;Cô lập&lt;/i&gt;.&lt;br/&gt; 6 . Đổi tên: &lt;i&gt;Bỏ qua các quy tắc của ứng dụng&lt;/i&gt; hiện được gọi là IP &lt;i&gt;Trust&lt;/i&gt;.&lt;br/&gt; 7. Khắc phục sự cố khi Rethink được cài đặt trong Hồ sơ công việc.&lt;br/&gt; 8. Bây giờ xóa các quy tắc dành riêng cho ứng dụng khi gỡ cài đặt ứng dụng.&lt;br/&gt; 9. Và các bản sửa lỗi và thay đổi nhỏ khác về giao diện người dùng.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/ translate&gt;Hỗ trợ dịch ứng dụng&lt;/a&gt;</string>
+    <string name="settings_allow_bypass_desc" translatable="true">Cho phép các ứng dụng yêu cầu truy cập vào tất cả các mạng có sẵn. Các ứng dụng này có thể bỏ qua đường hầm VPN của Rethink theo yêu cầu. Một số ứng dụng hội nghị âm thanh/video như Zoom và Meet có thể yêu cầu tính năng này hoạt động bình thường.</string>
     <string name="settings_import_export_heading" translatable="true">Sao lưu và khôi phục</string>
     <string name="settings_https_desc" translatable="true">Cài đặt này chỉ là một đề xuất và có thể các ứng dụng sẽ bỏ qua nó. Các ứng dụng sử dụng proxy HTTP(S) sẽ bỏ qua cả quy tắc Tường lửa và DNS.</string>
     <string name="orbot_bs_status_4" translatable="true">Thiết lập Tor-as-a-Proxy (Orbot) chỉ bằng một cú nhấp.</string>
@@ -329,12 +329,12 @@
     <string name="firewall_status_whitelisted" translatable="true">bỏ qua các quy tắc tường lửa phổ quát</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Xác thực sinh trắc học không được hỗ trợ hoặc bị tắt trên thiết bị này</string>
     <string name="firewall_card_text_inactive" translatable="true">Kích hoạt chế độ tường lửa.</string>
-    <string name="lbl_rules" translatable="true">Luật</string>
-    <string name="lbl_configure" translatable="true">Sửa đổi</string>
+    <string name="lbl_rules" translatable="true">quy tắc</string>
+    <string name="lbl_configure" translatable="true">Cấu hình</string>
     <string name="bypass_universal" translatable="true">Bỏ qua quy tắc universal</string>
     <string name="bypass_dns_firewall" translatable="true">Bỏ qua DNS và tường lửa</string>
-    <string name="bsct_block_ip" translatable="true">Chặn, cho phép <u>Địa chỉ IP này</u> cho <u>Ứng dụng này </u></string>
-    <string name="bsct_block_domain" translatable="true">Chặn, cho phép <u>Địa chỉ IP này</u> cho <u>Ứng dụng này </u></string>
+    <string name="bsct_block_ip" translatable="true">Chặn, tin tưởng \u0020<u>địa chỉ IP này</u> cho <u>ứng dụng</u></string>
+    <string name="bsct_block_domain" translatable="true">Chặn, tin tưởng <u>tên miền </u> cho <u>ứng dụng này </u></string>
     <string name="lbl_logs" translatable="true">Nhật kí thông tin</string>
     <string name="pause_title_desc" translatable="true">đang nghỉ một chút…</string>
     <string name="settings_custom_downloader_heading" translatable="true">Sử dụng trình tải xuống trong ứng dụng</string>
@@ -352,7 +352,7 @@
     <string name="lbl_maybe_blocked" translatable="true">Có thể bị chặn</string>
     <string name="lbl_network" translatable="true">mạng</string>
     <string name="settings_enable_logs_desc" translatable="true">Lưu trữ nhật ký DNS và Tường lửa trên bộ nhớ cục bộ</string>
-    <string name="settings_allow_lan_heading" translatable="true">Không định tuyến IP riêng (thử nghiệm)</string>
+    <string name="settings_allow_lan_heading" translatable="true">Không định tuyến IP riêng tư (thử nghiệm)</string>
     <string name="orbot_stop_dialog_title" translatable="true">Cần can thiệp thủ công</string>
     <string name="settings_http_proxy_error_text1" translatable="true">Phạm vi cổng phải từ 1024-65535</string>
     <string name="settings_app_list_default_app" translatable="true">không ai</string>
@@ -517,4 +517,28 @@
     <string name="fapps_filter_categories_heading" translatable="true">Hạng mục</string>
     <string name="fapps_filter_parent_system" translatable="true">Hệ thống</string>
     <string name="fapps_info_isolate_msg" translatable="true">Chặn tất cả ngoại trừ các IP đáng tin cậy.</string>
+    <string name="settings_all_networks_dialog_message" translatable="true">Khi được bật, các quy tắc tường lửa ứng dụng cho đồng hồ đo (ví dụ: Di động) và không có đồng hồ đo (ví dụ: WiFi) sẽ không được áp dụng.
+\n
+\n Bạn có muốn tiếp tục\?</string>
+    <string name="settings_pcap_dialog_option_2" translatable="true">Xuất ra Logcat</string>
+    <string name="firewall_status_bypass_dns_firewall" translatable="true">Bỏ qua các quy tắc DNS và tường lửa</string>
+    <string name="firewall_status_block_metered" translatable="true">Bị chặn trên các mạng có đồng hồ đo (di động)</string>
+    <string name="settings_ptrans_desc" translatable="true">Chuyển đổi lưu lượng gửi từ IPv6 sang IPv4 trên thiết bị. Tắt nếu kết nối của bạn chỉ hỗ trợ IPv4.</string>
+    <string name="hsf_exclude_error" translatable="true">Không thể loại trừ ở chế độ khóa VPN</string>
+    <string name="trusted_domains_desc" translatable="true">Những quy tắc miền tin cậy chỉ hoạt động với <u>Rethink\'s DNS</u></string>
+    <string name="settings_ptrans_heading" translatable="true">Bắt buộc đầu ra IPv4</string>
+    <string name="settings_allow_lan_desc" translatable="true">Loại trừ LAN, lặp lại, các tuyến liên kết cục bộ từ đường hầm VPN của Rethink.</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Một số tùy chọn bị tắt khi VPN ở chế độ khóa.<u>Xem cài đặt VPN</u></string>
+    <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Ứng dụng đã chọn sẽ bị loại trừ khỏi VPN để cho phép ứng dụng đó thay mặt bạn kết nối proxy.</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">Đen</string>
+    <string name="settings_default_dns_desc" translatable="true">Trong một số ít trường hợp khi không thể xác định được DNS ưa thích của người dùng, DNS thay thế sẽ được sử dụng.</string>
+    <string name="firewall_status_block_unmetered" translatable="true">Bị chặn trên các mạng không có đồng hồ đo (wifi)</string>
+    <string name="hsf_vpn_prepare_failure" translatable="true">Quyền VPN bị mất hoặc một ứng dụng khác đang ở chế độ \"Luôn bật VPN\".</string>
+    <string name="hsf_notification_permission_failure" translatable="true">Bật quyền thông báo từ màn hình Cài đặt</string>
+    <string name="hsf_start_dialog_message" translatable="true">Bạn chỉ còn một bước nữa là có được Android an toàn và bảo mật: Xem ngay hoạt động mạng, chặn trang web, IP và ứng dụng không hoạt động.</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Bắt gói đang hoạt động</string>
+    <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Tắt khả năng bắt gói tin</string>
+    <string name="settings_pcap_heading" translatable="true">Bắt giữ gói dữ liệu</string>
+    <string name="settings_default_dns_heading" translatable="true">Chọn DNS thay thế</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s truy vấn</string>
 </resources>
