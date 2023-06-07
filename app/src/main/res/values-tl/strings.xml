@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_title_desc" translatable="true">Isang napakadaling i-customize na DNS at Firewall</string>
-    <string name="about_title_desc" translatable="true">Tuklasin at hadlangan ang mga banta sa seguridad ng network</string>
+    <string name="settings_title_desc" translatable="true">Isang DNS at Firewall na may mataas na antas ng pagsasaayos</string>
+    <string name="about_title_desc" translatable="true">Makita at harangan ang mga banta sa seguridad ng network</string>
     <string name="txt_home" translatable="true">Tahanan</string>
     <string name="title_about" translatable="true">Tungkol sa</string>
-    <string name="title_statistics" translatable="true">Mga istatistika</string>
-    <string name="pause_title_desc" translatable="true">umiidlip…</string>
-    <string name="accessibility_service_description" translatable="true">Ang Rethink ay gumagamit ng accessibility service upang malaman at i-firewall ang mga background application. Hindi nangongolekta o nagbebenta ng anumang impormasyon ang Rethink.</string>
+    <string name="title_statistics" translatable="true">Mga Estadistika</string>
+    <string name="pause_title_desc" translatable="true">nagpapahinga lang…</string>
+    <string name="accessibility_service_description" translatable="true">Ang Rethink ay gumagamit ng serbisyong pang-accessibility upang malaman at i-firewall ang mga aplikasyon sa background. Hindi nangongolekta o nagbebenta ng anumang impormasyon ang Rethink.</string>
     <string name="next" translatable="true">Susunod</string>
     <string name="skip" translatable="true">Laktawan</string>
-    <string name="finish" translatable="true">Tapos na</string>
-    <string name="lbl_cancel" translatable="true">Kanselahin</string>
-    <string name="lbl_apply" translatable="true">I-apply</string>
-    <string name="lbl_dismiss" translatable="true">I-dismiss</string>
+    <string name="finish" translatable="true">Tapusin</string>
+    <string name="lbl_cancel" translatable="true">Ikansela</string>
+    <string name="lbl_apply" translatable="true">Maglapat</string>
+    <string name="lbl_dismiss" translatable="true">Balewalain</string>
     <string name="lbl_all" translatable="true">Lahat</string>
     <string name="lbl_allowed" translatable="true">Pinapayagan</string>
     <string name="lbl_blocked" translatable="true">Nablock</string>
