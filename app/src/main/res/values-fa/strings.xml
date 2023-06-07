@@ -211,29 +211,45 @@
     <string name="settings_allow_lan_desc" translatable="true">حذف LAN، Loopback و مسیرهای پیوند محلی از تونل VPN Rethink.</string>
     <string name="settings_ip_network_heading" translatable="true">نسخه IP را انتخاب کنید</string>
     <string name="settings_ptrans_desc" translatable="true">ترافیک IPv6 خروجی را به IPv4 روی دستگاه ترجمه کنید؛ اگر به یک شبکه IPv4 متصل هستید، فعال کنید.</string>
-    <string name="settings_allow_bypass_heading" translatable="true">اجازه دور زدن</string>
+    <string name="settings_allow_bypass_heading" translatable="true">فعال سازی قابلیت مشاهده شبکه</string>
     <string name="settings_ip_network_desc" translatable="true">از بین نسخه های پروتکل اینترنت، یکی را انتخاب کنید.</string>
     <string name="settings_ptrans_heading" translatable="true">خروج اجباری IPv4</string>
     <string name="lbl_wildcard" translatable="true">ولیدکارت</string>
     <string name="orbot_http" translatable="true">پروکسی HTTP</string>
     <string name="orbot_none" translatable="true">هیچکدام (پیش‌فرض)</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">حالت را انتخاب کنید.</string>
-    <string name="settings_lock_down_mode_desc" translatable="true">وقتی VPN در حالت قفل است، برخی از گزینه‌ها غیرفعال می‌شوند. <u>تنظیمات VPN را ببینید</u>.</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">وقتی VPN در حالت فقط DNS یا حالت قفل اجرا می شود، نمی توان پراکسی ها را راه اندازی کرد. <u>به تنظیمات VPN بروید</u></string>
-    <string name="orbot_socks5" translatable="true">فقط پروکسی TCP</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">برخی از گزینه‌ها وقتی VPN در حالت قفل باشد، غیرفعال می‌شوند. <u>تنظیمات VPN را ببینید</u>.</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">نمی توان پراکسی ها را وقتی VPN در حالت فقط DNS یا حالت قفل اجرا می شود، راه اندازی کرد. <u>به تنظیمات VPN بروید</u></string>
+    <string name="orbot_socks5" translatable="true">پروکسی صرفا از نوع TCP</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">DNSCrypt</string>
     <string name="settings_proxy_header" translatable="true">پروکسی</string>
     <string name="orbot_none_desc" translatable="true">هیچ کدام از موارد بالا.</string>
-    <string name="settings_https_heading" translatable="true">راه اندازی پروکسی HTTP(S).</string>
-    <string name="orbot_both" translatable="true">پروکسی TCP + HTTP</string>
-    <string name="settings_socks5_heading" translatable="true">اجرای پروکسی SOCKS5</string>
+    <string name="settings_https_heading" translatable="true">راه اندازی پروکسی HTTP(S)</string>
+    <string name="orbot_both" translatable="true">پروکسی از نوع TCP + HTTP</string>
+    <string name="settings_socks5_heading" translatable="true">راه اندازی پروکسی SOCKS5</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">حالت را انتخاب کنید.</string>
-    <string name="settings_allow_bypass_desc" translatable="true">به برنامه های درخواست کننده اجازه دسترسی به همه شبکه های موجود را بدهید. این برنامه‌ها ممکن است بر حسب تقاضا از تونل VPN Rethink عبور کنند. برخی از برنامه‌های کنفرانس صوتی/تصویری مانند Zoom و Meet ممکن است برای عملکرد صحیح به این نیاز داشته باشند.</string>
-    <string name="settings_socks5_desc" translatable="true">اتصالات را به نقطه پایانی SOCKS5 انتقال دهید.</string>
-    <string name="settings_https_desc" translatable="true">این تنظیم فقط یک توصیه است و ممکن است برنامه ها آن را نادیده بگیرند. برنامه‌هایی که از پروکسی HTTP(S) استفاده می‌کنند، قوانین فایروال و DNS را دور می‌زنند.</string>
-    <string name="orbot_socks5_desc" translatable="true">همه اتصالات TCP را به Orbot هدایت می کند.</string>
-    <string name="orbot_http_desc" translatable="true">توصیه میشود برنامه‌ها از پروکسی HTTP Orbot استفاده کنند.</string>
-    <string name="orbot" translatable="true">Orbot</string>
-    <string name="orbot_both_desc" translatable="true">همه موارد بالا .</string>
-    <string name="orbot_bs_status_1" translatable="true">ارسال %1$s اتصال به Orbot.</string>
+    <string name="settings_allow_bypass_desc" translatable="true">به برنامه های درخواست کننده اجازه دسترسی به همه شبکه های موجود را بدهید. این برنامه‌ها ممکن است بر حسب تقاضا تونل VPN Rethink را دور بزنند. برخی از برنامه‌های کنفرانس صوتی/تصویری مانند Zoom و Meet ممکن است برای عملکرد صحیح به این نیاز داشته باشند.</string>
+    <string name="settings_socks5_desc" translatable="true">انتقال اتصالات به نقطه پایانی SOCKS5.</string>
+    <string name="settings_https_desc" translatable="true">این تنظیم فقط یک توصیه بوده و ممکن است برنامه ها آن را نادیده بگیرند. برنامه‌هایی که از پروکسی HTTP(S) استفاده می‌کنند، قوانین فایروال و DNS را دور می‌زنند.</string>
+    <string name="orbot_socks5_desc" translatable="true">هدایت همه اتصالات TCP به Orbot.</string>
+    <string name="orbot_http_desc" translatable="true">توصیه میشود برنامه‌ها از پروکسیOrbot HTTP استفاده کنند.</string>
+    <string name="orbot" translatable="true">Orbot (ربات پیازی تور)</string>
+    <string name="orbot_both_desc" translatable="true">همه موارد بالا.</string>
+    <string name="orbot_bs_status_1" translatable="true">ارسال %1$s اتصالات به Orbot.</string>
+    <string name="orbot_bs_status_3" translatable="true">ارسال %1$s به Orbot، پروکسی HTTP نیز تنظیم شده است.</string>
+    <string name="orbot_stop_dialog_title" translatable="true">مداخله دستی لازم است</string>
+    <string name="orbot_app_issue" translatable="true">Orbot اجرا نشد. آیا نصب شده است؟</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
+\n
+\n%2$s</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_title" translatable="true">Orbot و پروکسی ها</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">RethinkDNS برای ارسال DNS queries به Orbot تنظیم شده است. در صورت نیاز تغییر دهید.</string>
+    <string name="orbot_stop_dialog_message" translatable="true">RethinkDNS ارسال اتصالات به Orbot را متوقف کرده است، اما ممکن است که Orbot همچنان در پس‌زمینه درحال اجرا باشد.</string>
+    <string name="orbot_bs_status_2" translatable="true">پروکسی HTTP تنظیم شد (برنامه ها ممکن است آن را نادیده بگیرند).</string>
+    <string name="orbot_bs_status_4" translatable="true">راه اندازی تور (Orbot) بعنوان پروکسی با یک کلیک.</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">در حال راه اندازی Orbot…</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">DNS را تغییر دهید</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Orbot را متوقف کنید</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS و TCP</string>
 </resources>
