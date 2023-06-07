@@ -26,25 +26,25 @@
     <string name="other_dns_list_tab1">DoH</string>
     <string name="dns_mode_info_explanation_new">درخواست های DNS را نظارت، مسدود و رمزگذاری کنید.</string>
     <string name="dns_firewall_mode_info_explanation_new">همه موارد بالا + دور زدن سانسور اینترنت.</string>
-    <string name="universal_firewall_explanation">قوانین فایروال را بر روی همه برنامه ها بر اساس رویدادهای دستگاه اعمال کنید، به عنوان مثال، فایروال زمانی که دستگاه قفل است یا زمانی که یک برنامه خاص در حال استفاده نیست.</string>
+    <string name="universal_firewall_explanation">قوانین دیوار آتش را بر روی همه برنامه ها بر اساس رویدادهای دستگاه اعمال کنید، به عنوان مثال، زمانی که دستگاه قفل است یا زمانی که یک برنامه خاص در حال استفاده نیست دیوار آتش فعال باشد.</string>
     <string name="accessibility_service_description">RethinkDNS از سرویس دسترس پذیری برای شناسایی و فایروال برنامه های پس زمینه استفاده می کند. RethinkDNS هیچ اطلاعاتی را جمع آوری یا نمی فروشد.</string>
     <string name="status_protected_with_http_private_dns">محافظت شده با پروکسی http و dns خصوصی</string>
     <string name="slide_2_desc">RethinkDNS ساده ترین راه برای نظارت بر فعالیت شبکه، دور زدن سانسور اینترنت و برنامه های فایروال در دستگاه اندرویدی شما است.</string>
     <string name="slide_1_desc">RethinkDNS یک نرم افزار متن باز است که توسط برنامه Mozilla Builders MVP حمایت می شود.</string>
     <string name="status_protected_with_proxy_private_dns">محافظت شده با پروکسی و dns خصوصی</string>
     <string name="slide_1_title">رایگان و متن‌باز</string>
-    <string name="hybrid_mode_info_title">DNS + فایروال</string>
+    <string name="hybrid_mode_info_title">DNS + دیوار آتش</string>
     <string name="dns_mode_info_title">DNS</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="firewall_mode_info_title">فایروال</string>
+    <string name="firewall_mode_info_title">دیوار آتش</string>
     <string name="status_protected_with_tor_private_dns">محافظت شده با tor و dns خصوصی</string>
     <string name="block">مسدود کردن</string>
-    <string name="firewall_mode_info_explanation_new">نظارت بر فعالیت شبکه و فایروال هر برنامه یا آدرس IP.</string>
+    <string name="firewall_mode_info_explanation_new">نظارت بر فعالیت شبکه و استقرار دیوار آتش بر هر برنامه یا آدرس IP.</string>
     <string name="status_dns_server_down">سرور dns از کار افتاده است</string>
     <string name="status_protected_with_socks5">محافظت شده با پروکسی socks</string>
     <string name="status_protected_with_socks5_private_dns">محافظت شده با socks5 و dns خصوصی</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">محافظت نشده</string>
-    <string name="notification_action_stop_vpn">متوقف کردن</string>
+    <string name="notification_action_stop_vpn">توقف</string>
     <string name="rethink_plus">RethinkDNS پلاس</string>
     <string name="notification_action_dns_firewall_mode">DNS + فایروال</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">برای تغییر تنظیمات حفاظت ضربه بزنید</string>
@@ -78,4 +78,140 @@
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">حفاظت شده</string>
     <string name="pause_title_desc" translatable="true">ایجاد وقفه …</string>
     <string name="hybrid_mode_notification_title" translatable="true">حفاظت شده! به DNS + فایروال متصل است.</string>
+    <string name="custom_url_error_invalid_url" translatable="true">نشانی نامعتبر</string>
+    <string name="conn_track_clear_logs_title" translatable="true">همه گزارش های شبکه حذف شود؟</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">%1$s را در دستگاه مسدود کرد</string>
+    <string name="bsct_conn_desc_allowed" translatable="true">مجاز در %1$s %2$s</string>
+    <string name="bypass_dns_firewall" translatable="true">دور زدن DNS و دیوار آتش</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">VPN همیشه روشن</string>
+    <string name="lbl_maybe_blocked" translatable="true">احتمالاً مسدود شده است</string>
+    <string name="lbl_network" translatable="true">شبکه</string>
+    <string name="isolate" translatable="true">منزوی</string>
+    <string name="default_dns_name" translatable="true">RDNS پیش فرض</string>
+    <string name="dns_query_clear_logs_title" translatable="true">همه گزارش‌های DNS حذف شوند؟</string>
+    <string name="bsct_app_info" translatable="true">اطلاعات برنامه</string>
+    <string name="bsct_block_ip" translatable="true">مسدود کنید، به <u>این IP</u> برای <u>این برنامه</u> اعتماد کنید</string>
+    <string name="bsct_block_domain" translatable="true">برای <u>این برنامه</u> دامنه(های) <u/> را مسدود کنید، اعتماد کنید</string>
+    <string name="bsct_conn_block_desc" translatable="true">%1$s توسط %2$s مسدود شد</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">مسدود شده در %1$s %2$s</string>
+    <string name="always_on_dialog" translatable="true">\"VPN همیشه روشن\" در این دستگاه فعال است. برای شروع Rethink، لطفاً به برنامه تنظیمات بروید و «VPN همیشه روشن» را غیرفعال کنید.</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">برو به تنظیمات</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">تنظیمات دسترس‌پذیری باز نشد. بعدا دوباره تلاش کنید!</string>
+    <string name="conn_track_clear_logs_message" translatable="true">این ulg فقط \'chvahj شبکه را حذف می کند اما قوانین فایروال را حذف نمی کند. این عمل برگشت پذیر نیست. آیا می خواهید ادامه دهید؟</string>
+    <string name="notification_action_pause_vpn" translatable="true">مکث</string>
+    <string name="bypass_universal" translatable="true">دور زدن کلی</string>
+    <string name="allow" translatable="true">اجازه</string>
+    <string name="status_protected_with_private_dns" translatable="true">محافظت شده با DNS خصوصی</string>
+    <string name="notification_action_resume_vpn" translatable="true">ادامه</string>
+    <string name="status_protected_with_tor" translatable="true">محافظت شده توسط تور</string>
+    <string name="alert_permission_accessibility" translatable="true">مجوز-دسترسی</string>
+    <string name="dns_query_clear_logs_message" translatable="true">این عمل گزارش‌های DNS روی دستگاه را حذف می‌کند و برگشت پذیر نیست. آیا می خواهید ادامه دهید؟</string>
+    <string name="bsct_block" translatable="true">مسدود کردن، دور زدن، مستثنی کردن، انزوای <u>این برنامه</u></string>
+    <string name="exclude" translatable="true">مستثنی</string>
+    <string name="always_on_dialog_heading" translatable="true">VPN همیشه روشن را غیرفعال کنید</string>
+    <string name="untracked" translatable="true">ردیابی نشده</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.
+\n
+\nRethinkDNS هیچ اطلاعاتی را جمع آوری نکرده و به هیچ وجه از شما جاسوسی نمی کند.</string>
+    <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">متصل به DNS و دیوار آتش Rethink</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">سرویس دسترسی RethinkDNS متوقف شده یا از کار افتاده است. <i><b>به تنظیمات رفته و RethinkDNS را اجباراً متوقف کنید</b></i> و دوباره آن را برای استفاده از <i>ویژگی مسدود کردن هر برنامه‌ای که از آن</i> استفاده نمی‌کنید، راه‌اندازی کنید.
+\n
+\nRethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.</string>
+    <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>: اتصال یک برنامه به اینترنت را مسدود می‌کند.
+\n <u>#2</u>: اتصال هر برنامه ای را به یک IP خاص مسدود می کند.
+\n <u>#3</u>: وقتی دستگاه قفل است، همه اتصالات را مسدود می‌کند (دیوار آتش کلی).
+\n <u>#4</u>: هر برنامه ای را که استفاده نمی شود، مسدود می کند (دیوار آتش کلی).
+\n <u>#5</u>: هنگامی که منبع برنامه ناشناخته باشد، اتصالات را مسدود می کند (دیوار آتش کلی).
+\n <u>#6</u>: تمام ترافیک UDP به جز DNS (دیوار آتش کلی) را مسدود می کند.
+\n <u>#7</u>: هنگامی که DNS دور زده می‌شود، اتصالات را مسدود کنید (دیوار آتش کلی).</string>
+    <string name="always_on_dialog_stop_message" translatable="true">VPN همیشه روشن برای Rethink فعال است. آیا مطمئنید که در هر صورت می‌خواهید Rethink را متوقف کنید؟</string>
+    <string name="always_on_dialog_positive" translatable="true">توقف</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">برطرف کننده DNSCrypt حذف شد.</string>
+    <string name="always_on_dialog_lockdown_stop_message" translatable="true">VPN ،Rethink را در حالت <i>Lockdown</i> اجرا می کند. توقف آن منجر به از دست رفتن اتصال اینترنت در این نمایه کاربر می شود. میخواهید ادامه دهید؟</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">برطرف کننده DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">رله DNSCrypt را از پیکربندی ذخیره شده حذف کنید.</string>
+    <string name="private_dns_dialog_heading" translatable="true">DNS خصوصی را خاموش کنید</string>
+    <string name="private_dns_dialog_desc" translatable="true">تنظیمات DNS Rethink توسط DNSخصوصی اندروید لغو شده است.
+\n
+\nبرای استفاده از DNS Rethink به تنظیمات اندروید بروید و \"DNS خصوصی\" را خاموش کنید.</string>
+    <string name="private_dns_dialog_positive" translatable="true">برو به تنظیمات</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">شبکه</string>
+    <string name="dns_act_configure_tab" translatable="true">پیکربندی</string>
+    <string name="univ_firewall_dialog_title" translatable="true">قانون IP حذف شود؟</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">نقطه پایانی DoH حذف شود؟</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">نقطه پایانی DNS روی Https را از پیکربندی ذخیره شده حذف کنید.</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">برطرف کننده DNSCrypt حذف شود؟</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">رله DNSCrypt حذف شد.</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">پروکسی DNS را از پیکربندی ذخیره شده حذف کنید.</string>
+    <string name="dns_proxy_remove_success" translatable="true">پروکسی DNS حذف شد.</string>
+    <string name="local_blocklist_redownload_desc" translatable="true">لیست های مسدود شده‌ی روی دستگاه از قبل در آخرین نسخه v%1$s هستند.</string>
+    <string name="blocklist_update_check_failure" translatable="true">مشکلی پیش آمد. بعداً دوباره تلاش کنید!</string>
+    <string name="blocklist_update_check_not_required" translatable="true">لیست های مسدود از قبل در آخرین نسخه هستند.</string>
+    <string name="show_logs_disabled_dns_message" translatable="true">ثبت درخواست DNS غیرفعال شده است. برای فعال سازی مجدد، به <i>تنظیمات</i> رفته و <i> گزینه فعال سازی گزارش روی دستگاه را روشن کنید.</i></string>
+    <string name="configure_dns_connected_dns_proxy_status" translatable="true">پروکسی DNS</string>
+    <string name="configure_dns_crypt" translatable="true">برطرف کننده‌های DNSCrypt: %1$s</string>
+    <string name="http_proxy_dialog_heading" translatable="true">پروکسی HTTP(S) را تنظیم کنید</string>
+    <string name="show_logs_disabled_network_message" translatable="true">ثبت اتصال غیرفعال شده است. برای فعال سازی مجدد، به <i>تنظیمات</i> بروید و <i>گزینه فعال کردن گزارش روی دستگاه را روشن کنید.</i></string>
+    <string name="configure_dns_connection_name" translatable="true">متصل به %1$s</string>
+    <string name="univ_firewall_dialog_message" translatable="true">حذف این قانون به هر برنامه ای اجازه می دهد تا به این IP متصل شود. آیا می خواهید ادامه دهید؟</string>
+    <string name="http_proxy_dialog_desc" translatable="true">تنظیمات پروکسی HTTP(S) تنها یک اشاره به برنامه ها هستند، اما ممکن است از آن استفاده کنند یا نکنند. با این حال، مرورگرهایی مانند کروم و فایرفاکس از این موارد استفاده می کنند. برنامه‌هایی که از پروکسی HTTP(S) استفاده می‌کنند، قوانین فایروال و DNS را دور خواهند زد.</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">پروکسی DNS حذف شود؟</string>
+    <string name="local_blocklist_download" translatable="true">لیست های مسدود را دانلود کنید</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">رله DNSCrypt حذف شود؟</string>
+    <string name="configure_dns_connected_doh_status" translatable="true">DNS از طریق HTTPS</string>
+    <string name="refresh_complete" translatable="true">همگام‌سازی مجدد فهرست برنامه‌ها کامل شد.</string>
+    <string name="firewall_act_universal_tab" translatable="true">کلی</string>
+    <string name="doh_custom_url_remove_success" translatable="true">نقطه پایانی حذف شد.</string>
+    <string name="local_blocklist_redownload" translatable="true">به روز است!</string>
+    <string name="local_blocklist_download_desc" translatable="true">برای استفاده از این ویژگی، لیست های مسدودی (حدود 60 مگابایت) را دانلود کنید؟</string>
+    <string name="search_firewall_all_apps" translatable="true"><font size="12">جستجوی برنامه‌ها</font></string>
+    <string name="app_mode_firewall" translatable="true">دیوار آتش</string>
+    <string name="app_mode_dns_firewall" translatable="true">DNS و دیوار آتش(پیش‌فرض)</string>
+    <string name="app_mode_dns_low_battery" translatable="true">DNS (صرفه جویی در باتری)</string>
+    <string name="app_mode_dns" translatable="true">DNS</string>
+    <string name="download_update_dialog_message" translatable="true">نسخه جدید برنامه برای دانلود از وب سایت موجود است. آیا می خواهید ادامه دهید؟</string>
+    <string name="download_update_dialog_message_ok" translatable="true">شما در حال حاضر در آخرین نسخه هستید.</string>
+    <string name="download_update_dialog_message_success" translatable="true">دانلود فهرست بلاک با موفقیت انجام شد.</string>
+    <string name="download_update_dialog_failure_title" translatable="true">مشکلی پیش آمد!</string>
+    <string name="search_firewall_network_log" translatable="true"><font size="12">جستجوی برنامه‌ها، آی‌پی‌ها، دامنه‌ها</font></string>
+    <string name="search_universal_ips" translatable="true"><font size="12">جستجوی آی‌پی‌ها</font></string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">URL کپی شد</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">آدرس IP کپی شد.</string>
+    <string name="whats_dialog_title" translatable="true">چه چیزی در v054c جدید است</string>
+    <string name="info_dialog_rethink_toast_msg" translatable="true">به عنوان URL RDNS+ DNS-over-HTTPS کپی شد</string>
+    <string name="settings_enable_logs_desc" translatable="true">گزارش های DNS و دیوار آتش را به صورت محلی روی دستگاه ذخیره کنید.</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">به‌روز است!</string>
+    <string name="download_update_dialog_failure_message" translatable="true">یا سرورهای ما قطع است یا اتصال برقرار نشد. لطفا بعد از مدتی دوباره امتحان کنید.</string>
+    <string name="download_update_dialog_trylater_title" translatable="true">در حال حاضر نمی توان به روز رسانی کرد</string>
+    <string name="download_update_dialog_trylater_message" translatable="true">به روز رسانی در حال حاضر قابل اجرا نیست، لطفاً بعداً دوباره امتحان کنید.</string>
+    <string name="search_dns_logs" translatable="true"><font size="12">جستجوی نام دامنه یا آی‌پی‌ها </font></string>
+    <string name="search_custom_domains" translatable="true"><font size="12">جستجوی نامهای دامنه</font></string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">جستجوی فهرست‌های مسدود</font></string>
+    <string name="trusted_domains_desc" translatable="true">قانون اعتبار دامنه فقط با <u>Rethink\'s DNS</u> کار می کند.</string>
+    <string name="app_mode_wireguard" translatable="true">VPN (شبکه خصوصی مجازی)</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="settings_enable_logs" translatable="true">فعال کردن گزارش‌گیری روی دستگاه</string>
+    <string name="app_mode_choose" translatable="true">حالت را انتخاب کنید</string>
+    <string name="download_update_dialog_title" translatable="true">به‌روزرسانی جدید!</string>
+    <string name="whats_new_version_update" translatable="true"><b>حداکثر تلاش</b>
+\n
+\n 1. معرفی یک حل‌کننده خصوصی‌تر Rethink، <i>Max</i>.
+\n 2. IPv6 را به عنوان آزمایشی علامت گذاری کنید. به طور پیش فرض به IPv4 تغییر دهید.
+\n 3. <i>ویژگی جدید</i>: پشتیبان گیری و بازیابی تنظیمات برنامه.
+\n 4. <i>ویژگی جدید</i>: حالت قفل برنامه.
+\n 5. <i>ویژگی جدید</i>: حالت قفل جهانی.
+\n 6. <i>ویژگی جدید</i>: قوانین فایروال را روی شماره پورت اعمال کنید.
+\n 7. <i>ویژگی جدید</i>: قوانین فایروال برنامه را به صورت دسته ای اعمال کنید.
+\n 8. تازه سازی UI جزئی.
+\n 9. رفع حافظه و خرابی دیگر.</string>
+    <string name="connection_http3" translatable="true">HTTP3</string>
+    <string name="relative_time_today" translatable="true">امروز</string>
+    <string name="relative_time_yesterday" translatable="true">دیروز</string>
+    <string name="settings_allow_lan_heading" translatable="true">IP های خصوصی را مسیریابی نکنید (آزمایشی)</string>
+    <string name="settings_allow_lan_desc" translatable="true">حذف LAN، Loopback و مسیرهای پیوند محلی از تونل VPN Rethink.</string>
+    <string name="settings_ip_network_heading" translatable="true">نسخه IP را انتخاب کنید</string>
+    <string name="settings_ptrans_desc" translatable="true">ترافیک IPv6 خروجی را به IPv4 روی دستگاه ترجمه کنید؛ اگر به یک شبکه IPv4 متصل هستید، فعال کنید.</string>
+    <string name="settings_allow_bypass_heading" translatable="true">اجازه دور زدن</string>
+    <string name="settings_ip_network_desc" translatable="true">از بین نسخه های پروتکل اینترنت، یکی را انتخاب کنید.</string>
+    <string name="settings_ptrans_heading" translatable="true">خروج اجباری IPv4</string>
 </resources>
