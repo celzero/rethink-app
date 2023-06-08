@@ -21,7 +21,6 @@ android_app {
 
     plugins: [
         "androidx.room_room-compiler-plugin",
-        "glide-annotation-processor",
     ],
 
     required: [
@@ -40,9 +39,6 @@ android_app {
         "androidx.work_work-runtime-ktx",
         "com.google.android.material_material",
         "firestack",
-        "glide-prebuilt",
-        "glide-disklrucache-prebuilt",
-        "glide-annotation-and-compiler-prebuilt",
         "gson-prebuilt-jar",
         "guava",
         "ipaddress",

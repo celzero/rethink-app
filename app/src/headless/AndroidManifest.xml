@@ -7,16 +7,7 @@
         android:name="com.celzero.bravedns.CONTROL_VPN"
         android:protectionLevel="normal" />
 
-    <application
-        android:name=".RethinkDnsApplication"
-        android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:largeHeap="true"
-        android:roundIcon="@drawable/ic_launcher"
-        android:supportsRtl="true"
-        android:theme="@style/AppThemeInitial"
-        tools:replace="android:icon, android:roundIcon">
+    <application android:name=".RethinkDnsApplication">
         <provider
             android:name=".provider.ApplicationProvider"
             android:authorities="com.celzero.bravedns.appprovider"

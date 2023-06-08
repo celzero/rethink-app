@@ -44,7 +44,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
 import com.celzero.bravedns.backup.BackupHelper

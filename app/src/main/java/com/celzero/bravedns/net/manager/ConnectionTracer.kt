@@ -6,7 +6,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.google.common.cache.Cache
