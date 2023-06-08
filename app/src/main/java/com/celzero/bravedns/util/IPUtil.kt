@@ -16,7 +16,7 @@
 package com.celzero.bravedns.util
 
 import android.util.Log
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
 import java.net.InetAddress

@@ -20,7 +20,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.download.BlocklistDownloadHelper.Companion.deleteOldFiles
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager

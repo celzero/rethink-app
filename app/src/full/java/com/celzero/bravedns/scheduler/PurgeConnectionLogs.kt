@@ -19,7 +19,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.celzero.bravedns.BuildConfig.DEBUG
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.util.LoggerConstants
 import org.koin.core.component.KoinComponent

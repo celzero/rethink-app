@@ -89,7 +89,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         booleanPref("block_udp_traffic_other_than_dns").withDefault<Boolean>(false)
 
     // user chosen blocklists stored custom dictionary indexed in base64
-    var localBlocklistStamp by stringPref("local_block_list_stamp").withDefault<String>("")
+    var localBlocklistStamp by
+        stringPref("local_block_list_stamp")
+            .withDefault<String>(if (Utilities.isHeadlessFlavour()) "1:YAYBACABEDAgAA==" else "")
 
     // whether to drop packets when the source app originating the reqs couldn't be determined
     private var _blockUnknownConnections by
