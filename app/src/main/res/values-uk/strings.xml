@@ -9,12 +9,12 @@
     <string name="finish">Закінчити</string>
     <string name="slide_2_title">Ласкаво просимо</string>
     <string name="slide_1_title">Вільний і з відкритим вихідним кодом</string>
-    <string name="slide_1_desc">RethinkDNS - це ПЗ з відкритим вихідним кодом, яке підтримується програмою Mozilla Builders MVP.</string>
+    <string name="slide_1_desc">Rethink - це ПЗ з відкритим вихідним кодом, яке підтримується програмою Mozilla Builders MVP.</string>
     <string name="block">блокувати</string>
     <string name="exclude">виключити</string>
-    <string name="isolate">карантин</string>
+    <string name="isolate">ізолювати</string>
     <string name="untracked">не відстежуваний</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">Попередження: RethinkDNS було деактивовано</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Попередження: Rethink було деактивовано</string>
     <string name="dns_mode_notification_title">Захищено! Підключено до Швидкого та Безпечного DNS.</string>
     <string name="firewall_mode_notification_title">Захищено! Підключено до Брандмауера.</string>
     <string name="always_on_dialog_positive">Зупинити</string>
@@ -22,11 +22,11 @@
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
     <string name="settings_title_desc">DNS і Брандмауер, що легко налаштовуються</string>
-    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
     <string name="private_dns_dialog_heading">Вимкнути Приватний DNS</string>
     <string name="about_title_desc">Виявлення та блокування загроз мережевої безпеки</string>
-    <string name="accessibility_service_description">RethinkDNS використовує службу спеціальних можливостей для виявлення і блокування фонових застосунків. RethinkDNS не збирає та не продає жодної інформації.</string>
-    <string name="slide_2_desc">RethinkDNS - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
+    <string name="accessibility_service_description">Rethink використовує службу спеціальних можливостей для виявлення і блокування фонових застосунків. Rethink не збирає та не продає жодної інформації.</string>
+    <string name="slide_2_desc">Rethink - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">дозволити</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
@@ -159,9 +159,9 @@
     <string name="brbs_backup_desc" translatable="true">Резервне копіювання налаштувань застосунків, журналів мережі та dns</string>
     <string name="brbs_backup_dialog_message" translatable="true">Створює резервну копію налаштувань застосунку, журналів мережі та dns у файл. Це призведе до перезапуску VPN.</string>
     <string name="brbs_restore_complete_toast" translatable="true">Відновлення завершено, перезапуск застосунку…</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).
 \n
-\nRethinkDNS не збирає жодної інформації та жодним чином не шпигує за вами.</string>
+\nRethink не збирає жодної інформації та жодним чином не шпигує за вами.</string>
     <string name="download_update_dialog_message" translatable="true">Нова версія застосунку доступна для завантаження з вебсайту. Ви бажаєте продовжити\?</string>
     <string name="settings_locale_dialog_neutral" translatable="true">Допоможіть перекласти цей застосунок</string>
     <string name="settings_biometeric_heading" translatable="true">Увімкнути блокування застосунків</string>
@@ -215,9 +215,9 @@
     <string name="firewall_rule_trusted_domain" translatable="true">Домен (Застосунок)</string>
     <string name="firewall_rule_block_domain" translatable="true">Домен (Застосунок)</string>
     <string name="app_mode_firewall" translatable="true">Брандмауер</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Служба доступності RethinkDNS зупинилася або вийшла з ладу. <i><b>Перейдіть до налаштувань і примусово зупиніть</b></i> RethinkDNS і запустіть його знову, щоб використовувати <i>Блокування будь-якого застосунку, яка не використовується</i>.
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Служба доступності Rethink зупинилася або вийшла з ладу. <i><b>Перейдіть до налаштувань і примусово зупиніть</b></i> Rethink і запустіть його знову, щоб використовувати <i>Блокування будь-якого застосунку, яка не використовується</i>.
 \n
-\nRethinkDNS використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).</string>
+\nRethink використовує службу доступності, щоб відстежувати, які застосунки використовуються (на передньому плані) і які не використовуються (у фоновому режимі).</string>
     <string name="always_on_dialog" translatable="true">«Завжди увімкнений VPN» увімкнено на цьому пристрої. Щоб запустити Rethink, перейдіть до Налаштувань та вимкніть «Завжди увімкнений VPN».</string>
     <string name="bsct_conn_rule_explanation" translatable="true"><u>№1</u>: блокує підключення застосунку до Інтернету.
 \n <u>№2</u>: блокує підключення будь-якого застосунку до певної IP-адреси.
@@ -264,4 +264,70 @@
     <string name="new_app_bulk_notification_content" translatable="true">RethinkDNS заблокував %1$s нові застосунки. Натисніть, щоб переглянути або змінити.</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">більшість дозволених застосунків</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">більшість заблокованих застосунків</string>
+    <string name="always_on_dialog_heading" translatable="true">Вимкнути Постійно ввімкнений VPN</string>
+    <string name="always_on_dialog_positive_btn" translatable="true">Перейти до налаштувань</string>
+    <string name="always_on_dialog_stop_heading" translatable="true">Постійно ввімкнений VPN</string>
+    <string name="private_dns_dialog_desc" translatable="true">Налаштування DNS Rethink перевизначаються приватними DNS Android.
+\n
+\nЩоб використовувати DNS Rethink, перейдіть до налаштувань Android і вимкніть \"Приватний DNS\".</string>
+    <string name="univ_firewall_dialog_title" translatable="true">Видалити правило IP\?</string>
+    <string name="doh_custom_url_remove_success" translatable="true">Кінцева точка видалена.</string>
+    <string name="lbl_rules" translatable="true">правила</string>
+    <string name="bypass_dns_firewall" translatable="true">обхід dns та брандмауера</string>
+    <string name="hybrid_mode_info_title" translatable="true">DNS + Брандмауер</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">Не вдалося відкрити Налаштування доступності. Спробуйте пізніше!</string>
+    <string name="bsct_block_ip" translatable="true">Блокувати, довіряти <u>цю IP-адресу</u> для <u>цього застосунку</u></string>
+    <string name="bsct_block_domain" translatable="true">Блокувати, довіряти <u>домен(и)</u> для <u>цього застосунку</u></string>
+    <string name="bsct_conn_desc_allowed" translatable="true">дозволено на %1$s %2$s</string>
+    <string name="bsct_conn_desc_blocked" translatable="true">заблоковано на %1$s %2$s</string>
+    <string name="local_blocklist_download" translatable="true">Завантажити списки блокування</string>
+    <string name="wireguard_mode_info_explanation_new" translatable="true">Вже скоро.</string>
+    <string name="bsct_conn_block_desc" translatable="true">заблоковано %1$s за адресою %2$s</string>
+    <string name="lbl_network" translatable="true">мережа</string>
+    <string name="default_dns_name" translatable="true">RDNS за замовчуванням</string>
+    <string name="dns_query_clear_logs_title" translatable="true">Видалити всі журнали DNS\?</string>
+    <string name="always_on_dialog_stop_message" translatable="true">У Rethink ввімкнено постійний доступ до VPN. Ви дійсно хочете зупинити Rethink\?</string>
+    <string name="private_dns_dialog_positive" translatable="true">Перейти до налаштувань</string>
+    <string name="dns_crypt_relay_remove_success" translatable="true">DNSCrypt Relay видалено.</string>
+    <string name="dns_crypt_relay_remove_dialog_message" translatable="true">Видалити ретранслятор DNSCrypt зі збереженої конфігурації.</string>
+    <string name="dns_proxy_remove_success" translatable="true">DNS-проксі видалено.</string>
+    <string name="local_blocklist_download_desc" translatable="true">Завантажити списки блокування (близько 60 МБ), щоб використовувати цю функцію\?</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Неправильний підставний символ.</string>
+    <string name="title_statistics" translatable="true">Статистика</string>
+    <string name="lbl_cancel" translatable="true">Скасувати</string>
+    <string name="lbl_allowed" translatable="true">Дозволено</string>
+    <string name="lbl_apply" translatable="true">Застосувати</string>
+    <string name="lbl_disabled" translatable="true">Вимкнено</string>
+    <string name="lbl_domain" translatable="true">Домен</string>
+    <string name="lbl_action_required" translatable="true">Необхідні дії</string>
+    <string name="lbl_ip_rules" translatable="true">Правила IP</string>
+    <string name="lbl_domain_rules" translatable="true">Правила домену</string>
+    <string name="lbl_wildcard" translatable="true">Підставний символ</string>
+    <string name="lbl_all" translatable="true">Всі</string>
+    <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Видалити DNSCrypt Relay\?</string>
+    <string name="lbl_dismiss" translatable="true">Відхилити</string>
+    <string name="lbl_configure" translatable="true">Налаштування</string>
+    <string name="lbl_blocked" translatable="true">Заблоковано</string>
+    <string name="lbl_maybe_blocked" translatable="true">Можливо, заблоковано.</string>
+    <string name="lbl_logs" translatable="true">журнали</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">Все перераховане вище + обхід інтернет-цензури.</string>
+    <string name="conn_track_clear_logs_title" translatable="true">Видалити всі мережеві журнали\?</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">Моніторинг, блокування та шифрування DNS-запитів.</string>
+    <string name="alert_permission_accessibility" translatable="true">Дозвіл - Доступність</string>
+    <string name="custom_url_error_invalid_url" translatable="true">Неправильна URL-адреса</string>
+    <string name="dns_query_clear_logs_message" translatable="true">Видалення журналів DNS на пристрої. Ця операція не є зворотною. Ви хочете продовжити\?</string>
+    <string name="brave_dns_connect_mode_change_firewall" translatable="true">Виберіть режим.</string>
+    <string name="brave_dns_connect_mode_change_dns" translatable="true">Виберіть режим.</string>
+    <string name="conn_track_clear_logs_message" translatable="true">При цьому видаляються лише мережеві журнали, але не правила брандмауера. Ця операція не є зворотною. Ви хочете продовжити\?</string>
+    <string name="bsct_conn_block_desc_device" translatable="true">заблоковано %1$s на пристрої</string>
+    <string name="firewall_act_universal_tab" translatable="true">універсальний</string>
+    <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Видалити резолвер DNSCrypt\?</string>
+    <string name="dns_crypt_url_remove_dialog_message" translatable="true">Видаліть резолвер DNSCrypt із збереженої конфігурації.</string>
+    <string name="firewall_act_network_monitor_tab" translatable="true">Мережа</string>
+    <string name="doh_custom_url_remove_dialog_message" translatable="true">Видалити кінцеву точку DNS через Https зі збереженої конфігурації.</string>
+    <string name="dns_crypt_url_remove_success" translatable="true">Резолвер DNSCrypt видалено.</string>
+    <string name="dns_act_configure_tab" translatable="true">Налаштування</string>
+    <string name="doh_custom_url_remove_dialog_title" translatable="true">Видалити кінцеву точку DoH\?</string>
+    <string name="dns_proxy_remove_dialog_title" translatable="true">Видалити DNS проксі\?</string>
+    <string name="dns_proxy_remove_dialog_message" translatable="true">Видалити DNS-проксі зі збереженої конфігурації.</string>
 </resources>

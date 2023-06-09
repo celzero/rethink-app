@@ -116,10 +116,10 @@
     <string name="download_update_dialog_trylater_title">Impossible d’appliquer la mise à jour actuellement</string>
     <string name="download_update_dialog_trylater_message">La mise à jour ne peut être appliquée pour le moment, veuillez réessayer plus tard.</string>
     <string name="settings_enable_logs">Activer la journalisation embarquée sur l’appareil</string>
-    <string name="whats_new_version_update">&lt;b&gt;Super Chargé!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Filtrage DNS avancé ; appliquez les règles de domaine uniquement lorsque les applications se connectent.&lt;br/&gt; 2. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Autoriser ou refuser des domaines par application.&lt;br/&gt; 3. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Autoriser ou refuser des domaines pour toutes les applications.&lt;br/&gt; 4. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Contournez les règles DNS et de pare-feu par application. 5. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Capture de paquets (PCAP).&lt;br/&gt; 6. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : DNS Booster ; fusionnez les demandes, mettez en cache les réponses.&lt;br/&gt; 7. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Modifier les règles de domaine et d\'IP.&lt;br/&gt; 8. Et autres modifications mineures de l\'interface utilisateur et corrections de bogues.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Aidez à la traduction de cette application&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;LAN party!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nouvelle fonctionnalité&lt;/i&gt; : Exclure les IP privées (LAN / link-local).&lt;br/&gt; 2. Faire fonctionner le paramètre Bypass DNS &amp; Firewall.&lt;br/&gt; 3. Montrer Peut-être bloqué dans les journaux DNS pour les domaines qui peuvent être bloqués par le pare-feu.&lt;br/&gt; 4. Montrer l\'icône adaptative là où elle est prise en charge.&lt;br/&gt; 5. Notif d\'authentification bio-métrique toutes les 15 minutes.&lt;br/&gt; 6. 6 autres améliorations de l\'interface utilisateur et des performances.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Aidez à traduire cette application&lt;/a&gt;</string>
     <string name="settings_ptrans_desc">Traduit le trafic sortant IPv6 en IPv4 sur l’appareil. Activez cette option si vous êtes connecté à un réseau uniquement IPv4.</string>
-    <string name="settings_allow_bypass_desc">Autorisez les applications à contourner le pare-feu de RethinkDNS à la demande. Certaines applications de conférence audio/vidéo comme Zoom et WhatsApp peuvent nécessiter cela pour fonctionner correctement.</string>
-    <string name="settings_lock_down_mode_desc">Impossible de configurer VPN lorsque celui-ci fonctionne en mode confinement. <u>Accéder aux paramètres VPN d’Android</u>.</string>
+    <string name="settings_allow_bypass_desc">Autorisez les applications requérantes à accéder à tous les réseaux disponibles. Ces applications peuvent contourner le tunnel VPN de Rethink à la demande. Certaines applications de conférence audio/vidéo comme Zoom et Meet peuvent en avoir besoin pour fonctionner correctement.</string>
+    <string name="settings_lock_down_mode_desc">Certaines options sont désactivées lorsque le VPN est en mode de verrouillage. <u>Voir les paramètres VPN</u>.</string>
     <string name="settings_https_desc">Ce paramètre n’est qu’une recommandation, certaines applications pourraient l’ignorer. Les applications utilisant le proxy HTTP(S) contourneront les règles du pare-feu et du DNS.</string>
     <string name="orbot_http_desc">Recommande que les applications utilisent le proxy HTTP d’Orbot.</string>
     <string name="orbot_bs_status_2">Le proxy HTTP est défini (des applications pourraient l’ignorer).</string>
@@ -174,7 +174,8 @@
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="settings_theme_dialog_themes_3">Sombre</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (expérimental)</string>
-    <string name="settings_ip_dialog_ipv46">Auto (expérimental)</string>
+    <string name="settings_ip_dialog_ipv46">Auto (expérimental)
+\ndes contrôles de connectivité sont envoyés pour vérifier la joignabilité.</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (par défaut)</string>
     <string name="settings_notification_desc">Boutons d’action à afficher avec la notification Rethink : %1$s</string>
@@ -252,7 +253,7 @@
     <string name="about_connect">contact</string>
     <string name="download_update_dialog_message_ok_title">À jour !</string>
     <string name="settings_selected_ip_desc">%1$s</string>
-    <string name="settings_allow_bypass_heading">Autoriser le contournement</string>
+    <string name="settings_allow_bypass_heading">Activer la visibilité du réseau</string>
     <string name="ada_network_log_title">journal du réseau pour cette application</string>
     <string name="settings_http_proxy_error_text2">Port invalide</string>
     <string name="dns_info_positive">Valider</string>
@@ -724,7 +725,7 @@
     <string name="firewall_act_network_monitor_tab">Réseau</string>
     <string name="dns_crypt_url_remove_success">Résolveur DNSCrypt supprimé.</string>
     <string name="local_blocklist_download">Télécharger les listes de blocage</string>
-    <string name="whats_dialog_title">Quoi de neuf dans la v054b</string>
+    <string name="whats_dialog_title">Quoi de neuf dans la v054c</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_stop_dialog_neutral">Changer de DNS</string>
@@ -860,7 +861,7 @@
     <string name="logs_card_network_count" translatable="true">%1$s connexions</string>
     <string name="logs_card_dns_count" translatable="true">%1$s demandes de renseignements</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Capture de paquets active</string>
-    <string name="cd_dns_alg_desc" translatable="true">Assigner IP uniquement par requêt DNS.</string>
+    <string name="cd_dns_alg_desc" translatable="true">Attribution d\'une IP unique par requête DNS</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domaine de confiance (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Cette connexion a été autorisée car <i>l’application source</i> est configurée pour <i>contourner les règles du pare-feu global</i>.<br/><br/> Pour modifier cela, accédez à l’écran <i>Pare-feu de l’application</i>.</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme bloqué dans les règles de domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
@@ -868,7 +869,9 @@
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">contournera les règles universelles de DNS et de pare-feu</string>
     <string name="lbl_network" translatable="true">réseau</string>
-    <string name="trusted_domains_desc" translatable="true">Les règles de domaines ne peuvent fonctionner qu\'avec <u>le DNS de Rethink</u>.</string>
-    <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqués</string>
-    <string name="bypass_dns_firewall_tooltip">%1$s ne peuvent fonctionner qu\'avec le DNS de Rethink</string>
+    <string name="trusted_domains_desc" translatable="true">La règle du domaine de confiance ne fonctionne qu\'avec <u>le DNS de Rethink</u>.</string>
+    <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqué</string>
+    <string name="bypass_dns_firewall_tooltip">%1$s fonctionne uniquement avec le DNS de Rethink</string>
+    <string name="settings_allow_lan_heading" translatable="true">Ne pas acheminer les IP privées (expérimental)</string>
+    <string name="settings_allow_lan_desc" translatable="true">Exclure les routes LAN, loopback, link-local du tunnel VPN de Rethink.</string>
 </resources>
