@@ -369,7 +369,7 @@
     <string name="settings_enable_logs" translatable="true">ऑन-डिवाइस लॉगिंग सक्षम करें</string>
     <string name="app_mode_choose" translatable="true">मोड चुनें</string>
     <string name="relative_time_yesterday" translatable="true">कल</string>
-    <string name="whats_dialog_title" translatable="true">वर्ज़न054बी में क्या नया है</string>
+    <string name="whats_dialog_title" translatable="true">संस्करण 054सी में क्या नया है</string>
     <string name="relative_time_today" translatable="true">आज</string>
     <string name="settings_app_notification_a13_heading" translatable="true">ऐप अधिसूचना</string>
     <string name="settings_http_proxy_error_text1" translatable="true">पोर्ट रेंज 1024-65535 में होनी चाहिए</string>

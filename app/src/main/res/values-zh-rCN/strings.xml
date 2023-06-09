@@ -68,7 +68,7 @@
     <string name="download_update_dialog_trylater_title">现在无法更新</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_enable_logs">启用本地日志</string>
-    <string name="whats_dialog_title">v054b 的新内容</string>
+    <string name="whats_dialog_title">v054c 的新内容</string>
     <string name="settings_allow_bypass_heading">于网络可见</string>
     <string name="settings_socks5_heading">设置 SOCKS5 代理</string>
     <string name="orbot">Orbot</string>
