@@ -52,8 +52,8 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.openAndroidAppInfo
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
@@ -77,7 +77,7 @@ class AppInfoActivity :
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
 
-    private var uid: Int = 0
+    private var uid: Int = INVALID_UID
     private lateinit var appInfo: AppInfo
 
     private var ipListUiState: Boolean = true
@@ -148,10 +148,6 @@ class AppInfoActivity :
         appInfo = ai
 
         val packages = FirewallManager.getPackageNamesByUid(appInfo.uid)
-
-        if (packages.count() != 1) {
-            b.aadAppInfoIcon.visibility = View.GONE
-        }
 
         b.aadAppDetailName.text = appName(packages.count())
         appStatus = FirewallManager.appStatus(appInfo.uid)
@@ -255,7 +251,20 @@ class AppInfoActivity :
 
         b.aadConnDetailSearch.setOnQueryTextListener(this)
 
-        b.aadAppInfoIcon.setOnClickListener { openAndroidAppInfo(this, appInfo.packageName) }
+        b.aadAppInfoIcon.setOnClickListener {
+            val packages = FirewallManager.getAppNamesByUid(appInfo.uid)
+            if (packages.count() == 1) {
+                openAndroidAppInfo(this, appInfo.packageName)
+            } else if (packages.count() > 1) {
+                showAppInfoDialog(packages)
+            } else {
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+            }
+        }
 
         TooltipCompat.setTooltipText(
             b.aadAppSettingsBypassDnsFirewall,
@@ -376,6 +385,28 @@ class AppInfoActivity :
         b.aadAppDnsRethinkConfigure.setOnClickListener { rethinkListBottomSheet() }
 
         b.aadConnDelete.setOnClickListener { showDeleteConnectionsDialog() }
+    }
+
+    private fun showAppInfoDialog(packages: List<String>) {
+        val builderSingle: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
+
+        builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
+
+        val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
+        arrayAdapter.addAll(packages)
+        builderSingle.setCancelable(false)
+
+        builderSingle.setItems(packages.toTypedArray(), null)
+
+        builderSingle.setPositiveButton(getString(R.string.ada_noapp_dialog_positive)) {
+            dialog: DialogInterface,
+            _: Int ->
+            dialog.dismiss()
+        }
+
+        val alertDialog: android.app.AlertDialog = builderSingle.create()
+        alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+        alertDialog.show()
     }
 
     private fun setAppDns(url: String) {
