@@ -143,7 +143,7 @@ object BugReportZipper {
         while (entries.hasMoreElements()) {
             val e = entries.nextElement()
             if (ignoreFileName == e.name) {
-                Log.d(LOG_TAG_SCHEDULER, "Ignoring the old file: ${e.name} from bug_report.zip")
+                Log.i(LOG_TAG_SCHEDULER, "Ignoring the old file: ${e.name} from bug_report.zip")
                 continue
             }
 

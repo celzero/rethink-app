@@ -280,6 +280,8 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsBiometricSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean
             ->
             persistentState.biometricAuth = checked
+            // Reset the biometric auth time
+            persistentState.biometricAuthTime = Constants.INIT_TIME_MS
         }
     }
 

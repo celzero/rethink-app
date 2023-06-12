@@ -727,10 +727,6 @@ object Utilities {
         return port
     }
 
-    fun isValidDnsPort(port: Int): Boolean {
-        return port in 1..65535
-    }
-
     fun getRandomString(length: Int): String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
         return (1..length).map { allowedChars.random() }.joinToString("")

@@ -203,19 +203,20 @@ object VpnController : KoinComponent {
     }
 
     fun protocols(): String {
-        var protoString = ""
-        val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: 0
-        val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: 0
-        if (ipv4Size >= 1 && ipv6Size >= 1) {
-            protoString = "IPv4, IPv6"
-        } else if (ipv4Size >= 1) {
-            protoString = "IPv4"
+        val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: -1
+        val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: -1
+        return if (ipv4Size >= 1 && ipv6Size >= 1) {
+            "IPv4, IPv6"
         } else if (ipv6Size >= 1) {
-            protoString = "IPv6"
-        } else {
-            // no-op
+            "IPv6"
+        } else if (ipv4Size >= 1) {
+            "IPv4"
         }
-        return protoString
+        else {
+            // if there are zero ipv4 and ipv6 networks, then we are failing open
+            // see: BraveVpnService#establishVpn
+            "IPv4, IPv6"
+        }
     }
 
     fun netType(): String {

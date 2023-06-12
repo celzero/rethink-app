@@ -51,8 +51,8 @@ object DomainRulesManager : KoinComponent {
 
     var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
     var trustedDomains: MutableSet<String> = hashSetOf()
-    var trie: dnsx.CritBit = Dnsx.newCritBit()
-    private val trustedTrie: dnsx.CritBit = Dnsx.newCritBit()
+    var trie: dnsx.RadixTree = Dnsx.newRadixTree()
+    private val trustedTrie: dnsx.RadixTree = Dnsx.newRadixTree()
 
     // stores all the previous response sent
     private val domainLookupCache: Cache<CacheKey, Status> =
