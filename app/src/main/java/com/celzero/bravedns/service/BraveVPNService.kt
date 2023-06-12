@@ -23,6 +23,8 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -120,8 +122,7 @@ class BraveVPNService :
         private const val IPV6_TEMPLATE: String = "fd66:f83a:c650::%d"
         private const val IPV6_PREFIX_LENGTH: Int = 120
 
-        // This value must match the hardcoded MTU in outline-go-tun2socks.
-        // TODO: Make outline-go-tun2socks's MTU configurable.
+        // TODO: add the minimum of the underlying network interface MTU
         private const val VPN_INTERFACE_MTU: Int = 1500
     }
 
@@ -183,13 +184,13 @@ class BraveVPNService :
         try {
 
             // allNet is always sorted, first network is always the active network
-            underlyingNetworks?.allNet?.forEach { networkProps ->
+            underlyingNetworks?.allNet?.forEach { prop ->
                 underlyingNetworks?.ipv4Net?.forEach {
-                    if (it.network == networkProps && it.isReachable) {
+                    if (it == prop) {
                         pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
                         if (pfd == null) return
 
-                        networkProps.bindSocket(pfd!!.fileDescriptor)
+                        prop.network.bindSocket(pfd!!.fileDescriptor)
                         return
                     } else {
                         // no-op
@@ -217,14 +218,14 @@ class BraveVPNService :
 
         var pfd: ParcelFileDescriptor? = null
         try {
-            underlyingNetworks?.allNet?.forEach { networkProps ->
+            underlyingNetworks?.allNet?.forEach { prop ->
                 underlyingNetworks?.ipv6Net?.forEach {
-                    if (it.network == networkProps && it.isReachable) {
+                    if (it == prop) {
                         pfd = ParcelFileDescriptor.adoptFd(fid.toInt())
                         if (pfd == null) return
 
                         Log.i(LOG_TAG_VPN, "bind6: network is reachable via ICMP")
-                        networkProps.bindSocket(pfd!!.fileDescriptor)
+                        prop.network.bindSocket(pfd!!.fileDescriptor)
                     } else {
                         // no-op
                     }
@@ -307,7 +308,7 @@ class BraveVPNService :
             }
 
             // check for app rules (unmetered, metered connections)
-            val appRuleset = appBlocked(connectionStatus)
+            val appRuleset = appBlocked(connInfo, connectionStatus)
             if (appRuleset != null) {
                 return appRuleset
             }
@@ -405,7 +406,7 @@ class BraveVPNService :
             }
 
             // block all metered connections (Universal firewall setting)
-            if (persistentState.getBlockMeteredConnections() && isConnectionMetered()) {
+            if (persistentState.getBlockMeteredConnections() && isConnectionMetered(connInfo)) {
                 return FirewallRuleset.RULE1F
             }
 
@@ -595,7 +596,10 @@ class BraveVPNService :
 
     // Check if the app has firewall rules set
     // refer: FirewallManager.kt line-no#58
-    private fun appBlocked(connectionStatus: FirewallManager.ConnectionStatus): FirewallRuleset? {
+    private fun appBlocked(
+        connInfo: ConnTrackerMetaData,
+        connectionStatus: FirewallManager.ConnectionStatus
+    ): FirewallRuleset? {
         if (isAppBlocked(connectionStatus)) {
             return FirewallRuleset.RULE1
         }
@@ -605,19 +609,35 @@ class BraveVPNService :
             return null
         }
 
-        if (isWifiBlockedForUid(connectionStatus) && !isConnectionMetered()) {
+        if (isWifiBlockedForUid(connectionStatus) && !isConnectionMetered(connInfo)) {
             return FirewallRuleset.RULE1D
         }
 
-        if (isMobileDataBlockedForUid(connectionStatus) && isConnectionMetered()) {
+        if (isMobileDataBlockedForUid(connectionStatus) && isConnectionMetered(connInfo)) {
             return FirewallRuleset.RULE1E
         }
 
         return null
     }
 
-    private fun isConnectionMetered(): Boolean {
+    private fun isConnectionMetered(connInfo: ConnTrackerMetaData): Boolean {
+        if (persistentState.useMultipleNetworks) {
+            return boundNetworkMeteredCheck(connInfo)
+        }
         return activeNetworkMeteredCheck()
+    }
+
+    private fun boundNetworkMeteredCheck(connInfo: ConnTrackerMetaData): Boolean {
+        val dest = IPAddressString(connInfo.destIP)
+        // TODO: check for all networks instead of just the first one
+        val boundedNetwork =
+            if (dest.isIPv6) {
+                underlyingNetworks?.ipv6Net?.first()?.network
+            } else {
+                underlyingNetworks?.ipv4Net?.first()?.network
+            }
+        // if there are no network to be bound given a destination IP, fallback to active network
+        return isMetered(boundedNetwork ?: return activeNetworkMeteredCheck())
     }
 
     private fun activeNetworkMeteredCheck(): Boolean {
@@ -627,22 +647,17 @@ class BraveVPNService :
         // isAccessibilityServiceRunning default value(false) is passed instead of
         // checking it from accessibility service for the first time.
         if (ts == null || Math.abs(now - ts) > Constants.ACTIVE_NETWORK_CHECK_THRESHOLD_MS) {
-            if (DEBUG) {
-                val ifname =
-                    connectivityManager
-                        .getLinkProperties(connectivityManager.activeNetwork)
-                        ?.interfaceName
-                val metered = connectivityManager.isActiveNetworkMetered
-                Log.d(
-                    LOG_TAG_VPN,
-                    "activeNetworkHeartbeatTimestamp: $ts, metered?: $metered," +
-                        "active? ${connectivityManager.activeNetwork}, name: $ifname"
-                )
-            }
             underlyingNetworks?.lastUpdated = now
             underlyingNetworks?.isActiveNetworkMetered = connectivityManager.isActiveNetworkMetered
         }
         return underlyingNetworks?.isActiveNetworkMetered == true
+    }
+
+    private fun isMetered(network: Network): Boolean {
+        // if no network is available, assume metered
+        return connectivityManager
+            .getNetworkCapabilities(network)
+            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED) == false
     }
 
     private fun isAppBlocked(connectionStatus: FirewallManager.ConnectionStatus): Boolean {
@@ -1208,6 +1223,7 @@ class BraveVPNService :
                     FirewallManager.loadAppFirewallRules()
                     DomainRulesManager.load()
                     IpRulesManager.loadIpRules()
+                    WireguardManager.load()
 
                     if (FirewallManager.getTotalApps() <= 0) {
                         notifyEmptyFirewallRules()
@@ -1345,7 +1361,7 @@ class BraveVPNService :
                             updateTun(createNewTunnelOptsObj())
                         }
                         AppConfig.DnsType.NETWORK_DNS -> {
-                            enableSystemDns(createNewTunnelOptsObj())
+                            setDnsServers()
                         }
                     }
                 }
@@ -1386,6 +1402,13 @@ class BraveVPNService :
                 // restart vpn to enable/disable route lan traffic
                 io("route_lan_traffic") { restartVpn(createNewTunnelOptsObj()) }
             }
+            PersistentState.WIREGUARD -> {
+                Log.i(
+                    LOG_TAG_VPN,
+                    "wireguard pref changed, restarting vpn: $key, ${persistentState.wireguardEnabledCount}"
+                )
+                io("wireguard") { restartVpn(createNewTunnelOptsObj()) }
+            }
         }
     }
 
@@ -1402,26 +1425,6 @@ class BraveVPNService :
             )
         Log.i(LOG_TAG_VPN, "created new tunnel options, opts: $opts")
         return opts
-    }
-
-    private suspend fun enableSystemDns(opts: AppConfig.TunnelOptions) {
-        val linkProperties =
-            connectivityManager.getLinkProperties(connectivityManager.activeNetwork)
-        val dnsServers = linkProperties?.dnsServers
-
-        if (dnsServers.isNullOrEmpty()) {
-            ui {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.system_dns_connection_failure),
-                    Toast.LENGTH_SHORT
-                )
-            }
-            return
-        }
-
-        appConfig.updateSystemDnsServers(dnsServers)
-        updateTun(opts)
     }
 
     private fun spawnLocalBlocklistStampUpdate() {
@@ -1552,14 +1555,15 @@ class BraveVPNService :
     }
 
     override fun onNetworkConnected(networks: ConnectionMonitor.UnderlyingNetworks) {
+        val isRoutesChanged = isUnderlyingRoutesChanged(underlyingNetworks, networks)
         underlyingNetworks = networks
-        Log.i(LOG_TAG_VPN, "connecting to networks, $underlyingNetworks")
+        Log.i(LOG_TAG_VPN, "connecting to networks, $underlyingNetworks, $isRoutesChanged")
 
-        // always set system dns to tunnel
-        setDnsServers(networks)
+        // always reset the system dns server ip of the active network with the tunnel
+        setDnsServers()
 
-        // restart vpn on network changes in auto (IP4+6) mode
-        if (appConfig.getInternetProtocol().isIPv46()) {
+        // restart vpn to add new routes if in ipv46 mode
+        if (appConfig.getInternetProtocol().isIPv46() && isRoutesChanged) {
             io("ip46-restart-vpn") { restartVpnWithExistingAppConfig() }
             return
         }
@@ -1570,17 +1574,35 @@ class BraveVPNService :
             Log.w(LOG_TAG_VPN, "network changed but empty underlying networks")
             setUnderlyingNetworks(null)
         } else {
-            setUnderlyingNetworks(networks.allNet.toTypedArray())
+            // get all network from allNet
+            val allNetworks = networks.allNet.map { it.network }.toTypedArray()
+            setUnderlyingNetworks(allNetworks)
         }
     }
 
-    private fun setDnsServers(networks: ConnectionMonitor.UnderlyingNetworks) {
-        val linkProperties = connectivityManager.getLinkProperties(networks.allNet?.first())
-        val dnsServers = linkProperties?.dnsServers
+    private fun isUnderlyingRoutesChanged(
+        old: ConnectionMonitor.UnderlyingNetworks?,
+        new: ConnectionMonitor.UnderlyingNetworks
+    ): Boolean {
+        // no old routes to compare with, return true
+        if (old == null) return true
+
+        val old6 = old.ipv6Net.isNotEmpty()
+        val new6 = new.ipv6Net.isNotEmpty()
+        val old4 = old.ipv4Net.isNotEmpty()
+        val new4 = new.ipv4Net.isNotEmpty()
+        // inform if ipv6 or ipv4 routes changed
+        return old6 != new6 || old4 != new4
+    }
+
+    private fun setDnsServers() {
+        // TODO: grab dns servers from all networks and set to system dns
+        val lp = connectivityManager.getLinkProperties(connectivityManager.activeNetwork)
+        val dnsServers = lp?.dnsServers
 
         if (dnsServers.isNullOrEmpty()) {
-            // TODO: send an alert/notification instead of toast
-            Log.w(LOG_TAG_VPN, "No dns servers found")
+            // TODO: send an alert/notification instead?
+            Log.w(LOG_TAG_VPN, "No system dns servers found")
             if (appConfig.isSystemDns()) {
                 // on null dns servers, show toast
                 ui {
@@ -1593,13 +1615,15 @@ class BraveVPNService :
             } else {
                 // no-op
             }
-        } else {
-            io("set-system-dns") {
-                Log.i(LOG_TAG_VPN, "Setting dns servers: $dnsServers")
-                appConfig.updateSystemDnsServers(dnsServers)
-                // instead of calling updateTun with system dns, restart vpn. use the
-                // setSystemDns to update the dns address in the tunnel options
-                vpnAdapter?.setSystemDns()
+        }
+        io("set-system-dns") {
+            Log.i(LOG_TAG_VPN, "Setting dns servers: $dnsServers")
+            appConfig.updateSystemDnsServers(dnsServers)
+            // set system dns whenever there is a change in network
+            vpnAdapter?.setSystemDns()
+            // add appropriate transports to the tunnel, if system dns is enabled
+            if (appConfig.isSystemDns()) {
+                updateTun(createNewTunnelOptsObj())
             }
         }
     }
@@ -1820,22 +1844,17 @@ class BraveVPNService :
                         "underlyingNetworks: ${underlyingNetworks?.useActive}, ${underlyingNetworks?.ipv6Net?.size}"
                     )
                 if (underlyingNetworks?.useActive != true) {
-                    if (underlyingNetworks?.ipv6Net?.size == 0) {
+                    return if (underlyingNetworks?.ipv6Net?.size == 0) {
                         Log.i(LOG_TAG_VPN, "No IPv6 networks available")
-                        return false
+                        false
+                    } else {
+                        Log.i(LOG_TAG_VPN, "IPv6 networks available")
+                        true
                     }
-
-                    underlyingNetworks?.ipv6Net?.forEach {
-                        if (it.isReachable) {
-                            Log.i(LOG_TAG_VPN, "IPv6 network is reachable")
-                            return true
-                        }
-                    }
-                    return false
                 } else {
                     val activeNetwork = connectivityManager.activeNetwork ?: return false
                     underlyingNetworks?.ipv6Net?.forEach {
-                        if (it.network == activeNetwork && it.isReachable) {
+                        if (it.network == activeNetwork) {
                             Log.i(
                                 LOG_TAG_VPN,
                                 "Active network is reachable for IPv6: ${it.network.networkHandle}, ${activeNetwork.networkHandle}"
@@ -1873,28 +1892,15 @@ class BraveVPNService :
                     if (underlyingNetworks?.ipv4Net?.size == 0) {
                         Log.i(LOG_TAG_VPN, "No IPv4 networks available")
                         return false
+                    } else {
+                        Log.i(LOG_TAG_VPN, "IPv4 networks available")
+                        return true
                     }
-
-                    underlyingNetworks?.ipv4Net?.forEach {
-                        if (DEBUG)
-                            Log.d(
-                                LOG_TAG_VPN,
-                                "IPv4 network: ${it.network.networkHandle}, ${it.isReachable}"
-                            )
-                        if (it.isReachable) {
-                            Log.i(LOG_TAG_VPN, "IPv4 network is reachable")
-                            return true
-                        }
-                    }
-                    return false
                 } else {
                     val activeNetwork = connectivityManager.activeNetwork ?: return false
                     underlyingNetworks?.ipv4Net?.forEach {
-                        Log.i(
-                            LOG_TAG_VPN,
-                            "IPv4 network: ${it.network.networkHandle}, ${it.isReachable}"
-                        )
-                        if (it.network == activeNetwork && it.isReachable) {
+                        Log.i(LOG_TAG_VPN, "IPv4 network: ${it.network.networkHandle}")
+                        if (it.network == activeNetwork) {
                             Log.i(LOG_TAG_VPN, "IPv4 network is reachable")
                             return true
                         }
@@ -2032,10 +2038,9 @@ class BraveVPNService :
     }
 
     private fun io(s: String, f: suspend () -> Unit) =
-        vpnScope.launch(CoroutineName(s)) { withContext(Dispatchers.IO) { f() } }
+        vpnScope.launch(CoroutineName(s) + Dispatchers.IO) { f() }
 
-    private fun ui(f: suspend () -> Unit) =
-        vpnScope.launch { withContext(Dispatchers.Main) { f() } }
+    private fun ui(f: suspend () -> Unit) = vpnScope.launch(Dispatchers.Main) { f() }
 
     override fun onQuery(fqdn: String?, qtype: Long, suggestedId: String?): String? {
         // queryType: see ResourceRecordTypes.kt
@@ -2045,7 +2050,7 @@ class BraveVPNService :
                 "onQuery: rcvd query: $fqdn, qtype: $qtype, suggested_id: $suggestedId"
             )
         if (fqdn == null) {
-            return suggestedId?.ifEmpty { Dnsx.Preferred }
+            return suggestedId?.ifEmpty { getTransportId(Dnsx.Preferred) }
         }
 
         if (appConfig.getBraveMode().isDnsMode()) {
@@ -2061,7 +2066,7 @@ class BraveVPNService :
         }
 
         Log.e(LOG_TAG_VPN, "onQuery: unknown mode ${appConfig.getBraveMode()}, returning preferred")
-        return getPreferredTransportId()
+        return getTransportId(Dnsx.Preferred)
     }
 
     // function to decide which transport id to return on Dns only mode
@@ -2069,20 +2074,18 @@ class BraveVPNService :
         // check for global domain rules
         when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
             // TODO: return Preferred for now
-            DomainRulesManager.Status.TRUST -> return Dnsx.BlockFree
-            DomainRulesManager.Status.BLOCK -> return Dnsx.BlockAll
+            DomainRulesManager.Status.TRUST ->
+                return getTransportId(Dnsx.BlockFree) // Dnsx.BlockFree
+            DomainRulesManager.Status.BLOCK -> return getTransportId(Dnsx.BlockAll) // Dnsx.BlockAll
             else -> {} // no-op, fall-through;
         }
 
-        return getPreferredTransportId()
+        return getTransportId(Dnsx.Preferred)
     }
 
     // function to decide which transport id to return on DnsFirewall mode
     private fun getTransportIdForDnsFirewallMode(fqdn: String): String {
-        return if (!isRethinkEnabled()) {
-            // if rethink is not enabled then return preferred or CT+Preferred
-            getPreferredTransportId()
-        } else if (FirewallManager.isAnyAppBypassesDns()) {
+        return if (FirewallManager.isAnyAppBypassesDns()) {
             // if any app is bypassed (dns + firewall) and if local blocklist enabled or remote dns
             // is rethink then return Alg so that the decision is made by in flow() function
             Dnsx.Alg
@@ -2093,21 +2096,16 @@ class BraveVPNService :
             // if the domain is not trusted and no app is bypassed then return preferred or
             // CT+preferred so that if the domain is blocked by upstream then no need to do
             // any further processing
-            getPreferredTransportId()
+            getTransportId(Dnsx.Preferred)
         }
     }
 
-    private fun getPreferredTransportId(): String {
+    private fun getTransportId(transId: String): String {
         return if (persistentState.enableDnsCache) {
-            Dnsx.CT + Dnsx.Preferred
+            Dnsx.CT + transId
         } else {
-            Dnsx.Preferred
+            transId
         }
-    }
-
-    private fun isRethinkEnabled(): Boolean {
-        // check if remote rethink is enabled
-        return appConfig.getDnsType().isRethinkRemote()
     }
 
     override fun onResponse(summary: Summary?) {
@@ -2177,6 +2175,31 @@ class BraveVPNService :
         }
 
         // check for other proxy rules
+        if (appConfig.isWireguardEnabled()) {
+            val enabledWireguardConfigs = WireguardManager.getActiveConfigs()
+            if (enabledWireguardConfigs.isEmpty()) {
+                Log.e(LOG_TAG_VPN, "flow: wireguard is enabled but no configs are enabled")
+                // pass-through
+            } else {
+                val id = WireguardManager.getActiveConfigIdForApp(uid)
+                if (id == -1) {
+                    if (DEBUG)
+                        Log.d(
+                            LOG_TAG_VPN,
+                            "flow: wireguard is enabled but app is not included, proceed for other checks, $connectionId, $uid"
+                        )
+                    // pass-through, no wireguard config is enabled for this app
+                } else {
+                    val proxyId = "${Ipn.WG}$id"
+                    if (DEBUG)
+                        Log.d(
+                            LOG_TAG_VPN,
+                            "flow: wireguard is enabled and app is included, returning $proxyId, $connectionId, $uid"
+                        )
+                    return getFlowResponseString(proxyId, connectionId, uid)
+                }
+            }
+        }
 
         // if no proxy is enabled, return Ipn.Base
         if (!appConfig.isProxyEnabled()) {
@@ -2246,6 +2269,7 @@ class BraveVPNService :
         Log.d(LOG_TAG_VPN, "block-alg: $uid, $src, $dest, $realIps, $d, $blocklists")
         if (d == null) return true
 
+        // TODO: handle multiple domains, for now, use the first domain
         val domains: Set<String> = d.split(",").toSet()
         if (domains.isEmpty()) {
             Log.w(LOG_TAG_VPN, "block-alg domains are empty")
