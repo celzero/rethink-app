@@ -18,6 +18,11 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout_name"
         android:layout_width="match_parent"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
         android:layout_marginTop="10dp"
         android:layout_height="wrap_content"
         android:hint="@string/cd_doh_dialog_resolver_name"
@@ -44,6 +49,11 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout1"
         android:layout_width="match_parent"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
         android:layout_height="wrap_content"
         android:hint="@string/cd_doh_dialog_resolver_url"
         app:hintTextColor="?attr/accentGood"
