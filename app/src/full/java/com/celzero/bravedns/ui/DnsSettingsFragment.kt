@@ -37,15 +37,15 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UiUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class DnsSettingsFragment :
     Fragment(R.layout.fragment_dns_configure),

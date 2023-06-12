@@ -32,8 +32,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UiUtils
+import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -113,7 +113,7 @@ class DnsCryptRelayEndpointAdapter(
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptRelayName
             if (endpoint.isSelected) {
                 b.dnsCryptEndpointListUrlExplanation.text =
-                    context.getString(UIUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
+                    context.getString(UiUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
@@ -171,7 +171,7 @@ class DnsCryptRelayEndpointAdapter(
             builder.setTitle(R.string.dns_crypt_relay_remove_dialog_title)
             builder.setMessage(R.string.dns_crypt_relay_remove_dialog_message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
+            builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 deleteEndpoint(id)
             }
 

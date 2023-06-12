@@ -712,7 +712,7 @@ class AppInfoActivity :
         builder.setTitle(R.string.ada_delete_logs_dialog_title)
         builder.setMessage(R.string.ada_delete_logs_dialog_desc)
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.ada_delete_logs_dialog_positive)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ ->
             deleteAppLogs()
         }
 

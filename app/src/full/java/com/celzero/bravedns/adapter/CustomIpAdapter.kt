@@ -380,7 +380,7 @@ class CustomIpAdapter(private val context: Context) :
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(
-                context.getString(R.string.univ_ip_delete_individual_positive)
+                context.getString(R.string.lbl_delete)
             ) { _, _ ->
                 IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port)
                 Toast.makeText(

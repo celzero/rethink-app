@@ -2,13 +2,10 @@ package com.celzero.bravedns
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
-import android.net.VpnService
 import android.os.StrictMode
 import android.util.Log
 import com.celzero.bravedns.scheduler.ScheduleManager
 import com.celzero.bravedns.scheduler.WorkScheduler
-import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -37,16 +34,15 @@ class RethinkDnsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         DEBUG = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == ApplicationInfo.FLAG_DEBUGGABLE
-
-        turnOnStrictMode()
 
         startKoin {
             if (DEBUG) androidLogger()
             androidContext(this@RethinkDnsApplication)
             koin.loadModules(AppModules)
         }
+
+        turnOnStrictMode()
 
         if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "Schedule job")
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()

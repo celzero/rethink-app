@@ -55,8 +55,8 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.fetchColor
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -211,18 +211,18 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     private fun updateBlockedRulesChip() {
         if (connectionInfo!!.blockedByRule.isBlank()) {
-            b.bsConnTrackAppKill.text = getString(R.string.firewall_rule_no_rule)
+            b.bsConnTrackAppInfo.text = getString(R.string.firewall_rule_no_rule)
             return
         }
 
         val rule = connectionInfo!!.blockedByRule
         // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
-            b.bsConnTrackAppKill.text =
+            b.bsConnTrackAppInfo.text =
                 getFirewallRule(FirewallRuleset.RULE2G.id)?.title?.let { getString(it) }
             return
         } else {
-            b.bsConnTrackAppKill.text = getFirewallRule(rule)?.title?.let { getString(it) }
+            b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
         }
     }
 
@@ -257,31 +257,31 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     private fun lightenUpChip() {
         // Load icons for the firewall rules if available
-        b.bsConnTrackAppKill.chipIcon =
+        b.bsConnTrackAppInfo.chipIcon =
             ContextCompat.getDrawable(
                 requireContext(),
                 FirewallRuleset.getRulesIcon(connectionInfo?.blockedByRule)
             )
         if (connectionInfo!!.isBlocked) {
-            b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
+            b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
             val colorFilter =
                 PorterDuffColorFilter(
                     fetchColor(requireContext(), R.attr.chipTextNegative),
                     PorterDuff.Mode.SRC_IN
                 )
-            b.bsConnTrackAppKill.chipBackgroundColor =
+            b.bsConnTrackAppInfo.chipBackgroundColor =
                 ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
-            b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
+            b.bsConnTrackAppInfo.chipIcon?.colorFilter = colorFilter
         } else {
-            b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
+            b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
             val colorFilter =
                 PorterDuffColorFilter(
                     fetchColor(requireContext(), R.attr.chipTextPositive),
                     PorterDuff.Mode.SRC_IN
                 )
-            b.bsConnTrackAppKill.chipBackgroundColor =
+            b.bsConnTrackAppInfo.chipBackgroundColor =
                 ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorPositive))
-            b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
+            b.bsConnTrackAppInfo.chipIcon?.colorFilter = colorFilter
         }
     }
 
@@ -305,7 +305,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             persistentState.setBlockUnknownConnections(b.bsConnUnknownAppCheck.isChecked)
         }
 
-        b.bsConnTrackAppKill.setOnClickListener {
+        b.bsConnTrackAppInfo.setOnClickListener {
             showFirewallRulesDialog(connectionInfo!!.blockedByRule)
         }
 

@@ -55,9 +55,9 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.openVpnProfile
+import com.celzero.bravedns.util.UiUtils.sendEmailIntent
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastR
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour

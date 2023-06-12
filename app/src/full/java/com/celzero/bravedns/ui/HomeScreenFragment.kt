@@ -58,10 +58,10 @@ import com.celzero.bravedns.service.*
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.UIUtils.openNetworkSettings
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.openNetworkSettings
+import com.celzero.bravedns.util.UiUtils.openVpnProfile
+import com.celzero.bravedns.util.UiUtils.sendEmailIntent
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
@@ -70,12 +70,12 @@ import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -1007,7 +1007,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(R.string.hsf_vpn_dialog_header)
         builder.setMessage(R.string.hsf_vpn_dialog_message)
         builder.setCancelable(false)
-        builder.setPositiveButton(R.string.hsf_vpn_dialog_positive) { _, _ ->
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             startForResult.launch(prepareVpnIntent)
         }
 

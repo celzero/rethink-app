@@ -48,7 +48,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UiUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
 import com.google.android.material.chip.Chip

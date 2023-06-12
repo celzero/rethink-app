@@ -403,7 +403,7 @@ class FirewallAppListAdapter(
             builderSingle.setItems(packageList.toTypedArray(), null)
 
             builderSingle
-                .setPositiveButton(context.getString(R.string.ctbs_proceed_positive_text)) {
+                .setPositiveButton(context.getString(R.string.lbl_proceed)) {
                     _: DialogInterface,
                     _: Int ->
                     if (isWifi) {

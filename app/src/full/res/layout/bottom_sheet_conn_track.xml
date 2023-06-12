@@ -31,14 +31,14 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
-            android:layout_toStartOf="@id/bs_conn_track_app_kill"
+            android:layout_toStartOf="@id/bs_conn_track_app_info"
             android:padding="5dp"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/small_font_text_view"
             android:visibility="visible" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/bs_conn_track_app_kill"
+            android:id="@+id/bs_conn_track_app_info"
             style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -308,10 +308,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/trusted_domains_desc"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:gravity="center_vertical"
-        android:textColor="?attr/chipTextNegative"
+        android:textColor="?attr/primaryLightColorText"
         android:fontFamily="monospace"
         android:textSize="@dimen/small_font_text_view" />
 

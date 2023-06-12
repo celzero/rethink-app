@@ -47,7 +47,7 @@ import com.celzero.bravedns.ui.NetworkLogsActivity
 import com.celzero.bravedns.ui.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import kotlin.math.log2
