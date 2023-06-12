@@ -292,5 +292,8 @@ class Constants {
 
         // max logs to retrieve from the database, used in the log fragment
         const val MAX_LOGS = 35000
+
+        // wireguard folder name
+        const val WIREGUARD_FOLDER_NAME = "wireguard"
     }
 }

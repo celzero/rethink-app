@@ -52,6 +52,7 @@
     <string name="lbl_listen_port" translatable="true">Listen port</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_auto" translatable="true">(auto)</string>
+    <string name="lbl_include" translatable="true">Include</string>
 
     <string name="slide_2_title" translatable="true">Welcome</string>
     <string name="slide_2_desc" translatable="true">Rethink is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
@@ -1357,5 +1358,11 @@
     <string name="config_delete_dialog_title">Delete Config</string>
     <string name="config_delete_success_toast">Config deleted</string>
     <string name="config_add_success_toast">Config added</string>
+
+    <string name="include_all_app_wg_dialog_title">Include all apps</string>
+    <string name="include_all_app_wg_dialog_desc">Include all apps in this WireGuard tunnel?</string>
+
+    <string name="exclude_all_app_wg_dialog_title">Exclude all apps</string>
+    <string name="exclude_all_app_wg_dialog_desc">Exclude all apps in this WireGuard tunnel?</string>
 
 </resources>

@@ -77,6 +77,15 @@
             android:name=".ui.NetworkLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
+            android:name=".ui.WgHomeActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.WgConfigEditorActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.WgConfigDetailActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
             android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
