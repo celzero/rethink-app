@@ -34,9 +34,24 @@
     <string name="lbl_configure" translatable="true">Configure</string>
     <string name="lbl_logs" translatable="true">logs</string>
     <string name="lbl_network" translatable="true">network</string>
-
+    <string name="lbl_create" translatable="true">Create</string>
+    <string name="lbl_qr_code" translatable="true">QR Code</string>
+    <string name="lbl_import" translatable="true">Import</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">Public Key</string>
+    <string name="lbl_addresses" translatable="true">Addresses</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Servers</string>
+    <string name="lbl_applications" translatable="true">Applications</string>
     <string name="lbl_ip_rules" translatable="true">IP Rules</string>
     <string name="lbl_domain_rules" translatable="true">Domain Rules</string>
+    <string name="lbl_delete" translatable="true">Delete</string>
+    <string name="lbl_proceed" translatable="true">Proceed</string>
+    <string name="lbl_private_key" translatable="true">Private key</string>
+    <string name="lbl_generated" translatable="true">(generated)</string>
+    <string name="lbl_random" translatable="true">(random)</string>
+    <string name="lbl_listen_port" translatable="true">Listen port</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(auto)</string>
 
     <string name="slide_2_title" translatable="true">Welcome</string>
     <string name="slide_2_desc" translatable="true">Rethink is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
@@ -281,7 +296,7 @@
     <string name="search_custom_domains" translatable="true"><font size="12">Search domain names</font></string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Search blocklists</font></string>
 
-    <string name="trusted_domains_desc" translatable="true">The trust domain rule works with <u>Rethink\'s DNS</u> only.</string>
+    <string name="trusted_domains_desc" translatable="true">The trust domain rule works better with <u>Rethink\'s DNS</u>.</string>
 
     <string name="app_mode_dns_low_battery" translatable="true">DNS (battery saver)</string>
     <string name="app_mode_dns" translatable="true">DNS</string>
@@ -293,6 +308,7 @@
 
     <string name="info_dialog_copy_toast_msg" translatable="true">IP address copied.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL copied</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Public key copied.</string>
     <string name="info_dialog_rethink_toast_msg" translatable="true">Copied as RDNS+ DNS-over-HTTPS URL</string>
 
     <string name="settings_enable_logs_desc" translatable="true">Store DNS and Firewall logs locally on-device.</string>
@@ -324,7 +340,7 @@
     <string name="settings_ptrans_desc" translatable="true">Translate outbound IPv6 traffic to IPv4 on-device. Enable if you are connected to an IPv4-only network.</string>
 
     <string name="settings_allow_lan_heading" translatable="true">Do not route Private IPs (experimental)</string>
-    <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, link-local routes from Rethink\'s VPN tunnel.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Exclude LAN, loopback, multicast, link-local routes from Rethink\'s VPN tunnel.</string>
 
     <string name="settings_allow_bypass_heading" translatable="true">Enable network visibility</string>
     <string name="settings_allow_bypass_desc" translatable="true">Allow requesting apps to access all available networks. These apps may bypass Rethink\'s VPN tunnel on-demand. Some audio/video conference apps like Zoom and Meet may require this to function properly.</string>
@@ -561,7 +577,6 @@
 
     <string name="hsf_vpn_dialog_header" translatable="true">Attention!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethink does not collect any information or spy on you in any way.</string>
-    <string name="hsf_vpn_dialog_positive" translatable="true">Proceed</string>
 
     <string name="hsf_vpn_prepare_failure" translatable="true">Either VPN permission missing, or another app is in Always-on VPN mode.</string>
 
@@ -776,7 +791,6 @@
     <string name="cd_dns_alg_desc" translatable="true">Assign unique IP per DNS request</string>
 
     <!-- Connection Tracker fragment string -->
-    <string name="ct_delete_logs_positive_btn" translatable="true">Delete logs</string>
 
     <string name="ct_ip_details" translatable="false">%1$s (%2$s)</string>
 
@@ -786,7 +800,6 @@
     <string name="ctbs_app_info_not_available_toast" translatable="true">App settings page not found</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s other app(s)</string>
     <string name="ctbs_block_other_apps" translatable="true">Rules applied for %1$s will also be applicable for %2$s other apps</string>
-    <string name="ctbs_proceed_positive_text" translatable="true">Proceed</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">Go Back</string>
     <!-- DNS Log fragment -->
 
@@ -833,7 +846,6 @@
     <string name="univ_view_blocked_ip" translatable="true">IP &amp; Port rules</string>
     <string name="univ_view_blocked_ip_desc" translatable="true">Modify blocked or trusted Domain, IP / Port rules.</string>
 
-    <string name="univ_ip_delete_individual_positive" translatable="true">Delete</string>
     <string name="univ_ip_delete_individual_toast" translatable="true">%1$s deleted.</string>
     <string name="univ_ip_delete_dialog_positive" translatable="true">Delete all</string>
     <string name="univ_ip_delete_toast_success" translatable="true">Deleted all IP rules.</string>
@@ -848,7 +860,6 @@
     <string name="dns_connected_rethink_plus" translatable="true">Connected. %1$s blocklists in-use</string>
     <string name="dns_connected_no_count" translatable="true">Connected</string>
     <string name="dns_connected" translatable="true">Connected</string>
-    <string name="dns_delete_positive" translatable="true">Delete</string>
 
     <string name="dns_info_positive" translatable="true">Ok</string>
     <string name="dns_info_neutral" translatable="true">Copy</string>
@@ -918,7 +929,6 @@
     <string name="fapps_isolate_block_dialog_message" translatable="true">Isolate <i>listed</i> apps?</string>
 
     <string name="fapps_lockdown_hint" translatable="true">Vpn is in lockdown mode. Firewall will not honour Metered / Unmetered rules.</string>
-    <string name="fapps_all_network_hint" translatable="true"><u>Use all networks</u> is enabled. Firewall will not honour Metered / Unmetered rules.</string>
 
     <string name="fapps_firewall_filter_hint" translatable="true">Showing all apps</string>
 
@@ -1082,7 +1092,6 @@
     <string name="cd_toast_added" translatable="true">Domain added successfully</string>
     <string name="cd_remove_dialog_title" translatable="true">Delete domain?</string>
     <string name="cd_remove_dialog_message" translatable="true">Delete the domain from saved configuration.</string>
-    <string name="cd_remove_dialog_positive" translatable="true">Delete</string>
 
     <string name="cd_no_rules_text" translatable="true">No domain rules.</string>
 
@@ -1165,7 +1174,6 @@
 
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Clear logs</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen" translatable="true">Clear all logs related to this application.</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen" translatable="true">Proceed</string>
 
     <string name="bypass_dns_firewall_tooltip">%1$s works with Rethink\'s DNS only</string>
 
@@ -1293,5 +1301,61 @@
     <string name="ssv_most_blocked_ips_heading" description="This label will appear on the stats screen as a header for most blocked ips" translatable="true">most blocked ips</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Start Rethink to proceed</string>
     <string name="ssv_see_more" translatable="true">Show All</string>
+
+    <!-- wireguard -->
+    <string name="bad_config_reason_invalid_key" translatable="true">Invalid key</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Invalid number</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Invalid value</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Missing attribute</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Missing section</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Syntax error</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Unknown attribute</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Unknown section</string>
+
+    <string name="key_length_explanation_base64" translatable="true">: WireGuard base64 keys must be 44 characters (32 bytes)</string>
+    <string name="key_length_explanation_binary" translatable="true">: WireGuard keys must be 32 bytes</string>
+    <string name="key_length_explanation_hex" translatable="true">: WireGuard hex keys must be 64 characters (32 bytes)</string>
+
+    <string name="key_contents_error" translatable="true">Bad characters in key</string>
+    <string name="key_length_error" translatable="true">Incorrect key length</string>
+
+    <string name="parse_error_inet_address" translatable="true">IP address</string>
+    <string name="parse_error_inet_endpoint" translatable="true">endpoint</string>
+    <string name="parse_error_inet_network" translatable="true">IP network</string>
+    <string name="parse_error_integer" translatable="true">number</string>
+
+    <string name="bad_config_explanation_pka" translatable="true">: Must be positive and no more than 65535</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Must be positive</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Must be a valid UDP port number</string>
+
+    <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
+    <string name="bad_config_context_top_level" translatable="false">%s</string>
+
+    <string name="bad_config_error" translatable="true">%1$s in %2$s</string>
+    <string name="generic_error" translatable="true">Unknown “%s” error</string>
+
+    <string name="parse_error_generic" translatable="true">string</string>
+    <string name="parse_error_reason" translatable="true">Cannot parse %1$s “%2$s”</string>
+    <string name="unknown_error" translatable="true">Unknown error</string>
+    <string name="invalid_file_error" translatable="true">invalid file</string>
+
+    <string name="import_error" translatable="true">Unable to import tunnel: %s</string>
+    <string name="illegal_filename_error" translatable="true">Illegal file name “%s”</string>
+    <string name="no_configs_error" translatable="true">No configurations found</string>
+    <string name="bad_extension_error" translatable="true">File must be .conf or .zip</string>
+
+    <string name="setup_wireguard" translatable="true">Setup Wireguard</string>
+    <string name="wireguard_description" translatable="true">WireGuard as a proxy.</string>
+    <string name="new_warp_config_desc" translatable="true">Fetch WARP configuration from server</string>
+    <string name="new_warp_error_toast" translatable="true">Unable to fetch WARP configuration</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Invalid WARP configuration</string>
+
+    <string name="add_remove_apps" translatable="true">Add / Remove Applications</string>
+    <string name="add_peer" translatable="true">Add Peer</string>
+
+    <string name="config_delete_dialog_desc">Are you sure you want to delete this Config?</string>
+    <string name="config_delete_dialog_title">Delete Config</string>
+    <string name="config_delete_success_toast">Config deleted</string>
+    <string name="config_add_success_toast">Config added</string>
 
 </resources>

@@ -456,7 +456,6 @@
     <string name="ci_dialog_desc">IP-Adresse, IP-Subnetz (Bereich), Port zulassen (umgehen) oder sperren. Beispiel: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80,[10.1.0.0/16]:80, *.*:80</string>
     <string name="ada_app_status_exclude">ist von DNS und Firewall ausgeschlossen</string>
     <string name="ada_firewall_title">Firewall-Regeln für diese Anwendung</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Fortfahren</string>
     <string name="bsdl_blocked_desc">blockiert %1$s durch %2$s</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Sperren Sie Inhalte für Erwachsene und Raubkopien, Online-Glücksspiele und -Dating, sowie soziale Medien.</string>
     <string name="rt_dialog_message">Möchten Sie neu konfigurierte Blocklisten anwenden\?</string>
@@ -487,7 +486,6 @@
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_dialog_header">Benutzerdefinierte Domäne(n): %1$s</string>
     <string name="cd_toast_added">Domain erfolgreich hinzugefügt</string>
-    <string name="cd_remove_dialog_positive">Löschen</string>
     <string name="cd_dialog_error_invalid_wildcard">Ungültiger Platzhalter.</string>
     <string name="cd_blocked_initial">B</string>
     <string name="ci_trust_initial">T</string>
@@ -528,7 +526,7 @@
     <string name="dns_card_latency_active">Latenzzeit: %1$sms</string>
     <string name="hsf_vpn_dialog_header">Achtung!</string>
     <string name="hsf_vpn_prepare_failure">Entweder fehlt die VPN-Berechtigung, oder eine andere Anwendung befindet sich im Always-on-VPN-Modus.</string>
-    <string name="hsf_vpn_dialog_positive">Fortfahren</string>
+    <string name="lbl_proceed">Fortfahren</string>
     <string name="hsf_notification_permission_failure">Aktivieren Sie die Benachrichtigungsberechtigung in den Bildschirm Einstellungen</string>
     <string name="firewall_status_block_unmetered">in nicht gebührenpflichtigen Netzen (Wlan) blockiert</string>
     <string name="firewall_status_block_metered">in gebührenpflichtigen (mobilen) Netzen gesperrt</string>
@@ -600,7 +598,6 @@
     <string name="cd_doh_dialog_resolver_name">Resolver-Name</string>
     <string name="cd_doh_dialog_resolver_url">Resolver-URL</string>
     <string name="cd_dnscrypt_relay_heading">Relays</string>
-    <string name="ct_delete_logs_positive_btn">Protokolle löschen</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="dns_log_dialog_positive">Protokolle löschen</string>
     <string name="dns_btm_sheet_chip">+%1$s andere IPs</string>
@@ -655,7 +652,6 @@
     <string name="ctbs_app_info_not_available_toast">Seite mit den App-Einstellungen nicht gefunden</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s andere App(s)</string>
     <string name="ctbs_block_other_apps">Regeln angewendet für %1$s sind auch anwendbar für %2$s andere Apps</string>
-    <string name="ctbs_proceed_positive_text">Fortfahren</string>
     <string name="ctbs_dialog_negative_btn">Gehe zurück</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s Blockliste(n)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -690,7 +686,6 @@
     <string name="dc_local_block_heading">Geräteinterne Sperrlisten</string>
     <string name="intent_launch_error">Zählung nicht gestartet %1$s</string>
     <string name="cd_dns_crypt_title">Resolver</string>
-    <string name="univ_ip_delete_individual_positive">Löschen</string>
     <string name="dns_connected">Verbunden</string>
     <string name="dns_proxy_dialog_message">Name der Anwendung: %1$s
 \n
@@ -735,7 +730,6 @@
     <string name="univ_accessibility_dialog_negative">Verweigern</string>
     <string name="dns_connected_rethink_plus">Verbunden. %1$s Blocklisten aktiv</string>
     <string name="dns_connected_no_count">Verbunden</string>
-    <string name="dns_delete_positive">Löschen</string>
     <string name="dns_info_positive">Ok</string>
     <string name="dns_info_neutral">Kopieren</string>
     <string name="dns_crypt_relay_error_toast">Kein Resolver ausgewählt</string>
@@ -801,7 +795,6 @@
     <string name="fapps_filter_filter_heading">Typ</string>
     <string name="copy_clipboard_label">URL</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blockieren auf nicht getakteten Verbindung</string>
-    <string name="fapps_all_network_hint" translatable="true"><u>Alle Netzwerke verwenden</u> ist aktiviert. Die Firewall berücksichtigt keine getakteten/nicht getakteten-Regeln.</string>
     <string name="fapps_info_metered_msg" translatable="true">Zulassen / Blockieren im getakteten (mobilen) Netzwerk.</string>
     <string name="fapps_lockdown_hint" translatable="true">VPN befindet sich im Sperrmodus. Die Firewall berücksichtigt keine Metered/Unmetered-Regeln.</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starten Sie Rethink, um fortzufahren</string>

@@ -388,7 +388,6 @@
     <string name="cd_custom_doh_dialog_title" translatable="true">Niestandardowy adres URL serwera</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Wewnętrzny</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">Zewnętrzny</string>
-    <string name="ct_delete_logs_positive_btn" translatable="true">Usuń dzienniki (logi)</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s inne aplikacje</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">Wróć</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s Inne IP</string>
@@ -406,7 +405,6 @@
     <string name="fapps_firewall_filter_excluded" translatable="true">Wykluczony</string>
     <string name="fapps_unmetered_block_dialog_message" translatable="true">Zablokować połączenia w sieci WiFi dla <i>wymienionych</i> aplikacji\?</string>
     <string name="fapps_metered_block_dialog_message" translatable="true">Zablokować połączenia w sieci taryfowej (komórkowej) dla <i>wymienionych</i> aplikacji\?</string>
-    <string name="fapps_all_network_hint" translatable="true"><u>Używaj wszystkich sieci</u>jest włączona. Firewall nie będzie honorował reguł WiFi / komórkowej (taryfowej).</string>
     <string name="fapps_lockdown_hint" translatable="true">VPN jest w trybie blokady. Firewall nie będzie honorować reguł mierzonych/niezmierzonych.</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Wyświetlam wszystkie aplikacje</string>
     <string name="fapps_firewall_filter_desc" translatable="true">Wyświetlanie <u>%1$s</u> %2$s aplikacji</string>
@@ -443,7 +441,6 @@
     <string name="build__flavor_fdroid" translatable="true">fdroid</string>
     <string name="build__flavor_website" translatable="true">strona WWW</string>
     <string name="cd_remove_dialog_title" translatable="true">Usunąć domenę\?</string>
-    <string name="cd_remove_dialog_positive" translatable="true">Usuń</string>
     <string name="cd_remove_dialog_message" translatable="true">Usuń domenę z zapisanej konfiguracji.</string>
     <string name="cd_dialog_desc" translatable="true">Niestandardowy adres URL (domena) lub dzika karta, aby zezwolić lub zablokować. np. *.test.com, test.com/test</string>
     <string name="cd_dialog_title" translatable="true">Dodaj domenę</string>
@@ -611,7 +608,7 @@
     <string name="pcap_failure_toast" translatable="true">Błąd podczas tworzenia pliku pcap, spróbuj ponownie!</string>
     <string name="logs_card_network_count" translatable="true">%1$s połączenia</string>
     <string name="logs_card_dns_count" translatable="true">%1$s zapytania</string>
-    <string name="hsf_vpn_dialog_positive" translatable="true">Przejdź dalej</string>
+    <string name="lbl_proceed" translatable="true">Przejdź dalej</string>
     <string name="hsf_start_dialog_positive" translatable="true">Start</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Przechwytywanie pakietów aktywne</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Przechwytywanie pakietów wyłączone</string>
@@ -697,7 +694,6 @@
     <string name="cd_doh_dialog_resolver_url" translatable="true">Adres URL programu rozpoznawania nazw</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">Przekaźniki</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">Nie znaleziono strony z ustawieniami aplikacji</string>
-    <string name="ctbs_proceed_positive_text" translatable="true">Przejdź dalej</string>
     <string name="dns_btm_sheet_dialog_message" translatable="true"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s blocklist(s)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Brak odpowiedzi</string>
     <string name="dns_btm_sheet_dialog_ips" translatable="true"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -713,12 +709,10 @@
     <string name="univ_firewall_rule_10" translatable="true">Blokuj wszystkie poza pominiętymi aplikacjami i IP</string>
     <string name="univ_view_blocked_ip" translatable="true">reguły ip i portów</string>
     <string name="univ_view_blocked_ip_desc" translatable="true">Zmodyfikuj reguły zablokowanej lub zaufanej domeny, adresu IP / portu.</string>
-    <string name="univ_ip_delete_individual_positive" translatable="true">Usuń</string>
     <string name="univ_ip_delete_individual_toast" translatable="true">Usunięto %1$s</string>
     <string name="univ_accessibility_crash_dialog_positive" translatable="true">Przejdź do ustawień</string>
     <string name="univ_accessibility_dialog_positive" translatable="true">Dotacja</string>
     <string name="dns_connected" translatable="true">Połączony</string>
-    <string name="dns_delete_positive" translatable="true">Skasuj</string>
     <string name="dns_crypt_relay_error_toast" translatable="true">Nie wybrano resolwera</string>
     <string name="dns_proxy_dialog_message" translatable="true">Nazwa aplikacji: %1$s
 \n
@@ -756,7 +750,6 @@
     <string name="ada_app_exclude" translatable="true">Wyklucz</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuj programy typu attentionware, spyware, scareware.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokowanie treści dla dorosłych i pirackich, hazardu i randek online oraz mediów społecznościowych.</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen" translatable="true">Przejdź dalej</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuj złośliwe oprogramowanie, ransomware, cryptoware, phisherów i inne zagrożenia.</string>
     <string name="radio_max_btn" translatable="true">Max</string>
     <string name="rt_filter_desc_subgroups" translatable="true">Wyświetlanie <u>%1$s</u> list blokujących w grupie: %2$s i podgrupie: %3$s</string>

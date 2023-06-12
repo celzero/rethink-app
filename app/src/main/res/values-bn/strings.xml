@@ -65,7 +65,7 @@
     <string name="firewall_status_excluded">dns এবং ফায়ারওয়াল থেকে বাদ</string>
     <string name="firewall_status_unknown">অজানা</string>
     <string name="firewall_card_text_inactive">ফায়ারওয়াল মোড সক্ষম করুন।</string>
-    <string name="hsf_vpn_dialog_positive">এগিয়ে যান</string>
+    <string name="lbl_proceed">এগিয়ে যান</string>
     <string name="hsf_pause_vpn_failure">বিরতি দেওয়া যাবে না: রিথিঙ্কডিএনএস সক্রিয় নয়</string>
     <string name="about_dialog_positive_button">চলো যাই</string>
     <string name="about_mail_to_string">mailto:</string>
@@ -195,7 +195,6 @@
     <string name="dc_block_heading">নিয়ম</string>
     <string name="about_settings">পদ্ধতি</string>
     <string name="cd_dns_crypt_error_text_1">স্ট্যাম্প খালি করা যাবে না</string>
-    <string name="univ_ip_delete_individual_positive">মুছুন</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="allow">অনুমতি</string>
     <string name="status_protected_with_tor_private_dns">টর এবং প্রাইভেট ডিএনএস দিয়ে সুরক্ষিত</string>
@@ -212,7 +211,6 @@
     <string name="settings_http_proxy_error_text3">হোস্টনাম খালি</string>
     <string name="settings_notification_dialog_title">বিজ্ঞপ্তি কর্ম চয়ন করুন</string>
     <string name="cd_dns_crypt_title">সমাধানকারী</string>
-    <string name="dns_delete_positive">মুছুন</string>
     <string name="dns_info_positive">ঠিক আছে</string>
     <string name="dns_proxy_port">পোর্ট নাম্বার</string>
     <string name="txt_home">গৃহ</string>
@@ -237,7 +235,6 @@
     <string name="about_settings_app_info">অ্যাপের তথ্য</string>
     <string name="about_mozilla">RethinkDNS হল Mozilla Builders MVP প্রোগ্রামের অংশ।</string>
     <string name="about_mail_bugreport_share_title">ইমেল প্রদানকারী নির্বাচন করুন</string>
-    <string name="ct_delete_logs_positive_btn">লগ মুছুন</string>
     <string name="dns_info_neutral">অনুলিপি</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="fapps_filter_parent_installed">ইনস্টলকৃত</string>
@@ -505,7 +502,6 @@
     <string name="cd_doh_dialog_resolver_name">সমাধানকারীর নাম</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="ctbs_app_info_not_available_toast">অ্যাপ সেটিংস পৃষ্ঠা পাওয়া যায়নি</string>
-    <string name="ctbs_proceed_positive_text">এগিয়ে যান</string>
     <string name="ctbs_dialog_negative_btn">পূর্বাবস্থায় যান</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s ব্লকলিস্ট(গুলি)&lt;/h3&gt;%3$s।&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="hs_download_positive_website">ওয়েবসাইট</string>
@@ -572,7 +568,6 @@
     <string name="firewall_rule_block_app_unmetered_desc"><i>আনমিটারড</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>সোর্স অ্যাপ</i> সেট করা হয়েছে <i>বাইপাস ইউনিভার্সাল</i> ফায়ারওয়াল নিয়মে।</string>
     <string name="notif_dialog_pause_dialog_message">বিরতি অবস্থায় আবেদন, চালিয়ে যেতে পুনরায় শুরু করুন</string>
-    <string name="cd_remove_dialog_positive">মুছুন</string>
     <string name="brbs_backup_dialog_message">একটি ফাইলে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ ব্যাক আপ করে। এটি VPN পুনরায় চালু করবে।</string>
     <string name="other_dns_list_tab2">ডিএনস্ক্রিপ্ট</string>
     <string name="firewall_rule_block_udp_ntp">UDP অবরুদ্ধ</string>
@@ -740,7 +735,6 @@
     <string name="fapps_unmetered_block_dialog_title">আনমিটারে ব্লক করুন</string>
     <string name="fapps_metered_unblock_dialog_title">মিটারে অনুমতি দিন</string>
     <string name="rules_load_failure_reload">পুনরায় লোড</string>
-    <string name="fapps_all_network_hint"><u>সব নেটওয়ার্ক ব্যবহার করুন</u> সক্ষম করা আছে। ফায়ারওয়াল মিটারড / আনমিটারড নিয়ম মেনে চলবে না।</string>
     <string name="rules_load_failure_desc">কোন ফায়ারওয়াল নিয়ম পাওয়া যায়নি</string>
     <string name="fapps_info_dialog_message">অ্যাপ্লিকেশানগুলিকে ইন্টারনেটে সংযোগ করা থেকে ব্লক করুন৷ ইন্টারনেটে অ্যাক্সেস সীমিত করা অযৌক্তিক ডেটা ব্যবহার রোধ করতে, সেইসাথে ব্যাটারি সংরক্ষণ করতে সহায়তা করে।
 \n

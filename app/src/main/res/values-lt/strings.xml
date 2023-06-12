@@ -196,7 +196,7 @@
     <string name="hsf_stop_btn_state">sustabdyti</string>
     <string name="hsf_downtime">(neaktyvus nuo %1$s)</string>
     <string name="hsf_vpn_dialog_header">Dėmesio!</string>
-    <string name="hsf_vpn_dialog_positive">Tęsti</string>
+    <string name="lbl_proceed">Tęsti</string>
     <string name="hsf_start_dialog_header">Paleisti %1$s</string>
     <string name="hsf_start_dialog_positive">Paleisti</string>
     <string name="hsf_proxy_chip_text">Įgaliotasis serveris aktyvus</string>
@@ -253,11 +253,9 @@
     <string name="cd_doh_dialog_resolver_name">Sprendiklio pavadinimas</string>
     <string name="cd_doh_dialog_resolver_url">Sprendiklio URL</string>
     <string name="cd_dnscrypt_relay_heading">Relės</string>
-    <string name="ct_delete_logs_positive_btn">Ištrinti žurnalus</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s kita (-os) programėlė (-s)</string>
     <string name="ctbs_block_other_apps">Taisyklės, taikomos %1$s, bus taikomos ir kitoms %2$s programėlėms</string>
-    <string name="ctbs_proceed_positive_text">Tęsti</string>
     <string name="ctbs_dialog_negative_btn">Grįžti atgal</string>
     <string name="dns_log_dialog_positive">Ištrinti žurnalus</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;šrifto dydis=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s blokavimo sąrašas (-ai)&lt;/h3&gt;%3$s. &lt;br/&gt;&lt;br/&gt;</Data> </string>
@@ -273,7 +271,6 @@
     <string name="univ_firewall_rule_8">Blokuoti 80 prievado (nesaugaus HTTP) srautą</string>
     <string name="univ_firewall_rule_9">Blokuoti matuojamame (mobiliajame) tinkle</string>
     <string name="univ_view_blocked_ip">ip ir prievadų taisyklės</string>
-    <string name="univ_ip_delete_individual_positive">Išrinti</string>
     <string name="univ_ip_delete_individual_toast">%1$s ištrinta.</string>
     <string name="univ_ip_delete_dialog_positive">Ištrinti viską</string>
     <string name="univ_ip_delete_toast_success">Ištrintos visos IP taisyklės.</string>
@@ -283,7 +280,6 @@
     <string name="univ_accessibility_dialog_negative">Drausti</string>
     <string name="dns_connected_no_count">Prisijungta</string>
     <string name="dns_connected">Prisijungta</string>
-    <string name="dns_delete_positive">Išrinti</string>
     <string name="dns_info_positive">Gerai</string>
     <string name="dns_info_neutral">Kopijuoti</string>
     <string name="dns_proxy_dialog_message">Programėlės pavadinimas: %1$s
@@ -374,7 +370,6 @@
     <string name="cd_toast_deleted">Domenas pašalintas iš pasirinktinių sąrašo</string>
     <string name="cd_toast_added">Domenas sėkmingai pridėtas</string>
     <string name="cd_remove_dialog_message">Ištrinti domeną iš išsaugotos konfigūracijos.</string>
-    <string name="cd_remove_dialog_positive">Ištrinti</string>
     <string name="cd_dialog_desc">Pasirinktinis URL (domenas) arba simbolis, kurį galima leisti arba blokuoti, pvz., *.testas.lt, testas.lt/testas</string>
     <string name="cd_dialog_edittext_hint">Įveskite %1$s</string>
     <string name="cd_dialog_error_invalid_domain">Netinkamas URL (domenas).</string>
@@ -604,7 +599,6 @@
     <string name="hs_download_positive_default">gerai</string>
     <string name="fapps_metered_unblock_dialog_message">Leisti prisijungimus matuojamame (mobiliajame) tinkle <i>išvardytoms</i> programėlėms\?</string>
     <string name="fapps_lockdown_hint">VPN veikia visiško užrakinimo režimu. Ugniasienė nesilaikys matuojamų / nematuojamų tinklų taisyklių.</string>
-    <string name="fapps_all_network_hint"><u>Įjungta naudoti visus tinklus</u>. Ugniasienė nesilaikys matuojamų / nematuojamų tinklų taisyklių.</string>
     <string name="univ_delete_firewall_dialog_message">Ištrynus šias taisykles, bet kuri programėlė galėtų prisijungti prie šiuo metu užblokuotų IP adresų.</string>
     <string name="dns_connected_rethink_plus">Prisijungta. Naudojami %1$s blokavimo sąrašai</string>
     <string name="dns_crypt_relay_error_toast">Nepasirinktas joks sprendiklis</string>

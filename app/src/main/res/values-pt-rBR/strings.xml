@@ -144,7 +144,6 @@
     <string name="notif_channel_desc_proxy_failure">Alerte sobre erros e anomalias de Proxy</string>
     <string name="notif_channel_desc_firewall_alerts">Alerte sobre erros e anomalias de Firewall</string>
     <string name="cd_remove_dialog_message">Apagar domínio da configuração salva.</string>
-    <string name="cd_remove_dialog_positive">Apagar</string>
     <string name="ci_blocked_initial">B</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_block_wifi">está bloqueado em redes de banda larga (wifi)</string>
@@ -470,7 +469,7 @@
     <string name="hsf_vpn_dialog_message">RethinkDNS precisa de permissão para criar uma VPN local para criptografar solicitações de DNS do dispositivo, implementar monitor de rede e executar regras do firewall.
 \n
 \nRethinkDNS não coleta nenhum tipo de informação nem espia você de maneira nenhuma.</string>
-    <string name="hsf_vpn_dialog_positive">Continuar</string>
+    <string name="lbl_proceed">Continuar</string>
     <string name="hsf_vpn_prepare_failure">Ou a permissão da VPN está ausente, ou outro app está no modo de VPN Sempre Ligada.</string>
     <string name="hsf_start_dialog_header">Iniciar %1$s</string>
     <string name="firewall_status_block_unmetered">bloqueado em redes de banda larga (wifi)</string>
@@ -525,12 +524,10 @@
     <string name="cd_doh_dialog_resolver_name">Nome do resolvedor</string>
     <string name="cd_doh_dialog_resolver_url">URL do resolvedor</string>
     <string name="cd_dnscrypt_relay_heading">Relays</string>
-    <string name="ct_delete_logs_positive_btn">Apagar registros</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="ctbs_app_info_not_available_toast">Página da configurações do app não encontrada</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s outro(s) app(s)</string>
     <string name="ctbs_block_other_apps">Regras aplicadas para %1$s também serão aplicadas para %2$s outros apps</string>
-    <string name="ctbs_proceed_positive_text">Continuar</string>
     <string name="ctbs_dialog_negative_btn">Voltar</string>
     <string name="dns_log_dialog_positive">Apagar registros</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s lista(s) de bloqueio&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
@@ -551,7 +548,6 @@
     <string name="univ_firewall_rule_9">Bloqueie na rede com franquia de dados (móvel)</string>
     <string name="univ_view_blocked_ip">Regras de IP e porta</string>
     <string name="univ_view_blocked_ip_desc">Modifique regras de IP/Portas bloqueadas ou contornadas.</string>
-    <string name="univ_ip_delete_individual_positive">Apagar</string>
     <string name="univ_ip_delete_individual_toast">%1$s apagado.</string>
     <string name="univ_ip_delete_dialog_positive">Apagar tudo</string>
     <string name="univ_delete_firewall_dialog_title">Apagar todas as regras de IP\?</string>
@@ -562,7 +558,6 @@
     <string name="dns_connected_rethink_plus">Conectado. %1$s listas de bloqueio em uso</string>
     <string name="dns_connected_no_count">Conectado</string>
     <string name="dns_connected">Conectado</string>
-    <string name="dns_delete_positive">Apagar</string>
     <string name="dns_info_neutral">Copiar</string>
     <string name="dns_crypt_relay_error_toast">Nenhum resolvedor selecionado</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
@@ -602,7 +597,6 @@
 \n
 \n2. A configuração <i>Usar todas as redes disponíveis</i> está ativada.</string>
     <string name="fapps_lockdown_hint">VPN está em modo restrito. O firewall não respeitará as regras de redes com franquia de dados / banda larga.</string>
-    <string name="fapps_all_network_hint"><u>Usar todas as redes</u> está ativado. O firewall não respeitará as regras de redes com franquia de dados / banda larga.</string>
     <string name="dns_proxy_toast_parameter">Proxy de DNS</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio em uso</string>
     <string name="settings_local_blocklist_dialog_positive">Baixar</string>
