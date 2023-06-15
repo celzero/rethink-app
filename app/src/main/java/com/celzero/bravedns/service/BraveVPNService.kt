@@ -729,7 +729,7 @@ class BraveVPNService :
             this.resources.getString(R.string.accessibility_notification_content)
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
@@ -801,7 +801,7 @@ class BraveVPNService :
         val contentTitle = resources.getString(R.string.rules_load_failure_heading)
         val contentText = resources.getString(R.string.rules_load_failure_desc)
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
@@ -1070,7 +1070,8 @@ class BraveVPNService :
             contentTitle = resources.getString(R.string.pause_mode_notification_title)
         }
 
-        builder.setSmallIcon(R.drawable.dns_icon).setContentIntent(pendingIntent)
+        builder.setSmallIcon(R.drawable.ic_notification_icon).setContentIntent(pendingIntent)
+        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
 
         // New action button options in the notification
         // 1. Pause / Resume, Stop action button.
@@ -1081,7 +1082,7 @@ class BraveVPNService :
                 LOG_TAG_VPN,
                 "notification action type:  ${persistentState.notificationActionType}"
             )
-        builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
+
         when (
             NotificationActionType.getNotificationActionType(persistentState.notificationActionType)
         ) {
@@ -1672,7 +1673,7 @@ class BraveVPNService :
                     mutable = false
                 )
             builder
-                .setSmallIcon(R.drawable.dns_icon)
+                .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(resources.getText(R.string.warning_title))
                 .setContentText(resources.getText(R.string.notification_content))
                 .setContentIntent(pendingIntent)
@@ -2182,7 +2183,8 @@ class BraveVPNService :
                 // pass-through
             } else {
                 val id = WireguardManager.getActiveConfigIdForApp(uid)
-                if (id == -1) {
+                // if no config is assigned / enabled for this app, pass-through
+                if (id == -1 || enabledWireguardConfigs.none { it.getId() == id }) {
                     if (DEBUG)
                         Log.d(
                             LOG_TAG_VPN,
