@@ -440,6 +440,10 @@ class BraveVPNService :
             if (dnsBypassed(connInfo.query)) {
                 return FirewallRuleset.RULE7
             }
+
+            if (isProxyEnabled(connInfo.uid)) {
+                return FirewallRuleset.RULE12
+            }
         } catch (iex: Exception) {
             // TODO: show alerts to user on such exceptions, in a separate ui?
             Log.e(LOG_TAG_VPN, "err blocking conn, block anyway", iex)
@@ -447,6 +451,23 @@ class BraveVPNService :
         }
 
         return FirewallRuleset.RULE0
+    }
+
+    private fun isProxyEnabled(uid: Int): Boolean {
+        val isProxyEnabled = appConfig.isProxyEnabled()
+        if (!isProxyEnabled) {
+            return false
+        }
+
+        // if proxy is enabled, then check if the app is allowed to use proxy
+        // this case holds true only when proxy is wireguard, else all apps are
+        // forced to use proxy
+        // TODO: change this logic when all proxy has option to add or remove apps
+        return if (appConfig.isWireguardEnabled()) {
+            WireguardManager.isAppAvailableInActiveWgConfig(uid)
+        } else {
+            true
+        }
     }
 
     private fun getDomainRule(domain: String, uid: Int): DomainRulesManager.Status {
@@ -2051,41 +2072,42 @@ class BraveVPNService :
                 "onQuery: rcvd query: $fqdn, qtype: $qtype, suggested_id: $suggestedId"
             )
         if (fqdn == null) {
-            return suggestedId?.ifEmpty { getTransportId(Dnsx.Preferred) }
+            return suggestedId?.ifEmpty { determineTransportId(Dnsx.Preferred, suggestedId) }
         }
 
         if (appConfig.getBraveMode().isDnsMode()) {
-            val res = getTransportIdForDnsMode(fqdn)
+            val res = getTransportIdForDnsMode(fqdn, suggestedId)
             if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns): dnsx: $res")
             return res
         }
 
         if (appConfig.getBraveMode().isDnsFirewallMode()) {
-            val res = getTransportIdForDnsFirewallMode(fqdn)
+            val res = getTransportIdForDnsFirewallMode(fqdn, suggestedId)
             if (DEBUG) Log.d(LOG_TAG_VPN, "onQuery (Dns+Firewall): dnsx: $res")
             return res
         }
 
         Log.e(LOG_TAG_VPN, "onQuery: unknown mode ${appConfig.getBraveMode()}, returning preferred")
-        return getTransportId(Dnsx.Preferred)
+        return determineTransportId(Dnsx.Preferred, suggestedId)
     }
 
     // function to decide which transport id to return on Dns only mode
-    private fun getTransportIdForDnsMode(fqdn: String): String {
+    private fun getTransportIdForDnsMode(fqdn: String, suggestedId: String?): String {
         // check for global domain rules
         when (DomainRulesManager.getDomainRule(fqdn, UID_EVERYBODY)) {
             // TODO: return Preferred for now
             DomainRulesManager.Status.TRUST ->
-                return getTransportId(Dnsx.BlockFree) // Dnsx.BlockFree
-            DomainRulesManager.Status.BLOCK -> return getTransportId(Dnsx.BlockAll) // Dnsx.BlockAll
+                return determineTransportId(Dnsx.BlockFree, suggestedId) // Dnsx.BlockFree
+            DomainRulesManager.Status.BLOCK ->
+                return determineTransportId(Dnsx.BlockAll, suggestedId) // Dnsx.BlockAll
             else -> {} // no-op, fall-through;
         }
 
-        return getTransportId(Dnsx.Preferred)
+        return determineTransportId(Dnsx.Preferred, suggestedId)
     }
 
     // function to decide which transport id to return on DnsFirewall mode
-    private fun getTransportIdForDnsFirewallMode(fqdn: String): String {
+    private fun getTransportIdForDnsFirewallMode(fqdn: String, suggestedId: String?): String {
         return if (FirewallManager.isAnyAppBypassesDns()) {
             // if any app is bypassed (dns + firewall) and if local blocklist enabled or remote dns
             // is rethink then return Alg so that the decision is made by in flow() function
@@ -2097,15 +2119,18 @@ class BraveVPNService :
             // if the domain is not trusted and no app is bypassed then return preferred or
             // CT+preferred so that if the domain is blocked by upstream then no need to do
             // any further processing
-            getTransportId(Dnsx.Preferred)
+            determineTransportId(Dnsx.Preferred, suggestedId)
         }
     }
 
-    private fun getTransportId(transId: String): String {
-        return if (persistentState.enableDnsCache) {
-            Dnsx.CT + transId
+    private fun determineTransportId(userPreferredId: String, systemSuggestedId: String?): String {
+        // use system suggested id on all cases except if the dns query should be blocked
+        return if (systemSuggestedId?.isNotEmpty() == true && userPreferredId != Dnsx.BlockAll) {
+            systemSuggestedId
+        } else if (persistentState.enableDnsCache) {
+            Dnsx.CT + userPreferredId
         } else {
-            transId
+            userPreferredId
         }
     }
 
@@ -2175,11 +2200,22 @@ class BraveVPNService :
             return getFlowResponseString(Ipn.Block, connectionId, uid)
         }
 
+        // if no proxy is enabled, return Ipn.Base
+        if (!appConfig.isProxyEnabled()) {
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: no proxy enabled, returning Ipn.Base, $connectionId, $uid"
+                )
+            return getFlowResponseString(Ipn.Base, connectionId, uid)
+        }
+
         // check for other proxy rules
+        // wireguard
         if (appConfig.isWireguardEnabled()) {
             val enabledWireguardConfigs = WireguardManager.getActiveConfigs()
             if (enabledWireguardConfigs.isEmpty()) {
-                Log.e(LOG_TAG_VPN, "flow: wireguard is enabled but no configs are enabled")
+                Log.e(LOG_TAG_VPN, "flow: no configs are enabled for wireguard")
                 // pass-through
             } else {
                 val id = WireguardManager.getActiveConfigIdForApp(uid)
@@ -2201,16 +2237,6 @@ class BraveVPNService :
                     return getFlowResponseString(proxyId, connectionId, uid)
                 }
             }
-        }
-
-        // if no proxy is enabled, return Ipn.Base
-        if (!appConfig.isProxyEnabled()) {
-            if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "flow: no proxy enabled, returning Ipn.Base, $connectionId, $uid"
-                )
-            return getFlowResponseString(Ipn.Base, connectionId, uid)
         }
 
         // chose socks5 proxy over http proxy
@@ -2374,5 +2400,15 @@ class BraveVPNService :
             protocol,
             query
         )
+    }
+
+    fun getProxyStatusById(id: String): Long? {
+        return if (vpnAdapter != null) {
+            val status = vpnAdapter?.getProxyStatusById(id)
+            status
+        } else {
+            Log.w(LOG_TAG_VPN, "error while fetching proxy status: vpnAdapter is null")
+            null
+        }
     }
 }
