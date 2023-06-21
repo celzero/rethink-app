@@ -47,7 +47,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class WgHomeActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
+class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private val b by viewBinding(ActivityWireguardMainBinding::bind)
     private val persistentState by inject<PersistentState>()
 
@@ -74,7 +74,7 @@ class WgHomeActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                                 Log.i(LoggerConstants.LOG_TAG_WIREGUARD, "result: ${result.text}")
                                 TunnelImporter.importTunnel(result.text) {
                                     Utilities.showToastUiCentered(
-                                        this@WgHomeActivity,
+                                        this@WgMainActivity,
                                         it.toString(),
                                         Toast.LENGTH_LONG
                                     )
@@ -88,7 +88,7 @@ class WgHomeActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                                     getString(R.string.invalid_file_error)
                                 )
                             Utilities.showToastUiCentered(
-                                this@WgHomeActivity,
+                                this@WgMainActivity,
                                 message,
                                 Toast.LENGTH_LONG
                             )
@@ -101,7 +101,7 @@ class WgHomeActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                                 getString(R.string.invalid_file_error)
                             )
                         Utilities.showToastUiCentered(
-                            this@WgHomeActivity,
+                            this@WgMainActivity,
                             message,
                             Toast.LENGTH_LONG
                         )
@@ -111,7 +111,7 @@ class WgHomeActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                     TunnelImporter.importTunnel(contentResolver, data) {
                         Log.e(LoggerConstants.LOG_TAG_WIREGUARD, it.toString())
                         Utilities.showToastUiCentered(
-                            this@WgHomeActivity,
+                            this@WgMainActivity,
                             it.toString(),
                             Toast.LENGTH_LONG
                         )
@@ -127,7 +127,7 @@ class WgHomeActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                 lifecycleScope.launch {
                     TunnelImporter.importTunnel(qrCode) {
                         Utilities.showToastUiCentered(
-                            this@WgHomeActivity,
+                            this@WgMainActivity,
                             it.toString(),
                             Toast.LENGTH_LONG
                         )
@@ -166,7 +166,7 @@ class WgHomeActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         val layoutManager = LinearLayoutManager(this)
         b.wgInterfaceList.layoutManager = layoutManager
 
-        wgConfigAdapter = WgConfigAdapter(this, persistentState)
+        wgConfigAdapter = WgConfigAdapter(this)
         wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
         b.wgInterfaceList.adapter = wgConfigAdapter
     }
