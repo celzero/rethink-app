@@ -40,6 +40,8 @@ class DetailedStatisticsViewModel(
     private var blockedDomains: MutableLiveData<String> = MutableLiveData()
     private var allowedIps: MutableLiveData<String> = MutableLiveData()
     private var blockedIps: MutableLiveData<String> = MutableLiveData()
+    private var allowedCountries: MutableLiveData<String> = MutableLiveData()
+    private var blockedCountries: MutableLiveData<String> = MutableLiveData()
 
     fun setData(type: SummaryStatisticsFragment.SummaryStatisticsType) {
         when (type) {
@@ -60,6 +62,12 @@ class DetailedStatisticsViewModel(
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
                 blockedIps.value = ""
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                allowedCountries.value = ""
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
+                blockedCountries.value = ""
             }
         }
     }
@@ -125,4 +133,21 @@ class DetailedStatisticsViewModel(
                 .liveData
                 .cachedIn(viewModelScope)
         }
+
+    val getAllContactedCountries =
+        allowedCountries.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    connectionTrackerDAO.getAllContactedCountries()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
+    val getAllBlockedCountries = blockedCountries.switchMap { _ ->
+        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                connectionTrackerDAO.getAllBlockedCountries()
+            }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
 }

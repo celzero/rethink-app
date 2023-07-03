@@ -55,6 +55,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.UiUtils.fetchColor
 import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getIcon
@@ -63,9 +64,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.Locale
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 
@@ -162,7 +163,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val uid = connectionInfo?.uid
 
         if (domain.isNullOrEmpty() || uid == null) {
-            b.bsConnDnsCacheText.visibility = View.GONE
+            b.bsConnDnsCacheText.visibility = View.VISIBLE
+            b.bsConnDnsCacheText.text = UiUtils.getCountryNameFromFlag(connectionInfo!!.flag)
             b.bsConnDomainRuleLl.visibility = View.GONE
             b.bsConnTrustedMsg.visibility = View.GONE
             return
@@ -171,7 +173,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val status = DomainRulesManager.getDomainRule(domain, uid)
         b.bsConnDomainSpinner.setSelection(status.id)
         b.bsConnDnsCacheText.visibility = View.VISIBLE
-        b.bsConnDnsCacheText.text = connectionInfo!!.dnsQuery
+        b.bsConnDnsCacheText.text =
+            "${UiUtils.getCountryNameFromFlag(connectionInfo!!.flag)}; ${connectionInfo!!.dnsQuery}"
 
         if (showTrustDomainTip(status)) {
             b.bsConnTrustedMsg.visibility = View.VISIBLE
@@ -181,7 +184,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun showTrustDomainTip(status: DomainRulesManager.Status): Boolean {
-        return status == DomainRulesManager.Status.TRUST && !appConfig.getDnsType().isRethinkRemote()
+        return status == DomainRulesManager.Status.TRUST &&
+            !appConfig.getDnsType().isRethinkRemote()
     }
 
     private fun updateConnDetailsChip() {
@@ -423,8 +427,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                     )
                         return
 
-
-                    if (showTrustDomainTip(fid))  {
+                    if (showTrustDomainTip(fid)) {
                         b.bsConnTrustedMsg.visibility = View.VISIBLE
                     } else {
                         b.bsConnTrustedMsg.visibility = View.GONE
