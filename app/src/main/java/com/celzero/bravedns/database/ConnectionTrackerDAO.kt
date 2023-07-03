@@ -144,7 +144,7 @@ interface ConnectionTrackerDAO {
     fun getAllContactedCountries(): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 group by flag order by count desc LIMIT 7"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 group by flag order by count desc LIMIT 7"
     )
     fun getMostBlockedCountries(): PagingSource<Int, AppConnection>
 
