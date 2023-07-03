@@ -143,7 +143,7 @@ dependencies {
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2'
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     // For liveData implementation
