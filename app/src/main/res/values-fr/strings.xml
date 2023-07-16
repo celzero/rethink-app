@@ -793,7 +793,7 @@
     <string name="fapps_unblock_dialog_title">Autoriser</string>
     <string name="fapps_bypass_block_dialog_message">Contourner les règles du pare-feu global pour les applications <i>listées</i> \?</string>
     <string name="fapps_unblock_dialog_message">Autoriser les connexions pour les applications <i>listées</i> \?</string>
-    <string name="fapps_exclude_block_dialog_title">Exclure</string>
+    <string name="fapps_exclude_block_dialog_title">Exclure apps</string>
     <string name="fapps_info_metered_msg">Autoriser/Bloquer les connexions sur réseau avec abonnement (mobile).</string>
     <string name="fapps_exclude_block_dialog_message">Exclure du DNS et du pare-feu les applications <i>listées</i> \?</string>
     <string name="fapps_isolate_block_dialog_message">Confiner les applications <i>listées</i> \?</string>
