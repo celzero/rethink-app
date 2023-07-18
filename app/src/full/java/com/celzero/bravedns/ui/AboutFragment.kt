@@ -363,8 +363,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun promptCrashLogAction() {
         val binding =
             DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-        val builder =
-            MaterialAlertDialogBuilder(requireContext()).setView(binding.root)
+        val builder = AlertDialog.Builder(requireContext()).setView(binding.root)
         builder.setTitle(getString(R.string.about_bug_report))
 
         val zipPath = getZipFilePath(requireContext())
@@ -387,17 +386,19 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         io {
             var fin: FileInputStream? = null
             var zin: ZipInputStream? = null
+            val maxLength = 20000
             try {
                 fin = FileInputStream(zipPath)
                 zin = ZipInputStream(fin)
                 var ze: ZipEntry?
 
+                // don't load more than 20k characters to avoid ANR
                 while (zin.nextEntry.also { ze = it } != null) {
                     val inStream = zipFile.getInputStream(ze)
                     val inputString = inStream?.bufferedReader().use { it?.readText() }
                     uiCtx {
                         if (!isAdded) return@uiCtx
-                        binding.logs.append(inputString)
+                        binding.logs.append(inputString?.slice(0 until maxLength))
                     }
                 }
             } catch (e: Exception) {
