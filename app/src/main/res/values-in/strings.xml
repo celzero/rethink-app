@@ -835,7 +835,7 @@
     <string name="firewall_status_bypass_dns_firewall" translatable="true">melewati aturan dns &amp; firewall</string>
     <string name="logs_card_network_count" translatable="true">%1$s koneksi</string>
     <string name="logs_card_dns_count" translatable="true">%1$s kueri</string>
-    <string name="hsf_packet_capture_chip_text" translatable="true">Penangkapan paket diaktifkan</string>
+    <string name="hsf_packet_capture_chip_text" translatable="true">Penangkapan paket aktif</string>
     <string name="settings_default_dns_heading" translatable="true">Pilih DNS cadangan</string>
     <string name="settings_default_dns_desc" translatable="true">Dalam kasus yang jarang terjadi ketika DNS pilihan pengguna tidak dapat dipastikan, DNS fallback akan digunakan.</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s aturan universal</string>
@@ -846,11 +846,11 @@
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Penangkapan paket dinonaktifkan</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Pintaskan (Bypass) Aplikasi</string>
     <string name="firewall_rule_domain_trusted_univ" translatable="true">Domain Tepercaya (Univ)</string>
-    <string name="ada_app_status_bypass_dns_firewall" translatable="true">akan melewati aturan dns &amp; firewall universal</string>
+    <string name="ada_app_status_bypass_dns_firewall" translatable="true">akan mengabaikan aturan dns &amp; firewall universal</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Lewati DNS &amp; Firewall</string>
     <string name="dc_refresh_toast" translatable="true">Penyegaran DNS selesai</string>
-    <string name="dc_setting_dns_cache_heading" translatable="true">Penguat DNS (experimental)</string>
-    <string name="dc_setting_dns_cache_desc" translatable="true">Menggabungkan permintaan, respons cache, menanggapi kesalahan dengan tangguh</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">Penguat DNS (eksperimental)</string>
+    <string name="dc_setting_dns_cache_desc" translatable="true">Menggabungkan permintaan, menyimpan tembolok (cache), menanggapi kesalahan dengan tangguh</string>
     <string name="brbs_backup_restore_desc" translatable="true">Tidak berfungsi di berbagai versi aplikasi atau perangkat</string>
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplikasi yang Dipintaskan/Di-Bypass</string>
@@ -859,7 +859,7 @@
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Sambungan ini diblokir karena <i>domain</i> diblokir oleh DNS pilihan pengguna.<br/><br/> Untuk mengubah perilaku ini, buka tab <i>Konfigurasi DNS</i>.</string>
     <string name="lbl_maybe_blocked" translatable="true">Mungkin Diblokir</string>
     <string name="lbl_network" translatable="true">jaringan</string>
-    <string name="trusted_domains_desc" translatable="true">Aturan domain terpercayaan hanya berfungsi dengan <u>DNS Rethink</u>.</string>
+    <string name="trusted_domains_desc" translatable="true">Aturan domain tepercaya hanya berfungsi dengan <u>DNS Rethink</u> saja.</string>
     <string name="settings_allow_lan_heading" translatable="true">Jangan merutekan IP Pribadi (percobaan)</string>
     <string name="settings_allow_lan_desc" translatable="true">Kecualikan LAN, loopback, rute tautan-lokal dari terowongan VPN Rethink.</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Abaikan DNS &amp; aturan firewall untuk aplikasi <i>tercantum</i>\?</string>

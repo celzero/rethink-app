@@ -58,9 +58,9 @@
     <string name="dns_firewall_mode_info_explanation_new">Alle oben genannten Möglichkeiten + Umgehung der Internetzensur.</string>
     <string name="wireguard_mode_info_explanation_new">Demnächst verfügbar.</string>
     <string name="alert_permission_accessibility">Erlaubnis - Barrierefreiheit</string>
-    <string name="alert_firewall_accessibility_explanation">RethinkDNS verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).
+    <string name="alert_firewall_accessibility_explanation">Rethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).
 \n
-\nRethinkDNS erfaßt keine Daten und spioniert Sie in keiner Weise aus.</string>
+\nRethink erfasst keine Daten und spioniert Sie in keiner Weise aus.</string>
     <string name="brave_dns_connect_mode_change_firewall">Modus wählen.</string>
     <string name="brave_dns_connect_mode_change_dns">Modus wählen.</string>
     <string name="default_dns_name">RDNS Standard</string>
@@ -75,7 +75,7 @@
     <string name="always_on_dialog_positive_btn">Einstellungen öffnen</string>
     <string name="always_on_dialog_stop_heading">Immer eingeschaltetes VPN</string>
     <string name="always_on_dialog_stop_message">Always-on VPN ist für Rethink aktiviert. Sind Sie sicher, dass Sie Rethink trotzdem beenden wollen\?</string>
-    <string name="always_on_dialog_lockdown_stop_message">RethinkDNS führt VPN im <i>Sperr-</i> Modus aus. Ein Beenden würde zum Verlust der Internetverbindung für dieses Benutzerprofil führen. Möchten Sie trotzdem fortfahren\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink führt die VPN im <i>Sperr-</i>Modus aus. Ein Beenden würde zum Verlust der Internetverbindung für dieses Benutzerprofil führen. Möchten Sie trotzdem fortfahren\?</string>
     <string name="always_on_dialog_positive">Beenden</string>
     <string name="firewall_act_network_monitor_tab">Netzwerk</string>
     <string name="dns_act_configure_tab">Konfigurieren</string>
@@ -119,7 +119,7 @@
 \nUm Rethink\'s DNS zu verwenden, gehen Sie zu den Android-Einstellungen und deaktivieren Sie \"Private DNS\".</string>
     <string name="dns_crypt_relay_remove_dialog_message">Löschen Sie das DNSCrypt-Relais aus der gespeicherten Konfiguration.</string>
     <string name="local_blocklist_download">Blocklisten herunterladen</string>
-    <string name="settings_lock_down_mode_desc">Kann keine Umgehung zulasse, wenn VPN im Lockdown-Modus läuft. <u>Gehen Sie zu den VPN-Einstellungen</u>.</string>
+    <string name="settings_lock_down_mode_desc">Gewisse Optionen sind deaktiviert, wenn die VPN im Lockdown-Modus läuft. <u>Siehe VPN-Einstellungen</u>.</string>
     <string name="local_blocklist_redownload">Aktuell!</string>
     <string name="blocklist_update_check_not_required">Die Blocklisten sind bereits auf dem neuesten Stand.</string>
     <string name="local_blocklist_redownload_desc">Die geräteinternen Blocklisten sind bereits auf dem neuesten Stand (%1$s).</string>
@@ -131,13 +131,13 @@
     <string name="info_dialog_rethink_toast_msg">Kopiert als RDNS+ DNS-über-HTTPS URL</string>
     <string name="app_mode_wireguard">VPN</string>
     <string name="relative_time_yesterday">Gestern</string>
-    <string name="settings_allow_bypass_desc">Erlauben Sie anfragenden Apps, die RethinkDNS-Firewall bei Bedarf zu umgehen. Einige Audio-/Videokonferenz-Apps wie Zoom und WhatsApp können eine On-Demand-Umgehung erfordern, um richtig zu funktionieren.</string>
+    <string name="settings_allow_bypass_desc">Erlauben Sie anfragenden Apps alle verfügbaren Netzwerke zu benutzen. Diese Apps könnten die RethinkDNS-Firewall bei Bedarf umgehen. Einige Audio-/Videokonferenz-Apps wie Zoom und Meet können dies erfordern, um richtig zu funktionieren.</string>
     <string name="orbot_http_desc">Empfiehlt, dass Anwendungen den HTTP-Proxy von Orbot verwenden.</string>
-    <string name="orbot_stop_dialog_message">RethinkDNS hat aufgehört Verbindungen zu Orbot weiterzuleiten, aber Orbot läuft vielleicht noch im Hintergrund.</string>
+    <string name="orbot_stop_dialog_message">Rethink hat aufgehört Verbindungen zu Orbot weiterzuleiten, aber Orbot läuft vielleicht noch im Hintergrund.</string>
     <string name="orbot_explanation">Orbot ist eine kostenlose Proxy-App, die es anderen Apps ermöglicht, das Internet sicherer zu nutzen <u/> .
 \nOrbot benutzt <u>Tor</u> um deinen Internetverkehr zu verschlüsseln, was dir hilft <u>Zensur zu umgehen</u> und dich gegen Formen der <u>Netzwerküberwachung</u> zu schützen, die deine persönliche Freiheit und Privatsphäre bedrohen.
-\n<u>TCP-Proxy</u>: RethinkDNS leitet nur TCP-Verbindungen von allen ausgeschlossenen Anwendungen an Orbot weiter.
-\n<u>HTTP-Proxy</u>: RethinkDNS <i>setzt</i> HTTP-Proxy ein, erzwingt aber nicht, dass die Anwendungen ihn verwenden. Normalerweise verwenden Browser wie Chrome und Firefox ihn. Anwendungen, die den HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
+\n<u>TCP-Proxy</u>: Rethink leitet nur TCP-Verbindungen von allen ausgeschlossenen Anwendungen an Orbot weiter.
+\n<u>HTTP-Proxy</u>: Rethink <i>setzt</i> HTTP-Proxy ein, erzwingt aber nicht, dass die Anwendungen ihn verwenden. Normalerweise verwenden Browser wie Chrome und Firefox ihn. Anwendungen, die den HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
     <string name="orbot_install_dialog_title">Orbot installieren\?</string>
     <string name="settings_orbot_desc">Orbot im nicht-VPN-Modus mit HTTPS/SOCKS5.</string>
     <string name="private_dns_dialog_positive">Einstellungen öffnen</string>
@@ -161,8 +161,8 @@
     <string name="search_custom_domains"><font size="12">Domänennamen suchen</font></string>
     <string name="search_rethinkplus_file_tag"><font size="12">Suche in Blocklisten</font></string>
     <string name="app_mode_choose">Modus wählen</string>
-    <string name="whats_dialog_title">Was ist neu in v054</string>
-    <string name="whats_new_version_update">&lt;b&gt;Turbogeladen!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Neue Funktion&lt;/i&gt;: Erweiterte DNS-Filterung; Domänenregeln nur anwenden, wenn Apps eine Verbindung herstellen.&lt;br/&gt; 2. &lt;i&gt;Neue Funktion&lt;/i&gt;: Domänen per App zulassen oder sperren.&lt;br/&gt; 3. &lt;i&gt;Neue Funktion&lt;/i&gt;: Domänen für alle Apps zulassen oder sperren.&lt;br/&gt; 4. &lt;i&gt;Neue Funktion&lt;/i&gt;: Umgehung von sowohl DNS- als auch Firewall-Regeln per App.&lt;br/&gt; 5. &lt;i&gt;Neue Funktion&lt;/i&gt;: Packet capture (PCAP).&lt;br/&gt; 6. &lt;i&gt;Neue Funktion&lt;/i&gt;: DNS Booster; Anfragenbündelung, Cache-Antworten.&lt;br/&gt; 7. &lt;i&gt;Neue Funktion&lt;/i&gt;: Bearbeiten von Domain- und IP-Regeln.&lt;br/&gt; 8. Und andere kleinere Benutzeroberflächen-Änderungen und Fehlerbehebungen.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Helfen Sie uns dies App zu übersetzen&lt;/a&gt;</string>
+    <string name="whats_dialog_title">Was ist neu in v054c</string>
+    <string name="whats_new_version_update">&lt;b&gt;LAN-Party!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Neue Funktion&lt;/i&gt;: Private IPs (LAN / link-local) ausschließen.&lt;br/&gt; 2. Die Einstellung zum Umgehen der DNS &amp; Firewall zum Funktionieren bringen.&lt;br/&gt; 3. Vielleicht Blockiert in den DNS Logs anzeigen für Domänen, die eventuell von der Firewall blockiert werden.&lt;br/&gt; 4. Adaptives Icon wo unterstützt anzeigen.&lt;br/&gt; 5. Biometrische Authentifizierung fragt alle 15 Minuten.&lt;br/&gt; 6. Und andere kleinere Benutzeroberflächen-Änderungen und Performance Verbesserungen.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Helfen Sie uns dies App zu übersetzen&lt;/a&gt;</string>
     <string name="connection_http3">HTTP3</string>
     <string name="relative_time_today">Heute</string>
     <string name="app_mode_dns_firewall">DNS und Firewall (Standard)</string>
@@ -174,7 +174,7 @@
     <string name="orbot_socks5">reine TCP-Proxy</string>
     <string name="settings_https_desc">Diese Einstellung ist nur eine Empfehlung und es ist möglich, dass Anwendungen sie ignorieren. Anwendungen, die einen HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
     <string name="orbot_bs_status_trying_connect">Orbot einrichten…</string>
-    <string name="orbot_stop_dialog_dns_message">RethinkDNS ist so eingerichtet, dass DNS-Anfragen an Orbot weitergeleitet werden. Ändern Sie dies nach Bedarf.</string>
+    <string name="orbot_stop_dialog_dns_message">Rethink ist so eingerichtet, dass DNS-Anfragen an Orbot weitergeleitet werden. Ändern Sie dies nach Bedarf.</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
 \n%2$s</string>
@@ -189,7 +189,7 @@
     <string name="settings_https_disabled_error">Verbunden mit Orbot. Schalten Sie es aus, um fortzufahren.</string>
     <string name="orbot_install_dialog_neutral">Webseite</string>
     <string name="settings_socks5_disabled_error">Verbunden mit Orbot. Schalten Sie es aus, um fortzufahren.</string>
-    <string name="settings_autostart_bootup_desc">Starten Sie beim Einschalten des Geräts RethinkDNS, wenn es vor dem Herunterfahren gelaufen ist.</string>
+    <string name="settings_autostart_bootup_desc">Starten Sie beim Einschalten des Geräts Rethink, wenn es vor dem Herunterfahren gelaufen ist.</string>
     <string name="slide_1_title">Kostenlos und quelloffen</string>
     <string name="settings_ptrans_heading">IPv4-Ausgang erzwingen</string>
     <string name="settings_socks5_heading">SOCKS5-Proxy einrichten</string>
@@ -198,7 +198,7 @@
     <string name="orbot_stop_dialog_neutral">DNS ändern</string>
     <string name="orbot_title">Orbot und Proxys</string>
     <string name="settings_orbot_disabled_error">Schalte HTTP(S) und/oder SOCKS5 Proxy aus, um mit der Tor-as-a-proxy Einrichtung fortzufahren.</string>
-    <string name="settings_network_all_networks_desc">Wenn diese Funktion aktiviert ist, verwendet RethinkDNS alle verfügbaren Netzwerke, um eine Verbindung zum Internet herzustellen. Wenn nicht, wird das Netzwerk verwendet, das von Android als <i>aktiv</i> angesehen wird.</string>
+    <string name="settings_network_all_networks_desc">Wenn diese Funktion aktiviert ist, verwendet Rethink alle verfügbaren Netzwerke, um eine Verbindung zum Internet herzustellen. Wenn nicht, wird das Netzwerk verwendet, das von Android als <i>aktiv</i> angesehen wird.</string>
     <string name="settings_ip_network_heading">IP-Version wählen</string>
     <string name="settings_ptrans_desc">Übersetzt ausgehenden IPv6-Datenverkehr geräteintern in IPv4. Aktivieren Sie diese Option, wenn Sie mit einem reinen IPv4-Netzwerk verbunden sind.</string>
     <string name="orbot_both_desc">Alle der oben genannten Punkte.</string>
@@ -218,13 +218,13 @@
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="allow">erlauben</string>
-    <string name="settings_allow_bypass_heading">Umgehung zulassen</string>
+    <string name="settings_allow_bypass_heading">Netzwerk Sichtbarkeit aktivieren</string>
     <string name="settings_title_desc">Eine hochgradig anpaßbare DNS und Firewall</string>
     <string name="slide_2_title">Willkommen</string>
     <string name="exclude">ausschließen</string>
     <string name="bsct_app_info">App-Informationen</string>
     <string name="settings_orbot_install_desc">Tippen Sie hier, um Orbot zu installieren</string>
-    <string name="settings_socks5_vpn_disabled_error">Starten Sie RethinkDNS, um fortzufahren.</string>
+    <string name="settings_socks5_vpn_disabled_error">Starten Sie Rethink, um fortzufahren.</string>
     <string name="orbot_app_issue">Orbot konnte nicht gestartet werden. Ist es installiert\?</string>
     <string name="settings_general_header">Allgemein</string>
     <string name="settings_network_all_networks">Alle verfügbaren Netze nutzen (experimentell)</string>
@@ -254,7 +254,7 @@
     <string name="settings_notification_dialog_title">Benachrichtigungsaktion auswählen</string>
     <string name="settings_notification_dialog_option_1">"
 \nPause / Stopp (Standard):
-\nZeigt zwei Schaltflächen, um RethinkDNS schnell anzuhalten oder zu beenden."</string>
+\nZeigt zwei Schaltflächen, um Rethink schnell anzuhalten oder zu beenden."</string>
     <string name="settings_notification_dialog_option_3">"
 \nKeine:
 \nZeigt keine Schaltfläche an.
@@ -281,13 +281,14 @@
     <string name="firewall_rule_block_ip_desc">Eine benutzerdefinierte Firewall-Regel hat die <i>Ziel-IP</i> blockiert.<br/><br/>Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
     <string name="settings_app_notification_a13_desc">Benachrichtigungserlaubnis für die App aktivieren</string>
     <string name="settings_http_proxy_error_text4">Verbindung mit dem Host fehlgeschlagen. Versuchen Sie es erneut.</string>
-    <string name="settings_ip_dialog_ipv46">Auto (experimentell)</string>
+    <string name="settings_ip_dialog_ipv46">Auto (experimentell)
+\nVerbindungsüberprüfungen werden gesendet, um die Verfügbarkeit sicher zu stellen.</string>
     <string name="settings_http_proxy_port">Port</string>
     <string name="settings_socks5_dialog_hint_password">Passwort (optional)</string>
     <string name="settings_dns_proxy_dialog_app_desc">Die gewählte Anwendung wird vom VPN ausgeschlossen, damit es in Ihrem Namen Verbindungen projizieren kann.</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimentell)</string>
     <string name="apps_icon_content_desc">Anwendungssymbol</string>
-    <string name="accessibility_notification_content">Der RethinkDNS-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Im Hintergrund laufende Anwendungen werden nicht mehr blockiert. Tippen Sie den Bildschirm an, um ihn wieder zu aktivieren.</string>
+    <string name="accessibility_notification_content">Der Rethink-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Im Hintergrund laufende Anwendungen werden nicht mehr blockiert. Tippen Sie den Bildschirm an, um ihn wieder zu aktivieren.</string>
     <string name="firewall_rule_block_univ_ip">IP / Port (Universell)</string>
     <string name="firewall_rule_device_lock">Gerät gesperrt</string>
     <string name="firewall_rule_block_app_unmetered_desc">Eine benutzerdefinierte Firewall-Regel hat diese <i>App</i> beim Versuch, eine Verbindung mit <i>Ungezählt</i> Netzwerk herzustellen, blockiert.<br/><br/> Zur Änderung die Registerkarte <i>Alle Apps</i> benutzen.</string>
@@ -323,14 +324,14 @@
     <string name="settings_ip_text_ipv46">Auto</string>
     <string name="settings_selected_ip_desc">%1$s</string>
     <string name="settings_notification_heading">Benachrichtigungsaktion auswählen</string>
-    <string name="settings_notification_desc">Aktionsschaltflächen, die mit der RethinkDNS-Benachrichtigung angezeigt werden sollen: %1$s</string>
+    <string name="settings_notification_desc">Aktionsschaltflächen, die mit der Rethink-Benachrichtigung angezeigt werden sollen: %1$s</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Firewall:
 \nZeigt zwei Tasten zum schnellen Umschalten zwischen dem batteriesparenden DNS-Modus und dem normalen DNS + Firewall-Modus."</string>
     <string name="settings_selected_theme">Aktuelles Farbschema: %1$s</string>
     <string name="settings_protocol_translation_dns_inactive">Wechseln Sie in den Modus DNS/DNS+Firewall, um diese Einstellung zu aktivieren</string>
     <string name="firewall_status_allow">erlaubt</string>
-    <string name="accessibility_failure_toast">Der RethinkDNS-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Anwendungen im Hintergrund werden nicht mehr blockiert.</string>
+    <string name="accessibility_failure_toast">Der Rethink-Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. Anwendungen im Hintergrund werden nicht mehr blockiert.</string>
     <string name="coming_soon_toast">demnächst</string>
     <string name="hs_btm_sheet_lock_down">Der Modus kann nicht geändert werden, wenn VPN <i>gesperrt ist</i>. Tippen Sie auf <u>, um die VPN-Einstellungen zu bearbeiten</u>.</string>
     <string name="firewall_rule_block_ip">IP/ Port (App)</string>
@@ -358,8 +359,8 @@
     <string name="firewall_act_universal_tab">universell</string>
     <string name="new_app_bulk_notification_title">Achtung</string>
     <string name="notif_channel_download">Download Warnung</string>
-    <string name="notif_channel_desc_vpn_notification">Informieren, wenn RethinkDNS aktiv ist und im Hintergrund läuft</string>
-    <string name="notif_channel_desc_vpn_failure">Informieren, wenn RethinkDNS von Android oder einer anderen VPN-App gestoppt wird</string>
+    <string name="notif_channel_desc_vpn_notification">Informieren, wenn Rethink aktiv ist und im Hintergrund läuft</string>
+    <string name="notif_channel_desc_vpn_failure">Informieren, wenn Rethink von Android oder einer anderen VPN-App gestoppt wird</string>
     <string name="notif_channel_vpn_notification">Aktives VPN</string>
     <string name="notif_channel_vpn_failure">Inaktives VPN</string>
     <string name="notif_channel_firewall_alerts">Firewall-Warnungen</string>
@@ -464,15 +465,15 @@
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Blockieren Sie Malware, Ransomware (Erpressersoftware), Kryptoware, Phisher und andere Bedrohungen.</string>
     <string name="brbs_restore_desc">Aus Sicherungsdatei wiederherstellen</string>
     <string name="brbs_backup_desc">Sichern von Anwendungseinstellungen, Netzwerk- und DNS-Protokollen</string>
-    <string name="alert_firewall_accessibility_regrant_explanation">Der RethinkDNS- Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Gehen Sie zu Einstellungen und erzwingen Sie das Beenden</b></i> von RethinkDNS und starten Sie es erneut, um die Funktion <i>Sperrung aller nicht genutzten Anwendungen</i> zu verwenden.
+    <string name="alert_firewall_accessibility_regrant_explanation">Der Rethink Dienst für Barrierefreiheit wurde angehalten oder ist abgestürzt. <i><b>Gehen Sie zu Einstellungen und erzwingen Sie das Beenden</b></i> von Rethink und starten Sie es erneut, um die Funktion <i>Sperrung aller nicht genutzten Anwendungen</i> zu verwenden.
 \n
-\nRethinkDNS verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
+\nRethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).</string>
     <string name="firewall_status_isolate">isoliert</string>
     <string name="firewall_status_excluded">von DNS und Firewall ausgeschlossen</string>
     <string name="firewall_status_whitelisted">umgeht die universellen Firewall-Regeln</string>
     <string name="firewall_rule_global_lockdown_desc">Diese Verbindung wurde blockiert, weil die universelle Sperre eingestellt ist.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
-    <string name="new_app_bulk_notification_content">RethinkDNS blockiert %1$s neue Anwendungen. Tippen Sie auf , um sie anzuzeigen oder zu ändern.</string>
-    <string name="new_app_notification_content">RethinkDNS blockierte die kürzlich installierte App, %1$s.</string>
+    <string name="new_app_bulk_notification_content">Rethink blockierte %1$s neue Anwendungen. Tippen Sie auf , um sie anzuzeigen oder zu ändern.</string>
+    <string name="new_app_notification_content">Rethink blockierte die kürzlich installierte App, %1$s.</string>
     <string name="new_app_notification_action_deny">Weiter blockieren</string>
     <string name="new_app_notification_action_toast_allow">Erlaubte Netzwerkverbindung für die App</string>
     <string name="new_app_notification_action_toast_deny">Netzwerkverbindung für die App verweigert</string>
@@ -518,9 +519,9 @@
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s Blocklisten</string>
     <string name="brbs_backup_dialog_failure_message">Das Backup konnte nicht erstellt werden. Erneut versuchen\?</string>
     <string name="ada_app_dns_settings">DNS-Einstellungen</string>
-    <string name="hsf_vpn_dialog_message">RethinkDNS benötigt die Erlaubnis, ein lokales VPN einzurichten, um die DNS-Anfragen des Geräts zu verschlüsseln, eine Netzwerküberwachung zu implementieren und Firewall-Regeln durchzusetzen.
+    <string name="hsf_vpn_dialog_message">Rethink benötigt die Erlaubnis, ein lokales VPN einzurichten, um die DNS-Anfragen des Geräts zu verschlüsseln, eine Netzwerküberwachung zu implementieren und Firewall-Regeln durchzusetzen.
 \n
-\nRethinkDNS sammelt keine Informationen und spioniert Sie in keiner Weise aus.</string>
+\nRethink sammelt keine Informationen und spioniert Sie in keiner Weise aus.</string>
     <string name="firewall_card_text_active">%1$s blockiert, %2$s umgangen, %3$s ausgeschlossen, %4$s isoliert</string>
     <string name="firewall_card_text_inactive">Aktivieren Sie den Firewall-Modus.</string>
     <string name="dns_card_latency_active">Latenzzeit: %1$sms</string>
@@ -552,12 +553,12 @@
     <string name="hsf_whats_new_remove_text">Schließen…</string>
     <string name="hsf_blocklist_updating_text">Aktivieren…</string>
     <string name="hsf_chip_appearance">Thema: %1$s</string>
-    <string name="hsf_pause_vpn_failure">Kann nicht pausieren: RethinkDNS nicht aktiv</string>
-    <string name="hsf_pause_lockdown_failure">Kann nicht pausieren: RethinkDNS im Lockdown-Modus</string>
+    <string name="hsf_pause_vpn_failure">Kann nicht pausieren: Rethink nicht aktiv</string>
+    <string name="hsf_pause_lockdown_failure">Kann nicht pausieren: Rethink im Lockdown-Modus</string>
     <string name="dc_block_heading">Regeln</string>
     <string name="dc_other_dns_heading">Typ</string>
-    <string name="about_bravedns_whoarewe">RethinkDNS ist ein freies und quelloffenes Projekt, das von ehemaligen Ingenieuren von Amazon, IBM und Scientific Games geleitet wird.</string>
-    <string name="about_bravedns_explantion">RethinkDNS ist der einfachste Weg, um App-Aktivitäten zu überwachen, die Internet-Zensur zu umgehen und Apps auf Ihrem Android-Gerät mit einer Firewall zu schützen.</string>
+    <string name="about_bravedns_whoarewe">Rethink ist ein freies und quelloffenes Projekt, das von ehemaligen Ingenieuren von Amazon, IBM und Scientific Games geleitet wird.</string>
+    <string name="about_bravedns_explantion">Rethink ist der einfachste Weg, um App-Aktivitäten zu überwachen, die Internet-Zensur zu umgehen und Apps auf Ihrem Android-Gerät mit einer Firewall zu schützen.</string>
     <string name="about_bravedns_toreport_text">Hilfe &amp; Feedback</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_bug_report">Fehlerbericht</string>
@@ -566,7 +567,7 @@
     <string name="about_email">E-Mail an uns</string>
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="about_twitter">Folge uns auf Twitter</string>
-    <string name="about_mozilla">RethinkDNS ist Teil des Mozilla Builders MVP-Programms.</string>
+    <string name="about_mozilla">Rethink ist Teil des Mozilla Builders MVP-Programms.</string>
     <string name="about_dialog_positive_button">Los geht\'s</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
@@ -604,7 +605,7 @@
     <string name="dc_dns_website_heading">Zeige Website Icon in DNS-Logs (experimentell)</string>
     <string name="dc_dns_website_desc">Ruft Webseitensymbole von <i>nextdns.io</i> und <i>duckduckgo.com</i> ab. Verbraucht bis zu 350 MB Speicherplatz</string>
     <string name="dc_dns_leaks_heading">Verhindere DNS Lecks</string>
-    <string name="dc_dns_leaks_desc">Wenn aktiviert, fängt RethinkDNS alle Pakete an Port 53 ab und leitet sie an einen vom Benutzer festgelegten DNS-Endpunkt weiter</string>
+    <string name="dc_dns_leaks_desc">Wenn aktiviert, fängt Rethink alle Pakete an Port 53 ab und leitet sie an einen vom Benutzer festgelegten DNS-Endpunkt weiter</string>
     <string name="dc_check_update_desc">Prüfen Sie einmal in <i>drei</i> Tagen auf Aktualisierungen der Blocklisten</string>
     <string name="about_bug_no_log_dialog_title">Fehlerbericht</string>
     <string name="about_bug_no_log_dialog_message">Es konnten keine Absturzprotokolle abgerufen werden. Möchten Sie Ihren Fehler manuell melden\?</string>
@@ -626,8 +627,8 @@
     <string name="about_app_translate">Übersetze</string>
     <string name="about_mail_to">hello@celzero.com</string>
     <string name="about_mail_to_string">mailto:</string>
-    <string name="about_mail_subject">[RethinkDNS]:</string>
-    <string name="about_mail_bugreport_subject">[RethinkDns]: Fehlerbericht</string>
+    <string name="about_mail_subject">[Rethink]:</string>
+    <string name="about_mail_bugreport_subject">[Rethink]: Fehlerbericht</string>
     <string name="about_mail_bugreport_text">Sende E-Mail an: hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title">E-Mail-Anbieter auswählen</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
@@ -680,7 +681,7 @@
     <string name="about_bug_report_desc">E-Mail-Absturzprotokolle</string>
     <string name="contributors_list">Das &lt;i&gt;Rethink Open Source Project&lt;/i&gt; verdankt seine Existenz den Freiwilligen die zahllose Stunden in die Entwicklung der APP gesteckt haben.&lt;br/&gt; &lt;br/&gt;🛡️ Android app &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Network engine &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Resolver &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Community mods &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="dc_custom_dns_radio">Andere DNS</string>
-    <string name="dc_rethink_dns_radio">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_entries">%1$s Einträge »</string>
     <string name="dc_local_block_desc_1">Wählen Sie aus über 195 Blocklisten. Klicken Sie hier um Blocklisten herunterzuladen oder zu konfigurieren.</string>
     <string name="dc_local_block_heading">Geräteinterne Sperrlisten</string>
@@ -785,7 +786,7 @@
     <string name="settings_locale_desc">Wählen Sie Ihre bevorzugte Sprache</string>
     <string name="settings_locale_dialog_title">Wählen Sie Ihre bevorzugte Sprache</string>
     <string name="hs_biometeric_title">Rethink entsperren</string>
-    <string name="hs_biometeric_desc">Biometrische Authentifizierung zum Entsperren von RethinkDNS verwenden</string>
+    <string name="hs_biometeric_desc">Biometrische Authentifizierung zum Entsperren von Rethink verwenden</string>
     <string name="hs_biometeric_failed">Biometrische Authentifizierung fehlgeschlagen</string>
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">meistblockierte Domains</string>
     <string name="fapps_unblock_dialog_title">Anwendungen zulassen</string>
@@ -855,7 +856,7 @@
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Diese Verbindung wurde blockiert, da die <i>Domäne</i> in den universellen Domäne-Regeln als blockiert gesetzt wurde.<br/><br/> Um das zu ändern, gehe zum <i>Konfiguriere DNS</i>-Reiter.</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">wird universelle DNS- &amp; Firewall-Regeln umgehen</string>
     <string name="rules_card_domain_count" translatable="true">%1$s Domäne-Regeln</string>
-    <string name="cd_dns_alg_desc" translatable="true">Wende Domäne-Regeln nur beim Verbinden von Apps an</string>
+    <string name="cd_dns_alg_desc" translatable="true">Verwende einzigartige IP pro DNS-Anfrage</string>
     <string name="firewall_rule_domain_blocked_univ" translatable="true">Domäne (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Diese Verbindung wurde erlaubt, weil die <i>Urspungs-App</i> für die <i>Umgehung von DNS- und Firewall-Regeln</i> eingestellt ist.<br/><br/> Zur Änderung den Bildschirm <i>App-spezifischen Firewall</i> verwenden.</string>
     <string name="settings_default_dns_desc" translatable="true">In seltenen Fällen kann die vom Nutzer bevorzugte DNS nicht ermittelt werden. Dann wird die Reserve-DNS verwendet.</string>
@@ -863,4 +864,7 @@
     <string name="lbl_maybe_blocked" translatable="true">Vielleicht geblockt</string>
     <string name="lbl_network" translatable="true">Netzwerk</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
+    <string name="settings_allow_lan_heading" translatable="true">Private IPs nicht umlenken (experimentell)</string>
+    <string name="settings_allow_lan_desc" translatable="true">LAN, Loopback und link-local Routen von Rethinks VPN ausschließen.</string>
+    <string name="trusted_domains_desc" translatable="true">Die Regel zum Vertrauen der Domäne funktioniert nur mit der <u>Rethink DNS</u>.</string>
 </resources>

@@ -13,7 +13,7 @@
     <string name="orbot">Orbot</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">частные днс включены</string>
     <string name="notification_action_pause_vpn">ПАУЗА</string>
-    <string name="firewall_act_universal_tab">универсальный</string>
+    <string name="firewall_act_universal_tab">Универсальный</string>
     <string name="settings_dns_proxy_dialog_app">Приложение</string>
     <string name="settings_dns_proxy_dialog_positive_btn">установить</string>
     <string name="status_protected_with_private_dns">защищено с помощью персонального DNS</string>
@@ -31,7 +31,7 @@
     <string name="settings_theme_dialog_title">Внешний вид</string>
     <string name="notification_action_dns_mode">DNS</string>
     <string name="about_twitter_handle">https://twitter.com/rethinkdns</string>
-    <string name="settings_general_header">общий</string>
+    <string name="settings_general_header">Общее</string>
     <string name="txt_home">Главная</string>
     <string name="block">блокировать</string>
     <string name="status_protected_with_proxy_private_dns">защищено с помощью прокси и персонального dns</string>
@@ -51,7 +51,7 @@
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Предупреждение: Rethink был деактивирован</string>
     <string name="notification_action_dns_firewall_mode">DNS + Брандмауэр</string>
     <string name="settings_theme_heading">Внешний вид</string>
-    <string name="dc_other_dns_heading">тип</string>
+    <string name="dc_other_dns_heading">Тип</string>
     <string name="settings_app_list_default_app">Никто</string>
     <string name="skip">Пропустить</string>
     <string name="untracked">неотслеживаемый</string>
@@ -113,7 +113,7 @@
     <string name="alert_firewall_accessibility_regrant_explanation">Служба доступности Rethink остановилась или произошел сбой. <i><b>Перейдите Настройки и принудительно остановите</b></i> Rethink и запустите его снова, чтобы использовать функцию <i>Блокировки любого неиспользуемого приложения</i>.
 \n
 \nRethink использует службу доступности для отслеживания того, какие приложения используются (открыты), а какие не используются (в фоне).</string>
-    <string name="dc_other_settings_heading">продвинутый</string>
+    <string name="dc_other_settings_heading">Расширенные</string>
     <string name="bsct_block_ip">Блокировать, доверять <u>этому IP</u> для <u>этого приложения</u></string>
     <string name="bsct_conn_block_desc">заблокирован %1$s по %2$s</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Блокирует приложение от подключения к интернету.
@@ -233,7 +233,7 @@
     <string name="about_mail_subject">[Rethink]:</string>
     <string name="dns_info_neutral">Скопировать</string>
     <string name="always_on_dialog_positive_btn">Перейдите в настройки</string>
-    <string name="about_sponsor_link_text">Спонсор</string>
+    <string name="about_sponsor_link_text">Спонсировать</string>
     <string name="unicode_question_sign">❔</string>
     <string name="dns_query_clear_logs_message">Это приведет к удалению журналов DNS на устройстве. Операция является необратимой. Хотите продолжить\?</string>
     <string name="dns_proxy_remove_dialog_title">Удалить DNS-прокси\?</string>
@@ -375,7 +375,7 @@
     <string name="ada_app_status_whitelist">будет обходить универсальные правила брандмауэра</string>
     <string name="ada_noapp_dialog_title">Нет такого приложения</string>
     <string name="ada_app_status_block">заблокирован</string>
-    <string name="ada_app_status_block_md">блокируется в сетях с дозированной оплатой (мобильная связь)</string>
+    <string name="ada_app_status_block_md">блокируется в (мобильных) сетях с тарификацией</string>
     <string name="ada_ip_no_connection">В этом приложении нет журналов сети.</string>
     <string name="ada_app_status_exclude">исключен из dns и брандмауэра</string>
     <string name="ada_app_status_isolate">изолирован; разрешено только доверенным IP</string>
@@ -421,8 +421,8 @@
     <string name="settings_http_proxy_error_text3">Имя хоста пустое</string>
     <string name="settings_http_proxy_error_text2">Некорректный порт</string>
     <string name="settings_dns_proxy_dialog_app_desc">Выбранное приложение будет исключено из VPN, чтобы позволить ему проксировать соединения от вашего имени.</string>
-    <string name="settings_ip_dialog_ipv46">Авто (экспериментальный)
-\nпроверки связности отправляются для подтверждения достижимости.</string>
+    <string name="settings_ip_dialog_ipv46">Авто (экспериментально)
+\nпроверки подключения отправляются для подтверждения достижимости.</string>
     <string name="settings_socks5_dialog_hint_username">Имя пользователя (опционально)</string>
     <string name="settings_protocol_translation_dns_inactive">Переключитесь в режим DNS/DNS+Firewall, чтобы включить эту настройку</string>
     <string name="settings_notification_desc1">Пауза / Стоп (по умолчанию)</string>
@@ -432,13 +432,13 @@
 \nНе показывает кнопку.
 \n"</string>
     <string name="firewall_status_whitelisted">обходит универсальные правила брандмауэра</string>
-    <string name="firewall_card_text_inactive">Включите режим брандмауэра.</string>
+    <string name="firewall_card_text_inactive">Включить режим брандмауэра.</string>
     <string name="hsf_pause_lockdown_failure">Невозможно сделать паузу: Rethink в режиме блокировки</string>
     <string name="about_docs">Читать документацию</string>
     <string name="about_twitter">Следуйте за нами в Twitter</string>
     <string name="firewall_status_block_unmetered">блокируется в сетях без тарификации (wifi)</string>
     <string name="ct_bs_app_info_error">Информация о приложении не найдена</string>
-    <string name="hsf_notification_permission_failure">Включите разрешение на уведомления на экране Настройки</string>
+    <string name="hsf_notification_permission_failure">Включить разрешение на уведомления на экране Настройки</string>
     <string name="hsf_whats_new_chip_text">Что нового</string>
     <string name="hsf_start_dialog_header">Начать %1$s</string>
     <string name="hsf_chip_appearance">Тема: %1$s</string>
@@ -462,7 +462,7 @@
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
     <string name="notification_screen_error">Не удалось запустить экран уведомлений приложения.</string>
     <string name="no_browser_error">Невозможно открыть веб-страницу из браузера.</string>
-    <string name="log_file_not_available">Отчет о дорожно-транспортном происшествии не найден</string>
+    <string name="log_file_not_available">Отчет о сбое не обнаружен</string>
     <string name="about_mail_bugreport_text">Отправить это письмо по адресу: hello@celzero.com</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="cd_custom_doh_dialog_title">URL пользовательского сервера</string>
@@ -487,9 +487,9 @@
     <string name="dns_proxy_ip_address">IP-адрес</string>
     <string name="fapps_firewall_filter_isolate">Изолировано</string>
     <string name="fapps_unmetered_block_dialog_title">Блокировка при бездоговорном режиме</string>
-    <string name="fapps_unmetered_unblock_dialog_message">Разрешить подключения в сети без учета тарифов (WiFi) для приложений <i>, перечисленных в списке</i>\?</string>
+    <string name="fapps_unmetered_unblock_dialog_message">Разрешить подключения в сети без учета тарифов (WiFi) для приложений <i>перечисленных в списке</i>\?</string>
     <string name="fapps_metered_block_dialog_title">Блок на дозированном</string>
-    <string name="fapps_metered_block_dialog_message">Блокировать соединения в дозированной (мобильной) сети для приложений <i>, перечисленных в списке</i>\?</string>
+    <string name="fapps_metered_block_dialog_message">Блокировать соединения в (мобильной) тарифицируемой сети для приложений <i>перечисленных в списке</i>\?</string>
     <string name="fapps_lockdown_hint">Vpn находится в режиме блокировки. Брандмауэр не соблюдает правила Metered / Unmetered.</string>
     <string name="fapps_firewall_filter_hint">Показаны все приложения</string>
     <string name="rules_load_failure_desc">Правила брандмауэра не найдены</string>
@@ -543,7 +543,7 @@
     <string name="lbbs_update_check">Проверить наличие обновлений</string>
     <string name="lbbs_heading">Настройка 195+ списков блокировки</string>
     <string name="brbs_backup_title">Резервное копирование</string>
-    <string name="brbs_restore_title">Восстановить</string>
+    <string name="brbs_restore_title">Восстановление</string>
     <string name="brbs_restore_desc">Восстановить из файла резервной копии</string>
     <string name="brbs_restore_dialog_title">Восстановить резервную копию</string>
     <string name="brbs_restore_dialog_positive">Восстановить</string>
@@ -565,7 +565,7 @@
     <string name="settings_theme_dialog_themes_1">Определяется системой</string>
     <string name="settings_ip_dialog_title">Выберите версию IP</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (по умолчанию)</string>
-    <string name="settings_ip_dialog_ipv6">IPv6 (экспериментальный)</string>
+    <string name="settings_ip_dialog_ipv6">IPv6 (экспериментально)</string>
     <string name="settings_notification_heading">Выберите действие уведомления</string>
     <string name="settings_notification_desc2">DNS / DNS + брандмауэр</string>
     <string name="settings_notification_dialog_title">Выберите действие уведомления</string>
@@ -578,7 +578,7 @@
     <string name="firewall_card_status_active">%1$s приложений</string>
     <string name="firewall_card_text_active">%1$s заблокировано, %2$s обойдено, %3$s исключено, %4$s изолировано</string>
     <string name="dns_card_latency_active">Задержка: %1$sмс</string>
-    <string name="dns_card_latency_inactive">Включите режим DNS.</string>
+    <string name="dns_card_latency_inactive">Включить режим DNS.</string>
     <string name="apps_card_ips_count">%1$s Правила IP и портов</string>
     <string name="hsf_uptime">(активный %1$s; протос: %2$s; тип: %3$s)</string>
     <string name="hsf_downtime">(неактивен с %1$s)</string>
@@ -594,11 +594,11 @@
     <string name="dc_local_block_desc_1">Выбирайте из 195+ списков блокировок. Нажмите здесь, чтобы загрузить их или настроить.</string>
     <string name="dc_dns_website_heading">Показывать значок веб-сайта в журналах DNS (экспериментально)</string>
     <string name="about_bravedns_toreport_text">помощь и отзывы</string>
-    <string name="about_bug_report_desc">журналы аварий электронной почты</string>
+    <string name="about_bug_report_desc">отправка лога сбоя по email</string>
     <string name="about_bug_report">Сообщение об ошибке</string>
     <string name="about_bug_report_dialog_positive_btn">Отправить письмо</string>
     <string name="about_bug_no_log_dialog_title">Сообщение об ошибке</string>
-    <string name="about_bug_no_log_dialog_message">Не удалось получить журналы аварий. Вы хотите вручную сообщить о своей ошибке\?</string>
+    <string name="about_bug_no_log_dialog_message">Не удалось получить лог файл сбоя. Вы хотите вручную сообщить о ошибке\?</string>
     <string name="about_github">Внесение вклада на GitHub’е</string>
     <string name="about_privacy_policy">Ознакомиться с политикой конфиденциальности</string>
     <string name="about_settings_app_info">О программе</string>
@@ -623,11 +623,11 @@
     <string name="hs_download_negative_default">Напомнить позже</string>
     <string name="univ_firewall_rule_1">Блокировка всех приложений при блокировке устройства</string>
     <string name="univ_firewall_rule_4">Блокировать UDP, кроме DNS и NTP</string>
-    <string name="univ_firewall_rule_5">Блокировка при обходе DNS</string>
-    <string name="univ_firewall_rule_6">Блокировать вновь установленные приложения по умолчанию</string>
+    <string name="univ_firewall_rule_5">Блокировать при обходе DNS</string>
+    <string name="univ_firewall_rule_6">Блокировать недавно установленные приложения по умолчанию</string>
     <string name="univ_firewall_rule_7">Блокировать IPv4 в IPv6 (экспериментально)</string>
     <string name="univ_firewall_rule_8">Блокировать порт 80 (небезопасный трафик HTTP)</string>
-    <string name="univ_firewall_rule_9">Блокировка в дозированной (мобильной) сети</string>
+    <string name="univ_firewall_rule_9">Блокировать в сети с тарификацией (мобильной)</string>
     <string name="univ_firewall_rule_10">Блокировать все, кроме обойденных приложений и IP</string>
     <string name="univ_view_blocked_ip_desc">Изменить правила заблокированного или доверенного домена, IP/портов.</string>
     <string name="univ_ip_delete_toast_success">Удалены все правила IP.</string>
@@ -648,7 +648,7 @@
     <string name="dns_proxy_dialog_header_dns">Добавить DNS-прокси</string>
     <string name="dns_proxy_port">Номер порта</string>
     <string name="fapps_firewall_filter_bypass_universal">В обход</string>
-    <string name="fapps_metered_unblock_dialog_message">Разрешить соединения в дозированной (мобильной) сети для приложений <i>, перечисленных в списке</i>\?</string>
+    <string name="fapps_metered_unblock_dialog_message">Разрешить соединения в (мобильной) тарифицированной сети для приложений <i>перечисленных в списке</i>\?</string>
     <string name="rules_load_failure_heading">Примечание</string>
     <string name="rules_load_failure_reload">перезагрузить</string>
     <string name="dns_crypt_connection_failure">Ошибка при подключении к серверу DNSCrypt.</string>
@@ -771,15 +771,15 @@
     <string name="title_statistics">Статистика</string>
     <string name="settings_locale_heading">Изменить язык</string>
     <string name="settings_locale_desc">Выберите предпочтительный язык</string>
-    <string name="settings_biometeric_heading">Включить блокировку приложений</string>
-    <string name="settings_biometric_desc">Защитите это приложение с помощью блокировки экрана</string>
+    <string name="settings_biometeric_heading">Включить блокировку приложения</string>
+    <string name="settings_biometric_desc">Защитить это приложение с помощью блокировки экрана</string>
     <string name="hs_biometeric_title">Разблокировать Rethink</string>
     <string name="hs_biometeric_desc">Используйте биометрическую аутентификацию для разблокировки Rethink</string>
     <string name="hs_biometeric_feature_not_supported">Биометрическая аутентификация не поддерживается или отключена на этом устройстве</string>
     <string name="hs_biometeric_failed">Биометрическая аутентификация не прошла</string>
     <string name="hs_biometeric_error">Ошибка биометрической аутентификации</string>
     <string name="fapps_info_unmetered_msg">Разрешить / заблокировать в сети без учета тарифов (WiFi).</string>
-    <string name="fapps_info_metered_msg">Разрешить/запретить в дозированной (мобильной) сети.</string>
+    <string name="fapps_info_metered_msg">Разрешить/запретить в сети с тарификацией (мобильной).</string>
     <string name="fapps_info_bypass_msg">Обход правил универсального брандмауэра.</string>
     <string name="fapps_info_exclude_msg">Исключить из DNS и брандмауэра.</string>
     <string name="fapps_info_isolate_msg">Блокировать все, кроме доверенных IP.</string>
@@ -822,7 +822,7 @@
     <string name="lbl_domain_rules" translatable="true">Правила домена</string>
     <string name="cd_no_rules_text" translatable="true">Нет правил домена.</string>
     <string name="bsdl_block_desc" translatable="true">Блокировка, доверие к <u>этому домену</u></string>
-    <string name="lbl_rules" translatable="true">правила</string>
+    <string name="lbl_rules" translatable="true">Правила</string>
     <string name="lbl_configure" translatable="true">Настроить</string>
     <string name="lbl_logs" translatable="true">Логи</string>
     <string name="bypass_dns_firewall" translatable="true">обход DNS и брандмауэра</string>
@@ -844,7 +844,7 @@
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS-бустер ( экспериментально)</string>
     <string name="dc_refresh_toast" translatable="true">Обновление DNS завершено</string>
     <string name="settings_pcap_heading" translatable="true">Захват пакетов</string>
-    <string name="settings_general_customize" translatable="true">персонализация</string>
+    <string name="settings_general_customize" translatable="true">Персонализация</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Невозможно настроить прокси, когда VPN работает в режиме Только DNS или в режиме блокировки. <u>Перейти к настройкам VPN</u></string>
     <string name="settings_default_dns_heading" translatable="true">Выберите резервный DNS</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Обходить приложения</string>
@@ -862,9 +862,9 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">будет обходить универсальные правила DNS и брандмауэра</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Обход DNS и брандмауэра</string>
     <string name="ada_app_firewall" translatable="true">Брандмауэр</string>
-    <string name="brbs_backup_restore_desc" translatable="true">Не работает на разных версиях приложений и устройствах</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Не работает в разных версиях приложения или на разных устройствах</string>
     <string name="lbl_maybe_blocked" translatable="true">Может быть заблокирован</string>
-    <string name="lbl_network" translatable="true">сеть</string>
+    <string name="lbl_network" translatable="true">Cеть</string>
     <string name="trusted_domains_desc" translatable="true">Правило доверенного домена работает только с <u>Rethink DNS</u>.</string>
     <string name="settings_allow_lan_heading" translatable="true">Не маршрутизировать частные IP-адреса (экспериментально)</string>
     <string name="bypass_dns_firewall_tooltip">%1$s работает только с Rethink DNS</string>
