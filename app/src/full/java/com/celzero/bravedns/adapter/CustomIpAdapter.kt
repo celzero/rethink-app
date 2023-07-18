@@ -39,8 +39,8 @@ import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UiUtils.fetchColor
+import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
@@ -380,7 +380,7 @@ class CustomIpAdapter(private val context: Context) :
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(
-                context.getString(R.string.univ_ip_delete_individual_positive)
+                context.getString(R.string.lbl_delete)
             ) { _, _ ->
                 IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port)
                 Toast.makeText(
@@ -420,7 +420,12 @@ class CustomIpAdapter(private val context: Context) :
         dialog.window?.attributes = lp
 
         dBind.daciIpTitle.text = context.getString(R.string.ci_dialog_title)
-        dBind.daciIpEditText.setText(customIp.ipAddress)
+        if (customIp.port != 0) {
+            val ipPort = context.getString(R.string.ct_ip_port, customIp.ipAddress, customIp.port.toString())
+            dBind.daciIpEditText.setText(ipPort)
+        } else {
+            dBind.daciIpEditText.setText(customIp.ipAddress)
+        }
 
         if (customIp.uid == UID_EVERYBODY) {
             dBind.daciTrustBtn.text = context.getString(R.string.bypass_universal)

@@ -55,25 +55,25 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.openVpnProfile
+import com.celzero.bravedns.util.UiUtils.sendEmailIntent
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastR
+import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -116,8 +116,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val version = getVersionName()
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
-            b.aboutWhatsNew.text =
-                getString(R.string.about_whats_new, version)
+            b.aboutWhatsNew.text = getString(R.string.about_whats_new, version)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
@@ -155,7 +154,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 openActionViewIntent(getString(R.string.about_github_link).toUri())
             }
             b.aboutCrashLog -> {
-                if (isAtleastR()) {
+                if (isAtleastO()) {
                     handleShowAppExitInfo()
                 } else {
                     showNoLogDialog()
@@ -252,7 +251,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val packageName = requireContext().packageName
         try {
             val intent = Intent()
-            if (Utilities.isAtleastO()) {
+            if (isAtleastO()) {
                 intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
             } else {

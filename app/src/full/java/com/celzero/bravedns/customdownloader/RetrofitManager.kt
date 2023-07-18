@@ -18,13 +18,13 @@ package com.celzero.bravedns.customdownloader
 import android.util.Log
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import java.net.InetAddress
-import java.util.concurrent.TimeUnit
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
 import retrofit2.Retrofit
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 
 class RetrofitManager {
 
@@ -38,6 +38,12 @@ class RetrofitManager {
         }
 
         fun getBlocklistBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
+            return Retrofit.Builder()
+                .baseUrl(Constants.DOWNLOAD_BASE_URL)
+                .client(okHttpClient(dnsType))
+        }
+
+        fun getWarpBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
             return Retrofit.Builder()
                 .baseUrl(Constants.DOWNLOAD_BASE_URL)
                 .client(okHttpClient(dnsType))

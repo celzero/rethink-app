@@ -44,10 +44,11 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.AppInfoActivity
 import com.celzero.bravedns.ui.NetworkLogsActivity
-import com.celzero.bravedns.ui.SummaryStatisticsFragment
+import com.celzero.bravedns.ui.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UiUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import kotlin.math.log2
@@ -56,7 +57,7 @@ class SummaryStatisticsAdapter(
     private val context: Context,
     private val persistentState: PersistentState,
     private val appConfig: AppConfig,
-    private val type: SummaryStatisticsFragment.SummaryStatisticsType
+    private val type: SummaryStatisticsType
 ) :
     PagingDataAdapter<AppConnection, SummaryStatisticsAdapter.AppNetworkActivityViewHolder>(
         DIFF_CALLBACK
@@ -132,7 +133,7 @@ class SummaryStatisticsAdapter(
 
         private fun setIcon(appConnection: AppConnection) {
             when (type) {
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
+                SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                     val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
                     itemBinding.ssIcon.visibility = View.VISIBLE
                     itemBinding.ssFlag.visibility = View.GONE
@@ -144,7 +145,7 @@ class SummaryStatisticsAdapter(
                         )
                     )
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
+                SummaryStatisticsType.MOST_BLOCKED_APPS -> {
                     val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
                     itemBinding.ssIcon.visibility = View.VISIBLE
                     itemBinding.ssFlag.visibility = View.GONE
@@ -156,7 +157,7 @@ class SummaryStatisticsAdapter(
                         )
                     )
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     itemBinding.ssFlag.text = appConnection.flag
                     val query = appConnection.appOrDnsName?.dropLastWhile { it == ',' }
                     if (query == null) {
@@ -178,17 +179,27 @@ class SummaryStatisticsAdapter(
                         displayNextDnsFavIcon(query)
                     }
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
+                SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     itemBinding.ssIcon.visibility = View.GONE
                     itemBinding.ssFlag.visibility = View.VISIBLE
                     itemBinding.ssFlag.text = appConnection.flag
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
+                SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                     itemBinding.ssIcon.visibility = View.GONE
                     itemBinding.ssFlag.visibility = View.VISIBLE
                     itemBinding.ssFlag.text = appConnection.flag
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = appConnection.flag
+                }
+                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = appConnection.flag
+                }
+                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
                     itemBinding.ssIcon.visibility = View.GONE
                     itemBinding.ssFlag.visibility = View.VISIBLE
                     itemBinding.ssFlag.text = appConnection.flag
@@ -198,27 +209,33 @@ class SummaryStatisticsAdapter(
 
         private fun setName(appConnection: AppConnection) {
             when (type) {
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
+                SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                     itemBinding.ssName.text = getAppName(appConnection)
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
+                SummaryStatisticsType.MOST_BLOCKED_APPS -> {
                     itemBinding.ssName.text = getAppName(appConnection)
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     // remove the trailing dot
                     itemBinding.ssName.text =
                         appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
+                SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                     // remove the trailing dot
                     itemBinding.ssName.text =
                         appConnection.appOrDnsName?.dropLastWhile { it == '.' }
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
+                SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                     itemBinding.ssName.text = appConnection.ipAddress
                 }
-                SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                SummaryStatisticsType.MOST_BLOCKED_IPS -> {
                     itemBinding.ssName.text = appConnection.ipAddress
+                }
+                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                    itemBinding.ssName.text = getCountryNameFromFlag(appConnection.flag)
+                }
+                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
+                    itemBinding.ssName.text = getCountryNameFromFlag(appConnection.flag)
                 }
             }
         }
@@ -264,31 +281,46 @@ class SummaryStatisticsAdapter(
         private fun setClickListeners(appConnection: AppConnection) {
             itemBinding.ssContainer.setOnClickListener {
                 when (type) {
-                    SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
+                    SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                         startAppInfoActivity(appConnection)
                     }
-                    SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_APPS -> {
+                    SummaryStatisticsType.MOST_BLOCKED_APPS -> {
                         startAppInfoActivity(appConnection)
                     }
-                    SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                    SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                         if (appConfig.getBraveMode().isDnsMode()) {
                             showDnsLogs(appConnection)
                         } else {
-                            showNetworkLogs(appConnection, isDns = true)
+                            showNetworkLogs(
+                                appConnection,
+                                SummaryStatisticsType.MOST_CONTACTED_DOMAINS
+                            )
                         }
                     }
-                    SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
+                    SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
                         if (appConfig.getBraveMode().isDnsMode()) {
                             showDnsLogs(appConnection)
                         } else {
-                            showNetworkLogs(appConnection, isDns = true)
+                            showNetworkLogs(
+                                appConnection,
+                                SummaryStatisticsType.MOST_BLOCKED_DOMAINS
+                            )
                         }
                     }
-                    SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
-                        showNetworkLogs(appConnection)
+                    SummaryStatisticsType.MOST_CONTACTED_IPS -> {
+                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_CONTACTED_IPS)
                     }
-                    SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
-                        showNetworkLogs(appConnection)
+                    SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_IPS)
+                    }
+                    SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                        showNetworkLogs(
+                            appConnection,
+                            SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
+                        )
+                    }
+                    SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
+                        showNetworkLogs(appConnection, SummaryStatisticsType.MOST_BLOCKED_COUNTRIES)
                     }
                 }
             }
@@ -314,27 +346,53 @@ class SummaryStatisticsAdapter(
             }
         }
 
-        private fun showNetworkLogs(appConnection: AppConnection, isDns: Boolean = false) {
+        private fun showNetworkLogs(appConnection: AppConnection, type: SummaryStatisticsType) {
             if (!handleVpnState()) return
 
-            if (appConfig.getBraveMode().isFirewallActive()) {
-                if (isDns) {
-                    startActivity(
-                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
-                        appConnection.appOrDnsName
-                    )
-                } else {
-                    startActivity(
-                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
-                        appConnection.ipAddress
-                    )
-                }
-            } else {
+            if (!appConfig.getBraveMode().isFirewallActive()) {
                 Utilities.showToastUiCentered(
                     context,
                     context.getString(R.string.firewall_card_text_inactive),
                     Toast.LENGTH_SHORT
                 )
+                return
+            }
+
+            when (type) {
+                SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.appOrDnsName
+                    )
+                }
+                SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.appOrDnsName
+                    )
+                }
+                SummaryStatisticsType.MOST_CONTACTED_IPS -> {
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.ipAddress
+                    )
+                }
+                SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                    startActivity(
+                        NetworkLogsActivity.Tabs.NETWORK_LOGS.screen,
+                        appConnection.ipAddress
+                    )
+                }
+                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.flag)
+                }
+                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
+                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, appConnection.flag)
+                }
+                else -> {
+                    // should never happen, but just in case we'll show all logs
+                    startActivity(NetworkLogsActivity.Tabs.NETWORK_LOGS.screen, "")
+                }
             }
         }
 

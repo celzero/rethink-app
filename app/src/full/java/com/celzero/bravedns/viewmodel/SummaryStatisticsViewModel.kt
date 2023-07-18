@@ -34,11 +34,13 @@ class SummaryStatisticsViewModel(
     private val appConfig: AppConfig
 ) : ViewModel() {
     private var networkActivity: MutableLiveData<String> = MutableLiveData()
+    private var countryActivities: MutableLiveData<String> = MutableLiveData()
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var ips: MutableLiveData<String> = MutableLiveData()
 
     init {
         networkActivity.value = ""
+        countryActivities.value = ""
         domains.value = ""
         ips.value = ""
     }
@@ -106,4 +108,22 @@ class SummaryStatisticsViewModel(
                 .liveData
                 .cachedIn(viewModelScope)
         }
+
+    val getMostContactedCountries =
+            countryActivities.switchMap { _ ->
+                Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                        connectionTrackerDAO.getMostContactedCountries()
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
+
+    val getMostBlockedCountries =
+            countryActivities.switchMap { _ ->
+                Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                        connectionTrackerDAO.getMostBlockedCountries()
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
 }

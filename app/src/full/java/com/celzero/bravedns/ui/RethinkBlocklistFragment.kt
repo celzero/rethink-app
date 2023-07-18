@@ -57,8 +57,8 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
 import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.hasRemoteBlocklists

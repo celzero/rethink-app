@@ -38,8 +38,8 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.ui.CustomRulesActivity
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UiUtils.fetchColor
+import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -313,7 +313,7 @@ class CustomDomainAdapter(val context: Context) :
             builder.setTitle(R.string.cd_remove_dialog_title)
             builder.setMessage(R.string.cd_remove_dialog_message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.cd_remove_dialog_positive)) { _, _
+            builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _
                 ->
                 DomainRulesManager.deleteDomain(customDomain)
                 Utilities.showToastUiCentered(

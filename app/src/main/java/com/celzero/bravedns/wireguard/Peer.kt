@@ -1,0 +1,349 @@
+/*
+ * Copyright 2023 RethinkDNS and its authors
+ *
+ * Copyright © 2017-2023 WireGuard LLC. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.celzero.bravedns.wireguard
+
+import com.celzero.bravedns.wireguard.BadConfigException.*
+import ipn.Ipn
+import ipn.Key
+import java.lang.Exception
+import java.util.*
+import java.util.function.Consumer
+
+/**
+ * Represents the configuration for a WireGuard peer (a [Peer] block). Peers must have a public key,
+ * and may optionally have several other attributes.
+ *
+ * Instances of this class are immutable.
+ */
+@NonNullForAll
+class Peer private constructor(builder: Builder) {
+    val id: Int = 0
+    private val allowedIps: Set<InetNetwork>
+    private val endpoint: Optional<InetEndpoint>
+
+    /**
+     * Returns the peer's persistent keepalive.
+     *
+     * @return the persistent keepalive, or `Optional.empty()` if none is configured
+     */
+    val persistentKeepalive: Optional<Int>
+    private val preSharedKey: Optional<Key>
+    private val publicKey: Key
+
+    init {
+        // Defensively copy to ensure immutability even if the Builder is reused.
+        allowedIps =
+            Collections.unmodifiableSet(LinkedHashSet<Any?>(builder.allowedIps)) as Set<InetNetwork>
+        endpoint = builder.endpoint
+        persistentKeepalive = builder.persistentKeepalive
+        preSharedKey = builder.preSharedKey
+        publicKey = Objects.requireNonNull(builder.publicKey, "Peers must have a public key")!!
+    }
+
+    override fun equals(obj: Any?): Boolean {
+        if (obj !is Peer) return false
+        val other = obj
+        return allowedIps == other.allowedIps &&
+            endpoint == other.endpoint &&
+            persistentKeepalive == other.persistentKeepalive &&
+            preSharedKey == other.preSharedKey &&
+            publicKey == other.publicKey
+    }
+
+    /**
+     * Returns the peer's set of allowed IPs.
+     *
+     * @return the set of allowed IPs
+     */
+    fun getAllowedIps(): Set<InetNetwork> {
+        // The collection is already immutable.
+        return allowedIps
+    }
+
+    /**
+     * Returns the peer's endpoint.
+     *
+     * @return the endpoint, or `Optional.empty()` if none is configured
+     */
+    fun getEndpoint(): Optional<InetEndpoint> {
+        return endpoint
+    }
+
+    /**
+     * Returns the peer's pre-shared key.
+     *
+     * @return the pre-shared key, or `Optional.empty()` if none is configured
+     */
+    fun getPreSharedKey(): Optional<Key> {
+        return preSharedKey
+    }
+
+    /**
+     * Returns the peer's public key.
+     *
+     * @return the public key
+     */
+    fun getPublicKey(): Key {
+        return publicKey
+    }
+
+    override fun hashCode(): Int {
+        var hash = 1
+        hash = 31 * hash + allowedIps.hashCode()
+        hash = 31 * hash + endpoint.hashCode()
+        hash = 31 * hash + persistentKeepalive.hashCode()
+        hash = 31 * hash + preSharedKey.hashCode()
+        hash = 31 * hash + publicKey.hashCode()
+        return hash
+    }
+
+    /**
+     * Converts the `Peer` into a string suitable for debugging purposes. The `Peer` is identified
+     * by its public key and (if known) its endpoint.
+     *
+     * @return a concise single-line identifier for the `Peer`
+     */
+    override fun toString(): String {
+        val sb = StringBuilder("(Peer ")
+        sb.append(publicKey.base64())
+        endpoint.ifPresent(
+            Consumer<InetEndpoint> { ep: InetEndpoint? -> sb.append(" @").append(ep) }
+        )
+        sb.append(')')
+        return sb.toString()
+    }
+
+    /**
+     * Converts the `Peer` into a string suitable for inclusion in a `wg-quick` configuration file.
+     *
+     * @return the `Peer` represented as a series of "Key = Value" lines
+     */
+    fun toWgQuickString(): String {
+        val sb = StringBuilder()
+        if (!allowedIps.isEmpty())
+            sb.append("AllowedIPs = ").append(Attribute.join(allowedIps)).append('\n')
+        endpoint.ifPresent(
+            Consumer<InetEndpoint> { ep: InetEndpoint? ->
+                sb.append("Endpoint = ").append(ep).append('\n')
+            }
+        )
+        persistentKeepalive.ifPresent { pk: Int? ->
+            sb.append("PersistentKeepalive = ").append(pk).append('\n')
+        }
+        preSharedKey.ifPresent(
+            Consumer<Key> { psk: Key ->
+                sb.append("PreSharedKey = ").append(psk.base64()).append('\n')
+            }
+        )
+        sb.append("PublicKey = ").append(publicKey.base64()).append('\n')
+        return sb.toString()
+    }
+
+    /**
+     * Serializes the `Peer` for use with the WireGuard cross-platform userspace API. Note that not
+     * all attributes are included in this representation.
+     *
+     * @return the `Peer` represented as a series of "key=value" lines
+     */
+    fun toWgUserspaceString(): String {
+        val sb = StringBuilder()
+        // The order here is important: public_key signifies the beginning of a new peer.
+        sb.append("public_key=").append(publicKey.hex()).append('\n')
+        for (allowedIp in allowedIps) sb.append("allowed_ip=").append(allowedIp).append('\n')
+        endpoint.flatMap<Any>(InetEndpoint::getResolved).ifPresent { ep: Any? ->
+            sb.append("endpoint=").append(ep).append('\n')
+        }
+        persistentKeepalive.ifPresent { pk: Int? ->
+            sb.append("persistent_keepalive_interval=").append(pk).append('\n')
+        }
+        preSharedKey.ifPresent(
+            Consumer<Key> { psk: Key ->
+                sb.append("preshared_key=").append(psk.hex()).append('\n')
+            }
+        )
+        return sb.toString()
+    }
+
+    class Builder {
+        // Defaults to an empty set.
+        val allowedIps: MutableSet<InetNetwork> = LinkedHashSet<InetNetwork>()
+
+        // Defaults to not present.
+        var endpoint: Optional<InetEndpoint> = Optional.empty<InetEndpoint>()
+
+        // Defaults to not present.
+        var persistentKeepalive = Optional.empty<Int>()
+
+        // Defaults to not present.
+        var preSharedKey: Optional<Key> = Optional.empty<Key>()
+
+        // No default; must be provided before building.
+        var publicKey: Key? = null
+        fun addAllowedIp(allowedIp: InetNetwork): Builder {
+            allowedIps.add(allowedIp)
+            return this
+        }
+
+        fun addAllowedIps(allowedIps: Collection<InetNetwork>?): Builder {
+            this.allowedIps.addAll(allowedIps!!)
+            return this
+        }
+
+        @Throws(BadConfigException::class)
+        fun build(): Peer {
+            if (publicKey == null)
+                throw BadConfigException(
+                    Section.PEER,
+                    Location.PUBLIC_KEY,
+                    Reason.MISSING_ATTRIBUTE,
+                    null
+                )
+            return Peer(this)
+        }
+
+        @Throws(BadConfigException::class)
+        fun parseAllowedIPs(allowedIps: CharSequence?): Builder {
+            return try {
+                for (allowedIp in Attribute.split(allowedIps)) addAllowedIp(
+                    InetNetwork.parse(allowedIp)
+                )
+                this
+            } catch (e: ParseException) {
+                throw BadConfigException(Section.PEER, Location.ALLOWED_IPS, e)
+            }
+        }
+
+        @Throws(BadConfigException::class)
+        fun parseEndpoint(endpoint: String): Builder {
+            return try {
+                setEndpoint(InetEndpoint.parse(endpoint))
+            } catch (e: ParseException) {
+                throw BadConfigException(Section.PEER, Location.ENDPOINT, e)
+            }
+        }
+
+        @Throws(BadConfigException::class)
+        fun parsePersistentKeepalive(persistentKeepalive: String): Builder {
+            return try {
+                setPersistentKeepalive(persistentKeepalive.toInt())
+            } catch (e: NumberFormatException) {
+                throw BadConfigException(
+                    Section.PEER,
+                    Location.PERSISTENT_KEEPALIVE,
+                    persistentKeepalive,
+                    e
+                )
+            }
+        }
+
+        @Throws(BadConfigException::class)
+        fun parsePreSharedKey(preSharedKey: String): Builder {
+            return try {
+                val k = Ipn.newPrivateKeyOf(preSharedKey)
+                setPreSharedKey(k)
+            } catch (e: Exception) {
+                throw BadConfigException(Section.PEER, Location.PRE_SHARED_KEY, e)
+            }
+        }
+
+        @Throws(BadConfigException::class)
+        fun parsePublicKey(publicKey: String): Builder {
+            return try {
+                val k = Ipn.newPrivateKeyOf(publicKey)
+                setPublicKey(k)
+            } catch (e: Exception) {
+                throw BadConfigException(Section.PEER, Location.PUBLIC_KEY, e)
+            }
+        }
+
+        fun setEndpoint(endpoint: InetEndpoint): Builder {
+            this.endpoint = Optional.of<InetEndpoint>(endpoint)
+            return this
+        }
+
+        @Throws(BadConfigException::class)
+        fun setPersistentKeepalive(persistentKeepalive: Int): Builder {
+            if (persistentKeepalive < 0 || persistentKeepalive > MAX_PERSISTENT_KEEPALIVE)
+                throw BadConfigException(
+                    Section.PEER,
+                    Location.PERSISTENT_KEEPALIVE,
+                    Reason.INVALID_VALUE,
+                    persistentKeepalive.toString()
+                )
+            this.persistentKeepalive =
+                if (persistentKeepalive == 0) Optional.empty() else Optional.of(persistentKeepalive)
+            return this
+        }
+
+        fun setPreSharedKey(preSharedKey: Key): Builder {
+            this.preSharedKey = Optional.of<Key>(preSharedKey)
+            return this
+        }
+
+        fun setPublicKey(publicKey: Key?): Builder {
+            this.publicKey = publicKey
+            return this
+        }
+
+        companion object {
+            // See wg(8)
+            private const val MAX_PERSISTENT_KEEPALIVE = 65535
+        }
+    }
+
+    companion object {
+        /**
+         * Parses an series of "KEY = VALUE" lines into a `Peer`. Throws [ParseException] if the
+         * input is not well-formed or contains unknown attributes.
+         *
+         * @param lines an iterable sequence of lines, containing at least a public key attribute
+         * @return a `Peer` with all of its attributes set from `lines`
+         */
+        @Throws(BadConfigException::class)
+        fun parse(lines: Iterable<CharSequence?>): Peer {
+            val builder = Builder()
+            for (line in lines) {
+                val attribute: Attribute =
+                    Attribute.parse(line).orElseThrow {
+                        BadConfigException(
+                            Section.PEER,
+                            Location.TOP_LEVEL,
+                            Reason.SYNTAX_ERROR,
+                            line
+                        )
+                    }
+                when (attribute.key.toLowerCase(Locale.ENGLISH)) {
+                    "allowedips" -> builder.parseAllowedIPs(attribute.value)
+                    "endpoint" -> builder.parseEndpoint(attribute.value)
+                    "persistentkeepalive" -> builder.parsePersistentKeepalive(attribute.value)
+                    "presharedkey" -> builder.parsePreSharedKey(attribute.value)
+                    "publickey" -> builder.parsePublicKey(attribute.value)
+                    else ->
+                        throw BadConfigException(
+                            Section.PEER,
+                            Location.TOP_LEVEL,
+                            Reason.UNKNOWN_ATTRIBUTE,
+                            attribute.key
+                        )
+                }
+            }
+            return builder.build()
+        }
+    }
+}

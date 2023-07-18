@@ -20,7 +20,6 @@ class LoggerConstants {
         const val LOG_TAG_APP_UPDATE = "NonStoreAppUpdater"
         const val LOG_TAG_FIREWALL_LOG = "FirewallLogs"
         const val LOG_TAG_DNS_LOG = "DnsLogs"
-        const val LOG_TAG_APP_MODE = "AppConfig"
         const val LOG_TAG_VPN = "VpnLifecycle"
         const val LOG_TAG_CONNECTION = "ConnectivityEvents"
         const val LOG_TAG_DNS = "DnsManager"
@@ -32,5 +31,6 @@ class LoggerConstants {
         const val LOG_TAG_SCHEDULER = "JobScheduler"
         const val LOG_TAG_BACKUP_RESTORE = "BackupRestore"
         const val LOG_PROVIDER = "BlocklistProvider"
+        const val LOG_TAG_WIREGUARD = "WireGuard"
     }
 }

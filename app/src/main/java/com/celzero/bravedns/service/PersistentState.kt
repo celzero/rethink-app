@@ -54,6 +54,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
+        const val WIREGUARD = "wireguard_enabled_count"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -243,7 +244,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
 
     // enable dns alg
-    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
+    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(true)
 
     // dns crypt relay server
     var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")
@@ -265,6 +266,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // go logger level, default 2 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
+
+    // count of wireguard enabled
+    var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

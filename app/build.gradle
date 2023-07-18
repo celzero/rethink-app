@@ -202,8 +202,8 @@ dependencies {
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
 
-    download 'com.github.celzero:firestack:37b6b37c99'
-    implementation 'com.github.celzero:firestack:37b6b37c99'
+    download 'com.github.celzero:firestack:cdba425ef3'
+    implementation 'com.github.celzero:firestack:cdba425ef3'
     // implementation project(":tun2socks")
 
     // Work manager
@@ -226,6 +226,17 @@ dependencies {
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
+
+    implementation("androidx.security:security-crypto:1.0.0")
+
+    // For App Authentication APIs
+    implementation("androidx.security:security-app-authenticator:1.0.0-alpha02")
+
+    // For App Authentication API testing
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha02")
+
+    // barcode scanner for wireguard
+    fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }
 
 task downloadDependencies(type: Copy) {

@@ -40,6 +40,7 @@ import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
@@ -309,6 +310,7 @@ internal constructor(
         }
 
         FirewallManager.persistAppInfo(appInfo)
+        WireguardManager.addNewAppForMappping(appInfo)
     }
 
     private suspend fun insertApp(appInfo: ApplicationInfo) {
@@ -336,6 +338,7 @@ internal constructor(
         entry.appCategory = determineAppCategory(appInfo)
 
         FirewallManager.persistAppInfo(entry)
+        WireguardManager.addNewAppForMappping(entry)
     }
 
     private fun handleNewAppNotification(apps: HashSet<FirewallManager.AppInfoTuple>) {
@@ -397,7 +400,7 @@ internal constructor(
             )
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
@@ -478,7 +481,7 @@ internal constructor(
             context.resources.getString(R.string.new_app_notification_content, appName)
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)

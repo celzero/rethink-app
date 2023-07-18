@@ -219,7 +219,7 @@
     <string name="hsf_stop_btn_state" translatable="true">停止</string>
     <string name="hsf_vpn_dialog_header" translatable="true">注意！</string>
     <string name="hsf_notification_permission_failure" translatable="true">設定画面から通知機能を有効にする</string>
-    <string name="hsf_vpn_dialog_positive" translatable="true">続行</string>
+    <string name="lbl_proceed" translatable="true">続行</string>
     <string name="about_connect" translatable="true">問い合わせ</string>
     <string name="about_sponsor_link_text" translatable="true">支援者</string>
     <string name="about_email" translatable="true">メール</string>
@@ -261,11 +261,9 @@
     <string name="cd_dnscrypt_relay_heading" translatable="true">リレー</string>
     <string name="cd_dns_alg_heading" translatable="true">高度なDNSフィルタリング（試験的）</string>
     <string name="cd_dns_alg_desc" translatable="true">アプリの接続時のみドメインルールを適用する</string>
-    <string name="ct_delete_logs_positive_btn" translatable="true">ログの削除</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">アプリの設定ページが見つかりません</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s 他のアプリ</string>
     <string name="univ_firewall_rule_2" translatable="true">使用中でないアプリをブロックする</string>
-    <string name="ctbs_proceed_positive_text" translatable="true">続行</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">戻る</string>
     <string name="dns_log_dialog_positive" translatable="true">ログの削除</string>
     <string name="dns_btm_sheet_dialog_ips" translatable="true"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -281,7 +279,6 @@
     <string name="univ_firewall_rule_6" translatable="true">新しくインストールしたアプリケーションを既定でブロックする</string>
     <string name="univ_firewall_rule_7" translatable="true">IPv6でIPv4をブロックする(試験的)</string>
     <string name="univ_firewall_rule_9" translatable="true">従量制 (モバイル) ネットワークでの通信をブロックする</string>
-    <string name="univ_ip_delete_individual_positive" translatable="true">削除</string>
     <string name="univ_view_blocked_ip" translatable="true">IP とポートの規則</string>
     <string name="univ_ip_delete_dialog_positive" translatable="true">すべて削除</string>
     <string name="univ_delete_firewall_dialog_title" translatable="true">すべてのIP規則を削除しますか？</string>
@@ -446,7 +443,6 @@
     <string name="dns_btm_sheet_dialog_message" translatable="true"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s blocklist(s)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_crypt_relay_error_toast" translatable="true">リゾルバーが選択されていません</string>
     <string name="univ_view_blocked_ip_desc" translatable="true">ブロックまたは信頼されたドメイン、IP / ポート ルールを変更します。</string>
-    <string name="dns_delete_positive" translatable="true">削除</string>
     <string name="fapps_info_dialog_message" translatable="true">アプリがインターネットに接続できないようにブロックします。インターネットへの接続を制限することで、不当なデータ利用を防ぐとともに、バッテリーの節約にもつながります。</string>
     <string name="dns_connected" translatable="true">接続済み</string>
     <string name="dns_proxy_dialog_message" translatable="true">アプリ名: %1$s
@@ -595,7 +591,6 @@
     <string name="cd_remove_dialog_title" translatable="true">ドメインを削除しますか\?</string>
     <string name="category_name_non_app_sys" translatable="true">システムサービス</string>
     <string name="category_name_installed" translatable="true">インストール済みのアプリ</string>
-    <string name="cd_remove_dialog_positive" translatable="true">削除</string>
     <string name="cd_no_rules_text" translatable="true">ドメインルールはありません。</string>
     <string name="cd_blocked_initial" translatable="true">B</string>
     <string name="ci_no_rule" translatable="true">ルールなし</string>

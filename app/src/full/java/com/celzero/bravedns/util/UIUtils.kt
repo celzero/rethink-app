@@ -46,7 +46,7 @@ import java.util.TimeZone
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-object UIUtils {
+object UiUtils {
 
     fun getDnsStatus(): Int {
         val status = VpnController.state()
@@ -265,7 +265,7 @@ object UIUtils {
         if (isDgaDomain(dnsLog.queryStr)) return
 
         if (DEBUG)
-            Log.d(UIUtils::class.java.simpleName, "Glide - fetchFavIcon() -${dnsLog.queryStr}")
+            Log.d(LoggerConstants.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
 
         // fetch fav icon in background using glide
         FavIconDownloader(context, dnsLog.queryStr).run()

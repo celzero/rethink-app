@@ -306,7 +306,7 @@
 
     <style name="SearchView.Custom" parent="Widget.AppCompat.SearchView">
         <item name="searchViewStyle">@style/Widget.AppCompat.Light.SearchView</item>
-        <item name="android:maxWidth">@dimen/maxSize</item>
+        <item name="android:maxWidth">@dimen/max_size</item>
     </style>
 
     <style name="Chip.HomeScreen.Entry" parent="Widget.MaterialComponents.Chip.Entry">
@@ -439,7 +439,7 @@
         <item name="android:paddingLeft">@dimen/default_padding</item>
         <item name="android:paddingRight">@dimen/default_padding</item>
         <item name="strokeColor">?attr/accentGood</item>
-        <item name="strokeWidth">@dimen/defaultStrokeWidth</item>
+        <item name="strokeWidth">@dimen/default_stroke_width</item>
     </style>
 
     <style name="TabTextDefault" parent="TextAppearance.Design.Tab">

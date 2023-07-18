@@ -52,17 +52,17 @@ import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.UIUtils.openUrl
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.UiUtils.openUrl
+import com.celzero.bravedns.util.UiUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -136,6 +136,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.settingsActivityOrbotImg.setOnClickListener { handleOrbotUiEvent() }
 
         b.settingsActivityOrbotContainer.setOnClickListener { handleOrbotUiEvent() }
+
+        b.settingsActivityWireguardContainer.setOnClickListener { openWireguardActivity() }
+
+        b.settingsActivityWireguardImg.setOnClickListener { openWireguardActivity() }
 
         b.settingsActivityHttpProxyContainer.setOnClickListener {
             b.settingsActivityHttpProxySwitch.isChecked =
@@ -230,6 +234,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
 
         openOrbotBottomSheet()
+    }
+
+    private fun openWireguardActivity() {
+        val intent = Intent(this, WgHomeActivity::class.java)
+        startActivity(intent)
     }
 
     private fun openOrbotBottomSheet() {

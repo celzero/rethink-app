@@ -41,7 +41,7 @@ import com.celzero.bravedns.databinding.FragmentFirewallAppListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
@@ -195,12 +195,6 @@ class FirewallAppFragment :
             return
         }
 
-        if (persistentState.useMultipleNetworks) {
-            b.firewallAppLockdownHint.text = getString(R.string.fapps_all_network_hint)
-            b.firewallAppLockdownHint.visibility = View.VISIBLE
-            return
-        }
-
         b.firewallAppLockdownHint.visibility = View.GONE
     }
 
@@ -321,7 +315,10 @@ class FirewallAppFragment :
             )
         }
 
-        TooltipCompat.setTooltipText(b.ffaToggleAllBypassDnsFirewall, getString(R.string.bypass_dns_firewall_tooltip))
+        TooltipCompat.setTooltipText(
+            b.ffaToggleAllBypassDnsFirewall,
+            getString(R.string.bypass_dns_firewall_tooltip, getString(R.string.bypass_dns_firewall))
+        )
 
         b.ffaToggleAllBypassDnsFirewall.setOnClickListener {
             // show tooltip once the user clicks on the button

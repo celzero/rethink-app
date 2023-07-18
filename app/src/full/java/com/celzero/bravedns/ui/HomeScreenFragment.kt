@@ -58,10 +58,10 @@ import com.celzero.bravedns.service.*
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.UIUtils.openNetworkSettings
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.openNetworkSettings
+import com.celzero.bravedns.util.UiUtils.openVpnProfile
+import com.celzero.bravedns.util.UiUtils.sendEmailIntent
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
@@ -821,10 +821,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     override fun onResume() {
         super.onResume()
         handleShimmer()
+        maybeAutoStartVpn()
         updateCardsUi()
         syncDnsStatus()
         handleQuickSettingsChips()
         handleLockdownModeIfNeeded()
+    }
+
+    /**
+     * Issue fix - https://github.com/celzero/rethink-app/issues/57 When the application
+     * crashes/updates it goes into red waiting state. This causes confusion to the users also
+     * requires click of START button twice to start the app. FIX : The check for the controller
+     * state. If persistence state has vpn enabled and the VPN is not connected then the start will
+     * be initiated.
+     */
+    private fun maybeAutoStartVpn() {
+        if (isVpnActivated && !VpnController.state().on) {
+            Log.i(LOG_TAG_VPN, "start VPN (previous state)")
+            prepareAndStartVpn()
+        }
     }
 
     // set the app mode to dns+firewall mode when vpn in lockdown state
@@ -992,7 +1007,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         builder.setTitle(R.string.hsf_vpn_dialog_header)
         builder.setMessage(R.string.hsf_vpn_dialog_message)
         builder.setCancelable(false)
-        builder.setPositiveButton(R.string.hsf_vpn_dialog_positive) { _, _ ->
+        builder.setPositiveButton(R.string.lbl_proceed) { _, _ ->
             startForResult.launch(prepareVpnIntent)
         }
 

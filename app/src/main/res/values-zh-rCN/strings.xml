@@ -94,7 +94,6 @@
     <string name="fav_icon">fav_icon</string>
     <string name="firewall_rule_foreground">应用未使用</string>
     <string name="new_app_bulk_notification_title">注意</string>
-    <string name="cd_remove_dialog_positive">删除</string>
     <string name="ci_no_rules_text">无 IP 或端口规则。</string>
     <string name="ada_ip_no_connection">此应用无网络日志。</string>
     <string name="ada_app_status_isolate">正处隔离模式中；仅放行信任 IP</string>
@@ -119,7 +118,6 @@
     <string name="about_dialog_positive_button">一起出发</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="cd_dns_proxy_mode_internal">内部</string>
-    <string name="ctbs_proceed_positive_text">继续</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip_no_answer">无响应</string>
     <string name="dns_connected_no_count">已连接</string>
@@ -158,7 +156,6 @@
     <string name="cd_doh_dialog_resolver_name">解析服务名称</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="univ_firewall_rule_10">除绕行应用及 IP 外全部拦截</string>
-    <string name="dns_delete_positive">删除</string>
     <string name="dns_proxy_port">端口</string>
     <string name="copy_clipboard_label">URL</string>
     <string name="firewall_rule_block_app">应用已拦截</string>
@@ -385,7 +382,6 @@
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="error_loading_log_file">读取日志文件错误</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
-    <string name="ct_delete_logs_positive_btn">删除日志</string>
     <string name="dns_btm_resolved_crypt">%1$s 由 %2$s <u>匿名</u>地解析</string>
     <string name="dns_btm_resolved_doh_no_server">已解析 %1$s</string>
     <string name="fapps_firewall_filter_excluded">已排除</string>
@@ -418,7 +414,6 @@
     <string name="ctbs_block_other_apps">应用于 %1$s 的规则亦会应用于其他 %2$s 个应用</string>
     <string name="univ_ip_delete_dialog_positive">全部删除</string>
     <string name="fapps_firewall_filter_isolate">已隔离</string>
-    <string name="fapps_all_network_hint"><u>使用所有可用网络</u>已启用。防火墙将不会遵守收费 / 非收费规则。</string>
     <string name="network_log_app_name_unnamed">未命名（ %1$s ）</string>
     <string name="dns_proxy_connection_failure_lockdown">为 %2$s 而在闭关模式下排除 %1$s 可导致网络问题。</string>
     <string name="firewall_rule_foreground_desc">此连接因原始应用<i>未处于前台</i>而被拦截。<br/><br/>若需变更此行为，请至<i>全局</i>选项卡。</string>
@@ -476,7 +471,6 @@
     <string name="about_bug_no_log_dialog_message">无法获取崩溃日志。请问您是否想要手动报告漏洞？</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="cd_dns_crypt_error_text_1">印戳不能为空</string>
-    <string name="univ_ip_delete_individual_positive">删除</string>
     <string name="dns_query_latency">%1$sms</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 代理</string>
     <string name="update_complete_snack_message">已下载新版本。</string>
@@ -506,7 +500,7 @@
 \n显示两个按钮来快速暂停与停止 Rethink 。"</string>
     <string name="hsf_stop_btn_state">停止</string>
     <string name="hsf_uptime">（自%1$s启动；协议：%2$s；类型：%3$s）</string>
-    <string name="hsf_vpn_dialog_positive">继续</string>
+    <string name="lbl_proceed">继续</string>
     <string name="hsf_start_dialog_header">启动 %1$s</string>
     <string name="about_bug_report">漏洞报告</string>
     <string name="about_mail_bugreport_subject">[Rethink]: Bug report</string>
@@ -765,7 +759,6 @@
     <string name="ci_trust_txt">信任</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日志</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有与此应用有联系的日志。</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">继续</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">拦截成人、盗版内容，线上赌博、约会及社交媒体。</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">拦截吸睛软件、间谍软件及恐吓软件。</string>
     <string name="private_dns_dialog_heading">关闭私人 DNS</string>

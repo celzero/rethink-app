@@ -32,6 +32,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
         android:hint="@string/settings_http_proxy_hostname"
         app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_explanation_text">
@@ -57,6 +62,11 @@
         android:id="@+id/text_input_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
         android:hint="@string/settings_http_proxy_port"
         app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_ip_address">

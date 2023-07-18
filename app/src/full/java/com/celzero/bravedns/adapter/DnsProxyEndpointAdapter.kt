@@ -33,7 +33,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -175,7 +175,7 @@ class DnsProxyEndpointAdapter(
         builder.setMessage(R.string.dns_proxy_remove_dialog_message)
 
         builder.setCancelable(true)
-        builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
+        builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
             deleteProxyEndpoint(dnsProxyEndpoint.id)
         }
 

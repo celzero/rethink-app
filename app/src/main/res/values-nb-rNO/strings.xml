@@ -174,7 +174,6 @@
     <string name="about_sponsor_link_text">Sponsor</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="about_dialog_neutral_button">Foreslå funksjoner</string>
-    <string name="univ_ip_delete_individual_positive">Slett</string>
     <string name="dns_proxy_remove_success">DNS-mellomtjener slettet.</string>
     <string name="search_custom_domains"><font size="12">Søk etter domenenavn</font></string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
@@ -183,11 +182,9 @@
     <string name="univ_view_blocked_ip">IP og port-regler</string>
     <string name="search_universal_ips"><font size="12">Søk etter IP-er</font></string>
     <string name="cd_dns_crypt_dialog_name">Navn</string>
-    <string name="ctbs_proceed_positive_text">Fortsett</string>
     <string name="hs_download_positive_default">OK</string>
     <string name="local_blocklist_download">Last ned svartelister</string>
     <string name="cd_dns_crypt_dialog_desc">Beskrivelse (valgfritt)</string>
-    <string name="ct_delete_logs_positive_btn">Slett loggføring</string>
     <string name="blocklist_update_check_not_required">Svartelistene er allerede siste versjon.</string>
     <string name="ctbs_dialog_negative_btn">Gå tilbake</string>
     <string name="univ_ip_delete_individual_toast">%1$s slettet.</string>
@@ -218,7 +215,6 @@
     <string name="status_protected_with_http">Beskyttet med HTTP-mellomtjener</string>
     <string name="status_dns_error">DNS-feil</string>
     <string name="about_web">Lenker</string>
-    <string name="dns_delete_positive">Slett</string>
     <string name="dns_proxy_dialog_message">Programnavn: %1$s
 \n
 \nIP: %2$s
@@ -249,7 +245,6 @@
     <string name="other_dns_list_tab2">DNSCrypt</string>
     <string name="firewall_rule_exempt_orbot_setup">Orbot-oppsett</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_remove_dialog_positive">Slett</string>
     <string name="cd_dialog_error_invalid_domain">Ugyldig nettadresse (domene).</string>
     <string name="cd_no_rule_txt">Ingen regel</string>
     <string name="status_app_error">Programfeil</string>
@@ -311,7 +306,7 @@
     <string name="dns_crypt_connection_failure">Kunne ikke koble til DNSCrypt-tjener.</string>
     <string name="notif_channel_vpn_failure">Inaktiv VPN</string>
     <string name="cd_dialog_header">Egendefinert(e) domene(r): %1$s</string>
-    <string name="hsf_vpn_dialog_positive">Fortsett</string>
+    <string name="lbl_proceed">Fortsett</string>
     <string name="about_faq">O-S-S</string>
     <string name="dns_proxy_app">Program</string>
     <string name="firewall_rule_block_app_new_install">Nytt program</string>

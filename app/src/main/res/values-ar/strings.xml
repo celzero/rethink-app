@@ -17,7 +17,6 @@
     <string name="ada_ip_no_connection">لا توجد سجلات شبكة لهذا التطبيق.</string>
     <string name="settings_enable_logs">تمكين التسجيل على الجهاز</string>
     <string name="refresh_complete">اكتملت إعادة مزامنة قائمة التطبيقات.</string>
-    <string name="ctbs_proceed_positive_text">المضي قدما</string>
     <string name="dns_proxy_connection_failure_lockdown">يمكن أن يؤدي استبعاد %1$s لـ %2$s في وضع الإغلاق إلى حدوث مشكلات في الاتصال بالإنترنت.</string>
     <string name="new_app_notification_action_deny">استمر فى الحجز</string>
     <string name="settings_dns_proxy_dialog_password">كلمة المرور</string>
@@ -64,7 +63,6 @@
     <string name="rethink_max_desc">أكثر من 50 موقعًا ؛ أكثر خصوصية محلل تكراري يعمل على fly.io</string>
     <string name="orbot_status_arg_3">DNS و TCP</string>
     <string name="firewall_status_allow">مسموح</string>
-    <string name="univ_ip_delete_individual_positive">احذف</string>
     <string name="hsf_proxy_chip_remove_text">يتوقف…</string>
     <string name="category_name_others">أخرى</string>
     <string name="firewall_rule_block_udp_ntp">UDP محظور</string>
@@ -300,7 +298,7 @@
     <string name="settings_theme_dialog_themes_2">إضاءة</string>
     <string name="dns_card_latency_inactive">تمكين وضع DNS.</string>
     <string name="hsf_start_btn_state">بداية</string>
-    <string name="hsf_vpn_dialog_positive">المضي قدما</string>
+    <string name="lbl_proceed">المضي قدما</string>
     <string name="hsf_start_dialog_positive">ابدأ</string>
     <string name="dc_dns_website_desc">يجلب ايقونات مواقع الويب من <i> nextdns.io </i> و <i> duckduckgo.com </i>. يستهلك ما يصل إلى 350 ميغابايت في مساحة القرص</string>
     <string name="about_sponsor_link_text">كفيل</string>
@@ -311,7 +309,6 @@
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt; br / &gt; </Data> </string>
     <string name="univ_firewall_rule_7">منع IPv4 في IPv6 (تجريبي)</string>
     <string name="univ_accessibility_dialog_positive">السماح</string>
-    <string name="dns_delete_positive">احذف</string>
     <string name="dns_info_neutral">انسخ</string>
     <string name="socks5_proxy_toast_parameter">وكيل SOCKS5</string>
     <string name="orbot_toast_parameter">تور كوكيل</string>
@@ -513,7 +510,6 @@
     <string name="about_bravedns_whoarewe">RethinkDNS هو مشروع مجاني ومفتوح المصدر ، يقوده مهندسين سابقين من Amazon و IBM و Scientific Games.</string>
     <string name="cd_custom_dns_proxy_name_default">البروكسي</string>
     <string name="cd_dns_proxy_error_text_1">عنوان IP غير صالح</string>
-    <string name="ct_delete_logs_positive_btn">حذف السجلات</string>
     <string name="dns_btm_resolved_doh">تم حلها %1$s بواسطة %2$s</string>
     <string name="dns_btm_latency_ms">%1$s مللي ثانية</string>
     <string name="univ_firewall_rule_2">حظر أي تطبيق ليس قيد الاستخدام</string>
@@ -554,7 +550,6 @@
     <string name="firewall_rule_global_lockdown">إغلاق</string>
     <string name="new_app_bulk_notification_content">منع RethinkDNS تطبيقات %1$s الجديدة. انقر للعرض أو التعديل.</string>
     <string name="notif_channel_firewall_alerts">تنبيهات جدار الحماية</string>
-    <string name="cd_remove_dialog_positive">احذف</string>
     <string name="ci_dialog_edittext_hint">عنوان IP أو الشبكة الفرعية أو المنفذ</string>
     <string name="ci_bypass_universal">تجاوز عالمية</string>
     <string name="rbl_security">الأمن</string>
@@ -585,7 +580,6 @@
 \n1. VPN في وضع الإغلاق (على سبيل المثال ، <i> حظر الاتصالات بدون VPN </i> ممكّن).
 \n
 \n2. تم تمكين إعداد <i> استخدام كافة الشبكات المتاحة </i>.</string>
-    <string name="fapps_all_network_hint"><u> استخدام جميع الشبكات </u> ممكّن. لن يلتزم جدار الحماية بالقواعد المقننة / غير المقاسة.</string>
     <string name="firewall_rule_block_app_new_install">تطبيق جديد</string>
     <string name="firewall_rule_device_lock_desc">تم حظر هذا الاتصال بسبب قفل جهاز <i> </i> في ذلك الوقت. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="firewall_rule_unknown_desc">تم جدار حماية هذا الاتصال لأنه تعذر تحديد التطبيق المصدر <i> </i>. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
@@ -774,7 +768,6 @@
     <string name="ci_trust_initial">BA</string>
     <string name="ci_trust_txt">تجاوز قواعد التطبيق</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">امسح جميع السجلات المتعلقة بهذا التطبيق.</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">واصل</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">حظر برامج الانتباه وبرامج التجسس وبرامج الرعب.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s قوائم الحظر</string>
     <string name="private_dns_dialog_desc">تم تجاوز إعدادات DNS الخاصة بـ Rethink بواسطة DNS الخاص بنظام Android.

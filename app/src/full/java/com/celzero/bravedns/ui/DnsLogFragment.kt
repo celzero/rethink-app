@@ -35,7 +35,7 @@ import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
+import com.celzero.bravedns.util.UiUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.CoroutineScope
@@ -133,7 +133,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0).tag == null) return
+                    if (recyclerView.getChildAt(0)?.tag == null) return
 
                     val tag: Long = recyclerView.getChildAt(0).tag as Long
 

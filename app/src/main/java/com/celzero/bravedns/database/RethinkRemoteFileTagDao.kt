@@ -25,7 +25,7 @@ interface RethinkRemoteFileTagDao {
 
     @Update fun update(fileTag: RethinkRemoteFileTag)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(fileTag: RethinkRemoteFileTag)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(fileTag: RethinkRemoteFileTag)
 
     @Delete fun delete(fileTag: RethinkRemoteFileTag)
 
