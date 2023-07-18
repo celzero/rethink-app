@@ -63,6 +63,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
@@ -205,7 +206,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun showNoLogDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(R.string.about_bug_no_log_dialog_title)
         builder.setMessage(R.string.about_bug_no_log_dialog_message)
         builder.setPositiveButton(getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _
@@ -275,7 +276,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
         binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setTitle(getString(R.string.whats_dialog_title))
             .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
@@ -362,8 +363,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun promptCrashLogAction() {
         val binding =
             DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-        val builder: AlertDialog.Builder =
-            AlertDialog.Builder(requireContext()).setView(binding.root)
+        val builder =
+            MaterialAlertDialogBuilder(requireContext()).setView(binding.root)
         builder.setTitle(getString(R.string.about_bug_report))
 
         val zipPath = getZipFilePath(requireContext())

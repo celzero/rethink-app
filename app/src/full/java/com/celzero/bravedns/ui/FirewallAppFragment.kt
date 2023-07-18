@@ -45,6 +45,7 @@ import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -487,7 +488,7 @@ class FirewallAppFragment :
         val li =
             requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
-        val builder = AlertDialog.Builder(requireContext()).setView(view)
+        val builder = MaterialAlertDialogBuilder(requireContext()).setView(view)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }

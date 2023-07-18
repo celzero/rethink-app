@@ -41,6 +41,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -169,7 +170,7 @@ class RethinkEndpointAdapter(
         }
 
         private fun showDohMetadataDialog(endpoint: RethinkDnsEndpoint) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(endpoint.name)
             builder.setMessage(endpoint.url + "\n\n" + endpoint.desc)
             builder.setCancelable(true)

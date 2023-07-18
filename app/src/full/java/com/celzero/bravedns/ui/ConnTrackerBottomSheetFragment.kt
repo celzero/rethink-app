@@ -61,6 +61,7 @@ import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
@@ -645,8 +646,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         connStatus: FirewallManager.ConnectionStatus
     ) {
 
-        val builderSingle: android.app.AlertDialog.Builder =
-            android.app.AlertDialog.Builder(requireContext())
+        val builderSingle = MaterialAlertDialogBuilder(requireContext())
 
         builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()
@@ -688,7 +688,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                 )
             }
 
-        val alertDialog: android.app.AlertDialog = builderSingle.create()
+        val alertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.show()
     }

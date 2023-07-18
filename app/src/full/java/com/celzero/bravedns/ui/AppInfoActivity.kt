@@ -59,6 +59,7 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -388,7 +389,7 @@ class AppInfoActivity :
     }
 
     private fun showAppInfoDialog(packages: List<String>) {
-        val builderSingle: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
+        val builderSingle = MaterialAlertDialogBuilder(this)
 
         builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
 
@@ -404,7 +405,7 @@ class AppInfoActivity :
             dialog.dismiss()
         }
 
-        val alertDialog: android.app.AlertDialog = builderSingle.create()
+        val alertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.show()
     }
@@ -694,7 +695,7 @@ class AppInfoActivity :
     }
 
     private fun showNoAppFoundDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(R.string.ada_noapp_dialog_title))
         builder.setMessage(getString(R.string.ada_noapp_dialog_message))
         builder.setCancelable(false)
@@ -708,7 +709,7 @@ class AppInfoActivity :
     }
 
     private fun showDeleteConnectionsDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(R.string.ada_delete_logs_dialog_title)
         builder.setMessage(R.string.ada_delete_logs_dialog_desc)
         builder.setCancelable(true)
@@ -731,7 +732,7 @@ class AppInfoActivity :
         cStat: FirewallManager.ConnectionStatus
     ) {
 
-        val builderSingle: AlertDialog.Builder = AlertDialog.Builder(this)
+        val builderSingle = MaterialAlertDialogBuilder(this)
 
         builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()

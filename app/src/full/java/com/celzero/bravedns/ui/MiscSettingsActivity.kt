@@ -55,6 +55,7 @@ import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -286,7 +287,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun invokeChangeLocaleDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
@@ -370,7 +371,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showThemeDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_theme_dialog_title))
         val items =
             arrayOf(
@@ -411,7 +412,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private fun showGoLoggerDialog() {
         // show dialog with logger options, change log level in GoVpnAdapter based on selection
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_gologger_dialog_title))
         val items =
             arrayOf(
@@ -440,7 +441,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showPcapOptionsDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
         val items =
             arrayOf(
@@ -477,7 +478,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showNotificationActionDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_notification_dialog_title))
         val items =
             arrayOf(

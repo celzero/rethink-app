@@ -38,6 +38,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UiUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -225,7 +226,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     private fun showDnsLogsDeleteDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(R.string.dns_query_clear_logs_title)
         builder.setMessage(R.string.dns_query_clear_logs_message)
         builder.setCancelable(true)

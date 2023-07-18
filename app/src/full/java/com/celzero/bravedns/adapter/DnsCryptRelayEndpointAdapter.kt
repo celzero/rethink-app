@@ -35,6 +35,7 @@ import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
 import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -142,7 +143,7 @@ class DnsCryptRelayEndpointAdapter(
         }
 
         private fun showDialogExplanation(title: String, url: String, message: String?) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
             if (message != null) builder.setMessage(url + "\n\n" + message)
             else builder.setMessage(url)
@@ -167,7 +168,7 @@ class DnsCryptRelayEndpointAdapter(
         }
 
         private fun showDeleteDialog(id: Int) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(R.string.dns_crypt_relay_remove_dialog_title)
             builder.setMessage(R.string.dns_crypt_relay_remove_dialog_message)
             builder.setCancelable(true)

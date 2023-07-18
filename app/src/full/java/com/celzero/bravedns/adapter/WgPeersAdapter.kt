@@ -27,6 +27,7 @@ import com.celzero.bravedns.databinding.ListItemWgPeersBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.WgAddPeerDialog
 import com.celzero.bravedns.wireguard.Peer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class WgPeersAdapter(
     val context: Context,
@@ -54,7 +55,7 @@ class WgPeersAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun update(wgPeer: Peer) {
-            if (configId == 0) {
+            if (configId == WireguardManager.WARP_ID) {
                 handleWarpPeers()
             }
             if (wgPeer.getEndpoint().isPresent) {
@@ -96,7 +97,7 @@ class WgPeersAdapter(
     }
 
     private fun showDeleteInterfaceDialog(wgPeer: Peer) {
-        val builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         builder.setTitle("Delete?")
         builder.setMessage("Are you sure you want to delete this Config?")
         builder.setCancelable(true)
