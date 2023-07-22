@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bs_conn_top_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -38,10 +39,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_marginStart="5dp"
             android:gravity="center"
             android:padding="5dp"
             android:text="@string/settings_orbot_header"
-            android:layout_marginStart="5dp"
             android:textAlignment="center"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/heading_font_text_view" />
@@ -57,6 +58,21 @@
             android:contentDescription="@string/orbot_explanation"
             android:src="@drawable/brave_mode_info" />
     </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/include_applications"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_remove_apps"
+        android:textColor="?attr/secondaryTextColor"
+        android:textSize="@dimen/large_font_text_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/config_apps_text"
+        app:layout_constraintWidth_max="@dimen/max_btn_size"
+        app:rippleColor="?attr/secondaryTextColor" />
 
     <TextView
         android:id="@+id/orbot_status"
@@ -116,9 +132,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="0.75"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_http_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -167,9 +183,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:alpha="0.75"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_socks5_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -183,10 +199,10 @@
             android:id="@+id/bs_orbot_both_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:layout_marginBottom="1dp"
             android:paddingTop="5dp"
-            android:paddingBottom="5dp">
+            android:paddingBottom="5dp"
+            android:visibility="gone">
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bs_orbot_radio_both"
@@ -222,10 +238,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:alpha="0.75"
                     android:gravity="center_vertical"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_both_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
@@ -276,10 +292,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:alpha="0.75"
                     android:gravity="center_vertical"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:alpha="0.75"
                     android:text="@string/orbot_none_desc"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />

@@ -33,23 +33,28 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.animation.Rotate3dAnimation
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.BottomSheetOrbotBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastQ
+import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * One touch Orbot Integration. Bottom sheet dialog fragment shows UI that enables One touch
@@ -66,6 +71,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
+    private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -130,6 +136,17 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioSocks5.setOnCheckedChangeListener(null)
         b.bsOrbotRadioSocks5.setOnClickListener {
+            if (!isAnyAppSelected()) {
+                Toast.makeText(
+                        context,
+                        "Select atleast one app to enable Orbot",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+                b.bsOrbotRadioNone.isChecked = true
+                b.bsOrbotRadioSocks5.isChecked = false
+                return@setOnClickListener
+            }
             if (!b.bsOrbotRadioSocks5.isSelected) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableSocks5Orbot()
@@ -137,6 +154,17 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         b.bsSocks5OrbotRl.setOnClickListener {
+            if (!isAnyAppSelected()) {
+                Toast.makeText(
+                        context,
+                        "Select atleast one app to enable Orbot",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+                b.bsOrbotRadioNone.isChecked = true
+                b.bsOrbotRadioSocks5.isChecked = false
+                return@setOnClickListener
+            }
             if (!b.bsOrbotRadioSocks5.isChecked) {
                 b.bsOrbotRadioSocks5.isChecked = true
                 persistentState.orbotConnectionStatus.postValue(true)
@@ -146,6 +174,17 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioHttp.setOnCheckedChangeListener(null)
         b.bsOrbotRadioHttp.setOnClickListener {
+            if (!isAnyAppSelected()) {
+                Toast.makeText(
+                        context,
+                        "Select atleast one app to enable Orbot",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+                b.bsOrbotRadioNone.isChecked = true
+                b.bsOrbotRadioHttp.isChecked = false
+                return@setOnClickListener
+            }
             if (!b.bsOrbotRadioHttp.isSelected) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableHttpOrbot()
@@ -153,6 +192,17 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         b.bsOrbotHttpRl.setOnClickListener {
+            if (!isAnyAppSelected()) {
+                Toast.makeText(
+                        context,
+                        "Select atleast one app to enable Orbot",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+                b.bsOrbotRadioNone.isChecked = true
+                b.bsOrbotRadioHttp.isChecked = false
+                return@setOnClickListener
+            }
             if (!b.bsOrbotRadioHttp.isChecked) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 b.bsOrbotRadioHttp.isChecked = true
@@ -162,6 +212,17 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioBoth.setOnCheckedChangeListener(null)
         b.bsOrbotRadioBoth.setOnClickListener {
+            if (!isAnyAppSelected()) {
+                Toast.makeText(
+                        context,
+                        "Select atleast one app to enable Orbot",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+                b.bsOrbotRadioNone.isChecked = true
+                b.bsOrbotRadioBoth.isChecked = false
+                return@setOnClickListener
+            }
             if (!b.bsOrbotRadioBoth.isSelected) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 enableSocks5HttpOrbot()
@@ -169,6 +230,17 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         b.bsOrbotBothRl.setOnClickListener {
+            if (!isAnyAppSelected()) {
+                Toast.makeText(
+                        context,
+                        "Select atleast one app to enable Orbot",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+                b.bsOrbotRadioNone.isChecked = true
+                b.bsOrbotRadioBoth.isChecked = false
+                return@setOnClickListener
+            }
             if (!b.bsOrbotRadioBoth.isChecked) {
                 persistentState.orbotConnectionStatus.postValue(true)
                 b.bsOrbotRadioBoth.isChecked = true
@@ -193,6 +265,12 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+
+        b.includeApplications.setOnClickListener { openAppsDialog() }
+    }
+
+    private fun isAnyAppSelected(): Boolean {
+        return ProxyManager.isAnyAppSelected(ProxyManager.ID_ORBOT_BASE)
     }
 
     private fun handleOrbotStop() {
@@ -252,6 +330,31 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
                 updateOrbotNone()
             }
         }
+    }
+
+    private fun openAppsDialog() {
+        // treat proxyId and proxyName of Orbot as base
+        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
+        val appsAdapter =
+            WgIncludeAppsAdapter(
+                requireContext(),
+                ProxyManager.ID_ORBOT_BASE,
+                ProxyManager.ORBOT_PROXY_NAME
+            )
+        mappingViewModel.apps.observe(this.viewLifecycleOwner) {
+            appsAdapter.submitData(lifecycle, it)
+        }
+        val includeAppsDialog =
+            WgIncludeAppsDialog(
+                requireActivity(),
+                appsAdapter,
+                mappingViewModel,
+                themeId,
+                ProxyManager.ID_ORBOT_BASE,
+                ProxyManager.ID_ORBOT_BASE
+            )
+        includeAppsDialog.setCanceledOnTouchOutside(false)
+        includeAppsDialog.show()
     }
 
     private fun updateOrbotNone() {
@@ -372,7 +475,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun showStopOrbotDialog(isOrbotDns: Boolean) {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(getString(R.string.orbot_stop_dialog_title))
 
         builder.setCancelable(true)
