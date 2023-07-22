@@ -301,10 +301,15 @@ class SummaryStatisticsAdapter(
                         if (appConfig.getBraveMode().isDnsMode()) {
                             showDnsLogs(appConnection)
                         } else {
-                            showNetworkLogs(
-                                appConnection,
-                                SummaryStatisticsType.MOST_BLOCKED_DOMAINS
-                            )
+                            // if any app bypasses the dns, then the decision made in flow() call
+                            if (FirewallManager.isAnyAppBypassesDns()) {
+                                showNetworkLogs(
+                                    appConnection,
+                                    SummaryStatisticsType.MOST_BLOCKED_DOMAINS
+                                )
+                            } else {
+                                showDnsLogs(appConnection)
+                            }
                         }
                     }
                     SummaryStatisticsType.MOST_CONTACTED_IPS -> {

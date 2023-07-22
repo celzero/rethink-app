@@ -26,6 +26,7 @@ import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 
@@ -109,7 +110,12 @@ class DetailedStatisticsViewModel(
                     if (appConfig.getBraveMode().isDnsMode()) {
                         dnsLogDAO.getAllBlockedDomains()
                     } else {
-                        connectionTrackerDAO.getAllBlockedDomains()
+                        // if any app bypasses the dns, then the decision made in flow() call
+                        if (FirewallManager.isAnyAppBypassesDns()) {
+                            connectionTrackerDAO.getAllBlockedDomains()
+                        } else {
+                            dnsLogDAO.getAllBlockedDomains()
+                        }
                     }
                 }
                 .liveData
@@ -143,11 +149,12 @@ class DetailedStatisticsViewModel(
                 .cachedIn(viewModelScope)
         }
 
-    val getAllBlockedCountries = blockedCountries.switchMap { _ ->
-        Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                connectionTrackerDAO.getAllBlockedCountries()
-            }
-            .liveData
-            .cachedIn(viewModelScope)
-    }
+    val getAllBlockedCountries =
+        blockedCountries.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    connectionTrackerDAO.getAllBlockedCountries()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
 }
