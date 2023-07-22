@@ -311,7 +311,7 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    fun deleteIpRulesByUid(uid: Int) {
+    fun deleteRulesByUid(uid: Int) {
         io {
             // find the domains that are for the uid and remove them from domains
             val domainsToDelete = domains.filterKeys { it.uid == uid }.toMutableMap()
@@ -325,6 +325,17 @@ object DomainRulesManager : KoinComponent {
             val rulesDeleted = trie.delAll(uid.toString())
             val trustedRulesDeleted = trustedTrie.delAll(uid.toString())
             Log.i(LOG_TAG_DNS, "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie")
+            domainLookupCache.invalidateAll()
+        }
+    }
+
+    fun deleteAllRules() {
+        io {
+            customDomainsRepository.deleteAllRules()
+            domains.clear()
+            trustedDomains.clear()
+            trie.clear()
+            trustedTrie.clear()
             domainLookupCache.invalidateAll()
         }
     }
