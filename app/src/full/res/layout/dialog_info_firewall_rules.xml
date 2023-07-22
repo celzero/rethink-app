@@ -79,6 +79,19 @@
             android:drawablePadding="10dp"
             android:gravity="center_vertical"
             android:padding="5dp"
+            android:text="@string/fapps_info_bypass_dns_firewall_msg"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view"
+            app:drawableStartCompat="@drawable/ic_bypass_dns_firewall_off" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
             android:text="@string/fapps_info_exclude_msg"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="?attr/primaryTextColor"

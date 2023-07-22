@@ -154,14 +154,6 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
             handleDnsFirewallMode(checked)
         }
 
-        b.bsHsWireguardRl.setOnClickListener {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.coming_soon_toast),
-                Toast.LENGTH_SHORT
-            )
-        }
-
         b.bsHomeScreenVpnLockdownDesc.setOnClickListener { openVpnProfile(requireContext()) }
     }
 

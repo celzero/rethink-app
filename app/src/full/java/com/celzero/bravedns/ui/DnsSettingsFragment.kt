@@ -134,9 +134,8 @@ class DnsSettingsFragment :
     private fun observeAppState() {
         VpnController.connectionStatus.observe(viewLifecycleOwner) {
             if (it == BraveVPNService.State.PAUSED) {
-                startActivity(
-                    context?.let { it1 -> Intent().setClass(it1, PauseActivity::class.java) }
-                )
+                val intent = Intent(requireContext(), PauseActivity::class.java)
+                startActivity(intent)
             }
         }
 

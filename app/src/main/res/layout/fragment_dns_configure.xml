@@ -323,7 +323,7 @@
             android:layout_marginStart="55dp"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="5dp"
-            android:text="@string/dc_other_settings_heading"
+            android:text="@string/lbl_advanced"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
