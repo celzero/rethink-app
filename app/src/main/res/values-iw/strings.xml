@@ -118,7 +118,7 @@
     <string name="settings_network_all_networks" translatable="true">השתמש בכל הרשתות הזמינות (ניסיוני)</string>
     <string name="settings_all_networks_dialog_title" translatable="true">שים לב!</string>
     <string name="settings_orbot_install_desc" translatable="true">לחץ כאן כדי להתקין Orbot</string>
-    <string name="settings_socks5_disabled_error" translatable="true">מחובר לOrbot. כבה אותו כדי להמשיך.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">מחובר %1$s. כבה אותו כדי להמשיך.</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">הפעל את RethinkDNS כדי להמשיך.</string>
     <string name="settings_all_networks_dialog_positive_btn" translatable="true">הפעל בכל מקרה</string>
     <string name="settings_import_export_desc" translatable="true">גבה או שחזר באופן ידני נתוני אפליקציה והגדרות.</string>

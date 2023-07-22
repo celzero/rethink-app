@@ -56,7 +56,7 @@
 \n
 \n%2$s</string>
     <string name="orbot_install_dialog_positive">Pasang</string>
-    <string name="settings_socks5_disabled_error">Terhubung ke Orbot. Silahkan tutup dulu.</string>
+    <string name="settings_socks5_disabled_error">Terhubung ke %1$s. Silahkan tutup dulu.</string>
     <string name="download_update_dialog_failure_title">Terjadi kesalahan!</string>
     <string name="always_on_dialog_stop_message">Rethink diatur sebagai VPN Selalu-Menyala. Apakah Anda yakin untuk menghentikan Rethink\?</string>
     <string name="univ_firewall_dialog_message">Menghapus aturan ini akan memungkinkan aplikasi apa pun terhubung ke alamat IP ini. Apakah Anda ingin melanjutkan\?</string>
@@ -102,7 +102,7 @@
     <string name="conn_track_clear_logs_message">Hanya menghapus riwayat catatan jaringan, tidak dengan aturan-aturan firewall. Tindakan ini tidak dapat dibatalkan. Apakah Anda ingin melanjutkan\?</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">tidak terlindungi</string>
     <string name="about_website">Kunjungi rethinkdns.com</string>
-    <string name="cd_dialog_positive_btn">tambahkan</string>
+    <string name="lbl_add">tambahkan</string>
     <string name="settings_local_blocklist_version">Versi: v%1$s</string>
     <string name="firewall_rule_no_rule">Tanpa Aturan</string>
     <string name="hsf_chip_appearance">Tema %1$s</string>
@@ -273,9 +273,7 @@
     <string name="dns_proxy_port">Nomor Port</string>
     <string name="socks5_proxy_toast_parameter">Proksi SOCKS5</string>
     <string name="status_protected_with_socks5">terproteksi dengan proksi socks</string>
-    <string name="dns_proxy_positive_btn">tambahkan</string>
     <string name="brbs_backup_complete_toast">Selesai mencadangkan</string>
-    <string name="ci_header">Aturan-aturan IP &amp; Port: %1$s</string>
     <string name="default_dns_name">Bawaan RDNS</string>
     <string name="ci_dialog_added_success">IP telah ditambahkan ke daftar</string>
     <string name="ci_dialog_error_invalid_ip">Alamat IP, subnet atau port tidak sah.</string>
@@ -316,7 +314,7 @@
     <string name="about_mozilla">Rethink adalah bagian dari program Mozilla Builders MVP.</string>
     <string name="apps_info_title">Aplikasi</string>
     <string name="search_dns_logs"><font size="12">Mencari nama-nama domain atau IP</font></string>
-    <string name="settings_https_disabled_error">Terhubung ke Orbot. Silahkan tutup dulu.</string>
+    <string name="settings_https_disabled_error">Terhubung ke %1$s. Silahkan tutup dulu.</string>
     <string name="settings_theme_dialog_themes_2">Terang</string>
     <string name="about_app_update_check">Periksa pembaruan aplikasi</string>
     <string name="univ_delete_firewall_dialog_title">Hapus semua aturan IP\?</string>
@@ -623,7 +621,6 @@
     <string name="univ_firewall_rule_6">Blokir aplikasi yang baru saja diinstal secara default</string>
     <string name="orbot_toast_parameter">Tor-sebagai-proksi</string>
     <string name="notif_dialog_pause_dialog_message">Aplikasi dalam keadaan jeda, lanjut untuk meneruskan</string>
-    <string name="cd_dialog_header">Domain khusus: %1$s</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ada_ip_no_connection">Tidak ada log jaringan untuk aplikasi ini.</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
@@ -698,7 +695,6 @@
     <string name="dns_card_latency_active">Latensi: %1$sms</string>
     <string name="hsf_uptime">(aktif %1$s; protokol: %2$s; tipe: %3$s)</string>
     <string name="about_bug_report">Laporkan Bug</string>
-    <string name="dc_other_settings_heading">lanjutan</string>
     <string name="dc_entries">%1$s entri »</string>
     <string name="intent_launch_error">Tidak dapat memulai %1$s</string>
     <string name="notification_screen_error">Tidak dapat meluncurkan tampilan Notifikasi Aplikasi.</string>
@@ -743,7 +739,7 @@
     <string name="ci_bypass_universal">Pintaskan (Bypass) secara Universal</string>
     <string name="ada_app_bypass_univ">Pintaskan (Bypass) secara Universal</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Hapus semua log yang terkait dengan aplikasi ini.</string>
-    <string name="rt_list_adv_btn_txt">lanjutan</string>
+    <string name="lbl_advanced">lanjutan</string>
     <string name="rt_filter_desc_subgroups">Menampilkan daftar blokir <u>%1$s</u> dalam grup: %2$s dan subgrup: %3$s</string>
     <string name="bsrf_sub_group_heading">Subgrup</string>
     <string name="settings_dns_proxy_dialog_app_desc">Aplikasi yang dipilih akan dikecualikan dari VPN untuk memungkinkannya membuat koneksi proksi atas nama Anda.</string>

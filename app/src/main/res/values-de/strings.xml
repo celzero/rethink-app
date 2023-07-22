@@ -186,10 +186,10 @@
     <string name="settings_orbot_notification_action">Orbot öffnen</string>
     <string name="orbot">Orbot</string>
     <string name="orbot_status_arg_2">TCP</string>
-    <string name="settings_https_disabled_error">Verbunden mit Orbot. Schalten Sie es aus, um fortzufahren.</string>
+    <string name="settings_https_disabled_error">Verbunden mit %1$s. Schalten Sie es aus, um fortzufahren.</string>
     <string name="orbot_install_dialog_neutral">Webseite</string>
-    <string name="settings_socks5_disabled_error">Verbunden mit Orbot. Schalten Sie es aus, um fortzufahren.</string>
-    <string name="settings_autostart_bootup_desc">Starten Sie beim Einschalten des Geräts Rethink, wenn es vor dem Herunterfahren gelaufen ist.</string>
+    <string name="settings_socks5_disabled_error">Verbunden mit %1$s. Schalten Sie es aus, um fortzufahren.</string>
+    <string name="settings_autostart_bootup_desc">Starten Sie beim Einschalten des Geräts RethinkDNS, wenn es vor dem Herunterfahren gelaufen ist.</string>
     <string name="slide_1_title">Kostenlos und quelloffen</string>
     <string name="settings_ptrans_heading">IPv4-Ausgang erzwingen</string>
     <string name="settings_socks5_heading">SOCKS5-Proxy einrichten</string>
@@ -381,7 +381,6 @@
     <string name="ci_dialog_edittext_hint">IP-Adresse, Subnetz oder Port</string>
     <string name="ci_dialog_error_invalid_ip">Ungültige IP-Adresse, Subnetz oder Port.</string>
     <string name="ci_dialog_added_success">IP der Liste hinzugefügt</string>
-    <string name="ci_header">IP- &amp; Port-Regeln: %1$s</string>
     <string name="ci_no_rules_text">Keine IP- oder Port-Regeln.</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">universelle Umgehung</string>
@@ -485,7 +484,6 @@
     <string name="build__flavor_website">webseite</string>
     <string name="build__flavor_play_store">Spiel {fileName}</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_dialog_header">Benutzerdefinierte Domäne(n): %1$s</string>
     <string name="cd_toast_added">Domain erfolgreich hinzugefügt</string>
     <string name="cd_dialog_error_invalid_wildcard">Ungültiger Platzhalter.</string>
     <string name="cd_blocked_initial">B</string>
@@ -509,7 +507,7 @@
     <string name="rbl_security" description="The text appears as part of the blocklist setup screen as categories or headlines">Sicherheit</string>
     <string name="rt_dialog_title">Änderungen speichern</string>
     <string name="rt_list_simple_btn_txt">einfach</string>
-    <string name="rt_list_adv_btn_txt">Fortgeschritten</string>
+    <string name="lbl_advanced">Fortgeschritten</string>
     <string name="rt_filter_parent_selected">Ausgewählt</string>
     <string name="dc_local_block_enabled">Aktiviert</string>
     <string name="lbbs_configure">Konfigurieren</string>
@@ -593,7 +591,7 @@
     <string name="cd_dns_crypt_dialog_name">Name</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
     <string name="cd_dns_crypt_dialog_desc">Beschreibung (optional)</string>
-    <string name="cd_dialog_positive_btn">hinzufügen</string>
+    <string name="lbl_add">hinzufügen</string>
     <string name="cd_dns_crypt_error_text_1">Stamp kann nicht leer sein</string>
     <string name="cd_doh_dialog_heading">DNS über HTTPS hinzufügen</string>
     <string name="cd_doh_dialog_resolver_name">Resolver-Name</string>
@@ -719,7 +717,6 @@
 \n
 \nPortnummer: %2$s</string>
     <string name="fapps_info_dialog_message">Blockieren Sie die Verbindung von Apps mit dem Internet. Die Beschränkung des Internetzugangs hilft, eine unangemessene Datennutzung zu verhindern und den Akku zu schonen.</string>
-    <string name="dc_other_settings_heading">Fortgeschritten</string>
     <string name="dc_custom_block_heading">Domain Regeln</string>
     <string name="dc_check_update_heading">Aufforderung zur Aktualisierung der Blockliste</string>
     <string name="univ_view_blocked_ip_desc">Blockierte oder vertrauenswürdige Domänen- und IP-/Port-Regeln ändern.</string>
@@ -740,7 +737,6 @@
     <string name="dns_proxy_name">Name des Proxy</string>
     <string name="dns_proxy_ip_address">IP-Adresse</string>
     <string name="dns_proxy_port">Port-Nummer</string>
-    <string name="dns_proxy_positive_btn">Hinzufügen</string>
     <string name="fapps_filter_categories_heading">Kategorien</string>
     <string name="fapps_filter_clear_btn">Leeren</string>
     <string name="fapps_filter_parent_installed">Installiert</string>

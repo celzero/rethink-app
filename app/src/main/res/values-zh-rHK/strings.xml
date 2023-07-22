@@ -22,7 +22,6 @@
 \nRethink 並唔會收集任何資料，同埋唔會以任何方式監視您。</string>
     <string name="dc_dns_website_heading">喺 DNS 日誌入面展示網站圖示（實驗性）</string>
     <string name="dc_check_update_desc">每<i>三</i>日檢查有冇攔截清單更新</string>
-    <string name="dc_other_settings_heading">進階</string>
     <string name="about_bravedns_toreport_text">幫助同反饋</string>
     <string name="about_bug_no_log_dialog_message">拎唔到崩潰日誌。請問您係咪要手動報告漏洞？</string>
     <string name="about_version">v%1$s</string>
@@ -228,10 +227,10 @@
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">喺非 VPN 模式下用 HTTPS/SOCKS5 嘅 Orbot。</string>
     <string name="settings_orbot_install_desc">㩒一下呢度安裝 Orbot</string>
-    <string name="settings_socks5_disabled_error">連線咗去 Orbot。請閂咗佢先。</string>
+    <string name="settings_socks5_disabled_error">連線咗去 %1$s。請閂咗佢先。</string>
     <string name="settings_socks5_vpn_disabled_error">啓動 Rethink 以繼續。</string>
     <string name="settings_orbot_disabled_error">熄咗 HTTP(S) 同埋／或者 SOCKS5 代理以繼續設定 Tor 代理。</string>
-    <string name="settings_https_disabled_error">連線咗去 Orbot 。請閂咗佢先。</string>
+    <string name="settings_https_disabled_error">連線咗去 %1$s 。請閂咗佢先。</string>
     <string name="settings_orbot_notification_content">啓動唔到 Tor 代理。請手動開啓 Orbot 程式。</string>
     <string name="settings_orbot_notification_action">打開 Orbot</string>
     <string name="settings_general_header">一般設定</string>
@@ -407,7 +406,7 @@
     <string name="cd_dns_crypt_dialog_name">名稱</string>
     <string name="cd_dns_crypt_dialog_stamp">印戳</string>
     <string name="cd_dns_crypt_dialog_desc">說明（可選）</string>
-    <string name="cd_dialog_positive_btn">添加</string>
+    <string name="lbl_add">添加</string>
     <string name="cd_dns_crypt_error_text_1">印戳唔可以係空</string>
     <string name="cd_doh_dialog_resolver_name">解析服務名稱</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
@@ -468,7 +467,6 @@
     <string name="dns_proxy_app">應用程式</string>
     <string name="dns_proxy_ip_address">IP 地址</string>
     <string name="dns_proxy_port">埠</string>
-    <string name="dns_proxy_positive_btn">添加</string>
     <string name="fapps_filter_clear_btn">清除</string>
     <string name="fapps_filter_parent_installed">裝咗嘅</string>
     <string name="fapps_filter_filter_heading">類型</string>
@@ -561,7 +559,6 @@
     <string name="category_name_non_app_sys">系統服務</string>
     <string name="category_name_installed">已安裝程式</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_dialog_header">自訂網域：%1$s</string>
     <string name="cd_toast_deleted">網域已經從自訂清單入面丟咗</string>
     <string name="cd_toast_added">加咗網域</string>
     <string name="cd_remove_dialog_title">係咪刪除網域？</string>
@@ -575,7 +572,6 @@
     <string name="ci_dialog_edittext_hint">IP 地址、子網或者埠</string>
     <string name="ci_dialog_error_invalid_ip">冇效嘅 IP 地址、子網或者埠。</string>
     <string name="ci_dialog_added_success">已經將 IP 加咗入清單</string>
-    <string name="ci_header">IP 同埠規則: %1$s</string>
     <string name="ci_no_rules_text">冇 IP 或者埠規則。</string>
     <string name="ci_bypass_universal_initial">繞</string>
     <string name="ci_no_rule_initial">冇</string>
@@ -613,7 +609,7 @@
     <string name="rt_chip_check_update">檢查更新</string>
     <string name="rt_re_download">重新下載攔截清單</string>
     <string name="rt_list_simple_btn_txt">簡單</string>
-    <string name="rt_list_adv_btn_txt">進階</string>
+    <string name="lbl_advanced">進階</string>
     <string name="rt_download_desc">請下載攔截清單（大約 60 MB）嚟用呢個功能。</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>

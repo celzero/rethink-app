@@ -50,7 +50,7 @@
     <string name="about_bug_report">বাগ রিপোর্ট</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="about_version">v%1$s</string>
-    <string name="cd_dialog_positive_btn">যোগ করুন</string>
+    <string name="lbl_add">যোগ করুন</string>
     <string name="univ_ip_delete_toast_success">সমস্ত আইপি নিয়ম মুছে ফেলা হয়েছে।</string>
     <string name="univ_delete_firewall_dialog_message">এই নিয়মগুলি মুছে ফেলার ফলে যেকোনও অ্যাপ্লিকেশন বর্তমানে ব্লক করা আইপিগুলির সাথে সংযোগ করতে পারবে৷</string>
     <string name="about_title_desc">নেটওয়ার্ক নিরাপত্তা হুমকি সনাক্ত এবং ব্লক</string>
@@ -260,7 +260,6 @@
 \n
 \nপোর্ট নম্বর: %3$s</string>
     <string name="dns_proxy_app">অ্যাপ</string>
-    <string name="dns_proxy_positive_btn">যোগ করুন</string>
     <string name="isolate">তালাবদ্ধ</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">অপেক্ষা</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">সুরক্ষিত</string>
@@ -358,7 +357,6 @@
     <string name="settings_theme_dialog_themes_3">কাল</string>
     <string name="firewall_status_block_unmetered">মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কগুলিতে অবরুদ্ধ</string>
     <string name="hsf_whats_new_remove_text">বন্ধ…</string>
-    <string name="dc_other_settings_heading">উন্নত</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_dialog_neutral_button">বৈশিষ্ট্য প্রস্তাব করুন</string>
     <string name="univ_firewall_rule_1">ডিভাইস লক হয়ে গেলে সমস্ত অ্যাপ ব্লক করুন</string>
@@ -625,7 +623,7 @@
     <string name="ada_noapp_dialog_title">অ্যাপের তথ্য পাওয়া যায়নি</string>
     <string name="ada_app_status_isolate">লকডাউন মোডে আছে</string>
     <string name="notif_download_success_content">ডাউনলোড সফল হয়েছে।</string>
-    <string name="rt_list_adv_btn_txt">উন্নত</string>
+    <string name="lbl_advanced">উন্নত</string>
     <string name="rethink_sky_desc">280+ অবস্থান; উচ্চ আপটাইম; স্টাব রিজলভার ক্লাউডফ্লেয়ার ডটকমে চলছে</string>
     <string name="brbs_restore_dialog_failure_title">পুনরুদ্ধার ব্যর্থ হয়েছে</string>
     <string name="network_log_app_name_unnamed">নামহীন (%1$s)</string>
@@ -671,7 +669,6 @@
     <string name="firewall_rule_block_app_univ_mobile_desc"><i>Metered</i> (মোবাইল) নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ইউনিভার্সাল ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে। ট্যাব</string>
     <string name="firewall_rule_block_udp_ntp_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>UDP</i> সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="ci_header">আইপি এবং পোর্টের নিয়ম: %1$s</string>
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
     <string name="ada_app_metered">মিটারযুক্ত</string>
@@ -710,7 +707,6 @@
     <string name="firewall_rule_block_ip_univ_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান</string>
     <string name="firewall_rule_trusted_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
     <string name="notif_channel_desc_vpn_failure">Android বা অন্য VPN অ্যাপ দ্বারা RethinkDNS বন্ধ করা হলে জানান</string>
-    <string name="cd_dialog_header">কাস্টম ডোমেন(গুলি): %1$s</string>
     <string name="lbbs_heading">185+ ব্লকলিস্ট কনফিগার করুন</string>
     <string name="brbs_restore_complete_toast">পুনরুদ্ধার সম্পন্ন হয়েছে, অ্যাপ পুনরায় চালু হচ্ছে…</string>
     <string name="brbs_backup_complete_toast">ব্যাকআপ সম্পন্ন</string>

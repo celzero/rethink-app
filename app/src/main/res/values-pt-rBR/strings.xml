@@ -66,7 +66,6 @@
     <string name="dc_local_block_desc_1">Escolha entre mais de 195 listas de bloqueio. Toque aqui para baixar ou configurar listas de bloqueio.</string>
     <string name="dc_custom_block_heading">Regras de domínio</string>
     <string name="dc_block_heading">regras</string>
-    <string name="dc_other_settings_heading">avançado</string>
     <string name="dc_dns_website_heading">Mostrar ícone de site em registros do DNS (experimental)</string>
     <string name="about_github">Contribua no GitHub</string>
     <string name="about_mozilla">RethinkDNS faz parte do programa MVP da Mozilla Builders.</string>
@@ -160,7 +159,7 @@
     <string name="rt_edit_dialog_positive">Editar</string>
     <string name="rt_download">Baixar listas de bloqueio</string>
     <string name="rt_chip_update_available">Atualização disponível</string>
-    <string name="rt_list_adv_btn_txt">avançado</string>
+    <string name="lbl_advanced">avançado</string>
     <string name="lbbs_redownload">Baixar novamente listas de bloqueio</string>
     <string name="lbbs_download">Atualizar listas de bloqueio</string>
     <string name="brbs_backup_dialog_message">Faz backup de configurações do app, rede e registros de dns no arquivo. Isto reiniciará a VPN.</string>
@@ -231,7 +230,7 @@
 \n<u>Proxy TCP</u>: RethinkDNS encaminha apenas conexões TCP de todos os apps, exceto os excluídos ao Orbot.
 \n<u>Proxy HTTP</u>: RethinkDNS <i>configura</i> um proxy HTTP, mas não impõe que os aplicativos o usem. Normalmente, navegadores como Chrome e Firefox o usam. Os apps que usam o proxy HTTP(S) ignorarão as regras do firewall e DNS.</string>
     <string name="settings_autostart_bootup_heading">Início automático ao ligar (experimental)</string>
-    <string name="settings_https_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
+    <string name="settings_https_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
     <string name="settings_general_header">geral</string>
     <string name="settings_autostart_bootup_desc">Ao ligar o dispositivo, inicie RethinkDNS se ele estava funcionando antes de desligar aparelho.</string>
     <string name="isolate">restringir</string>
@@ -391,7 +390,7 @@
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc">Toque aqui para instalar Orbot</string>
-    <string name="settings_socks5_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
+    <string name="settings_socks5_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
     <string name="settings_socks5_vpn_disabled_error">Iniciar RethinkDNS para continuar.</string>
     <string name="settings_orbot_disabled_error">Desative proxy HTTP(S) e/ou SOCKS5 para continuar com a configuração do Tor-como-proxy.</string>
     <string name="settings_orbot_notification_content">Falha ao iniciar Tor-como-Proxy. Abra Orbot app para iniciá-lo manualmente.</string>
@@ -518,7 +517,7 @@
     <string name="cd_dns_crypt_dialog_name">Nome</string>
     <string name="cd_dns_crypt_dialog_stamp">Selo</string>
     <string name="cd_dns_crypt_dialog_desc">Descrição (opcional)</string>
-    <string name="cd_dialog_positive_btn">adicionar</string>
+    <string name="lbl_add">adicionar</string>
     <string name="cd_dns_crypt_error_text_1">Selo não pode estar vazio</string>
     <string name="cd_doh_dialog_heading">Adicionar DNS sobre HTTPS</string>
     <string name="cd_doh_dialog_resolver_name">Nome do resolvedor</string>
@@ -572,7 +571,6 @@
 \nNúmero da porta: %3$s</string>
     <string name="dns_proxy_port">Número da porta</string>
     <string name="dns_proxy_ip_address">Endereço do IP</string>
-    <string name="dns_proxy_positive_btn">adicionar</string>
     <string name="fapps_filter_parent_installed">Instalada</string>
     <string name="fapps_filter_parent_system">Sistema</string>
     <string name="fapps_firewall_filter_bypass_universal">Contornado</string>
@@ -655,7 +653,6 @@
     <string name="build__flavor_website">site</string>
     <string name="build__flavor_play_store">play</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_dialog_header">Domínios personalizados: %1$s</string>
     <string name="cd_toast_deleted">Domínio removido da lista personalizada</string>
     <string name="cd_toast_added">Domínio adicionado com sucesso</string>
     <string name="cd_remove_dialog_title">Apagar domínio\?</string>
@@ -672,7 +669,6 @@
     <string name="ci_dialog_edittext_hint">Endereço IP, sub-rede ou porta</string>
     <string name="ci_dialog_error_invalid_ip">Endereço IP, sub-rede ou porta inválida.</string>
     <string name="ci_dialog_added_success">IP adicionado à lista</string>
-    <string name="ci_header">Regras de IP e portas: %1$s</string>
     <string name="ci_no_rules_text">Nenhuma regra universal de bloqueio ou contorno de IP encontrada.</string>
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="ci_bypass_universal_txt">Autorização universal</string>

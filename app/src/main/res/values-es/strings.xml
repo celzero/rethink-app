@@ -11,7 +11,6 @@
     <string name="firewall_rule_isolate">Aislamiento</string>
     <string name="firewall_rule_block_udp_ntp_desc">Una regla del cortafuegos activada por el usuario bloqueó esta conexión <i>UDP</i>.<br/><br/> Para cambiarla, vaya a la pestaña <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip">IP omitida</string>
-    <string name="dc_other_settings_heading">avanzado</string>
     <string name="about_website_link">https://www.rethinkdns.com/</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
@@ -187,7 +186,7 @@
     <string name="cd_dns_crypt_dialog_name">Nombre</string>
     <string name="cd_dns_crypt_relay_heading">Repetidor</string>
     <string name="cd_doh_dialog_resolver_name">Nombre del servidor de resoluciones</string>
-    <string name="cd_dialog_positive_btn">añadir</string>
+    <string name="lbl_add">añadir</string>
     <string name="cd_doh_dialog_heading">Añadir DNS sobre HTTPS</string>
     <string name="cd_dns_crypt_error_text_1">El sello no puede estar vacío</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
@@ -318,7 +317,6 @@
     <string name="build__flavor_play_store">Play</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="cd_toast_deleted">Dominio eliminado de la lista personalizada</string>
-    <string name="cd_dialog_header">Reglas de dominio: %1$s</string>
     <string name="ci_dialog_title">Añadir regla de IP/puerto</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ci_no_rule_txt">Ninguna regla</string>
@@ -531,7 +529,6 @@
     <string name="univ_delete_firewall_dialog_title">¿Borrar todas las reglas IP\?</string>
     <string name="univ_delete_firewall_dialog_message">El borrado de estas reglas permitiría a cualquier aplicación conectarse a las IPs actualmente bloqueadas.</string>
     <string name="dns_connected">Conectado</string>
-    <string name="dns_proxy_positive_btn">Añadir</string>
     <string name="fapps_filter_filter_heading">Tipo</string>
     <string name="fapps_filter_categories_heading">Categorías</string>
     <string name="orbot_toast_parameter">Tor-como-un-proxy</string>
@@ -563,7 +560,6 @@
     <string name="ci_dialog_edittext_hint">Dirección IP, subred o puerto</string>
     <string name="ci_dialog_error_invalid_ip">Dirección IP, subred o puerto no válidos.</string>
     <string name="ci_dialog_added_success">IP añadida a la lista</string>
-    <string name="ci_header">Reglas de IP y puertos: %1$s</string>
     <string name="ci_no_rules_text">No hay reglas de IP o puerto.</string>
     <string name="ada_app_unmetered">Sin límites</string>
     <string name="ada_app_metered">Con límites</string>
@@ -598,7 +594,7 @@
     <string name="rt_dialog_neutral">Continuar</string>
     <string name="rt_chip_check_update">Buscar actualizaciones</string>
     <string name="rt_re_download">Volver a descargar las listas de bloqueo</string>
-    <string name="rt_list_adv_btn_txt">avanzado</string>
+    <string name="lbl_advanced">avanzado</string>
     <string name="rt_list_simple_btn_txt">Simple</string>
     <string name="rethink_max_desc">Más de 50 ubicaciones; más privadas; resolución recursiva que funciona en fly.io</string>
     <string name="rethink_sky_desc">Más de 280 ubicaciones; mayor tiempo de actividad; resolución local que se ejecuta en cloudflare.com</string>
@@ -673,7 +669,7 @@
     <string name="settings_check_update_desc">Comprueba automáticamente las actualizaciones de la aplicación una vez a la semana.</string>
     <string name="settings_https_desc">Esta configuración es sólo una recomendación y es posible que las aplicaciones la ignoren. Las aplicaciones que utilicen el proxy HTTP(S) omitirán las reglas del Cortafuegos y del DNS.</string>
     <string name="status_dns_error">error de dns</string>
-    <string name="settings_socks5_disabled_error">Conectado a Orbot. Apágalo para continuar.</string>
+    <string name="settings_socks5_disabled_error">Conectado a %1$s. Apágalo para continuar.</string>
     <string name="settings_orbot_notification_content">Fallo al iniciar Tor-como-un-Proxy. Abra la aplicación Orbot para iniciarla manualmente.</string>
     <string name="settings_orbot_notification_action">Abrir Orbot</string>
     <string name="settings_all_networks_dialog_positive_btn">Activar de todos modos</string>
@@ -698,7 +694,7 @@
     <string name="orbot_none_desc">Ninguna de las anteriores.</string>
     <string name="orbot_status_arg_3">DNS y TCP</string>
     <string name="settings_orbot_heading">Configuración de Orbot</string>
-    <string name="settings_https_disabled_error">Conectado a Orbot. apague para continuar.</string>
+    <string name="settings_https_disabled_error">Conectado a %1$s. apague para continuar.</string>
     <string name="settings_general_header">general</string>
     <string name="settings_ptrans_heading">Forzar la salida de IPv4</string>
     <string name="orbot_bs_status_4">Configuración de Tor-como-un-Proxy (Orbot) con un solo clic.</string>

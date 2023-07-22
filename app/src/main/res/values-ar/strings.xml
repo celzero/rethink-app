@@ -22,7 +22,7 @@
     <string name="settings_dns_proxy_dialog_password">كلمة المرور</string>
     <string name="settings_notification_desc1">إيقاف مؤقت / إيقاف (افتراضي)</string>
     <string name="ada_app_bypass_univ">تجاوز عالمي</string>
-    <string name="rt_list_adv_btn_txt">المتقدمة</string>
+    <string name="lbl_advanced">المتقدمة</string>
     <string name="dns_crypt_relay_remove_dialog_message">احذف مرحل DNSCrypt من التكوين المحفوظ.</string>
     <string name="orbot_install_dialog_title">تثبيت Orbot؟</string>
     <string name="settings_check_update_desc">تحقق تلقائيًا من تحديثات التطبيق مرة واحدة في الأسبوع.</string>
@@ -227,7 +227,6 @@
     <string name="firewall_rule_block_dns_bypass">تجاوز DNS</string>
     <string name="new_app_notification_content">منع RethinkDNS التطبيق المثبت مؤخرًا ، %1$s.</string>
     <string name="build__flavor_fdroid">فدرويد</string>
-    <string name="cd_dialog_header">%1$s: المجال (المجالات) المخصص</string>
     <string name="cd_toast_added">تمت إضافة المجال بنجاح</string>
     <string name="lbbs_enabled">‮مُفعّل</string>
     <string name="status_protected_with_private_dns">محمي بنظام أسماء النطاقات الخصوصي</string>
@@ -237,7 +236,7 @@
     <string name="configure_dns_crypt">DNSCrypt: محللات %1$s</string>
     <string name="download_update_dialog_title">تحديث جديد!</string>
     <string name="settings_proxy_header">وكيل (بروكسي)</string>
-    <string name="settings_https_disabled_error">متصل بـ Orbot. قم بإيقاف تشغيله للمتابعة.</string>
+    <string name="settings_https_disabled_error">متصل بـ %1$s. قم بإيقاف تشغيله للمتابعة.</string>
     <string name="settings_http_proxy_desc">إعادة توجيه إلى %1$s: %2$s</string>
     <string name="settings_socks5_dialog_hint_ip">عنوان الإنترنت (IP address)</string>
     <string name="about_mail_bugreport_share_title">حدد مزود البريد الإلكتروني</string>
@@ -271,7 +270,6 @@
     <string name="settings_socks_forwarding_default_desc">قم بإعادة توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
     <string name="settings_theme_dialog_themes_4">أسود قاتم</string>
     <string name="dc_block_heading">قواعد</string>
-    <string name="dc_other_settings_heading">المتقدمة</string>
     <string name="dc_local_block_heading">قوائم الحظر على الجهاز</string>
     <string name="about_bug_no_log_dialog_message">تعذر جلب سجلات التعطل. هل تريد الإبلاغ عن الخطأ الخاص بك يدويًا؟</string>
     <string name="about_mail_bugreport_text">أرسل هذا البريد الإلكتروني إلى: hello@celzero.com</string>
@@ -332,7 +330,6 @@
     <string name="about_version">ضد %1$s</string>
     <string name="contributors_dialog_title">المؤلفين</string>
     <string name="dns_btm_resolved_crypt">تم حل <u> بشكل مجهول </u> %1$s بواسطة %2$s</string>
-    <string name="dns_proxy_positive_btn">إضافة</string>
     <string name="fapps_firewall_filter_isolate">إغلاق</string>
     <string name="settings_local_blocklist_dialog_positive">تنزيل</string>
     <string name="other_dns_list_tab1">DoH</string>
@@ -346,7 +343,6 @@
     <string name="cd_toast_deleted">تمت إزالة المجال من القائمة المخصصة</string>
     <string name="cd_dialog_error_invalid_domain">URL غير صالح (المجال).</string>
     <string name="cd_no_rule_initial">ش</string>
-    <string name="ci_header">قواعد عناوين IP و المنافذ: %1$s</string>
     <string name="ada_app_status_exclude">مستثنى من نظام dns وجدار الحماية</string>
     <string name="ada_network_log_title">سجل الشبكة لهذا التطبيق</string>
     <string name="notif_download_failure_content">التحميل فشل. حاول مرة أخرى.</string>
@@ -426,7 +422,7 @@
     <string name="hsf_uptime">(نشط منذ %1$s ؛ البروتوس: %2$s)</string>
     <string name="dc_local_block_desc_1">اختر من بين 185+ قائمة الحظر. انقر هنا لتنزيل أو تكوين قوائم الحظر.</string>
     <string name="about_bug_report_dialog_positive_btn">أرسل بريد الكتروني</string>
-    <string name="cd_dialog_positive_btn">إضافة</string>
+    <string name="lbl_add">إضافة</string>
     <string name="dns_btm_sheet_chip">+ %1$s عناوين IP أخرى</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="dns_connected_rethink_plus">متصل. %1$s قوائم الحظر قيد الاستخدام</string>
@@ -469,7 +465,7 @@
     <string name="configure_dns_connected_doh_status">إستخدام DNS بدلا من HTTPS</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_orbot_desc">Orbot في وضع غير vpn مع HTTPS / SOCKS5.</string>
-    <string name="settings_socks5_disabled_error">متصل بـ Orbot. قم بإيقاف تشغيله للمتابعة.</string>
+    <string name="settings_socks5_disabled_error">متصل بـ %1$s. قم بإيقاف تشغيله للمتابعة.</string>
     <string name="settings_general_header">جنرال لواء</string>
     <string name="settings_socks_forwarding_desc">إعادة التوجيه إلى %1$s: %2$s ، %3$s</string>
     <string name="apps_icon_content_desc">أيقونة التطبيق</string>

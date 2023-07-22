@@ -256,7 +256,7 @@
     <string name="cd_dns_crypt_relay_heading" translatable="true">リレー</string>
     <string name="cd_dns_crypt_dialog_name" translatable="true">名称</string>
     <string name="cd_dns_crypt_dialog_desc" translatable="true">説明 (オプション)</string>
-    <string name="cd_dialog_positive_btn" translatable="true">追加</string>
+    <string name="lbl_add" translatable="true">追加</string>
     <string name="cd_doh_dialog_resolver_url" translatable="true">リゾルバURL</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">リレー</string>
     <string name="cd_dns_alg_heading" translatable="true">高度なDNSフィルタリング（試験的）</string>
@@ -297,7 +297,6 @@
     <string name="dns_proxy_name" translatable="true">プロキシ名</string>
     <string name="dns_proxy_app" translatable="true">アプリ</string>
     <string name="dns_proxy_port" translatable="true">ポート番号</string>
-    <string name="dns_proxy_positive_btn" translatable="true">追加</string>
     <string name="fapps_filter_filter_heading" translatable="true">タイプ</string>
     <string name="fapps_filter_categories_heading" translatable="true">カテゴリー</string>
     <string name="fapps_info_exclude_msg" translatable="true">DNSとファイアウォールの両方から除外する。</string>
@@ -418,7 +417,7 @@
     <string name="settings_theme_desc" translatable="true">ダーク/ライトテーマ</string>
     <string name="settings_general_customize" translatable="true">カスタマイズ</string>
     <string name="settings_orbot_heading" translatable="true">Orbotのセットアップ</string>
-    <string name="settings_socks5_disabled_error" translatable="true">Orbotに接続されています。続行するにはOFFにしてください。</string>
+    <string name="settings_socks5_disabled_error" translatable="true">%1$sに接続されています。続行するにはOFFにしてください。</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">Rethinkを起動して始める。</string>
     <string name="settings_orbot_notification_action" translatable="true">Orbotを開く</string>
     <string name="settings_autostart_bootup_desc" translatable="true">デバイスの電源投入時に、シャットダウン前にRethinkDNSが動作していた場合は、RethinkDNSが自動的に起動します。</string>
@@ -495,13 +494,12 @@
 \n
 \n%2$s</string>
     <string name="orbot_stop_dialog_message" translatable="true">RethinkDNSはOrbotへの接続転送を停止していますが、Orbotはバックグラウンドで動作している可能性があります。</string>
-    <string name="settings_https_disabled_error" translatable="true">Orbotに接続されています。続行するにはOFFにしてください。</string>
+    <string name="settings_https_disabled_error" translatable="true">%1$sに接続されています。続行するにはOFFにしてください。</string>
     <string name="settings_orbot_notification_content" translatable="true">Tor-as-a-Proxy の起動失敗。 Orbotアプリを開き、手動で起動します。</string>
     <string name="settings_http_proxy_desc" translatable="true">%1$s に転送する :%2$s</string>
     <string name="firewall_status_block_unmetered" translatable="true">定額制 (wifi) ネットワークでブロック</string>
     <string name="hsf_start_dialog_positive" translatable="true">開始</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+を有効にする</string>
-    <string name="dc_other_settings_heading" translatable="true">上級者向け</string>
     <string name="about_bravedns_explantion" translatable="true">RethinkDNSは、アンドロイド端末上のアプリの動作を監視し、インターネット検閲を回避し、アプリをファイアウォールするための最も簡単な方法です。</string>
     <string name="about_bravedns_toreport_text" translatable="true">ヘルプ＆フィードバック</string>
     <string name="about_bug_report_desc" translatable="true">メールクラッシュログ</string>
@@ -580,7 +578,6 @@
     <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">バイパスされたアプリ</string>
     <string name="firewall_rule_block_domain" translatable="true">ドメイン (アプリ)</string>
     <string name="firewall_rule_exempt_orbot_setup" translatable="true">Orbot セットアップ</string>
-    <string name="cd_dialog_header" translatable="true">ドメイン ルール: %1$s</string>
     <string name="cd_remove_dialog_message" translatable="true">保存された設定からドメインを削除する。</string>
     <string name="notif_channel_desc_vpn_failure" translatable="true">RethinkDNSがAndroidまたは別のVPNアプリによって停止されたときに通知する</string>
     <string name="cd_toast_added" translatable="true">ドメインが正常に追加されました</string>

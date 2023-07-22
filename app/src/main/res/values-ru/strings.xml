@@ -113,7 +113,6 @@
     <string name="alert_firewall_accessibility_regrant_explanation">Служба доступности Rethink остановилась или произошел сбой. <i><b>Перейдите Настройки и принудительно остановите</b></i> Rethink и запустите его снова, чтобы использовать функцию <i>Блокировки любого неиспользуемого приложения</i>.
 \n
 \nRethink использует службу доступности для отслеживания того, какие приложения используются (открыты), а какие не используются (в фоне).</string>
-    <string name="dc_other_settings_heading">Расширенные</string>
     <string name="bsct_block_ip">Блокировать, доверять <u>этому IP</u> для <u>этого приложения</u></string>
     <string name="bsct_conn_block_desc">заблокирован %1$s по %2$s</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>: Блокирует приложение от подключения к интернету.
@@ -194,12 +193,11 @@
     <string name="cd_dns_crypt_dialog_stamp">Штамп</string>
     <string name="always_on_dialog_heading">Отключить постоянно включенную VPN</string>
     <string name="local_blocklist_redownload_desc">Списки блокировки на устройстве уже обновлены до последней версии v%1$s.</string>
-    <string name="cd_dialog_positive_btn">добавить</string>
+    <string name="lbl_add">добавить</string>
     <string name="fav_icon">fav_icon</string>
     <string name="conn_track_clear_logs_title">Удалить все сетевые журналы\?</string>
     <string name="hsf_proxy_chip_remove_text">Остановка…</string>
     <string name="contributors_dialog_title">Авторы</string>
-    <string name="dns_proxy_positive_btn">добавить</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">Удалить резолвер DNSCrypt\?</string>
     <string name="dns_proxy_remove_dialog_message">Удалить DNS-прокси из сохраненной конфигурации.</string>
     <string name="fapps_filter_parent_system">Системные</string>
@@ -368,7 +366,6 @@
     <string name="ci_bypass_universal_initial">BU</string>
     <string name="cd_dialog_desc">Пользовательский URL (домен) или дикий символ для разрешения или блокировки. например, *.test.com, test.com/test</string>
     <string name="ci_dialog_desc">Разрешить (обход) или заблокировать IP-адрес, IP-подсеть (диапазон), порт. Пример: 10.10.10.10, 10.1.1.*, 10.2.2/24, ffff::/104, [::]:80, [10.1.0.0/16]:80, *.*:80</string>
-    <string name="ci_header">Правила IP и портов: %1$s</string>
     <string name="ci_no_rule">Нет правил</string>
     <string name="ci_no_rule_initial">N</string>
     <string name="ada_app_status_allow">разрешено</string>
@@ -401,7 +398,7 @@
     <string name="rt_filter_desc_subgroups">Показывает <u>%1$s</u> списки блокировки в группе: %2$s и подгруппе: %3$s</string>
     <string name="lbbs_enabled">Включено</string>
     <string name="rt_list_simple_btn_txt">простой</string>
-    <string name="rt_list_adv_btn_txt">продвинутый</string>
+    <string name="lbl_advanced">продвинутый</string>
     <string name="rethink_sky_desc">280+ местоположений; более высокое время работы; резолвер заглушки работает на cloudflare.com</string>
     <string name="brbs_backup_dialog_positive">Резервное копирование</string>
     <string name="brbs_backup_dialog_failure_title">Не удалось создать резервную копию</string>
@@ -672,7 +669,6 @@
     <string name="notif_channel_desc_firewall_alerts">Оповещение об ошибках и аномалиях брандмауэра</string>
     <string name="notif_channel_desc_proxy_failure">Оповещение об ошибках и аномалиях в прокси-серверах</string>
     <string name="category_name_installed">Установленные приложения</string>
-    <string name="cd_dialog_header">Пользовательский домен(ы): %1$s</string>
     <string name="settings_orbot_install_desc">Нажмите здесь, чтобы установить Orbot</string>
     <string name="orbot_toast_parameter">Tor-as-a-proxy</string>
     <string name="orbot_socks5">Прокси-сервер только для TCP</string>
@@ -680,7 +676,7 @@
     <string name="about_bravedns_whoarewe">Rethink - это свободный проект с открытым исходным кодом, возглавляемый бывшими инженерами из Amazon, IBM и Scientific Games.</string>
     <string name="orbot_app_issue">Не удалось запустить Orbot. Он установлен\?</string>
     <string name="orbot_stop_dialog_dns_message">Rethink настроен на пересылку DNS-запросов в Orbot. Измените по мере необходимости.</string>
-    <string name="settings_https_disabled_error">Подключен к Orbot. Выключите его, чтобы продолжить.</string>
+    <string name="settings_https_disabled_error">Подключен к %1$s. Выключите его, чтобы продолжить.</string>
     <string name="settings_orbot_notification_action">Открыть Orbot</string>
     <string name="settings_autostart_bootup_desc">Запустить Rethink при включении устройства, если он был запущен до выключения.</string>
     <string name="orbot_title">Orbot и прокси</string>
@@ -694,7 +690,7 @@
     <string name="orbot_install_dialog_message">Orbot переносит возможности и функциональность Tor на Android.</string>
     <string name="settings_all_networks_dialog_positive_btn">Включить в любом случае</string>
     <string name="orbot_bs_status_trying_connect">Настройка Orbot…</string>
-    <string name="settings_socks5_disabled_error">Подключен к Orbot. Выключите его, чтобы продолжить.</string>
+    <string name="settings_socks5_disabled_error">Подключен к %1$s. Выключите его, чтобы продолжить.</string>
     <string name="settings_check_update_desc">Автоматически проверять наличие обновлений приложений раз в неделю.</string>
     <string name="settings_orbot_heading">Настройка Orbot</string>
     <string name="settings_autostart_bootup_heading">Автоматический запуск при включении питания (экспериментально)</string>

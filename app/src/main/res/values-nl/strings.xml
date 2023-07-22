@@ -38,9 +38,9 @@
     <string name="settings_https_heading">HTTP(S)-proxy instellen</string>
     <string name="orbot_http_desc">Beveelt aan dat apps de HTTP-proxy van Orbot gebruiken.</string>
     <string name="orbot_stop_dialog_dns_message">RethinkDNS is ingesteld om DNS queries door te sturen naar Orbot. Verander indien nodig.</string>
-    <string name="settings_socks5_disabled_error">Verbonden met Orbot. Zet het uit om verder te gaan.</string>
+    <string name="settings_socks5_disabled_error">Verbonden met %1$s. Zet het uit om verder te gaan.</string>
     <string name="settings_import_export_heading">Back-up &amp; Herstel</string>
-    <string name="settings_https_disabled_error">Verbonden met Orbot. Zet het uit om verder te gaan.</string>
+    <string name="settings_https_disabled_error">Verbonden met %1$s. Zet het uit om verder te gaan.</string>
     <string name="settings_autostart_bootup_desc">Start RethinkDNS bij het opstarten van het apparaat als het actief was voor het afsluiten.</string>
     <string name="settings_autostart_bootup_heading">Auto-start bij opstarten (experimenteel)</string>
     <string name="settings_all_networks_dialog_message">Indien ingeschakeld, worden app firewall regels voor gemeten (bijv. Mobiel) en niet gemeten (bijv. WiFi) niet gehonoreerd.
@@ -421,7 +421,6 @@
     <string name="hsf_exclude_error">Uitsluiten niet mogelijk in VPN-lockdownsmodus</string>
     <string name="hsf_chip_appearance">Thema: %1$s</string>
     <string name="hsf_pause_lockdown_failure">Kan niet pauzeren: RethinkDNS in lockdown modus</string>
-    <string name="dc_other_settings_heading">geavanceerd</string>
     <string name="dc_custom_block_heading">Individuele domeinen toestaan of weigeren</string>
     <string name="dc_dns_website_heading">Toon website-icoontje in DNS-logs (experimenteel)</string>
     <string name="about_bravedns_toreport_text">hulp en feedback</string>
@@ -469,7 +468,6 @@
     <string name="dns_query_latency">%1$sms</string>
     <string name="dns_proxy_dialog_header_dns">DNS-proxy toevoegen</string>
     <string name="dns_proxy_app">App</string>
-    <string name="dns_proxy_positive_btn">toevoegen</string>
     <string name="fapps_filter_categories_heading">Categorieën</string>
     <string name="fapps_filter_parent_installed">Geïnstalleerd</string>
     <string name="fapps_filter_parent_system">Systeem</string>
@@ -517,7 +515,7 @@
     <string name="cd_dns_crypt_dialog_name">Naam</string>
     <string name="cd_dns_crypt_dialog_stamp">Stempel</string>
     <string name="cd_dns_crypt_dialog_desc">Beschrijving (optioneel)</string>
-    <string name="cd_dialog_positive_btn">toevoegen</string>
+    <string name="lbl_add">toevoegen</string>
     <string name="cd_dns_crypt_error_text_1">Stempel kan niet leeg zijn</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s andere app(s)</string>
     <string name="ctbs_block_other_apps">De regels voor %1$s gelden ook voor %2$s andere apps</string>

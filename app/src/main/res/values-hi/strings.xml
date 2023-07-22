@@ -186,7 +186,7 @@
     <string name="settings_orbot_desc" translatable="true">एचटीटीपीएस/ सॉक्स5 के साथ गैर-वीपीएन मोड में ऑर्बोट।</string>
     <string name="settings_orbot_install_desc" translatable="true">ऑर्बोट इंस्टॉल करने के लिए यहां टैप करें</string>
     <string name="settings_orbot_disabled_error" translatable="true">टॉर-एक-प्रॉक्सी-के-रूप-में सेटअप के साथ जारी रखने के लिए एचटीटीपी(एस) और/या सॉक्स5 प्रॉक्सी को बंद करें।</string>
-    <string name="settings_https_disabled_error" translatable="true">ऑर्बोट से जुड़ा है। जारी रखने के लिए इसे बंद करें।</string>
+    <string name="settings_https_disabled_error" translatable="true">%1$s से जुड़ा है। जारी रखने के लिए इसे बंद करें।</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">आगे बढ़ने के लिए रीथिंक शुरू करें।</string>
     <string name="settings_orbot_notification_action" translatable="true">ऑर्बोट खोले</string>
     <string name="settings_all_networks_dialog_title" translatable="true">सावधान!</string>
@@ -251,7 +251,6 @@
     <string name="hsf_pause_vpn_failure" translatable="true">रोक नहीं सकते: रीथिंक सक्रिय नहीं है</string>
     <string name="dc_custom_dns_radio" translatable="true">अन्य डीएनएस</string>
     <string name="dc_entries" translatable="true">%1$s एंट्री</string>
-    <string name="dc_other_settings_heading" translatable="true">एडवांस</string>
     <string name="dc_rethink_dns_radio" translatable="true">रीथिंक डीएनएस</string>
     <string name="dc_custom_block_heading" translatable="true">डोमेन नियम</string>
     <string name="dc_dns_leaks_heading" translatable="true">डीएनएस लीक को रोकें</string>
@@ -388,8 +387,6 @@
     <string name="dns_proxy_ip_address" translatable="true">आइपी पता</string>
     <string name="ci_no_rules_text" translatable="true">कोई आईपी या पोर्ट नियम नहीं।</string>
     <string name="ci_bypass_universal_initial" translatable="true">बीयू</string>
-    <string name="cd_dialog_header" translatable="true">डोमेन नियम: %1$s</string>
-    <string name="ci_header" translatable="true">आईपी और पोर्ट नियम: %1$s</string>
     <string name="ci_bypass_universal_txt" translatable="true">यूनिवर्सल बाईपास</string>
     <string name="ci_no_rule_initial" translatable="true">एन</string>
     <string name="ada_noapp_dialog_positive" translatable="true">ठीक है</string>
@@ -445,7 +442,7 @@
     <string name="cd_doh_dialog_resolver_name" translatable="true">रिजॉल्वर नाम</string>
     <string name="ctbs_block_other_apps" translatable="true">%1$s के लिए लागू नियम %2$s अन्य ऐप्स के लिए भी लागू होंगे</string>
     <string name="cd_dns_crypt_resolver_heading" translatable="true">रिज़ॉल्वर</string>
-    <string name="cd_dialog_positive_btn" translatable="true">जोड़ें</string>
+    <string name="lbl_add" translatable="true">जोड़ें</string>
     <string name="univ_firewall_rule_5" translatable="true">डीएनएस को बायपास करने पर ब्लॉक करें</string>
     <string name="univ_firewall_rule_6" translatable="true">नए इंस्टॉल किए गए ऐप्स को ब्लॉक करें डिफ़ॉल्ट रूप से</string>
     <string name="univ_firewall_rule_7" translatable="true">आईपीवी6 में आईपीवी4 को ब्लॉक करें (प्रयोगात्मक)</string>
@@ -458,7 +455,6 @@
 \n
 \nपोर्ट नंबर: %3$s</string>
     <string name="dns_proxy_app" translatable="true">ऐप</string>
-    <string name="dns_proxy_positive_btn" translatable="true">जोड़ें</string>
     <string name="fapps_filter_filter_heading" translatable="true">प्रकार</string>
     <string name="fapps_info_isolate_msg" translatable="true">विश्वसनीय आईपी को छोड़कर सभी को अवरोधित करें।</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">बिनमीटर को ब्लॉक करें</string>
@@ -589,7 +585,7 @@
     <string name="orbot_stop_dialog_neutral" translatable="true">डीएनएस बदलें</string>
     <string name="orbot_install_dialog_message" translatable="true">ऑर्बोट टॉर की सुविधाओं और कार्यक्षमता को एंड्रॉइड पर लाता है।</string>
     <string name="settings_orbot_header" translatable="true">ऑर्बोट</string>
-    <string name="settings_socks5_disabled_error" translatable="true">ऑर्बोट से जुड़ा है। जारी रखने के लिए इसे बंद करें।</string>
+    <string name="settings_socks5_disabled_error" translatable="true">%1$s से जुड़ा है। जारी रखने के लिए इसे बंद करें।</string>
     <string name="settings_orbot_notification_content" translatable="true">टॉर-एक-प्रॉक्सी-के-रूप-में प्रारंभ करने में विफलता। इसे मैन्युअल रूप से प्रारंभ करने के लिए ऑर्बोट ऐप खोलें।</string>
     <string name="settings_general_header" translatable="true">आम</string>
     <string name="settings_autostart_bootup_heading" translatable="true">पावर-अप पर ऑटो-स्टार्ट (प्रयोगात्मक)</string>
@@ -723,7 +719,7 @@
     <string name="ada_app_metered" translatable="true">मीटर्ड</string>
     <string name="ada_app_bypass_univ" translatable="true">यूनिवर्सल बाईपास</string>
     <string name="ada_app_isolate" translatable="true">अलग रखे</string>
-    <string name="rt_list_adv_btn_txt" translatable="true">एडवांस</string>
+    <string name="lbl_advanced" translatable="true">एडवांस</string>
     <string name="rbl_parental_control" description="The text appears as part of the blocklist setup screen as categories or headlines" translatable="true">अभिभावक नियंत्रण</string>
     <string name="radio_max_btn" translatable="true">🪂 मैक्स</string>
     <string name="rethink_sky_desc" translatable="true">280+ स्थान; उच्च अपटाइम; cloudflare.com पर चल रहा स्टब रिज़ॉल्वर</string>

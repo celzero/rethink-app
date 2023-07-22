@@ -208,7 +208,6 @@
     <string name="hsf_pause_lockdown_failure">Negalima pristabdyti: RethinkDNS veikia visiško užrakinimo režimu</string>
     <string name="dc_block_heading">taisyklės</string>
     <string name="dc_other_dns_heading">tipas</string>
-    <string name="dc_other_settings_heading">Išplėstiniai</string>
     <string name="dc_custom_dns_radio">Kitas DNS</string>
     <string name="dc_rethink_dns_radio">RethinkDNS</string>
     <string name="dc_entries">%1$s įrašai 🔗</string>
@@ -382,7 +381,6 @@
     <string name="ci_dialog_edittext_hint">IP adresas, potinklis arba prievadas</string>
     <string name="ci_dialog_error_invalid_ip">Netinkamas IP adresas, potinklis arba prievadas.</string>
     <string name="ci_dialog_added_success">IP įtrauktas į sąrašą</string>
-    <string name="ci_header">IP ir prievado taisyklės: %1$s</string>
     <string name="ci_no_rules_text">Nerasta jokių universaliųjų IP blokavimo ar apėjimo taisyklių.</string>
     <string name="ci_bypass_universal_initial">AU</string>
     <string name="ada_noapp_dialog_message">Programėlės informacija nurodytai programėlei nerasta.</string>
@@ -398,7 +396,7 @@
     <string name="bsac_title_desc">Taisyklės taikomos tik šiai programėlei.</string>
     <string name="rt_dialog_neutral">Tęsti</string>
     <string name="rt_list_simple_btn_txt">paprasta</string>
-    <string name="rt_list_adv_btn_txt">išplėstinė</string>
+    <string name="lbl_advanced">išplėstinė</string>
     <string name="rt_download_desc">Atsisiųsti blokavimo sąrašus (apie 60 MB), kad galėtumėte naudotis šia funkcija.</string>
     <string name="radio_sky_btn">⛅ Dangus</string>
     <string name="bsrf_clear_filter">Išvalyti</string>
@@ -512,8 +510,8 @@
     <string name="orbot_install_activity_error">Kažkas nutiko ne taip, pabandykite po kurio laiko</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_install_desc">Bakstelėkite čia, kad įdiegtumėte Orbot</string>
-    <string name="settings_socks5_disabled_error">Prisijungta prie Orbot. Norėdami tęsti, jį išjunkite.</string>
-    <string name="settings_https_disabled_error">Prisijungta prie Orbot. Norėdami tęsti, jį išjunkite.</string>
+    <string name="settings_socks5_disabled_error">Prisijungta prie %1$s. Norėdami tęsti, jį išjunkite.</string>
+    <string name="settings_https_disabled_error">Prisijungta prie %1$s. Norėdami tęsti, jį išjunkite.</string>
     <string name="settings_network_all_networks_desc">Kai įjungta, RethinkDNS naudoja visus galimus tinklus prisijungti prie interneto. Jei ne, ji naudoja tą tinklą, kurį Android laiko <i>aktyviu</i>.</string>
     <string name="settings_socks5_vpn_disabled_error">Norėdami tęsti, paleiskite RethinkDNS.</string>
     <string name="settings_orbot_notification_content">Gedimas paleidžiant Tor kaip įgaliotasis serveris. Atidarykite Orbot programėlę, kad paleistumėte jį rankiniu būdu.</string>
@@ -587,7 +585,7 @@
     <string name="cd_dns_crypt_error_text_1">Antspaudas negali būti tuščias</string>
     <string name="cd_dns_proxy_mode_external">Išorinis</string>
     <string name="cd_dns_proxy_error_text_2">Prievado diapazonas turėtų būti nuo 1024 iki 65535</string>
-    <string name="cd_dialog_positive_btn">pridėti</string>
+    <string name="lbl_add">pridėti</string>
     <string name="cd_doh_dialog_heading">Pridėti DNS per HTTPS</string>
     <string name="dns_btm_record_type">Užklausos tipas: %1$s</string>
     <string name="dns_btm_latency_ms">%1$sms</string>
@@ -606,7 +604,6 @@
     <string name="fapps_filter_categories_heading">Kategorijos</string>
     <string name="fapps_filter_clear_btn">Išvalyti</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
-    <string name="dns_proxy_positive_btn">pridėti</string>
     <string name="fapps_filter_parent_system">Sistemos</string>
     <string name="settings_local_blocklist_in_use">Naudojami %1$s blokavimo sąrašai</string>
     <string name="other_dns_list_tab1">DoH</string>
@@ -651,7 +648,6 @@
     <string name="notif_channed_desc_download">Įspėti apie įrenginio blokavimo sąrašų atsisiuntimo eigą</string>
     <string name="build__flavor_fdroid">fdroid</string>
     <string name="notif_channel_desc_firewall_alerts">Įspėti apie ugniasienės klaidas ir anomalijas</string>
-    <string name="cd_dialog_header">Pasirinktinis (-iai) domenas (-ai): %1$s</string>
     <string name="cd_remove_dialog_title">Ištrinti domeną\?</string>
     <string name="category_name_non_app_sys">Sistemos paslaugos</string>
     <string name="category_name_installed">Įdiegtos programėlės</string>

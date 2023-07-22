@@ -129,7 +129,6 @@
     <string name="hsf_stop_btn_state">parar</string>
     <string name="hsf_notification_permission_failure">Ative a permissão de notificação em Configurações</string>
     <string name="hsf_blocklist_updating_text">A ativar…</string>
-    <string name="dc_other_settings_heading">avançado</string>
     <string name="next">Seguinte</string>
     <string name="slide_2_title">Boas-vindas</string>
     <string name="allow">permitir</string>
@@ -268,7 +267,7 @@
     <string name="firewall_act_universal_tab">universal</string>
     <string name="orbot_app_issue">Não foi possível iniciar o Orbot. Ele está instalado\?</string>
     <string name="settings_socks5_vpn_disabled_error">Inicie o RethinkDNS para prosseguir.</string>
-    <string name="settings_https_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
+    <string name="settings_https_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
     <string name="status_protected_with_proxy_private_dns">protegido com proxy e dns privado</string>
     <string name="always_on_dialog_positive">Parar</string>
     <string name="orbot_bs_status_1">Encaminhando conexões %1$s para Orbot.</string>
@@ -342,7 +341,7 @@
 \n
 \n%2$s</string>
     <string name="orbot_install_dialog_positive">Instalar</string>
-    <string name="settings_socks5_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
+    <string name="settings_socks5_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
     <string name="settings_allow_bypass_desc">Permite que as aplicações ignorem a firewall do RethinkDNS. Algumas aplicações de conferências áudio/vídeo como o Zoom e o WhatsApp podem necessitar de contornar a firewall para funcionar corretamente.</string>
     <string name="orbot_http_desc">Recomenda que as aplicações utilizem o proxy HTTP do Orbot.</string>
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
@@ -441,7 +440,6 @@
     <string name="category_name_sys_components">Componentes do sistema</string>
     <string name="category_name_sys_apps">Aplicações do sistema</string>
     <string name="category_name_installed">Aplicações instaladas</string>
-    <string name="cd_dialog_header">Domínios personalizados: %1$s</string>
     <string name="build__flavor_website">Site da web</string>
     <string name="cd_toast_deleted">Domínio removido da lista personalizada</string>
     <string name="cd_dialog_error_invalid_domain">URL (domínio) inválido.</string>
@@ -525,7 +523,7 @@
     <string name="cd_dns_crypt_resolver_heading">Resolver</string>
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_stamp">Carimbo</string>
-    <string name="cd_dialog_positive_btn">adicionar</string>
+    <string name="lbl_add">adicionar</string>
     <string name="cd_dns_crypt_error_text_1">O carimbo não pode ficar vazio</string>
     <string name="cd_doh_dialog_heading">Adicionar DNS sobre HTTPS</string>
     <string name="cd_dnscrypt_relay_heading">Retransmissores</string>
@@ -566,7 +564,6 @@
     <string name="dns_proxy_dialog_message_no_app">Endereço IP: %1$s
 \n
 \nNúmero da porta: %2$s</string>
-    <string name="dns_proxy_positive_btn">adicionar</string>
     <string name="fapps_filter_filter_heading">Tipo</string>
     <string name="fapps_filter_categories_heading">Categorias</string>
     <string name="fapps_filter_clear_btn">Limpar</string>
@@ -665,7 +662,6 @@
     <string name="ci_dialog_edittext_hint">Endereço IP, sub-rede ou porta</string>
     <string name="ci_dialog_error_invalid_ip">Endereço IP, sub-rede ou porta inválida.</string>
     <string name="ci_dialog_added_success">IP adicionado à lista</string>
-    <string name="ci_header">Regras de IP e porta: %1$s</string>
     <string name="ci_no_rules_text">Nenhuma regra de IP ou porta.</string>
     <string name="ci_bypass_universal_initial">CU</string>
     <string name="ci_bypass_universal_txt">Contorno universal</string>
@@ -709,7 +705,7 @@
     <string name="rt_chip_check_update">Ver se há atualizações</string>
     <string name="rt_re_download">Descarregar novamente as listas de bloqueio</string>
     <string name="rt_list_simple_btn_txt">simples</string>
-    <string name="rt_list_adv_btn_txt">avançado</string>
+    <string name="lbl_advanced">avançado</string>
     <string name="rt_filter_parent_selected">Selecionado</string>
     <string name="rt_download_desc">Descarregar listas de bloqueio (cerca de 60 MB) para usar esta funcionalidade.</string>
     <string name="radio_sky_btn">⛅ Sky</string>

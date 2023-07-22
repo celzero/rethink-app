@@ -139,10 +139,10 @@
     <string name="orbot_install_dialog_title">是否安裝 Orbot ？</string>
     <string name="settings_orbot_heading">設定 Orbot</string>
     <string name="settings_orbot_install_desc">輕觸此處以安裝 Orbot</string>
-    <string name="settings_socks5_disabled_error">已連線至 Orbot 。請先將其關閉。</string>
+    <string name="settings_socks5_disabled_error">已連線至 %1$s 。請先將其關閉。</string>
     <string name="settings_socks5_vpn_disabled_error">啓動 Rethink 以繼續。</string>
     <string name="settings_orbot_disabled_error">關閉 HTTP(S) 與/或 SOCKS5 代理以繼續設定 Tor 代理。</string>
-    <string name="settings_https_disabled_error">已連線至 Orbot 。請先將其關閉。</string>
+    <string name="settings_https_disabled_error">已連線至 %1$s 。請先將其關閉。</string>
     <string name="settings_orbot_notification_content">啓動 Tor 代理失敗。請手動開啓 Orbot 應用。</string>
     <string name="settings_orbot_notification_action">打開 Orbot</string>
     <string name="settings_general_header">一般設定</string>
@@ -243,7 +243,6 @@
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="firewall_rule_unknown_desc">此連線因無法得知<i>來源應用</i>而被攔截。<br/><br/>若需變更此行爲，請至<i>全局</i>選項卡。</string>
     <string name="new_app_bulk_notification_title">注意</string>
-    <string name="cd_dialog_header">自訂網域：%1$s</string>
     <string name="cd_no_rule_initial">無</string>
     <string name="ci_no_rule_txt">無規則</string>
     <string name="ci_bypass_universal">無條件放行</string>
@@ -289,7 +288,6 @@
     <string name="rt_download_desc">請下載攔截清單（約 60 MB ）以使用此功能。</string>
     <string name="brbs_restore_desc">從備份檔中恢復</string>
     <string name="firewall_rule_block_ip_univ_desc">一項用戶定義的全局防火牆規則攔截了此<i>目標 IP / 埠</i>。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
-    <string name="ci_header">IP 與埠規則: %1$s</string>
     <string name="ada_app_status_block">已攔截</string>
     <string name="rbl_parental_control">家長控制</string>
     <string name="rt_download_start">正在下載攔截清單……</string>
@@ -388,7 +386,7 @@
     <string name="cd_no_rule_txt">無規則</string>
     <string name="ada_noapp_dialog_positive">確認</string>
     <string name="ada_app_status_block_wifi">已於非計費網路（ WiFi ）攔截</string>
-    <string name="rt_list_adv_btn_txt">進階</string>
+    <string name="lbl_advanced">進階</string>
     <string name="bsrf_sub_group_heading">子分組</string>
     <string name="brbs_backup_dialog_positive">備份</string>
     <string name="notif_channel_vpn_notification">VPN 已啓用</string>
@@ -497,7 +495,6 @@
     <string name="hsf_pause_lockdown_failure">無法暫停： Rethink 正處於閉關模式</string>
     <string name="dc_block_heading">規則</string>
     <string name="dc_other_dns_heading">類型</string>
-    <string name="dc_other_settings_heading">進階</string>
     <string name="dc_custom_dns_radio">其他 DNS</string>
     <string name="dc_entries">%1$s 條目 »</string>
     <string name="dc_local_block_heading">本地攔截清單</string>
@@ -584,7 +581,7 @@
     <string name="cd_dns_crypt_dialog_name">名稱</string>
     <string name="cd_dns_crypt_dialog_stamp">印戳</string>
     <string name="cd_dns_crypt_dialog_desc">說明（可選）</string>
-    <string name="cd_dialog_positive_btn">添加</string>
+    <string name="lbl_add">添加</string>
     <string name="cd_dns_crypt_error_text_1">印戳不能爲空</string>
     <string name="cd_doh_dialog_heading">添加 DNS over HTTPS</string>
     <string name="cd_doh_dialog_resolver_name">解析服務名稱</string>
@@ -649,7 +646,6 @@
     <string name="dns_proxy_app">應用</string>
     <string name="dns_proxy_ip_address">IP 位址</string>
     <string name="dns_proxy_port">埠</string>
-    <string name="dns_proxy_positive_btn">添加</string>
     <string name="fapps_filter_filter_heading">類型</string>
     <string name="fapps_filter_categories_heading">類別</string>
     <string name="fapps_filter_clear_btn">清除</string>

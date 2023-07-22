@@ -181,10 +181,10 @@
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">Orbot in modalità non-vpn con HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc">Tocca qui per installare Orbot</string>
-    <string name="settings_socks5_disabled_error">Connesso a Orbot. Disabilitarlo per continuare.</string>
-    <string name="settings_socks5_vpn_disabled_error">Avvia Rethink per continuare.</string>
+    <string name="settings_socks5_disabled_error">Connesso a %1$s. Disabilitarlo per continuare.</string>
+    <string name="settings_socks5_vpn_disabled_error">Avvia RethinkDNS per continuare.</string>
     <string name="settings_orbot_disabled_error">Disattiva il proxy HTTP(S) e/o SOCKS5 per continuare a impostare Tor-come-proxy.</string>
-    <string name="settings_https_disabled_error">Connesso a Orbot. Disabilitarlo per continuare.</string>
+    <string name="settings_https_disabled_error">Connesso a %1$s. Disabilitarlo per continuare.</string>
     <string name="settings_orbot_notification_content">Errore durante l\'avvio di Tor-come-Proxy. Apri l\'app Orbot e avvialo manualmente.</string>
     <string name="settings_orbot_notification_action">Apri Orbot</string>
     <string name="settings_general_header">generali</string>
@@ -281,7 +281,6 @@
     <string name="univ_ip_delete_dialog_positive">Elimina tutti</string>
     <string name="fapps_filter_categories_heading">Categorie</string>
     <string name="dns_query_latency">%1$s ms</string>
-    <string name="dns_proxy_positive_btn">aggiungi</string>
     <string name="dns_proxy_dialog_message">Nome app: %1$s
 \n
 \nIndirizzo IP: %2$s
@@ -401,7 +400,6 @@
     <string name="hsf_pause_lockdown_failure">Impossibile mettere in pausa: Rethink è impostata come VPN obbligatoria</string>
     <string name="dc_block_heading">regole</string>
     <string name="dc_other_dns_heading">tipo</string>
-    <string name="dc_other_settings_heading">avanzate</string>
     <string name="dc_custom_dns_radio">Altro DNS</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_entries">%1$s elementi »</string>
@@ -482,7 +480,7 @@
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_desc">Descrizione (facoltativa)</string>
     <string name="cd_dns_crypt_dialog_name">Nome</string>
-    <string name="cd_dialog_positive_btn">aggiungi</string>
+    <string name="lbl_add">aggiungi</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
     <string name="cd_dns_crypt_error_text_1">Lo stamp non può essere vuoto</string>
     <string name="cd_doh_dialog_heading">Aggiungi DNS su HTTPS</string>
@@ -644,7 +642,6 @@
     <string name="build__flavor_website">sito web</string>
     <string name="build__flavor_play_store">play</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_dialog_header">Domini(o) personalizzati/o: %1$s</string>
     <string name="cd_toast_deleted">Dominio rimosso dalla lista</string>
     <string name="cd_toast_added">Dominio aggiunto con successo</string>
     <string name="cd_remove_dialog_title">Elimina dominio\?</string>
@@ -661,8 +658,7 @@
     <string name="ci_dialog_edittext_hint">Indirizzo IP, sottorete o porta</string>
     <string name="ci_dialog_error_invalid_ip">Indirizzo IP, sottorete o porta non validi.</string>
     <string name="ci_dialog_added_success">IP aggiunto alla lista</string>
-    <string name="ci_header">Regole IP e porte: %1$s</string>
-    <string name="ci_no_rules_text">Nessuna regola IP o porta.</string>
+    <string name="ci_no_rules_text">Non è stata trovata alcuna regola IP o porta.</string>
     <string name="ci_bypass_universal_initial">AU</string>
     <string name="ci_bypass_universal_txt">Aggira regole Universali</string>
     <string name="ci_blocked_initial">B</string>
@@ -701,7 +697,7 @@
     <string name="rt_chip_check_update">Controlla aggiornamenti</string>
     <string name="rt_re_download">Ri-scarica le liste dei filtri</string>
     <string name="rt_list_simple_btn_txt">semplice</string>
-    <string name="rt_list_adv_btn_txt">avanzate</string>
+    <string name="lbl_advanced">avanzate</string>
     <string name="rt_download_desc">Per utilizzare questa funzione, scarica le liste dei filtri (circa 60 MB).</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>

@@ -256,9 +256,9 @@
     <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
     <string name="settings_orbot_install_desc" translatable="true">Kliknij tutaj, aby zainstalować Orbot-a</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">Uruchom RethinkDNS, aby kontynuować.</string>
-    <string name="settings_https_disabled_error" translatable="true">Połączony z Orbotem. Wyłącz ją, aby kontynuować.</string>
+    <string name="settings_https_disabled_error" translatable="true">Połączony z %1$s. Wyłącz ją, aby kontynuować.</string>
     <string name="settings_orbot_notification_content" translatable="true">Błąd uruchamiania Tor-as-a-Proxy. Otwórz aplikację Orbot, aby uruchomić ją ręcznie.</string>
-    <string name="settings_socks5_disabled_error" translatable="true">Połączony z Orbotem. Wyłącz, aby kontynuować.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Połączony z %1$sem. Wyłącz, aby kontynuować.</string>
     <string name="settings_ptrans_heading" translatable="true">Wymuś wyjście IPv4</string>
     <string name="settings_network_all_networks_desc" translatable="true">Po włączeniu RethinkDNS używa wszystkich dostępnych sieci do łączenia się z Internetem. Jeśli nie, używa dowolnej sieci, która zostanie uznana za <i>aktywną</i> przez Androida.</string>
     <string name="settings_autostart_bootup_desc" translatable="true">Po włączeniu urządzenia uruchom RethinkDNS, jeśli był uruchomiony przed zamknięciem.</string>
@@ -399,7 +399,6 @@
     <string name="dns_proxy_dialog_message_no_app" translatable="true">Adres IP: %1$s
 \n
 \nNumer portu: %2$s</string>
-    <string name="dns_proxy_positive_btn" translatable="true">dodaj</string>
     <string name="fapps_filter_filter_heading" translatable="true">Typ</string>
     <string name="fapps_filter_clear_btn" translatable="true">Oczyść</string>
     <string name="fapps_firewall_filter_excluded" translatable="true">Wykluczony</string>
@@ -470,7 +469,7 @@
     <string name="notif_download_success_content" translatable="true">Pobieranie zakończone sukcesem.</string>
     <string name="rt_dialog_neutral" translatable="true">Kontynuuj</string>
     <string name="rt_edit_dialog_positive" translatable="true">Edytuj</string>
-    <string name="rt_list_adv_btn_txt" translatable="true">zaawansowane</string>
+    <string name="lbl_advanced" translatable="true">zaawansowane</string>
     <string name="rt_filter_parent_selected" translatable="true">Wybrano</string>
     <string name="rt_download_desc" translatable="true">Pobierz listy blokujące (około 60MB), aby korzystać z tej funkcji.</string>
     <string name="rethink_sky_desc" translatable="true">280+ lokalizacji; wyższy uptime; stub resolver działający na cloudflare.com</string>
@@ -614,7 +613,6 @@
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Przechwytywanie pakietów wyłączone</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Nie można wstrzymać: RethinkDNS nie jest aktywny</string>
     <string name="dc_block_heading" translatable="true">zasady</string>
-    <string name="dc_other_settings_heading" translatable="true">zaawansowane</string>
     <string name="dc_rethink_dns_radio" translatable="true">RethinkDNS</string>
     <string name="dc_dns_leaks_heading" translatable="true">Zapobieganie wyciekom DNS</string>
     <string name="about_bravedns_explantion" translatable="true">RethinkDNS to najprostszy sposób na monitorowanie aktywności aplikacji, obchodzenie cenzury internetowej i zapory aplikacji na urządzeniu z systemem Android.</string>
@@ -655,7 +653,6 @@
     <string name="category_name_sys_components" translatable="true">Komponenty systemu</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Połączenie to zostało dopuszczone, ponieważ domena <i/> jest ustawiona jako zaufana w regułach domeny uniwersalnej.<br/><br/> Aby zmienić to zachowanie przejdź do zakładki <i>Configure DNS</i>.</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">To połączenie zostało zablokowane, ponieważ domena <i/> jest zablokowana przez preferowane przez użytkownika DNS.<br/><br/> Aby zmienić to zachowanie przejdź do zakładki <i>Configure DNS</i>.</string>
-    <string name="ci_header" translatable="true">Reguły IP i portu: %1$s</string>
     <string name="cd_no_rules_text" translatable="true">Nie znaleziono reguł domeny.</string>
     <string name="category_name_installed" translatable="true">Zainstalowane aplikacje</string>
     <string name="category_name_non_app_sys" translatable="true">Usługi systemowe</string>
@@ -687,7 +684,7 @@
     <string name="settings_dns_proxy_dialog_app" translatable="true">Aplikacja</string>
     <string name="settings_app_list_default_app" translatable="true">Nikt</string>
     <string name="hsf_whats_new_chip_text" translatable="true">Co nowego\?</string>
-    <string name="cd_dialog_positive_btn" translatable="true">Dodaj</string>
+    <string name="lbl_add" translatable="true">Dodaj</string>
     <string name="cd_doh_dialog_resolver_name" translatable="true">Nazwa resolwera</string>
     <string name="cd_dns_crypt_error_text_1" translatable="true">Pieczęć nie może być pusta</string>
     <string name="cd_doh_dialog_heading" translatable="true">Dodaj DNS przez HTTPS</string>
@@ -777,7 +774,6 @@
     <string name="hsf_uptime" translatable="true">(aktywny od %1$s; protos: %2$s)</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">To połączenie zostało dopuszczone, ponieważ &lt;i&gt;docelowe IP&lt;/i&gt; jest ustawione na omijanie wszystkich uniwersalnych reguł firewalla.&lt;br/&gt;&lt;br/&gt; Aby zmienić przejdź do &lt;i&gt;Reguł IP&lt;i&gt; w zakładce &lt;i&gt;Uniwersalne&lt;/i&gt;.</string>
     <string name="cd_toast_deleted" translatable="true">Domena usunięta z listy niestandardowej</string>
-    <string name="cd_dialog_header" translatable="true">Reguły domeny: %1$s</string>
     <string name="notif_channel_desc_vpn_failure" translatable="true">Informuj, gdy RethinkDNS zostanie zatrzymany przez system Android lub inną aplikację VPN</string>
     <string name="notif_channel_vpn_failure" translatable="true">Nieaktywny VPN</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Reguła firewalla ustawiona przez użytkownika zablokowała domenę <i/> .<br/><br/> Aby to zmienić przejdź do ekranu <i>App-specific Firewall</i>.</string>
