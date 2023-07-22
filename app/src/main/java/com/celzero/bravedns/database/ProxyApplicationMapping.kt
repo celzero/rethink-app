@@ -17,18 +17,18 @@ package com.celzero.bravedns.database
 
 import androidx.room.Entity
 
-@Entity(tableName = "WgApplicationMapping", primaryKeys = ["uid", "packageName", "wgInterfaceId"])
-class WgApplicationMapping {
+@Entity(tableName = "ProxyApplicationMapping", primaryKeys = ["uid", "packageName", "proxyId"])
+class ProxyApplicationMapping {
 
     var uid: Int = 0
     var packageName: String = ""
     var appName: String = ""
-    var wgInterfaceName: String = ""
+    var proxyName: String = ""
     var isActive: Boolean = false
-    var wgInterfaceId: Int = -1
+    var proxyId: String = ""
 
     override fun equals(other: Any?): Boolean {
-        if (other !is WgApplicationMapping) return false
+        if (other !is ProxyApplicationMapping) return false
         if (packageName != other.packageName) return false
         return true
     }
@@ -41,15 +41,15 @@ class WgApplicationMapping {
         uid: Int,
         packageName: String,
         appName: String,
-        wgInterfaceName: String,
+        proxyName: String,
         isActive: Boolean,
-        wgInterfaceId: Int
+        proxyId: String
     ) {
         this.uid = uid
         this.packageName = packageName
         this.appName = appName
-        this.wgInterfaceName = wgInterfaceName
+        this.proxyName = proxyName
         this.isActive = isActive
-        this.wgInterfaceId = wgInterfaceId
+        this.proxyId = proxyId
     }
 }

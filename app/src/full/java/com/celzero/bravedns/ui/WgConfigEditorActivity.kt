@@ -26,12 +26,13 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_WIREGUARD
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.WgIncludeAppsViewModel
+import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -43,7 +44,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     private val b by viewBinding(ActivityWgConfigEditorBinding::bind)
     private val persistentState by inject<PersistentState>()
 
-    private val mappingViewModel: WgIncludeAppsViewModel by viewModel()
+    private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
     private var wgConfig: Config? = null
     private var wgInterface: WgInterface? = null
     private var configId: Int = -1
@@ -60,7 +61,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, -1)
-        Log.d(LOG_TAG_WIREGUARD, "WgTunnelEditorActivity - tunnelId : $configId")
+        Log.d(LOG_TAG_PROXY, "WgTunnelEditorActivity - tunnelId : $configId")
         init()
         setupClickListeners()
     }
@@ -74,7 +75,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         handleAppsCount()
         wgConfig = WireguardManager.getConfigById(configId)
         wgInterface = wgConfig?.getInterface()
-        Log.d(LOG_TAG_WIREGUARD, "WgTunnelEditorActivity - wgConfig : $wgConfig")
+        Log.d(LOG_TAG_PROXY, "WgTunnelEditorActivity - wgConfig : $wgConfig")
 
         b.interfaceNameText.setText(wgConfig?.getName())
         b.privateKeyText.setText(wgInterface?.getKeyPair()?.getPrivateKey()?.base64())
@@ -100,7 +101,8 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     private fun handleAppsCount() {
         if (configId == -1) return
 
-        mappingViewModel.getAppCountById(configId).observe(this) {
+        val proxyId = ProxyManager.ID_WG_BASE + configId
+        mappingViewModel.getAppCountById(proxyId).observe(this) {
             b.mapApplications.text = getString(R.string.firewall_card_status_active, it.toString())
         }
     }
@@ -171,7 +173,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
             return wgConfig
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]
-            Log.e(LOG_TAG_WIREGUARD, "Exception while parsing wg interface: $error", e)
+            Log.e(LOG_TAG_PROXY, "Exception while parsing wg interface: $error", e)
             Toast.makeText(this, error, Toast.LENGTH_LONG).show()
             return null
         }
@@ -191,10 +193,12 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
 
     private fun showIncludeAppsDialog() {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val appsAdapter = WgIncludeAppsAdapter(this, configId)
+        val proxyId = ProxyManager.ID_WG_BASE + configId
+        val proxyName = WireguardManager.getConfigName(configId)
+        val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         val includeAppsDialog =
-            WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, configId)
+            WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
         includeAppsDialog.setCanceledOnTouchOutside(false)
         includeAppsDialog.show()
     }

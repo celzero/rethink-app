@@ -77,13 +77,22 @@
             android:name=".ui.NetworkLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WgHomeActivity"
+            android:name=".ui.WgMainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.WgConfigEditorActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.WgConfigDetailActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.CheckoutActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.TcpProxyMainActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.UniversalFirewallSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"

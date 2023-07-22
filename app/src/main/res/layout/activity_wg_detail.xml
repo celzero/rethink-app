@@ -40,6 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="30dp"
                     android:padding="10dp"
                     android:text="@string/new_warp_config_desc"
                     android:textColor="?attr/secondaryTextColor"
@@ -68,23 +69,23 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="15dp">
+                    android:padding="10dp">
 
                     <RelativeLayout
-                        android:id="@+id/interface_title_layout"
+                        android:id="@+id/config_title_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/interface_name_text"
+                            android:id="@+id/config_name_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:text=""
                             android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
                             android:layout_toStartOf="@id/interface_edit"
+                            android:text=""
                             android:textAppearance="?attr/textAppearanceHeadline6"
                             android:textColor="?attr/secondaryTextColor" />
 
@@ -121,11 +122,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:labelFor="@+id/public_key_text"
+                        android:labelFor="@+id/config_public_key_text"
                         android:text="@string/lbl_public_key"
                         android:textColor="?attr/primaryTextColor"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/interface_title_layout" />
+                        app:layout_constraintTop_toBottomOf="@id/config_title_layout" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/public_key_text"
@@ -142,9 +143,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textColor="?attr/primaryTextColor"
-                        android:labelFor="@+id/addresses_text"
+                        android:labelFor="@+id/config_addresses_text"
                         android:text="@string/lbl_addresses"
+                        android:textColor="?attr/primaryTextColor"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/public_key_text" />
 
@@ -257,9 +258,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:labelFor="@+id/applications_text"
-                        android:textColor="?attr/primaryTextColor"
+                        android:labelFor="@+id/config_apps_text"
                         android:text="@string/lbl_applications"
+                        android:textColor="?attr/primaryTextColor"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/listen_port_mtu_barrier" />
 
@@ -269,16 +270,14 @@
                         android:layout_height="wrap_content"
                         android:textColor="?attr/primaryTextColor"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/applications_label"
+                        app:layout_constraintTop_toBottomOf="@id/applications_label"
                         tools:text="8 excluded" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/set_included_applications"
+                        android:id="@+id/applications_btn"
                         style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintWidth_max="@dimen/max_btn_size"
-                        android:layout_margin="4dp"
                         android:text="@string/add_remove_apps"
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="@dimen/large_font_text_view"
@@ -286,6 +285,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/applications_text"
+                        app:layout_constraintWidth_max="@dimen/max_btn_size"
                         app:rippleColor="?attr/secondaryTextColor" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -312,7 +312,9 @@
         android:textColor="?attr/primaryTextColor"
         app:backgroundTint="?attr/chipColorBgNormal"
         app:fabSize="mini"
-        app:icon="@android:drawable/ic_dialog_map"
+        app:icon="@drawable/ic_add"
+        app:iconTint="@android:color/transparent"
+        app:iconTintMode="add"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

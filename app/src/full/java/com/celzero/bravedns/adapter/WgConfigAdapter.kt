@@ -20,18 +20,19 @@ import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgInterfaceBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.WgConfigDetailActivity
 import com.celzero.bravedns.ui.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.LoggerConstants
 
-class WgConfigAdapter(private val context: Context, private val persistentState: PersistentState) :
+class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -58,7 +59,7 @@ class WgConfigAdapter(private val context: Context, private val persistentState:
     override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
         val item = getItem(position)
         Log.d(
-            LoggerConstants.LOG_TAG_WIREGUARD,
+            LoggerConstants.LOG_TAG_PROXY,
             "onBindViewHolder: position - $position, ${item?.name}, ${item?.id}"
         )
         val wgConfigFiles: WgConfigFiles = item ?: return
@@ -81,24 +82,31 @@ class WgConfigAdapter(private val context: Context, private val persistentState:
         }
 
         fun setupClickListeners(wgConfigFiles: WgConfigFiles) {
-            b.interfaceNameText.setOnClickListener {
-                val intent = Intent(context, WgConfigDetailActivity::class.java)
-                intent.putExtra(INTENT_EXTRA_WG_ID, wgConfigFiles.id)
-                context.startActivity(intent)
-            }
+            b.interfaceNameText.setOnClickListener { launchConfigDetail(wgConfigFiles.id) }
 
-            b.interfaceSwitch.setOnCheckedChangeListener { _, b ->
-                if (b) {
-                    WireguardManager.enableConfig(wgConfigFiles)
-                    persistentState.wireguardEnabledCount++
+            b.interfaceSwitch.setOnCheckedChangeListener { _, checked ->
+                if (checked) {
+                    if (WireguardManager.canEnableConfig(wgConfigFiles)) {
+                        WireguardManager.enableConfig(wgConfigFiles)
+                    } else {
+                        b.interfaceSwitch.isChecked = false
+                        Toast.makeText(
+                                context,
+                                context.getString(R.string.wireguard_enabled_failure),
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+                    }
                 } else {
                     WireguardManager.disableConfig(wgConfigFiles)
-                    persistentState.wireguardEnabledCount--
-                    if (persistentState.wireguardEnabledCount < 0) {
-                        persistentState.wireguardEnabledCount = 0
-                    }
                 }
             }
+        }
+
+        private fun launchConfigDetail(id: Int) {
+            val intent = Intent(context, WgConfigDetailActivity::class.java)
+            intent.putExtra(INTENT_EXTRA_WG_ID, id)
+            context.startActivity(intent)
         }
     }
 }

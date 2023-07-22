@@ -92,7 +92,7 @@ class WgAddPeerDialog(
                 WireguardManager.addPeer(configId, wgPeer)
                 this.dismiss()
             } catch (e: Throwable) {
-                Log.e(LoggerConstants.LOG_TAG_WIREGUARD, "Error while adding peer", e)
+                Log.e(LoggerConstants.LOG_TAG_PROXY, "Error while adding peer", e)
                 Toast.makeText(context, ErrorMessages[context, e], Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

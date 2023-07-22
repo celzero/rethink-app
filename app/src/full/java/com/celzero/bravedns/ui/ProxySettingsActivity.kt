@@ -33,11 +33,11 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetHttpProxyBinding
@@ -45,19 +45,25 @@ import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
+import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.UiUtils.openUrl
 import com.celzero.bravedns.util.UiUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import ipn.Ipn
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -88,16 +94,24 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         super.onResume()
         refreshOrbotUi()
         handleProxyUi()
+        displayWireguardUi()
     }
 
     private fun initView() {
         b.settingsActivityHttpProxyProgress.visibility = View.GONE
+        b.settingsWireguardTitle.text = getString(R.string.lbl_wireguard).lowercase()
+        b.orbotTitle.text = getString(R.string.orbot).lowercase()
+        b.otherTitle.text = getString(R.string.category_name_others).lowercase()
+
         observeCustomProxy()
+        displayTcpProxyUi()
         displayHttpProxyUi()
         displaySocks5Ui()
     }
 
     private fun initClickListeners() {
+
+        b.settingsActivityTcpProxyContainer.setOnClickListener { handleTcpProxy() }
 
         b.settingsActivitySocks5Rl.setOnClickListener {
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
@@ -115,17 +129,19 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 return@setOnCheckedChangeListener
             }
 
-            if (!appConfig.canEnableProxy()) {
+            if (appConfig.getBraveMode().isDnsMode()) {
                 b.settingsActivitySocks5Switch.isChecked = false
                 return@setOnCheckedChangeListener
             }
 
             if (!appConfig.canEnableSocks5Proxy()) {
+                val s = persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
                 showToastUiCentered(
                     this,
-                    getString(R.string.settings_socks5_disabled_error),
+                    getString(R.string.settings_socks5_disabled_error, s),
                     Toast.LENGTH_SHORT
                 )
+
                 b.settingsActivitySocks5Switch.isChecked = false
                 return@setOnCheckedChangeListener
             }
@@ -155,15 +171,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 return@setOnCheckedChangeListener
             }
 
-            if (!appConfig.canEnableProxy()) {
+            if (appConfig.getBraveMode().isDnsMode()) {
                 b.settingsActivityHttpProxySwitch.isChecked = false
                 return@setOnCheckedChangeListener
             }
 
             if (!appConfig.canEnableHttpProxy()) {
+                val s = persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
                 showToastUiCentered(
                     this,
-                    getString(R.string.settings_https_disabled_error),
+                    getString(R.string.settings_https_disabled_error, s),
                     Toast.LENGTH_SHORT
                 )
                 b.settingsActivityHttpProxySwitch.isChecked = false
@@ -174,9 +191,71 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
     }
 
+    private fun handleTcpProxy() {
+        // disable the click event until below coroutine is completed.
+        disableTcpProxyUi()
+
+        io {
+            when (TcpProxyHelper.getTcpProxyPaymentStatus()) {
+                TcpProxyHelper.PaymentStatus.PAID -> {
+                    uiCtx {
+                        enableTcpProxyUi()
+                        val intent = Intent(this, TcpProxyMainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+                        startActivity(intent)
+                    }
+                }
+                TcpProxyHelper.PaymentStatus.INITIATED -> {
+                    uiCtx {
+                        enableTcpProxyUi()
+                        val intent = Intent(this, CheckoutActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+                        startActivity(intent)
+                    }
+                }
+                else -> {
+                    val isTcpWorking = TcpProxyHelper.publicKeyUsable()
+                    uiCtx {
+                        if (isTcpWorking) {
+                            enableTcpProxyUi()
+                            val intent = Intent(this, CheckoutActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+                            startActivity(intent)
+                        } else {
+                            showTcpProxyErrorDialog()
+                            enableTcpProxyUi()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun disableTcpProxyUi() {
+        b.settingsActivityTcpProxyContainer.isClickable = false
+        b.settingsActivityTcpProxyProgress.visibility = View.VISIBLE
+        b.settingsActivityTcpProxyImg.visibility = View.GONE
+    }
+
+    private fun enableTcpProxyUi() {
+        b.settingsActivityTcpProxyContainer.isClickable = true
+        b.settingsActivityTcpProxyProgress.visibility = View.GONE
+        b.settingsActivityTcpProxyImg.visibility = View.VISIBLE
+    }
+
+    private fun showTcpProxyErrorDialog() {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle("Rethink Proxy")
+        builder.setMessage(
+            "Issue checking for Rethink Proxy. There may be a problem with your network or the proxy server. Please try again later."
+        )
+        builder.setPositiveButton("Okay") { dialog, _ -> dialog.dismiss() }
+        builder.create().show()
+    }
+
     /** Prompt user to download the Orbot app based on the current BUILDCONFIG flavor. */
     private fun showOrbotInstallDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(R.string.orbot_install_dialog_title)
         builder.setMessage(R.string.orbot_install_dialog_message)
         builder.setPositiveButton(getString(R.string.orbot_install_dialog_positive)) { _, _ ->
@@ -225,11 +304,20 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
 
         if (!appConfig.canEnableOrbotProxy()) {
-            showToastUiCentered(
-                this,
-                getString(R.string.settings_orbot_disabled_error),
-                Toast.LENGTH_SHORT
-            )
+            val s = persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
+            if (s.lowercase() == AppConfig.ProxyProvider.CUSTOM.name.lowercase()) {
+                showToastUiCentered(
+                    this,
+                    getString(R.string.settings_orbot_disabled_error),
+                    Toast.LENGTH_SHORT
+                )
+            } else {
+                showToastUiCentered(
+                    this,
+                    getString(R.string.settings_socks5_disabled_error, s),
+                    Toast.LENGTH_SHORT
+                )
+            }
             return
         }
 
@@ -237,7 +325,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun openWireguardActivity() {
-        val intent = Intent(this, WgHomeActivity::class.java)
+        val intent = Intent(this, WgMainActivity::class.java)
         startActivity(intent)
     }
 
@@ -271,6 +359,53 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     persistentState.httpProxyPort.toString()
                 )
         }
+    }
+
+    private fun displayTcpProxyUi() {
+        val tcpProxies = TcpProxyHelper.getActiveTcpProxy()
+        if (tcpProxies == null || !tcpProxies.isActive) {
+            b.settingsActivityTcpProxyDesc.text =
+                "Not active" // getString(R.string.tcp_proxy_description)
+            return
+        }
+
+        Log.i(
+            LOG_TAG_UI,
+            "displayTcpProxyUi: ${tcpProxies?.isActive}, ${tcpProxies?.name}, ${tcpProxies?.url}"
+        )
+        b.settingsActivityTcpProxyDesc.text =
+            "Active" // getString(R.string.tcp_proxy_description_active)
+    }
+
+    private fun displayWireguardUi() {
+        val activeWgs = WireguardManager.getActiveConfigs()
+        if (activeWgs.isEmpty()) {
+            b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
+            return
+        }
+
+        var wgStatus = ""
+        activeWgs.forEach {
+            val id = Ipn.WG + it.getId()
+            val statusId = VpnController.getProxyStatusById(id)
+            if (statusId != null) {
+                val resId = UiUtils.getProxyStatusStringRes(statusId)
+                val s = getString(resId)
+                wgStatus += getString(R.string.ci_ip_label, it.getName(), s.padStart(1, ' ')) + "\n"
+                if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "current proxy status for $id: $s")
+            } else {
+                wgStatus +=
+                    getString(
+                        R.string.ci_ip_label,
+                        it.getName(),
+                        getString(R.string.status_failing).padStart(1, ' ')
+                    ) + "\n"
+                if (DEBUG)
+                    Log.d(LoggerConstants.LOG_TAG_PROXY, "current proxy status is null for $id")
+            }
+        }
+        wgStatus = wgStatus.trimEnd()
+        b.settingsActivityWireguardDesc.text = wgStatus
     }
 
     private fun displaySocks5Ui() {
@@ -394,7 +529,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         val appNames: MutableList<String> = ArrayList()
         appNames.add(getString(R.string.settings_app_list_default_app))
-        appNames.addAll(FirewallManager.getAllAppNames())
+        if (!VpnController.isVpnLockdown()) {
+            appNames.addAll(FirewallManager.getAllAppNames())
+        }
         val proxySpinnerAdapter =
             ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, appNames)
         appNameSpinner.adapter = proxySpinnerAdapter
@@ -405,7 +542,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 proxyEndpoint?.userName.toString(),
                 TextView.BufferType.EDITABLE
             )
-            if (
+            if (VpnController.isVpnLockdown()) {
+                appNameSpinner.setSelection(0)
+                appNameSpinner.isEnabled = false
+            } else if (
                 !proxyEndpoint?.proxyAppName.isNullOrBlank() &&
                     proxyEndpoint?.proxyAppName != getString(R.string.settings_app_list_default_app)
             ) {
@@ -432,7 +572,13 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             var isIPValid = true
             var isUDPBlock = false
             val mode: String = getString(R.string.cd_dns_proxy_mode_external)
-            val appName: String = appNames[appNameSpinner.selectedItemPosition]
+            val pos =
+                if (appNameSpinner.selectedItemPosition > appNames.size) {
+                    0
+                } else {
+                    appNameSpinner.selectedItemPosition
+                }
+            val appName: String = appNames[pos]
             val appPackageName =
                 if (
                     appName.isBlank() ||
@@ -502,24 +648,46 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         dialog.show()
     }
 
+    private fun enableTcpProxy() {
+        io { TcpProxyHelper.enable() }
+    }
+
     // Should be in disabled state when the brave mode is in DNS only / Vpn in lockdown mode.
     private fun handleProxyUi() {
         val canEnableProxy = appConfig.canEnableProxy()
 
         if (canEnableProxy) {
-            b.settingsActivitySocks5Rl.alpha = 1f
-            b.settingsActivityHttpProxyContainer.alpha = 1f
             b.settingsActivityOrbotContainer.alpha = 1f
             b.settingsActivityVpnLockdownDesc.visibility = View.GONE
+            b.settingsActivityWireguardContainer.alpha = 1f
+            b.settingsActivityTcpProxyContainer.alpha = 1f
+            b.settingsActivitySocks5Rl.alpha = 1f
+            b.settingsActivityHttpProxyContainer.alpha = 1f
         } else {
+            b.settingsActivityOrbotContainer.alpha = 0.5f
+            b.settingsActivityWireguardContainer.alpha = 0.5f
+            b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
+            b.settingsActivityTcpProxyContainer.alpha = 0.5f
             b.settingsActivitySocks5Rl.alpha = 0.5f
             b.settingsActivityHttpProxyContainer.alpha = 0.5f
-            b.settingsActivityOrbotContainer.alpha = 0.5f
-            b.settingsActivityVpnLockdownDesc.visibility = View.VISIBLE
         }
+
+        // Wireguard
+        b.settingsActivityWireguardImg.isEnabled = canEnableProxy
+        b.settingsActivityWireguardContainer.isEnabled = canEnableProxy
+        // TCP Proxy
+        b.settingsActivityTcpProxyIcon.isEnabled = canEnableProxy
+        b.settingsActivityTcpProxyContainer.isEnabled = canEnableProxy
         // Orbot
-        b.settingsActivityOrbotImg.isEnabled = canEnableProxy
-        b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
+        // case, when VPN is in lockdown mode, Orbot proxy should be disabled.
+        if (VpnController.isVpnLockdown()) {
+            b.settingsActivityOrbotContainer.alpha = 0.5f
+        } else {
+            b.settingsActivityOrbotContainer.alpha = 1f
+        }
+        b.settingsActivityOrbotImg.isEnabled = canEnableProxy && !VpnController.isVpnLockdown()
+        b.settingsActivityOrbotContainer.isEnabled =
+            canEnableProxy && !VpnController.isVpnLockdown()
         // SOCKS5
         b.settingsActivitySocks5Switch.isEnabled = canEnableProxy
         // HTTP Proxy

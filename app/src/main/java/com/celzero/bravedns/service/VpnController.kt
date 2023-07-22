@@ -202,6 +202,10 @@ object VpnController : KoinComponent {
         braveVpnService?.decreasePauseDuration(durationMs)
     }
 
+    fun getProxyStatusById(id: String): Long? {
+        return braveVpnService?.getProxyStatusById(id)
+    }
+
     fun protocols(): String {
         val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: -1
         val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: -1

@@ -222,7 +222,7 @@ object Utilities {
     fun normalizeIp(ipstr: String?): InetAddress? {
         if (ipstr == null) return null
 
-        val ipAddress: IPAddress = HostName(ipstr).address ?: return null
+        val ipAddress: IPAddress = HostName(ipstr).asAddress() ?: return null
         val ip = ipAddress.toInetAddress()
 
         // no need to check if IP is not of type IPv6

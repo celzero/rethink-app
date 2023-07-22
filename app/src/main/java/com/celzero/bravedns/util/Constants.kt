@@ -27,6 +27,9 @@ class Constants {
         // rethink base url (modified from download to dl on v053l)
         const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
 
+        // rethink base url for tcp proxy
+        const val TCP_PROXY_BASE_URL = "https://redir.nile.workers.dev"
+
         const val FILE_TAG = "filetag.json"
 
         // file names which are downloaded as part of on-device blocklists

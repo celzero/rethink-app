@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,31 +25,34 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.WgApplicationMappingDAO
+import com.celzero.bravedns.database.ProxyApplicationMappingDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.celzero.bravedns.util.LoggerConstants
 
-class WgIncludeAppsViewModel(private val mappingDAO: WgApplicationMappingDAO) : ViewModel() {
+class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingDAO) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
 
     init {
-        filteredList.postValue("")
+        filteredList.postValue("%%")
     }
 
     var apps =
-        filteredList.switchMap { input ->
+        filteredList.switchMap { searchTxt ->
+            Log.d(LoggerConstants.LOG_TAG_PROXY, "Filtering the apps list - $searchTxt")
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                mappingDAO.getAppsMapping()
+                mappingDAO.getAppsMapping(searchTxt)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         }
 
     fun setFilter(filter: String) {
-        filteredList.value = filter
+        Log.d(LoggerConstants.LOG_TAG_PROXY, "Filtering the apps list - $filter")
+        filteredList.postValue("%$filter%")
     }
 
-    fun getAppCountById(configId: Int): LiveData<Int> {
+    fun getAppCountById(configId: String): LiveData<Int> {
         return mappingDAO.getAppCountByIdLiveData(configId)
     }
 

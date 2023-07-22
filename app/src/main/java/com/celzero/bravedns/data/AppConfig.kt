@@ -37,8 +37,8 @@ import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -139,7 +139,6 @@ internal constructor(
         val tunDnsMode: TunDnsMode,
         val tunFirewallMode: TunFirewallMode,
         val tunProxyMode: TunProxyMode,
-        val wireguradMode: WireguardMode,
         val ptMode: ProtoTranslationMode,
         val blocker: Controller,
         val listener: Listener,
@@ -245,21 +244,14 @@ internal constructor(
         DNS_PORT(Settings.DNSModePort)
     }
 
-    enum class WireguardMode {
-        NONE,
-        VPN;
-
-        fun isTunWireguard(): Boolean {
-            return this == VPN
-        }
-    }
-
     // TODO: untangle the mess of proxy modes and providers
     enum class TunProxyMode {
         NONE,
         HTTPS,
         SOCKS5,
-        ORBOT;
+        ORBOT,
+        TCP,
+        WIREGUARD;
 
         fun isTunProxyOrbot(): Boolean {
             return this == ORBOT
@@ -272,6 +264,14 @@ internal constructor(
         fun isTunProxyHttps(): Boolean {
             return this == HTTPS
         }
+
+        fun isTunProxyWireguard(): Boolean {
+            return this == WIREGUARD
+        }
+
+        fun isTunProxyTcp(): Boolean {
+            return this == TCP
+        }
     }
 
     // Provider - Custom - SOCKS5, Http proxy setup.
@@ -279,7 +279,9 @@ internal constructor(
     enum class ProxyProvider {
         NONE,
         CUSTOM,
-        ORBOT;
+        ORBOT,
+        TCP,
+        WIREGUARD;
 
         fun isProxyProviderCustom(): Boolean {
             return CUSTOM.name == name
@@ -293,11 +295,21 @@ internal constructor(
             return ORBOT.name == name
         }
 
+        fun isProxyProviderWireguard(): Boolean {
+            return WIREGUARD.name == name
+        }
+
+        fun isProxyProviderTcp(): Boolean {
+            return TCP.name == name
+        }
+
         companion object {
             fun getProxyProvider(name: String): ProxyProvider {
                 return when (name) {
+                    WIREGUARD.name -> WIREGUARD
                     CUSTOM.name -> CUSTOM
                     ORBOT.name -> ORBOT
+                    TCP.name -> TCP
                     else -> NONE
                 }
             }
@@ -309,7 +321,9 @@ internal constructor(
         NONE,
         HTTP,
         SOCKS5,
-        HTTP_SOCKS5;
+        TCP,
+        HTTP_SOCKS5,
+        WIREGUARD;
 
         fun isProxyTypeHttp(): Boolean {
             return HTTP.name == name
@@ -323,8 +337,20 @@ internal constructor(
             return HTTP_SOCKS5.name == name
         }
 
+        fun isProxyTypeTcp(): Boolean {
+            return TCP.name == name
+        }
+
         fun isProxyTypeNone(): Boolean {
             return NONE.name == name
+        }
+
+        fun isProxyTypeWireguard(): Boolean {
+            return WIREGUARD.name == name
+        }
+
+        fun isSocks5Enabled(): Boolean {
+            return isProxyTypeSocks5() || isProxyTypeHttpSocks5()
         }
 
         companion object {
@@ -333,6 +359,8 @@ internal constructor(
                     HTTP.name -> HTTP
                     SOCKS5.name -> SOCKS5
                     HTTP_SOCKS5.name -> HTTP_SOCKS5
+                    WIREGUARD.name -> WIREGUARD
+                    TCP.name -> TCP
                     else -> NONE
                 }
             }
@@ -454,6 +482,10 @@ internal constructor(
 
     suspend fun getOrbotProxyDetails(): ProxyEndpoint? {
         return proxyEndpointRepository.getConnectedOrbotProxy()
+    }
+
+    fun isTcpProxyEnabled(): Boolean {
+        return TcpProxyHelper.getActiveTcpProxy() != null
     }
 
     fun isWireguardEnabled(): Boolean {
@@ -583,7 +615,6 @@ internal constructor(
             getDnsMode(),
             getFirewallMode(),
             getTunProxyMode(),
-            getWireguardMode(),
             ptMode,
             blocker,
             listener,
@@ -858,7 +889,17 @@ internal constructor(
             return
         }
 
+        if (provider == ProxyProvider.WIREGUARD) {
+            setProxy(proxyType, provider)
+            return
+        }
+
         if (provider == ProxyProvider.ORBOT) {
+            setProxy(proxyType, provider)
+            return
+        }
+
+        if (provider == ProxyProvider.TCP) {
             setProxy(proxyType, provider)
             return
         }
@@ -889,6 +930,7 @@ internal constructor(
         removeOrbot()
         persistentState.proxyProvider = ProxyProvider.NONE.name
         persistentState.proxyType = ProxyType.NONE.name
+        persistentState.updateProxyStatus()
     }
 
     private fun removeOrbot() {
@@ -923,6 +965,7 @@ internal constructor(
     private fun setProxy(type: ProxyType, provider: ProxyProvider) {
         persistentState.proxyProvider = provider.name
         persistentState.proxyType = type.name
+        persistentState.updateProxyStatus()
     }
 
     // Returns the proxymode to set in Tunnel.
@@ -933,6 +976,10 @@ internal constructor(
         val type = persistentState.proxyType
         val provider = persistentState.proxyProvider
         if (DEBUG) Log.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
+
+        if (ProxyProvider.WIREGUARD.name == provider) {
+            return TunProxyMode.WIREGUARD
+        }
 
         if (ProxyProvider.ORBOT.name == provider) {
             return TunProxyMode.ORBOT
@@ -951,13 +998,6 @@ internal constructor(
             }
         }
         return TunProxyMode.NONE
-    }
-
-    fun getWireguardMode(): WireguardMode {
-        if (WireguardManager.isAnyWgConfigActive()) {
-            return WireguardMode.VPN
-        }
-        return WireguardMode.NONE
     }
 
     fun isCustomHttpProxyEnabled(): Boolean {
@@ -992,19 +1032,34 @@ internal constructor(
     }
 
     fun canEnableProxy(): Boolean {
-        return !getBraveMode().isDnsMode() && !VpnController.isVpnLockdown()
+        return !getBraveMode().isDnsMode()
     }
 
     fun canEnableSocks5Proxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() &&
+        return !getBraveMode().isDnsMode() &&
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+    }
+
+    fun canEnableWireguardProxy(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        Log.d(LOG_TAG_VPN, "canEnableWireguardProxy: ${proxyProvider.name}")
+        return canEnableProxy() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderWireguard())
     }
 
     fun canEnableHttpProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() &&
+        Log.d(LOG_TAG_VPN, "canEnableHttpProxy: ${proxyProvider.name}")
+        return !getBraveMode().isDnsMode() &&
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+    }
+
+    fun canEnableTcpProxy(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        Log.d(LOG_TAG_VPN, "canEnableTcpProxy: ${proxyProvider.name}")
+        return !getBraveMode().isDnsMode() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderTcp())
     }
 
     fun canEnableOrbotProxy(): Boolean {

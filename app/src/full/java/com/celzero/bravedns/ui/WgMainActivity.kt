@@ -68,17 +68,17 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                         val qrCodeFromFileScanner =
                             QrCodeFromFileScanner(contentResolver, QRCodeReader())
                         val result = qrCodeFromFileScanner.scan(data)
-                        Log.i(LoggerConstants.LOG_TAG_WIREGUARD, "result: $result, data: $data")
+                        Log.i(LoggerConstants.LOG_TAG_PROXY, "result: $result, data: $data")
                         if (result != null) {
                             withContext(Dispatchers.Main) {
-                                Log.i(LoggerConstants.LOG_TAG_WIREGUARD, "result: ${result.text}")
+                                Log.i(LoggerConstants.LOG_TAG_PROXY, "result: ${result.text}")
                                 TunnelImporter.importTunnel(result.text) {
                                     Utilities.showToastUiCentered(
                                         this@WgMainActivity,
                                         it.toString(),
                                         Toast.LENGTH_LONG
                                     )
-                                    Log.e(LoggerConstants.LOG_TAG_WIREGUARD, it.toString())
+                                    Log.e(LoggerConstants.LOG_TAG_PROXY, it.toString())
                                 }
                             }
                         } else {
@@ -92,7 +92,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                                 message,
                                 Toast.LENGTH_LONG
                             )
-                            Log.e(LoggerConstants.LOG_TAG_WIREGUARD, message)
+                            Log.e(LoggerConstants.LOG_TAG_PROXY, message)
                         }
                     } catch (e: Exception) {
                         val message =
@@ -105,11 +105,11 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                             message,
                             Toast.LENGTH_LONG
                         )
-                        Log.e(LoggerConstants.LOG_TAG_WIREGUARD, e.message, e)
+                        Log.e(LoggerConstants.LOG_TAG_PROXY, e.message, e)
                     }
                 } else {
                     TunnelImporter.importTunnel(contentResolver, data) {
-                        Log.e(LoggerConstants.LOG_TAG_WIREGUARD, it.toString())
+                        Log.e(LoggerConstants.LOG_TAG_PROXY, it.toString())
                         Utilities.showToastUiCentered(
                             this@WgMainActivity,
                             it.toString(),
@@ -131,7 +131,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                             it.toString(),
                             Toast.LENGTH_LONG
                         )
-                        Log.e(LoggerConstants.LOG_TAG_WIREGUARD, it.toString())
+                        Log.e(LoggerConstants.LOG_TAG_PROXY, it.toString())
                     }
                 }
             }
@@ -145,6 +145,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
 
     private fun init() {
         collapseFab()
+        observeConfig()
         setupInterfaceList()
         setupClickListeners()
 
@@ -160,6 +161,18 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private fun observeConfig() {
+        wgConfigViewModel.configCount().observe(this) {
+            if (it == 0) {
+                b.wgEmptyView.visibility = View.VISIBLE
+                b.wgInterfaceList.visibility = View.GONE
+            } else {
+                b.wgEmptyView.visibility = View.GONE
+                b.wgInterfaceList.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setupInterfaceList() {

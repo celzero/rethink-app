@@ -276,6 +276,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var dnsRequestsCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
+    var proxyStatus: MutableLiveData<Int> = MutableLiveData()
 
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
@@ -401,5 +402,39 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     fun getBlockWhenDeviceLocked(): Boolean {
         return _blockWhenDeviceLocked
+    }
+
+    fun getProxyStatus(): Int {
+        if (proxyStatus.value == null) updateProxyStatus()
+        return proxyStatus.value ?: -1
+    }
+
+    fun updateProxyStatus() {
+        val status =
+            when (AppConfig.ProxyProvider.getProxyProvider(proxyProvider)) {
+                AppConfig.ProxyProvider.WIREGUARD -> {
+                    R.string.lbl_wireguard
+                }
+                AppConfig.ProxyProvider.ORBOT -> {
+                    R.string.orbot
+                }
+                AppConfig.ProxyProvider.TCP -> {
+                    R.string.orbot_socks5
+                }
+                AppConfig.ProxyProvider.CUSTOM -> {
+                    val type = AppConfig.ProxyType.of(proxyType)
+                    if (type == AppConfig.ProxyType.SOCKS5) {
+                        R.string.lbl_socks5
+                    } else if (type == AppConfig.ProxyType.HTTP) {
+                        R.string.lbl_http
+                    } else {
+                        R.string.lbl_http_socks5
+                    }
+                }
+                else -> {
+                    -1
+                }
+            }
+        proxyStatus.postValue(status)
     }
 }

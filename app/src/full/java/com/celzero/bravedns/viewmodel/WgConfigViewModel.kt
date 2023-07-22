@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
@@ -44,5 +45,9 @@ class WgConfigViewModel(private val wgConfigFilesDAO: WgConfigFilesDAO) : ViewMo
 
     fun insert(wgConfigFiles: WgConfigFiles) {
         wgConfigFilesDAO.insert(wgConfigFiles)
+    }
+
+    fun configCount(): LiveData<Int> {
+        return wgConfigFilesDAO.getConfigCount()
     }
 }

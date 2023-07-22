@@ -459,15 +459,13 @@ class BraveVPNService :
             return false
         }
 
-        // if proxy is enabled, then check if the app is allowed to use proxy
-        // this case holds true only when proxy is wireguard, else all apps are
-        // forced to use proxy
-        // TODO: change this logic when all proxy has option to add or remove apps
-        return if (appConfig.isWireguardEnabled()) {
-            WireguardManager.isAppAvailableInActiveWgConfig(uid)
-        } else {
-            true
+        val id = ProxyManager.getProxyIdForApp(uid)
+        if (id == ProxyManager.ID_SYSTEM) {
+            Log.i(LOG_TAG_VPN, "No proxy enabled for uid=$uid")
+            return false
         }
+
+        return ProxyManager.isProxyActive(id)
     }
 
     private fun getDomainRule(domain: String, uid: Int): DomainRulesManager.Status {
@@ -1245,7 +1243,8 @@ class BraveVPNService :
                     FirewallManager.loadAppFirewallRules()
                     DomainRulesManager.load()
                     IpRulesManager.loadIpRules()
-                    WireguardManager.load()
+                    TcpProxyHelper.load()
+                    ProxyManager.load()
 
                     if (FirewallManager.getTotalApps() <= 0) {
                         notifyEmptyFirewallRules()
@@ -1425,10 +1424,6 @@ class BraveVPNService :
                 io("route_lan_traffic") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.WIREGUARD -> {
-                Log.i(
-                    LOG_TAG_VPN,
-                    "wireguard pref changed, restarting vpn: $key, ${persistentState.wireguardEnabledCount}"
-                )
                 io("wireguard") { restartVpn(createNewTunnelOptsObj()) }
             }
         }
@@ -2146,16 +2141,19 @@ class BraveVPNService :
     override fun onICMPClosed(summary: ICMPSummary?) {
         // no-op
         // TODO: implement ICMP
+        // if (DEBUG) Log.d(LOG_TAG_VPN, "TEST onICMPClosed: $summary")
     }
 
     override fun onTCPSocketClosed(summary: TCPSocketSummary?) {
         // no-op
         // TODO: update connection tracker with the summary
+        // if (DEBUG) Log.d(LOG_TAG_VPN, "TEST onTCPSocketClosed: $summary")
     }
 
     override fun onUDPSocketClosed(summary: UDPSocketSummary?) {
         // no-op
         // TODO: update connection tracker with the summary
+        /// if (DEBUG) Log.d(LOG_TAG_VPN, "TEST onUDPSocketClosed: $summary")
     }
 
     override fun flow(
@@ -2173,10 +2171,15 @@ class BraveVPNService :
         val first = HostName(src)
         val second = HostName(dest)
 
-        val srcIp = if (first.address == null) "" else first.address.toString()
+        val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
         val srcPort = first.port ?: 0
-        val dstIp = if (second.address == null) "" else second.address.toString()
+        val dstIp = if (second.asAddress() == null) "" else second.asAddress().toString()
         val dstPort = second.port ?: 0
+
+        val ips = realIps?.split(",")?.toList() ?: emptyList()
+        // use realIps; as of now, netstack uses the first ip
+        // TODO: apply firewall rules on all real ips
+        val realDestIp = ips.first().trim()
 
         val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
 
@@ -2220,7 +2223,10 @@ class BraveVPNService :
             } else {
                 val id = WireguardManager.getActiveConfigIdForApp(uid)
                 // if no config is assigned / enabled for this app, pass-through
-                if (id == -1 || enabledWireguardConfigs.none { it.getId() == id }) {
+                if (
+                    id == WireguardManager.INVALID_CONF_ID ||
+                        enabledWireguardConfigs.none { it.getId() == id }
+                ) {
                     if (DEBUG)
                         Log.d(
                             LOG_TAG_VPN,
@@ -2239,14 +2245,50 @@ class BraveVPNService :
             }
         }
 
-        // chose socks5 proxy over http proxy
-        if (appConfig.isOrbotProxyEnabled()) {
-            if (DEBUG)
+        if (appConfig.isTcpProxyEnabled()) {
+            val activeId = ProxyManager.getProxyIdForApp(uid)
+            if (!activeId.contains(ProxyManager.ID_TCP_BASE)) {
+                Log.e(LOG_TAG_VPN, "flow: tcp proxy is enabled but app is not included")
+                // pass-through
+            } else {
+                val ip = realDestIp.ifEmpty { dstIp }
+                val isCloudflareIp = TcpProxyHelper.isCloudflareIp(ip)
                 Log.d(
                     LOG_TAG_VPN,
-                    "flow: received rule: orbot, returning Ipn.OrbotS5, $connectionId, $uid"
+                    "flow: tcp proxy enabled, checking for cloudflare: $realDestIp, $isCloudflareIp"
                 )
-            return getFlowResponseString(Ipn.OrbotS5, connectionId, uid)
+                if (isCloudflareIp) {
+                    val proxyId = "${Ipn.WG}${WireguardManager.SEC_WARP_ID}"
+                    if (DEBUG)
+                        Log.d(
+                            LOG_TAG_VPN,
+                            "flow: tcp proxy enabled, but destination is cloudflare, returning $proxyId, $connectionId, $uid"
+                        )
+                    return getFlowResponseString(proxyId, connectionId, uid)
+                }
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: tcp proxy enabled, returning ${ProxyManager.ID_TCP_BASE}, $connectionId, $uid"
+                    )
+                return getFlowResponseString(ProxyManager.ID_TCP_BASE, connectionId, uid)
+            }
+        }
+
+        // chose socks5 proxy over http proxy
+        if (appConfig.isOrbotProxyEnabled()) {
+            val activeId = ProxyManager.getProxyIdForApp(uid)
+            if (!activeId.contains(ProxyManager.ID_ORBOT_BASE)) {
+                Log.e(LOG_TAG_VPN, "flow: orbot proxy is enabled but app is not included")
+                // pass-through
+            } else {
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: received rule: orbot, returning Ipn.OrbotS5, $connectionId, $uid"
+                    )
+                return getFlowResponseString(Ipn.OrbotS5, connectionId, uid)
+            }
         }
 
         if (appConfig.isCustomSocks5Enabled()) {
@@ -2307,10 +2349,10 @@ class BraveVPNService :
         val first = HostName(src)
         val second = HostName(dest)
 
-        val srcIp = if (first.address == null) "" else first.address.toString()
+        val srcIp = if (first.asAddress() == null) "" else first.asAddress().toString()
         val srcPort = first.port ?: 0
         // ignore dstIp, use realIps instead
-        val dstIp = if (second.address == null) "" else second.address.toString()
+        val dstIp = if (second.asAddress() == null) "" else second.asAddress().toString()
         val dstPort = second.port ?: 0
 
         val ips = realIps?.split(",")?.toList() ?: emptyList()

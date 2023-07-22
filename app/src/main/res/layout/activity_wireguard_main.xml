@@ -22,6 +22,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <RelativeLayout
+        android:id="@+id/wg_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_network">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/wg_no_config_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="30dp"
+            android:padding="10dp"
+            android:text="@string/wireguard_no_config_msg"
+            android:textAlignment="center"
+            android:textSize="@dimen/heading_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/wg_no_config_text"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/illustrations_no_record" />
+
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/wg_interface_list"
         android:layout_width="match_parent"
@@ -38,9 +68,12 @@
         android:layout_marginBottom="40dp"
         android:contentDescription="@string/lbl_create"
         android:text="@string/lbl_create"
-        app:backgroundTint="?attr/accentGood"
+        android:textColor="?attr/primaryTextColor"
+        app:backgroundTint="?attr/chipColorBgNormal"
         app:fabSize="mini"
-        app:icon="@android:drawable/ic_dialog_email"
+        app:icon="@drawable/ic_add"
+        app:iconTint="@android:color/transparent"
+        app:iconTintMode="add"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,13 +87,15 @@
         android:layout_marginBottom="40dp"
         android:contentDescription="@string/lbl_qr_code"
         android:text="@string/lbl_qr_code"
-        app:backgroundTint="?attr/accentGood"
+        android:textColor="?attr/primaryTextColor"
+        app:backgroundTint="?attr/chipColorBgNormal"
         app:fabSize="mini"
-        app:icon="@android:drawable/ic_dialog_map"
+        app:icon="@drawable/ic_qr_code_scanner"
+        app:iconTint="@android:color/transparent"
+        app:iconTintMode="add"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/import_fab"
@@ -70,13 +105,15 @@
         android:layout_marginBottom="40dp"
         android:contentDescription="@string/lbl_import"
         android:text="@string/lbl_import"
-        app:backgroundTint="?attr/accentGood"
+        android:textColor="?attr/primaryTextColor"
+        app:backgroundTint="?attr/chipColorBgNormal"
         app:fabSize="mini"
-        app:icon="@android:drawable/ic_dialog_map"
+        app:icon="@drawable/ic_import_conf"
+        app:iconTint="@android:color/transparent"
+        app:iconTintMode="add"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/wg_add_fab"

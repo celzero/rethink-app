@@ -1,0 +1,324 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/topBanner"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:contentDescription="@string/parse_error_generic"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_launcher" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/app_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp"
+                    android:text="TCP Proxy"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/proxy_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Fast proxy servers combined with affordability. Ideal solution for individuals. A reliable and secure way to access the internet anonymously."
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/payment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_centerInParent="true"
+                    android:alpha="0.5"
+                    android:background="?attr/primaryLightColorText" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/rectangle_border_background"
+                    android:text="plans"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="@dimen/large_font_text_view"
+                    android:visibility="visible"
+                    app:chipBackgroundColor="?attr/chipBgColorPositive" />
+
+            </RelativeLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/payment_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:text="Choose a plan"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/subscriptionListContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkedButton="@id/plan6MonthsButton"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <!-- 1 Month Plan -->
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/plan1MonthButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="1 Month Plan"
+                    android:textSize="16sp" />
+
+                <!-- 3 Months Plan -->
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/plan3MonthsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="3 Month Plan"
+                    android:textSize="16sp" />
+
+                <!-- 6 Months Plan -->
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/plan6MonthsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="6 Months Plan"
+                    android:textSize="16sp" />
+
+            </RadioGroup>
+
+            <!-- Button to Proceed with Subscription -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/payment_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:backgroundTint="?attr/accentGood"
+                android:padding="16dp"
+                android:text="purchase"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <!-- Restore Purchase Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/restore_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:backgroundTint="@android:color/transparent"
+                android:fontFamily="sans-serif-medium"
+                android:padding="16dp"
+                android:text="Restore Purchase"
+                android:textAllCaps="false"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="16sp" />
+
+            <!-- Terms and Conditions -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/terms_and_conditions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:padding="16dp"
+                android:text="Terms and Conditions"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:lineSpacingExtra="10dp"
+                android:padding="10dp"
+                android:text="Rethink DNS + Firewall are anti-surveillance tools first and foremost: It is absolutely against our ethos, then, to track users of our apps and services, or sell any information whatsoever to any third-party in any form, pseudo-anonymized, de-anonymized, anonymized, aggregated, or otherwise. We do not collect, sell, license, share any data (personally identifiable or otherwise) from the Rethink DNS + Firewall Android app. The code is open source so you may inspect it yourself or deploy to your servers. \nPersonally identifiable information: Any data that can be traced back to the user including (but not limited to) a combination of IP addresses, name, device-id, advertisement-id, and location. \n\n Non personally identifiable information: Aggregrated (summarized) data and anonymized data scrubbed off any personally identifiable information. \nCollect: Data stored by Rethink. \nSell: Data sold to third parties. \nLicense: Restricted access to data collected by Rethink to third parties. \nShare: Data shared with third parties. \nAggregate: Data combined with other data to form a summary of information. \nAnonymize: Data scrubbed off any personally identifiable information. \nDe-anonymize: Data scrubbed off any personally identifiable information. \nShare: Permanent access to data collected by Rethink to third parties. \n\nWe do not collect, sell, license, share any data (personally identifiable or otherwise) from the Rethink DNS + Firewall Android app. The code is open source so you may inspect it yourself or deploy to your servers."
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/payment_success_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/payment_success_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:text="Payment Successful"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/payment_success_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:text="Your payment was successful. You can now enjoy the proxy features of Rethink."
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/payment_success_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:backgroundTint="?attr/accentGood"
+                android:padding="16dp"
+                android:text="continue"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/payment_awaiting_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/payment_awaiting_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="?attr/accentGood" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/payment_awaiting_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:text="Awaiting payment"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/payment_awaiting_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:text="Please wait while we process your payment. This may take a few seconds."
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/payment_failed_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/payment_failed_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:text="Payment Failed"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/payment_failed_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:padding="10dp"
+                android:text="Your payment failed. Please try again."
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/payment_failed_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:backgroundTint="?attr/accentGood"
+                android:padding="16dp"
+                android:text="try again"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</ScrollView>

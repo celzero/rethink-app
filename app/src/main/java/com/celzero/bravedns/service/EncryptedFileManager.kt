@@ -18,7 +18,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKey
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants
@@ -26,29 +26,34 @@ import com.celzero.bravedns.wireguard.Config
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 object EncryptedFileManager {
     // Although you can define your own key generation parameter specification, it's
     // recommended that you use the value specified here.
-    private val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
-    private val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
+    // private val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
+    // private val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
-    fun read(ctx: Context, fileToRead: String): Config? {
+    fun readWireguardConfig(ctx: Context, fileToRead: String): Config? {
         var config: Config? = null
         try {
             val dir = File(fileToRead)
+            val masterKey =
+                MasterKey.Builder(ctx.applicationContext)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
             val encryptedFile =
                 EncryptedFile.Builder(
-                        dir,
                         ctx.applicationContext,
-                        mainKeyAlias,
+                        dir,
+                        masterKey,
                         EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
                     )
                     .build()
 
             Log.d(
-                LoggerConstants.LOG_TAG_WIREGUARD,
+                LoggerConstants.LOG_TAG_PROXY,
                 "Encrypted File Read: ${dir.absolutePath}, $fileToRead"
             )
             val inputStream = encryptedFile.openFileInput()
@@ -67,42 +72,104 @@ object EncryptedFileManager {
             config = Config.parse(ist)
             if (DEBUG)
                 Log.d(
-                    LoggerConstants.LOG_TAG_WIREGUARD,
+                    LoggerConstants.LOG_TAG_PROXY,
                     "read config: ${config.getName()}, ${config.toWgQuickString()}"
                 )
             ist.close()
             byteArrayOutputStream.close()
         } catch (e: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_WIREGUARD, "Encrypted File Read: ${e.message}")
+            Log.e(LoggerConstants.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
         }
 
         return config
     }
 
-    fun write(ctx: Context, data: String, fileName: String) {
+    fun read(ctx: Context, file: File): String {
+        var content = ""
         try {
-
-            // Create a file with this name or replace an entire existing file
-            // that has the same name. Note that you cannot append to an existing file,
-            // and the filename cannot contain path separators.
-            val dir =
-                File(ctx.filesDir.canonicalPath + File.separator + WIREGUARD_FOLDER_NAME + File.separator)
-            if (!dir.exists()) {
-                dir.mkdirs()
-            }
-            val fileToWrite = File(dir, fileName)
-            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_WIREGUARD, "write into $fileToWrite, $data")
+            val masterKey =
+                MasterKey.Builder(ctx.applicationContext)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
             val encryptedFile =
                 EncryptedFile.Builder(
-                        fileToWrite,
                         ctx.applicationContext,
-                        mainKeyAlias,
+                        file,
+                        masterKey,
                         EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
                     )
                     .build()
 
-            if (fileToWrite.exists()) {
-                fileToWrite.delete()
+            Log.d(LoggerConstants.LOG_TAG_PROXY, "Encrypted File Read: ${file.absolutePath}, $file")
+
+            // Open the file and read its content and return it as a string.
+            val inputStream = encryptedFile.openFileInput()
+            content = inputStream.readBytes().toString(Charset.defaultCharset())
+        } catch (e: Exception) {
+            Log.e(LoggerConstants.LOG_TAG_PROXY, "Encrypted File Read: ${e.message}")
+        }
+        return content
+    }
+
+    fun writeWireguardConfig(ctx: Context, cfg: String, fileName: String): Boolean {
+        try {
+            val dir =
+                File(
+                    ctx.filesDir.canonicalPath +
+                        File.separator +
+                        WIREGUARD_FOLDER_NAME +
+                        File.separator
+                )
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            val fileToWrite = File(dir, fileName)
+            return write(ctx, cfg, fileToWrite)
+        } catch (e: Exception) {
+            Log.e(LoggerConstants.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+        }
+        return false
+    }
+
+    fun writeTcpConfig(ctx: Context, cfg: String, fileName: String): Boolean {
+        try {
+            val dir =
+                File(
+                    ctx.filesDir.canonicalPath +
+                        File.separator +
+                        TcpProxyHelper.TCP_FOLDER_NAME +
+                        File.separator +
+                        TcpProxyHelper.getFolderName()
+                )
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            val fileToWrite = File(dir, fileName)
+            write(ctx, cfg, fileToWrite)
+        } catch (e: Exception) {
+            Log.e(LoggerConstants.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
+        }
+        return false
+    }
+
+    fun write(ctx: Context, data: String, file: File): Boolean {
+        try {
+            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "write into $file, $data")
+            val masterKey =
+                MasterKey.Builder(ctx.applicationContext)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
+            val encryptedFile =
+                EncryptedFile.Builder(
+                        ctx.applicationContext,
+                    file,
+                        masterKey,
+                        EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+                    )
+                    .build()
+
+            if (file.exists()) {
+                file.delete()
             }
 
             val fileContent = data.toByteArray(StandardCharsets.UTF_8)
@@ -111,8 +178,10 @@ object EncryptedFileManager {
                 flush()
                 close()
             }
+            return true
         } catch (e: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_WIREGUARD, "Encrypted File Write: ${e.message}")
+            Log.e(LoggerConstants.LOG_TAG_PROXY, "Encrypted File Write: ${e.message}")
         }
+        return false
     }
 }

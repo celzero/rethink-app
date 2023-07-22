@@ -38,7 +38,7 @@ object ViewModelModule {
         viewModel { DetailedStatisticsViewModel(get(), get(), get()) }
         viewModel { LocalBlocklistPacksMapViewModel(get()) }
         viewModel { RemoteBlocklistPacksMapViewModel(get()) }
-        viewModel { WgIncludeAppsViewModel(get()) }
+        viewModel { ProxyAppsMappingViewModel(get()) }
         viewModel { WgConfigViewModel(get()) }
     }
 

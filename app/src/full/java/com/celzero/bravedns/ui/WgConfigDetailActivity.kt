@@ -35,16 +35,20 @@ import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
+import com.celzero.bravedns.service.WireguardManager.WARP_ID
 import com.celzero.bravedns.service.WireguardManager.isWarpWorking
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_WIREGUARD
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.WgIncludeAppsViewModel
+import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -55,7 +59,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private val b by viewBinding(ActivityWgDetailBinding::bind)
     private val persistentState by inject<PersistentState>()
 
-    private val mappingViewModel: WgIncludeAppsViewModel by viewModel()
+    private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
 
     private var wgPeersAdapter: WgPeersAdapter? = null
     private var layoutManager: LinearLayoutManager? = null
@@ -69,7 +73,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             ANIMATION_PIVOT_VALUE
         )
 
-    private var configId: Int = -1
+    private var configId: Int = INVALID_CONF_ID
     private var wgInterface: WgInterface? = null
     private val peers: MutableList<Peer> = mutableListOf()
 
@@ -85,7 +89,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, -1)
+        configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, INVALID_CONF_ID)
         setupClickListeners()
     }
 
@@ -103,7 +107,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         handleWarpConfigView()
         handleAppsCount()
         val config = WireguardManager.getConfigById(configId)
-        if (config == null && configId == 0) {
+        if (config == null && configId == WARP_ID) {
             showNewWarpConfigLayout()
             return
         }
@@ -122,7 +126,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (wgInterface == null) {
             return
         }
-        b.interfaceNameText.text = config.getName()
+        b.configNameText.text = config.getName()
         b.publicKeyText.text = wgInterface?.getKeyPair()?.getPublicKey()?.base64()
 
         if (wgInterface?.getAddresses()?.isEmpty() == true) {
@@ -175,9 +179,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private suspend fun fetchWarpConfigFromServer() {
-        val config = WireguardManager.getNewWarpConfig()
+        val config = WireguardManager.getNewWarpConfig(WARP_ID)
         Log.i(
-            LOG_TAG_WIREGUARD,
+            LOG_TAG_PROXY,
             "new config from server: ${config?.getName()}, ${config?.toWgQuickString()}"
         )
         if (config == null) {
@@ -191,12 +195,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun handleWarpConfigView() {
-        if (configId == 0) {
+        if (configId == WARP_ID) {
             if (isWarpConfAvailable()) {
-                if (DEBUG) Log.d(LOG_TAG_WIREGUARD, "warp config already available")
+                if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config already available")
                 showWarpConfig()
             } else {
-                if (DEBUG) Log.d(LOG_TAG_WIREGUARD, "warp config not found, show new config layout")
+                if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config not found, show new config layout")
                 showNewWarpConfigLayout()
             }
         } else {
@@ -235,7 +239,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun handleAppsCount() {
-        mappingViewModel.getAppCountById(configId).observe(this) {
+        val id = ProxyManager.ID_WG_BASE + configId
+        mappingViewModel.getAppCountById(id).observe(this) {
             b.applicationsText.text = getString(R.string.firewall_card_status_active, it.toString())
         }
     }
@@ -249,7 +254,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
         b.addPeerFab.setOnClickListener { openAddPeerDialog() }
 
-        b.setIncludedApplications.setOnClickListener { openAppsDialog() }
+        b.applicationsBtn.setOnClickListener { openAppsDialog() }
 
         b.interfaceDelete.setOnClickListener { showDeleteInterfaceDialog() }
 
@@ -297,16 +302,18 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun openAppsDialog() {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val appsAdapter = WgIncludeAppsAdapter(this, configId)
+        val proxyId = ProxyManager.ID_WG_BASE + configId
+        val proxyName = WireguardManager.getConfigName(configId)
+        val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         val includeAppsDialog =
-            WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, configId)
+            WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
         includeAppsDialog.setCanceledOnTouchOutside(false)
         includeAppsDialog.show()
     }
 
     private fun showDeleteInterfaceDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(R.string.lbl_delete))
         builder.setMessage(getString(R.string.config_delete_dialog_desc))
         builder.setCancelable(true)

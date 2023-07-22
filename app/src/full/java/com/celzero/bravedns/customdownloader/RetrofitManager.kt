@@ -49,6 +49,12 @@ class RetrofitManager {
                 .client(okHttpClient(dnsType))
         }
 
+        fun getTcpProxyBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
+            return Retrofit.Builder()
+                .baseUrl(Constants.TCP_PROXY_BASE_URL)
+                .client(okHttpClient(dnsType))
+        }
+
         fun okHttpClient(dnsType: OkHttpDnsType): OkHttpClient {
             val b = OkHttpClient.Builder()
             b.connectTimeout(1, TimeUnit.MINUTES)

@@ -18,33 +18,34 @@ package com.celzero.bravedns.ui
 import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.WgAppsIncludeDialogBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.viewmodel.WgIncludeAppsViewModel
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class WgIncludeAppsDialog(
     private var activity: Activity,
     internal var adapter: RecyclerView.Adapter<*>,
-    var viewModel: WgIncludeAppsViewModel,
+    var viewModel: ProxyAppsMappingViewModel,
     themeID: Int,
-    private val configId: Int
-) : Dialog(activity, themeID), View.OnClickListener, SearchView.OnQueryTextListener {
+    private val proxyId: String,
+    private val proxyName: String
+) : Dialog(activity, themeID), SearchView.OnQueryTextListener {
 
     private lateinit var b: WgAppsIncludeDialogBinding
-
-    private var layoutManager: RecyclerView.LayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,25 +65,26 @@ class WgIncludeAppsDialog(
             WindowManager.LayoutParams.MATCH_PARENT
         )
 
-        layoutManager = LinearLayoutManager(activity)
-
+        val layoutManager = LinearLayoutManager(activity)
         b.wgIncludeAppRecyclerViewDialog.layoutManager = layoutManager
         b.wgIncludeAppRecyclerViewDialog.adapter = adapter
 
         FirewallManager.getApplistObserver().observe(activity as LifecycleOwner) {
             b.wgIncludeAppSelectCountText.text =
-                context.getString(R.string.firewall_card_status_active, it.toString())
+                context.getString(R.string.firewall_card_status_active, it.size.toString())
         }
     }
 
     private fun initializeClickListeners() {
-        b.wgIncludeAppDialogOkButton.setOnClickListener(this)
+        b.wgIncludeAppDialogOkButton.setOnClickListener {
+            clearSearch()
+            dismiss()
+        }
 
         b.wgIncludeAppDialogSearchView.setOnQueryTextListener(this)
-        b.wgIncludeAppDialogSearchView.setOnSearchClickListener(this)
 
         b.wgIncludeAppDialogSearchView.setOnCloseListener {
-            toggleCategoryChipsUi()
+            clearSearch()
             false
         }
 
@@ -91,43 +93,14 @@ class WgIncludeAppsDialog(
         }
 
         b.wgIncludeAppSelectAllCheckbox.setOnCheckedChangeListener(null)
-
-        b.wgIncludeAppDialogSearchFilter.setOnClickListener(this)
-    }
-
-    override fun onClick(v: View) {
-        when (v.id) {
-            R.id.wg_include_app_dialog_ok_button -> {
-                clearSearch()
-                dismiss()
-            }
-            R.id.wg_include_app_dialog_search_filter -> {
-                toggleCategoryChipsUi()
-            }
-            R.id.wg_include_app_dialog_search_view -> {
-                toggleCategoryChipsUi()
-            }
-            else -> {
-                clearSearch()
-                dismiss()
-            }
-        }
     }
 
     private fun clearSearch() {
         viewModel.setFilter("")
     }
 
-    private fun toggleCategoryChipsUi() {
-        if (!b.wgIncludeAppDialogChipGroup.isVisible) {
-            b.wgIncludeAppDialogChipGroup.visibility = View.VISIBLE
-        } else {
-            b.wgIncludeAppDialogChipGroup.visibility = View.GONE
-        }
-    }
-
     private fun showDialog(toAdd: Boolean) {
-        val builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         if (toAdd) {
             builder.setTitle(context.getString(R.string.include_all_app_wg_dialog_title))
             builder.setMessage(context.getString(R.string.include_all_app_wg_dialog_desc))
@@ -142,9 +115,11 @@ class WgIncludeAppsDialog(
         ) { _, _ ->
             // add all if the list is empty or remove all if the list is full
             if (toAdd) {
-                WireguardManager.addAllAppsToConfig(configId)
+                Log.i(LOG_TAG_PROXY, "Adding all apps to proxy $proxyId, $proxyName")
+                ProxyManager.updateProxyIdForAllApps(proxyId, proxyName)
             } else {
-                WireguardManager.removeAllAppsFromConfig(configId)
+                Log.i(LOG_TAG_PROXY, "Removing all apps from proxy $proxyId, $proxyName")
+                ProxyManager.removeProxyForAllApps()
             }
             Toast.makeText(
                     context,
@@ -162,11 +137,13 @@ class WgIncludeAppsDialog(
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
+        Log.d(LOG_TAG_PROXY, "Query text submit: $query")
         viewModel.setFilter(query)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
+        Log.d(LOG_TAG_PROXY, "Query text change: $query")
         viewModel.setFilter(query)
         return true
     }

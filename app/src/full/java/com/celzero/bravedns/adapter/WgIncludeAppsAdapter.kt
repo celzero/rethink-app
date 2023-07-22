@@ -28,40 +28,41 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
-import com.celzero.bravedns.database.WgApplicationMapping
+import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_WIREGUARD
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class WgIncludeAppsAdapter(private val context: Context, private val interfaceId: Int) :
-    PagingDataAdapter<WgApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
+class WgIncludeAppsAdapter(private val context: Context, private val proxyId: String, private val proxyName: String) :
+    PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
         DIFF_CALLBACK
     ) {
 
     companion object {
 
         private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<WgApplicationMapping>() {
+            object : DiffUtil.ItemCallback<ProxyApplicationMapping>() {
 
                 // based on the apps package info and excluded status
                 override fun areItemsTheSame(
-                    oldConnection: WgApplicationMapping,
-                    newConnection: WgApplicationMapping
+                    oldConnection: ProxyApplicationMapping,
+                    newConnection: ProxyApplicationMapping
                 ): Boolean {
-                    return (oldConnection.wgInterfaceId == newConnection.wgInterfaceId &&
+                    return (oldConnection.proxyId == newConnection.proxyId &&
                         oldConnection.uid == newConnection.uid)
                 }
 
                 // return false, when there is difference in excluded status
                 override fun areContentsTheSame(
-                    oldConnection: WgApplicationMapping,
-                    newConnection: WgApplicationMapping
+                    oldConnection: ProxyApplicationMapping,
+                    newConnection: ProxyApplicationMapping
                 ): Boolean {
-                    return (oldConnection.wgInterfaceId == newConnection.wgInterfaceId &&
+                    return (oldConnection.proxyId == newConnection.proxyId &&
                         oldConnection.uid == newConnection.uid)
                 }
             }
@@ -74,42 +75,43 @@ class WgIncludeAppsAdapter(private val context: Context, private val interfaceId
     }
 
     override fun onBindViewHolder(holder: IncludedAppInfoViewHolder, position: Int) {
-        val apps: WgApplicationMapping = getItem(position) ?: return
+        val apps: ProxyApplicationMapping = getItem(position) ?: return
         holder.update(apps)
     }
 
     inner class IncludedAppInfoViewHolder(private val b: ListItemWgIncludeAppsBinding) :
         RecyclerView.ViewHolder(b.root) {
 
-        fun update(mapping: WgApplicationMapping) {
+        fun update(mapping: ProxyApplicationMapping) {
             b.wgIncludeAppListApkLabelTv.text = mapping.appName
             Log.i(
-                LOG_TAG_WIREGUARD,
-                "update - ${mapping.appName}, ${mapping.wgInterfaceId}, $interfaceId, ${mapping.wgInterfaceName}"
+                LOG_TAG_PROXY,
+                "update - ${mapping.appName}, ${mapping.proxyId}, $proxyId, ${mapping.proxyName}"
             )
-            if (mapping.wgInterfaceId == -1) {
+
+            if (mapping.proxyId == "") {
                 b.wgIncludeAppAppDescTv.text = ""
                 b.wgIncludeAppAppDescTv.visibility = View.GONE
                 b.wgIncludeAppListCheckbox.isChecked = false
-            } else if (mapping.wgInterfaceId != interfaceId) {
-                b.wgIncludeAppAppDescTv.text = "part of ${mapping.wgInterfaceName}"
+            } else if (mapping.proxyId != proxyId) {
+                b.wgIncludeAppAppDescTv.text = "part of ${mapping.proxyName}"
                 b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
                 b.wgIncludeAppListCheckbox.isChecked = false
             } else {
                 b.wgIncludeAppAppDescTv.text = ""
                 b.wgIncludeAppAppDescTv.visibility = View.GONE
-                b.wgIncludeAppListCheckbox.isChecked = mapping.wgInterfaceId == interfaceId
+                b.wgIncludeAppListCheckbox.isChecked = mapping.proxyId == proxyId
             }
 
-            val isIncluded = mapping.wgInterfaceId == interfaceId && mapping.wgInterfaceId != -1
+            val isIncluded = mapping.proxyId == proxyId && mapping.proxyId != ""
             displayIcon(getIcon(context, mapping.packageName, mapping.appName))
             setupClickListeners(mapping, isIncluded)
         }
 
-        private fun setupClickListeners(mapping: WgApplicationMapping, isIncluded: Boolean) {
+        private fun setupClickListeners(mapping: ProxyApplicationMapping, isIncluded: Boolean) {
             b.wgIncludeAppListContainer.setOnClickListener {
                 Log.i(
-                    LOG_TAG_WIREGUARD,
+                    LOG_TAG_PROXY,
                     "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded"
                 )
                 updateInterfaceDetails(mapping, !isIncluded)
@@ -117,8 +119,8 @@ class WgIncludeAppsAdapter(private val context: Context, private val interfaceId
 
             b.wgIncludeAppListCheckbox.setOnCheckedChangeListener(null)
             b.wgIncludeAppListCheckbox.setOnClickListener {
-                val isAdded = mapping.wgInterfaceId == interfaceId
-                Log.i(LOG_TAG_WIREGUARD, "wgIncludeAppListCheckbox - ${mapping.appName}, $isAdded")
+                val isAdded = mapping.proxyId == proxyId
+                Log.i(LOG_TAG_PROXY, "wgIncludeAppListCheckbox - ${mapping.appName}, $isAdded")
                 updateInterfaceDetails(mapping, !isAdded)
             }
         }
@@ -130,20 +132,21 @@ class WgIncludeAppsAdapter(private val context: Context, private val interfaceId
                 .into(b.wgIncludeAppListApkIconIv)
         }
 
-        private fun updateInterfaceDetails(mapping: WgApplicationMapping, include: Boolean) {
+        private fun updateInterfaceDetails(mapping: ProxyApplicationMapping, include: Boolean) {
             val appUidList = FirewallManager.getAppNamesByUid(mapping.uid)
 
             if (appUidList.count() > 1) {
                 showDialog(appUidList, mapping, include)
             } else {
                 if (include) {
-                    WireguardManager.updateConfigIdForApp(mapping.uid, interfaceId)
-                    Log.i(LOG_TAG_WIREGUARD, "App ${mapping.appName} included in wg? $interfaceId")
+                    ProxyManager.updateProxyIdForApp(mapping.uid, proxyId, proxyName)
+                    Log.i(LOG_TAG_PROXY, "App ${mapping.appName} included in wg? $proxyId")
                 } else {
-                    WireguardManager.updateConfigIdForApp(mapping.uid, -1)
+                    ProxyManager.removeProxyIdForApp(mapping.uid)
+                    b.wgIncludeAppListCheckbox.isChecked = false
                     Log.i(
-                        LOG_TAG_WIREGUARD,
-                        "App ${mapping.appName} removed from wg? prev id ${mapping.wgInterfaceId}}"
+                        LOG_TAG_PROXY,
+                        "App ${mapping.appName} removed from wg? prev id ${mapping.proxyId}}"
                     )
                 }
             }
@@ -151,18 +154,18 @@ class WgIncludeAppsAdapter(private val context: Context, private val interfaceId
 
         private fun showDialog(
             packageList: List<String>,
-            mapping: WgApplicationMapping,
-            isIncluded: Boolean
+            mapping: ProxyApplicationMapping,
+            included: Boolean
         ) {
             val positiveTxt: String
 
-            val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
+            val builderSingle= MaterialAlertDialogBuilder(context)
 
             builderSingle.setIcon(R.drawable.ic_firewall_exclude_on)
 
             val count = packageList.count()
             positiveTxt =
-                if (isIncluded) {
+                if (included) {
                     builderSingle.setTitle("Include apps - $count")
                     "Include"
                 } else {
@@ -178,12 +181,13 @@ class WgIncludeAppsAdapter(private val context: Context, private val interfaceId
 
             builderSingle
                 .setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                    if (isIncluded) {
-                        WireguardManager.updateConfigIdForApp(mapping.uid, interfaceId)
-                        Log.i(LOG_TAG_WIREGUARD, "Included apps: ${mapping.uid}")
+                    if (included) {
+                        ProxyManager.updateProxyIdForApp(mapping.uid, proxyId, proxyName)
+                        Log.i(LOG_TAG_PROXY, "Included apps: ${mapping.uid}, $proxyId, $proxyName")
                     } else {
-                        WireguardManager.updateConfigIdForApp(mapping.uid, -1)
-                        Log.i(LOG_TAG_WIREGUARD, "Removed apps: ${mapping.uid}")
+                        ProxyManager.removeProxyIdForApp(mapping.uid)
+                        b.wgIncludeAppListCheckbox.isChecked = false
+                        Log.i(LOG_TAG_PROXY, "Removed apps: ${mapping.uid}, $proxyId, $proxyName")
                     }
                 }
                 .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) {

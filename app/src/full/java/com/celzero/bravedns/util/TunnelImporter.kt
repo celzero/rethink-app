@@ -133,7 +133,7 @@ object TunnelImporter : KoinComponent {
 
     fun importTunnel(configText: String, messageCallback: (CharSequence) -> Unit) {
         try {
-            Log.d(LoggerConstants.LOG_TAG_WIREGUARD, "Importing tunnel: $configText")
+            Log.d(LoggerConstants.LOG_TAG_PROXY, "Importing tunnel: $configText")
             val config =
                 Config.parse(ByteArrayInputStream(configText.toByteArray(StandardCharsets.UTF_8)))
             WireguardManager.addConfig(config)
@@ -151,7 +151,7 @@ object TunnelImporter : KoinComponent {
         for (throwable in throwables) {
             val error = ErrorMessages[context, throwable]
             message = context.getString(R.string.import_error, error)
-            Log.e(LoggerConstants.LOG_TAG_WIREGUARD, message, throwable)
+            Log.e(LoggerConstants.LOG_TAG_PROXY, message, throwable)
         }
         // trim the message and take string after ":"
         val idx = message.indexOf(':')

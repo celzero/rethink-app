@@ -28,6 +28,8 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
@@ -47,6 +49,7 @@ import intra.Intra
 import intra.Tunnel
 import ipn.Ipn
 import java.io.IOException
+import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -275,20 +278,13 @@ class GoVpnAdapter(
     }
 
     private suspend fun setTunnelMode(tunnelOptions: TunnelOptions) {
-        if (tunnelOptions.tunProxyMode.isTunProxyOrbot()) {
-            tunnel?.setTunMode(
-                tunnelOptions.tunDnsMode.mode,
-                tunnelOptions.tunFirewallMode.mode,
-                tunnelOptions.ptMode.id
-            )
-        } else {
-            tunnel?.setTunMode(
-                tunnelOptions.tunDnsMode.mode,
-                tunnelOptions.tunFirewallMode.mode,
-                tunnelOptions.ptMode.id
-            )
-        }
-        setWireguardTunnelModeIfNeeded(tunnelOptions.wireguradMode)
+        tunnel?.setTunMode(
+            tunnelOptions.tunDnsMode.mode,
+            tunnelOptions.tunFirewallMode.mode,
+            tunnelOptions.ptMode.id
+        )
+        setTcpProxyIfNeeded()
+        setWireguardTunnelModeIfNeeded(tunnelOptions.tunProxyMode)
         setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
         setHttpProxyIfNeeded(tunnelOptions.tunProxyMode)
     }
@@ -358,7 +354,7 @@ class GoVpnAdapter(
      * TODO - Move these code to common place and set the tunnel mode and other parameters. Return
      * the tunnel to the adapter.
      */
-    private fun setProxyMode(
+    private fun setSocks5Proxy(
         tunProxyMode: AppConfig.TunProxyMode,
         userName: String?,
         password: String?,
@@ -390,18 +386,22 @@ class GoVpnAdapter(
         ipAddress: String?,
         port: Int
     ): String {
+        // socks5://<username>:<password>@<ip>:<port>
+        // convert string to url
         val proxyUrl = StringBuilder()
         proxyUrl.append("socks5://")
-        if (!userName.isNullOrEmpty() && !password.isNullOrEmpty()) {
+        if (!userName.isNullOrEmpty()) {
             proxyUrl.append(userName)
-            proxyUrl.append(":")
-            proxyUrl.append(password)
+            if (!password.isNullOrEmpty()) {
+                proxyUrl.append(":")
+                proxyUrl.append(password)
+            }
             proxyUrl.append("@")
         }
         proxyUrl.append(ipAddress)
         proxyUrl.append(":")
         proxyUrl.append(port)
-        return proxyUrl.toString()
+        return URI.create(proxyUrl.toString()).toASCIIString()
     }
 
     private fun showDnscryptConnectionFailureToast() {
@@ -424,19 +424,23 @@ class GoVpnAdapter(
         }
     }
 
-    private suspend fun setWireguardTunnelModeIfNeeded(tunWireguardMode: AppConfig.WireguardMode) {
-        if (!tunWireguardMode.isTunWireguard()) return
+    private fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
+        if (!tunProxyMode.isTunProxyWireguard()) return
 
         val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
         if (wgConfigs.isEmpty()) {
             Log.w(LOG_TAG_VPN, "no wireguard config found")
+            if (persistentState.wireguardEnabledCount > 0) {
+                persistentState.wireguardEnabledCount = 0
+                Log.i(LOG_TAG_VPN, "wireguard enabled count reset to 0 as no config found")
+            }
             return
         }
         wgConfigs.forEach {
             val wgUserSpaceString = it.toWgUserspaceString()
             Log.i(
                 LOG_TAG_VPN,
-                "adding wireguard config id(${Ipn.WG + it.getId()}): $wgUserSpaceString"
+                "adding wireguard config id(${Ipn.WG + it.getId()}), ${it.getName()}"
             )
             tunnel?.proxies?.addProxy(Ipn.WG + it.getId(), wgUserSpaceString)
         }
@@ -446,7 +450,10 @@ class GoVpnAdapter(
         if (!tunProxyMode.isTunProxySocks5() && !tunProxyMode.isTunProxyOrbot()) return
 
         val socks5: ProxyEndpoint? =
-            if (tunProxyMode.isTunProxyOrbot()) {
+            if (
+                tunProxyMode.isTunProxyOrbot() &&
+                    AppConfig.ProxyType.of(persistentState.proxyType).isSocks5Enabled()
+            ) {
                 appConfig.getOrbotProxyDetails()
             } else {
                 appConfig.getSocks5ProxyDetails()
@@ -455,7 +462,7 @@ class GoVpnAdapter(
             Log.w(LOG_TAG_VPN, "could not fetch socks5 details for proxyMode: $tunProxyMode")
             return
         }
-        setProxyMode(
+        setSocks5Proxy(
             tunProxyMode,
             socks5.userName,
             socks5.password,
@@ -463,6 +470,17 @@ class GoVpnAdapter(
             socks5.proxyPort
         )
         Log.i(LOG_TAG_VPN, "Socks5 mode set: " + socks5.proxyIP + "," + socks5.proxyPort)
+    }
+
+    fun getProxyStatusById(id: String): Long? {
+        return try {
+            val status = tunnel?.proxies?.getProxy(id)?.status()
+            if (DEBUG) Log.d(LOG_TAG_VPN, "getProxyStatusById: $id, $status")
+            status
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "getProxyStatusById: $id, ${e.message}", e)
+            null
+        }
     }
 
     private fun setHttpProxyIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
@@ -478,13 +496,52 @@ class GoVpnAdapter(
         Log.i(LOG_TAG_VPN, "Http mode set with url: $httpProxyUrl")
     }
 
+    // v055, unused
+    private fun setTcpProxyIfNeeded() {
+        if (!appConfig.isTcpProxyEnabled()) {
+            Log.i(LOG_TAG_VPN, "tcp proxy not enabled")
+            return
+        }
+
+        val tcpProxyUrl = TcpProxyHelper.getActiveTcpProxy()
+        if (tcpProxyUrl == null) {
+            Log.w(LOG_TAG_VPN, "could not fetch tcp proxy details")
+            return
+        }
+
+        val ips = getIpString(context, "https://sky.rethinkdns.com/")
+        Log.d(LOG_TAG_VPN, "ips: $ips")
+        // svc.rethinkdns.com / duplex.deno.dev
+        val added =
+            tunnel
+                ?.proxies
+                ?.addProxy(ProxyManager.ID_TCP_BASE, "pipws://proxy.nile.workers.dev/ws/nosig")
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_VPN,
+                "Tcp mode set(${ProxyManager.ID_TCP_BASE}): ${tcpProxyUrl.url}, res: $added"
+            )
+        val secWarp = WireguardManager.getSecWarpConfig()
+        if (secWarp == null) {
+            Log.w(LOG_TAG_VPN, "no sec warp config found")
+            return
+        }
+        val wgUserSpaceString = secWarp.toWgUserspaceString()
+        val added2 = tunnel?.proxies?.addProxy(Ipn.WG + secWarp.getId(), wgUserSpaceString)
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_VPN,
+                "Tcp mode(wireguard) set(${Ipn.WG + secWarp.getId()}): ${secWarp.getName()}, res: $added2"
+            )
+    }
+
     private fun constructHttpsProxyUrl(p: ProxyInfo): String {
         val proxyUrl = StringBuilder()
         proxyUrl.append("https://")
         proxyUrl.append(p.host)
         proxyUrl.append(":")
         proxyUrl.append(p.port)
-        return proxyUrl.toString()
+        return URI.create(proxyUrl.toString()).toASCIIString()
     }
 
     fun hasTunnel(): Boolean {

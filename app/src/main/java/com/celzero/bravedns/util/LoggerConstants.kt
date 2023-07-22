@@ -31,6 +31,6 @@ class LoggerConstants {
         const val LOG_TAG_SCHEDULER = "JobScheduler"
         const val LOG_TAG_BACKUP_RESTORE = "BackupRestore"
         const val LOG_PROVIDER = "BlocklistProvider"
-        const val LOG_TAG_WIREGUARD = "WireGuard"
+        const val LOG_TAG_PROXY = "ProxyLogs"
     }
 }
