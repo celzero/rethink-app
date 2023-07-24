@@ -253,26 +253,6 @@
                         app:barrierDirection="bottom"
                         app:constraint_referenced_ids="listen_port_text,mtu_text" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/applications_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:labelFor="@+id/config_apps_text"
-                        android:text="@string/lbl_applications"
-                        android:textColor="?attr/primaryTextColor"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/listen_port_mtu_barrier" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/applications_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="?attr/primaryTextColor"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/applications_label"
-                        tools:text="8 excluded" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/applications_btn"
                         style="@style/Widget.Material3.Button.TextButton"

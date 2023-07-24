@@ -24,7 +24,6 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -241,7 +240,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun handleAppsCount() {
         val id = ProxyManager.ID_WG_BASE + configId
         mappingViewModel.getAppCountById(id).observe(this) {
-            b.applicationsText.text = getString(R.string.firewall_card_status_active, it.toString())
+            b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
 
