@@ -2216,36 +2216,32 @@ class BraveVPNService :
         // check for other proxy rules
         // wireguard
         if (appConfig.isWireguardEnabled()) {
-            val enabledWireguardConfigs = WireguardManager.getActiveConfigs()
-            if (enabledWireguardConfigs.isEmpty()) {
-                Log.e(LOG_TAG_VPN, "flow: no configs are enabled for wireguard")
-                // pass-through
+            val id = WireguardManager.getActiveConfigIdForApp(uid)
+            val proxyId = "${ProxyManager.ID_WG_BASE}$id"
+            // if no config is assigned / enabled for this app, pass-through
+            // add ID_WG_BASE to the id to get the proxyId
+            if (
+                id == WireguardManager.INVALID_CONF_ID ||
+                    !WireguardManager.isConfigActive(proxyId)
+            ) {
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: wireguard is enabled but app is not included, proceed for other checks, $connectionId, $uid"
+                    )
+                // pass-through, no wireguard config is enabled for this app
             } else {
-                val id = WireguardManager.getActiveConfigIdForApp(uid)
-                // if no config is assigned / enabled for this app, pass-through
-                if (
-                    id == WireguardManager.INVALID_CONF_ID ||
-                        enabledWireguardConfigs.none { it.getId() == id }
-                ) {
-                    if (DEBUG)
-                        Log.d(
-                            LOG_TAG_VPN,
-                            "flow: wireguard is enabled but app is not included, proceed for other checks, $connectionId, $uid"
-                        )
-                    // pass-through, no wireguard config is enabled for this app
-                } else {
-                    val proxyId = "${Ipn.WG}$id"
-                    if (DEBUG)
-                        Log.d(
-                            LOG_TAG_VPN,
-                            "flow: wireguard is enabled and app is included, returning $proxyId, $connectionId, $uid"
-                        )
-                    return getFlowResponseString(proxyId, connectionId, uid)
-                }
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: wireguard is enabled and app is included, returning $proxyId, $connectionId, $uid"
+                    )
+                return getFlowResponseString(proxyId, connectionId, uid)
             }
         }
 
-        if (appConfig.isTcpProxyEnabled()) {
+        // comment out tcp proxy for v055 release
+        /*if (appConfig.isTcpProxyEnabled()) {
             val activeId = ProxyManager.getProxyIdForApp(uid)
             if (!activeId.contains(ProxyManager.ID_TCP_BASE)) {
                 Log.e(LOG_TAG_VPN, "flow: tcp proxy is enabled but app is not included")
@@ -2273,7 +2269,7 @@ class BraveVPNService :
                     )
                 return getFlowResponseString(ProxyManager.ID_TCP_BASE, connectionId, uid)
             }
-        }
+        }*/
 
         // chose socks5 proxy over http proxy
         if (appConfig.isOrbotProxyEnabled()) {
@@ -2287,7 +2283,7 @@ class BraveVPNService :
                         LOG_TAG_VPN,
                         "flow: received rule: orbot, returning Ipn.OrbotS5, $connectionId, $uid"
                     )
-                return getFlowResponseString(Ipn.OrbotS5, connectionId, uid)
+                return getFlowResponseString(ProxyManager.ID_ORBOT_BASE, connectionId, uid)
             }
         }
 
@@ -2310,7 +2306,7 @@ class BraveVPNService :
         }
 
         if (DEBUG)
-            Log.d(LOG_TAG_VPN, "flow: no proxy enabled, returning Ipn.Base, $connectionId, $uid")
+            Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connectionId, $uid")
         return getFlowResponseString(Ipn.Base, connectionId, uid)
     }
 

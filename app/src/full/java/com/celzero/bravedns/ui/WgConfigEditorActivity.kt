@@ -60,7 +60,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, -1)
+        configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireguardManager.INVALID_CONF_ID)
         Log.d(LOG_TAG_PROXY, "WgTunnelEditorActivity - tunnelId : $configId")
         init()
         setupClickListeners()
@@ -99,11 +99,11 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     }
 
     private fun handleAppsCount() {
-        if (configId == -1) return
+        if (configId == WireguardManager.INVALID_CONF_ID) return
 
         val proxyId = ProxyManager.ID_WG_BASE + configId
         mappingViewModel.getAppCountById(proxyId).observe(this) {
-            b.mapApplications.text = getString(R.string.firewall_card_status_active, it.toString())
+            b.mapApplications.text = getString(R.string.add_remove_apps, it.toString())
         }
     }
 

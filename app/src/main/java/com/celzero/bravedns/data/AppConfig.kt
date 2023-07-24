@@ -38,7 +38,6 @@ import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -353,6 +352,14 @@ internal constructor(
             return isProxyTypeSocks5() || isProxyTypeHttpSocks5()
         }
 
+        fun isAnyProxyEnabled(): Boolean {
+            return isProxyTypeHttp() ||
+                isProxyTypeSocks5() ||
+                isProxyTypeHttpSocks5() ||
+                isProxyTypeTcp() ||
+                isProxyTypeWireguard()
+        }
+
         companion object {
             fun of(name: String): ProxyType {
                 return when (name) {
@@ -489,7 +496,11 @@ internal constructor(
     }
 
     fun isWireguardEnabled(): Boolean {
-        return persistentState.wireguardEnabledCount > 0
+        val proxyType = ProxyType.of(persistentState.proxyType)
+        // adding extra check of persistentState.wireguardEnabledCount > 0
+        // to make sure the wireguard is enabled and the count is greater than 0
+        // consider removing the check
+        return proxyType.isProxyTypeWireguard() && persistentState.wireguardEnabledCount > 0
     }
 
     fun getHttpProxyInfo(): ProxyInfo? {
@@ -1028,7 +1039,7 @@ internal constructor(
         if (proxyProvider.isProxyProviderNone()) return false
 
         val proxyType = ProxyType.of(persistentState.proxyType)
-        return !proxyType.isProxyTypeNone()
+        return proxyType.isAnyProxyEnabled()
     }
 
     fun canEnableProxy(): Boolean {
@@ -1043,21 +1054,18 @@ internal constructor(
 
     fun canEnableWireguardProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        Log.d(LOG_TAG_VPN, "canEnableWireguardProxy: ${proxyProvider.name}")
         return canEnableProxy() &&
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderWireguard())
     }
 
     fun canEnableHttpProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        Log.d(LOG_TAG_VPN, "canEnableHttpProxy: ${proxyProvider.name}")
         return !getBraveMode().isDnsMode() &&
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
     }
 
     fun canEnableTcpProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        Log.d(LOG_TAG_VPN, "canEnableTcpProxy: ${proxyProvider.name}")
         return !getBraveMode().isDnsMode() &&
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderTcp())
     }

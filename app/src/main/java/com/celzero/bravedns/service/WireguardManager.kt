@@ -171,7 +171,7 @@ object WireguardManager : KoinComponent {
         val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
         appConfig.addProxy(proxyType, proxyProvider)
         persistentState.wireguardEnabledCount++
-        Log.d(LOG_TAG_PROXY, "enable wg config: ${configFiles.id}, ${configFiles.name}")
+        Log.i(LOG_TAG_PROXY, "enable wg config: ${configFiles.id}, ${configFiles.name}")
         return
     }
 
@@ -211,6 +211,7 @@ object WireguardManager : KoinComponent {
             val proxyType = AppConfig.ProxyType.WIREGUARD
             val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
             appConfig.removeProxy(proxyType, proxyProvider)
+            persistentState.wireguardEnabledCount = 0
         }
         Log.i(
             LOG_TAG_PROXY,

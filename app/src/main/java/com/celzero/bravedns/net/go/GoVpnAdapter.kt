@@ -365,9 +365,9 @@ class GoVpnAdapter(
             val url = constructSocks5ProxyUrl(userName, password, ipAddress, port)
             val id =
                 if (tunProxyMode.isTunProxyOrbot()) {
-                    Ipn.OrbotS5
+                    ProxyManager.ID_ORBOT_BASE
                 } else {
-                    Ipn.SOCKS5
+                    ProxyManager.ID_S5_BASE
                 }
             val result = tunnel?.proxies?.addProxy(id, url)
             Log.i(LOG_TAG_VPN, "Proxy mode set with tunnel url($id): $url, result: $result")
