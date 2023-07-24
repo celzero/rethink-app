@@ -18,6 +18,7 @@
         android:background="?attr/border" />
 
     <RelativeLayout
+        android:id="@+id/bs_orbot_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -70,7 +71,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/config_apps_text"
+        app:layout_constraintTop_toBottomOf="@id/bs_orbot_header"
         app:layout_constraintWidth_max="@dimen/max_btn_size"
         app:rippleColor="?attr/secondaryTextColor" />
 
