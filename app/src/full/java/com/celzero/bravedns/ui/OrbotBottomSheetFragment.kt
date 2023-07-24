@@ -29,7 +29,6 @@ import android.view.Window
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
@@ -93,6 +92,7 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeApps()
         setupClickListeners()
     }
 
@@ -107,6 +107,12 @@ class OrbotBottomSheetFragment : BottomSheetDialogFragment() {
             uiCtx { updateUi(isOrbotDns) }
         }
         handleHttpUI()
+    }
+
+    private fun observeApps() {
+        mappingViewModel.getAppCountById(ProxyManager.ID_ORBOT_BASE).observe(viewLifecycleOwner) {
+            b.includeApplications.text = getString(R.string.add_remove_apps, it.toString())
+        }
     }
 
     private fun handleHttpUI() {
