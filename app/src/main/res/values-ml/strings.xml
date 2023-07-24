@@ -25,7 +25,6 @@
     <string name="lbl_blocked" translatable="true">തടഞ്ഞു</string>
     <string name="lbl_disabled" translatable="true">അപ്രാപ്തമാക്കി</string>
     <string name="lbl_action_required" translatable="true">നടപടി ആവശ്യമാണ്</string>
-    <string name="rt_list_adv_btn_txt" translatable="true">വിപുലമായ</string>
     <string name="lbbs_enabled" translatable="true">പ്രവർത്തനക്ഷമമാക്കി</string>
     <string name="notification_action_stop_vpn" translatable="true">നിർത്തുക</string>
     <string name="always_on_dialog_positive_btn" translatable="true">ക്രമീകരണങ്ങളിലേക്ക് പോകുക</string>
