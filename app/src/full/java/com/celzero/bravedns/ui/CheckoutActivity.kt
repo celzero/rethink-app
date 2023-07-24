@@ -24,8 +24,6 @@ import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UiUtils.fetchColor
-import com.stripe.android.paymentsheet.PaymentSheet
-import com.stripe.android.paymentsheet.PaymentSheetResult
 import ipn.Ipn
 import java.io.File
 import java.math.BigInteger
@@ -39,8 +37,8 @@ import org.koin.android.ext.android.inject
 class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
     private val b by viewBinding(ActivityCheckoutProxyBinding::bind)
     private val persistentState by inject<PersistentState>()
-    lateinit var paymentSheet: PaymentSheet
-    lateinit var customerConfig: PaymentSheet.CustomerConfiguration
+    //lateinit var paymentSheet: PaymentSheet
+    //lateinit var customerConfig: PaymentSheet.CustomerConfiguration
     lateinit var paymentIntentClientSecret: String
 
     companion object {
@@ -216,7 +214,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
         }
     }
 
-    fun presentPaymentSheet() {
+    /*fun presentPaymentSheet() {
         paymentSheet.presentWithPaymentIntent(
             paymentIntentClientSecret,
             PaymentSheet.Configuration(
@@ -243,7 +241,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
                 print("Completed")
             }
         }
-    }
+    }*/
 
     private fun setSpannablePricing(btn: RadioButton, planType: String, planPrice: String) {
 
