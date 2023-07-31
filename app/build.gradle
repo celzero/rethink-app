@@ -163,7 +163,7 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.5.7'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
