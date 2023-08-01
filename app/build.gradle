@@ -243,19 +243,6 @@ dependencies {
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
 }
 
-task downloadDependencies(type: Copy) {
-    from configurations.download
-    into "libs"
-}
-
-task unzipJNI(type: Copy) {
-    dependsOn downloadDependencies
-    fileTree(dir: 'libs', includes: ['**/*.aar']).each { zipFile ->
-        from zipTree(zipFile).matching({ include 'jni/**' })
-    }
-    into "libs"
-}
-
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
 task downloadBlocklists(type: Download) {
     // def assetsDir = new File(projectDir, 'src/main/assets'
@@ -280,4 +267,10 @@ task downloadBlocklists(type: Download) {
     useETag true
     // overwrite older files as determined by last-modified, always
     overwrite true
+}
+
+task downloadDependencies(type: Copy) {
+    dependsOn downloadBlocklists
+    from configurations.download
+    into "libs"
 }
