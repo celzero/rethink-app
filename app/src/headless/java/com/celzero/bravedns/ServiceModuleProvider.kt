@@ -42,8 +42,7 @@ val AppModules: List<Module> by lazy {
         add(RootModule)
         addAll(DatabaseModule.modules)
         addAll(DataModule.modules)
-        addAll(ServiceModule.modules)
-        add(orbotHelperModule)
         add(schedulerModule)
+        add(orbotHelperModule)
     }
 }
