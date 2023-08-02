@@ -1,2 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="title_settings" translatable="true">설정</string>
+    <string name="title_statistics" translatable="true">통계</string>
+    <string name="pause_title_desc" translatable="true">낮잠 자는 중…</string>
+    <string name="settings_title_desc" translatable="true">고도로 사용자 정의 가능한 DNS 및 방화벽</string>
+    <string name="title_about" translatable="true">정보</string>
+    <string name="about_title_desc" translatable="true">네트워크 보안 위협 탐지 및 차단</string>
+    <string name="txt_home" translatable="true">홈</string>
+    <string name="next" translatable="true">다음</string>
+    <string name="skip" translatable="true">넘기기</string>
+    <string name="lbl_dismiss" translatable="true">해제</string>
+    <string name="accessibility_service_description" translatable="true">Rethink는 접근성 서비스를 사용하여 백그라운드 애플리케이션을 탐지하고 방화벽을 차단합니다. Rethink는 어떤 정보도 수집하거나 판매하지 않습니다.</string>
+    <string name="finish" translatable="true">끝내기</string>
+    <string name="lbl_cancel" translatable="true">취소</string>
+    <string name="lbl_apply" translatable="true">적용</string>
+</resources>
