@@ -16,55 +16,52 @@
 package com.celzero.bravedns.util
 
 import android.content.Context
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLISTS_IN_APP
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import java.io.File
 import java.io.InputStreamReader
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-class LocalBlocklistUtil(val context: Context) {
+class LocalBlocklistUtil(val context: Context, val persistentState: PersistentState) {
 
     fun init() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val jsonObject: JsonObject =
-                JsonParser.parseReader(
-                    InputStreamReader(
-                        context.assets.open(
-                            ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG.removePrefix(File.separator)
+        val jsonObject: JsonObject =
+            JsonParser.parseReader(
+                InputStreamReader(
+                    context.assets.open(
+                        ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG.removePrefix(File.separator)
+                    )
+                )
+            ) as JsonObject
+
+        val localBlocklistTimestamp =
+            jsonObject.get("timestamp").asString.split("/").last().toLong()
+        persistentState.localBlocklistTimestamp = localBlocklistTimestamp
+
+        val assets = context.assets.list("") ?: return
+        for (asset in assets) {
+            val file =
+                ONDEVICE_BLOCKLISTS_IN_APP.firstOrNull {
+                    asset.contains(it.filename.removePrefix(File.separator))
+                }
+                    ?: continue
+            context.assets
+                .open(file.filename.removePrefix(File.separator))
+                .copyTo(
+                    File(
+                            Utilities.blocklistDir(
+                                    context,
+                                    Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                                    localBlocklistTimestamp
+                                )
+                                ?.apply { mkdirs() }
+                                ?: return,
+                            file.filename.removePrefix(File.separator)
                         )
-                    )
-                ) as JsonObject
-
-            val localBlocklistTimestamp =
-                jsonObject.get("timestamp").asString.split("/").last().toLong()
-
-            val assets = context.assets.list("") ?: return@launch
-            for (asset in assets) {
-                val file =
-                    ONDEVICE_BLOCKLISTS_IN_APP.firstOrNull {
-                        asset.contains(it.filename.removePrefix(File.separator))
-                    }
-                        ?: continue
-                context.assets
-                    .open(file.filename.removePrefix(File.separator))
-                    .copyTo(
-                        File(
-                                Utilities.blocklistDir(
-                                        context,
-                                        Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                                        localBlocklistTimestamp
-                                    )
-                                    ?.apply { mkdirs() }
-                                    ?: return@launch,
-                                file.filename.removePrefix(File.separator)
-                            )
-                            .outputStream()
-                    )
-            }
+                        .outputStream()
+                )
         }
     }
 }
