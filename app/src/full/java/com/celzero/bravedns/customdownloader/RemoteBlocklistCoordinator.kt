@@ -90,7 +90,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
     }
 
     private suspend fun downloadRemoteBlocklist(timestamp: Long): Boolean {
-        Log.d(LoggerConstants.LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
+        Log.i(LoggerConstants.LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
 
         val retrofit =
             RetrofitManager.getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)

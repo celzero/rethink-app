@@ -111,8 +111,7 @@
             android:layout_marginBottom="2dp"
             android:clickable="true"
             android:focusable="true"
-            android:orientation="vertical"
-            />
+            android:orientation="vertical" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/connection_list_scroll_header"

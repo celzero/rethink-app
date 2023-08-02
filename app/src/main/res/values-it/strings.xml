@@ -181,10 +181,10 @@
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">Orbot in modalità non-vpn con HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc">Tocca qui per installare Orbot</string>
-    <string name="settings_socks5_disabled_error">Connesso a Orbot. Disabilitarlo per continuare.</string>
-    <string name="settings_socks5_vpn_disabled_error">Avvia Rethink per continuare.</string>
+    <string name="settings_socks5_disabled_error">Connesso a %1$s. Disabilitarlo per continuare.</string>
+    <string name="settings_socks5_vpn_disabled_error">Avvia RethinkDNS per continuare.</string>
     <string name="settings_orbot_disabled_error">Disattiva il proxy HTTP(S) e/o SOCKS5 per continuare a impostare Tor-come-proxy.</string>
-    <string name="settings_https_disabled_error">Connesso a Orbot. Disabilitarlo per continuare.</string>
+    <string name="settings_https_disabled_error">Connesso a %1$s. Disabilitarlo per continuare.</string>
     <string name="settings_orbot_notification_content">Errore durante l\'avvio di Tor-come-Proxy. Apri l\'app Orbot e avvialo manualmente.</string>
     <string name="settings_orbot_notification_action">Apri Orbot</string>
     <string name="settings_general_header">generali</string>
@@ -260,7 +260,7 @@
     <string name="firewall_status_allow">consentito</string>
     <string name="firewall_status_whitelisted">Aggira le regole universali del firewall</string>
     <string name="firewall_status_blocked">bloccata</string>
-    <string name="hsf_vpn_dialog_positive">Procedi</string>
+    <string name="lbl_proceed">Procedi</string>
     <string name="hsf_vpn_dialog_message">Rethink ha bisogno del permesso di impostare una VPN locale per crittografare le richieste DNS del dispositivo, monitorare le connessioni di rete e applicare le regole del firewall.
 \n
 \nRethink non raccoglie informazioni né spia l\'utente in alcun modo.</string>
@@ -281,7 +281,6 @@
     <string name="univ_ip_delete_dialog_positive">Elimina tutti</string>
     <string name="fapps_filter_categories_heading">Categorie</string>
     <string name="dns_query_latency">%1$s ms</string>
-    <string name="dns_proxy_positive_btn">aggiungi</string>
     <string name="dns_proxy_dialog_message">Nome app: %1$s
 \n
 \nIndirizzo IP: %2$s
@@ -401,7 +400,6 @@
     <string name="hsf_pause_lockdown_failure">Impossibile mettere in pausa: Rethink è impostata come VPN obbligatoria</string>
     <string name="dc_block_heading">regole</string>
     <string name="dc_other_dns_heading">tipo</string>
-    <string name="dc_other_settings_heading">avanzate</string>
     <string name="dc_custom_dns_radio">Altro DNS</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_entries">%1$s elementi »</string>
@@ -482,19 +480,17 @@
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_desc">Descrizione (facoltativa)</string>
     <string name="cd_dns_crypt_dialog_name">Nome</string>
-    <string name="cd_dialog_positive_btn">aggiungi</string>
+    <string name="lbl_add">aggiungi</string>
     <string name="cd_dns_crypt_dialog_stamp">Stamp</string>
     <string name="cd_dns_crypt_error_text_1">Lo stamp non può essere vuoto</string>
     <string name="cd_doh_dialog_heading">Aggiungi DNS su HTTPS</string>
     <string name="cd_doh_dialog_resolver_name">Nome Resolver</string>
     <string name="cd_doh_dialog_resolver_url">URL del Resolver</string>
     <string name="cd_dnscrypt_relay_heading">Relay</string>
-    <string name="ct_delete_logs_positive_btn">Cancella registro</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="ctbs_app_info_not_available_toast">Pagina delle impostazioni dell\'app non trovata</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s altre app</string>
     <string name="ctbs_block_other_apps">Le regole applicate a %1$s saranno applicate anche a %2$s altre applicazioni</string>
-    <string name="ctbs_proceed_positive_text">Procedi</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s liste dei filtri&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip">+%1$s altri IP</string>
@@ -514,9 +510,8 @@
     <string name="univ_firewall_rule_4">Blocca connessioni UDP, con eccezione di DNS e NTP</string>
     <string name="univ_firewall_rule_7">Blocca IPv4 quando su IPv6 (sperimentale)</string>
     <string name="univ_firewall_rule_9">Blocca connessioni a consumo (dati mobili)</string>
-    <string name="univ_view_blocked_ip">Regole IP e porte</string>
-    <string name="univ_view_blocked_ip_desc">Modifica regole per Dominio, IP / Porta bloccati o autorizzati.</string>
-    <string name="univ_ip_delete_individual_positive">Elimina</string>
+    <string name="univ_view_blocked_ip">regole ip e porte</string>
+    <string name="univ_view_blocked_ip_desc">Modifica regole oer IP / Porte bloccati o autorizzati.</string>
     <string name="univ_ip_delete_toast_success">Tutte le regole IP sono state eliminate.</string>
     <string name="univ_delete_firewall_dialog_title">Elimina tutte le regole IP\?</string>
     <string name="univ_delete_firewall_dialog_message">Eliminare queste regole consentirà a qualunque applicazione di connettersi agli IP che stanno bloccando.</string>
@@ -526,7 +521,6 @@
     <string name="dns_connected_rethink_plus">Connesso. %1$s liste dei filtri in uso</string>
     <string name="dns_connected_no_count">Connesso</string>
     <string name="dns_connected">Connesso</string>
-    <string name="dns_delete_positive">Elimina</string>
     <string name="dns_info_positive">Ok</string>
     <string name="dns_info_neutral">Copia</string>
     <string name="dns_crypt_relay_error_toast">Nessun resolver selezionato</string>
@@ -555,7 +549,6 @@
     <string name="fapps_metered_block_dialog_message">Bloccare le connessioni sulla rete a consumo (dati mobili) delle le applicazioni <i>elencate</i>\?</string>
     <string name="fapps_firewall_filter_hint">Mostra tutte le app</string>
     <string name="fapps_lockdown_hint">La VPN è in modalità obbligatoria. Il Firewall non rispetterà le regole A Consumo / Non a Consumo.</string>
-    <string name="fapps_all_network_hint"><u>Utilizza tutte le reti disponibili</u> è attivo. Il Firewall non rispetterà le regole A Consumo / Non a Consumo.</string>
     <string name="fapps_firewall_filter_desc"><u>%1$s</u>%2$s app elencate</string>
     <string name="fapps_firewall_filter_desc_category"><u>%1$s</u> %2$s app elencate delle categorie: %3$s</string>
     <string name="rules_load_failure_heading">Nota</string>
@@ -649,12 +642,10 @@
     <string name="build__flavor_website">sito web</string>
     <string name="build__flavor_play_store">play</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="cd_dialog_header">Domini(o) personalizzati/o: %1$s</string>
     <string name="cd_toast_deleted">Dominio rimosso dalla lista</string>
     <string name="cd_toast_added">Dominio aggiunto con successo</string>
     <string name="cd_remove_dialog_title">Elimina dominio\?</string>
     <string name="cd_remove_dialog_message">Elimina il dominio dalla configurazione salvata.</string>
-    <string name="cd_remove_dialog_positive">Elimina</string>
     <string name="cd_dialog_title">Aggiungi dominio</string>
     <string name="cd_dialog_desc">Consenti o blocca uno specifico URL (dominio) o un insieme di questi utilizzando una wild-card. es. *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Scrivi %1$s</string>
@@ -667,8 +658,7 @@
     <string name="ci_dialog_edittext_hint">Indirizzo IP, sottorete o porta</string>
     <string name="ci_dialog_error_invalid_ip">Indirizzo IP, sottorete o porta non validi.</string>
     <string name="ci_dialog_added_success">IP aggiunto alla lista</string>
-    <string name="ci_header">Regole IP e porte: %1$s</string>
-    <string name="ci_no_rules_text">Nessuna regola IP o porta.</string>
+    <string name="ci_no_rules_text">Non è stata trovata alcuna regola IP o porta.</string>
     <string name="ci_bypass_universal_initial">AU</string>
     <string name="ci_bypass_universal_txt">Aggira regole Universali</string>
     <string name="ci_blocked_initial">B</string>
@@ -707,7 +697,7 @@
     <string name="rt_chip_check_update">Controlla aggiornamenti</string>
     <string name="rt_re_download">Ri-scarica le liste dei filtri</string>
     <string name="rt_list_simple_btn_txt">semplice</string>
-    <string name="rt_list_adv_btn_txt">avanzate</string>
+    <string name="lbl_advanced">avanzate</string>
     <string name="rt_download_desc">Per utilizzare questa funzione, scarica le liste dei filtri (circa 60 MB).</string>
     <string name="radio_sky_btn">⛅ Sky</string>
     <string name="radio_max_btn">🪂 Max</string>
@@ -760,7 +750,6 @@
     <string name="ci_trust_txt">Autorizzato</string>
     <string name="ada_firewall_title">regole firewall per questa app</string>
     <string name="ada_app_isolate">Isola</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Procedi</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Elimina registri</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Elimina tutti i registri relativi a questa applicazione.</string>
     <string name="notif_download_cancel_content">Download annullato.</string>

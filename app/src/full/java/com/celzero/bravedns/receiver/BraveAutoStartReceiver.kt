@@ -23,7 +23,6 @@ import android.net.VpnService
 import android.util.Log
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -54,7 +53,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
                 try {
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {
-                    Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode.")
+                    Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
                     return
                 }
 
@@ -62,10 +61,6 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
                 VpnController.start(context)
                 return
             }
-
-            val startIntent = Intent(context, HomeScreenActivity::class.java)
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(startIntent)
         }
     }
 }

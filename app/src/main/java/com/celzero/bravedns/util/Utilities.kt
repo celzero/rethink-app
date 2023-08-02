@@ -222,7 +222,7 @@ object Utilities {
     fun normalizeIp(ipstr: String?): InetAddress? {
         if (ipstr == null) return null
 
-        val ipAddress: IPAddress = HostName(ipstr).address ?: return null
+        val ipAddress: IPAddress = HostName(ipstr).asAddress() ?: return null
         val ip = ipAddress.toInetAddress()
 
         // no need to check if IP is not of type IPv6
@@ -725,10 +725,6 @@ object Utilities {
     fun getDnsPort(port: Int): Int {
         if (port > 65535 || port <= 0) return 53
         return port
-    }
-
-    fun isValidDnsPort(port: Int): Boolean {
-        return port in 1..65535
     }
 
     fun getRandomString(length: Int): String {

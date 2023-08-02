@@ -40,6 +40,8 @@ object DatabaseModule {
         single { get<AppDatabase>().rethinkRemoteFileTagDao() }
         single { get<AppDatabase>().remoteBlocklistPacksMapDao() }
         single { get<AppDatabase>().localBlocklistPacksMapDao() }
+        single { get<AppDatabase>().wgConfigFilesDAO() }
+        single { get <AppDatabase>().wgApplicationMappingDao() }
     }
     private val repositoryModule = module {
         single { get<AppDatabase>().appInfoRepository() }
@@ -57,6 +59,8 @@ object DatabaseModule {
         single { get<AppDatabase>().rethinkLocalFileTagRepository() }
         single { get<AppDatabase>().remoteBlocklistPacksMapRepository() }
         single { get<AppDatabase>().localBlocklistPacksMapRepository() }
+        single { get<AppDatabase>().wgConfigFilesRepository() }
+        single { get<AppDatabase>().wgApplicationMappingRepository() }
     }
 
     val modules = listOf(databaseModule, daoModule, repositoryModule)

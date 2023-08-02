@@ -31,7 +31,6 @@ import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricManager
@@ -40,8 +39,8 @@ import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
@@ -55,13 +54,14 @@ import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import org.koin.android.ext.android.inject
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserException
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import org.koin.android.ext.android.inject
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
 
 class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) {
     private val b by viewBinding(ActivityMiscSettingsBinding::bind)
@@ -280,11 +280,13 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsBiometricSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean
             ->
             persistentState.biometricAuth = checked
+            // Reset the biometric auth time
+            persistentState.biometricAuthTime = Constants.INIT_TIME_MS
         }
     }
 
     private fun invokeChangeLocaleDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_locale_dialog_title))
         val languages = getLocaleEntries()
         val items = languages.keys.toTypedArray()
@@ -368,7 +370,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showThemeDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_theme_dialog_title))
         val items =
             arrayOf(
@@ -409,7 +411,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private fun showGoLoggerDialog() {
         // show dialog with logger options, change log level in GoVpnAdapter based on selection
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_gologger_dialog_title))
         val items =
             arrayOf(
@@ -438,7 +440,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showPcapOptionsDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_pcap_dialog_title))
         val items =
             arrayOf(
@@ -475,7 +477,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     }
 
     private fun showNotificationActionDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_notification_dialog_title))
         val items =
             arrayOf(

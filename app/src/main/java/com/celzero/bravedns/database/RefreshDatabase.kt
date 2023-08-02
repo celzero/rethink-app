@@ -34,12 +34,15 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.receiver.NotificationActionReceiver
+import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.FirewallManager.deletePackage
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
@@ -48,16 +51,16 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class RefreshDatabase
 internal constructor(
@@ -143,8 +146,7 @@ internal constructor(
                         }
                         .toHashSet()
 
-                FirewallManager.deletePackages(packagesToDelete)
-                removeRulesRelatedToDeletedPackages(packagesToDelete)
+                handleDeletedPackages(packagesToDelete)
 
                 Log.i(LOG_TAG_APP_DB, "remove: $packagesToDelete; insert: $packagesToAdd")
 
@@ -160,10 +162,15 @@ internal constructor(
         }
     }
 
-    private suspend fun removeRulesRelatedToDeletedPackages(
-        packagesToDelete: Set<FirewallManager.AppInfoTuple>
-    ) {
-        packagesToDelete.forEach { IpRulesManager.deleteIpRulesByUid(it.uid) }
+    private suspend fun handleDeletedPackages(packagesToDelete: Set<FirewallManager.AppInfoTuple>) {
+        // remove all the rules related to the packages
+        packagesToDelete.forEach {
+            IpRulesManager.deleteRulesByUid(it.uid)
+            DomainRulesManager.deleteRulesByUid(it.uid)
+            val appInfo = FirewallManager.getAppInfoByUid(it.uid) ?: return@forEach
+            ProxyManager.deleteApp(appInfo)
+        }
+        FirewallManager.deletePackages(packagesToDelete)
     }
 
     private suspend fun refreshNonApps(
@@ -309,6 +316,7 @@ internal constructor(
         }
 
         FirewallManager.persistAppInfo(appInfo)
+        ProxyManager.addNewApp(appInfo)
     }
 
     private suspend fun insertApp(appInfo: ApplicationInfo) {
@@ -336,6 +344,7 @@ internal constructor(
         entry.appCategory = determineAppCategory(appInfo)
 
         FirewallManager.persistAppInfo(entry)
+        ProxyManager.addNewApp(entry)
     }
 
     private fun handleNewAppNotification(apps: HashSet<FirewallManager.AppInfoTuple>) {
@@ -397,7 +406,7 @@ internal constructor(
             )
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
@@ -478,7 +487,7 @@ internal constructor(
             context.resources.getString(R.string.new_app_notification_content, appName)
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)

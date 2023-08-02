@@ -139,10 +139,10 @@
     <string name="orbot_install_dialog_title">是否安裝 Orbot ？</string>
     <string name="settings_orbot_heading">設定 Orbot</string>
     <string name="settings_orbot_install_desc">輕觸此處以安裝 Orbot</string>
-    <string name="settings_socks5_disabled_error">已連線至 Orbot 。請先將其關閉。</string>
+    <string name="settings_socks5_disabled_error">已連線至 %1$s 。請先將其關閉。</string>
     <string name="settings_socks5_vpn_disabled_error">啓動 Rethink 以繼續。</string>
     <string name="settings_orbot_disabled_error">關閉 HTTP(S) 與/或 SOCKS5 代理以繼續設定 Tor 代理。</string>
-    <string name="settings_https_disabled_error">已連線至 Orbot 。請先將其關閉。</string>
+    <string name="settings_https_disabled_error">已連線至 %1$s 。請先將其關閉。</string>
     <string name="settings_orbot_notification_content">啓動 Tor 代理失敗。請手動開啓 Orbot 應用。</string>
     <string name="settings_orbot_notification_action">打開 Orbot</string>
     <string name="settings_general_header">一般設定</string>
@@ -243,7 +243,6 @@
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="firewall_rule_unknown_desc">此連線因無法得知<i>來源應用</i>而被攔截。<br/><br/>若需變更此行爲，請至<i>全局</i>選項卡。</string>
     <string name="new_app_bulk_notification_title">注意</string>
-    <string name="cd_dialog_header">自訂網域：%1$s</string>
     <string name="cd_no_rule_initial">無</string>
     <string name="ci_no_rule_txt">無規則</string>
     <string name="ci_bypass_universal">無條件放行</string>
@@ -260,7 +259,6 @@
     <string name="firewall_rule_block_ip_desc">一項用戶定義的全局防火牆規則攔截了此<i>目標 IP </i>。<br/><br/>若需更改，請移步<i>分應用防火牆</i>區。</string>
     <string name="firewall_rule_block_dns_bypass_desc">此連線因<i>來源應用</i>繞過了用戶設定的 DNS 而被攔截。<br/><br/>若需變更此行爲，請移步<i>全局</i>選項卡。</string>
     <string name="build__flavor_play_store">play</string>
-    <string name="cd_remove_dialog_positive">刪除</string>
     <string name="ada_app_metered">計費網路</string>
     <string name="ada_app_bypass_univ">無條件放行</string>
     <string name="notif_download_content_text">正在下載……</string>
@@ -290,7 +288,6 @@
     <string name="rt_download_desc">請下載攔截清單（約 60 MB ）以使用此功能。</string>
     <string name="brbs_restore_desc">從備份檔中恢復</string>
     <string name="firewall_rule_block_ip_univ_desc">一項用戶定義的全局防火牆規則攔截了此<i>目標 IP / 埠</i>。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
-    <string name="ci_header">IP 與埠規則: %1$s</string>
     <string name="ada_app_status_block">已攔截</string>
     <string name="rbl_parental_control">家長控制</string>
     <string name="rt_download_start">正在下載攔截清單……</string>
@@ -389,7 +386,7 @@
     <string name="cd_no_rule_txt">無規則</string>
     <string name="ada_noapp_dialog_positive">確認</string>
     <string name="ada_app_status_block_wifi">已於非計費網路（ WiFi ）攔截</string>
-    <string name="rt_list_adv_btn_txt">進階</string>
+    <string name="lbl_advanced">進階</string>
     <string name="bsrf_sub_group_heading">子分組</string>
     <string name="brbs_backup_dialog_positive">備份</string>
     <string name="notif_channel_vpn_notification">VPN 已啓用</string>
@@ -481,7 +478,7 @@
     <string name="hsf_vpn_dialog_message">Rethink 需要設定本地 VPN 的權限，以加密裝置的 DNS 請求、實現網路監測與執行防火牆規則。
 \n
 \nRethink 並不會收集任何資料，且不會以任何方式監視您。</string>
-    <string name="hsf_vpn_dialog_positive">繼續</string>
+    <string name="lbl_proceed">繼續</string>
     <string name="hsf_vpn_prepare_failure">可能是丟失 VPN 權限，亦可能是另一應用正處於永久連線 VPN 模式中。</string>
     <string name="hsf_start_dialog_message">您距安全的 Android 系統僅有一步之遙：即時查看網路活動，攔截網站、 IP 與不聽話的應用。</string>
     <string name="hsf_start_dialog_positive">啓動</string>
@@ -498,7 +495,6 @@
     <string name="hsf_pause_lockdown_failure">無法暫停： Rethink 正處於閉關模式</string>
     <string name="dc_block_heading">規則</string>
     <string name="dc_other_dns_heading">類型</string>
-    <string name="dc_other_settings_heading">進階</string>
     <string name="dc_custom_dns_radio">其他 DNS</string>
     <string name="dc_entries">%1$s 條目 »</string>
     <string name="dc_local_block_heading">本地攔截清單</string>
@@ -585,18 +581,16 @@
     <string name="cd_dns_crypt_dialog_name">名稱</string>
     <string name="cd_dns_crypt_dialog_stamp">印戳</string>
     <string name="cd_dns_crypt_dialog_desc">說明（可選）</string>
-    <string name="cd_dialog_positive_btn">添加</string>
+    <string name="lbl_add">添加</string>
     <string name="cd_dns_crypt_error_text_1">印戳不能爲空</string>
     <string name="cd_doh_dialog_heading">添加 DNS over HTTPS</string>
     <string name="cd_doh_dialog_resolver_name">解析服務名稱</string>
     <string name="cd_doh_dialog_resolver_url">解析服務 URL</string>
     <string name="cd_dnscrypt_relay_heading">中繼</string>
-    <string name="ct_delete_logs_positive_btn">刪除日誌</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="ctbs_app_info_not_available_toast">未找到應用設定頁</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s 個其他應用</string>
     <string name="ctbs_block_other_apps">應用於 %1$s 的規則亦會應用於其他 %2$s 個應用</string>
-    <string name="ctbs_proceed_positive_text">繼續</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;：%2$s 個攔截清單&lt;/h3&gt;%3$s。&lt;br/&gt;&lt;br/&gt;</Data> </string>
@@ -622,7 +616,6 @@
     <string name="univ_firewall_rule_10">除繞行應用及 IP 外全部攔截</string>
     <string name="univ_view_blocked_ip">IP 與埠規則</string>
     <string name="univ_view_blocked_ip_desc">修改攔截或信任的網域、 IP / 埠規則。</string>
-    <string name="univ_ip_delete_individual_positive">刪除</string>
     <string name="univ_ip_delete_individual_toast">已刪除 %1$s 。</string>
     <string name="univ_ip_delete_dialog_positive">全部刪除</string>
     <string name="univ_ip_delete_toast_success">已刪除所有 IP 規則。</string>
@@ -634,7 +627,6 @@
     <string name="dns_connected_rethink_plus">已連線。正使用 %1$s 個攔截清單</string>
     <string name="dns_connected_no_count">已連線</string>
     <string name="dns_connected">已連線</string>
-    <string name="dns_delete_positive">刪除</string>
     <string name="dns_info_positive">確認</string>
     <string name="dns_info_neutral">複製</string>
     <string name="dns_crypt_relay_error_toast">未選擇解析服務</string>
@@ -654,7 +646,6 @@
     <string name="dns_proxy_app">應用</string>
     <string name="dns_proxy_ip_address">IP 位址</string>
     <string name="dns_proxy_port">埠</string>
-    <string name="dns_proxy_positive_btn">添加</string>
     <string name="fapps_filter_filter_heading">類型</string>
     <string name="fapps_filter_categories_heading">類別</string>
     <string name="fapps_filter_clear_btn">清除</string>
@@ -674,7 +665,6 @@
     <string name="fapps_metered_unblock_dialog_title">於計費網路放行</string>
     <string name="fapps_metered_unblock_dialog_message">是否於計費網路放行<i>已列出</i>應用？</string>
     <string name="fapps_lockdown_hint">VPN 正處於閉關模式。防火牆將不會遵守計費 / 非計費規則。</string>
-    <string name="fapps_all_network_hint"><u>使用所有可用網路</u>已啓用。防火牆將不會遵守計費 / 非計費規則。</string>
     <string name="fapps_firewall_filter_hint">正顯示所有應用</string>
     <string name="fapps_firewall_filter_desc">顯示 <u>%1$s</u> %2$s 個應用</string>
     <string name="fapps_firewall_filter_desc_category">正顯示 <u>%1$s</u> %2$s 個應用於分類：%3$s</string>
@@ -765,7 +755,6 @@
     <string name="ci_trust_txt">信任</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日誌</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有與此應用有聯繫的日誌。</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">繼續</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">攔截成人、盜版內容，線上賭博、約會及社交媒體。</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">攔截吸睛軟體、間諜軟體及恐嚇軟體。</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">攔截惡意軟體、勒索軟體、加密軟體、釣魚及其他威脅。</string>

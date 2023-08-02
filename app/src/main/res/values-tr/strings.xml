@@ -116,7 +116,6 @@
     <string name="settings_theme_dialog_themes_3">Koyu</string>
     <string name="app_info_error">Uygulama bilgisi başlatılamadı.</string>
     <string name="univ_firewall_rule_8">Port 80 (güvensiz HTTP) trafiğini engelleyin</string>
-    <string name="univ_ip_delete_individual_positive">Sil</string>
     <string name="dns_info_neutral">Kopyala</string>
     <string name="dns_proxy_port">Liman Numarası</string>
     <string name="fapps_firewall_filter_isolate">Kilitlenme</string>
@@ -173,7 +172,6 @@
     <string name="firewall_rule_unknown">Kaynak Bilinmiyor</string>
     <string name="firewall_rule_block_dns_bypass">DNS Bypass Edildi</string>
     <string name="new_app_bulk_notification_title">Dikkat</string>
-    <string name="cd_remove_dialog_positive">Sil</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Güvenlik Duvarı:
 \nPil tasarrufu sağlayan DNS modu ile normal DNS + Güvenlik Duvarı modu arasında hızlıca geçiş yapmak için iki düğme gösterir."</string>
@@ -258,13 +256,10 @@
     <string name="settings_selected_theme">Şu anki tema: %1$s</string>
     <string name="hsf_whats_new_chip_text">Yenilikler</string>
     <string name="hsf_pause_lockdown_failure">Duraklatılamıyor: RethinkDNS kilitleme modunda</string>
-    <string name="dc_other_settings_heading">gelişmiş</string>
     <string name="about_bug_no_log_dialog_positive_btn">E-posta gönder</string>
     <string name="about_app">app, uygulama</string>
     <string name="vpn_profile_error">VPN profili başlatılamadı.</string>
-    <string name="ctbs_proceed_positive_text">Devam Et</string>
     <string name="dns_btm_sheet_chip">+%1$s Diğer IP\'ler</string>
-    <string name="dns_delete_positive">Sil</string>
     <string name="fapps_firewall_filter_excluded">Hariç tutulan</string>
     <string name="dns_crypt_connection_failure">DNSCrypt sunucusuna bağlanırken hata oluştu.</string>
     <string name="dns_proxy_connection_failure">DNS Proxy sunucusuna bağlanırken hata oluştu.</string>
@@ -294,7 +289,6 @@
     <string name="univ_ip_delete_dialog_positive">Tümünü sil</string>
     <string name="univ_accessibility_dialog_positive">İzin ver</string>
     <string name="fapps_unmetered_unblock_dialog_message"><i>Listelenen</i> uygulamalar için kotasız (WiFi) ağda bağlantılara izin verilsin mi\?</string>
-    <string name="fapps_all_network_hint"><u>Tüm ağları kullan</u> etkinleştirildi. Güvenlik Duvarı Ölçülü / Ölçüsüz kurallarına uymayacaktır.</string>
     <string name="settings_local_blocklist_in_use">%1$s kullanımdaki blok listeleri</string>
     <string name="firewall_rule_block_udp_ntp">UDP Engellendi</string>
     <string name="notif_dialog_pause_dialog_title">Uygulama duraklatıldı!</string>
@@ -328,8 +322,7 @@
     <string name="about_mozilla_alumni_link">https://builders.mozilla.community/alumni.html</string>
     <string name="brbs_restore_dialog_title">Yedeği geri yükle</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
-    <string name="dns_proxy_positive_btn">ekle</string>
-    <string name="default_dns_name">RDNS Varsayılanı</string>
+    <string name="default_dns_name">RDNS Varsayılan</string>
     <string name="dns_query_clear_logs_title">Tüm DNS kayıtları silinsin mi\?</string>
     <string name="always_on_dialog_stop_message">Rethink için her zaman açık VPN etkinleştirildi. Yine de Rethink\'i durdurmak istediğinizden emin misiniz\?</string>
     <string name="firewall_act_network_monitor_tab">Ağ</string>
@@ -361,7 +354,7 @@
     <string name="app_mode_dns_low_battery">DNS (pil tasarrufu)</string>
     <string name="app_mode_choose">Mod seçin</string>
     <string name="orbot_none">Yok (varsayılan)</string>
-    <string name="settings_socks5_disabled_error">Orbot\'a bağlandı. Devam etmek için kapatın.</string>
+    <string name="settings_socks5_disabled_error">%1$s\'a bağlandı. Devam etmek için kapatın.</string>
     <string name="settings_general_header">genel</string>
     <string name="apps_icon_content_desc">Uygulama Simgesi</string>
     <string name="hsf_start_dialog_positive">Başlangıç</string>
@@ -375,7 +368,6 @@
     <string name="fapps_firewall_filter_desc"><u>%1$s</u> %2$s uygulamaları gösteriliyor</string>
     <string name="notif_channel_vpn_notification">Aktif VPN</string>
     <string name="category_name_sys_apps">Sistem Uygulamaları</string>
-    <string name="cd_dialog_header">Özel alan(lar): %1$s</string>
     <string name="rt_edit_dialog_positive">Düzenle</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -415,7 +407,7 @@
     <string name="search_firewall_network_log"><font size="12">Uygulamaları, IP\'leri, alan adlarını arayın</font></string>
     <string name="app_mode_wireguard">VPN</string>
     <string name="settings_vpn_heading">vpn</string>
-    <string name="settings_https_disabled_error">Orbot\'a bağlandı. Devam etmek için kapatın.</string>
+    <string name="settings_https_disabled_error">%1$s\'a bağlandı. Devam etmek için kapatın.</string>
     <string name="settings_dns_proxy_dialog_hostname">Sunucu adı</string>
     <string name="settings_app_list_default_app">Hiç kimse</string>
     <string name="settings_socks5_dialog_hint_password">Parola (isteğe bağlı)</string>
@@ -455,11 +447,10 @@
     <string name="notif_channel_download">Uyarıları İndir</string>
     <string name="category_name_non_app_sys">Sistem Hizmetleri</string>
     <string name="category_name_installed">Yüklü Uygulamalar</string>
-    <string name="ci_header">IP ve Bağlantı Noktası Kuralları: %1$s</string>
     <string name="ada_app_status_block_md">ölçülü (mobil) ağlarda engellenir</string>
     <string name="notif_download_content_text">İndirme işlemi devam ediyor…</string>
     <string name="rt_chip_check_update">Güncellemeleri denetle</string>
-    <string name="rt_list_adv_btn_txt">gelişmiş</string>
+    <string name="lbl_advanced">gelişmiş</string>
     <string name="bsrf_sub_group_heading">Alt grup</string>
     <string name="lbbs_search">Blok listelerindeki alan adlarını arama</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
@@ -503,7 +494,7 @@
     <string name="settings_theme_dialog_title">Görünüm</string>
     <string name="settings_ip_dialog_ipv46">Otomatik (deneysel)</string>
     <string name="firewall_status_isolate">kilitle</string>
-    <string name="hsf_vpn_dialog_positive">Devam Et</string>
+    <string name="lbl_proceed">Devam Et</string>
     <string name="about_website">rethinkdns.com adresini ziyaret edin</string>
     <string name="about_settings">sistem</string>
     <string name="cd_custom_dns_proxy_title">Özel DNS Proxy</string>
@@ -544,7 +535,7 @@
     <string name="build__flavor_website">web sitesi</string>
     <string name="dc_doh">HTTPS üzerinden Dns</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>
-    <string name="cd_dialog_positive_btn">ekle</string>
+    <string name="lbl_add">ekle</string>
     <string name="dns_proxy_toast_parameter">DNS Proxy</string>
     <string name="dns_mode_info_explanation_new">DNS isteklerini izleyin, engelleyin ve şifreleyin.</string>
     <string name="search_dns_logs"><font size="12">Alan adlarını veya IP\'leri arama</font></string>
@@ -653,7 +644,6 @@
     <string name="about_web">bağlantılar</string>
     <string name="about_bug_report">Hata raporu</string>
     <string name="collecting_logs_progress_text">Yakalanıyor…</string>
-    <string name="ct_delete_logs_positive_btn">Günlükleri sil</string>
     <string name="rbl_privacy">Gizlilik</string>
     <string name="rt_dialog_message">Yeni yapılandırılmış blok listelerini uygulamak istiyor musunuz\?</string>
     <string name="cd_doh_dialog_resolver_url">Çözümleyici URL\'si</string>
@@ -776,7 +766,6 @@
     <string name="private_dns_error">Özel dns ekranı başlatılamadı.</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Günlükleri temizleyin</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Bu uygulamayla ilgili tüm günlükleri temizleyin.</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Devam Et</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">Yetişkinlere yönelik ve korsan içerikleri, çevrim içi kumar ve randevuları ve sosyal medyayı engelleyin.</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">Dikkat yazılımlarını, casus yazılımları, korkutucu yazılımları engelleyin.</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen">Kötü amaçlı yazılımları, fidye yazılımlarını, kripto yazılımlarını, kimlik avcılarını ve diğer tehditleri engelleyin.</string>

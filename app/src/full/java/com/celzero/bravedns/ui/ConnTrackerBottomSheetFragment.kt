@@ -55,17 +55,19 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.fetchColor
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils
+import com.celzero.bravedns.util.UiUtils.fetchColor
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.Locale
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 
@@ -162,7 +164,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val uid = connectionInfo?.uid
 
         if (domain.isNullOrEmpty() || uid == null) {
-            b.bsConnDnsCacheText.visibility = View.GONE
+            b.bsConnDnsCacheText.visibility = View.VISIBLE
+            b.bsConnDnsCacheText.text = UiUtils.getCountryNameFromFlag(connectionInfo!!.flag)
             b.bsConnDomainRuleLl.visibility = View.GONE
             b.bsConnTrustedMsg.visibility = View.GONE
             return
@@ -171,7 +174,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         val status = DomainRulesManager.getDomainRule(domain, uid)
         b.bsConnDomainSpinner.setSelection(status.id)
         b.bsConnDnsCacheText.visibility = View.VISIBLE
-        b.bsConnDnsCacheText.text = connectionInfo!!.dnsQuery
+        b.bsConnDnsCacheText.text =
+            "${UiUtils.getCountryNameFromFlag(connectionInfo!!.flag)}; ${connectionInfo!!.dnsQuery}"
 
         if (showTrustDomainTip(status)) {
             b.bsConnTrustedMsg.visibility = View.VISIBLE
@@ -181,7 +185,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun showTrustDomainTip(status: DomainRulesManager.Status): Boolean {
-        return status == DomainRulesManager.Status.TRUST && !appConfig.getDnsType().isRethinkRemote()
+        return status == DomainRulesManager.Status.TRUST &&
+            !appConfig.getDnsType().isRethinkRemote()
     }
 
     private fun updateConnDetailsChip() {
@@ -211,18 +216,18 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     private fun updateBlockedRulesChip() {
         if (connectionInfo!!.blockedByRule.isBlank()) {
-            b.bsConnTrackAppKill.text = getString(R.string.firewall_rule_no_rule)
+            b.bsConnTrackAppInfo.text = getString(R.string.firewall_rule_no_rule)
             return
         }
 
         val rule = connectionInfo!!.blockedByRule
         // TODO: below code is not required, remove it in future (20/03/2023)
         if (rule.contains(FirewallRuleset.RULE2G.id)) {
-            b.bsConnTrackAppKill.text =
+            b.bsConnTrackAppInfo.text =
                 getFirewallRule(FirewallRuleset.RULE2G.id)?.title?.let { getString(it) }
             return
         } else {
-            b.bsConnTrackAppKill.text = getFirewallRule(rule)?.title?.let { getString(it) }
+            b.bsConnTrackAppInfo.text = getFirewallRule(rule)?.title?.let { getString(it) }
         }
     }
 
@@ -257,31 +262,31 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
     private fun lightenUpChip() {
         // Load icons for the firewall rules if available
-        b.bsConnTrackAppKill.chipIcon =
+        b.bsConnTrackAppInfo.chipIcon =
             ContextCompat.getDrawable(
                 requireContext(),
                 FirewallRuleset.getRulesIcon(connectionInfo?.blockedByRule)
             )
         if (connectionInfo!!.isBlocked) {
-            b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
+            b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextNegative))
             val colorFilter =
                 PorterDuffColorFilter(
                     fetchColor(requireContext(), R.attr.chipTextNegative),
                     PorterDuff.Mode.SRC_IN
                 )
-            b.bsConnTrackAppKill.chipBackgroundColor =
+            b.bsConnTrackAppInfo.chipBackgroundColor =
                 ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorNegative))
-            b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
+            b.bsConnTrackAppInfo.chipIcon?.colorFilter = colorFilter
         } else {
-            b.bsConnTrackAppKill.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
+            b.bsConnTrackAppInfo.setTextColor(fetchColor(requireContext(), R.attr.chipTextPositive))
             val colorFilter =
                 PorterDuffColorFilter(
                     fetchColor(requireContext(), R.attr.chipTextPositive),
                     PorterDuff.Mode.SRC_IN
                 )
-            b.bsConnTrackAppKill.chipBackgroundColor =
+            b.bsConnTrackAppInfo.chipBackgroundColor =
                 ColorStateList.valueOf(fetchColor(requireContext(), R.attr.chipBgColorPositive))
-            b.bsConnTrackAppKill.chipIcon?.colorFilter = colorFilter
+            b.bsConnTrackAppInfo.chipIcon?.colorFilter = colorFilter
         }
     }
 
@@ -305,7 +310,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             persistentState.setBlockUnknownConnections(b.bsConnUnknownAppCheck.isChecked)
         }
 
-        b.bsConnTrackAppKill.setOnClickListener {
+        b.bsConnTrackAppInfo.setOnClickListener {
             showFirewallRulesDialog(connectionInfo!!.blockedByRule)
         }
 
@@ -423,8 +428,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                     )
                         return
 
-
-                    if (showTrustDomainTip(fid))  {
+                    if (showTrustDomainTip(fid)) {
                         b.bsConnTrustedMsg.visibility = View.VISIBLE
                     } else {
                         b.bsConnTrustedMsg.visibility = View.GONE
@@ -642,8 +646,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         connStatus: FirewallManager.ConnectionStatus
     ) {
 
-        val builderSingle: android.app.AlertDialog.Builder =
-            android.app.AlertDialog.Builder(requireContext())
+        val builderSingle = MaterialAlertDialogBuilder(requireContext())
 
         builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()
@@ -685,7 +688,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                 )
             }
 
-        val alertDialog: android.app.AlertDialog = builderSingle.create()
+        val alertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.show()
     }

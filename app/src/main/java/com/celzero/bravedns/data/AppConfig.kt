@@ -37,7 +37,7 @@ import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
@@ -59,9 +59,9 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
+import java.net.InetAddress
 import protect.Controller
 import settings.Settings
-import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -217,10 +217,10 @@ internal constructor(
 
         fun isValidDnsType(): Boolean {
             return this == DOH ||
-                    this == DNSCRYPT ||
-                    this == DNS_PROXY ||
-                    this == RETHINK_REMOTE ||
-                    this == NETWORK_DNS
+                this == DNSCRYPT ||
+                this == DNS_PROXY ||
+                this == RETHINK_REMOTE ||
+                this == NETWORK_DNS
         }
 
         companion object {
@@ -248,7 +248,9 @@ internal constructor(
         NONE,
         HTTPS,
         SOCKS5,
-        ORBOT;
+        ORBOT,
+        TCP,
+        WIREGUARD;
 
         fun isTunProxyOrbot(): Boolean {
             return this == ORBOT
@@ -261,6 +263,14 @@ internal constructor(
         fun isTunProxyHttps(): Boolean {
             return this == HTTPS
         }
+
+        fun isTunProxyWireguard(): Boolean {
+            return this == WIREGUARD
+        }
+
+        fun isTunProxyTcp(): Boolean {
+            return this == TCP
+        }
     }
 
     // Provider - Custom - SOCKS5, Http proxy setup.
@@ -268,7 +278,9 @@ internal constructor(
     enum class ProxyProvider {
         NONE,
         CUSTOM,
-        ORBOT;
+        ORBOT,
+        TCP,
+        WIREGUARD;
 
         fun isProxyProviderCustom(): Boolean {
             return CUSTOM.name == name
@@ -282,11 +294,21 @@ internal constructor(
             return ORBOT.name == name
         }
 
+        fun isProxyProviderWireguard(): Boolean {
+            return WIREGUARD.name == name
+        }
+
+        fun isProxyProviderTcp(): Boolean {
+            return TCP.name == name
+        }
+
         companion object {
             fun getProxyProvider(name: String): ProxyProvider {
                 return when (name) {
+                    WIREGUARD.name -> WIREGUARD
                     CUSTOM.name -> CUSTOM
                     ORBOT.name -> ORBOT
+                    TCP.name -> TCP
                     else -> NONE
                 }
             }
@@ -298,7 +320,9 @@ internal constructor(
         NONE,
         HTTP,
         SOCKS5,
-        HTTP_SOCKS5;
+        TCP,
+        HTTP_SOCKS5,
+        WIREGUARD;
 
         fun isProxyTypeHttp(): Boolean {
             return HTTP.name == name
@@ -312,8 +336,28 @@ internal constructor(
             return HTTP_SOCKS5.name == name
         }
 
+        fun isProxyTypeTcp(): Boolean {
+            return TCP.name == name
+        }
+
         fun isProxyTypeNone(): Boolean {
             return NONE.name == name
+        }
+
+        fun isProxyTypeWireguard(): Boolean {
+            return WIREGUARD.name == name
+        }
+
+        fun isSocks5Enabled(): Boolean {
+            return isProxyTypeSocks5() || isProxyTypeHttpSocks5()
+        }
+
+        fun isAnyProxyEnabled(): Boolean {
+            return isProxyTypeHttp() ||
+                isProxyTypeSocks5() ||
+                isProxyTypeHttpSocks5() ||
+                isProxyTypeTcp() ||
+                isProxyTypeWireguard()
         }
 
         companion object {
@@ -322,6 +366,8 @@ internal constructor(
                     HTTP.name -> HTTP
                     SOCKS5.name -> SOCKS5
                     HTTP_SOCKS5.name -> HTTP_SOCKS5
+                    WIREGUARD.name -> WIREGUARD
+                    TCP.name -> TCP
                     else -> NONE
                 }
             }
@@ -362,11 +408,9 @@ internal constructor(
                 PcapMode.NONE -> {
                     ""
                 }
-
                 PcapMode.LOGCAT -> {
                     "0"
                 }
-
                 PcapMode.EXTERNAL_FILE -> {
                     path
                 }
@@ -447,6 +491,18 @@ internal constructor(
         return proxyEndpointRepository.getConnectedOrbotProxy()
     }
 
+    fun isTcpProxyEnabled(): Boolean {
+        return TcpProxyHelper.getActiveTcpProxy() != null
+    }
+
+    fun isWireguardEnabled(): Boolean {
+        val proxyType = ProxyType.of(persistentState.proxyType)
+        // adding extra check of persistentState.wireguardEnabledCount > 0
+        // to make sure the wireguard is enabled and the count is greater than 0
+        // consider removing the check
+        return proxyType.isProxyTypeWireguard() && persistentState.wireguardEnabledCount > 0
+    }
+
     fun getHttpProxyInfo(): ProxyInfo? {
         val proxyInfo: ProxyInfo?
         val host = persistentState.httpProxyHostAddress
@@ -478,20 +534,17 @@ internal constructor(
                 connectedDns.postValue(endpoint.dohName)
                 persistentState.connectedDnsName = endpoint.dohName
             }
-
             DnsType.DNSCRYPT -> {
                 val endpoint = getConnectedDnscryptServer()
                 connectedDns.postValue(endpoint.dnsCryptName)
                 persistentState.connectedDnsName = endpoint.dnsCryptName
             }
-
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
 
                 connectedDns.postValue(endpoint.proxyName)
                 persistentState.connectedDnsName = endpoint.proxyName
             }
-
             DnsType.RETHINK_REMOTE -> {
                 val endpoint = getRemoteRethinkEndpoint() ?: return
 
@@ -499,7 +552,6 @@ internal constructor(
                 persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
                 persistentState.connectedDnsName = endpoint.name
             }
-
             DnsType.NETWORK_DNS -> {
                 connectedDns.postValue(context.getString(R.string.network_dns))
                 persistentState.connectedDnsName = context.getString(R.string.network_dns)
@@ -509,10 +561,10 @@ internal constructor(
 
     private fun isValidDnsType(dt: DnsType): Boolean {
         return (dt == DnsType.DOH ||
-                dt == DnsType.DNSCRYPT ||
-                dt == DnsType.DNS_PROXY ||
-                dt == DnsType.RETHINK_REMOTE ||
-                dt == DnsType.NETWORK_DNS)
+            dt == DnsType.DNSCRYPT ||
+            dt == DnsType.DNS_PROXY ||
+            dt == DnsType.RETHINK_REMOTE ||
+            dt == DnsType.NETWORK_DNS)
     }
 
     suspend fun switchRethinkDnsToMax() {
@@ -722,36 +774,31 @@ internal constructor(
         onDnsChange(DnsType.NETWORK_DNS)
     }
 
-    fun updateSystemDnsServers(dnsServers: List<InetAddress>) {
+    fun updateSystemDnsServers(dnsServers: List<InetAddress>?) {
         var dnsIp: String? = null
-        val dnsPort = 0
+        val dnsPort = -1 // unknown
 
-        when (getInternetProtocol()) {
-            InternetProtocol.IPv4 -> {
-                run loop@{
-                    dnsServers.forEach {
-                        if (IPAddressString(it.hostAddress).isIPv4) {
-                            dnsIp = it.hostAddress
-                            return@loop
-                        }
+        if (dnsServers.isNullOrEmpty()) {
+            Log.w(LOG_TAG_VPN, "No System DNS servers; unsetting existing $systemDns")
+            systemDns.port = getDnsPort(dnsPort)
+            systemDns.ipAddress = ""
+            return
+        }
+        try {
+            dnsIp =
+                when (getInternetProtocol()) {
+                    InternetProtocol.IPv4 -> {
+                        dnsServers.first { IPAddressString(it.hostAddress).isIPv4 }.hostAddress
+                    }
+                    InternetProtocol.IPv6 -> {
+                        dnsServers.first { IPAddressString(it.hostAddress).isIPv6 }.hostAddress
+                    }
+                    InternetProtocol.IPv46 -> {
+                        dnsServers[0].hostAddress
                     }
                 }
-            }
-
-            InternetProtocol.IPv6 -> {
-                run loop@{
-                    dnsServers.forEach {
-                        if (IPAddressString(it.hostAddress).isIPv6) {
-                            dnsIp = it.hostAddress
-                            return@loop
-                        }
-                    }
-                }
-            }
-
-            InternetProtocol.IPv46 -> {
-                dnsIp = dnsServers[0].hostAddress
-            }
+        } catch (e: NoSuchElementException) {
+            Log.w(LOG_TAG_VPN, "No ip4 / ip6 matching with dns servers")
         }
 
         if (dnsIp.isNullOrEmpty()) {
@@ -783,20 +830,16 @@ internal constructor(
             DnsType.DOH -> {
                 doHEndpointRepository.removeConnectionStatus()
             }
-
             DnsType.DNSCRYPT -> {
                 dnsCryptEndpointRepository.removeConnectionStatus()
                 dnsCryptRelayEndpointRepository.removeConnectionStatus()
             }
-
             DnsType.DNS_PROXY -> {
                 dnsProxyEndpointRepository.removeConnectionStatus()
             }
-
             DnsType.RETHINK_REMOTE -> {
                 rethinkDnsEndpointRepository.removeConnectionStatus()
             }
-
             DnsType.NETWORK_DNS -> {
                 // no-op, no need to remove connection status
             }
@@ -857,7 +900,17 @@ internal constructor(
             return
         }
 
+        if (provider == ProxyProvider.WIREGUARD) {
+            setProxy(proxyType, provider)
+            return
+        }
+
         if (provider == ProxyProvider.ORBOT) {
+            setProxy(proxyType, provider)
+            return
+        }
+
+        if (provider == ProxyProvider.TCP) {
             setProxy(proxyType, provider)
             return
         }
@@ -888,6 +941,7 @@ internal constructor(
         removeOrbot()
         persistentState.proxyProvider = ProxyProvider.NONE.name
         persistentState.proxyType = ProxyType.NONE.name
+        persistentState.updateProxyStatus()
     }
 
     private fun removeOrbot() {
@@ -922,6 +976,7 @@ internal constructor(
     private fun setProxy(type: ProxyType, provider: ProxyProvider) {
         persistentState.proxyProvider = provider.name
         persistentState.proxyType = type.name
+        persistentState.updateProxyStatus()
     }
 
     // Returns the proxymode to set in Tunnel.
@@ -933,6 +988,10 @@ internal constructor(
         val provider = persistentState.proxyProvider
         if (DEBUG) Log.d(LOG_TAG_VPN, "selected proxy type: $type, with provider as $provider")
 
+        if (ProxyProvider.WIREGUARD.name == provider) {
+            return TunProxyMode.WIREGUARD
+        }
+
         if (ProxyProvider.ORBOT.name == provider) {
             return TunProxyMode.ORBOT
         }
@@ -941,11 +1000,9 @@ internal constructor(
             ProxyType.HTTP.name -> {
                 return TunProxyMode.HTTPS
             }
-
             ProxyType.SOCKS5.name -> {
                 return TunProxyMode.SOCKS5
             }
-
             ProxyType.HTTP_SOCKS5.name -> {
                 // FIXME: tunnel does not support both http and socks5 at once.
                 return TunProxyMode.SOCKS5
@@ -982,29 +1039,41 @@ internal constructor(
         if (proxyProvider.isProxyProviderNone()) return false
 
         val proxyType = ProxyType.of(persistentState.proxyType)
-        return !proxyType.isProxyTypeNone()
+        return proxyType.isAnyProxyEnabled()
     }
 
     fun canEnableProxy(): Boolean {
-        return !getBraveMode().isDnsMode() && !VpnController.isVpnLockdown()
+        return !getBraveMode().isDnsMode()
     }
 
     fun canEnableSocks5Proxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        return !getBraveMode().isDnsMode() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+    }
+
+    fun canEnableWireguardProxy(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         return canEnableProxy() &&
-                (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderWireguard())
     }
 
     fun canEnableHttpProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() &&
-                (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+        return !getBraveMode().isDnsMode() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderCustom())
+    }
+
+    fun canEnableTcpProxy(): Boolean {
+        val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
+        return !getBraveMode().isDnsMode() &&
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderTcp())
     }
 
     fun canEnableOrbotProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
         return canEnableProxy() &&
-                (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
+            (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
     }
 
     suspend fun getConnectedSocks5Proxy(): ProxyEndpoint? {

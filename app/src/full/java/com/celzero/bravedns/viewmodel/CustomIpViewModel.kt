@@ -48,8 +48,22 @@ class CustomIpViewModel(private val customIpDao: CustomIpDao) : ViewModel() {
             }
         }
 
+    val allIpRules = filteredList.switchMap { input -> getAllRules(input) }
+
     fun ipRulesCount(uid: Int): LiveData<Int> {
         return customIpDao.getAppWiseIpRulesCount(uid)
+    }
+
+    fun allIpRulesCount(): LiveData<Int> {
+        return customIpDao.getIpRulesCountInt()
+    }
+
+    private fun getAllRules(query: String): LiveData<PagingData<CustomIp>> {
+        return Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                customIpDao.getAllCustomIpRules("%$query%")
+            }
+            .liveData
+            .cachedIn(viewModelScope)
     }
 
     private fun getAppWise(uid: Int, input: String?): LiveData<PagingData<CustomIp>> {

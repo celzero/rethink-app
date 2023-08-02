@@ -25,9 +25,9 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
 @Dao
 interface DnsLogDAO {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(dnsLog: DnsLog)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(dnsLog: DnsLog)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insertBatch(dnsLogs: List<DnsLog>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertBatch(dnsLogs: List<DnsLog>)
 
     // replace order by timeStamp desc with order by id desc, as order by timeStamp desc is building
     // the query with temporary index on the table. This is causing the query to be slow.

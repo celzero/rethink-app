@@ -32,9 +32,10 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
-import com.celzero.bravedns.util.UIUtils
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UiUtils
+import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -113,7 +114,7 @@ class DnsCryptEndpointAdapter(
 
             b.dnsCryptEndpointListUrlExplanation.text =
                 if (endpoint.isSelected) {
-                    context.getString(UIUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
+                    context.getString(UiUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
                 } else {
                     ""
                 }
@@ -141,11 +142,11 @@ class DnsCryptEndpointAdapter(
         }
 
         private fun showDeleteDialog(id: Int) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(R.string.dns_crypt_custom_url_remove_dialog_title)
             builder.setMessage(R.string.dns_crypt_url_remove_dialog_message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
+            builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 deleteEndpoint(id)
             }
 
@@ -156,7 +157,7 @@ class DnsCryptEndpointAdapter(
         }
 
         private fun showDialogExplanation(title: String, url: String, message: String?) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
             if (message == null) builder.setMessage(url)
             else builder.setMessage(url + "\n\n" + message)

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="20dp">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_http_proxy_top"
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:textSize="@dimen/large_font_text_view"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_http_proxy_explanation_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,11 +29,13 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/dialog_http_proxy_ip_address"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_margin="4dp"
         android:hint="@string/settings_http_proxy_hostname"
         app:hintTextColor="?attr/accentGood"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_explanation_text">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -45,20 +47,23 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:inputType="none"
-            android:typeface="monospace"
             android:maxLines="1"
             android:padding="10dp"
             android:text=""
             android:textSize="@dimen/large_font_text_view"
+            android:typeface="monospace"
             app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout1"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:hint="@string/settings_http_proxy_port"
         app:hintTextColor="?attr/accentGood"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_http_proxy_ip_address">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -69,16 +74,16 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:inputType="number"
-            android:typeface="monospace"
+            android:inputType="none"
             android:maxLines="1"
             android:padding="10dp"
+            android:text=""
             android:textSize="@dimen/large_font_text_view"
+            android:typeface="monospace"
             app:layout_constraintRight_toLeftOf="parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
-
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/dialog_http_proxy_failure_text"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"

@@ -36,9 +36,10 @@ import com.celzero.bravedns.databinding.ActivityConnectionTrackerBinding
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
+import com.celzero.bravedns.util.UiUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -133,7 +134,7 @@ class ConnectionTrackerFragment :
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
 
-                    if (recyclerView.getChildAt(0).tag == null) return
+                    if (recyclerView.getChildAt(0)?.tag == null) return
 
                     val tag: Long = recyclerView.getChildAt(0).tag as Long
 
@@ -257,11 +258,11 @@ class ConnectionTrackerFragment :
     }
 
     private fun showDeleteDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(R.string.conn_track_clear_logs_title)
         builder.setMessage(R.string.conn_track_clear_logs_message)
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.ct_delete_logs_positive_btn)) { _, _ ->
+        builder.setPositiveButton(getString(R.string.dns_log_dialog_positive)) { _, _ ->
             io { connectionTrackerRepository.clearAllData() }
         }
 

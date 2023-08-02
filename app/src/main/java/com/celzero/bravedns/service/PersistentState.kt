@@ -54,6 +54,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
+        const val WIREGUARD = "wireguard_enabled_count"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -243,7 +244,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
 
     // enable dns alg
-    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
+    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(true)
 
     // dns crypt relay server
     var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")
@@ -266,12 +267,16 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // go logger level, default 2 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
 
+    // count of wireguard enabled
+    var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var dnsRequestsCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
+    var proxyStatus: MutableLiveData<Int> = MutableLiveData()
 
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
@@ -397,5 +402,39 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     fun getBlockWhenDeviceLocked(): Boolean {
         return _blockWhenDeviceLocked
+    }
+
+    fun getProxyStatus(): Int {
+        if (proxyStatus.value == null) updateProxyStatus()
+        return proxyStatus.value ?: -1
+    }
+
+    fun updateProxyStatus() {
+        val status =
+            when (AppConfig.ProxyProvider.getProxyProvider(proxyProvider)) {
+                AppConfig.ProxyProvider.WIREGUARD -> {
+                    R.string.lbl_wireguard
+                }
+                AppConfig.ProxyProvider.ORBOT -> {
+                    R.string.orbot
+                }
+                AppConfig.ProxyProvider.TCP -> {
+                    R.string.orbot_socks5
+                }
+                AppConfig.ProxyProvider.CUSTOM -> {
+                    val type = AppConfig.ProxyType.of(proxyType)
+                    if (type == AppConfig.ProxyType.SOCKS5) {
+                        R.string.lbl_socks5
+                    } else if (type == AppConfig.ProxyType.HTTP) {
+                        R.string.lbl_http
+                    } else {
+                        R.string.lbl_http_socks5
+                    }
+                }
+                else -> {
+                    -1
+                }
+            }
+        proxyStatus.postValue(status)
     }
 }

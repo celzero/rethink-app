@@ -35,9 +35,10 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
-import com.celzero.bravedns.util.UIUtils.getDnsStatus
+import com.celzero.bravedns.util.UiUtils.clipboardCopy
+import com.celzero.bravedns.util.UiUtils.getDnsStatus
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -157,7 +158,7 @@ class DohEndpointAdapter(
         }
 
         private fun showDohMetadataDialog(title: String, url: String, message: String?) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
             builder.setMessage(url + "\n\n" + message)
             builder.setCancelable(true)
@@ -180,11 +181,11 @@ class DohEndpointAdapter(
         }
 
         private fun showDeleteDnsDialog(id: Int) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
+            builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 deleteEndpoint(id)
             }
 

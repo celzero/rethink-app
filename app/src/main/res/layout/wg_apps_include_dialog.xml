@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/wg_include_app_dialog_heading"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="@string/add_remove_apps"
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/wg_include_app_dialog_search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wg_include_app_dialog_heading"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/wg_include_app_dialog_search_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif"
+                    android:isScrollContainer="true"
+                    android:focusable="false"
+                    app:iconifiedByDefault="false"
+                    app:queryHint="@string/search_proxy_add_apps">
+                </androidx.appcompat.widget.SearchView>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/wg_include_app_dialog_search_filter"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.15"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_filter"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:clipToPadding="false"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/wg_include_app_dialog_chip_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:padding="2dp"
+                    android:visibility="gone"
+                    app:singleLine="true"
+                    app:singleSelection="false" />
+            </HorizontalScrollView>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <RelativeLayout
+        android:id="@+id/wg_include_app_select_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wg_include_app_dialog_search_layout"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+
+        <TextView
+            android:id="@+id/wg_include_app_select_count_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/wg_include_app_select_all_text"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <TextView
+            android:id="@+id/wg_include_app_select_all_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/wg_include_app_select_all_checkbox"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="@string/lbl_select_all"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/wg_include_app_select_all_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:buttonTint="?attr/accentGood"
+            android:foregroundTint="?attr/accentGood" />
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/wg_include_app_recycler_view_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/wg_include_app_dialog_ok_button"
+        android:layout_below="@id/wg_include_app_select_all" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/wg_include_app_dialog_ok_button"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:text="@string/lbl_dismiss"
+        android:textColor="?attr/accentGood"
+        android:textSize="@dimen/large_font_text_view" />
+
+</RelativeLayout>

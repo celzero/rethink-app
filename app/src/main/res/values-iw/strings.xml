@@ -118,7 +118,7 @@
     <string name="settings_network_all_networks" translatable="true">השתמש בכל הרשתות הזמינות (ניסיוני)</string>
     <string name="settings_all_networks_dialog_title" translatable="true">שים לב!</string>
     <string name="settings_orbot_install_desc" translatable="true">לחץ כאן כדי להתקין Orbot</string>
-    <string name="settings_socks5_disabled_error" translatable="true">מחובר לOrbot. כבה אותו כדי להמשיך.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">מחובר %1$s. כבה אותו כדי להמשיך.</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">הפעל את RethinkDNS כדי להמשיך.</string>
     <string name="settings_all_networks_dialog_positive_btn" translatable="true">הפעל בכל מקרה</string>
     <string name="settings_import_export_desc" translatable="true">גבה או שחזר באופן ידני נתוני אפליקציה והגדרות.</string>
@@ -203,13 +203,11 @@
     <string name="hsf_start_btn_state" translatable="true">התחל</string>
     <string name="hsf_whats_new_chip_text" translatable="true">מה חדש</string>
     <string name="hsf_proxy_chip_text" translatable="true">פרוקסי פעיל</string>
-    <string name="univ_ip_delete_individual_positive" translatable="true">מחיקה</string>
     <string name="about_twitter" translatable="true">עקבו אחרינו בטוויטר</string>
     <string name="univ_ip_delete_dialog_positive" translatable="true">למחוק הכל</string>
     <string name="about_mozilla" translatable="true">RethinkDNS היא חלק מתוכנית ה-MVP של Mozilla Builders.</string>
     <string name="vpn_profile_error" translatable="true">לא ניתן היה להפעיל את פרופיל VPN.</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">חיצוני</string>
-    <string name="ctbs_proceed_positive_text" translatable="true">להמשיך</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">חזור</string>
     <string name="cd_dns_proxy_error_text_1" translatable="true">כתובת IP שגויה</string>
     <string name="univ_ip_delete_toast_success" translatable="true">מחק את כל כללי ה-IP.</string>

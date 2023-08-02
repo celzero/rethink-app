@@ -33,10 +33,11 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.Utilities
-import java.util.concurrent.TimeUnit
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settings) {
     private val b by viewBinding(ActivityTunnelSettingsBinding::bind)
@@ -133,7 +134,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             }
         }
 
-        b.settingsActivityVpnLockdownDesc.setOnClickListener { UIUtils.openVpnProfile(this) }
+        b.settingsActivityVpnLockdownDesc.setOnClickListener { UiUtils.openVpnProfile(this) }
 
         b.settingsActivityIpRl.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityIpRl)
@@ -161,7 +162,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showDefaultDnsDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_default_dns_heading))
         val items = Constants.DEFAULT_DNS_LIST.map { it.name }.toTypedArray()
         // get the index of the default dns url
@@ -179,7 +180,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showAllNetworksDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(R.string.settings_all_networks_dialog_title))
         builder.setMessage(getString(R.string.settings_all_networks_dialog_message))
         builder.setPositiveButton(getString(R.string.settings_all_networks_dialog_positive_btn)) {
@@ -238,7 +239,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     }
 
     private fun showIpDialog() {
-        val alertBuilder = AlertDialog.Builder(this)
+        val alertBuilder = MaterialAlertDialogBuilder(this)
         alertBuilder.setTitle(getString(R.string.settings_ip_dialog_title))
         val items =
             arrayOf(

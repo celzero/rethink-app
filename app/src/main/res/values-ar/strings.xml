@@ -17,13 +17,12 @@
     <string name="ada_ip_no_connection">لا توجد سجلات شبكة لهذا التطبيق.</string>
     <string name="settings_enable_logs">تمكين التسجيل على الجهاز</string>
     <string name="refresh_complete">اكتملت إعادة مزامنة قائمة التطبيقات.</string>
-    <string name="ctbs_proceed_positive_text">المضي قدما</string>
     <string name="dns_proxy_connection_failure_lockdown">يمكن أن يؤدي استبعاد %1$s لـ %2$s في وضع الإغلاق إلى حدوث مشكلات في الاتصال بالإنترنت.</string>
     <string name="new_app_notification_action_deny">استمر فى الحجز</string>
     <string name="settings_dns_proxy_dialog_password">كلمة المرور</string>
     <string name="settings_notification_desc1">إيقاف مؤقت / إيقاف (افتراضي)</string>
     <string name="ada_app_bypass_univ">تجاوز عالمي</string>
-    <string name="rt_list_adv_btn_txt">المتقدمة</string>
+    <string name="lbl_advanced">المتقدمة</string>
     <string name="dns_crypt_relay_remove_dialog_message">احذف مرحل DNSCrypt من التكوين المحفوظ.</string>
     <string name="orbot_install_dialog_title">تثبيت Orbot؟</string>
     <string name="settings_check_update_desc">تحقق تلقائيًا من تحديثات التطبيق مرة واحدة في الأسبوع.</string>
@@ -64,7 +63,6 @@
     <string name="rethink_max_desc">أكثر من 50 موقعًا ؛ أكثر خصوصية محلل تكراري يعمل على fly.io</string>
     <string name="orbot_status_arg_3">DNS و TCP</string>
     <string name="firewall_status_allow">مسموح</string>
-    <string name="univ_ip_delete_individual_positive">احذف</string>
     <string name="hsf_proxy_chip_remove_text">يتوقف…</string>
     <string name="category_name_others">أخرى</string>
     <string name="firewall_rule_block_udp_ntp">UDP محظور</string>
@@ -229,7 +227,6 @@
     <string name="firewall_rule_block_dns_bypass">تجاوز DNS</string>
     <string name="new_app_notification_content">منع RethinkDNS التطبيق المثبت مؤخرًا ، %1$s.</string>
     <string name="build__flavor_fdroid">فدرويد</string>
-    <string name="cd_dialog_header">%1$s: المجال (المجالات) المخصص</string>
     <string name="cd_toast_added">تمت إضافة المجال بنجاح</string>
     <string name="lbbs_enabled">‮مُفعّل</string>
     <string name="status_protected_with_private_dns">محمي بنظام أسماء النطاقات الخصوصي</string>
@@ -239,7 +236,7 @@
     <string name="configure_dns_crypt">DNSCrypt: محللات %1$s</string>
     <string name="download_update_dialog_title">تحديث جديد!</string>
     <string name="settings_proxy_header">وكيل (بروكسي)</string>
-    <string name="settings_https_disabled_error">متصل بـ Orbot. قم بإيقاف تشغيله للمتابعة.</string>
+    <string name="settings_https_disabled_error">متصل بـ %1$s. قم بإيقاف تشغيله للمتابعة.</string>
     <string name="settings_http_proxy_desc">إعادة توجيه إلى %1$s: %2$s</string>
     <string name="settings_socks5_dialog_hint_ip">عنوان الإنترنت (IP address)</string>
     <string name="about_mail_bugreport_share_title">حدد مزود البريد الإلكتروني</string>
@@ -273,7 +270,6 @@
     <string name="settings_socks_forwarding_default_desc">قم بإعادة توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
     <string name="settings_theme_dialog_themes_4">أسود قاتم</string>
     <string name="dc_block_heading">قواعد</string>
-    <string name="dc_other_settings_heading">المتقدمة</string>
     <string name="dc_local_block_heading">قوائم الحظر على الجهاز</string>
     <string name="about_bug_no_log_dialog_message">تعذر جلب سجلات التعطل. هل تريد الإبلاغ عن الخطأ الخاص بك يدويًا؟</string>
     <string name="about_mail_bugreport_text">أرسل هذا البريد الإلكتروني إلى: hello@celzero.com</string>
@@ -300,7 +296,7 @@
     <string name="settings_theme_dialog_themes_2">إضاءة</string>
     <string name="dns_card_latency_inactive">تمكين وضع DNS.</string>
     <string name="hsf_start_btn_state">بداية</string>
-    <string name="hsf_vpn_dialog_positive">المضي قدما</string>
+    <string name="lbl_proceed">المضي قدما</string>
     <string name="hsf_start_dialog_positive">ابدأ</string>
     <string name="dc_dns_website_desc">يجلب ايقونات مواقع الويب من <i> nextdns.io </i> و <i> duckduckgo.com </i>. يستهلك ما يصل إلى 350 ميغابايت في مساحة القرص</string>
     <string name="about_sponsor_link_text">كفيل</string>
@@ -311,7 +307,6 @@
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt; br / &gt; </Data> </string>
     <string name="univ_firewall_rule_7">منع IPv4 في IPv6 (تجريبي)</string>
     <string name="univ_accessibility_dialog_positive">السماح</string>
-    <string name="dns_delete_positive">احذف</string>
     <string name="dns_info_neutral">انسخ</string>
     <string name="socks5_proxy_toast_parameter">وكيل SOCKS5</string>
     <string name="orbot_toast_parameter">تور كوكيل</string>
@@ -335,7 +330,6 @@
     <string name="about_version">ضد %1$s</string>
     <string name="contributors_dialog_title">المؤلفين</string>
     <string name="dns_btm_resolved_crypt">تم حل <u> بشكل مجهول </u> %1$s بواسطة %2$s</string>
-    <string name="dns_proxy_positive_btn">إضافة</string>
     <string name="fapps_firewall_filter_isolate">إغلاق</string>
     <string name="settings_local_blocklist_dialog_positive">تنزيل</string>
     <string name="other_dns_list_tab1">DoH</string>
@@ -349,7 +343,6 @@
     <string name="cd_toast_deleted">تمت إزالة المجال من القائمة المخصصة</string>
     <string name="cd_dialog_error_invalid_domain">URL غير صالح (المجال).</string>
     <string name="cd_no_rule_initial">ش</string>
-    <string name="ci_header">قواعد عناوين IP و المنافذ: %1$s</string>
     <string name="ada_app_status_exclude">مستثنى من نظام dns وجدار الحماية</string>
     <string name="ada_network_log_title">سجل الشبكة لهذا التطبيق</string>
     <string name="notif_download_failure_content">التحميل فشل. حاول مرة أخرى.</string>
@@ -429,7 +422,7 @@
     <string name="hsf_uptime">(نشط منذ %1$s ؛ البروتوس: %2$s)</string>
     <string name="dc_local_block_desc_1">اختر من بين 185+ قائمة الحظر. انقر هنا لتنزيل أو تكوين قوائم الحظر.</string>
     <string name="about_bug_report_dialog_positive_btn">أرسل بريد الكتروني</string>
-    <string name="cd_dialog_positive_btn">إضافة</string>
+    <string name="lbl_add">إضافة</string>
     <string name="dns_btm_sheet_chip">+ %1$s عناوين IP أخرى</string>
     <string name="about_mail_subject">[RethinkDNS]:</string>
     <string name="dns_connected_rethink_plus">متصل. %1$s قوائم الحظر قيد الاستخدام</string>
@@ -472,7 +465,7 @@
     <string name="configure_dns_connected_doh_status">إستخدام DNS بدلا من HTTPS</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_orbot_desc">Orbot في وضع غير vpn مع HTTPS / SOCKS5.</string>
-    <string name="settings_socks5_disabled_error">متصل بـ Orbot. قم بإيقاف تشغيله للمتابعة.</string>
+    <string name="settings_socks5_disabled_error">متصل بـ %1$s. قم بإيقاف تشغيله للمتابعة.</string>
     <string name="settings_general_header">جنرال لواء</string>
     <string name="settings_socks_forwarding_desc">إعادة التوجيه إلى %1$s: %2$s ، %3$s</string>
     <string name="apps_icon_content_desc">أيقونة التطبيق</string>
@@ -513,7 +506,6 @@
     <string name="about_bravedns_whoarewe">RethinkDNS هو مشروع مجاني ومفتوح المصدر ، يقوده مهندسين سابقين من Amazon و IBM و Scientific Games.</string>
     <string name="cd_custom_dns_proxy_name_default">البروكسي</string>
     <string name="cd_dns_proxy_error_text_1">عنوان IP غير صالح</string>
-    <string name="ct_delete_logs_positive_btn">حذف السجلات</string>
     <string name="dns_btm_resolved_doh">تم حلها %1$s بواسطة %2$s</string>
     <string name="dns_btm_latency_ms">%1$s مللي ثانية</string>
     <string name="univ_firewall_rule_2">حظر أي تطبيق ليس قيد الاستخدام</string>
@@ -554,7 +546,6 @@
     <string name="firewall_rule_global_lockdown">إغلاق</string>
     <string name="new_app_bulk_notification_content">منع RethinkDNS تطبيقات %1$s الجديدة. انقر للعرض أو التعديل.</string>
     <string name="notif_channel_firewall_alerts">تنبيهات جدار الحماية</string>
-    <string name="cd_remove_dialog_positive">احذف</string>
     <string name="ci_dialog_edittext_hint">عنوان IP أو الشبكة الفرعية أو المنفذ</string>
     <string name="ci_bypass_universal">تجاوز عالمية</string>
     <string name="rbl_security">الأمن</string>
@@ -585,7 +576,6 @@
 \n1. VPN في وضع الإغلاق (على سبيل المثال ، <i> حظر الاتصالات بدون VPN </i> ممكّن).
 \n
 \n2. تم تمكين إعداد <i> استخدام كافة الشبكات المتاحة </i>.</string>
-    <string name="fapps_all_network_hint"><u> استخدام جميع الشبكات </u> ممكّن. لن يلتزم جدار الحماية بالقواعد المقننة / غير المقاسة.</string>
     <string name="firewall_rule_block_app_new_install">تطبيق جديد</string>
     <string name="firewall_rule_device_lock_desc">تم حظر هذا الاتصال بسبب قفل جهاز <i> </i> في ذلك الوقت. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
     <string name="firewall_rule_unknown_desc">تم جدار حماية هذا الاتصال لأنه تعذر تحديد التطبيق المصدر <i> </i>. <br/> <br/> لتغيير هذا السلوك ، انتقل إلى علامة التبويب <i> العالمي </i>.</string>
@@ -774,7 +764,6 @@
     <string name="ci_trust_initial">BA</string>
     <string name="ci_trust_txt">تجاوز قواعد التطبيق</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">امسح جميع السجلات المتعلقة بهذا التطبيق.</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">واصل</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">حظر برامج الانتباه وبرامج التجسس وبرامج الرعب.</string>
     <string name="rsv_blocklist_count_text" description="This label will appear in rethink configure simple view screen which shows number of blocklists for each category">%1$s قوائم الحظر</string>
     <string name="private_dns_dialog_desc">تم تجاوز إعدادات DNS الخاصة بـ Rethink بواسطة DNS الخاص بنظام Android.

@@ -60,9 +60,9 @@ interface CustomIpDao {
 
     @Transaction
     @Query("delete from CustomIp where ipAddress = :ipAddress and uid = :uid and port = :port")
-    fun deleteIpRules(uid: Int, ipAddress: String, port: Int)
+    fun deleteRules(uid: Int, ipAddress: String, port: Int)
 
-    @Query("delete from CustomIp where uid = :uid") fun deleteIpRuleByUid(uid: Int)
+    @Query("delete from CustomIp where uid = :uid") fun deleteRulesByUid(uid: Int)
 
     @Query("delete from CustomIp where uid = $UID_EVERYBODY") fun deleteAllIPRulesUniversal()
 
@@ -75,6 +75,9 @@ interface CustomIpDao {
     @Query("select count(*) from CustomIp where uid = :uid and isActive = 1")
     fun getAppWiseIpRulesCount(uid: Int): LiveData<Int>
 
+    @Query("select count(*) from CustomIp where isActive = 1")
+    fun getIpRulesCountInt(): LiveData<Int>
+
     @Query(
         "select * from CustomIp where uid = :uid and isActive = 1 order by modifiedDateTime desc"
     )
@@ -84,4 +87,10 @@ interface CustomIpDao {
         "select * from CustomIp where ipAddress like :query and uid = :uid and  isActive = 1 order by modifiedDateTime desc"
     )
     fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
+
+    @Query("select * from CustomIp where ipAddress like :query and isActive = 1 order by uid")
+    fun getAllCustomIpRules(query: String): PagingSource<Int, CustomIp>
+
+    @Query("delete from CustomIp")
+    fun deleteAllRules()
 }

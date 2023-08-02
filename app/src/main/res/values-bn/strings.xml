@@ -50,7 +50,7 @@
     <string name="about_bug_report">বাগ রিপোর্ট</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="about_version">v%1$s</string>
-    <string name="cd_dialog_positive_btn">যোগ করুন</string>
+    <string name="lbl_add">যোগ করুন</string>
     <string name="univ_ip_delete_toast_success">সমস্ত আইপি নিয়ম মুছে ফেলা হয়েছে।</string>
     <string name="univ_delete_firewall_dialog_message">এই নিয়মগুলি মুছে ফেলার ফলে যেকোনও অ্যাপ্লিকেশন বর্তমানে ব্লক করা আইপিগুলির সাথে সংযোগ করতে পারবে৷</string>
     <string name="about_title_desc">নেটওয়ার্ক নিরাপত্তা হুমকি সনাক্ত এবং ব্লক</string>
@@ -65,7 +65,7 @@
     <string name="firewall_status_excluded">dns এবং ফায়ারওয়াল থেকে বাদ</string>
     <string name="firewall_status_unknown">অজানা</string>
     <string name="firewall_card_text_inactive">ফায়ারওয়াল মোড সক্ষম করুন।</string>
-    <string name="hsf_vpn_dialog_positive">এগিয়ে যান</string>
+    <string name="lbl_proceed">এগিয়ে যান</string>
     <string name="hsf_pause_vpn_failure">বিরতি দেওয়া যাবে না: রিথিঙ্কডিএনএস সক্রিয় নয়</string>
     <string name="about_dialog_positive_button">চলো যাই</string>
     <string name="about_mail_to_string">mailto:</string>
@@ -195,7 +195,6 @@
     <string name="dc_block_heading">নিয়ম</string>
     <string name="about_settings">পদ্ধতি</string>
     <string name="cd_dns_crypt_error_text_1">স্ট্যাম্প খালি করা যাবে না</string>
-    <string name="univ_ip_delete_individual_positive">মুছুন</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
     <string name="allow">অনুমতি</string>
     <string name="status_protected_with_tor_private_dns">টর এবং প্রাইভেট ডিএনএস দিয়ে সুরক্ষিত</string>
@@ -212,7 +211,6 @@
     <string name="settings_http_proxy_error_text3">হোস্টনাম খালি</string>
     <string name="settings_notification_dialog_title">বিজ্ঞপ্তি কর্ম চয়ন করুন</string>
     <string name="cd_dns_crypt_title">সমাধানকারী</string>
-    <string name="dns_delete_positive">মুছুন</string>
     <string name="dns_info_positive">ঠিক আছে</string>
     <string name="dns_proxy_port">পোর্ট নাম্বার</string>
     <string name="txt_home">গৃহ</string>
@@ -237,7 +235,6 @@
     <string name="about_settings_app_info">অ্যাপের তথ্য</string>
     <string name="about_mozilla">RethinkDNS হল Mozilla Builders MVP প্রোগ্রামের অংশ।</string>
     <string name="about_mail_bugreport_share_title">ইমেল প্রদানকারী নির্বাচন করুন</string>
-    <string name="ct_delete_logs_positive_btn">লগ মুছুন</string>
     <string name="dns_info_neutral">অনুলিপি</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="fapps_filter_parent_installed">ইনস্টলকৃত</string>
@@ -263,7 +260,6 @@
 \n
 \nপোর্ট নম্বর: %3$s</string>
     <string name="dns_proxy_app">অ্যাপ</string>
-    <string name="dns_proxy_positive_btn">যোগ করুন</string>
     <string name="isolate">তালাবদ্ধ</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">অপেক্ষা</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">সুরক্ষিত</string>
@@ -361,7 +357,6 @@
     <string name="settings_theme_dialog_themes_3">কাল</string>
     <string name="firewall_status_block_unmetered">মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কগুলিতে অবরুদ্ধ</string>
     <string name="hsf_whats_new_remove_text">বন্ধ…</string>
-    <string name="dc_other_settings_heading">উন্নত</string>
     <string name="about_join_telegram">Telegram</string>
     <string name="about_dialog_neutral_button">বৈশিষ্ট্য প্রস্তাব করুন</string>
     <string name="univ_firewall_rule_1">ডিভাইস লক হয়ে গেলে সমস্ত অ্যাপ ব্লক করুন</string>
@@ -505,7 +500,6 @@
     <string name="cd_doh_dialog_resolver_name">সমাধানকারীর নাম</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="ctbs_app_info_not_available_toast">অ্যাপ সেটিংস পৃষ্ঠা পাওয়া যায়নি</string>
-    <string name="ctbs_proceed_positive_text">এগিয়ে যান</string>
     <string name="ctbs_dialog_negative_btn">পূর্বাবস্থায় যান</string>
     <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s ব্লকলিস্ট(গুলি)&lt;/h3&gt;%3$s।&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="hs_download_positive_website">ওয়েবসাইট</string>
@@ -572,7 +566,6 @@
     <string name="firewall_rule_block_app_unmetered_desc"><i>আনমিটারড</i> নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে।</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>সোর্স অ্যাপ</i> সেট করা হয়েছে <i>বাইপাস ইউনিভার্সাল</i> ফায়ারওয়াল নিয়মে।</string>
     <string name="notif_dialog_pause_dialog_message">বিরতি অবস্থায় আবেদন, চালিয়ে যেতে পুনরায় শুরু করুন</string>
-    <string name="cd_remove_dialog_positive">মুছুন</string>
     <string name="brbs_backup_dialog_message">একটি ফাইলে অ্যাপ সেটিংস, নেটওয়ার্ক এবং ডিএনএস লগ ব্যাক আপ করে। এটি VPN পুনরায় চালু করবে।</string>
     <string name="other_dns_list_tab2">ডিএনস্ক্রিপ্ট</string>
     <string name="firewall_rule_block_udp_ntp">UDP অবরুদ্ধ</string>
@@ -630,7 +623,7 @@
     <string name="ada_noapp_dialog_title">অ্যাপের তথ্য পাওয়া যায়নি</string>
     <string name="ada_app_status_isolate">লকডাউন মোডে আছে</string>
     <string name="notif_download_success_content">ডাউনলোড সফল হয়েছে।</string>
-    <string name="rt_list_adv_btn_txt">উন্নত</string>
+    <string name="lbl_advanced">উন্নত</string>
     <string name="rethink_sky_desc">280+ অবস্থান; উচ্চ আপটাইম; স্টাব রিজলভার ক্লাউডফ্লেয়ার ডটকমে চলছে</string>
     <string name="brbs_restore_dialog_failure_title">পুনরুদ্ধার ব্যর্থ হয়েছে</string>
     <string name="network_log_app_name_unnamed">নামহীন (%1$s)</string>
@@ -676,7 +669,6 @@
     <string name="firewall_rule_block_app_univ_mobile_desc"><i>Metered</i> (মোবাইল) নেটওয়ার্কে সংযোগ করার চেষ্টা করার সময় একটি ব্যবহারকারী-সেট ইউনিভার্সাল ফায়ারওয়াল নিয়ম এই <i>অ্যাপ</i> ব্লক করে। ট্যাব</string>
     <string name="firewall_rule_block_udp_ntp_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম এই <i>UDP</i> সংযোগ ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান।</string>
     <string name="build__flavor_fdroid">fdroid</string>
-    <string name="ci_header">আইপি এবং পোর্টের নিয়ম: %1$s</string>
     <string name="ci_delete">মুছে ফেলা</string>
     <string name="ada_noapp_dialog_message">নির্দিষ্ট অ্যাপ্লিকেশনের জন্য অ্যাপ্লিকেশন তথ্য পাওয়া যায় নি.</string>
     <string name="ada_app_metered">মিটারযুক্ত</string>
@@ -715,7 +707,6 @@
     <string name="firewall_rule_block_ip_univ_desc">একটি ব্যবহারকারী-সেট ফায়ারওয়াল নিয়ম <i>গন্তব্য আইপি / পোর্ট</i>কে ব্লক করেছে।<br/><br/> পরিবর্তন করতে <i>ইউনিভার্সাল</i> ট্যাবে যান</string>
     <string name="firewall_rule_trusted_ip_desc">এই সংযোগের অনুমতি দেওয়া হয়েছিল কারণ <i>গন্তব্য IP</i> অ্যাপ-নির্দিষ্ট নিয়মগুলিকে বাইপাস করার জন্য সেট করা হয়েছে।<br/><br/> পরিবর্তন করতে <i>অ্যাপ-নির্দিষ্ট ফায়ারওয়াল</i> স্ক্রিনে যান।</string>
     <string name="notif_channel_desc_vpn_failure">Android বা অন্য VPN অ্যাপ দ্বারা RethinkDNS বন্ধ করা হলে জানান</string>
-    <string name="cd_dialog_header">কাস্টম ডোমেন(গুলি): %1$s</string>
     <string name="lbbs_heading">185+ ব্লকলিস্ট কনফিগার করুন</string>
     <string name="brbs_restore_complete_toast">পুনরুদ্ধার সম্পন্ন হয়েছে, অ্যাপ পুনরায় চালু হচ্ছে…</string>
     <string name="brbs_backup_complete_toast">ব্যাকআপ সম্পন্ন</string>
@@ -740,7 +731,6 @@
     <string name="fapps_unmetered_block_dialog_title">আনমিটারে ব্লক করুন</string>
     <string name="fapps_metered_unblock_dialog_title">মিটারে অনুমতি দিন</string>
     <string name="rules_load_failure_reload">পুনরায় লোড</string>
-    <string name="fapps_all_network_hint"><u>সব নেটওয়ার্ক ব্যবহার করুন</u> সক্ষম করা আছে। ফায়ারওয়াল মিটারড / আনমিটারড নিয়ম মেনে চলবে না।</string>
     <string name="rules_load_failure_desc">কোন ফায়ারওয়াল নিয়ম পাওয়া যায়নি</string>
     <string name="fapps_info_dialog_message">অ্যাপ্লিকেশানগুলিকে ইন্টারনেটে সংযোগ করা থেকে ব্লক করুন৷ ইন্টারনেটে অ্যাক্সেস সীমিত করা অযৌক্তিক ডেটা ব্যবহার রোধ করতে, সেইসাথে ব্যাটারি সংরক্ষণ করতে সহায়তা করে।
 \n

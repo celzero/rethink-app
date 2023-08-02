@@ -21,7 +21,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -36,12 +35,12 @@ import com.celzero.bravedns.databinding.FragmentCustomDomainBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 
 class CustomDomainFragment :
@@ -53,11 +52,13 @@ class CustomDomainFragment :
     private val viewModel by inject<CustomDomainViewModel>()
 
     private var uid = UID_EVERYBODY
+    private var rule = CustomRulesActivity.RULES.APP_SPECIFIC_RULES
 
     companion object {
-        fun newInstance(uid: Int): CustomDomainFragment {
+        fun newInstance(uid: Int, rules: CustomRulesActivity.RULES): CustomDomainFragment {
             val args = Bundle()
             args.putInt(INTENT_UID, uid)
+            args.putInt(CustomRulesActivity.INTENT_RULES, rules.type)
             val fragment = CustomDomainFragment()
             fragment.arguments = args
             return fragment
@@ -71,39 +72,47 @@ class CustomDomainFragment :
 
     private fun initView() {
         uid = arguments?.getInt(INTENT_UID, UID_EVERYBODY) ?: UID_EVERYBODY
-        b.cdaHeading.text = getString(R.string.cd_dialog_header, getAppName())
+        rule =
+            arguments?.getInt(CustomRulesActivity.INTENT_RULES)?.let {
+                CustomRulesActivity.RULES.getType(it)
+            }
+                ?: CustomRulesActivity.RULES.APP_SPECIFIC_RULES
 
         b.cdaSearchView.setOnQueryTextListener(this)
-        observeCustomRules()
         setupRecyclerView()
         setupClickListeners()
 
         b.cdaRecycler.requestFocus()
     }
 
-    private fun getAppName(): String {
-        if (uid == UID_EVERYBODY) {
-            return getString(R.string.firewall_act_universal_tab)
-        }
-
-        val appNames = FirewallManager.getAppNamesByUid(uid)
-
-        val packageCount = appNames.count()
-        return if (packageCount >= 2) {
-            getString(R.string.ctbs_app_other_apps, appNames[0], packageCount.minus(1).toString())
+    private fun setupRecyclerView() {
+        layoutManager = LinearLayoutManager(requireContext())
+        b.cdaRecycler.layoutManager = layoutManager
+        b.cdaRecycler.setHasFixedSize(true)
+        if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+            b.cdaAddFab.visibility = View.VISIBLE
+            setupAppSpecificRules(rule)
         } else {
-            appNames[0]
+            b.cdaAddFab.visibility = View.GONE
+            setupAllRules(rule)
         }
     }
 
-    private fun setupRecyclerView() {
-        layoutManager = LinearLayoutManager(requireContext())
-        val adapter = CustomDomainAdapter(requireContext())
-        b.cdaRecycler.layoutManager = layoutManager
+    private fun setupAppSpecificRules(rule: CustomRulesActivity.RULES) {
+        observeCustomRules()
+        val adapter = CustomDomainAdapter(requireContext(), rule)
         b.cdaRecycler.adapter = adapter
-
         viewModel.setUid(uid)
         viewModel.customDomains.observe(this as LifecycleOwner) {
+            adapter.submitData(this.lifecycle, it)
+        }
+    }
+
+    private fun setupAllRules(rule: CustomRulesActivity.RULES) {
+        observeAllRules()
+        val adapter = CustomDomainAdapter(requireContext(), rule)
+        b.cdaRecycler.adapter = adapter
+        viewModel.allDomainRules.observe(this as LifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
         }
     }
@@ -116,6 +125,19 @@ class CustomDomainFragment :
 
     private fun observeCustomRules() {
         viewModel.domainRulesCount(uid).observe(viewLifecycleOwner) {
+            if (it <= 0) {
+                showNoRulesUi()
+                hideRulesUi()
+                return@observe
+            }
+
+            hideNoRulesUi()
+            showRulesUi()
+        }
+    }
+
+    private fun observeAllRules() {
+        viewModel.allDomainRulesCount().observe(viewLifecycleOwner) {
             if (it <= 0) {
                 showNoRulesUi()
                 hideRulesUi()
@@ -274,14 +296,18 @@ class CustomDomainFragment :
     }
 
     private fun showDomainRulesDeleteDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
-            DomainRulesManager.deleteIpRulesByUid(uid)
+            if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                DomainRulesManager.deleteRulesByUid(uid)
+            } else {
+                DomainRulesManager.deleteAllRules()
+            }
             Utilities.showToastUiCentered(
                 requireContext(),
-                getString(R.string.univ_ip_delete_toast_success),
+                getString(R.string.cd_deleted_toast),
                 Toast.LENGTH_SHORT
             )
         }

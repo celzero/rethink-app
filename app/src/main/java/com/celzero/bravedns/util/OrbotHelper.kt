@@ -290,7 +290,7 @@ class OrbotHelper(
         val contentTitle = context.resources.getString(R.string.lbl_action_required)
         val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)

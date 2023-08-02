@@ -33,8 +33,9 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -133,7 +134,7 @@ class DnsProxyEndpointAdapter(
     }
 
     private fun showDetailsDialog(title: String, packageName: String?, ip: String?, port: String) {
-        val builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         builder.setTitle(title)
 
         val app = FirewallManager.getAppInfoByPackage(packageName)?.appName
@@ -170,12 +171,12 @@ class DnsProxyEndpointAdapter(
     }
 
     private fun showDeleteDialog(dnsProxyEndpoint: DnsProxyEndpoint) {
-        val builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         builder.setTitle(R.string.dns_proxy_remove_dialog_title)
         builder.setMessage(R.string.dns_proxy_remove_dialog_message)
 
         builder.setCancelable(true)
-        builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
+        builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
             deleteProxyEndpoint(dnsProxyEndpoint.id)
         }
 
