@@ -107,8 +107,8 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            versionCode = 29
-            versionName = "v054c"
+            versionCode = 30
+            versionName = "v055"
             vectorDrawables.useSupportLibrary = true
         }
     }
