@@ -144,6 +144,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     }
 
     private fun init() {
+        b.settingsNetwork.text = getString(R.string.lbl_wireguard).lowercase()
         collapseFab()
         observeConfig()
         setupInterfaceList()
