@@ -44,7 +44,7 @@
     <string name="bypass_universal">obejście uniwersalne</string>
     <string name="exclude">wyklucz</string>
     <string name="untracked">nieśledzone</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">Ostrzeżenie: RethinkDNS został dezaktywowany</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Ostrzeżenie: Rethink został dezaktywowany</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Naciśnij, aby zmienić ustawienia ochrony</string>
     <string name="firewall_mode_notification_title">Chroniony! Połączony z Zaporą.</string>
     <string name="hybrid_mode_notification_title">Chroniony! Połączony z DNS + Zaporą.</string>
@@ -129,7 +129,7 @@
     <string name="ssv_see_more">Pokaż Wszystko</string>
     <string name="app_name_small_case">rethink</string>
     <string name="txt_home">Strona główna</string>
-    <string name="settings_allow_bypass_heading">Pozwól na obejście</string>
+    <string name="settings_allow_bypass_heading">Włącz widoczność sieci</string>
     <string name="app_mode_dns_low_battery" translatable="true">DNS (oszczędzanie baterii)</string>
     <string name="settings_ptrans_desc" translatable="true">Przetłumacz wychodzący ruch IPv6 na IPv4 na urządzeniu. Włącz, jeśli masz połączenie z siecią obsługującą tylko IPv4.</string>
     <string name="settings_allow_bypass_desc" translatable="true">Pozwól żądającym aplikacjom ominąć zaporę RethinkDNS na żądanie. Niektóre aplikacje do obsługi konferencji audio/wideo, takie jak Zoom i WhatsApp, mogą wymagać obejścia na żądanie, aby działać poprawnie.</string>
@@ -170,7 +170,7 @@
     <string name="download_update_dialog_failure_message" translatable="true">Albo nasze serwery są wyłączone, albo nie można nawiązać połączenia. Spróbuj ponownie za jakiś czas.</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">Zkopiowano adres IP.</string>
-    <string name="whats_dialog_title" translatable="true">Co nowego w wersji v053n</string>
+    <string name="whats_dialog_title" translatable="true">Co nowego w wersji v054c</string>
     <string name="settings_vpn_heading" translatable="true">vpn</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">Z kopiowano URL</string>
     <string name="blocklist_update_check_failure" translatable="true">Coś poszło nie tak. Spróbuj ponownie później!</string>
@@ -255,7 +255,7 @@
     <string name="settings_orbot_disabled_error" translatable="true">Wyłącz proxy HTTP (S) i/lub SOCKS5, aby kontynuować konfigurację Tor-as-a-proxy.</string>
     <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
     <string name="settings_orbot_install_desc" translatable="true">Kliknij tutaj, aby zainstalować Orbot-a</string>
-    <string name="settings_socks5_vpn_disabled_error" translatable="true">Uruchom RethinkDNS, aby kontynuować.</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Uruchom Rethink, aby kontynuować.</string>
     <string name="settings_https_disabled_error" translatable="true">Połączony z Orbotem. Wyłącz ją, aby kontynuować.</string>
     <string name="settings_orbot_notification_content" translatable="true">Błąd uruchamiania Tor-as-a-Proxy. Otwórz aplikację Orbot, aby uruchomić ją ręcznie.</string>
     <string name="settings_socks5_disabled_error" translatable="true">Połączony z Orbotem. Wyłącz, aby kontynuować.</string>
@@ -303,7 +303,7 @@
     <string name="hsf_exclude_error" translatable="true">Wykluczenie nie jest możliwe w trybie blokady VPN</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">Zatrzymywanie…</string>
     <string name="hsf_chip_appearance" translatable="true">Temat: %1$s</string>
-    <string name="hsf_pause_lockdown_failure" translatable="true">Nie można wstrzymać: RethinkDNS w trybie blokady</string>
+    <string name="hsf_pause_lockdown_failure" translatable="true">Nie można wstrzymać: Rethink jest w trybie blokady</string>
     <string name="about_docs" translatable="true">Przeczytaj dokumenty</string>
     <string name="about_privacy_policy" translatable="true">Polityka prywatności</string>
     <string name="about_connect" translatable="true">kontakt</string>
@@ -320,8 +320,8 @@
     <string name="about_dialog_positive_button" translatable="true">Let\'s Go</string>
     <string name="about_mail_to" translatable="true">hello@celzero.com</string>
     <string name="about_mail_to_string" translatable="true">Napisz do:</string>
-    <string name="about_mail_subject" translatable="true">[RethinkDNS]:</string>
-    <string name="about_mail_bugreport_subject" translatable="true">[RethinkDns]: Zgłoszenie błędu</string>
+    <string name="about_mail_subject" translatable="true">[Rethink]:</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Zgłoszenie błędu</string>
     <string name="about_mail_bugreport_text" translatable="true">Wyślij tę wiadomość do : hello@celzero.com</string>
     <string name="about_mail_bugreport_share_title" translatable="true">Wybierz dostawcę poczty elektronicznej</string>
     <string name="log_file_not_available" translatable="true">Nie znaleziono raportu o awarii</string>
@@ -430,7 +430,7 @@
     <string name="new_app_bulk_notification_title" translatable="true">Uwaga</string>
     <string name="firewall_rule_block_http_desc" translatable="true">To połączenie zostało zablokowane, ponieważ prawdopodobnie użyto w nim <i>niezabezpieczonego protokołu HTTP</i>.<br/><br/> Aby to zmienić przejdź do zakładki <i>Universal</i>.</string>
     <string name="new_app_bulk_notification_content" translatable="true">RethinkDNS zablokował %1$s nowe aplikacje. Stuknij, aby wyświetlić lub zmodyfikować.</string>
-    <string name="new_app_notification_content" translatable="true">RethinkDNS zablokował ostatnio zainstalowaną aplikację, %1$s.</string>
+    <string name="new_app_notification_content" translatable="true">Rethink zablokował ostatnio zainstalowaną aplikację, %1$s.</string>
     <string name="notif_dialog_pause_dialog_message" translatable="true">Aplikacja w stanie wstrzymania, wznów aby kontynuować</string>
     <string name="notif_dialog_pause_dialog_title" translatable="true">Aplikacja wstrzymana!</string>
     <string name="notif_dialog_pause_dialog_neutral" translatable="true">Pokaż</string>
@@ -503,7 +503,7 @@
     <string name="firewall_status_block_unmetered" translatable="true">zablokowane w sieciach niezmierzonych (Wi-Fi)</string>
     <string name="firewall_status_block_metered" translatable="true">zablokowane w sieciach taryfowych (mobilnych)</string>
     <string name="hs_biometeric_title" translatable="true">Odblokuj Rethink</string>
-    <string name="hs_biometeric_desc" translatable="true">Użyj uwierzytelniania biometrycznego, aby odblokować RethinkDNS</string>
+    <string name="hs_biometeric_desc" translatable="true">Użyj uwierzytelniania biometrycznego, aby odblokować Rethink</string>
     <string name="hs_biometeric_feature_not_supported" translatable="true">Uwierzytelnianie biometryczne nie jest obsługiwane lub wyłączone na tym urządzeniu</string>
     <string name="hs_biometeric_failed" translatable="true">Uwierzytelnianie biometryczne nie powiodło się</string>
     <string name="hs_biometeric_error" translatable="true">Błąd uwierzytelniania biometrycznego</string>
@@ -615,10 +615,10 @@
     <string name="hsf_start_dialog_positive" translatable="true">Start</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Przechwytywanie pakietów aktywne</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Przechwytywanie pakietów wyłączone</string>
-    <string name="hsf_pause_vpn_failure" translatable="true">Nie można wstrzymać: RethinkDNS nie jest aktywny</string>
+    <string name="hsf_pause_vpn_failure" translatable="true">Nie można wstrzymać: Rethink nie jest aktywny</string>
     <string name="dc_block_heading" translatable="true">zasady</string>
     <string name="dc_other_settings_heading" translatable="true">zaawansowane</string>
-    <string name="dc_rethink_dns_radio" translatable="true">RethinkDNS</string>
+    <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
     <string name="dc_dns_leaks_heading" translatable="true">Zapobieganie wyciekom DNS</string>
     <string name="about_bravedns_explantion" translatable="true">RethinkDNS to najprostszy sposób na monitorowanie aktywności aplikacji, obchodzenie cenzury internetowej i zapory aplikacji na urządzeniu z systemem Android.</string>
     <string name="about_sponsor_link_text" translatable="true">Wesprzyj nas</string>
@@ -847,4 +847,6 @@
     <string name="rt_download_start" translatable="true">Pobieranie list blokujących…</string>
     <string name="rt_chip_update_available" translatable="true">Dostępne uaktualnienie</string>
     <string name="rt_chip_check_update" translatable="true">Sprawdź aktualizacje</string>
+    <string name="lbl_network" translatable="true">sieć</string>
+    <string name="lbl_maybe_blocked" translatable="true">Prawdopodobnie zablokowane</string>
 </resources>
