@@ -53,6 +53,7 @@
         <item name="chipTextColor">@color/chipTextColor</item>
         <item name="invertedPrimaryTextColor">@color/invertedPrimaryText</item>
         <item name="textColorAccentBad">@color/textColorAccentBad</item>
+        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColor</item>
 
         <item name="svgStrokeColor">@color/stroke</item>
         <item name="svgFillColor">@color/fill</item>
@@ -122,6 +123,7 @@
         <item name="chipTextColor">@color/chipTextColorLight</item>
         <item name="secondaryTextColor">@color/secondaryTextLight</item>
         <item name="textColorAccentBad">@color/textColorAccentBadLight</item>
+        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorLight</item>
 
         <item name="svgStrokeColor">@color/strokeLight</item>
         <item name="svgFillColor">@color/fillLight</item>
@@ -184,6 +186,7 @@
         <item name="homeScreenBtnBackground">@color/homeScreenBtnBackgroundBlack</item>
         <item name="textViewBackground">@color/textViewBackgroundBlack</item>
         <item name="buttonBackground">@color/buttonBackgroundBlack</item>
+        <item name="homeScreenHeaderTextColor">@color/homeScreenHeaderTextColorBlack</item>
 
         <item name="primaryTextColor">@color/primaryTextBlack</item>
         <item name="primaryLightColorText">@color/primaryLightColorTextBlack</item>
