@@ -240,7 +240,6 @@
     <string name="build__flavor_website">website</string>
     <string name="build__flavor_play_store">play</string>
     <string name="refresh_complete">Повторная синхронизация списка приложений завершена.</string>
-    <string name="wireguard_mode_info_explanation_new">В ближайшее время.</string>
     <string name="settings_theme_dialog_themes_2">Светлая</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="fapps_filter_categories_heading">Категории</string>

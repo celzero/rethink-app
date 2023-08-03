@@ -49,7 +49,6 @@
     <string name="notification_action_dns_firewall_mode">DNS + فایروال</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">برای تغییر تنظیمات حفاظت ضربه بزنید</string>
     <string name="notification_action_dns_mode">DNS</string>
-    <string name="wireguard_mode_info_explanation_new">به زودی.</string>
     <string name="skip">رد شدن</string>
     <string name="apps_info_title">برنامه ها</string>
     <string name="rdns_plus">RDNS پلاس</string>

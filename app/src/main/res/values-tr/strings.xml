@@ -568,7 +568,6 @@
 \n
 \nRethink, hangi uygulamaların kullanımda olduğunu (ön plan) ve hangilerinin kullanımda olmadığını (arka plan) izlemek için erişilebilirlik hizmetini kullanır.</string>
     <string name="hybrid_mode_info_title">DNS + Güvenlik Duvarı</string>
-    <string name="wireguard_mode_info_explanation_new">Çok yakında.</string>
     <string name="brave_dns_connect_mode_change_firewall">Mod Seçin.</string>
     <string name="bsct_block"><u>Bu uygulamayı</u> engelleyin, atlayın, hariç tutun, koruyun</string>
     <string name="always_on_dialog_heading">Her Zaman Açık VPN\'i Devre Dışı Bırak</string>

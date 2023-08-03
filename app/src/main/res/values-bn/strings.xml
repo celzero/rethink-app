@@ -394,7 +394,6 @@
     <string name="dns_firewall_mode_info_explanation_new">উপরের সবগুলো + বাইপাস ইন্টারনেট সেন্সরশিপ।</string>
     <string name="dns_crypt_relay_remove_dialog_message">সংরক্ষিত কনফিগারেশন থেকে DNSCrypt রিলে মুছুন।</string>
     <string name="custom_url_error_invalid_url">অবৈধ ইউ আর এল</string>
-    <string name="wireguard_mode_info_explanation_new">শীঘ্রই আসছে.</string>
     <string name="alert_firewall_accessibility_regrant_explanation">RethinkDNS অ্যাক্সেসিবিলিটি পরিষেবা বন্ধ বা ক্র্যাশ হয়েছে৷ <i><b>সেটিংসে যান এবং ফোর্স স্টপ</b></i> রিথিঙ্কডিএনএসে যান এবং <i>ব্যবহৃত নয় এমন কোনো অ্যাপ ব্লক করুন</i> বৈশিষ্ট্যটি ব্যবহার করতে এটি আবার শুরু করুন।
 \n
 \nRethinkDNS অ্যাক্সেসিবিলিটি পরিষেবা ব্যবহার করে কোন অ্যাপগুলি ব্যবহার করা হচ্ছে (ফোরগ্রাউন্ড) বনাম যেগুলি ব্যবহারে নেই (পটভূমিতে) তা ট্র্যাক করতে।</string>

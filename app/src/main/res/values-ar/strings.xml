@@ -645,7 +645,6 @@
     <string name="alert_firewall_accessibility_explanation">يستخدم RethinkDNS خدمة إمكانية الوصول لتتبع التطبيقات قيد الاستخدام (المقدمة) مقابل التطبيقات غير المستخدمة (الخلفية).
 \n
 \nلا تجمع RethinkDNS أي معلومات أو تتجسس عليك بأي شكل من الأشكال.</string>
-    <string name="wireguard_mode_info_explanation_new">قريبا.</string>
     <string name="dns_mode_info_explanation_new">مراقبة طلبات DNS وحظرها وتشفيرها.</string>
     <string name="settings_https_desc">هذا الإعداد مجرد توصية ومن الممكن أن تتجاهله التطبيقات. ستتجاوز التطبيقات التي تستخدم بروكسي HTTP(S) قواعد جدار الحماية و قواعد نظام dns.</string>
     <string name="firewall_status_block_metered">محظور على شبكات (المحمول) المقننة</string>

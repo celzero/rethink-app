@@ -292,7 +292,6 @@
     <string name="new_app_notification_action_toast_deny">拦截应用网络连接</string>
     <string name="ada_app_bypass_univ">无条件放行</string>
     <string name="rethink_sky_desc">逾 280 处地点；更长的在线时间；于 cloudflare.com 上运行的中间解析服务</string>
-    <string name="wireguard_mode_info_explanation_new">即将推出。</string>
     <string name="dns_query_clear_logs_message">这会删除所有在设备上保存的 DNS 日志。此操作不可逆。请问您是否想要继续？</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">是否删除 DNSCrypt 解析服务？</string>
     <string name="dns_proxy_remove_success">DNS 代理已删除。</string>

@@ -27,7 +27,6 @@
     <string name="dns_mode_info_explanation_new">Monitorizar, bloquear e encriptar pedidos DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new">Para além dos dois anteriores (DNS e Firewall), contornar também a censura da Internet.</string>
     <string name="alert_permission_accessibility">Permissão - Acessibilidade</string>
-    <string name="wireguard_mode_info_explanation_new">Brevemente.</string>
     <string name="alert_firewall_accessibility_explanation">O RethinkDNS utiliza o serviço de acessibilidade para rastrear as aplicações estão a ser utilizadas (primeiro plano) e diferenciar as que não estão em utilização (segundo plano).
 \n
 \nO RethinkDNS não recolhe nenhuma informação sua nem o vigia.</string>

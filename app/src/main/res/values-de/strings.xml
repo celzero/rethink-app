@@ -56,7 +56,6 @@
     <string name="apps_info_title">Apps</string>
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="dns_firewall_mode_info_explanation_new">Alle oben genannten Möglichkeiten + Umgehung der Internetzensur.</string>
-    <string name="wireguard_mode_info_explanation_new">Demnächst verfügbar.</string>
     <string name="alert_permission_accessibility">Erlaubnis - Barrierefreiheit</string>
     <string name="alert_firewall_accessibility_explanation">Rethink verwendet den Dienst für Barrierefreiheit, um zu verfolgen, welche Anwendungen in Gebrauch sind (im Vordergrund) und welche nicht (im Hintergrund).
 \n

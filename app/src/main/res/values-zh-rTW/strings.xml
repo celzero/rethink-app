@@ -173,7 +173,6 @@
     <string name="apps_info_title">應用</string>
     <string name="hybrid_mode_info_title">DNS + 防火牆</string>
     <string name="dns_firewall_mode_info_explanation_new">上述所有功能及繞過互聯網審查。</string>
-    <string name="wireguard_mode_info_explanation_new">即將推出。</string>
     <string name="dns_mode_notification_title">已保護！已連線至快速且安全的 DNS 。</string>
     <string name="alert_firewall_accessibility_explanation">Rethink 使用無障礙服務來追蹤正在使用的應用（前景）與未使用的應用（背景）。
 \n

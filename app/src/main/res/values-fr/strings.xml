@@ -69,7 +69,6 @@
     <string name="always_on_dialog_stop_heading">VPN permanent</string>
     <string name="exclude">exclure</string>
     <string name="dns_mode_info_title">DNS</string>
-    <string name="wireguard_mode_info_explanation_new">Prochainement.</string>
     <string name="dns_query_clear_logs_title">Effacer tous les journaux DNS \?</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">protégé</string>
     <string name="status_protected_with_proxy">protégé par proxy</string>

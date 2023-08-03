@@ -13,7 +13,6 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="alert_permission_accessibility">Toestemming - Toegankelijkheid</string>
     <string name="dns_firewall_mode_info_explanation_new">Al het bovenstaande + het omzeilen van internetcensuur.</string>
-    <string name="wireguard_mode_info_explanation_new">Binnenkort.</string>
     <string name="dns_proxy_remove_dialog_title">DNS Proxy verwijderen\?</string>
     <string name="bsct_block">Blokkeren, omzeilen, uitsluiten, lockdown <u>deze app</u></string>
     <string name="dns_act_configure_tab">Configureren</string>

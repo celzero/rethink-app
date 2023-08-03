@@ -36,7 +36,6 @@
     <string name="firewall_mode_info_title" translatable="true">חומת אש</string>
     <string name="firewall_mode_info_explanation_new" translatable="true">עקוב אחר פעילות הרשת וחומת אש בכל אפליקציה או כתובת IP.</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + חומת אש</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">בקרוב.</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">פתיחת הגדרות הנגישות נכשלה. נסה שוב מאוחר יותר!</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">בחר מצב.</string>
     <string name="custom_url_error_invalid_url" translatable="true">כתובת האתר לא תקינה</string>

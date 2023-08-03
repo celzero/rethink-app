@@ -77,7 +77,6 @@
     <string name="exclude">kecualikan</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit.">terlindungi</string>
     <string name="status_protected_with_socks5_private_dns">terlindungi dengan socks5 &amp; dns pribadi</string>
-    <string name="wireguard_mode_info_explanation_new">Segera tersedia.</string>
     <string name="status_protected_with_tor">terlindungi dengan tor</string>
     <string name="brave_dns_connect_mode_change_firewall">Pilih Mode.</string>
     <string name="settings_title_desc">DNS dan Firewall yang sangat mudah disesuaikan</string>

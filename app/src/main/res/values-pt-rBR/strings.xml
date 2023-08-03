@@ -277,7 +277,6 @@
     <string name="apps_info_title">Apps</string>
     <string name="dns_mode_info_explanation_new">Monitore, bloqueie e criptografe solicitações do DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new">Tudo isso + contorne a censura da internet.</string>
-    <string name="wireguard_mode_info_explanation_new">Em breve.</string>
     <string name="alert_permission_accessibility">Permissão - Acessibilidade</string>
     <string name="alert_firewall_accessibility_explanation">RethinkDNS usa o serviço de acessibilidade para rastrear quais apps estão em uso (primeiro plano) versus aqueles que não estão em uso (segundo plano).
 \n

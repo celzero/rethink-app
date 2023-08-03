@@ -124,7 +124,6 @@
     <string name="hybrid_mode_info_title" translatable="true">डीएनएस + फ़ायरवॉल</string>
     <string name="dns_mode_info_explanation_new" translatable="true">डीएनएस अनुरोधों को मॉनिटर, ब्लॉक और एन्क्रिप्ट करें।</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">उपरोक्त सभी + इंटरनेट सेंसरशिप को बायपास करें।</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">जल्द आ रहा है।</string>
     <string name="alert_permission_accessibility" translatable="true">अनुमति - सुलभता</string>
     <string name="alert_firewall_accessibility_explanation" translatable="true">रीथिंक सुलभता सेवा का इस्तेमाल करता है ये देखने के लिए की कौन सा ऐप इस्तेमाल किया जा रहा है और कौन सा नही।
 \n

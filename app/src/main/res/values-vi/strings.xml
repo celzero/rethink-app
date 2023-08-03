@@ -48,7 +48,6 @@
     <string name="apps_info_title" translatable="true">Ứng dụng</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + tường lửa</string>
     <string name="dns_mode_info_explanation_new" translatable="true">Theo dõi, chặn, và mã hoá các yêu cầu DNS</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">Sắp có…</string>
     <string name="alert_permission_accessibility" translatable="true">Quyền - Trợ năng</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Không thể mở Cài đặt trợ năng. Thử lại sau!</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">Chọn chế độ.</string>

@@ -128,7 +128,6 @@
     <string name="hybrid_mode_info_title">DNS + 防火牆</string>
     <string name="dns_mode_info_explanation_new">監測、攔截同加密 DNS 請求。</string>
     <string name="dns_firewall_mode_info_explanation_new">上面所有功能加埋繞過互聯網審查。</string>
-    <string name="wireguard_mode_info_explanation_new">就嚟推出。</string>
     <string name="alert_permission_accessibility">權限 - 無障礙設定</string>
     <string name="alert_firewall_accessibility_explanation">Rethink 用咗無障礙服務嚟追蹤你用緊嘅 app（前景）同唔係用緊嘅 app（背景）。
 \n

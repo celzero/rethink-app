@@ -45,7 +45,6 @@
     <string name="apps_info_title" translatable="true">アプリ</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + ファイアウォール</string>
     <string name="dns_mode_info_explanation_new" translatable="true">DNS リクエストを監視、ブロック、暗号化します。</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">準備中。</string>
     <string name="alert_permission_accessibility" translatable="true">権限 - アクセシビリティ</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">モードを選択してください。</string>
     <string name="conn_track_clear_logs_title" translatable="true">全てのネットワークログを削除しますか？</string>

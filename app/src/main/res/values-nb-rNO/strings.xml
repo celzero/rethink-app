@@ -13,7 +13,6 @@
     <string name="allow">tillat</string>
     <string name="exclude">utelat</string>
     <string name="dns_mode_info_explanation_new">Hold øye med, blokker, og krypter DNS-forespørsler.</string>
-    <string name="wireguard_mode_info_explanation_new">Kommer snart</string>
     <string name="settings_app_list_default_app">Ingen</string>
     <string name="bsct_conn_desc_blocked">blokkert på %1$s %2$s</string>
     <string name="settings_title_desc">En tilpasningsvennlig DNS og brannmur</string>

@@ -455,7 +455,6 @@
     <string name="dns_mode_info_title">DNS</string>
     <string name="apps_info_title">Programėlės</string>
     <string name="dns_firewall_mode_info_explanation_new">Visa tai + apeikite interneto cenzūrą.</string>
-    <string name="wireguard_mode_info_explanation_new">Jau netrukus.</string>
     <string name="whats_new_version_update">&lt;b&gt;Didžiausios pastangos&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. Pristatome privatesnį Rethink sprendiklį &lt;i&gt;Max&lt;/i&gt;.&lt;br/&gt; 2. Pažymėti IPv6 kaip eksperimentinį; perjungti į IPv4 pagal numatytuosius nustatymus.&lt;br/&gt; 3. &lt;i&gt;Nauja funkcija&lt;/i&gt;: kurkite atsarginę kopiją ir atkurkite programėlės nustatymus.&lt;br/&gt; 4. &lt;i&gt;Nauja funkcija&lt;/i&gt;: programėlės užrakinimo režimas.&lt;br/&gt; 5. &lt;i&gt;Nauja funkcija&lt;/i&gt;: universalus užrakinimo režimas.&lt;br/&gt; 6. &lt;i&gt;Nauja funkcija&lt;/i&gt;: taikykite ugniasienės taisykles prievadų numeriams.&lt;br/&gt; 7. &lt;i&gt;Nauja funkcija&lt;/i&gt;: programėlių ugniasienės taisykles taikykite paketais.&lt;br/&gt; 8. Nedidelis naudotojo sąsajos atnaujinimas.&lt;br/&gt; 9. Kiti atminties ir gedimų pataisymai.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://hosted.weblate.org/projects/rethink-dns-firewall/app/&gt;Padėkite išversti šią programėlę&lt;/a&gt;</string>
     <string name="firewall_mode_info_title">Ugniasienė</string>
     <string name="firewall_mode_info_explanation_new">Stebėkite tinklo veiklą ir uždarykite ugniasienę bet kuriai programėlei ar IP adresui.</string>

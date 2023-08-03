@@ -29,7 +29,6 @@
     <string name="firewall_rules">Reguły Sieci</string>
     <string name="firewall_mode_info_title">Zapora</string>
     <string name="dns_firewall_mode_info_explanation_new">Powyższe + omijanie cenzury Internetu.</string>
-    <string name="wireguard_mode_info_explanation_new">Dostępne wkrótce.</string>
     <string name="pause_title_desc">chwila przerwy…</string>
     <string name="settings_title_desc">Wysoce konfigurowalny DNS i Firewall</string>
     <string name="about_title_desc">Wykrywaj i blokuj zagrożenia bezpieczeństwa sieci</string>

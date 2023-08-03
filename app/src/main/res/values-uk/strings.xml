@@ -280,7 +280,6 @@
     <string name="bsct_conn_desc_allowed" translatable="true">дозволено на %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">заблоковано на %1$s %2$s</string>
     <string name="local_blocklist_download" translatable="true">Завантажити списки блокування</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">Вже скоро.</string>
     <string name="bsct_conn_block_desc" translatable="true">заблоковано %1$s за адресою %2$s</string>
     <string name="lbl_network" translatable="true">мережа</string>
     <string name="default_dns_name" translatable="true">RDNS за замовчуванням</string>
