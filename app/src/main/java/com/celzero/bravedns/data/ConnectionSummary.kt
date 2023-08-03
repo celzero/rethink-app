@@ -17,17 +17,13 @@ package com.celzero.bravedns.data
 
 import java.io.Serializable
 
-data class ConnTrackerMetaData(
-    val uid: Int,
-    val sourceIP: String,
-    val sourcePort: Int,
-    val destIP: String,
-    val destPort: Int,
-    val timestamp: Long,
-    var isBlocked: Boolean,
-    var blockedByRule: String,
-    var blocklists: String,
-    val protocol: Int,
-    var query: String,
-    var connId: String
+data class ConnectionSummary(
+    val uid: String,
+    val pid: String,
+    val connId: String,
+    val downloadBytes: Long,
+    val uploadBytes: Long,
+    val duration: Int,
+    val synack: Int,
+    val message: String
 ) : Serializable

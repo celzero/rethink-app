@@ -48,6 +48,7 @@ class RethinkDnsApplication : Application() {
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
         // database refresh is used in both headless and main project
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
+        get<WorkScheduler>().scheduleDataUsageJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()
     }
 

@@ -125,8 +125,8 @@
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
                 android:gravity="center"
+                android:paddingBottom="7dp"
                 android:orientation="horizontal"
-                android:paddingBottom="10dp"
                 android:weightSum="1">
 
                 <LinearLayout
@@ -205,6 +205,81 @@
                         android:src="@drawable/ic_keyboard_arrow_down" />
                 </LinearLayout>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/connection_summary_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="10dp"
+                android:weightSum="1">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.65"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/connection_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:ellipsize="start"
+                        android:fontFamily="sans-serif-light"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:scrollHorizontally="true"
+                        android:singleLine="false"
+                        android:textAppearance="@android:style/TextAppearance.Material.Body1"
+                        android:textColor="?attr/primaryLightColorText"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/connection_upload"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-condensed"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/connection_download"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-condensed"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textSize="@dimen/default_font_text_view" />
+
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

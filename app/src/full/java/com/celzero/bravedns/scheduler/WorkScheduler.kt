@@ -38,14 +38,14 @@ class WorkScheduler(val context: Context) {
     companion object {
         const val APP_EXIT_INFO_ONE_TIME_JOB_TAG = "OnDemandCollectAppExitInfoJob"
         const val APP_EXIT_INFO_JOB_TAG = "ScheduledCollectAppExitInfoJob"
-        const val REFRESH_APPS_JOB_TAG = "ScheduledRefreshAppsJob"
         const val PURGE_CONNECTION_LOGS_JOB_TAG = "ScheduledPurgeConnectionLogsJob"
         const val BLOCKLIST_UPDATE_CHECK_JOB_TAG = "ScheduledBlocklistUpdateCheckJob"
+        const val DATA_USAGE_JOB_TAG = "ScheduledDataUsageJob"
 
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
-        const val REFRESH_TIME_INTERVAL_HOURS: Long = 3
         const val PURGE_LOGS_TIME_INTERVAL_DAYS: Long = 7
         const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 3
+        const val DATA_USAGE_TIME_INTERVAL_MINS: Long = 20
 
         fun isWorkRunning(context: Context, tag: String): Boolean {
             val instance = WorkManager.getInstance(context)
@@ -102,11 +102,7 @@ class WorkScheduler(val context: Context) {
 
     // Schedule AppExitInfo every APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS
     fun scheduleAppExitInfoCollectionJob() {
-        if (
-            isWorkScheduled(context, APP_EXIT_INFO_JOB_TAG) ||
-                isWorkRunning(context, APP_EXIT_INFO_ONE_TIME_JOB_TAG)
-        )
-            return
+        if (isWorkScheduled(context.applicationContext, APP_EXIT_INFO_JOB_TAG)) return
 
         // app exit info is supported from R+
         if (!Utilities.isAtleastR()) return
@@ -120,7 +116,7 @@ class WorkScheduler(val context: Context) {
                 )
                 .addTag(APP_EXIT_INFO_JOB_TAG)
                 .build()
-        WorkManager.getInstance(context)
+        WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 APP_EXIT_INFO_JOB_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
@@ -129,7 +125,7 @@ class WorkScheduler(val context: Context) {
     }
 
     fun schedulePurgeConnectionsLog() {
-        if (isWorkScheduled(context, PURGE_CONNECTION_LOGS_JOB_TAG)) return
+        if (isWorkScheduled(context.applicationContext, PURGE_CONNECTION_LOGS_JOB_TAG)) return
 
         val purgeLogs =
             PeriodicWorkRequest.Builder(
@@ -140,7 +136,7 @@ class WorkScheduler(val context: Context) {
                 .addTag(PURGE_CONNECTION_LOGS_JOB_TAG)
                 .build()
 
-        WorkManager.getInstance(context)
+        WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 PURGE_CONNECTION_LOGS_JOB_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
@@ -150,7 +146,7 @@ class WorkScheduler(val context: Context) {
 
     // Schedule AppExitInfo on demand
     fun scheduleOneTimeWorkForAppExitInfo() {
-        if (isWorkRunning(context, APP_EXIT_INFO_JOB_TAG)) return
+        if (isWorkRunning(context.applicationContext, APP_EXIT_INFO_JOB_TAG)) return
 
         val appExitInfoCollector =
             OneTimeWorkRequestBuilder<AppExitInfoCollector>()
@@ -161,7 +157,7 @@ class WorkScheduler(val context: Context) {
                 )
                 .addTag(APP_EXIT_INFO_ONE_TIME_JOB_TAG)
                 .build()
-        WorkManager.getInstance(context)
+        WorkManager.getInstance(context.applicationContext)
             .beginUniqueWork(
                 APP_EXIT_INFO_ONE_TIME_JOB_TAG,
                 ExistingWorkPolicy.REPLACE,
@@ -172,11 +168,7 @@ class WorkScheduler(val context: Context) {
 
     // schedule blocklist update check (based on user settings)
     fun scheduleBlocklistUpdateCheckJob() {
-        if (
-            isWorkScheduled(context, BLOCKLIST_UPDATE_CHECK_JOB_TAG) ||
-                isWorkRunning(context, BLOCKLIST_UPDATE_CHECK_JOB_TAG)
-        )
-            return
+        if (isWorkScheduled(context.applicationContext, BLOCKLIST_UPDATE_CHECK_JOB_TAG)) return
 
         Log.i(LOG_TAG_SCHEDULER, "Scheduled blocklist update check")
         val blocklistUpdateCheck =
@@ -187,11 +179,33 @@ class WorkScheduler(val context: Context) {
                 )
                 .addTag(BLOCKLIST_UPDATE_CHECK_JOB_TAG)
                 .build()
-        WorkManager.getInstance(context)
+        WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 BLOCKLIST_UPDATE_CHECK_JOB_TAG,
                 ExistingPeriodicWorkPolicy.UPDATE,
                 blocklistUpdateCheck
             )
+    }
+
+    fun scheduleDataUsageJob() {
+        Log.i(LOG_TAG_SCHEDULER, "Data usage job schedule started")
+        if (isWorkScheduled(context.applicationContext, DATA_USAGE_JOB_TAG)) return
+
+        Log.i(LOG_TAG_SCHEDULER, "Data usage job scheduled")
+        val workRequest =
+            PeriodicWorkRequest.Builder(
+                    DataUsageUpdater::class.java,
+                    DATA_USAGE_TIME_INTERVAL_MINS,
+                    TimeUnit.MINUTES // Set the repeat interval for every 15 minutes
+                )
+                .addTag(DATA_USAGE_JOB_TAG)
+                .build()
+
+        WorkManager.getInstance(context.applicationContext)
+        .enqueueUniquePeriodicWork(
+            DATA_USAGE_JOB_TAG,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            workRequest
+        )
     }
 }

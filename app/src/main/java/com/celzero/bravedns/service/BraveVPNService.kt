@@ -43,6 +43,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnTrackerMetaData
+import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.net.go.GoVpnAdapter
@@ -248,7 +249,8 @@ class BraveVPNService :
         srcIp: String,
         srcPort: Int,
         dstIp: String,
-        dstPort: Int
+        dstPort: Int,
+        connId: String
     ): Boolean {
 
         // print the invalid destination ip received
@@ -260,7 +262,16 @@ class BraveVPNService :
             )
         }
 
-        val connInfo = createConnTrackerMetaData(uid, srcIp, srcPort, dstIp, dstPort, protocol)
+        val connInfo =
+            createConnTrackerMetaData(
+                uid,
+                srcIp,
+                srcPort,
+                dstIp,
+                dstPort,
+                protocol,
+                connId = connId
+            )
         if (DEBUG) Log.d(LOG_TAG_VPN, "block: $connInfo")
         return processFirewallRequest(connInfo)
     }
@@ -2138,22 +2149,57 @@ class BraveVPNService :
         netLogTracker.processDnsLog(summary)
     }
 
-    override fun onICMPClosed(summary: ICMPSummary?) {
-        // no-op
-        // TODO: implement ICMP
-        // if (DEBUG) Log.d(LOG_TAG_VPN, "TEST onICMPClosed: $summary")
+    override fun onICMPClosed(s: ICMPSummary?) {
+        if (s == null) {
+            Log.i(LOG_TAG_VPN, "received null summary")
+            return
+        }
+
+        // uid, downloadBytes, uploadBytes, synack are not applicable for icmp
+        val connectionSummary = ConnectionSummary("", s.pid, s.id, 0L, 0L, s.duration, 0, s.msg)
+
+        netLogTracker.updateSummary(connectionSummary)
     }
 
-    override fun onTCPSocketClosed(summary: TCPSocketSummary?) {
-        // no-op
-        // TODO: update connection tracker with the summary
-        // if (DEBUG) Log.d(LOG_TAG_VPN, "TEST onTCPSocketClosed: $summary")
+    override fun onTCPSocketClosed(s: TCPSocketSummary?) {
+        if (s == null) {
+            Log.i(LOG_TAG_VPN, "received null summary")
+            return
+        }
+
+        val connectionSummary =
+            ConnectionSummary(
+                s.uid,
+                s.pid,
+                s.id,
+                s.downloadBytes,
+                s.uploadBytes,
+                s.duration,
+                s.synack,
+                s.msg
+            )
+        netLogTracker.updateSummary(connectionSummary)
     }
 
-    override fun onUDPSocketClosed(summary: UDPSocketSummary?) {
-        // no-op
-        // TODO: update connection tracker with the summary
-        /// if (DEBUG) Log.d(LOG_TAG_VPN, "TEST onUDPSocketClosed: $summary")
+    override fun onUDPSocketClosed(s: UDPSocketSummary?) {
+        if (s == null) {
+            Log.i(LOG_TAG_VPN, "received null summary")
+            return
+        }
+
+        // synack is not applicable for udp
+        val connectionSummary =
+            ConnectionSummary(
+                s.uid,
+                s.pid,
+                s.id,
+                s.downloadBytes,
+                s.uploadBytes,
+                s.duration,
+                0,
+                s.msg
+            )
+        netLogTracker.updateSummary(connectionSummary)
     }
 
     override fun flow(
@@ -2183,24 +2229,24 @@ class BraveVPNService :
 
         val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
 
+        // generate a random 8 character string for connId
+        val connId = Utilities.getRandomString(8)
+
         val rule =
             if (realIps?.isEmpty() == true || d?.isEmpty() == true) {
-                block(protocol, uid, srcIp, srcPort, dstIp, dstPort)
+                block(protocol, uid, srcIp, srcPort, dstIp, dstPort, connId)
             } else {
-                blockAlg(protocol, uid, src, dest, realIps, d, blocklists)
+                blockAlg(protocol, uid, src, dest, realIps, d, blocklists, connId)
             }
-
-        // generate a random 8 character string for connectionId
-        val connectionId = Utilities.getRandomString(8)
 
         if (rule) {
             // return Ipn.Block, no need to check for other rules
             if (DEBUG)
                 Log.d(
                     LOG_TAG_VPN,
-                    "flow: received rule: block, returning Ipn.Block, $connectionId, $uid"
+                    "flow: received rule: block, returning Ipn.Block, $connId, $uid"
                 )
-            return getFlowResponseString(Ipn.Block, connectionId, uid)
+            return getFlowResponseString(Ipn.Block, connId, uid)
         }
 
         // if no proxy is enabled, return Ipn.Base
@@ -2208,9 +2254,9 @@ class BraveVPNService :
             if (DEBUG)
                 Log.d(
                     LOG_TAG_VPN,
-                    "flow: no proxy enabled, returning Ipn.Base, $connectionId, $uid"
+                    "flow: no proxy enabled, returning Ipn.Base, $connId, $uid"
                 )
-            return getFlowResponseString(Ipn.Base, connectionId, uid)
+            return getFlowResponseString(Ipn.Base, connId, uid)
         }
 
         // check for other proxy rules
@@ -2221,22 +2267,21 @@ class BraveVPNService :
             // if no config is assigned / enabled for this app, pass-through
             // add ID_WG_BASE to the id to get the proxyId
             if (
-                id == WireguardManager.INVALID_CONF_ID ||
-                    !WireguardManager.isConfigActive(proxyId)
+                id == WireguardManager.INVALID_CONF_ID || !WireguardManager.isConfigActive(proxyId)
             ) {
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
-                        "flow: wireguard is enabled but app is not included, proceed for other checks, $connectionId, $uid"
+                        "flow: wireguard is enabled but app is not included, proceed for other checks, $connId, $uid"
                     )
                 // pass-through, no wireguard config is enabled for this app
             } else {
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
-                        "flow: wireguard is enabled and app is included, returning $proxyId, $connectionId, $uid"
+                        "flow: wireguard is enabled and app is included, returning $proxyId, $connId, $uid"
                     )
-                return getFlowResponseString(proxyId, connectionId, uid)
+                return getFlowResponseString(proxyId, connId, uid)
             }
         }
 
@@ -2258,16 +2303,16 @@ class BraveVPNService :
                     if (DEBUG)
                         Log.d(
                             LOG_TAG_VPN,
-                            "flow: tcp proxy enabled, but destination is cloudflare, returning $proxyId, $connectionId, $uid"
+                            "flow: tcp proxy enabled, but destination is cloudflare, returning $proxyId, $connId, $uid"
                         )
-                    return getFlowResponseString(proxyId, connectionId, uid)
+                    return getFlowResponseString(proxyId, connId, uid)
                 }
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
-                        "flow: tcp proxy enabled, returning ${ProxyManager.ID_TCP_BASE}, $connectionId, $uid"
+                        "flow: tcp proxy enabled, returning ${ProxyManager.ID_TCP_BASE}, $connId, $uid"
                     )
-                return getFlowResponseString(ProxyManager.ID_TCP_BASE, connectionId, uid)
+                return getFlowResponseString(ProxyManager.ID_TCP_BASE, connId, uid)
             }
         }*/
 
@@ -2281,9 +2326,9 @@ class BraveVPNService :
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
-                        "flow: received rule: orbot, returning Ipn.OrbotS5, $connectionId, $uid"
+                        "flow: received rule: orbot, returning Ipn.OrbotS5, $connId, $uid"
                     )
-                return getFlowResponseString(ProxyManager.ID_ORBOT_BASE, connectionId, uid)
+                return getFlowResponseString(ProxyManager.ID_ORBOT_BASE, connId, uid)
             }
         }
 
@@ -2291,32 +2336,32 @@ class BraveVPNService :
             if (DEBUG)
                 Log.d(
                     LOG_TAG_VPN,
-                    "flow: received rule: http, returning Ipn.SOCKS5, $connectionId, $uid"
+                    "flow: received rule: http, returning Ipn.SOCKS5, $connId, $uid"
                 )
-            return getFlowResponseString(Ipn.SOCKS5, connectionId, uid)
+            return getFlowResponseString(Ipn.SOCKS5, connId, uid)
         }
 
         if (appConfig.isCustomHttpProxyEnabled()) {
             if (DEBUG)
                 Log.d(
                     LOG_TAG_VPN,
-                    "flow: received rule: http, returning Ipn.HTTP1, $connectionId, $uid"
+                    "flow: received rule: http, returning Ipn.HTTP1, $connId, $uid"
                 )
-            return getFlowResponseString(Ipn.HTTP1, connectionId, uid)
+            return getFlowResponseString(Ipn.HTTP1, connId, uid)
         }
 
         if (DEBUG)
-            Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connectionId, $uid")
-        return getFlowResponseString(Ipn.Base, connectionId, uid)
+            Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connId, $uid")
+        return getFlowResponseString(Ipn.Base, connId, uid)
     }
 
-    private fun getFlowResponseString(proxyId: String, connectionId: String, uid: Int): String {
-        // "proxyId, connectionId, uid"
+    private fun getFlowResponseString(proxyId: String, connId: String, uid: Int): String {
+        // "proxyId, connId, uid"
         return StringBuilder()
             .apply {
                 append(proxyId)
                 append(",")
-                append(connectionId)
+                append(connId)
                 append(",")
                 append(uid)
             }
@@ -2330,7 +2375,8 @@ class BraveVPNService :
         dest: String,
         realIps: String?,
         d: String?,
-        blocklists: String
+        blocklists: String,
+        connId: String
     ): Boolean {
         Log.d(LOG_TAG_VPN, "block-alg: $uid, $src, $dest, $realIps, $d, $blocklists")
         if (d == null) return true
@@ -2368,7 +2414,8 @@ class BraveVPNService :
                 dstPort,
                 protocol,
                 blocklists,
-                domains.first()
+                domains.first(),
+                connId
             )
         if (DEBUG) Log.d(LOG_TAG_VPN, "block-alg connInfo: $connInfo")
         return processFirewallRequest(connInfo, anyRealIpBlocked, blocklists)
@@ -2413,7 +2460,8 @@ class BraveVPNService :
         dstPort: Int,
         protocol: Int,
         blocklists: String = "",
-        query: String = ""
+        query: String = "",
+        connId: String
     ): ConnTrackerMetaData {
 
         // Ref: ipaddress doc:
@@ -2421,7 +2469,7 @@ class BraveVPNService :
         if (DEBUG)
             Log.d(
                 LOG_TAG_VPN,
-                "createConnInfoObj: uid: $uid, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort, protocol: $protocol, query: $query"
+                "createConnInfoObj: uid: $uid, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort, protocol: $protocol, query: $query, connId: $connId"
             )
 
         // FIXME: replace currentTimeMillis with elapsed-time
@@ -2436,7 +2484,8 @@ class BraveVPNService :
             "", /*rule*/
             blocklists,
             protocol,
-            query
+            query,
+            connId
         )
     }
 

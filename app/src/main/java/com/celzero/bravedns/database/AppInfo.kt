@@ -32,6 +32,8 @@ class AppInfo {
     var connectionStatus: Int = FirewallManager.ConnectionStatus.ALLOW.id
     var screenOffAllowed: Boolean = false
     var backgroundAllowed: Boolean = false
+    var uploadBytes: Long = 0
+    var downloadBytes: Long = 0
 
     override fun equals(other: Any?): Boolean {
         if (other !is AppInfo) return false

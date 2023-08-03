@@ -89,6 +89,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
             displayTransactionDetails(connTracker)
             displayProtocolDetails(connTracker.port, connTracker.protocol)
             displayAppDetails(connTracker)
+            displaySummaryDetails(connTracker)
             displayFirewallRulesetHint(connTracker.isBlocked, connTracker.blockedByRule)
 
             b.connectionParentLayout.setOnClickListener { openBottomSheet(connTracker) }
@@ -196,6 +197,21 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
                 }
             }
+        }
+
+        private fun displaySummaryDetails(ct: ConnectionTracker) {
+            if (ct.message.isEmpty()) {
+                b.connectionSummaryLl.visibility = View.GONE
+                return
+            }
+
+            b.connectionSummaryLl.visibility = View.VISIBLE
+            b.connectionMessage.text = ct.message
+            // add unicode for download and upload
+            val download = Utilities.humanReadableByteCount(ct.downloadBytes, true)
+            val upload = Utilities.humanReadableByteCount(ct.uploadBytes, true)
+            b.connectionDownload.text = context.getString(R.string.symbol_download, download)
+            b.connectionUpload.text = context.getString(R.string.symbol_upload, upload)
         }
 
         private fun loadAppIcon(drawable: Drawable?) {

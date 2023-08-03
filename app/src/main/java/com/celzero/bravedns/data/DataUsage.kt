@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 RethinkDNS and its authors
+ * Copyright 2023 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,4 @@
  */
 package com.celzero.bravedns.data
 
-import java.io.Serializable
-
-data class ConnTrackerMetaData(
-    val uid: Int,
-    val sourceIP: String,
-    val sourcePort: Int,
-    val destIP: String,
-    val destPort: Int,
-    val timestamp: Long,
-    var isBlocked: Boolean,
-    var blockedByRule: String,
-    var blocklists: String,
-    val protocol: Int,
-    var query: String,
-    var connId: String
-) : Serializable
+data class DataUsage(val uid: Int, val uploadBytes: Long, val downloadBytes: Long)

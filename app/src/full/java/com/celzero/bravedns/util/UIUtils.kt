@@ -305,7 +305,9 @@ object UiUtils {
         return matcher.find()
     }
 
-    fun getCountryNameFromFlag(flag: String): String {
+    fun getCountryNameFromFlag(flag: String?): String {
+        if (flag == null) return ""
+
         val flagCodePoints =
             mapOf(
                 "🇦🇨" to "Ascension Island",

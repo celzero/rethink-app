@@ -19,6 +19,7 @@ import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.celzero.bravedns.data.AppConnection
+import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
 
 @Dao
@@ -31,6 +32,9 @@ interface ConnectionTrackerDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
+
+    @Query("update ConnectionTracker set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId")
+    fun updateSummary(connId: String, downloadBytes: Long, uploadBytes: Long, duration: Int, synack: Int, message: String)
 
     @Delete fun delete(connectionTracker: ConnectionTracker)
 
@@ -190,4 +194,7 @@ interface ConnectionTrackerDAO {
     fun getAllBlockedDomains(): PagingSource<Int, AppConnection>
 
     @Query("select count(id) from ConnectionTracker") fun logsCount(): LiveData<Long>
+
+    @Query("SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :fromTime and timeStamp <= :toTime GROUP BY uid")
+    fun getDataUsage(fromTime: Long, toTime: Long): List<DataUsage>
 }

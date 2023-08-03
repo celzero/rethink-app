@@ -270,6 +270,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // count of wireguard enabled
     var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
 
+    // previous data usage check timestamp
+    var prevDataUsageCheck by longPref("prev_data_usage_check").withDefault<Long>(INIT_TIME_MS)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
     var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()

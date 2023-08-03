@@ -18,6 +18,9 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import com.celzero.bravedns.data.ConnTrackerMetaData
+import com.celzero.bravedns.data.ConnectionSummary
+import com.celzero.bravedns.database.AppInfo
+import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
@@ -48,6 +51,8 @@ internal constructor(
 
     private var dnsNetLogBatcher: NetLogBatcher<DnsLog>? = null
     private var ipNetLogBatcher: NetLogBatcher<ConnectionTracker>? = null
+    private var updateSummary: NetLogBatcher<ConnectionSummary>? = null
+    private var appSummary: NetLogBatcher<ConnectionSummary>? = null
 
     suspend fun startLogger(s: CoroutineScope) {
         if (ipTracker == null) {
@@ -66,6 +71,9 @@ internal constructor(
 
         dnsNetLogBatcher = NetLogBatcher(dnsLogTracker!!::insertBatch)
         dnsNetLogBatcher!!.begin(scope!!)
+
+        updateSummary = NetLogBatcher(ipTracker!!::updateBatch)
+        updateSummary!!.begin(scope!!)
     }
 
     fun writeIpLog(info: ConnTrackerMetaData) {
@@ -74,6 +82,14 @@ internal constructor(
         scope?.launch {
             val connTracker = ipTracker?.makeConnectionTracker(info) ?: return@launch
             ipNetLogBatcher?.add(connTracker)
+        }
+    }
+
+    fun updateSummary(summary: ConnectionSummary) {
+        if (!persistentState.logsEnabled) return
+
+        scope?.launch {
+            updateSummary?.add(summary)
         }
     }
 

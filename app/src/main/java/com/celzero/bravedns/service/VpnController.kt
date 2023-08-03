@@ -215,8 +215,7 @@ object VpnController : KoinComponent {
             "IPv6"
         } else if (ipv4Size >= 1) {
             "IPv4"
-        }
-        else {
+        } else {
             // if there are zero ipv4 and ipv6 networks, then we are failing open
             // see: BraveVpnService#establishVpn
             "IPv4, IPv6"

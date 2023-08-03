@@ -15,7 +15,10 @@
  */
 package com.celzero.bravedns.database
 
+import android.util.Log
 import androidx.lifecycle.LiveData
+import com.celzero.bravedns.data.ConnectionSummary
+import com.celzero.bravedns.data.DataUsage
 
 class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTrackerDAO) {
 
@@ -25,6 +28,23 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun insertBatch(conns: List<ConnectionTracker>) {
         connectionTrackerDAO.insertBatch(conns)
+    }
+
+    suspend fun updateBatch(summary: List<ConnectionSummary>) {
+        summary.forEach {
+            Log.d(
+                "TEST",
+                "Updating summary for ${it.connId}, ${it.downloadBytes}, ${it.uploadBytes}, ${it.duration}, ${it.synack}, ${it.message}"
+            )
+            connectionTrackerDAO.updateSummary(
+                it.connId,
+                it.downloadBytes,
+                it.uploadBytes,
+                it.duration,
+                it.synack,
+                it.message
+            )
+        }
     }
 
     suspend fun purgeLogsByDate(date: Long) {
@@ -41,5 +61,9 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun clearLogsByUid(uid: Int) {
         connectionTrackerDAO.clearLogsByUid(uid)
+    }
+
+    suspend fun getDataUsage(before: Long, current: Long): List<DataUsage> {
+        return connectionTrackerDAO.getDataUsage(before, current)
     }
 }

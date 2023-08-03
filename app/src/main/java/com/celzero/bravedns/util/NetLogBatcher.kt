@@ -101,6 +101,15 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
             }
         }
 
+    suspend fun update(payload: T) =
+        withContext(looper + nprod) {
+            batches.add(payload)
+            // if the batch size is met, dispatch it to the consumer
+            if (batches.size >= batchSize) {
+                txswap()
+            }
+        }
+
     private suspend fun sig() =
         withContext(looper + nsig) {
             // consume all signals
