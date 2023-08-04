@@ -160,7 +160,7 @@ class DnsCryptEndpointAdapter(
             val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
             if (message == null) builder.setMessage(url)
-            else builder.setMessage(url + "\n\n" + message)
+            else builder.setMessage(url + "\n\n" + cryptDesc(message))
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
                 dialogInterface,
@@ -181,6 +181,23 @@ class DnsCryptEndpointAdapter(
             val alertDialog: AlertDialog = builder.create()
             alertDialog.setCancelable(true)
             alertDialog.show()
+        }
+
+        private fun cryptDesc(message: String?): String {
+            if (message.isNullOrEmpty()) return ""
+
+            return try {
+                if (message.contains("R.string.")) {
+                    val m = message.substringAfter("R.string.")
+                    val resId: Int =
+                        context.resources.getIdentifier(m, "string", context.packageName)
+                    context.getString(resId)
+                } else {
+                    message
+                }
+            } catch (ignored: Exception) {
+                ""
+            }
         }
 
         private fun updateDnsCryptDetails(endpoint: DnsCryptEndpoint) {

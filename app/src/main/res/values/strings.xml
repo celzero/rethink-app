@@ -1388,4 +1388,27 @@
 
     <string name="wireguard_no_config_msg">WireGuard not found</string>
 
+    <!-- dns description -->
+    <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Blocks malware and adult content. Uses Cloudflare\'s 1.1.1.3 DNS endpoint.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Blocks malicious content. Uses Cloudflare\'s 1.1.1.2 DNS endpoint.</string>
+    <string name="google_dns_desc" translatable="true">Does not block any DNS requests. Uses Google\'s DNS endpoint.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Family filter blocks access to all adult, pornographic and explicit sites. It also blocks proxy and VPN domains that could be used to bypass our filters. Mixed content sites (like Reddit) are also blocked. Google, Bing and Youtube are set to the Safe Mode.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Adult filter blocks access to all adult, pornographic and explicit sites. It does not block proxy or VPNs, nor mixed-content sites. Sites like Reddit are allowed. Google and Bing are set to the Safe Mode.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 routes your DNS queries through a secure network of servers around the globe.</string>
+
+    <!-- dnscrypt description -->
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Blocks access to all adult, pornographic and explicit sites. It also blocks proxy and VPN domains that are used to bypass the filters. Mixed content sites (like Reddit) are also blocked. Google, Bing and Youtube are set to the Safe Mode.</string>
+    <string name="crypt_adguard_desc" translatable="true">Protects your device from malware and more.</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS with safe-search and adult content blocking.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+
+    <!-- dns crypt relays -->
+    <string name="crypt_relay_netherlands" translatable="true">Anonymized DNS relay hosted in Netherlands</string>
+    <string name="crypt_relay_france" translatable="true">Anonymized DNS relay hosted in Paris, France provided by https://cryptostrom.is/.</string>
+    <string name="crypt_relay_sweden" translatable="true">Anonymized DNS relay hosted in Sweden provided by https://cryptostrom.is/.</string>
+    <string name="crypt_relay_us" translatable="true">Anonymized DNS relay hosted in the US - Los Angeles, CA provided by https://cryptostrom.is/.</string>
+    <string name="crypt_relay_singapore" translatable="true">Anonymized DNS relay hosted in Singapore.</string>
+
 </resources>

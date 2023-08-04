@@ -2142,7 +2142,7 @@ class BraveVPNService :
 
     override fun onResponse(summary: Summary?) {
         if (summary == null) {
-            Log.i(LOG_TAG_VPN, "received null summary")
+            Log.i(LOG_TAG_VPN, "received null summary for dns")
             return
         }
 
@@ -2151,7 +2151,7 @@ class BraveVPNService :
 
     override fun onICMPClosed(s: ICMPSummary?) {
         if (s == null) {
-            Log.i(LOG_TAG_VPN, "received null summary")
+            Log.i(LOG_TAG_VPN, "received null summary for icmp")
             return
         }
 
@@ -2163,7 +2163,7 @@ class BraveVPNService :
 
     override fun onTCPSocketClosed(s: TCPSocketSummary?) {
         if (s == null) {
-            Log.i(LOG_TAG_VPN, "received null summary")
+            Log.i(LOG_TAG_VPN, "received null summary for tcp")
             return
         }
 
@@ -2183,7 +2183,7 @@ class BraveVPNService :
 
     override fun onUDPSocketClosed(s: UDPSocketSummary?) {
         if (s == null) {
-            Log.i(LOG_TAG_VPN, "received null summary")
+            Log.i(LOG_TAG_VPN, "received null summary for udp")
             return
         }
 
@@ -2232,14 +2232,14 @@ class BraveVPNService :
         // generate a random 8 character string for connId
         val connId = Utilities.getRandomString(8)
 
-        val rule =
+        val isBlocked =
             if (realIps?.isEmpty() == true || d?.isEmpty() == true) {
                 block(protocol, uid, srcIp, srcPort, dstIp, dstPort, connId)
             } else {
                 blockAlg(protocol, uid, src, dest, realIps, d, blocklists, connId)
             }
 
-        if (rule) {
+        if (isBlocked) {
             // return Ipn.Block, no need to check for other rules
             if (DEBUG)
                 Log.d(

@@ -21,7 +21,6 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -145,7 +144,7 @@ class DnsCryptRelayEndpointAdapter(
         private fun showDialogExplanation(title: String, url: String, message: String?) {
             val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
-            if (message != null) builder.setMessage(url + "\n\n" + message)
+            if (message != null) builder.setMessage(url + "\n\n" + relayDesc(message))
             else builder.setMessage(url)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
@@ -165,6 +164,23 @@ class DnsCryptRelayEndpointAdapter(
                 )
             }
             builder.create().show()
+        }
+
+        private fun relayDesc(message: String?): String {
+            if (message.isNullOrEmpty()) return ""
+
+            return try {
+                if (message.contains("R.string.")) {
+                    val m = message.substringAfter("R.string.")
+                    val resId: Int =
+                        context.resources.getIdentifier(m, "string", context.packageName)
+                    context.getString(resId)
+                } else {
+                    message
+                }
+            } catch (ignored: Exception) {
+                ""
+            }
         }
 
         private fun showDeleteDialog(id: Int) {

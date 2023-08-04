@@ -22,7 +22,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -160,7 +159,7 @@ class DohEndpointAdapter(
         private fun showDohMetadataDialog(title: String, url: String, message: String?) {
             val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
-            builder.setMessage(url + "\n\n" + message)
+            builder.setMessage(url + "\n\n" + getDnsDesc(message))
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
                 dialogInterface,
@@ -178,6 +177,23 @@ class DohEndpointAdapter(
                 )
             }
             builder.create().show()
+        }
+
+        private fun getDnsDesc(message: String?): String {
+            if (message.isNullOrEmpty()) return ""
+
+            return try {
+                if (message.contains("R.string.")) {
+                    val m = message.substringAfter("R.string.")
+                    val resId: Int =
+                        context.resources.getIdentifier(m, "string", context.packageName)
+                    context.getString(resId)
+                } else {
+                    message
+                }
+            } catch (ignored: Exception) {
+                ""
+            }
         }
 
         private fun showDeleteDnsDialog(id: Int) {
