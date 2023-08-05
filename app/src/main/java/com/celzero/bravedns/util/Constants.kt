@@ -279,9 +279,10 @@ class Constants {
 
         val DEFAULT_DNS_LIST =
             listOf(
-                DefaultDnsServer(0, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
-                DefaultDnsServer(1, "Google", "https://dns.google.com/dns-query", "DoH"),
-                DefaultDnsServer(2, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
+                DefaultDnsServer(0, "None", "", "None"),
+                DefaultDnsServer(1, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
+                DefaultDnsServer(2, "Google", "https://dns.google.com/dns-query", "DoH"),
+                DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
             )
 
         // pcap folder name

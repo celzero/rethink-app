@@ -31,7 +31,6 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -573,6 +572,12 @@ class GoVpnAdapter(
 
     @Throws(Exception::class)
     private fun makeDefaultTransport(url: String?): Transport {
+        // when the user has selected none as the dns mode, we use the grounded transport
+        if (url.isNullOrEmpty()) {
+            Log.i(LOG_TAG_VPN, "using grounded transport as default dns is set to none")
+            return Intra.newGroundedTransport(Dnsx.Default)
+        }
+
         val dohIPs: String = getIpString(context, url)
         return Intra.newDoHTransport(Dnsx.Default, url, dohIPs)
     }
@@ -645,7 +650,7 @@ class GoVpnAdapter(
     }
 
     private fun getDefaultDohUrl(): String {
-        return persistentState.defaultDnsUrl.ifEmpty { Constants.DEFAULT_DNS_LIST[0].url }
+        return persistentState.defaultDnsUrl
     }
 
     private fun setBraveDNSLocalMode() {
