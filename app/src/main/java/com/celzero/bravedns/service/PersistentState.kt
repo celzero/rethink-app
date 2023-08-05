@@ -256,7 +256,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
 
     // dns caching in tunnel
-    var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(false)
+    var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(true)
 
     // private ips, default false (route private ips to tunnel)
     var privateIps by booleanPref("private_ips").withDefault<Boolean>(false)
