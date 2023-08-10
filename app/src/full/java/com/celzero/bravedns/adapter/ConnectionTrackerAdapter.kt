@@ -40,6 +40,7 @@ import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
 import java.util.Locale
@@ -200,18 +201,31 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun displaySummaryDetails(ct: ConnectionTracker) {
-            if (ct.message.isEmpty()) {
+            if (
+                ct.duration == 0 &&
+                    ct.downloadBytes == 0L &&
+                    ct.uploadBytes == 0L &&
+                    ct.message.isEmpty()
+            ) {
                 b.connectionSummaryLl.visibility = View.GONE
                 return
             }
 
             b.connectionSummaryLl.visibility = View.VISIBLE
-            b.connectionMessage.text = ct.message
+            val duration = getDurationInHumanReadableFormat(context, ct.duration)
+            b.connectionDuration.text = context.getString(R.string.symbol_duration, duration)
             // add unicode for download and upload
-            val download = Utilities.humanReadableByteCount(ct.downloadBytes, true)
-            val upload = Utilities.humanReadableByteCount(ct.uploadBytes, true)
-            b.connectionDownload.text = context.getString(R.string.symbol_download, download)
-            b.connectionUpload.text = context.getString(R.string.symbol_upload, upload)
+            val download =
+                context.getString(
+                    R.string.symbol_download,
+                    Utilities.humanReadableByteCount(ct.downloadBytes, true)
+                )
+            val upload =
+                context.getString(
+                    R.string.symbol_upload,
+                    Utilities.humanReadableByteCount(ct.uploadBytes, true)
+                )
+            b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
         }
 
         private fun loadAppIcon(drawable: Drawable?) {

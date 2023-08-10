@@ -65,17 +65,18 @@ import com.google.common.net.InternetDomainName
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
 import java.net.URI
+import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 
 object Utilities {
 
@@ -107,7 +108,6 @@ object Utilities {
             fqdn
         }
     }
-
 
     fun isAccessibilityServiceEnabled(
         context: Context,
@@ -220,7 +220,7 @@ object Utilities {
     }
 
     fun normalizeIp(ipstr: String?): InetAddress? {
-        if (ipstr == null) return null
+        if (ipstr.isNullOrEmpty()) return null
 
         val ipAddress: IPAddress = HostName(ipstr).asAddress() ?: return null
         val ip = ipAddress.toInetAddress()
@@ -580,22 +580,21 @@ object Utilities {
         }
     }
 
-        fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
-            val remoteDir =
-                blocklistDir(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
-                    ?: return false
-            val remoteFile =
-                blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
-                    ?: return false
-            if (remoteFile.exists()) {
-                return true
-            }
-
-            return false
+    fun hasRemoteBlocklists(ctx: Context, timestamp: Long): Boolean {
+        val remoteDir =
+            blocklistDir(ctx, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp) ?: return false
+        val remoteFile =
+            blocklistFile(remoteDir.absolutePath, Constants.ONDEVICE_BLOCKLIST_FILE_TAG)
+                ?: return false
+        if (remoteFile.exists()) {
+            return true
         }
 
-        fun blocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
-            if (ctx == null) return null
+        return false
+    }
+
+    fun blocklistDir(ctx: Context?, which: String, timestamp: Long): File? {
+        if (ctx == null) return null
         return try {
             File(blocklistDownloadBasePath(ctx, which, timestamp))
         } catch (e: IOException) {
@@ -727,9 +726,13 @@ object Utilities {
         return port
     }
 
+    // generates a random 12-byte value, converts it to hexadecimal, and then
+    // provides the hexadecimal value as a string
     fun getRandomString(length: Int): String {
-        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-        return (1..length).map { allowedChars.random() }.joinToString("")
+        val random = ByteArray(length)
+        SecureRandom().nextBytes(random)
+        // formats each byte as a two-character hexadecimal string
+        return random.joinToString("") { "%02x".format(it) }
     }
 
     fun humanReadableByteCount(bytes: Long, si: Boolean): String {
@@ -738,5 +741,15 @@ object Utilities {
         val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
         val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
         return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+    }
+
+    // get time in seconds and add "sec" or "min" or "hr" or "day" accordingly
+    fun getDurationInHumanReadableFormat(context: Context, sec: Int): String {
+        return when {
+            sec < 60 -> "$sec ${context.getString(R.string.lbl_sec)}"
+            sec < 3600 -> "${sec / 60} ${context.getString(R.string.lbl_min)}"
+            sec < 86400 -> "${sec / 3600} ${context.getString(R.string.lbl_hour)}"
+            else -> "${sec / 86400} ${context.getString(R.string.lbl_day)}"
+        }
     }
 }

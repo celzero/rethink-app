@@ -19,6 +19,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.service.PersistentState
@@ -51,10 +52,11 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
                 val currentDataUsage = appInfoRepository.getDataUsageByUid(it.uid)
                 val upload = currentDataUsage.uploadBytes + it.uploadBytes
                 val download = currentDataUsage.downloadBytes + it.downloadBytes
-                Log.i(
-                    LoggerConstants.LOG_TAG_SCHEDULER,
-                    "Data usage for ${it.uid}, $upload, $download"
-                )
+                if (DEBUG)
+                    Log.d(
+                        LoggerConstants.LOG_TAG_SCHEDULER,
+                        "Data usage for ${it.uid}, $upload, $download"
+                    )
                 appInfoRepository.updateDataUsageByUid(it.uid, upload, download)
             } catch (e: Exception) {
                 Log.e(
@@ -65,5 +67,9 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
             }
         }
         persistentState.prevDataUsageCheck = currentTimestamp
+        Log.i(
+            LoggerConstants.LOG_TAG_SCHEDULER,
+            "Data usage updated for all apps at $currentTimestamp"
+        )
     }
 }

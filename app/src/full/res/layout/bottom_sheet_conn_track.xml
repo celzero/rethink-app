@@ -133,6 +133,7 @@
         android:layout_marginBottom="10dp"
         android:ellipsize="end"
         android:gravity="center"
+        android:fontFamily="sans-serif-light"
         android:padding="5dp"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"
@@ -144,8 +145,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|bottom"
-        android:fontFamily="sans-serif-condensed"
         android:maxLines="1"
+        android:fontFamily="sans-serif-light"
         android:singleLine="true"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view" />
@@ -325,15 +326,6 @@
         android:text="@string/trusted_domains_desc"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_text_view" />
-
-    <TextView
-        android:id="@+id/bs_conn_blocked_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:id="@+id/connection_summary_ll"

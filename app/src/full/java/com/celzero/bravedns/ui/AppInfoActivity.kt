@@ -154,6 +154,7 @@ class AppInfoActivity :
         appStatus = FirewallManager.appStatus(appInfo.uid)
         connStatus = FirewallManager.connectionStatus(appInfo.uid)
         updateFirewallStatusUi(appStatus, connStatus)
+        updateDataUsage()
         // introduce this on v054
         // updateDnsDetails()
 
@@ -204,6 +205,12 @@ class AppInfoActivity :
                 disableDnsStatusUi()
             }
         }
+    }
+
+    private fun updateDataUsage() {
+        val upload = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
+        val download = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
+        b.aadDataUsageStatus.text = getString(R.string.ct_bs_upload_download, upload, download)
     }
 
     private fun updateFirewallStatusUi(
@@ -713,9 +720,7 @@ class AppInfoActivity :
         builder.setTitle(R.string.ada_delete_logs_dialog_title)
         builder.setMessage(R.string.ada_delete_logs_dialog_desc)
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ ->
-            deleteAppLogs()
-        }
+        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> deleteAppLogs() }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
         builder.create().show()

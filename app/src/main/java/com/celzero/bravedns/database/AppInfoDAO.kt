@@ -126,9 +126,13 @@ interface AppInfoDAO {
 
     @Query("delete from AppInfo where uid = :uid") fun deleteByUid(uid: Int): Int
 
-    @Query("select uid as uid, downloadBytes as downloadBytes, uploadBytes as uploadBytes from AppInfo where uid = :uid")
+    @Query(
+        "select uid as uid, downloadBytes as downloadBytes, uploadBytes as uploadBytes from AppInfo where uid = :uid"
+    )
     fun getDataUsageByUid(uid: Int): DataUsage
 
-    @Query("update AppInfo set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes where uid = :uid")
-    fun updateDataUsageByUid(uid: Int, downloadBytes: Long, uploadBytes: Long)
+    @Query(
+        "update AppInfo set  uploadBytes = :uploadBytes, downloadBytes = :downloadBytes where uid = :uid"
+    )
+    fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long)
 }

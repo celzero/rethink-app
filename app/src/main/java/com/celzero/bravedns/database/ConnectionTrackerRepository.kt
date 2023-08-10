@@ -32,10 +32,6 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun updateBatch(summary: List<ConnectionSummary>) {
         summary.forEach {
-            Log.d(
-                "TEST",
-                "Updating summary for ${it.connId}, ${it.downloadBytes}, ${it.uploadBytes}, ${it.duration}, ${it.synack}, ${it.message}"
-            )
             connectionTrackerDAO.updateSummary(
                 it.connId,
                 it.downloadBytes,
