@@ -34,7 +34,9 @@ class RethinkDnsApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        DEBUG = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE == ApplicationInfo.FLAG_DEBUGGABLE
+        DEBUG =
+            applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE ==
+                ApplicationInfo.FLAG_DEBUGGABLE
 
         startKoin {
             if (DEBUG) androidLogger()

@@ -33,8 +33,17 @@ interface ConnectionTrackerDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
 
-    @Query("update ConnectionTracker set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId")
-    fun updateSummary(connId: String, downloadBytes: Long, uploadBytes: Long, duration: Int, synack: Int, message: String)
+    @Query(
+        "update ConnectionTracker set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
+    )
+    fun updateSummary(
+        connId: String,
+        downloadBytes: Long,
+        uploadBytes: Long,
+        duration: Int,
+        synack: Int,
+        message: String
+    )
 
     @Delete fun delete(connectionTracker: ConnectionTracker)
 
@@ -172,7 +181,6 @@ interface ConnectionTrackerDAO {
     )
     fun getAllBlockedIps(): PagingSource<Int, AppConnection>
 
-
     @Query(
         "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 0 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where isBlocked = 0 and dnsQuery != '' group by dnsQuery order by count desc LIMIT 7"
     )
@@ -195,6 +203,8 @@ interface ConnectionTrackerDAO {
 
     @Query("select count(id) from ConnectionTracker") fun logsCount(): LiveData<Long>
 
-    @Query("SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :fromTime and timeStamp <= :toTime GROUP BY uid")
+    @Query(
+        "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :fromTime and timeStamp <= :toTime GROUP BY uid"
+    )
     fun getDataUsage(fromTime: Long, toTime: Long): List<DataUsage>
 }

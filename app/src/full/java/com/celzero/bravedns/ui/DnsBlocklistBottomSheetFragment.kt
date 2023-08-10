@@ -127,8 +127,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         b.dnsBlockUrl.text = log!!.queryStr
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
-        b.dnsBlockIpLatency.text =
-            getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
+        b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
 
         displayFavIcon()
         displayDnsTransactionDetails()
@@ -190,10 +189,8 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
 
                     // no need to apply rule, if prev selection and current selection are same
                     if (
-                        DomainRulesManager.getDomainRule(
-                            log!!.queryStr,
-                            Constants.UID_EVERYBODY
-                        ) == status
+                        DomainRulesManager.getDomainRule(log!!.queryStr, Constants.UID_EVERYBODY) ==
+                            status
                     ) {
                         return
                     }
@@ -253,10 +250,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
     private fun handleResponseIpsChip() {
         b.dnsBlockIpsChip.visibility = View.VISIBLE
         lightenUpChip(b.dnsBlockIpsChip, BlockType.ALLOWED)
-        if (
-            ResourceRecordTypes.mayContainIp(log!!.typeName) &&
-                log!!.responseIps == "--"
-        ) {
+        if (ResourceRecordTypes.mayContainIp(log!!.typeName) && log!!.responseIps == "--") {
             b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }
@@ -460,9 +454,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt
             val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP)
             b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
-        } else if (
-            log!!.isLocallyAnswered()
-        ) { // usually happens when there is a network failure
+        } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)
         } else {
             b.dnsBlockBlockedDesc.text =
@@ -476,9 +468,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             return
         }
 
-        if (
-            log!!.isLocallyAnswered()
-        ) { // usually true when query blocked by on-device blocklists
+        if (log!!.isLocallyAnswered()) { // usually true when query blocked by on-device blocklists
             b.dnsBlockBlockedDesc.text = getString(R.string.bsct_conn_block_desc_device, uptime)
         } else {
             b.dnsBlockBlockedDesc.text =

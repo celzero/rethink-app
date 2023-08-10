@@ -38,7 +38,9 @@ class WgConfigViewModel(private val wgConfigFilesDAO: WgConfigFilesDAO) : ViewMo
 
     var interfaces =
         list.switchMap { _ ->
-            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) { wgConfigFilesDAO.getWgConfigsLiveData() }
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    wgConfigFilesDAO.getWgConfigsLiveData()
+                }
                 .liveData
                 .cachedIn(viewModelScope)
         }

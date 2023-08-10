@@ -37,8 +37,7 @@ import org.koin.core.component.inject
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
 
-object
-IpRulesManager : KoinComponent {
+object IpRulesManager : KoinComponent {
 
     private val customIpRepository by inject<CustomIpRepository>()
     private val persistentState by inject<PersistentState>()
@@ -452,7 +451,8 @@ IpRulesManager : KoinComponent {
                     // no-op
                 }
             } else if (
-                wc.asAddress().isAnyLocal && wc.asAddress().ipVersion == hostName.asAddress().ipVersion
+                wc.asAddress().isAnyLocal &&
+                    wc.asAddress().ipVersion == hostName.asAddress().ipVersion
             ) {
                 // case where the default (0.0.0.0 / [::]) is treated as wildcard
                 val rule = wildCards[w]

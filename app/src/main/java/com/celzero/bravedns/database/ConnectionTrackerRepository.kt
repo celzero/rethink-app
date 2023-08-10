@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.database
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.data.DataUsage

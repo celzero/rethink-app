@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package com.celzero.bravedns.database
+package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
@@ -23,7 +23,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.SEC_WARP_ID
 import com.celzero.bravedns.service.WireguardManager.WARP_ID
 
@@ -37,19 +36,21 @@ interface WgConfigFilesDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(wgConfigFiles: WgConfigFiles): Long
 
-    @Query("select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc")
+    @Query(
+        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc"
+    )
     fun getWgConfigsLiveData(): PagingSource<Int, WgConfigFiles>
 
-    @Query("select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc")
+    @Query(
+        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc"
+    )
     fun getWgConfigs(): List<WgConfigFiles>
 
     @Delete fun delete(wgConfigFiles: WgConfigFiles)
 
-    @Query("delete from WgConfigFiles where id = :id")
-    fun deleteConfig(id: Int)
+    @Query("delete from WgConfigFiles where id = :id") fun deleteConfig(id: Int)
 
-    @Query("select * from WgConfigFiles where id = :id")
-    fun isConfigAdded(id: Int): WgConfigFiles?
+    @Query("select * from WgConfigFiles where id = :id") fun isConfigAdded(id: Int): WgConfigFiles?
 
     @Query("select count(id) from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")
     fun getConfigCount(): LiveData<Int>

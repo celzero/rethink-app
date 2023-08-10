@@ -202,10 +202,10 @@ class WorkScheduler(val context: Context) {
                 .build()
 
         WorkManager.getInstance(context.applicationContext)
-        .enqueueUniquePeriodicWork(
-            DATA_USAGE_JOB_TAG,
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-            workRequest
-        )
+            .enqueueUniquePeriodicWork(
+                DATA_USAGE_JOB_TAG,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                workRequest
+            )
     }
 }

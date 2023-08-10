@@ -38,7 +38,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.FragmentFirewallAppListBinding
-import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText

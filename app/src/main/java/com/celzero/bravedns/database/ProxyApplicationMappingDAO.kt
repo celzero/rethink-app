@@ -40,14 +40,22 @@ interface ProxyApplicationMappingDAO {
     @Query("delete from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
     fun deleteByPackageName(uid: Int, packageName: String)
 
-    @Query("select * from ProxyApplicationMapping") fun getWgAppMapping(): List<ProxyApplicationMapping>
+    @Query("select * from ProxyApplicationMapping")
+    fun getWgAppMapping(): List<ProxyApplicationMapping>
 
     // query to get apps for pager adapter
-    @Query("select * from ProxyApplicationMapping where appName like :appName order by lower(appName)")
+    @Query(
+        "select * from ProxyApplicationMapping where appName like :appName order by lower(appName)"
+    )
     fun getAllAppsMapping(appName: String): PagingSource<Int, ProxyApplicationMapping>
 
-    @Query("select * from ProxyApplicationMapping where appName like :appName and proxyId = :proxyId order by lower(appName)")
-    fun getSelectedAppsMapping(appName: String, proxyId: String): PagingSource<Int, ProxyApplicationMapping>
+    @Query(
+        "select * from ProxyApplicationMapping where appName like :appName and proxyId = :proxyId order by lower(appName)"
+    )
+    fun getSelectedAppsMapping(
+        appName: String,
+        proxyId: String
+    ): PagingSource<Int, ProxyApplicationMapping>
 
     @Query("select count(packageName) from ProxyApplicationMapping where proxyId = :id")
     fun getAppCountById(id: String): Int
@@ -60,9 +68,7 @@ interface ProxyApplicationMappingDAO {
     )
     fun updateProxyIdForApp(uid: Int, cfgId: String, cfgName: String)
 
-    @Query(
-        "update ProxyApplicationMapping set proxyId = '', proxyName = '' where proxyId = :cfgId"
-    )
+    @Query("update ProxyApplicationMapping set proxyId = '', proxyName = '' where proxyId = :cfgId")
     fun removeAllAppsForProxy(cfgId: String)
 
     @Query("update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName")

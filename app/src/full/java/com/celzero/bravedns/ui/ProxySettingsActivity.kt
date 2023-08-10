@@ -63,12 +63,11 @@ import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import ipn.Ipn
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -394,10 +393,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             } else {
                 wgStatus +=
                     getString(
-                        R.string.ci_ip_label,
-                        it.getName(),
-                        getString(R.string.status_failing).padStart(1, ' ')
-                    ).replaceFirstChar(Char::titlecase) + "\n"
+                            R.string.ci_ip_label,
+                            it.getName(),
+                            getString(R.string.status_failing).padStart(1, ' ')
+                        )
+                        .replaceFirstChar(Char::titlecase) + "\n"
                 if (DEBUG)
                     Log.d(LoggerConstants.LOG_TAG_PROXY, "current proxy status is null for $id")
             }

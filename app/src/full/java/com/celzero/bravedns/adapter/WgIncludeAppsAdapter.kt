@@ -38,7 +38,11 @@ import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class WgIncludeAppsAdapter(private val context: Context, private val proxyId: String, private val proxyName: String) :
+class WgIncludeAppsAdapter(
+    private val context: Context,
+    private val proxyId: String,
+    private val proxyName: String
+) :
     PagingDataAdapter<ProxyApplicationMapping, WgIncludeAppsAdapter.IncludedAppInfoViewHolder>(
         DIFF_CALLBACK
     ) {
@@ -110,10 +114,7 @@ class WgIncludeAppsAdapter(private val context: Context, private val proxyId: St
 
         private fun setupClickListeners(mapping: ProxyApplicationMapping, isIncluded: Boolean) {
             b.wgIncludeAppListContainer.setOnClickListener {
-                Log.i(
-                    LOG_TAG_PROXY,
-                    "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded"
-                )
+                Log.i(LOG_TAG_PROXY, "wgIncludeAppListContainer- ${mapping.appName}, $isIncluded")
                 updateInterfaceDetails(mapping, !isIncluded)
             }
 
@@ -159,7 +160,7 @@ class WgIncludeAppsAdapter(private val context: Context, private val proxyId: St
         ) {
             val positiveTxt: String
 
-            val builderSingle= MaterialAlertDialogBuilder(context)
+            val builderSingle = MaterialAlertDialogBuilder(context)
 
             builderSingle.setIcon(R.drawable.ic_firewall_exclude_on)
 

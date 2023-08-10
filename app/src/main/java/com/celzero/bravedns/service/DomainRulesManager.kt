@@ -27,17 +27,17 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import dnsx.Dnsx
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.MalformedURLException
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.regex.Pattern
 import kotlin.concurrent.write
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 object DomainRulesManager : KoinComponent {
 

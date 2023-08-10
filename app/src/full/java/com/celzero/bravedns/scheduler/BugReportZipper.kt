@@ -194,9 +194,7 @@ object BugReportZipper {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         val prefsMap = prefs.all
         val prefsDetails = StringBuilder()
-        prefsMap.forEach { (key, value) ->
-            prefsDetails.append("$key=$value\n")
-        }
+        prefsMap.forEach { (key, value) -> prefsDetails.append("$key=$value\n") }
         file.appendText(prefsDetails.toString())
     }
 

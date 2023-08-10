@@ -77,7 +77,8 @@ class WgAddPeerDialog(
             val peerPublicKey = b.peerPublicKey.text.toString()
             val presharedKey = b.peerPresharedKey.text.toString().ifEmpty { peerPublicKey }
             val peerEndpoint = b.peerEndpoint.text.toString()
-            val peerPersistentKeepAlive = b.peerPersistentKeepAlive.text.toString().ifEmpty { "100" }
+            val peerPersistentKeepAlive =
+                b.peerPersistentKeepAlive.text.toString().ifEmpty { "100" }
             val allowedIps = b.peerAllowedIps.text.toString()
 
             try {

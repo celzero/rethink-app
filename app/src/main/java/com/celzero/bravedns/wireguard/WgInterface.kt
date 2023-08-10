@@ -20,7 +20,6 @@ package com.celzero.bravedns.wireguard
 
 import com.celzero.bravedns.wireguard.BadConfigException.*
 import ipn.Ipn
-import java.lang.Exception
 import java.net.InetAddress
 import java.util.*
 import java.util.stream.Collectors

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package com.celzero.bravedns.database
+package com.celzero.bravedns.database
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -31,16 +31,15 @@ interface TcpProxyDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(tcpProxyEndpoints: List<TcpProxyEndpoint>): LongArray
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(tcpProxyEndpoints: TcpProxyEndpoint): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(tcpProxyEndpoints: TcpProxyEndpoint): Long
 
     @Query("select * from TcpProxyEndpoint")
     fun getTcpProxiesLiveData(): PagingSource<Int, TcpProxyEndpoint>
 
-    @Query("select * from TcpProxyEndpoint")
-    fun getTcpProxies(): List<TcpProxyEndpoint>
+    @Query("select * from TcpProxyEndpoint") fun getTcpProxies(): List<TcpProxyEndpoint>
 
     @Delete fun delete(tcpProxy: TcpProxyEndpoint)
 
-    @Query("delete from TcpProxyEndpoint where id = :id")
-    fun deleteById(id: Int)
+    @Query("delete from TcpProxyEndpoint where id = :id") fun deleteById(id: Int)
 }

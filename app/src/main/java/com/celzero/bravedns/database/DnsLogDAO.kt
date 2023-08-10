@@ -33,14 +33,17 @@ interface DnsLogDAO {
     // the query with temporary index on the table. This is causing the query to be slow.
     // ref: https://stackoverflow.com/a/50776662 (auto covering index)
     // LIMIT 35000 to avoid the query to be slow
-    @Query("select * from DNSLogs order by id desc LIMIT $MAX_LOGS") fun getAllDnsLogs(): PagingSource<Int, DnsLog>
+    @Query("select * from DNSLogs order by id desc LIMIT $MAX_LOGS")
+    fun getAllDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by id desc LIMIT $MAX_LOGS"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc LIMIT $MAX_LOGS")
+    @Query(
+        "select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc LIMIT $MAX_LOGS"
+    )
     fun getAllowedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
@@ -56,7 +59,9 @@ interface DnsLogDAO {
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS")
+    @Query(
+        "select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS"
+    )
     fun getMaybeBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(

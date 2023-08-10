@@ -34,8 +34,6 @@ import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
-import java.net.InetAddress
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
@@ -43,6 +41,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
@@ -371,7 +371,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     if (!isAuto && addr.scope != RT_SCOPE_UNIVERSE) {
                         Log.i(
                             LOG_TAG_CONNECTION,
-                            "skipping address: ${addr.address.hostAddress} with scope: ${addr.scope}")
+                            "skipping address: ${addr.address.hostAddress} with scope: ${addr.scope}"
+                        )
                         return@inner
                     }
 

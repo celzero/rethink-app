@@ -19,8 +19,6 @@ package com.celzero.bravedns.service
 import android.content.Context
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
-import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
@@ -88,9 +86,7 @@ internal constructor(
     fun updateSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        scope?.launch {
-            updateSummary?.add(summary)
-        }
+        scope?.launch { updateSummary?.add(summary) }
     }
 
     // now, this method is doing multiple things which should be removed.

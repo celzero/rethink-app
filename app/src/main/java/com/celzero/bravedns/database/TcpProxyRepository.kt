@@ -43,5 +43,4 @@ class TcpProxyRepository(private val tcpProxyDAO: TcpProxyDAO) {
     suspend fun deleteConfig(id: Int) {
         tcpProxyDAO.deleteById(id)
     }
-
 }

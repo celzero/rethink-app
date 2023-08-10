@@ -245,10 +245,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
     private suspend fun fetchWarpConfigFromServer() {
         val config = WireguardManager.getNewWarpConfig(WireguardManager.SEC_WARP_ID)
-        Log.i(
-            LoggerConstants.LOG_TAG_PROXY,
-            "new config from server: ${config?.getName()}"
-        )
+        Log.i(LoggerConstants.LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()
             return

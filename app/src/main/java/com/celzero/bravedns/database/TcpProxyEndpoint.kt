@@ -16,7 +16,6 @@
 package com.celzero.bravedns.database
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "TcpProxyEndpoint")
@@ -38,7 +37,14 @@ class TcpProxyEndpoint {
         return this.id.hashCode()
     }
 
-    constructor(id: Int, name: String, token: String, url: String, paymentStatus: Int, isActive: Boolean) {
+    constructor(
+        id: Int,
+        name: String,
+        token: String,
+        url: String,
+        paymentStatus: Int,
+        isActive: Boolean
+    ) {
         this.id = id
         this.name = name
         this.token = token

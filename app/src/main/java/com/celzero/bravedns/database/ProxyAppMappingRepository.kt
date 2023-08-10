@@ -15,7 +15,9 @@
  */
 package com.celzero.bravedns.database
 
-class ProxyAppMappingRepository(private val proxyApplicationMappingDAO: ProxyApplicationMappingDAO) {
+class ProxyAppMappingRepository(
+    private val proxyApplicationMappingDAO: ProxyApplicationMappingDAO
+) {
 
     suspend fun update(wgMapping: ProxyApplicationMapping) {
         proxyApplicationMappingDAO.update(wgMapping)

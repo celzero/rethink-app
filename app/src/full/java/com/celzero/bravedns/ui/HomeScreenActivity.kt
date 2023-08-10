@@ -92,7 +92,6 @@ import java.util.Calendar
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
-
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 

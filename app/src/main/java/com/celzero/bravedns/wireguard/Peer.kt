@@ -21,7 +21,6 @@ package com.celzero.bravedns.wireguard
 import com.celzero.bravedns.wireguard.BadConfigException.*
 import ipn.Ipn
 import ipn.Key
-import java.lang.Exception
 import java.util.*
 import java.util.function.Consumer
 
@@ -173,9 +172,7 @@ class Peer private constructor(builder: Builder) {
             sb.append("persistent_keepalive_interval=").append(pk).append('\n')
         }
         preSharedKey.ifPresent(
-            Consumer<Key> { psk: Key ->
-                sb.append("preshared_key=").append(psk.hex()).append('\n')
-            }
+            Consumer<Key> { psk: Key -> sb.append("preshared_key=").append(psk.hex()).append('\n') }
         )
         return sb.toString()
     }

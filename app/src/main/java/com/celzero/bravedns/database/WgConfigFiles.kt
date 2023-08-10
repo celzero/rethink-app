@@ -39,7 +39,13 @@ class WgConfigFiles {
     }
 
     @Ignore
-    constructor(id: Int, name: String, configPath: String, serverResponse: String, isActive: Boolean) {
+    constructor(
+        id: Int,
+        name: String,
+        configPath: String,
+        serverResponse: String,
+        isActive: Boolean
+    ) {
         this.id = id
         this.name = name
         this.configPath = configPath

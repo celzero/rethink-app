@@ -35,6 +35,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * Encapsulates the logic of scanning a barcode from a file,
+ *
  * @property contentResolver - Resolver to read the incoming data
  * @property reader - An instance of zxing's [Reader] class to parse the image
  */
@@ -68,13 +69,11 @@ class QrCodeFromFileScanner(
                 multFactor = originalWidth.toFloat() / originalHeight.toFloat()
                 newWidth = (newHeight * multFactor).toInt()
             }
-
             originalWidth > originalHeight -> {
                 newWidth = scaledSize
                 multFactor = originalHeight.toFloat() / originalWidth.toFloat()
                 newHeight = (newWidth * multFactor).toInt()
             }
-
             originalHeight == originalWidth -> {
                 newHeight = scaledSize
                 newWidth = scaledSize
@@ -86,8 +85,9 @@ class QrCodeFromFileScanner(
     private fun doScan(data: Uri): Result? {
         Log.d(TAG, "Starting to scan an image: $data")
         contentResolver.openInputStream(data).use { inputStream ->
-            val originalBitmap = BitmapFactory.decodeStream(inputStream)
-                ?: throw IllegalArgumentException("Can't decode stream to Bitmap")
+            val originalBitmap =
+                BitmapFactory.decodeStream(inputStream)
+                    ?: throw IllegalArgumentException("Can't decode stream to Bitmap")
 
             return try {
                 scanBitmapForResult(originalBitmap).also {
@@ -101,11 +101,11 @@ class QrCodeFromFileScanner(
                 originalBitmap.recycle()
             }
         }
-
     }
 
     /**
      * Attempts to parse incoming data
+     *
      * @return result of the decoding operation
      * @throws NotFoundException when parser didn't find QR code in the image
      */
@@ -116,6 +116,7 @@ class QrCodeFromFileScanner(
 
         /**
          * Given a reference to a file, check if this file could be parsed by this class
+         *
          * @return true if the file can be parsed, false if not
          */
         fun validContentType(contentResolver: ContentResolver, data: Uri): Boolean {

@@ -48,8 +48,6 @@ import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
 import ipn.Ipn
-import java.io.IOException
-import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,6 +55,8 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
+import java.io.IOException
+import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -445,10 +445,7 @@ class GoVpnAdapter(
                 val wgUserSpaceString = it.toWgUserspaceString()
                 val id = ID_WG_BASE + it.getId()
                 if (proxyList.contains(id)) {
-                    Log.i(
-                        LOG_TAG_VPN,
-                        "wireguard config id($id) already added, ${it.getName()}"
-                    )
+                    Log.i(LOG_TAG_VPN, "wireguard config id($id) already added, ${it.getName()}")
                     return@forEach
                 }
                 tunnel?.proxies?.addProxy(id, wgUserSpaceString)

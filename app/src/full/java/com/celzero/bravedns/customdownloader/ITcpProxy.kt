@@ -20,19 +20,13 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.Streaming
 
 interface ITcpProxy {
 
     @GET("/p/{appVersion}")
-    suspend fun getPublicKey(
-        @Path("appVersion") appVersion: String
-    ): Response<JsonObject?>?
+    suspend fun getPublicKey(@Path("appVersion") appVersion: String): Response<JsonObject?>?
 
-    @GET("/p")
-    suspend fun getPaymentStatus(
-        @Query("ref_id") refId: String
-    ): Response<JsonObject?>?
+    @GET("/p") suspend fun getPaymentStatus(@Query("ref_id") refId: String): Response<JsonObject?>?
 
     /*@GET("/warp/renew")
     @Streaming

@@ -27,7 +27,7 @@ interface IWireguardWarp {
     @GET("/warp/new")
     suspend fun getNewWarpConfig(
         @Query("pubkey") publicKey: String,
-        @Query("device") device: String ,
+        @Query("device") device: String,
         @Query("locale") locale: String
     ): Response<JsonObject?>?
 
@@ -39,9 +39,7 @@ interface IWireguardWarp {
         @Query("compressed") compressed: String
     ): Response<JsonObject?>?
 
-    @GET("/warp/works")
-    @Streaming
-    suspend fun isWarpConfigWorking(): Response<JsonObject?>?
+    @GET("/warp/works") @Streaming suspend fun isWarpConfigWorking(): Response<JsonObject?>?
 
     @GET("/warp/quota")
     @Streaming
