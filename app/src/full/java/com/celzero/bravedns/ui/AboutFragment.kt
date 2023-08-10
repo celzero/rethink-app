@@ -103,6 +103,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutTelegram.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
+        b.fossImg.setOnClickListener(this)
+        b.osomImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
         b.aboutWhatsNew.setOnClickListener(this)
         b.aboutAppInfo.setOnClickListener(this)
@@ -175,6 +177,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.mozillaImg -> {
                 openActionViewIntent(getString(R.string.about_mozilla_alumni_link).toUri())
+            }
+            b.fossImg -> {
+                openActionViewIntent(getString(R.string.about_foss_link).toUri())
+            }
+            b.osomImg -> {
+                openActionViewIntent(getString(R.string.about_osom_link).toUri())
             }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
@@ -386,7 +394,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         io {
             var fin: FileInputStream? = null
             var zin: ZipInputStream? = null
-            val maxLength = 20000
+            // load only 10k characters to avoid ANR
+            val maxLength = 10000
             try {
                 fin = FileInputStream(zipPath)
                 zin = ZipInputStream(fin)
@@ -398,6 +407,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                     val inputString = inStream?.bufferedReader().use { it?.readText() }
                     uiCtx {
                         if (!isAdded) return@uiCtx
+                        binding.info.visibility = View.VISIBLE
                         binding.logs.append(inputString?.slice(0 until maxLength))
                     }
                 }
@@ -405,7 +415,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
                 uiCtx {
                     if (!isAdded) return@uiCtx
-
+                    binding.info.visibility = View.GONE
                     binding.logs.text = getString(R.string.error_loading_log_file)
                 }
             } finally {
