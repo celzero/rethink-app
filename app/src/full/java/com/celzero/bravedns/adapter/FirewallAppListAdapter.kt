@@ -105,7 +105,7 @@ class FirewallAppListAdapter(
         private fun getFirewallText(
             aStat: FirewallManager.FirewallStatus,
             cStat: FirewallManager.ConnectionStatus
-        ): CharSequence {
+        ): String {
             return when (aStat) {
                 FirewallManager.FirewallStatus.NONE ->
                     when (cStat) {

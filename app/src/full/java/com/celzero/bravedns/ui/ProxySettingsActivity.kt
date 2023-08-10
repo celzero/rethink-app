@@ -45,6 +45,7 @@ import com.celzero.bravedns.databinding.DialogSetProxyBinding
 import com.celzero.bravedns.databinding.FragmentProxyConfigureBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
@@ -57,7 +58,6 @@ import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.UiUtils.openUrl
-import com.celzero.bravedns.util.UiUtils.openVpnProfile
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -116,8 +116,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.settingsActivitySocks5Rl.setOnClickListener {
             b.settingsActivitySocks5Switch.isChecked = !b.settingsActivitySocks5Switch.isChecked
         }
-
-        b.settingsActivityVpnLockdownDesc.setOnClickListener { openVpnProfile(this) }
 
         b.settingsActivitySocks5Switch.setOnCheckedChangeListener {
             _: CompoundButton,
@@ -386,11 +384,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         var wgStatus = ""
         activeWgs.forEach {
-            val id = Ipn.WG + it.getId()
+            val id = ProxyManager.ID_WG_BASE + it.getId()
             val statusId = VpnController.getProxyStatusById(id)
             if (statusId != null) {
                 val resId = UiUtils.getProxyStatusStringRes(statusId)
-                val s = getString(resId)
+                val s = getString(resId).replaceFirstChar(Char::titlecase)
                 wgStatus += getString(R.string.ci_ip_label, it.getName(), s.padStart(1, ' ')) + "\n"
                 if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "current proxy status for $id: $s")
             } else {
@@ -399,7 +397,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                         R.string.ci_ip_label,
                         it.getName(),
                         getString(R.string.status_failing).padStart(1, ' ')
-                    ) + "\n"
+                    ).replaceFirstChar(Char::titlecase) + "\n"
                 if (DEBUG)
                     Log.d(LoggerConstants.LOG_TAG_PROXY, "current proxy status is null for $id")
             }

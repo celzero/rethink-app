@@ -41,7 +41,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -282,7 +281,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     getString(R.string.no_browser_error),
                     Toast.LENGTH_SHORT
                 )
-                Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+                Log.w(LOG_TAG_UI, "activity not found ${e.message}", e)
             }
         }
 
@@ -562,7 +561,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun enableProxyCardIfNeeded() {
-        if (isVpnActivated) {
+        if (isVpnActivated && !appConfig.getBraveMode().isDnsMode()) {
             if (persistentState.getProxyStatus() != -1) {
                 observeProxyStates()
             } else {
@@ -639,7 +638,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      */
     private fun observeDnsStates() {
         persistentState.median.observe(viewLifecycleOwner) {
-            Log.d(LOG_TAG_VPN, "Median latency: $it")
             // show status as very fast, fast, slow, and very slow based on the latency
             if (it in 0L..19L) {
                 val string =
@@ -1103,10 +1101,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         notificationPermissionResult =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 if (it) {
-                    Log.i(LoggerConstants.LOG_TAG_UI, "User accepted notification permission")
+                    Log.i(LOG_TAG_UI, "User accepted notification permission")
                 } else {
                     persistentState.shouldRequestNotificationPermission = false
-                    Log.w(LoggerConstants.LOG_TAG_UI, "User rejected notification permission")
+                    Log.w(LOG_TAG_UI, "User rejected notification permission")
                     Snackbar.make(
                             requireActivity().findViewById<View>(android.R.id.content).rootView,
                             getString(R.string.hsf_notification_permission_failure),
@@ -1218,6 +1216,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else if (isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
+            } else if (appConfig.isWireguardEnabled() && isPrivateDnsActive(requireContext())) {
+                statusId = R.string.status_protected_with_wg_private_dns
+                colorId = fetchTextColor(R.color.primaryLightColorText)
+            } else if (appConfig.isWireguardEnabled()) {
+                statusId = R.string.status_protected_with_wg
             }
         }
 

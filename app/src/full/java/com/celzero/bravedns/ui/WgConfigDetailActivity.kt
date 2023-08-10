@@ -111,7 +111,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return
         }
         if (config == null) {
-            showInvalidConfigError()
             finish()
             return
         }
@@ -172,17 +171,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
     }
 
-    private fun showInvalidConfigError() {
-        Toast.makeText(this, getString(R.string.new_warp_invalid_config_toast), Toast.LENGTH_LONG)
-            .show()
-    }
-
     private suspend fun fetchWarpConfigFromServer() {
         val config = WireguardManager.getNewWarpConfig(WARP_ID)
-        Log.i(
-            LOG_TAG_PROXY,
-            "new config from server: ${config?.getName()}, ${config?.toWgQuickString()}"
-        )
+        Log.i(LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()
             return

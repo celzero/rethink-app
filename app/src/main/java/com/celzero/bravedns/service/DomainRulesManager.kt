@@ -27,17 +27,17 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import dnsx.Dnsx
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.net.MalformedURLException
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.regex.Pattern
 import kotlin.concurrent.write
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 object DomainRulesManager : KoinComponent {
 
@@ -49,9 +49,9 @@ object DomainRulesManager : KoinComponent {
 
     data class CacheKey(val domain: String, val uid: Int)
 
-    var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
-    var trustedDomains: MutableSet<String> = hashSetOf()
-    var trie: dnsx.RadixTree = Dnsx.newRadixTree()
+    private var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
+    private var trustedDomains: MutableSet<String> = hashSetOf()
+    private var trie: dnsx.RadixTree = Dnsx.newRadixTree()
     private val trustedTrie: dnsx.RadixTree = Dnsx.newRadixTree()
 
     // stores all the previous response sent
@@ -316,15 +316,20 @@ object DomainRulesManager : KoinComponent {
             // find the domains that are for the uid and remove them from domains
             val domainsToDelete = domains.filterKeys { it.uid == uid }.toMutableMap()
             // find the domains that are in delete list and remove them from trusted domains
-            val trustedDomainsToDelete = domainsToDelete.filterValues { it.status == Status.TRUST.id }
+            val trustedDomainsToDelete =
+                domainsToDelete.filterValues { it.status == Status.TRUST.id }
 
             customDomainsRepository.deleteRulesByUid(uid)
             domains.entries.removeAll(domainsToDelete.entries)
-            trustedDomains.removeAll(trustedDomainsToDelete.keys.map { it.domain.lowercase(Locale.ROOT) }
-                .toSet())
+            trustedDomains.removeAll(
+                trustedDomainsToDelete.keys.map { it.domain.lowercase(Locale.ROOT) }.toSet()
+            )
             val rulesDeleted = trie.delAll(uid.toString())
             val trustedRulesDeleted = trustedTrie.delAll(uid.toString())
-            Log.i(LOG_TAG_DNS, "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie")
+            Log.i(
+                LOG_TAG_DNS,
+                "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie"
+            )
             domainLookupCache.invalidateAll()
         }
     }

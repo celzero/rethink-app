@@ -52,10 +52,12 @@ object EncryptedFileManager {
                     )
                     .build()
 
-            Log.d(
-                LoggerConstants.LOG_TAG_PROXY,
-                "Encrypted File Read: ${dir.absolutePath}, $fileToRead"
-            )
+            if (DEBUG) {
+                Log.d(
+                    LoggerConstants.LOG_TAG_PROXY,
+                    "Encrypted File Read: ${dir.absolutePath}, $fileToRead"
+                )
+            }
             val inputStream = encryptedFile.openFileInput()
             val byteArrayOutputStream = ByteArrayOutputStream()
             var nextByte: Int = inputStream.read()
@@ -70,11 +72,6 @@ object EncryptedFileManager {
             val ist = ByteArrayInputStream(plaintext)
 
             config = Config.parse(ist)
-            if (DEBUG)
-                Log.d(
-                    LoggerConstants.LOG_TAG_PROXY,
-                    "read config: ${config.getName()}, ${config.toWgQuickString()}"
-                )
             ist.close()
             byteArrayOutputStream.close()
         } catch (e: Exception) {
@@ -99,8 +96,6 @@ object EncryptedFileManager {
                         EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
                     )
                     .build()
-
-            Log.d(LoggerConstants.LOG_TAG_PROXY, "Encrypted File Read: ${file.absolutePath}, $file")
 
             // Open the file and read its content and return it as a string.
             val inputStream = encryptedFile.openFileInput()
@@ -162,7 +157,7 @@ object EncryptedFileManager {
             val encryptedFile =
                 EncryptedFile.Builder(
                         ctx.applicationContext,
-                    file,
+                        file,
                         masterKey,
                         EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
                     )

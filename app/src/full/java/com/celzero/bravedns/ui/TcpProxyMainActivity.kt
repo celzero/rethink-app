@@ -247,7 +247,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
         val config = WireguardManager.getNewWarpConfig(WireguardManager.SEC_WARP_ID)
         Log.i(
             LoggerConstants.LOG_TAG_PROXY,
-            "new config from server: ${config?.getName()}, ${config?.toWgQuickString()}"
+            "new config from server: ${config?.getName()}"
         )
         if (config == null) {
             showConfigCreationError()
