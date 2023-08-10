@@ -237,11 +237,6 @@
     <string name="settings_network_all_networks_desc">如果開咗呢個，Rethink 就會用所有用得嘅網絡嚟上網。如果冇開，就會用 Android 認爲<i>活躍</i>嘅網絡。</string>
     <string name="settings_autostart_bootup_heading">開機時自動開啓（實驗性）</string>
     <string name="settings_autostart_bootup_desc">Rethink 如果喺熄機嘅時候仲行緊，咁喺下次開機嘅時候就自動開。</string>
-    <string name="settings_all_networks_dialog_title">注意！</string>
-    <string name="settings_all_networks_dialog_message">如果開咗呢個，程式防火牆規則就唔會考慮網絡係收錢（例如流動數據）定唔收錢（例如 WiFi）。
-\n
-\n您係咪要繼續？</string>
-    <string name="settings_all_networks_dialog_positive_btn">仍要啓用</string>
     <string name="settings_check_update_heading">檢查應用程式更新</string>
     <string name="settings_check_update_desc">每個禮拜自動檢查一次有冇更新。</string>
     <string name="settings_custom_downloader_heading">用 app 入面嘅下載器</string>

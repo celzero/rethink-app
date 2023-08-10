@@ -236,9 +236,6 @@
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Переадресація на %1$s:%2$s</string>
     <string name="univ_firewall_rule_6" translatable="true">Блокування нових встановлених застосунків за замовчуванням</string>
     <string name="settings_orbot_notification_content" translatable="true">Помилка запуску Tor-as-a-Proxy. Відкрийте застосунок Orbot, щоб запустити його вручну.</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">Якщо увімкнути, правила брандмауера застосунків для обмеженого (наприклад, мобільний) і без обмеження (наприклад, WiFi) не виконуватимуться.
-\n
-\nВи хочете продовжити\?</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Сповіщення застосунку</string>
     <string name="notification_screen_error" translatable="true">Не вдалося запустити екран сповіщень застосунку.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Використовувати вбудований завантажувач</string>

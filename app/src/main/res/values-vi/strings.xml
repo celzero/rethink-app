@@ -219,7 +219,6 @@
     <string name="settings_general_header" translatable="true">tổng quan</string>
     <string name="settings_autostart_bootup_heading" translatable="true">Tự khởi động khi bật nguồn (thử nghiệm)</string>
     <string name="settings_network_all_networks" translatable="true">Sử dụng tất cả các mạng có sẵn (thử nghiệm)</string>
-    <string name="settings_all_networks_dialog_title" translatable="true">Chú ý!</string>
     <string name="settings_check_update_heading" translatable="true">Kiểm tra các bản cập nhật ứng dụng</string>
     <string name="settings_check_update_desc" translatable="true">Tự động kiểm tra các bản cập nhật ứng dụng mỗi tuần một lần.</string>
     <string name="settings_custom_downloader_desc" translatable="true">Nếu bị tắt, <i>Trình quản lý tải xuống</i> tích hợp sẵn của Android sẽ được sử dụng.</string>
@@ -418,7 +417,6 @@
     <string name="logs_card_network_count" translatable="true">%1$s các kết nối</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Không thể thiết lập proxy khi VPN đang chạy ở chế độ chỉ DNS hoặc chế độ khóa. <u>Chuyển đến phần cài đặt VPN</u></string>
     <string name="settings_general_customize" translatable="true">tuỳ chỉnh</string>
-    <string name="settings_all_networks_dialog_positive_btn" translatable="true">Vẫn bật</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink cần có quyền để thiết lập VPN cục bộ để mã hoá các yêu cầu DNS, triển khai trình giám sát mạng và thực thi các quy tắc tường lửa.
 \nRethink không thu thập thông tin hay theo dõi bạn dưới bất kì hình thức nào.</string>
     <string name="about_mail_bugreport_text" translatable="true">Gửi email này tới : hello@celzero.com</string>
@@ -508,9 +506,6 @@
     <string name="fapps_filter_categories_heading" translatable="true">Hạng mục</string>
     <string name="fapps_filter_parent_system" translatable="true">Hệ thống</string>
     <string name="fapps_info_isolate_msg" translatable="true">Chặn tất cả ngoại trừ các IP đáng tin cậy.</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">Khi được bật, các quy tắc tường lửa ứng dụng cho đồng hồ đo (ví dụ: Di động) và không có đồng hồ đo (ví dụ: WiFi) sẽ không được áp dụng.
-\n
-\n Bạn có muốn tiếp tục\?</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Xuất ra Logcat</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">Bỏ qua các quy tắc DNS và tường lửa</string>
     <string name="firewall_status_block_metered" translatable="true">Bị chặn trên các mạng có đồng hồ đo (di động)</string>

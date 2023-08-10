@@ -42,9 +42,6 @@
     <string name="settings_https_disabled_error">Verbonden met %1$s. Zet het uit om verder te gaan.</string>
     <string name="settings_autostart_bootup_desc">Start RethinkDNS bij het opstarten van het apparaat als het actief was voor het afsluiten.</string>
     <string name="settings_autostart_bootup_heading">Auto-start bij opstarten (experimenteel)</string>
-    <string name="settings_all_networks_dialog_message">Indien ingeschakeld, worden app firewall regels voor gemeten (bijv. Mobiel) en niet gemeten (bijv. WiFi) niet gehonoreerd.
-\n
-\nWilt u doorgaan\?</string>
     <string name="settings_custom_downloader_desc">Indien uitgeschakeld, wordt Android\'s ingebouwde <i>Download Manager</i> gebruikt.</string>
     <string name="settings_app_notification_a13_desc">Meldingsrechten voor de app inschakelen</string>
     <string name="settings_http_proxy_error_text3">Hostname is leeg</string>
@@ -147,8 +144,6 @@
     <string name="settings_orbot_disabled_error">Schakel HTTP(S) en/of SOCKS5 proxy uit om door te gaan met Tor-as-a-proxy setup.</string>
     <string name="settings_orbot_notification_action">Orbot openen</string>
     <string name="settings_network_all_networks">Alle beschikbare netwerken gebruiken (experimenteel)</string>
-    <string name="settings_all_networks_dialog_title">Attentie!</string>
-    <string name="settings_all_networks_dialog_positive_btn">Toch inschakelen</string>
     <string name="settings_check_update_heading">Controleren op app-updates</string>
     <string name="settings_check_update_desc">Automatisch controleren op app-updates eenmaal per week.</string>
     <string name="settings_custom_downloader_heading">Gebruik in-app downloader</string>

@@ -189,13 +189,8 @@
     <string name="settings_general_header">generali</string>
     <string name="settings_network_all_networks">Usa tutte le reti disponibili (sperimentale)</string>
     <string name="settings_network_all_networks_desc">Se abilitato, Rethink utilizza tutte le reti disponibili per connettersi a Internet. Altrimenti, Rethink utilizza la rete indicata come <i>attiva</i> da Android.</string>
-    <string name="settings_all_networks_dialog_title">Attenzione!</string>
     <string name="settings_autostart_bootup_heading">Avvio automatico all\'accensione (sperimentale)</string>
     <string name="settings_autostart_bootup_desc">Avvia automaticamente Rethink quando accendi il dispositivo, se questo era in esecuzione prima che venisse spento.</string>
-    <string name="settings_all_networks_dialog_message">Attivando questa opzione, non verranno rispettate le regole del firewall dell\'app per i dispositivi a consumo (es. connessione mobile) e non a consumo (es. Wi-Fi).
-\n
-\nVuoi continuare\?</string>
-    <string name="settings_all_networks_dialog_positive_btn">Abilita comunque</string>
     <string name="settings_check_update_heading">Controlla aggiornamenti dell\'app</string>
     <string name="settings_custom_downloader_heading">Scarica direttamente nell\'app</string>
     <string name="settings_custom_downloader_desc">Se disabilitato, verrà utilizzato il <i>Gestore dei Download</i> di Android</string>

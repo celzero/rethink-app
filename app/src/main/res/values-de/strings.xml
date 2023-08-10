@@ -208,7 +208,6 @@
     <string name="orbot_none">Keine (Standard)</string>
     <string name="orbot_install_dialog_positive">Installieren</string>
     <string name="settings_orbot_header">Orbot ❯</string>
-    <string name="settings_all_networks_dialog_title">Achtung!</string>
     <string name="bsct_conn_desc_allowed">erlaubt am %1$s %2$s</string>
     <string name="app_mode_dns_low_battery">DNS (Akkusparer)</string>
     <string name="orbot_bs_status_2">HTTP Proxy ist eingestellt (Anwendungen können dies ignorieren).</string>
@@ -299,9 +298,6 @@
     <string name="firewall_rule_block_udp_ntp_desc">Eine benutzerdefinierte Firewall-Regel hat diese <i>UDP</i> Verbindung blockiert.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
     <string name="firewall_rule_block_http_desc">Diese Verbindung wurde blockiert, weil sie wahrscheinlich <i>unsicheres HTTP</i> verwendet hat.<br/><br/> Zur Änderung die Registerkarte <i>Universell</i> benutzen.</string>
     <string name="firewall_rule_exempt_app_bypass_univ_desc">Diese Verbindung wurde zugelassen, weil die <i>Ursprungs-App</i> für die <i>Umgehung der universellen</i> Firewall-Regeln eingestellt ist.<br/><br/> Zur Änderung den Bildschirm <i>App-spezifische Firewall</i> benutzen.</string>
-    <string name="settings_all_networks_dialog_message">Wenn diese Option aktiviert ist, werden App-Firewall-Regeln für gebührenpflichtige Verbindungen (z. B. mobiles Datenvolumen) und nicht gebührenpflichtige Verbindungen (z. B. Wlan) nicht beachtet.
-\n
-\nMöchten Sie fortfahren\?</string>
     <string name="settings_http_proxy_dialog_title">Benutzerdefinierte Server-URL</string>
     <string name="settings_http_proxy_error_text1">Der Portbereich sollte zwischen 1024 und 65535 liegen</string>
     <string name="settings_http_proxy_error_text2">Ungültiger Port</string>
@@ -348,7 +344,6 @@
     <string name="firewall_rule_exempt_orbot_setup_desc">Diese Verbindung wurde zugelassen, weil <i>Tor-as-a-proxy (Orbot)</i> aktiv war.</string>
     <string name="settings_import_export_desc">Manuelles Sichern oder Wiederherstellen der App-Daten und Einstellungen.</string>
     <string name="settings_custom_downloader_heading">In-App-Downloader verwenden</string>
-    <string name="settings_all_networks_dialog_positive_btn">Trotzdem aktivieren</string>
     <string name="settings_check_update_desc">Einmal pro Woche automatisch nach App-Updates suchen.</string>
     <string name="settings_check_update_heading">Nach App-Updates suchen</string>
     <string name="settings_custom_downloader_desc">Wenn deaktiviert, wird der in Android integrierte <i>Download Manager</i> verwendet</string>

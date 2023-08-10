@@ -83,9 +83,6 @@
     <string name="firewall_mode_info_title">Firewall</string>
     <string name="apps_info_title">Aplicações</string>
     <string name="firewall_mode_info_explanation_new">Monitorizar a atividade da rede e aplicar a firewall a qualquer aplicação ou endereço IP.</string>
-    <string name="settings_all_networks_dialog_message">Quando ativado, serão ignoradas as regras de firewall da aplicação para redes limitadas (ex: móvel) e não limitadas (ex: WiFi).
-\n
-\nQuer continuar\?</string>
     <string name="settings_theme_desc">Tema escuro/claro</string>
     <string name="settings_http_proxy_desc">Encaminhando para %1$s:%2$s</string>
     <string name="settings_http_proxy_error_text4">Falha na conexão do host. Tente novamente.</string>
@@ -282,7 +279,6 @@
     <string name="settings_check_update_desc">Verifica automaticamente se existem atualizações da aplicação uma vez por semana.</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="orbot">Orbot</string>
-    <string name="settings_all_networks_dialog_positive_btn">Ativar mesmo assim</string>
     <string name="settings_ip_network_desc">Escolha entre as versões do Protocolo de Internet.</string>
     <string name="settings_ptrans_desc">Traduzir o tráfego IPv6 de saída para IPv4 no dispositivo. Ative se estiver conectado a uma rede apenas com IPv4.</string>
     <string name="settings_proxy_header">proxy</string>
@@ -309,7 +305,6 @@
     <string name="orbot_stop_dialog_dns_message">O RethinkDNS está configurado para reencaminhar os pedidos do DNS para o Orbot. Altere conforme necessário.</string>
     <string name="orbot_stop_dialog_neutral">Alterar DNS</string>
     <string name="settings_orbot_install_desc">Toque aqui para instalar o Orbot</string>
-    <string name="settings_all_networks_dialog_title">Atenção!</string>
     <string name="finish">Terminar</string>
     <string name="settings_https_heading">Configurar proxy HTTP(S)</string>
     <string name="orbot_bs_status_2">O proxy HTTP está definido (as aplicações podem ignorá-lo).</string>

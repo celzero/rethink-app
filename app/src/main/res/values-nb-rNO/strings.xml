@@ -194,7 +194,6 @@
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
     <string name="blocklist_update_check_failure">Noe gikk galt. Prøv igjen senere.</string>
     <string name="cd_custom_dns_proxy_title">Egendefinert DNS-mellomtjener</string>
-    <string name="settings_all_networks_dialog_positive_btn">Skru på uansett</string>
     <string name="configure_dns_connected_doh_status">DNS over HTTPS</string>
     <string name="settings_socks5_disabled_error">Tilkoblet til %1$s. Skru det av for å fortsette.</string>
     <string name="dns_proxy_remove_dialog_title">Slett DNS-mellomtjener\?</string>

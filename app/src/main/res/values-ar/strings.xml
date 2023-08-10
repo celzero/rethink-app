@@ -206,9 +206,6 @@
     <string name="settings_socks5_dialog_hint_port">المنفذ</string>
     <string name="settings_theme_dialog_themes_1">حسب النظام</string>
     <string name="settings_theme_dialog_themes_3">مظهر داكن</string>
-    <string name="settings_all_networks_dialog_message">عند التمكين، لن يتم احترام قواعد جدار الحماية للتطبيق للاتصال المقنن (على سبيل المثال: WiFiMobile) وللاتصال غير المقنن (على سبيل المثال: MobileWiFi).
-\n
-\nهل تريد الاستمرار؟</string>
     <string name="dc_check_update_desc">تحقق من وجود تحديثات لقائمة الحظر مرة واحدة كل <i> ثلاثة </i> أيام</string>
     <string name="about_email">راسلنا بالبريد الإلكتروني</string>
     <string name="app_info_error">تعذر تشغيل معلومات التطبيق.</string>
@@ -690,8 +687,6 @@
 \n<u> بروكسي TCP </u>: يقوم RethinkDNS فقط بإعادة توجيه اتصالات TCP الخاصة بجميع التطبيقات إلّا تلك المستثنية إلى Orbot.
 \n<u>بروكسي HTTP </u>: يعيّن RethinkDNS <i> بروكسي HTTP </i> ولكنه لا يفرض التطبيقات على استخدامها. عادةً ما تستخدمها متصفحات الويب مثل Chrome و Firefox. ستتجاوز التطبيقات التي تستخدم بروكسي HTTP(S) قواعد جدار الحماية وقواعد نظام dns.</string>
     <string name="settings_orbot_disabled_error">قم بإيقاف تشغيل HTTP (S) و / أو وكيل SOCKS5 لمتابعة إعداد Tor-as-a-proxy.</string>
-    <string name="settings_all_networks_dialog_title">انتباه!</string>
-    <string name="settings_all_networks_dialog_positive_btn">تمكين على أي حال</string>
     <string name="settings_import_export_heading">النسخ الاحتياطي والاستعادة</string>
     <string name="about_bravedns_explantion">RethinkDNS هي أسهل طريقة لمراقبة نشاط التطبيقات وتجاوز الرقابة على الإنترنت وتطبيقات جدار الحماية على جهاز Android الخاص بك.</string>
     <string name="cd_dns_crypt_relay_name">DNSRelay %1$s</string>

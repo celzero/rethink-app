@@ -81,7 +81,6 @@
     <string name="app_mode_dns_firewall">DNS এবং ফায়ারওয়াল (ডিফল্ট)</string>
     <string name="orbot_http">হাইপারটেক্সট ট্রান্সফার প্রটোকল প্রক্সি</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
-    <string name="settings_all_networks_dialog_positive_btn">যাইহোক সক্ষম করুন</string>
     <string name="settings_theme_desc">গাঢ়/হালকা থিম</string>
     <string name="settings_http_proxy_dialog_title">কাস্টম সার্ভার URL</string>
     <string name="settings_socks5_dialog_hint_password">পাসওয়ার্ড (ঐচ্ছিক)</string>
@@ -292,7 +291,6 @@
     <string name="download_update_dialog_message_ok">আপনি ইতিমধ্যেই সর্বশেষ সংস্করণে রয়েছেন৷</string>
     <string name="orbot_app_issue">অরবট চালু করা যায়নি। এটা ইনস্টল করা হয়\?</string>
     <string name="orbot_install_dialog_neutral">ওয়েবসাইট</string>
-    <string name="settings_all_networks_dialog_title">মনোযোগ!</string>
     <string name="settings_dns_proxy_dialog_hostname">হোস্ট নাম</string>
     <string name="settings_theme_dialog_themes_4">সত্যিকারের কালো</string>
     <string name="settings_notification_desc2">DNS / DNS + ফায়ারওয়াল</string>
@@ -458,7 +456,6 @@
 \nপজ/স্টপ (ডিফল্ট):
 \nদুটি বোতাম দেখায়, দ্রুত বিরাম দিতে এবং RethinkDNS বন্ধ করতে।"</string>
     <string name="settings_orbot_notification_content">Tor-as-a-Proxy শুরু করতে ব্যর্থ হয়েছে৷ ম্যানুয়ালি শুরু করতে Orbot অ্যাপটি খুলুন।</string>
-    <string name="settings_all_networks_dialog_message">সক্ষম হলে, মিটারযুক্ত (যেমন: ওয়াইফাই) এবং নন-মিটারড (যেমন: মোবাইল) এর জন্য অ্যাপ ফায়ারওয়াল নিয়মগুলিকে সম্মান করা হবে না৷আপনি কি অবিরত করতে চান\?</string>
     <string name="settings_autostart_bootup_desc">ডিভাইস পাওয়ার-আপে, যদি এটি বন্ধ করার আগে চলমান থাকে তবে রিথিঙ্কডিএনএস শুরু করুন।</string>
     <string name="settings_ip_dialog_ipv4">IPv4 (ডিফল্ট)</string>
     <string name="settings_protocol_translation_dns_inactive">এই সেটিং সক্ষম করতে DNS/DNS+ফায়ারওয়াল মোডে স্যুইচ করুন</string>

@@ -394,11 +394,6 @@
     <string name="settings_orbot_disabled_error">Desative proxy HTTP(S) e/ou SOCKS5 para continuar com a configuração do Tor-como-proxy.</string>
     <string name="settings_orbot_notification_content">Falha ao iniciar Tor-como-Proxy. Abra Orbot app para iniciá-lo manualmente.</string>
     <string name="settings_orbot_notification_action">Abrir Orbot</string>
-    <string name="settings_all_networks_dialog_title">Atenção!</string>
-    <string name="settings_all_networks_dialog_message">Quando ativado, as regras de firewall do app para redes com franquia de dados (ex: Móvel) e banda larga (ex: WiFi) não serão honradas.
-\n
-\nVocê quer continuar\?</string>
-    <string name="settings_all_networks_dialog_positive_btn">Ativar de qualquer modo</string>
     <string name="settings_network_all_networks">Usar todas as redes disponíveis (experimental)</string>
     <string name="settings_check_update_heading">Verifique se há atualizações do app</string>
     <string name="settings_check_update_desc">Verifique automaticamente as atualizações do app uma vez por semana.</string>

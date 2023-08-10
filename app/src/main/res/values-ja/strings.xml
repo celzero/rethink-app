@@ -158,10 +158,6 @@
     <string name="settings_orbot_desc" translatable="true">HTTPS/SOCKS5 を使用した非 VPN モードの Orbot 。</string>
     <string name="settings_general_header" translatable="true">一般設定</string>
     <string name="settings_autostart_bootup_heading" translatable="true">電源投入時の自動起動(試験的)</string>
-    <string name="settings_all_networks_dialog_title" translatable="true">注意！</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">有効な場合、アプリのファイアウォールルールのうち、従量制（例：モバイル）と非従量制（例：WiFi）のルールは尊重されなくなります。
-\n
-\n続けますか？</string>
     <string name="settings_check_update_heading" translatable="true">アプリの更新をチェック</string>
     <string name="settings_check_update_desc" translatable="true">週に 1 回、アプリの更新を自動的に確認します。</string>
     <string name="settings_custom_downloader_heading" translatable="true">アプリ内ダウンローダーを利用する</string>
@@ -420,7 +416,6 @@
     <string name="settings_socks5_vpn_disabled_error" translatable="true">Rethinkを起動して始める。</string>
     <string name="settings_orbot_notification_action" translatable="true">Orbotを開く</string>
     <string name="settings_autostart_bootup_desc" translatable="true">デバイスの電源投入時に、シャットダウン前にRethinkDNSが動作していた場合は、RethinkDNSが自動的に起動します。</string>
-    <string name="settings_all_networks_dialog_positive_btn" translatable="true">とにかく有効にする</string>
     <string name="settings_network_all_networks_desc" translatable="true">有効にすると、RethinkDNSは利用可能なすべてのネットワークを使用してインターネットに接続します。そうでない場合は、Androidによって<i>アクティブ</i>と見なされるネットワークを使用します。</string>
     <string name="settings_custom_downloader_desc" translatable="true">無効の場合、Androidの組み込みの<i>ダウンロードマネージャー</i>が使用されます</string>
     <string name="settings_app_notification_a13_heading" translatable="true">アプリの通知</string>

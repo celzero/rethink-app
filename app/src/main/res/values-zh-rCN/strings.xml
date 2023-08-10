@@ -142,7 +142,6 @@
     <string name="settings_socks5_desc">将连接转发至 SOCKS5 端点。</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="settings_orbot_install_desc">轻触此处以安装 Orbot</string>
-    <string name="settings_all_networks_dialog_positive_btn">仍要启用</string>
     <string name="settings_custom_downloader_desc">若被禁用，将使用 Android 内附的<i>下载管理器</i></string>
     <string name="settings_ip_dialog_ipv4">IPv4 （默认）</string>
     <string name="settings_notification_dialog_option_3">"
@@ -175,7 +174,6 @@
     <string name="orbot_both">TCP + HTTP 代理</string>
     <string name="orbot_bs_status_1">将 %1$s 连接转发至 Orbot。</string>
     <string name="orbot_stop_dialog_negative">停止 Orbot</string>
-    <string name="settings_all_networks_dialog_title">注意！</string>
     <string name="settings_import_export_heading">备份与恢复</string>
     <string name="settings_http_proxy_error_text4">服务器连接失败。请重试。</string>
     <string name="settings_dns_proxy_dialog_hostname">域名</string>
@@ -302,9 +300,6 @@
 \n%2$s</string>
     <string name="orbot_stop_dialog_message">Rethink 已停止向 Orbot 转发连接，但 Orbot 可能仍于后台运行。</string>
     <string name="orbot_install_dialog_positive">安装</string>
-    <string name="settings_all_networks_dialog_message">启用时，应用防火墙规则将不会考虑网络为收费（如移动数据）或非收费（如 WiFi ）。
-\n
-\n您是否想要继续？</string>
     <string name="settings_theme_dialog_themes_2">亮色</string>
     <string name="settings_theme_dialog_themes_3">暗色</string>
     <string name="settings_ip_dialog_ipv6">IPv6 （实验性）</string>

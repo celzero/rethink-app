@@ -149,9 +149,6 @@
     <string name="settings_autostart_bootup_heading">裝置啓動時自啓（實驗性）</string>
     <string name="settings_autostart_bootup_desc">Rethink 若在關機前運行，開機時則自動啓動。</string>
     <string name="settings_network_all_networks_desc">啓用時， Rethink 將使用所有可用的網路來連線至互聯網。若未啓用，則將使用 Android 認爲<i>活躍</i>的網路。</string>
-    <string name="settings_all_networks_dialog_message">啓用時，應用防火牆規則將不會考慮網路爲計費（如行動數據）或非計費（如 WiFi ）。
-\n
-\n您是否想要繼續？</string>
     <string name="allow">放行</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">輕觸以更改防護設定</string>
     <string name="slide_1_desc">Rethink 爲一款受 Mozilla Builders MVP 計劃資助與支持的開放原始碼軟體。</string>
@@ -232,8 +229,6 @@
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
-    <string name="settings_all_networks_dialog_title">注意！</string>
-    <string name="settings_all_networks_dialog_positive_btn">仍要啓用</string>
     <string name="settings_check_update_heading">檢查應用更新</string>
     <string name="settings_check_update_desc">每週一次自動檢查應用是否有可用更新。</string>
     <string name="hs_download_positive_website">訪問網站</string>

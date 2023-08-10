@@ -385,9 +385,6 @@
     <string name="about_app_contributors">Autores</string>
     <string name="dc_dns_website_desc">Obtener los iconos del sitio web <i>nextdns.io</i> y <i>duckduckgo.com</i>. Consume hasta 350 mb de espacio en disco</string>
     <string name="settings_theme_dialog_themes_1">Fijado por el sistema</string>
-    <string name="settings_all_networks_dialog_message">Cuando está activa, las reglas del Cortafuegos para las aplicaciones con límites (p.ej. móvil) y sin límites (p.ej. wiffi) no se respetarán.
-\n
-\n¿Desea continuar\?</string>
     <string name="settings_socks5_dialog_hint_username">Nombre de usuario (opcional)</string>
     <string name="settings_socks5_dialog_hint_password">Contraseña (opcional)</string>
     <string name="about_mail_bugreport_text">Envíe este correo electrónico a : hello@celzero.com</string>
@@ -671,7 +668,6 @@
     <string name="settings_socks5_disabled_error">Conectado a %1$s. Apágalo para continuar.</string>
     <string name="settings_orbot_notification_content">Fallo al iniciar Tor-como-un-Proxy. Abra la aplicación Orbot para iniciarla manualmente.</string>
     <string name="settings_orbot_notification_action">Abrir Orbot</string>
-    <string name="settings_all_networks_dialog_positive_btn">Activar de todos modos</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
@@ -708,7 +704,6 @@
     <string name="orbot_install_activity_error">Algo salió mal, inténtalo después de un tiempo</string>
     <string name="orbot_socks5_desc">Reenvía todas las conexiones TCP a Orbot.</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
-    <string name="settings_all_networks_dialog_title">¡Atención!</string>
     <string name="settings_allow_bypass_heading">Habilitar la visibilidad de la red</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (en pruebas)</string>
     <string name="search_universal_ips"><font size="12">Buscar IPs</font></string>

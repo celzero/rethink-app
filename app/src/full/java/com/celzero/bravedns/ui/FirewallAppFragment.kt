@@ -57,7 +57,6 @@ class FirewallAppFragment :
     private val b by viewBinding(FragmentFirewallAppListBinding::bind)
 
     private val appInfoViewModel: AppInfoViewModel by viewModel()
-    private val persistentState by inject<PersistentState>()
     private val refreshDatabase by inject<RefreshDatabase>()
 
     private var layoutManager: RecyclerView.LayoutManager? = null

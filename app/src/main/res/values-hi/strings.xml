@@ -188,8 +188,6 @@
     <string name="settings_https_disabled_error" translatable="true">%1$s से जुड़ा है। जारी रखने के लिए इसे बंद करें।</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">आगे बढ़ने के लिए रीथिंक शुरू करें।</string>
     <string name="settings_orbot_notification_action" translatable="true">ऑर्बोट खोले</string>
-    <string name="settings_all_networks_dialog_title" translatable="true">सावधान!</string>
-    <string name="settings_all_networks_dialog_positive_btn" translatable="true">फिर भी सक्षम करें</string>
     <string name="settings_check_update_heading" translatable="true">ऐप अपडेट के लिए जाँच करें</string>
     <string name="settings_theme_desc" translatable="true">डार्क/लाइट थीम</string>
     <string name="settings_theme_heading" translatable="true">दिखावट</string>
@@ -591,9 +589,6 @@
     <string name="settings_autostart_bootup_desc" translatable="true">डिवाइस पावर-अप पर, रीथिंक शुरू करें अगर वो शटडाउन से पहले चल रहा था।</string>
     <string name="settings_network_all_networks" translatable="true">सभी उपलब्ध नेटवर्क का उपयोग करें (प्रयोगात्मक)</string>
     <string name="settings_network_all_networks_desc" translatable="true">सक्षम होने पर, रीथिंक इंटरनेट से जुड़ने के लिए सभी मौजूद नेटवर्क का इस्तेमाल करता है। अगर नहीं, तो ये एंड्रॉइड द्वारा <i>सक्रिय</i> समझे जाने वाले नेटवर्क का इस्तेमाल करता है।</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">सक्षम होने पर, मीटर्ड (उदाहरण मोबाइल) और गैर-मीटर्ड (उदाहरण वाईफाई) के लिए ऐप फ़ायरवॉल नियमों का सम्मान नहीं किया जाएगा।
-\n
-\nक्या आप जारी रखना चाहते हैं\?</string>
     <string name="settings_check_update_desc" translatable="true">सप्ताह में एक बार ऐप अपडेट के लिए स्वचालित रूप से जांचें।</string>
     <string name="settings_custom_downloader_heading" translatable="true">इन-ऐप डाउनलोडर का उपयोग करें</string>
     <string name="settings_custom_downloader_desc" translatable="true">अक्षम होने पर, एंड्रॉइड के अंतर्निर्मित <i>डाउनलोड प्रबंधक</i> का उपयोग किया जाता है</string>

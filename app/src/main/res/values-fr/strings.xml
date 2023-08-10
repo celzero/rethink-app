@@ -233,12 +233,7 @@
 \nOrbot utilise <u>Tor</u> pour chiffrer votre trafic Internet, ce qui vous aide à <u>contourner la censure</u> et à vous défendre contre les formes de <u>surveillance du réseau</u> qui menacent les libertés individuelles et la vie privée.
 \n<u>Proxy TCP</u> : Rethink transmet à Orbot les connexions TCP de toutes les applications sauf celles qui sont exclues.
 \n<u>Proxy HTTP</u> : Rethink <i>établit</i> un proxy HTTP mais n’oblige pas les applications à l’utiliser. En général, les navigateurs comme Chrome et Firefox l’utilisent. Les applications qui utilisent le proxy HTTP(S) contournent les règles du pare-feu et du DNS.</string>
-    <string name="settings_all_networks_dialog_message">Si activé, les règles de pare-feu des applications pour les services avec abonnement (ex : Mobile) et sans abonnement (ex : Wi-Fi) ne seront pas respectées.
-\n
-\nVoulez-vous continuer \?</string>
     <string name="settings_network_all_networks_desc">Si activé, Rethink utilisera tous les réseaux disponibles pour se connecter à Internet. Sinon, il utilisera le réseau jugé <i>actif</i> par Android.</string>
-    <string name="settings_all_networks_dialog_title">Attention !</string>
-    <string name="settings_all_networks_dialog_positive_btn">Activer malgré tout</string>
     <string name="settings_check_update_heading">Vérifiez l’existence de mises à jour</string>
     <string name="settings_check_update_desc">Vérifiez automatiquement l’existence de mises à jour une fois par semaine.</string>
     <string name="dns_proxy_port">Numéro de port</string>

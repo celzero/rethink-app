@@ -83,13 +83,11 @@
     <string name="lbbs_redownload">Blok listelerini yeniden indirin</string>
     <string name="settings_dns_proxy_dialog_username">Kullanıcı adı</string>
     <string name="univ_view_blocked_ip_desc">Engellenen veya atlanan IP / Port kurallarını değiştirin.</string>
-    <string name="settings_all_networks_dialog_positive_btn">Yine de etkinleştir</string>
     <string name="notif_channel_desc_vpn_failure">RethinkDNS Android veya başka bir VPN uygulaması tarafından durdurulduğunda bilgilendirin</string>
     <string name="settings_dns_proxy_dialog_app">Uygulama</string>
     <string name="about_email">Bize e-posta gönderin</string>
     <string name="univ_firewall_dialog_message">Bu kuralın silinmesi, herhangi bir uygulamanın bu IP\'ye bağlanmasına izin verecektir. Devam etmek istiyor musunuz\?</string>
     <string name="orbot_both_desc">Yukarıdakilerin hepsi.</string>
-    <string name="settings_all_networks_dialog_title">Dikkat!</string>
     <string name="settings_custom_downloader_heading">Uygulama içi indiriciyi kullanın</string>
     <string name="settings_socks5_dialog_hint_port">Bağlantı noktası</string>
     <string name="settings_ip_dialog_title">IP sürümünü seçin</string>
@@ -266,9 +264,6 @@
     <string name="firewall_rule_trusted_ip">Bypass Edilen IP (Uygulama)</string>
     <string name="new_app_notification_action_toast_deny">Uygulama için ağ bağlantısı reddedildi</string>
     <string name="notif_dialog_pause_dialog_message">Uygulama duraklama durumunda, devam etmek için devam edin</string>
-    <string name="settings_all_networks_dialog_message">Etkinleştirildiğinde, ölçülü (örn: Mobil) ve ölçülü olmayan (örn: Wi-Fi) uygulama güvenlik duvarı kuralları yerine getirilmeyecektir.
-\n
-\nDevam etmek istiyor musunuz\?</string>
     <string name="ci_blocked_initial">Si</string>
     <string name="dc_dns_crypt">DNSCrypt</string>
     <string name="cd_custom_dns_proxy_name">Proxy %1$s</string>

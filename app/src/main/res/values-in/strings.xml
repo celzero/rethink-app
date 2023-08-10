@@ -338,7 +338,6 @@
     <string name="firewall_rule_block_udp_ntp_desc">Aturan firewall yang ditetapkan \"Pengguna\" memblokir koneksi<i>UDP</i>.<br/><br/> Untuk mengubahnya kunjungi tab<i>Universal</i>.</string>
     <string name="rt_chip_check_update">Periksa pembaruan</string>
     <string name="firewall_mode_info_explanation_new">Pantau aktivitas jaringan dan blokir aplikasi atau alamat IP apa pun.</string>
-    <string name="settings_all_networks_dialog_title">Perhatian!</string>
     <string name="settings_check_update_desc">Secara otomatis memeriksa pembaruan setiap minggu.</string>
     <string name="settings_ip_dialog_ipv46">Otomatis (eksperimental)
 \nPemeriksaan konektivitas dikirim untuk memastikan keterjangkauan.</string>
@@ -513,7 +512,6 @@
     <string name="settings_notification_desc1">Jeda/Berhenti (bawaan)</string>
     <string name="dns_btm_resolved_crypt">diselesaikan <u>secara anonim</u> %1$s oleh %2$s</string>
     <string name="cd_doh_dialog_heading">Tambahkan DNS melalui HTTPS</string>
-    <string name="settings_all_networks_dialog_positive_btn">Tetap aktifkan</string>
     <string name="cd_dns_crypt_relay_name">DNS Penghubung %1$s</string>
     <string name="dns_crypt_url_remove_dialog_message">Menghapus penyelesai (resolver) DNSCrypt dari konfigurasi yang tersimpan.</string>
     <string name="isolate">terisolasi</string>
@@ -563,9 +561,6 @@
     <string name="notification_action_pause_vpn">JEDA</string>
     <string name="orbot_stop_dialog_title">Dibutuhkan intervensi manual</string>
     <string name="dc_doh">Dns melalui HTTPS</string>
-    <string name="settings_all_networks_dialog_message">Jika opsi ini diaktifkan, aturan firewall aplikasi untuk koneksi terukur (misal: data seluler) dan koneksi yang tidak terukur (misal: WiFi) akan diabaikan.
-\n
-\nApakah Anda ingin melanjutkan\?</string>
     <string name="brbs_backup_desc">Cadangkan setelan aplikasi, riwayat jaringan dan DNS</string>
     <string name="firewall_rule_block_app_univ_mobile_desc">Aturan firewall universal yang diterapkan \"Pengguna\" memblokir <i>aplikasi</i> ini ketika mencoba terhubung ke jaringan <i>Terukur</i> (Data Selular).<br/><br/> Masuklah ke tab <i>Universal</i> untuk mengubahnya.</string>
     <string name="hsf_exclude_error">Tidak dapat dikecualikan dalam mode penguncian penuh VPN</string>
