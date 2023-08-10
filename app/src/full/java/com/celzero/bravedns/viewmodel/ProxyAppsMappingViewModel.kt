@@ -26,12 +26,16 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.ProxyApplicationMappingDAO
+import com.celzero.bravedns.ui.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 import com.celzero.bravedns.util.LoggerConstants
 
 class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingDAO) : ViewModel() {
 
     private var filteredList: MutableLiveData<String> = MutableLiveData()
+    private var filterType: WgIncludeAppsDialog.TopLevelFilter =
+        WgIncludeAppsDialog.TopLevelFilter.ALL_APPS
+    private var proxyId: String = ""
 
     init {
         filteredList.postValue("%%")
@@ -41,19 +45,24 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
         filteredList.switchMap { searchTxt ->
             Log.d(LoggerConstants.LOG_TAG_PROXY, "Filtering the apps list - $searchTxt")
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
-                mappingDAO.getAppsMapping(searchTxt)
+                    if (filterType == WgIncludeAppsDialog.TopLevelFilter.SELECTED_APPS) {
+                        mappingDAO.getSelectedAppsMapping(searchTxt, proxyId)
+                    } else {
+                        mappingDAO.getAllAppsMapping(searchTxt)
+                    }
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         }
 
-    fun setFilter(filter: String) {
+    fun setFilter(filter: String, type: WgIncludeAppsDialog.TopLevelFilter, pid: String) {
         Log.d(LoggerConstants.LOG_TAG_PROXY, "Filtering the apps list - $filter")
+        filterType = type
+        this.proxyId = pid
         filteredList.postValue("%$filter%")
     }
 
     fun getAppCountById(configId: String): LiveData<Int> {
         return mappingDAO.getAppCountByIdLiveData(configId)
     }
-
 }

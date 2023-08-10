@@ -72,7 +72,7 @@ class WgPeersAdapter(
                 b.persistentKeepaliveLabel.visibility = View.GONE
             }
             if (wgPeer.getPreSharedKey().isPresent) {
-                b.preSharedKeyText.text = wgPeer.getPreSharedKey().get().toString()
+                b.preSharedKeyText.text = wgPeer.getPreSharedKey().get().base64()
             } else {
                 b.preSharedKeyText.visibility = View.GONE
                 b.preSharedKeyLabel.visibility = View.GONE

@@ -42,7 +42,6 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
@@ -317,6 +316,21 @@ internal constructor(
 
         FirewallManager.persistAppInfo(appInfo)
         ProxyManager.addNewApp(appInfo)
+    }
+
+    suspend fun refreshProxyMapping() {
+        // remove the apps from proxy mapping which are not tracked by app info repository
+        val proxyMapping = ProxyManager.getProxyMapping()
+        val trackedApps = FirewallManager.getAllAppsUid()
+        Log.i(
+            "AppDatabase",
+            "refreshing proxy mapping, size: ${proxyMapping.size}, trackedApps: ${trackedApps.size}"
+        )
+        proxyMapping.forEach {
+            if (!trackedApps.contains(it)) {
+                ProxyManager.deleteApp(FirewallManager.AppInfoTuple(it.uid, it.packageName))
+            }
+        }
     }
 
     private suspend fun insertApp(appInfo: ApplicationInfo) {

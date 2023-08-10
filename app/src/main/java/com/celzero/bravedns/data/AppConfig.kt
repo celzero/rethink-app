@@ -348,6 +348,10 @@ internal constructor(
             return WIREGUARD.name == name
         }
 
+        fun isProxyTypeHasHttp(): Boolean {
+            return isProxyTypeHttp() || isProxyTypeHttpSocks5()
+        }
+
         fun isSocks5Enabled(): Boolean {
             return isProxyTypeSocks5() || isProxyTypeHttpSocks5()
         }

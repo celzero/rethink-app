@@ -40,13 +40,16 @@ interface WgConfigFilesDAO {
     @Query("select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc")
     fun getWgConfigsLiveData(): PagingSource<Int, WgConfigFiles>
 
-    @Query("select * from WgConfigFiles order by id desc")
+    @Query("select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc")
     fun getWgConfigs(): List<WgConfigFiles>
 
     @Delete fun delete(wgConfigFiles: WgConfigFiles)
 
     @Query("delete from WgConfigFiles where id = :id")
     fun deleteConfig(id: Int)
+
+    @Query("select * from WgConfigFiles where id = :id")
+    fun isConfigAdded(id: Int): WgConfigFiles?
 
     @Query("select count(id) from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")
     fun getConfigCount(): LiveData<Int>

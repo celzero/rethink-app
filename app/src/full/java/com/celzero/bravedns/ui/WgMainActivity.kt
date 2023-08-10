@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.WgConfigAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants
@@ -50,6 +51,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private val b by viewBinding(ActivityWireguardMainBinding::bind)
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
 
     private var wgConfigAdapter: WgConfigAdapter? = null
     private val wgConfigViewModel: WgConfigViewModel by viewModel()
@@ -147,6 +149,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         b.settingsNetwork.text = getString(R.string.lbl_wireguard).lowercase()
         collapseFab()
         observeConfig()
+        observeDnsName()
         setupInterfaceList()
         setupClickListeners()
 
@@ -168,11 +171,19 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         wgConfigViewModel.configCount().observe(this) {
             if (it == 0) {
                 b.wgEmptyView.visibility = View.VISIBLE
+                b.wgWireguardDisclaimer.visibility = View.GONE
                 b.wgInterfaceList.visibility = View.GONE
             } else {
                 b.wgEmptyView.visibility = View.GONE
+                b.wgWireguardDisclaimer.visibility = View.VISIBLE
                 b.wgInterfaceList.visibility = View.VISIBLE
             }
+        }
+    }
+
+    private fun observeDnsName() {
+        appConfig.getConnectedDnsObservable().observe(this) {
+            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
         }
     }
 

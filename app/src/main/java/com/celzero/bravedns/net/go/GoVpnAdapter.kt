@@ -29,6 +29,7 @@ import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
@@ -285,7 +286,7 @@ class GoVpnAdapter(
         setTcpProxyIfNeeded()
         setWireguardTunnelModeIfNeeded(tunnelOptions.tunProxyMode)
         setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
-        setHttpProxyIfNeeded(tunnelOptions.tunProxyMode)
+        setHttpProxyIfNeeded()
     }
 
     private fun setBraveDnsBlocklistMode() {
@@ -413,6 +414,10 @@ class GoVpnAdapter(
         }
     }
 
+    private fun showWireguardFailureToast(message: String) {
+        ui { showToastUiCentered(context.applicationContext, message, Toast.LENGTH_LONG) }
+    }
+
     private fun showDnsProxyConnectionFailureToast() {
         ui {
             showToastUiCentered(
@@ -426,22 +431,33 @@ class GoVpnAdapter(
     private fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
         if (!tunProxyMode.isTunProxyWireguard()) return
 
-        val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
-        if (wgConfigs.isEmpty()) {
-            Log.w(LOG_TAG_VPN, "no wireguard config found")
-            if (persistentState.wireguardEnabledCount > 0) {
-                persistentState.wireguardEnabledCount = 0
-                Log.i(LOG_TAG_VPN, "wireguard enabled count reset to 0 as no config found")
+        try {
+            val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
+            if (wgConfigs.isEmpty()) {
+                if (persistentState.wireguardEnabledCount > 0) {
+                    persistentState.wireguardEnabledCount = 0
+                    Log.i(LOG_TAG_VPN, "wireguard enabled count reset to 0 as no config found")
+                }
+                return
             }
-            return
-        }
-        wgConfigs.forEach {
-            val wgUserSpaceString = it.toWgUserspaceString()
-            Log.i(
-                LOG_TAG_VPN,
-                "adding wireguard config id(${Ipn.WG + it.getId()}), ${it.getName()}"
+            val proxyList = tunnel?.proxies?.refreshProxies()?.split(",") ?: emptyList()
+            wgConfigs.forEach {
+                val wgUserSpaceString = it.toWgUserspaceString()
+                val id = ID_WG_BASE + it.getId()
+                if (proxyList.contains(id)) {
+                    Log.i(
+                        LOG_TAG_VPN,
+                        "wireguard config id($id) already added, ${it.getName()}"
+                    )
+                    return@forEach
+                }
+                tunnel?.proxies?.addProxy(id, wgUserSpaceString)
+            }
+        } catch (e: Exception) {
+            showWireguardFailureToast(
+                e.message ?: context.getString(R.string.wireguard_connection_error)
             )
-            tunnel?.proxies?.addProxy(Ipn.WG + it.getId(), wgUserSpaceString)
+            Log.e(LOG_TAG_VPN, "connect-tunnel: could not start wireguard", e)
         }
     }
 
@@ -482,12 +498,12 @@ class GoVpnAdapter(
         }
     }
 
-    private fun setHttpProxyIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
-        if (!tunProxyMode.isTunProxyHttps()) return
+    private fun setHttpProxyIfNeeded() {
+        if (!AppConfig.ProxyType.of(appConfig.getProxyType()).isProxyTypeHasHttp()) return
 
         val httpProxy: ProxyInfo? = appConfig.getHttpProxyInfo()
         if (httpProxy == null) {
-            Log.w(LOG_TAG_VPN, "could not fetch http proxy details for proxyMode: $tunProxyMode")
+            Log.w(LOG_TAG_VPN, "could not fetch http proxy details")
             return
         }
         val httpProxyUrl = constructHttpsProxyUrl(httpProxy)
@@ -526,11 +542,11 @@ class GoVpnAdapter(
             return
         }
         val wgUserSpaceString = secWarp.toWgUserspaceString()
-        val added2 = tunnel?.proxies?.addProxy(Ipn.WG + secWarp.getId(), wgUserSpaceString)
+        val added2 = tunnel?.proxies?.addProxy(ID_WG_BASE + secWarp.getId(), wgUserSpaceString)
         if (DEBUG)
             Log.d(
                 LOG_TAG_VPN,
-                "Tcp mode(wireguard) set(${Ipn.WG + secWarp.getId()}): ${secWarp.getName()}, res: $added2"
+                "Tcp mode(wireguard) set(${ID_WG_BASE+ secWarp.getId()}): ${secWarp.getName()}, res: $added2"
             )
     }
 

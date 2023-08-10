@@ -16,7 +16,7 @@
 package com.celzero.bravedns.service
 
 import android.util.Log
-import com.celzero.bravedns.RethinkDnsApplication
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
@@ -34,7 +34,7 @@ object ProxyManager : KoinComponent {
     private val appConfig: AppConfig by inject()
 
     const val ID_ORBOT_BASE = "ORBOT"
-    const val ID_WG_BASE = "WG"
+    const val ID_WG_BASE = "wg"
     const val ID_TCP_BASE = "TCP"
     const val ID_S5_BASE = "S5"
     const val ID_HTTP_BASE = "HTTP"
@@ -89,6 +89,12 @@ object ProxyManager : KoinComponent {
         }
     }
 
+    fun getProxyMapping(): MutableSet<FirewallManager.AppInfoTuple> {
+        return appConfigMappings
+            .map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }
+            .toMutableSet()
+    }
+
     fun updateProxyIdForAllApps(proxyId: String, proxyName: String) {
         if (proxyId == "" || !isValidProxyId(proxyId)) {
             Log.e(LOG_TAG_PROXY, "Invalid proxy id: $proxyId")
@@ -133,8 +139,7 @@ object ProxyManager : KoinComponent {
                 proxyName
             )
         appConfigMappings.add(pam)
-        if (RethinkDnsApplication.DEBUG)
-            Log.d(LOG_TAG_PROXY, "Adding new app for mapping: ${pam.appName}, ${pam.uid}")
+        if (DEBUG) Log.d(LOG_TAG_PROXY, "Adding new app for mapping: ${pam.appName}, ${pam.uid}")
         io { proxyAppMappingRepository.insert(pam) }
     }
 
@@ -149,8 +154,15 @@ object ProxyManager : KoinComponent {
                 proxyId
             )
         appConfigMappings.remove(pam)
-        if (RethinkDnsApplication.DEBUG)
-            Log.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
+        if (DEBUG) Log.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
+        io { proxyAppMappingRepository.delete(pam) }
+    }
+
+    fun deleteApp(appInfoTuple: FirewallManager.AppInfoTuple) {
+        val pam =
+            ProxyApplicationMapping(appInfoTuple.uid, appInfoTuple.packageName, "", "", false, "")
+        appConfigMappings.remove(pam)
+        if (DEBUG) Log.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
         io { proxyAppMappingRepository.delete(pam) }
     }
 

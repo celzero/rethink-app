@@ -27,10 +27,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgInterfaceBinding
+import com.celzero.bravedns.service.ProxyManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.WgConfigDetailActivity
 import com.celzero.bravedns.ui.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.UiUtils
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -78,16 +81,36 @@ class WgConfigAdapter(private val context: Context) :
         fun update(wgConfigFiles: WgConfigFiles) {
             b.interfaceNameText.text = wgConfigFiles.name
             b.interfaceSwitch.isChecked = wgConfigFiles.isActive
+            updateStatus(wgConfigFiles)
             setupClickListeners(wgConfigFiles)
         }
 
+        private fun updateStatus(wgConfigFiles: WgConfigFiles) {
+            if (wgConfigFiles.isActive) {
+                val id = ProxyManager.ID_WG_BASE + wgConfigFiles.id
+                val statusId = VpnController.getProxyStatusById(id)
+                if (statusId != null) {
+                    val resId = UiUtils.getProxyStatusStringRes(statusId)
+                    b.interfaceStatus.text =
+                        context.getString(resId).replaceFirstChar(Char::titlecase)
+                } else {
+                    b.interfaceStatus.text =
+                        context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                }
+            } else {
+                b.interfaceStatus.text =
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+            }
+        }
+
         fun setupClickListeners(wgConfigFiles: WgConfigFiles) {
-            b.interfaceNameText.setOnClickListener { launchConfigDetail(wgConfigFiles.id) }
+            b.interfaceNameLayout.setOnClickListener { launchConfigDetail(wgConfigFiles.id) }
 
             b.interfaceSwitch.setOnCheckedChangeListener { _, checked ->
                 if (checked) {
                     if (WireguardManager.canEnableConfig(wgConfigFiles)) {
                         WireguardManager.enableConfig(wgConfigFiles)
+                        updateStatus(wgConfigFiles)
                     } else {
                         b.interfaceSwitch.isChecked = false
                         Toast.makeText(
@@ -99,6 +122,7 @@ class WgConfigAdapter(private val context: Context) :
                     }
                 } else {
                     WireguardManager.disableConfig(wgConfigFiles)
+                    updateStatus(wgConfigFiles)
                 }
             }
         }

@@ -363,10 +363,13 @@ class BraveVPNService :
                 return FirewallRuleset.RULE1G
             }
 
+            val globalDomainRule = getDomainRule(connInfo.query, UID_EVERYBODY)
+
             // should firewall rules by-pass universal firewall rules (previously whitelist)
             if (appStatus.bypassUniversal()) {
                 // bypass universal should block the domains that are blocked by dns (local/remote)
-                if (anyRealIpBlocked) {
+                // unless the domain is trusted by the user
+                if (anyRealIpBlocked && globalDomainRule != DomainRulesManager.Status.TRUST) {
                     return FirewallRuleset.RULE2G
                 }
 
@@ -378,17 +381,15 @@ class BraveVPNService :
             }
 
             // check for global domain allow/block domains
-            getDomainRule(connInfo.query, UID_EVERYBODY).let {
-                when (it) {
-                    DomainRulesManager.Status.TRUST -> {
-                        return FirewallRuleset.RULE2I
-                    }
-                    DomainRulesManager.Status.BLOCK -> {
-                        return FirewallRuleset.RULE2H
-                    }
-                    else -> {
-                        // fall through
-                    }
+            when (globalDomainRule) {
+                DomainRulesManager.Status.TRUST -> {
+                    return FirewallRuleset.RULE2I
+                }
+                DomainRulesManager.Status.BLOCK -> {
+                    return FirewallRuleset.RULE2H
+                }
+                else -> {
+                    // fall through
                 }
             }
 
@@ -1405,7 +1406,7 @@ class BraveVPNService :
                 io("allow-bypass") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROXY_TYPE -> {
-                io("proxy") { restartVpn(createNewTunnelOptsObj()) }
+                io("proxy") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.NETWORK -> {
                 connectionMonitor?.onUserPreferenceChanged()
@@ -1435,7 +1436,17 @@ class BraveVPNService :
                 io("route_lan_traffic") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.WIREGUARD -> {
-                io("wireguard") { restartVpn(createNewTunnelOptsObj()) }
+                // update wireguard tunnel if wireguard count is more than 1
+                if (persistentState.wireguardEnabledCount > 1) {
+                    io("wireguard") { updateTun(createNewTunnelOptsObj()) }
+                }
+            }
+            PersistentState.WIREGUARD_UPDATED -> {
+                // case when wireguard is enabled and user changes the wireguard config
+                if (persistentState.wireguardUpdated) {
+                    io("wireguard") { updateTun(createNewTunnelOptsObj()) }
+                    persistentState.wireguardUpdated = false
+                }
             }
         }
     }
@@ -2187,6 +2198,10 @@ class BraveVPNService :
             return
         }
 
+        Log.d(
+            LOG_TAG_VPN,
+            "onUDPSocketClosed: $s, ${s.uid}, ${s.pid}, ${s.id}, ${s.downloadBytes}, ${s.uploadBytes}, ${s.duration}, ${s.msg}"
+        )
         // synack is not applicable for udp
         val connectionSummary =
             ConnectionSummary(
@@ -2229,7 +2244,8 @@ class BraveVPNService :
 
         val uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
 
-        // generate a random 8 character string for connId
+        // generates a random 8-byte value, converts it to hexadecimal, and then
+        // provides the hexadecimal value as a string for connId
         val connId = Utilities.getRandomString(8)
 
         val isBlocked =
@@ -2242,20 +2258,14 @@ class BraveVPNService :
         if (isBlocked) {
             // return Ipn.Block, no need to check for other rules
             if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "flow: received rule: block, returning Ipn.Block, $connId, $uid"
-                )
+                Log.d(LOG_TAG_VPN, "flow: received rule: block, returning Ipn.Block, $connId, $uid")
             return getFlowResponseString(Ipn.Block, connId, uid)
         }
 
         // if no proxy is enabled, return Ipn.Base
         if (!appConfig.isProxyEnabled()) {
             if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "flow: no proxy enabled, returning Ipn.Base, $connId, $uid"
-                )
+                Log.d(LOG_TAG_VPN, "flow: no proxy enabled, returning Ipn.Base, $connId, $uid")
             return getFlowResponseString(Ipn.Base, connId, uid)
         }
 
@@ -2334,24 +2344,17 @@ class BraveVPNService :
 
         if (appConfig.isCustomSocks5Enabled()) {
             if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "flow: received rule: http, returning Ipn.SOCKS5, $connId, $uid"
-                )
+                Log.d(LOG_TAG_VPN, "flow: received rule: http, returning Ipn.SOCKS5, $connId, $uid")
             return getFlowResponseString(Ipn.SOCKS5, connId, uid)
         }
 
         if (appConfig.isCustomHttpProxyEnabled()) {
             if (DEBUG)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "flow: received rule: http, returning Ipn.HTTP1, $connId, $uid"
-                )
+                Log.d(LOG_TAG_VPN, "flow: received rule: http, returning Ipn.HTTP1, $connId, $uid")
             return getFlowResponseString(Ipn.HTTP1, connId, uid)
         }
 
-        if (DEBUG)
-            Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connId, $uid")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connId, $uid")
         return getFlowResponseString(Ipn.Base, connId, uid)
     }
 

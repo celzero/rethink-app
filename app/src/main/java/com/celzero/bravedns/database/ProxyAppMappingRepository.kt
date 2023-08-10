@@ -30,7 +30,7 @@ class ProxyAppMappingRepository(private val proxyApplicationMappingDAO: ProxyApp
     }
 
     suspend fun delete(wgMapping: ProxyApplicationMapping) {
-        proxyApplicationMappingDAO.delete(wgMapping)
+        proxyApplicationMappingDAO.deleteByPackageName(wgMapping.uid, wgMapping.packageName)
     }
 
     suspend fun getApps(): List<ProxyApplicationMapping> {

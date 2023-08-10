@@ -17,24 +17,38 @@ package com.celzero.bravedns.ui
 
 import android.app.Activity
 import android.app.Dialog
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.Window
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
+import android.widget.CompoundButton
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.WgAppsIncludeDialogBinding
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.java.KoinJavaComponent.inject
 
 class WgIncludeAppsDialog(
     private var activity: Activity,
@@ -43,9 +57,36 @@ class WgIncludeAppsDialog(
     themeID: Int,
     private val proxyId: String,
     private val proxyName: String
-) : Dialog(activity, themeID), SearchView.OnQueryTextListener {
+) : Dialog(activity, themeID), SearchView.OnQueryTextListener, KoinComponent {
 
     private lateinit var b: WgAppsIncludeDialogBinding
+
+    private lateinit var animation: Animation
+    private val refreshDatabase by inject<RefreshDatabase>()
+    private var filterType: TopLevelFilter = TopLevelFilter.ALL_APPS
+    private var searchText = ""
+
+    companion object {
+        private const val ANIMATION_DURATION = 750L
+        private const val ANIMATION_REPEAT_COUNT = -1
+        private const val ANIMATION_PIVOT_VALUE = 0.5f
+        private const val ANIMATION_START_DEGREE = 0.0f
+        private const val ANIMATION_END_DEGREE = 360.0f
+
+        private const val REFRESH_TIMEOUT: Long = 4000
+    }
+
+    enum class TopLevelFilter(val id: Int) {
+        ALL_APPS(0),
+        SELECTED_APPS(1);
+
+        fun getLabelId(): Int {
+            return when (this) {
+                ALL_APPS -> R.string.lbl_all
+                SELECTED_APPS -> R.string.rt_filter_parent_selected
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +95,25 @@ class WgIncludeAppsDialog(
         b = WgAppsIncludeDialogBinding.inflate(layoutInflater)
         setContentView(b.root)
         setCancelable(false)
-
+        addAnimation()
+        remakeFirewallChipsUi()
+        observeApps()
         initializeValues()
         initializeClickListeners()
+    }
+
+    private fun addAnimation() {
+        animation =
+            RotateAnimation(
+                ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE
+            )
+        animation.repeatCount = ANIMATION_REPEAT_COUNT
+        animation.duration = ANIMATION_DURATION
     }
 
     private fun initializeValues() {
@@ -68,10 +125,74 @@ class WgIncludeAppsDialog(
         val layoutManager = LinearLayoutManager(activity)
         b.wgIncludeAppRecyclerViewDialog.layoutManager = layoutManager
         b.wgIncludeAppRecyclerViewDialog.adapter = adapter
+    }
 
-        FirewallManager.getApplistObserver().observe(activity as LifecycleOwner) {
-            b.wgIncludeAppSelectCountText.text =
-                context.getString(R.string.firewall_card_status_active, it.size.toString())
+    private fun observeApps() {
+        viewModel.getAppCountById(proxyId).observe(activity as LifecycleOwner) {
+            b.wgIncludeAppDialogHeading.text =
+                activity.getString(R.string.add_remove_apps, it.toString())
+        }
+    }
+
+    private fun remakeFirewallChipsUi() {
+        b.wgIncludeAppDialogChipGroup.removeAllViews()
+
+        val all =
+            makeFirewallChip(
+                TopLevelFilter.ALL_APPS.id,
+                activity.getString(TopLevelFilter.ALL_APPS.getLabelId()),
+                true
+            )
+        val selected =
+            makeFirewallChip(
+                TopLevelFilter.SELECTED_APPS.id,
+                activity.getString(TopLevelFilter.SELECTED_APPS.getLabelId()),
+                false
+            )
+
+        b.wgIncludeAppDialogChipGroup.addView(all)
+        b.wgIncludeAppDialogChipGroup.addView(selected)
+    }
+
+    private fun makeFirewallChip(id: Int, label: String, checked: Boolean): Chip {
+        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
+        chip.tag = id
+        chip.text = label
+        chip.isChecked = checked
+
+        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
+            if (isSelected) {
+                applyFilter(button.tag)
+                colorUpChipIcon(chip)
+            } else {
+                // no-op
+                // no action needed for checkState: false
+            }
+        }
+
+        return chip
+    }
+
+    private fun colorUpChipIcon(chip: Chip) {
+        val colorFilter =
+            PorterDuffColorFilter(
+                ContextCompat.getColor(activity, R.color.primaryText),
+                PorterDuff.Mode.SRC_IN
+            )
+        chip.checkedIcon?.colorFilter = colorFilter
+        chip.chipIcon?.colorFilter = colorFilter
+    }
+
+    private fun applyFilter(tag: Any) {
+        when (tag as Int) {
+            TopLevelFilter.ALL_APPS.id -> {
+                filterType = TopLevelFilter.ALL_APPS
+                viewModel.setFilter(searchText, filterType, proxyId)
+            }
+            TopLevelFilter.SELECTED_APPS.id -> {
+                filterType = TopLevelFilter.SELECTED_APPS
+                viewModel.setFilter(searchText, filterType, proxyId)
+            }
         }
     }
 
@@ -93,10 +214,33 @@ class WgIncludeAppsDialog(
         }
 
         b.wgIncludeAppSelectAllCheckbox.setOnCheckedChangeListener(null)
+
+        b.wgRefreshList.setOnClickListener {
+            b.wgRefreshList.isEnabled = false
+            b.wgRefreshList.animation = animation
+            b.wgRefreshList.startAnimation(animation)
+            refreshDatabase()
+            val l = activity as LifecycleOwner
+            Utilities.delay(REFRESH_TIMEOUT, l.lifecycleScope) {
+                if (this.isShowing) {
+                    b.wgRefreshList.isEnabled = true
+                    b.wgRefreshList.clearAnimation()
+                    Utilities.showToastUiCentered(
+                        context,
+                        context.getString(R.string.refresh_complete),
+                        Toast.LENGTH_SHORT
+                    )
+                }
+            }
+        }
+    }
+
+    private fun refreshDatabase() {
+        io { refreshDatabase.refreshProxyMapping() }
     }
 
     private fun clearSearch() {
-        viewModel.setFilter("")
+        viewModel.setFilter("", filterType, proxyId)
     }
 
     private fun showDialog(toAdd: Boolean) {
@@ -138,13 +282,19 @@ class WgIncludeAppsDialog(
 
     override fun onQueryTextSubmit(query: String): Boolean {
         Log.d(LOG_TAG_PROXY, "Query text submit: $query")
-        viewModel.setFilter(query)
+        searchText = query
+        viewModel.setFilter(query, filterType, proxyId)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
         Log.d(LOG_TAG_PROXY, "Query text change: $query")
-        viewModel.setFilter(query)
+        searchText = query
+        viewModel.setFilter(query, filterType, proxyId)
         return true
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (activity as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

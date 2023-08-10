@@ -23,28 +23,25 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
+import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UiUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import ipn.Ipn
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_editor) {
     private val b by viewBinding(ActivityWgConfigEditorBinding::bind)
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
 
-    private val mappingViewModel: ProxyAppsMappingViewModel by viewModel()
     private var wgConfig: Config? = null
     private var wgInterface: WgInterface? = null
     private var configId: Int = -1
@@ -72,7 +69,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     }
 
     private fun init() {
-        handleAppsCount()
+        observeDnsName()
         wgConfig = WireguardManager.getConfigById(configId)
         wgInterface = wgConfig?.getInterface()
         Log.d(LOG_TAG_PROXY, "WgTunnelEditorActivity - wgConfig : $wgConfig")
@@ -98,12 +95,9 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
     }
 
-    private fun handleAppsCount() {
-        if (configId == WireguardManager.INVALID_CONF_ID) return
-
-        val proxyId = ProxyManager.ID_WG_BASE + configId
-        mappingViewModel.getAppCountById(proxyId).observe(this) {
-            b.mapApplications.text = getString(R.string.add_remove_apps, it.toString())
+    private fun observeDnsName() {
+        appConfig.getConnectedDnsObservable().observe(this) {
+            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
         }
     }
 
@@ -115,8 +109,6 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
             b.privateKeyText.setText(privateKey.toString())
             b.publicKeyText.setText(publicKey.toString())
         }
-
-        b.mapApplications.setOnClickListener { openAppsDialog() }
 
         b.saveTunnel.setOnClickListener {
             if (addWgInterface() != null) {
@@ -177,29 +169,5 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
             Toast.makeText(this, error, Toast.LENGTH_LONG).show()
             return null
         }
-    }
-
-    private fun openAppsDialog() {
-        if (isConfigSaved()) {
-            showIncludeAppsDialog()
-        } else {
-            addWgInterface()
-        }
-    }
-
-    private fun isConfigSaved(): Boolean {
-        return wgConfig?.getName()?.isNotEmpty() == true
-    }
-
-    private fun showIncludeAppsDialog() {
-        val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        val proxyId = ProxyManager.ID_WG_BASE + configId
-        val proxyName = WireguardManager.getConfigName(configId)
-        val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
-        mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
-        val includeAppsDialog =
-            WgIncludeAppsDialog(this, appsAdapter, mappingViewModel, themeId, proxyId, proxyName)
-        includeAppsDialog.setCanceledOnTouchOutside(false)
-        includeAppsDialog.show()
     }
 }

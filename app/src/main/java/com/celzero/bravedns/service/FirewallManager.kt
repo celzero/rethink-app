@@ -249,6 +249,12 @@ object FirewallManager : KoinComponent {
         }
     }
 
+    fun getAllAppsUid(): List<AppInfoTuple> {
+        lock.read {
+            return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }
+        }
+    }
+
     fun getPackageNames(): Set<AppInfoTuple> {
         lock.read {
             return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }.toHashSet()

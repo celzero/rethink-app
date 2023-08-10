@@ -91,11 +91,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityAllNetworkSwitch.setOnCheckedChangeListener {
             _: CompoundButton,
             b: Boolean ->
-            if (b) {
-                showAllNetworksDialog()
-            } else {
-                persistentState.useMultipleNetworks = b
-            }
+            persistentState.useMultipleNetworks = b
         }
 
         b.settingsActivityAllowBypassRl.setOnClickListener {
@@ -177,27 +173,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             persistentState.defaultDnsUrl = Constants.DEFAULT_DNS_LIST[pos].url
         }
         alertBuilder.create().show()
-    }
-
-    private fun showAllNetworksDialog() {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getString(R.string.settings_all_networks_dialog_title))
-        builder.setMessage(getString(R.string.settings_all_networks_dialog_message))
-        builder.setPositiveButton(getString(R.string.settings_all_networks_dialog_positive_btn)) {
-            dialog,
-            _ ->
-            b.settingsActivityAllNetworkSwitch.isChecked = true
-            persistentState.useMultipleNetworks = true
-            dialog.dismiss()
-        }
-
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
-            b.settingsActivityAllNetworkSwitch.isChecked = false
-            persistentState.useMultipleNetworks = false
-            dialog.dismiss()
-        }
-        builder.setCancelable(false)
-        builder.create().show()
     }
 
     private fun displayInternetProtocolUi() {

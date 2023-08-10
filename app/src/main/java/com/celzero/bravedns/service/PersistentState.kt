@@ -16,6 +16,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -55,6 +56,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
         const val WIREGUARD = "wireguard_enabled_count"
+        const val WIREGUARD_UPDATED = "wireguard_updated"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -270,6 +272,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // count of wireguard enabled
     var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
 
+    // wireguard updated
+    var wireguardUpdated by booleanPref("wireguard_updated").withDefault<Boolean>(false)
+
     // previous data usage check timestamp
     var prevDataUsageCheck by longPref("prev_data_usage_check").withDefault<Long>(INIT_TIME_MS)
 
@@ -408,6 +413,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     }
 
     fun getProxyStatus(): Int {
+        Log.d(
+            "TEST",
+            "Proxy status: $proxyProvider ${proxyType}, proxy status: ${proxyStatus.value}"
+        )
         if (proxyStatus.value == null) updateProxyStatus()
         return proxyStatus.value ?: -1
     }
