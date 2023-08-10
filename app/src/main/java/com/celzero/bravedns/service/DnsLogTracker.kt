@@ -121,6 +121,7 @@ internal constructor(
         } else {
             dnsLog.typeName = typeName.desc
         }
+
         dnsLog.resolver = transaction.serverName
 
         if (transaction.status === Transaction.Status.COMPLETE) {
@@ -148,6 +149,15 @@ internal constructor(
                     // no ip address found
                     dnsLog.flag =
                         context.getString(R.string.unicode_question_sign) // white question mark
+                    // add the response if it is not empty, in case of HTTP SVCB records, the
+                    // ip address is empty but the response is not
+                    if (transaction.response.isNotEmpty()) {
+                        dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
+                    }
+                    // if the response is empty and blocklist is not empty, then mark it as blocked
+                    if (transaction.blocklist.isNotEmpty()) {
+                        dnsLog.isBlocked = true
+                    }
                 }
             } else {
                 // make sure we don't log too much data
