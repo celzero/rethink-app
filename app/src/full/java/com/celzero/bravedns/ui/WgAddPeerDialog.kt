@@ -22,14 +22,19 @@ import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WgAddPeerDialog(
-    activity: Activity,
+    private val activity: Activity,
     themeID: Int,
     private var configId: Int,
     private val wgPeer: Peer?
@@ -75,28 +80,38 @@ class WgAddPeerDialog(
 
         b.customDialogOkButton.setOnClickListener {
             val peerPublicKey = b.peerPublicKey.text.toString()
-            val presharedKey = b.peerPresharedKey.text.toString().ifEmpty { peerPublicKey }
+            val presharedKey = b.peerPresharedKey.text.toString()
             val peerEndpoint = b.peerEndpoint.text.toString()
-            val peerPersistentKeepAlive =
-                b.peerPersistentKeepAlive.text.toString().ifEmpty { "100" }
+            val peerPersistentKeepAlive = b.peerPersistentKeepAlive.text.toString()
             val allowedIps = b.peerAllowedIps.text.toString()
 
             try {
-                val wgPeer =
-                    Peer.Builder()
-                        .parseEndpoint(peerEndpoint)
-                        .parseAllowedIPs(allowedIps)
-                        .parsePersistentKeepalive(peerPersistentKeepAlive)
-                        .parsePublicKey(peerPublicKey)
-                        .parsePreSharedKey(presharedKey)
-                        .build()
-                WireguardManager.addPeer(configId, wgPeer)
-                this.dismiss()
+                val builder = Peer.Builder()
+                if (allowedIps.isNotEmpty()) builder.parseAllowedIPs(allowedIps)
+                if (peerEndpoint.isNotEmpty()) builder.parseEndpoint(peerEndpoint)
+                if (peerPersistentKeepAlive.isNotEmpty())
+                    builder.parsePersistentKeepalive(peerPersistentKeepAlive)
+                if (presharedKey.isNotEmpty()) builder.parsePreSharedKey(presharedKey)
+                if (peerPublicKey.isNotEmpty()) builder.parsePublicKey(peerPublicKey)
+                val wgPeer = builder.build()
+
+                ui {
+                    io { WireguardManager.addPeer(configId, wgPeer) }
+                    this.dismiss()
+                }
             } catch (e: Throwable) {
                 Log.e(LoggerConstants.LOG_TAG_PROXY, "Error while adding peer", e)
                 Toast.makeText(context, ErrorMessages[context, e], Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
         }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        (activity as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+    }
+
+    private suspend fun io(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) { f() }
     }
 }

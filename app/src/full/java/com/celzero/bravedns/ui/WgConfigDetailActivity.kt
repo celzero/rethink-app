@@ -89,12 +89,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, INVALID_CONF_ID)
-        setupClickListeners()
     }
 
     override fun onResume() {
         super.onResume()
         init()
+        setupClickListeners()
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -345,7 +345,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         layoutManager = LinearLayoutManager(this)
         b.peersList.layoutManager = layoutManager
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
-        wgPeersAdapter = WgPeersAdapter(this, themeId, configId, peers)
+        wgPeersAdapter = WgPeersAdapter(this, this, themeId, configId, peers)
         b.peersList.adapter = wgPeersAdapter
     }
 

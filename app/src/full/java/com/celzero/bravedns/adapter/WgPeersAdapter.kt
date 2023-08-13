@@ -20,6 +20,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgPeersBinding
@@ -27,9 +29,13 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.WgAddPeerDialog
 import com.celzero.bravedns.wireguard.Peer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WgPeersAdapter(
     val context: Context,
+    private val lifecycleOwner: LifecycleOwner,
     private val themeId: Int,
     private val configId: Int,
     private var peers: List<Peer>
@@ -111,8 +117,18 @@ class WgPeersAdapter(
     }
 
     private fun deletePeer(wgPeer: Peer) {
-        WireguardManager.deletePeer(configId, wgPeer)
-        peers = WireguardManager.getPeers(configId)
-        this.notifyDataSetChanged()
+        ui {
+            ioCtx { WireguardManager.deletePeer(configId, wgPeer) }
+            peers = WireguardManager.getPeers(configId)
+            this.notifyDataSetChanged()
+        }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) { f() }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
 }

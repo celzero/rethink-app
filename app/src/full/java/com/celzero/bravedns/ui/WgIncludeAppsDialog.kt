@@ -238,7 +238,7 @@ class WgIncludeAppsDialog(
     }
 
     private fun clearSearch() {
-        viewModel.setFilter("", filterType, proxyId)
+        viewModel.setFilter("", TopLevelFilter.ALL_APPS, proxyId)
     }
 
     private fun showDialog(toAdd: Boolean) {

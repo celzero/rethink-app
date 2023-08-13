@@ -47,14 +47,18 @@ class WgConfigAdapter(private val context: Context) :
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection.id == newConnection.id)
+                    return (oldConnection.id == newConnection.id &&
+                        oldConnection.name == newConnection.name &&
+                        oldConnection.isActive == newConnection.isActive)
                 }
 
                 override fun areContentsTheSame(
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection.id == newConnection.id)
+                    return (oldConnection.id == newConnection.id &&
+                        oldConnection.name == newConnection.name &&
+                        oldConnection.isActive == newConnection.isActive)
                 }
             }
     }
@@ -86,20 +90,36 @@ class WgConfigAdapter(private val context: Context) :
         }
 
         private fun updateStatus(wgConfigFiles: WgConfigFiles) {
+            val id = ProxyManager.ID_WG_BASE + wgConfigFiles.id
+            val apps = ProxyManager.getAppCountForProxy(id).toString()
+            val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (wgConfigFiles.isActive) {
-                val id = ProxyManager.ID_WG_BASE + wgConfigFiles.id
                 val statusId = VpnController.getProxyStatusById(id)
                 if (statusId != null) {
                     val resId = UiUtils.getProxyStatusStringRes(statusId)
                     b.interfaceStatus.text =
-                        context.getString(resId).replaceFirstChar(Char::titlecase)
+                        context.getString(
+                            R.string.about_version_install_source,
+                            context.getString(resId).replaceFirstChar(Char::titlecase),
+                            appsCount
+                        )
                 } else {
                     b.interfaceStatus.text =
-                        context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                        context.getString(
+                            R.string.about_version_install_source,
+                            context
+                                .getString(R.string.status_failing)
+                                .replaceFirstChar(Char::titlecase),
+                            appsCount
+                        )
                 }
             } else {
                 b.interfaceStatus.text =
-                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                    context.getString(
+                        R.string.about_version_install_source,
+                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase),
+                        appsCount
+                    )
             }
         }
 

@@ -139,7 +139,6 @@ object ProxyManager : KoinComponent {
                 proxyName
             )
         appConfigMappings.add(pam)
-        if (DEBUG) Log.d(LOG_TAG_PROXY, "Adding new app for mapping: ${pam.appName}, ${pam.uid}")
         io { proxyAppMappingRepository.insert(pam) }
     }
 
@@ -181,6 +180,10 @@ object ProxyManager : KoinComponent {
             proxyId.contains(ID_TCP_BASE) ||
             proxyId.contains(ID_S5_BASE) ||
             proxyId.contains(ID_HTTP_BASE)
+    }
+
+    fun getAppCountForProxy(proxyId: String): Int {
+        return appConfigMappings.count { it.proxyId == proxyId }
     }
 
     private fun io(f: suspend () -> Unit) {

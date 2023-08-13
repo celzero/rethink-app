@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -35,6 +36,9 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import ipn.Ipn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_editor) {
@@ -111,18 +115,22 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
 
         b.saveTunnel.setOnClickListener {
-            if (addWgInterface() != null) {
-                Toast.makeText(
-                        this,
-                        getString(R.string.config_add_success_toast),
-                        Toast.LENGTH_LONG
-                    )
-                    .show()
-                finish()
-            } else {
-                // no-op, addWgInterface() will show the error message
+            ui {
+                if (addWgInterface() != null) {
+                    Toast.makeText(
+                            this,
+                            getString(R.string.config_add_success_toast),
+                            Toast.LENGTH_LONG
+                        )
+                        .show()
+                    finish()
+                } else {
+                    // no-op, addWgInterface() will show the error message
+                }
             }
         }
+
+        b.dismissBtn.setOnClickListener { finish() }
 
         b.publicKeyLabelLayout.setOnClickListener {
             clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
@@ -143,14 +151,13 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
     }
 
-    private fun addWgInterface(): Config? {
+    private suspend fun addWgInterface(): Config? {
         val name = b.interfaceNameText.text.toString()
         val addresses = b.addressesLabelText.text.toString()
         val mtu = b.mtuText.text.toString().ifEmpty { DEFAULT_MTU }
         val listenPort = b.listenPortText.text.toString().ifEmpty { DEFAULT_LISTEN_PORT }
         val dnsServers = b.dnsServersText.text.toString().ifEmpty { DEFAULT_DNS_SERVER }
         val privateKey = b.privateKeyText.text.toString()
-
         try {
             // parse the wg interface to check for errors
             val wgInterface =
@@ -161,7 +168,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                     .parseDnsServers(dnsServers)
                     .parseMtu(mtu)
                     .build()
-            wgConfig = WireguardManager.addOrUpdateInterface(configId, name, wgInterface)
+            ioCtx { wgConfig = WireguardManager.addOrUpdateInterface(configId, name, wgInterface) }
             return wgConfig
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]
@@ -169,5 +176,13 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
             Toast.makeText(this, error, Toast.LENGTH_LONG).show()
             return null
         }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) { f() }
     }
 }

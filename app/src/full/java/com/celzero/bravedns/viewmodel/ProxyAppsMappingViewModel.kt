@@ -38,6 +38,8 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
     private var proxyId: String = ""
 
     init {
+        filterType = WgIncludeAppsDialog.TopLevelFilter.ALL_APPS
+        proxyId = ""
         filteredList.postValue("%%")
     }
 
