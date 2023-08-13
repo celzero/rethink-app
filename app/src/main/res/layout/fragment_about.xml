@@ -490,7 +490,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
@@ -590,7 +589,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:contentDescription="@string/about_mozilla"
-                android:src="@drawable/osom_logos_hortizonal" />
+                android:src="@drawable/osom_logos_horizontal" />
 
         </LinearLayout>
 
@@ -598,7 +597,9 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:gravity="center"
             android:text="@string/about_mozilla"
             android:textColor="?attr/primaryLightColorText"
