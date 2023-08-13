@@ -45,7 +45,6 @@ internal constructor(
 ) {
 
     companion object {
-        private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
         const val DNS_LEAK_TEST = "dnsleaktest"
 
         // Some apps like firefox, instagram do not respect ttls
@@ -60,13 +59,6 @@ internal constructor(
     private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
 
     init {
-        // init values from persistence state
-        numRequests = persistentState.numberOfRequests
-        numBlockedRequests = persistentState.numberOfBlockedRequests
-        // trigger livedata update with init'd values
-        persistentState.dnsRequestsCountLiveData.postValue(numRequests)
-        persistentState.dnsBlockedCountLiveData.postValue(numBlockedRequests)
-
         vpnStateMap[Transaction.Status.COMPLETE] = BraveVPNService.State.WORKING
         vpnStateMap[Transaction.Status.SEND_FAIL] = BraveVPNService.State.NO_INTERNET
         vpnStateMap[Transaction.Status.NO_RESPONSE] = BraveVPNService.State.DNS_SERVER_DOWN
@@ -212,29 +204,4 @@ internal constructor(
         return transaction.serverName.isEmpty()
     }
 
-    fun updateDnsRequestCount(dnsLog: DnsLog) {
-        CoroutineScope(Dispatchers.IO).launch {
-            // Post number of requests and blocked count to livedata.
-            persistentState.dnsRequestsCountLiveData.postValue(++numRequests)
-            if (dnsLog.isBlocked)
-                persistentState.dnsBlockedCountLiveData.postValue(++numBlockedRequests)
-
-            // avoid excessive disk I/O from syncing the counter to disk after every request
-            if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {
-                // Blocked request count
-                if (numBlockedRequests > persistentState.numberOfBlockedRequests) {
-                    persistentState.numberOfBlockedRequests = numBlockedRequests
-                } else {
-                    numBlockedRequests = persistentState.numberOfBlockedRequests
-                }
-
-                // Number of request count
-                if (numRequests > persistentState.numberOfRequests) {
-                    persistentState.numberOfRequests = numRequests
-                } else {
-                    numRequests = persistentState.numberOfRequests
-                }
-            }
-        }
-    }
 }

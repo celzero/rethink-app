@@ -114,7 +114,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun initializeValues() {
-        persistentState.dnsBlockedCountLiveData.postValue(persistentState.numberOfBlockedRequests)
         isVpnActivated = VpnController.state().activationRequested
 
         themeNames =
@@ -727,7 +726,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun unObserveLogsCount() {
-        persistentState.dnsRequestsCountLiveData.removeObservers(viewLifecycleOwner)
+        appConfig.dnsLogsCount.removeObservers(viewLifecycleOwner)
         appConfig.networkLogsCount.removeObservers(viewLifecycleOwner)
     }
 
