@@ -23,7 +23,13 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.celzero.bravedns.service.WireguardManager.SEC_WARP_FILE_NAME
+import com.celzero.bravedns.service.WireguardManager.SEC_WARP_NAME
+import com.celzero.bravedns.service.WireguardManager.WARP_FILE_NAME
+import com.celzero.bravedns.service.WireguardManager.WARP_NAME
 import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
+import java.io.File
 
 @Database(
     entities =
@@ -40,9 +46,12 @@ import com.celzero.bravedns.util.Constants
             RethinkRemoteFileTag::class,
             RethinkLocalFileTag::class,
             LocalBlocklistPacksMap::class,
-            RemoteBlocklistPacksMap::class
+            RemoteBlocklistPacksMap::class,
+            WgConfigFiles::class,
+            ProxyApplicationMapping::class,
+            TcpProxyEndpoint::class
         ],
-    version = 18,
+    version = 19,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -80,6 +89,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_15_16)
                 .addMigrations(MIGRATION_16_17)
                 .addMigrations(MIGRATION_17_18)
+                .addMigrations(migration1819(context))
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -678,6 +688,114 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
             }
+
+        private fun migration1819(context: Context): Migration =
+            object : Migration(18, 19) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    with(database) {
+                        execSQL("DROP TABLE IF EXISTS WgConfigFiles")
+                        execSQL("DROP TABLE IF EXISTS ProxyApplicationMapping")
+                        execSQL(
+                            "CREATE TABLE WgConfigFiles('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'configPath' TEXT NOT NULL, 'serverResponse' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'isDeletable' INTEGER NOT NULL, PRIMARY KEY (id))"
+                        )
+                        val secWarpPath =
+                            context.filesDir.absolutePath +
+                                File.separator +
+                                WIREGUARD_FOLDER_NAME +
+                                File.separator +
+                                SEC_WARP_FILE_NAME
+                        execSQL(
+                            "INSERT INTO WgConfigFiles(id, name, configPath, serverResponse, isActive, isDeletable) VALUES(0, '$SEC_WARP_NAME', '$secWarpPath', '', 0, 0)"
+                        )
+                        val path =
+                            context.filesDir.absolutePath +
+                                File.separator +
+                                WIREGUARD_FOLDER_NAME +
+                                File.separator +
+                                WARP_FILE_NAME
+                        execSQL(
+                            "INSERT INTO WgConfigFiles(id, name, configPath, serverResponse, isActive, isDeletable) VALUES(1, '$WARP_NAME', '$path', '', 0, 0)"
+                        )
+                        execSQL(
+                            "CREATE TABLE ProxyApplicationMapping('uid' INTEGER NOT NULL, 'packageName' TEXT NOT NULL, 'appName' TEXT NOT NULL, 'proxyName' TEXT NOT NULL, 'isActive' INTEGER NOT NULL, 'proxyId' TEXT NOT NULL ,PRIMARY KEY (uid, packageName, proxyId))"
+                        )
+                        execSQL(
+                            "INSERT INTO ProxyApplicationMapping SELECT uid, packageName, appName, '', 1, '' FROM AppInfo order by lower(appName)"
+                        )
+                        execSQL("DROP TABLE IF EXISTS TcpProxyEndpoint")
+                        execSQL(
+                            "CREATE TABLE TcpProxyEndpoint ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'token' TEXT NOT NULL, 'url' TEXT NOT NULL, 'paymentStatus' INTEGER NOT NULL, 'isActive' INTEGER NOT NULL, PRIMARY KEY (id))"
+                        )
+                        execSQL(
+                            "INSERT INTO TcpProxyEndpoint(id, name, token, url, paymentStatus, isActive) VALUES(0, 'Default', '', 'proxy.nile.workers.dev/ws/', 0, 0)"
+                        )
+                        execSQL(
+                            "ALTER TABLE AppInfo add column downloadBytes INTEGER DEFAULT 0 NOT NULL"
+                        )
+                        execSQL(
+                            "ALTER TABLE AppInfo add column uploadBytes INTEGER DEFAULT 0 NOT NULL"
+                        )
+                        // doh
+                        execSQL(
+                            "UPDATE DoHEndpoint set dohExplanation = 'R.string.cloudflare_dns_desc' where dohName = 'Cloudflare'"
+                        )
+                        execSQL(
+                            "UPDATE DoHEndpoint set dohExplanation = 'R.string.cloudflare_family_dns_desc' where dohName = 'Cloudflare Family'"
+                        )
+                        execSQL(
+                            "UPDATE DoHEndpoint set dohExplanation = 'R.string.cloudflare_security_dns_desc' where dohName = 'Cloudflare Security'"
+                        )
+                        execSQL(
+                            "UPDATE DoHEndpoint set dohExplanation = 'R.string.google_dns_desc' where dohName = 'Google'"
+                        )
+                        execSQL(
+                            "UPDATE DoHEndpoint set dohExplanation = 'R.string.cleanbrowsing_family_dns_desc' where dohName = 'CleanBrowsing Family'"
+                        )
+                        execSQL(
+                            "UPDATE DoHEndpoint set dohExplanation = 'R.string.cleanbrowsing_adult_dns_desc' where dohName = 'CleanBrowsing Adult'"
+                        )
+                        execSQL(
+                            "UPDATE DoHEndpoint set dohExplanation = 'R.string.quad9_dns_desc' where dohName = 'Quad9 Secure'"
+                        )
+                        // dns crypt
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint set dnsCryptExplanation = 'R.string.crypt_cleanbrowsing_family_desc' where dnsCryptName = 'Cleanbrowsing Family'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint set dnsCryptExplanation = 'R.string.crypt_adguard_desc' where dnsCryptName = 'Adguard'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint set dnsCryptExplanation = 'R.string.crypt_adguard_family_desc' where dnsCryptName = 'Adguard Family'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint set dnsCryptExplanation = 'R.string.crypt_quad9_security_desc' where dnsCryptName = 'Quad9 Security'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptEndpoint set dnsCryptExplanation = 'R.string.crypt_quad9_desc' where dnsCryptName = 'Quad9'"
+                        )
+                        // dns crypt relay
+                        execSQL(
+                            "UPDATE DNSCryptRelayEndpoint set dnsCryptRelayExplanation = 'R.string.crypt_relay_netherlands' where dnsCryptRelayName = 'Netherlands'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptRelayEndpoint set dnsCryptRelayExplanation = 'R.string.crypt_relay_france' where dnsCryptRelayName = 'France'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptRelayEndpoint set dnsCryptRelayExplanation = 'R.string.crypt_relay_sweden' where dnsCryptRelayName = 'Sweden'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptRelayEndpoint set dnsCryptRelayExplanation = 'R.string.crypt_relay_us' where dnsCryptRelayName = 'US - Los Angeles, CA'"
+                        )
+                        execSQL(
+                            "UPDATE DNSCryptRelayEndpoint set dnsCryptRelayExplanation = 'R.string.crypt_relay_singapore' where dnsCryptRelayName = 'Singapore'"
+                        )
+                        execSQL(
+                            "ALTER TABLE DoHEndpoint ADD COLUMN isSecure INTEGER NOT NULL DEFAULT 1"
+                        )
+                    }
+                }
+            }
+
     }
 
     // fixme: revisit the links to remove the pragma for each table
@@ -702,6 +820,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun localBlocklistPacksMapDao(): LocalBlocklistPacksMapDao
     abstract fun remoteBlocklistPacksMapDao(): RemoteBlocklistPacksMapDao
     abstract fun appDatabaseRawQueries(): AppDatabaseRawQueryDao
+    abstract fun wgConfigFilesDAO(): WgConfigFilesDAO
+    abstract fun wgApplicationMappingDao(): ProxyApplicationMappingDAO
+    abstract fun tcpProxyEndpointDao(): TcpProxyDAO
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
@@ -720,4 +841,7 @@ abstract class AppDatabase : RoomDatabase() {
         LocalBlocklistPacksMapRepository(localBlocklistPacksMapDao())
     fun remoteBlocklistPacksMapRepository() =
         RemoteBlocklistPacksMapRepository(remoteBlocklistPacksMapDao())
+    fun wgConfigFilesRepository() = WgConfigFilesRepository(wgConfigFilesDAO())
+    fun wgApplicationMappingRepository() = ProxyAppMappingRepository(wgApplicationMappingDao())
+    fun tcpProxyEndpointRepository() = TcpProxyRepository(tcpProxyEndpointDao())
 }
