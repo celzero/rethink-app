@@ -507,17 +507,6 @@ internal constructor(
         return proxyType.isProxyTypeWireguard() && persistentState.wireguardEnabledCount > 0
     }
 
-    fun getHttpProxyInfo(): ProxyInfo? {
-        val proxyInfo: ProxyInfo?
-        val host = persistentState.httpProxyHostAddress
-        val port = persistentState.httpProxyPort
-        if (host.isNotEmpty() && port != Constants.INVALID_PORT) {
-            proxyInfo = ProxyInfo.buildDirectProxy(host, port)
-            return proxyInfo
-        }
-        return null
-    }
-
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getSelectedProxy()
     }
@@ -1084,9 +1073,8 @@ internal constructor(
         return proxyEndpointRepository.getConnectedProxy()
     }
 
-    fun insertCustomHttpProxy(host: String, port: Int) {
+    fun insertCustomHttpProxy(host: String) {
         persistentState.httpProxyHostAddress = host
-        persistentState.httpProxyPort = port
     }
 
     suspend fun insertCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {

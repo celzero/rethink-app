@@ -352,8 +352,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityHttpProxyDesc.text =
                 getString(
                     R.string.settings_http_proxy_desc,
-                    persistentState.httpProxyHostAddress,
-                    persistentState.httpProxyPort.toString()
+                    persistentState.httpProxyHostAddress
                 )
         }
     }
@@ -693,9 +692,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun showHttpProxyDialog() {
-        var isValid: Boolean
         var host: String
-        var port = INVALID_PORT
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
 
@@ -715,36 +712,15 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         val applyURLBtn = dialogBinding.dialogHttpProxyOkBtn
         val cancelURLBtn = dialogBinding.dialogHttpProxyCancelBtn
         val hostAddressEditText = dialogBinding.dialogHttpProxyEditText
-        val portEditText = dialogBinding.dialogHttpProxyEditTextPort
         val errorTxt = dialogBinding.dialogHttpProxyFailureText
 
         val hostName = persistentState.httpProxyHostAddress
-        val portAddr = persistentState.httpProxyPort
         if (hostName.isNotBlank()) {
             hostAddressEditText.setText(hostName, TextView.BufferType.EDITABLE)
-        }
-        // TODO portAddress check for 0 is needed only for version v053f. Remove.
-        if (portAddr != INVALID_PORT || portAddr == UNSPECIFIED_PORT) {
-            portEditText.setText(portAddr.toString(), TextView.BufferType.EDITABLE)
-        } else {
-            portEditText.setText(Constants.HTTP_PROXY_PORT, TextView.BufferType.EDITABLE)
         }
         applyURLBtn.setOnClickListener {
             host = hostAddressEditText.text.toString()
             var isHostValid = true
-            try {
-                port = portEditText.text.toString().toInt()
-                isValid = Utilities.isValidLocalPort(port)
-                if (!isValid) {
-                    errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
-                    errorTxt.visibility = View.VISIBLE
-                }
-            } catch (e: NumberFormatException) {
-                Log.e(LoggerConstants.LOG_TAG_VPN, "Error: ${e.message}", e)
-                errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
-                errorTxt.visibility = View.VISIBLE
-                isValid = false
-            }
 
             if (host.isBlank()) {
                 isHostValid = false
@@ -752,11 +728,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 errorTxt.visibility = View.VISIBLE
             }
 
-            if (isValid && isHostValid) {
+            if (isHostValid) {
                 errorTxt.visibility = View.INVISIBLE
                 io {
                     appConfig.addProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
-                    appConfig.insertCustomHttpProxy(host, port)
+                    appConfig.insertCustomHttpProxy(host)
                 }
                 dialog.dismiss()
                 Toast.makeText(
@@ -767,7 +743,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     .show()
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
                     b.settingsActivityHttpProxyDesc.text =
-                        getString(R.string.settings_http_proxy_desc, host, port.toString())
+                        getString(R.string.settings_http_proxy_desc, host)
                 }
             }
         }

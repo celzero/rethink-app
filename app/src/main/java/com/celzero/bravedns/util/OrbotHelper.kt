@@ -46,12 +46,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
+import java.net.URI
 
 /**
  * One-click Orbot setup.
@@ -369,13 +370,22 @@ class OrbotHelper(
 
     private fun handleOrbotHttpUpdate(): Boolean {
         return if (httpsIp != null && httpsPort != null) {
-            persistentState.httpProxyHostAddress = httpsIp!!
-            persistentState.httpProxyPort = httpsPort!!
+            persistentState.httpProxyHostAddress = constructHttpAddress(httpsIp!!, httpsPort!!)
             true
         } else {
             Log.w(LOG_TAG_VPN, "could not setup Orbot http proxy with ${httpsIp}:${httpsPort}")
             false
         }
+    }
+
+    private fun constructHttpAddress(ip: String?, port: Int?): String {
+        val proxyUrl = StringBuilder()
+        // Orbot only supports http proxy
+        proxyUrl.append("http://")
+        proxyUrl.append(ip)
+        proxyUrl.append(":")
+        proxyUrl.append(port)
+        return URI.create(proxyUrl.toString()).toASCIIString()
     }
 
     private fun constructProxy(): ProxyEndpoint? {
