@@ -29,13 +29,13 @@ import com.google.common.cache.CacheBuilder
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.write
 
 object IpRulesManager : KoinComponent {
 
@@ -115,7 +115,7 @@ object IpRulesManager : KoinComponent {
 
         io {
             val customIp = getObj(uid, ipAddress, port)
-            customIpRepository.deleteRules(uid, ipAddress, port)
+            customIpRepository.deleteRule(uid, ipAddress, port)
 
             if (customIp == null) return@io
 
@@ -349,33 +349,7 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    private fun constructCustomIpObject(
-        uid: Int,
-        hostName: HostName,
-        status: IpRuleStatus,
-        wildcard: Boolean = false
-    ): CustomIp {
-        val customIp = CustomIp()
-        customIp.setCustomIpAddress(hostName)
-        customIp.port = hostName.port ?: Constants.UNSPECIFIED_PORT
-        customIp.protocol = ""
-        customIp.isActive = true
-        customIp.status = status.id
-        customIp.wildcard = wildcard
-        customIp.modifiedDateTime = System.currentTimeMillis()
-
-        // TODO: is this needed in database?
-        customIp.ruleType =
-            if (hostName.asAddress()?.isIPv6 == true) {
-                IPRuleType.IPV6.id
-            } else {
-                IPRuleType.IPV4.id
-            }
-        customIp.uid = uid
-        return customIp
-    }
-
-    private fun constructCustomIpObject(
+    fun constructCustomIpObject(
         uid: Int,
         ipAddress: String,
         port: Int?,
@@ -402,24 +376,11 @@ object IpRulesManager : KoinComponent {
         return customIp
     }
 
-    fun addIpRule(uid: Int, hostName: HostName, status: IpRuleStatus) {
-        io {
-            Log.i(
-                LOG_TAG_FIREWALL,
-                "IP Rules, add rule for ip: $hostName with status: ${status.name}"
-            )
-            val customIpObj = constructCustomIpObject(uid, hostName, status)
-            customIpRepository.insert(customIpObj)
-            updateLocalCache(customIpObj)
-            resultsCache.invalidateAll()
-        }
-    }
-
     fun addIpRule(uid: Int, ipAddress: String, port: Int?, status: IpRuleStatus) {
         io {
             Log.i(
                 LOG_TAG_FIREWALL,
-                "IP Rules, add rule for ip: $ipAddress with status: ${status.name}"
+                "IP Rules, add rule for ($uid) ip: $ipAddress, $port with status: ${status.name}"
             )
             val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
             customIpRepository.insert(customIpObj)
@@ -428,12 +389,19 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    fun updateIpRule(prevIp: CustomIp, hostName: HostName, status: IpRuleStatus) {
+    fun updateIpRule(prevRule: CustomIp, newRule: CustomIp) {
         io {
-            customIpRepository.deleteRules(prevIp.uid, prevIp.ipAddress, prevIp.port)
-            val customIpObj = constructCustomIpObject(prevIp.uid, hostName, status)
-            customIpRepository.insert(customIpObj)
-            updateLocalCache(customIpObj)
+            Log.i(
+                LOG_TAG_FIREWALL,
+                "IP Rules, update rule for (${prevRule.uid}) ip: ${prevRule.getCustomIpAddress().asAddress().toNormalizedString()}, ${prevRule.port} with status: ${newRule.status}"
+            )
+            customIpRepository.deleteRule(
+                prevRule.uid,
+                prevRule.getCustomIpAddress().asAddress().toNormalizedString(),
+                prevRule.port
+            )
+            customIpRepository.insert(newRule)
+            updateLocalCache(newRule)
             resultsCache.invalidateAll()
         }
     }

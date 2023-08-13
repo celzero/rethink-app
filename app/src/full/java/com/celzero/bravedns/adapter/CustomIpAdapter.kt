@@ -800,13 +800,20 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private fun updateCustomIp(
-        prevIp: CustomIp,
+        prev: CustomIp,
         hostName: HostName?,
         status: IpRulesManager.IpRuleStatus
     ) {
         if (hostName == null) return
 
-        IpRulesManager.updateIpRule(prevIp, hostName, status)
+        val new =
+            IpRulesManager.constructCustomIpObject(
+                prev.uid,
+                hostName.asAddress().toNormalizedString(),
+                hostName.port,
+                status
+            )
+        IpRulesManager.updateIpRule(prev, new)
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
