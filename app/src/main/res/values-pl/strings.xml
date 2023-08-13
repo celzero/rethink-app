@@ -160,7 +160,6 @@
     <string name="show_logs_disabled_dns_message" translatable="true">Rejestrowanie żądań DNS zostało wyłączone. Aby ponownie włączyć, przejdź do <i>Ustawień</i> i włącz <i>Włącz rejestrowanie na urządzeniu.</i></string>
     <string name="http_proxy_dialog_heading" translatable="true">Ustawianie serwera proxy HTTP (S)</string>
     <string name="download_update_dialog_title" translatable="true">Nowa aktualizacja!</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Ustawienia serwera proxy HTTP (S) są tylko wskazówką dla aplikacji, ale mogą one z niego korzystać lub nie; jednak przeglądarki takie jak Chrome i Firefox używają ich. Aplikacje korzystające z serwera proxy HTTP (S) będą pomijać firewall, jak i dns ustawienia.</string>
     <string name="download_update_dialog_trylater_message" translatable="true">Aktualizacja nie może zostać wykonana teraz, spróbuj ponownie później.</string>
     <string name="search_universal_ips" translatable="true"><font size="12"> Wyszukiwanie adresów IP</font></string>
     <string name="search_custom_domains" translatable="true"><font size="12">Wyszukaj nazwy domen</font></string>
@@ -235,7 +234,7 @@
     <string name="orbot_install_dialog_title" translatable="true">Zainstalować Orbot\?</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Powiadomienia aplikacji</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Włącz uprawnienie do pokazywania powiadomień</string>
-    <string name="settings_http_proxy_desc" translatable="true">Przekierowuję do: %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc" translatable="true">Przekierowuję do: %1$s</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Własny adres URL serwera</string>
     <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
 \n
@@ -336,7 +335,6 @@
     <string name="bsct_block_domain" translatable="true">Zablokuj, zaufaj <u>domenie</u> dla <u>tej aplikacji</u></string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Nie można skonfigurować serwerów proxy, gdy sieć VPN działa w trybie tylko DNS lub w trybie blokady. <u>Przejdź do ustawień VPN</u></string>
     <string name="settings_general_customize" translatable="true">dostosuj</string>
-    <string name="settings_http_proxy_port" translatable="true">Port</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">Ustaw proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Wybrana aplikacja zostanie wykluczona z VPN, aby umożliwić jej połączenia proxy w Twoim imieniu.</string>
     <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
@@ -674,7 +672,6 @@
     <string name="settings_http_proxy_error_text3" translatable="true">Nazwa hosta jest pusta</string>
     <string name="settings_http_proxy_error_text4" translatable="true">Połączenie z hostem nie powiodło się. Spróbuj ponownie.</string>
     <string name="settings_http_proxy_toast_success" translatable="true">Serwer proxy HTTP jest ustawiony</string>
-    <string name="settings_http_proxy_hostname" translatable="true">Nazwa hosta</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">Aplikacja</string>
     <string name="settings_app_list_default_app" translatable="true">Nikt</string>
     <string name="hsf_whats_new_chip_text" translatable="true">Co nowego\?</string>

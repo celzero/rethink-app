@@ -61,7 +61,6 @@
     <string name="show_logs_disabled_network_message">O registo de conexões foi desativado. Para voltar a ativar, vá a <i>Configurações</i> e ative a opção<i>Ativar o registro no dispositivo.</i></string>
     <string name="show_logs_disabled_dns_message">O registo de pedidos DNS foi desativado. Para voltar a ativar, vá a <i>Configurações</i> e ative a opção <i>Ativar o registro no dispositivo.</i></string>
     <string name="configure_dns_connected_doh_status">DNS sobre HTTPS</string>
-    <string name="http_proxy_dialog_desc">As configurações de proxy HTTP(S) são apenas uma dica para as aplicações, mas estas podem ou não usá-los; no entanto, os navegadores como o Chrome e o Firefox usam-nos. As aplicações que usam o proxy HTTP(S) ignorarão as regras de firewall e DNS.</string>
     <string name="download_update_dialog_failure_message">Ou nossos servidores estão inativos ou a conexão não pôde ser estabelecida. Por favor, tente novamente após algum tempo.</string>
     <string name="download_update_dialog_trylater_title">Não é possível atualizar agora</string>
     <string name="download_update_dialog_trylater_message">A atualização não pode ser executada agora, tente novamente mais tarde.</string>
@@ -84,15 +83,13 @@
     <string name="apps_info_title">Aplicações</string>
     <string name="firewall_mode_info_explanation_new">Monitorizar a atividade da rede e aplicar a firewall a qualquer aplicação ou endereço IP.</string>
     <string name="settings_theme_desc">Tema escuro/claro</string>
-    <string name="settings_http_proxy_desc">Encaminhando para %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Encaminhando para %1$s</string>
     <string name="settings_http_proxy_error_text4">Falha na conexão do host. Tente novamente.</string>
-    <string name="settings_http_proxy_port">Porta</string>
     <string name="settings_socks_forwarding_desc_no_app">Encaminhando para %1$s:%2$s</string>
     <string name="settings_dns_proxy_dialog_header">Definir proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app">Aplicação</string>
     <string name="settings_http_proxy_error_text2">Porta inválida</string>
     <string name="settings_http_proxy_toast_success">O proxy HTTP está configurado</string>
-    <string name="settings_http_proxy_hostname">Nome do host</string>
     <string name="settings_socks_forwarding_default_desc">Encaminhar conexões para o ponto terminal SOCKS5.</string>
     <string name="settings_dns_proxy_dialog_hostname">Nome do host</string>
     <string name="settings_dns_proxy_dialog_app_desc">A aplicação selecionada será excluída da VPN para que possa fazer conexões proxy por sua própria conta.</string>

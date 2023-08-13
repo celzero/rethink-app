@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_http_proxy_hostname">Имя хоста</string>
     <string name="orbot_install_dialog_neutral">сайт</string>
     <string name="allow">разрешить</string>
     <string name="about_web">ссылки</string>
@@ -8,7 +7,6 @@
     <string name="always_on_dialog_neutral">Настройки</string>
     <string name="status_protected_with_tor_private_dns">защищено с помощью tor и персонального DNS</string>
     <string name="firewall_mode_info_title">Брандмауэр</string>
-    <string name="settings_http_proxy_port">Порт</string>
     <string name="settings_socks5_dialog_hint_port">Порт</string>
     <string name="orbot">Orbot</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">частные днс включены</string>
@@ -161,7 +159,6 @@
 \nOrbot использует <u>Tor</u> для шифрования вашего интернет-трафика, что помогает вам <u>обойти цензуру</u> и защититься от форм <u>сетевого наблюдения</u>, которые угрожают личной свободе и конфиденциальности.
 \n<u>TCP Proxy</u>: Rethink перенаправляет в Orbot только TCP-соединения всех приложений, кроме исключенных.
 \n<u>HTTP-прокси</u>: Rethink <i>устанавливает</i> HTTP-прокси, но не заставляет приложения использовать его. Обычно браузеры, такие как Chrome и Firefox, используют его. Приложения, использующие HTTP(S) прокси, будут обходить правила брандмауэра и DNS.</string>
-    <string name="http_proxy_dialog_desc">Настройки HTTP(S) Прокси являются лишь подсказкой для приложений, но они могут использовать или не использовать их; однако такие браузеры, как Chrome и Firefox, используют их. Приложения, использующие HTTP(S) прокси, будут обходить правила брандмауэра и DNS.</string>
     <string name="hsf_vpn_dialog_message">Rethink требуется разрешение на настройку локальной VPN для шифрования DNS-запросов устройства, внедрение сетевого монитора и применение правил брандмауэра.
 \n
 \nRethink не собирает никакой информации и не шпионит за вами каким-либо образом.</string>
@@ -412,7 +409,7 @@
     <string name="settings_dns_proxy_dialog_header">Установка прокси-сервера SOCKS5</string>
     <string name="settings_socks5_dialog_hint_password">Пароль (необязательно)</string>
     <string name="settings_notification_desc">Кнопки действий, которые будут отображаться вместе с уведомлением Rethink: %1$s</string>
-    <string name="settings_http_proxy_desc">Переадресация на %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Переадресация на %1$s</string>
     <string name="settings_http_proxy_error_text3">Имя хоста пустое</string>
     <string name="settings_http_proxy_error_text2">Некорректный порт</string>
     <string name="settings_dns_proxy_dialog_app_desc">Выбранное приложение будет исключено из VPN, чтобы позволить ему проксировать соединения от вашего имени.</string>

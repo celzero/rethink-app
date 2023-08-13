@@ -72,7 +72,7 @@
     <string name="settings_import_export_desc">Uygulama verilerini ve ayarlarını manuel olarak yedekleyin veya geri yükleyin.</string>
     <string name="settings_theme_heading">Görünüm</string>
     <string name="settings_theme_desc">Koyu/açık tema</string>
-    <string name="settings_http_proxy_desc">%1$s adresine yönlendirme:%2$s</string>
+    <string name="settings_http_proxy_desc">%1$s adresine yönlendirme</string>
     <string name="settings_custom_downloader_desc">Devre dışı bırakılırsa, Android\'in yerleşik <i>İndirme Yöneticisi</i> kullanılır.</string>
     <string name="settings_import_export_heading">Yedekle &amp; Geri Yükle</string>
     <string name="firewall_status_blocked">kapalı</string>
@@ -249,7 +249,6 @@
     <string name="app_mode_dns_firewall">DNS ve Güvenlik Duvarı (varsayılan)</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_both">TCP + HTTP Proxy</string>
-    <string name="settings_http_proxy_hostname">Sunucu adı</string>
     <string name="settings_socks_forwarding_desc_no_app">%1$s adresine yönlendirme:%2$s</string>
     <string name="settings_selected_theme">Şu anki tema: %1$s</string>
     <string name="hsf_whats_new_chip_text">Yenilikler</string>
@@ -535,7 +534,6 @@
     <string name="dns_mode_info_explanation_new">DNS isteklerini izleyin, engelleyin ve şifreleyin.</string>
     <string name="search_dns_logs"><font size="12">Alan adlarını veya IP\'leri arama</font></string>
     <string name="settings_http_proxy_dialog_title">Özel Sunucu URL\'si</string>
-    <string name="settings_http_proxy_port">Bağlantı noktası</string>
     <string name="hsf_proxy_chip_remove_text">Durduruluyor…</string>
     <string name="hsf_pause_vpn_failure">Duraklatılamıyor: RethinkDNS etkin değil</string>
     <string name="about_docs">Dokümanları okuyun</string>
@@ -594,7 +592,6 @@
     <string name="blocklist_update_check_failure">Bir şeyler ters gitti. Daha sonra tekrar deneyin!</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt çözümleyici silindi.</string>
     <string name="local_blocklist_download_desc">Bu özelliği kullanmak için gereken engelleme listeleri (~60MB) indirilsin mi\?</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) Proxy ayarları uygulamalar için yalnızca bir ipucudur, ancak bunu kullanabilir veya kullanmayabilirler; ancak Chrome ve Firefox gibi tarayıcılar bunları kullanır. HTTP(S) proxy kullanan uygulamalar hem Güvenlik Duvarı hem de DNS kurallarını atlayacaktır.</string>
     <string name="dc_other_dns_heading">tür</string>
     <string name="settings_allow_bypass_desc">İsteyen uygulamaların RethinkDNS güvenlik duvarını isteğe bağlı olarak atlamasına izin verin. Zoom ve WhatsApp gibi bazı sesli/görüntülü konferans uygulamalarının düzgün çalışması için isteğe bağlı bir baypas gerekebilir.</string>
     <string name="download_update_dialog_message">Uygulamanın yeni sürümü web sitesinden indirilebilir. Devam etmek istiyor musunuz\?</string>

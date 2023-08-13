@@ -45,7 +45,7 @@
     <string name="settings_custom_downloader_desc">Indien uitgeschakeld, wordt Android\'s ingebouwde <i>Download Manager</i> gebruikt.</string>
     <string name="settings_app_notification_a13_desc">Meldingsrechten voor de app inschakelen</string>
     <string name="settings_http_proxy_error_text3">Hostname is leeg</string>
-    <string name="settings_http_proxy_desc">Doorsturen naar %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Doorsturen naar %1$s</string>
     <string name="settings_http_proxy_error_text1">Het poortbereik moet liggen tussen 1024-65535</string>
     <string name="settings_http_proxy_error_text4">Host verbinding is mislukt. Probeer het opnieuw.</string>
     <string name="settings_http_proxy_toast_success">HTTP proxy is ingesteld</string>
@@ -151,8 +151,6 @@
     <string name="settings_app_notification_a13_heading">App melding</string>
     <string name="settings_theme_desc">Donker/licht thema</string>
     <string name="settings_http_proxy_dialog_title">Aangepaste server-URL</string>
-    <string name="settings_http_proxy_hostname">Hostnaam</string>
-    <string name="settings_http_proxy_port">Poort</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostnaam</string>
     <string name="settings_dns_proxy_dialog_port_number">Poortnummer</string>
@@ -372,7 +370,6 @@
     <string name="show_logs_disabled_network_message">Het loggen van verbindingen is uitgeschakeld. Om dit opnieuw in te schakelen, gaat u naar <i>Instellingen</i> en schakelt u <i>Inschakelen van on-device logging in.</i></string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvers</string>
-    <string name="http_proxy_dialog_desc">HTTP(S)-proxy-instellingen zijn slechts een hint voor toepassingen, die ze al dan niet gebruiken; browsers zoals Chrome en Firefox gebruiken ze echter wel. Toepassingen die HTTP(S)-proxy gebruiken, omzeilen zowel de firewall als de DNS-regels.</string>
     <string name="download_update_dialog_trylater_title">Ik kan nu niet updaten</string>
     <string name="title_about">Over</string>
     <string name="accessibility_service_description">RethinkDNS gebruikt de toegankelijkheidsdienst om achtergrondtoepassingen te detecteren en te firewarden. RethinkDNS verzamelt of verkoopt geen informatie.</string>

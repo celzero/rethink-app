@@ -232,7 +232,6 @@
     <string name="firewall_card_status_active">%1$s aplikasi</string>
     <string name="settings_socks5_dialog_hint_ip">Alamat IP</string>
     <string name="univ_firewall_rule_1">Blokir semua aplikasi saat perangkat terkunci</string>
-    <string name="settings_http_proxy_port">Port</string>
     <string name="ada_app_exclude">Kecualikan</string>
     <string name="cd_custom_dns_proxy_name_default">Proksi</string>
     <string name="network_dns">DNS Sistem</string>
@@ -378,7 +377,6 @@
     <string name="firewall_card_text_inactive">Aktifkan mode firewall.</string>
     <string name="univ_ip_delete_dialog_positive">Hapus semua</string>
     <string name="cd_dns_proxy_mode_external">Eksternal</string>
-    <string name="settings_http_proxy_hostname">Nama host</string>
     <string name="ci_no_rule_txt">Tanpa Aturan</string>
     <string name="radio_sky_btn">⛅ Langit</string>
     <string name="dns_btm_sheet_chip">+%1$s IP Lainnya</string>
@@ -408,7 +406,7 @@
     <string name="refresh_complete">Sinkronisasi ulang daftar aplikasi selesai.</string>
     <string name="app_mode_dns_firewall">DNS dan Firewall (bawaan)</string>
     <string name="settings_socks5_vpn_disabled_error">Mulai Rethink untuk melanjutkan.</string>
-    <string name="settings_http_proxy_desc">Meneruskan ke %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Meneruskan ke %1$s</string>
     <string name="about_connect">kontak</string>
     <string name="cd_dns_proxy_mode_internal">Internal</string>
     <string name="settings_https_heading">Atur Proksi HTTP(S)</string>
@@ -706,7 +704,6 @@
     <string name="dns_proxy_connection_failure_lockdown">Mengecualikan %1$s dalam mode terkunci penuh untuk %2$s dapat menyebabkan jaringan.</string>
     <string name="about_bug_no_log_dialog_title">Laporan bug</string>
     <string name="about_bravedns_whoarewe">Rethink adalah proyek sumber terbuka dan gratis, dipimpin oleh mantan insinyur dari Amazon, IBM, dan Permainan Ilmiah.</string>
-    <string name="http_proxy_dialog_desc">Pengaturan Proksi HTTP(S) hanya merupakan petunjuk bagi aplikasi, tetapi aplikasi tersebut mungkin atau mungkin tidak menggunakannya; namun, browser seperti Chrome dan Firefox menggunakannya. Aplikasi yang menggunakan proksi HTTP(S) akan memintas aturan Firewall dan DNS.</string>
     <string name="fapps_firewall_filter_hint">Menampilkan semua aplikasi</string>
     <string name="accessibility_notification_content">layanan aksesibilitas Rethink telah berhenti atau macet. Tidak lagi memblokir aplikasi latar belakang. Ketuk untuk mengaktifkan kembali.</string>
     <string name="firewall_rule_block_dns_bypass_desc">Sambungan ini diblokir dikarenakan <i>sumber aplikasi</i> tersebut telah memintaskan DNS pilihan pengguna.<br/><br/> Untuk mengubah setingan ini, buka tab <i>Universal</i>.</string>

@@ -93,7 +93,6 @@
     <string name="dns_act_configure_tab" translatable="true">कॉन्फ़िगर</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">सहेजे गए कॉन्फ़िगरेशन से डीएनएस प्रॉक्सी हटाएं।</string>
     <string name="show_logs_disabled_dns_message" translatable="true">डीएनएस अनुरोध लॉगिंग अक्षम कर दी गई है। पुनः सक्षम करने के लिए, <i>सेटिंग्स</i> पर जाएं और चालू करें <i>ऑन-डिवाइस लॉगिंग।</i></string>
-    <string name="http_proxy_dialog_desc" translatable="true">एचटीटीपी(एस) प्रॉक्सी सेटिंग्स केवल ऐप्स के लिए एक संकेत हैं लेकिन वे इसका उपयोग कर सकते हैं या नहीं भी कर सकते हैं; हालाँकि, क्रोम और फ़ायरफ़ॉक्स जैसे ब्राउज़र इनका उपयोग करते हैं। एचटीटीपी(एस) प्रॉक्सी का उपयोग करने वाले ऐप्स फ़ायरवॉल और डीएनएस नियमों को दरकिनार कर देंगे।</string>
     <string name="download_update_dialog_trylater_title" translatable="true">अभी अपडेट नहीं हो सकता</string>
     <string name="lbl_allowed" translatable="true">अनुमति प्राप्त</string>
     <string name="status_protected_with_http_private_dns" translatable="true">एचटीटीपी प्रॉक्सी और निजी डीएनएस के साथ सुरक्षित</string>
@@ -194,7 +193,6 @@
     <string name="settings_http_proxy_dialog_title" translatable="true">कस्टम सर्वर यूआरएल</string>
     <string name="settings_http_proxy_error_text4" translatable="true">होस्ट कनेक्शन विफल रहा। पुनः प्रयास करें।</string>
     <string name="settings_http_proxy_toast_success" translatable="true">एचटीटीपी प्रॉक्सी सेट है</string>
-    <string name="settings_http_proxy_port" translatable="true">पोर्ट</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">पासवर्ड</string>
     <string name="settings_app_list_default_app" translatable="true">कोई नहीं</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="true">चयनित ऐप को आपकी ओर से प्रॉक्सी कनेक्शन देने के लिए वीपीएन से बाहर रखा जाएगा।</string>
@@ -368,7 +366,6 @@
     <string name="settings_http_proxy_error_text1" translatable="true">पोर्ट रेंज 1024-65535 में होनी चाहिए</string>
     <string name="settings_http_proxy_error_text2" translatable="true">अमान्य पोर्ट</string>
     <string name="settings_http_proxy_error_text3" translatable="true">होस्टनाम खाली है</string>
-    <string name="settings_http_proxy_hostname" translatable="true">होस्टनाम</string>
     <string name="firewall_status_block_unmetered" translatable="true">बिना मीटर वाले (वाईफ़ाई) नेटवर्क पर ब्लॉक किया गया</string>
     <string name="lbl_proceed" translatable="true">आगे बढ़ें</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">या तो वीपीएन अनुमति गायब है, या कोई अन्य ऐप हमेशा-ऑन वीपीएन मोड में है।</string>
@@ -611,7 +608,7 @@
     <string name="hsf_whats_new_chip_text" translatable="true">क्या नया है</string>
     <string name="hsf_proxy_chip_text" translatable="true">प्रॉक्सी सक्रिय</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">बंद किया जा रहा है…</string>
-    <string name="settings_http_proxy_desc" translatable="true">%1$s को फोरवर्ड करना: %2$s</string>
+    <string name="settings_http_proxy_desc" translatable="true">%1$s को फोरवर्ड करना</string>
     <string name="hsf_pause_lockdown_failure" translatable="true">रुक नहीं सकता: रीथिंक लॉकडाउन मोड में है</string>
     <string name="dc_block_heading" translatable="true">नियम</string>
     <string name="dc_other_dns_heading" translatable="true">प्रकार</string>

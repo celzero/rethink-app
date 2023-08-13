@@ -28,7 +28,6 @@
     <string name="dns_firewall_mode_info_explanation_new">Omgå Internett-sensur også</string>
     <string name="accessibility_service_description">Rethink bruker tilgjengelighetstjenesten for å oppdage og legge til brannmur for bakgrunnsprogrammer. Rethink hverken samler inn eller selger info.</string>
     <string name="always_on_dialog_neutral">Innstillinger</string>
-    <string name="settings_http_proxy_hostname">Vertsnavn</string>
     <string name="orbot_status_arg_3">DNS og TCP</string>
     <string name="about_title_desc">Oppdag og blokker nettverkssikkerhetstrusler</string>
     <string name="slide_2_desc">Rethink lar deg holde øye med din nettverksaktivitet, omgå sensur på Internett, og legge til brannmur for programmer.</string>
@@ -93,12 +92,11 @@
     <string name="settings_general_header">Generelt</string>
     <string name="settings_theme_heading">Utseende</string>
     <string name="settings_theme_desc">Mørk/lys drakt</string>
-    <string name="settings_http_proxy_desc">Videresender til %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Videresender til %1$s</string>
     <string name="settings_http_proxy_dialog_title">Egendefinert tjener-nettadresse</string>
     <string name="settings_http_proxy_error_text2">Ugyldig port</string>
     <string name="settings_http_proxy_error_text3">Vertsnavnet er tomt</string>
     <string name="settings_http_proxy_toast_success">HTTP-mellomtjener satt</string>
-    <string name="settings_http_proxy_port">Port</string>
     <string name="settings_dns_proxy_dialog_header">Sett SOCKS5 (TCP)-mellomtjener</string>
     <string name="settings_dns_proxy_dialog_app">Program</string>
     <string name="settings_dns_proxy_dialog_hostname">Vertsnavn</string>

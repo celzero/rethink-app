@@ -59,7 +59,6 @@
     <string name="blocklist_update_check_not_required">ব্লকলিস্টগুলি ইতিমধ্যেই সর্বশেষ সংস্করণে রয়েছে৷</string>
     <string name="search_custom_domains"><font size="12">ডোমেন নাম অনুসন্ধান করুন</font></string>
     <string name="settings_http_proxy_error_text4">হোস্ট সংযোগ ব্যর্থ হয়েছে. আবার চেষ্টা করুন.</string>
-    <string name="settings_http_proxy_port">Port</string>
     <string name="settings_dns_proxy_dialog_header">SOCKS5 (TCP) প্রক্সি সেট করুন</string>
     <string name="settings_socks5_dialog_hint_port">Port</string>
     <string name="firewall_status_excluded">dns এবং ফায়ারওয়াল থেকে বাদ</string>
@@ -103,7 +102,7 @@
     <string name="info_dialog_rethink_toast_msg">RDNS+ DNS-over-HTTPS URL হিসেবে কপি করা হয়েছে</string>
     <string name="settings_orbot_disabled_error">Tor-as-a-proxy সেটআপ চালিয়ে যেতে HTTP(S) এবং/অথবা SOCKS5 প্রক্সি বন্ধ করুন।</string>
     <string name="settings_general_header">সাধারণ</string>
-    <string name="settings_http_proxy_desc">ফরোয়ার্ড করা হচ্ছে %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">ফরোয়ার্ড করা হচ্ছে %1$s</string>
     <string name="settings_http_proxy_error_text1">পোর্ট পরিসীমা 1024-65535 থেকে হওয়া উচিত</string>
     <string name="settings_socks_forwarding_desc">ফরওয়ার্ড করা হচ্ছে %1$s:%2$s, %3$s</string>
     <string name="settings_theme_dialog_themes_1">সিস্টেম দ্বারা সেট</string>
@@ -186,7 +185,6 @@
     <string name="orbot_status_arg_2">TCP</string>
     <string name="settings_orbot_desc">HTTPS/SOCKS5 সহ অ-ভিপিএন মোডে অরবট।</string>
     <string name="settings_import_export_heading">ব্যাকআপ এবং পুনরুদ্ধার করুন</string>
-    <string name="settings_http_proxy_hostname">হোস্ট নাম</string>
     <string name="settings_app_list_default_app">কেউ না</string>
     <string name="settings_theme_dialog_themes_2">হালকা</string>
     <string name="firewall_card_status_active">%1$s অ্যাপ</string>
@@ -397,7 +395,6 @@
 \nRethinkDNS অ্যাক্সেসিবিলিটি পরিষেবা ব্যবহার করে কোন অ্যাপগুলি ব্যবহার করা হচ্ছে (ফোরগ্রাউন্ড) বনাম যেগুলি ব্যবহারে নেই (পটভূমিতে) তা ট্র্যাক করতে।</string>
     <string name="alert_firewall_accessibility_exception">অ্যাক্সেসিবিলিটি সেটিংস খোলার ব্যর্থতা৷ পরে আবার চেষ্টা করুন!</string>
     <string name="conn_track_clear_logs_title">সমস্ত নেটওয়ার্ক লগ মুছবেন\?</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) প্রক্সি সেটিংস শুধুমাত্র অ্যাপ্লিকেশনগুলির জন্য একটি ইঙ্গিত কিন্তু তারা এটি ব্যবহার করতে পারে বা নাও করতে পারে; যাইহোক, ক্রোম এবং ফায়ারফক্সের মত ব্রাউজার এগুলো ব্যবহার করে। HTTP(S) প্রক্সি ব্যবহার করা অ্যাপগুলি ফায়ারওয়াল এবং DNS উভয় নিয়মকে বাইপাস করবে।</string>
     <string name="bsct_conn_desc_blocked">%1$s %2$s এ অবরুদ্ধ</string>
     <string name="always_on_dialog">এই ডিভাইসে \"সর্বদা-চালু VPN\" সক্ষম করা আছে৷ পুনর্বিবেচনা শুরু করতে, অনুগ্রহ করে সেটিংস অ্যাপে যান এবং \"সর্বদা-চালু VPN\" অক্ষম করুন।</string>
     <string name="always_on_dialog_stop_message">পুনর্বিবেচনার জন্য সর্বদা-চালু VPN সক্ষম করা আছে৷ আপনি কি নিশ্চিত যে আপনি যাইহোক পুনর্বিবেচনা বন্ধ করতে চান\?</string>

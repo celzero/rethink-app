@@ -172,7 +172,6 @@
     <string name="configure_dns_connection_name">連線咗去 %1$s</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s 個解析服務</string>
     <string name="http_proxy_dialog_heading">設定 HTTP(S) 代理</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) 代理設定只係對應用程式嘅一個提醒，佢地依然係有得揀用定唔用呢個代理；但係例如 Chrome 同 Firefox 之類嘅瀏覽器就會去用個代理。用咗 HTTP(S) 代理嘅 app 會同時繞過防火牆同埋 DNS 規則。</string>
     <string name="download_update_dialog_title">有得更新！</string>
     <string name="download_update_dialog_message">已經有新版本可以喺網站度下載。您係咪想繼續？</string>
     <string name="download_update_dialog_message_ok_title">已經係最新！</string>
@@ -242,15 +241,13 @@
     <string name="settings_custom_downloader_heading">用 app 入面嘅下載器</string>
     <string name="settings_theme_heading">外觀</string>
     <string name="settings_theme_desc">暗色／亮色主題</string>
-    <string name="settings_http_proxy_desc">轉發緊去 %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">轉發緊去 %1$s</string>
     <string name="settings_http_proxy_dialog_title">自訂伺服器 URL</string>
     <string name="settings_http_proxy_error_text1">埠範圍喺 1024 到 65535 之間</string>
     <string name="settings_http_proxy_error_text2">冇效嘅埠</string>
     <string name="settings_http_proxy_error_text3">網域係空</string>
     <string name="settings_http_proxy_error_text4">伺服器連線失敗。請再嚟過。</string>
     <string name="settings_http_proxy_toast_success">HTTP 代理設定咗</string>
-    <string name="settings_http_proxy_hostname">網域</string>
-    <string name="settings_http_proxy_port">埠</string>
     <string name="settings_dns_proxy_dialog_app">應用程式</string>
     <string name="settings_dns_proxy_dialog_hostname">網域</string>
     <string name="settings_dns_proxy_dialog_port_number">埠</string>

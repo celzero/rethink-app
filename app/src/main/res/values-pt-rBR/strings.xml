@@ -190,7 +190,6 @@
     <string name="show_logs_disabled_dns_message">Registro de solicitações do DNS foi desativado. Para reativar, vá para <i>Configurações</i> e toque no <i>Ativar registros no dispositivo.</i></string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvedores</string>
     <string name="bsct_conn_desc_allowed">permitido em %1$s %2$s</string>
-    <string name="http_proxy_dialog_desc">As configurações de proxy HTTP(S) dão apenas uma dica para os apps, mas podem ou não ser usadas; no entanto, navegadores como Chrome e Firefox as usam. Os aplicativos que usam o proxy HTTP(S) contornarão as regras do Firewall e do DNS.</string>
     <string name="download_update_dialog_trylater_title">Não é possível atualizar agora</string>
     <string name="search_universal_ips"><font size="12">Buscar IPs</font></string>
     <string name="search_custom_domains"><font size="12">Buscar nomes de domínio</font></string>
@@ -401,14 +400,12 @@
     <string name="settings_custom_downloader_desc">Se desativado, será usado <i>Gerenciador de downloads</i> integrado no Android.</string>
     <string name="settings_import_export_heading">Backup e restauração</string>
     <string name="settings_import_export_desc">Faça backup ou restaure os dados e configurações da aplicação.</string>
-    <string name="settings_http_proxy_desc">Encaminhando para %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Encaminhando para %1$s</string>
     <string name="settings_http_proxy_dialog_title">URL personalizada de servidor</string>
     <string name="settings_http_proxy_error_text1">A faixa de portas deve ser entre 1024-65535</string>
     <string name="settings_http_proxy_error_text2">Porta inválida</string>
     <string name="settings_http_proxy_error_text3">O nome do host está vazio</string>
     <string name="settings_http_proxy_toast_success">Proxy de HTTP está definido</string>
-    <string name="settings_http_proxy_hostname">Nome do host</string>
-    <string name="settings_http_proxy_port">Porta</string>
     <string name="settings_dns_proxy_dialog_header">Definir proxy SOCKS5 (TCP)</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Nome do host</string>

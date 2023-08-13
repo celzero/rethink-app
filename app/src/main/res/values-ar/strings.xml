@@ -146,7 +146,6 @@
     <string name="orbot_none">لا شيء (افتراضي)</string>
     <string name="orbot_title">Orbot و Proxies</string>
     <string name="settings_network_all_networks">استخدم جميع الشبكات المتاحة (تجريبي)</string>
-    <string name="settings_http_proxy_port">المنفذ</string>
     <string name="settings_dns_proxy_dialog_username">اسم المستخدم</string>
     <string name="settings_ip_dialog_ipv46">تلقائي (تجريبي)</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
@@ -234,7 +233,7 @@
     <string name="download_update_dialog_title">تحديث جديد!</string>
     <string name="settings_proxy_header">وكيل (بروكسي)</string>
     <string name="settings_https_disabled_error">متصل بـ %1$s. قم بإيقاف تشغيله للمتابعة.</string>
-    <string name="settings_http_proxy_desc">إعادة توجيه إلى %1$s: %2$s</string>
+    <string name="settings_http_proxy_desc">إعادة توجيه إلى %1$s</string>
     <string name="settings_socks5_dialog_hint_ip">عنوان الإنترنت (IP address)</string>
     <string name="about_mail_bugreport_share_title">حدد مزود البريد الإلكتروني</string>
     <string name="cd_dns_crypt_name_default">DNSCrypt</string>
@@ -413,7 +412,6 @@
     <string name="orbot_install_dialog_neutral">موقع الكتروني</string>
     <string name="settings_orbot_header">أوربوت ❯</string>
     <string name="settings_network_all_networks_desc">عند التمكين ، تستخدم RethinkDNS جميع الشبكات المتاحة للاتصال بالإنترنت. إذا لم يكن كذلك ، فإنه يستخدم أي شبكة يعتبرها <i> نشطة </i> بواسطة Android.</string>
-    <string name="settings_http_proxy_hostname">إسم المضيف</string>
     <string name="settings_dns_proxy_dialog_hostname">إسم المضيف</string>
     <string name="firewall_card_text_inactive">تفعيل وضع جدار الحماية.</string>
     <string name="hsf_uptime">(نشط منذ %1$s ؛ البروتوس: %2$s)</string>
@@ -521,7 +519,6 @@
     <string name="firewall_mode_info_explanation_new">راقب نشاط الشبكة وجدار الحماية أي تطبيق أو عنوان IP.</string>
     <string name="always_on_dialog_heading">تعطيل Always-on VPN</string>
     <string name="dns_proxy_remove_dialog_message">احذف وكيل DNS من التكوين المحفوظ.</string>
-    <string name="http_proxy_dialog_desc">إعدادات HTTP(S) بروكسي هي مجرد تلميح للتطبيقات لكن التطبيقات ربما تستخدمها وربما لا تستخدمها، ومع ذلك، المتصفحات مثل الكروم والفايرفوكس تستخدمها. التطبيقات التي تستخدم HTTP(S) بروكسي سوف تتجاوز كل من جدار الحماية وقواعد نظام أسماء النطاقات.</string>
     <string name="info_dialog_copy_toast_msg">تم نسخ عنوان IP.</string>
     <string name="orbot_socks5">وكيل TCP فقط</string>
     <string name="orbot_http_desc">يوصي بأن تستخدم التطبيقات وكيل HTTP الخاص بـ Orbot.</string>

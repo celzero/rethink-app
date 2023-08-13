@@ -40,7 +40,6 @@
     <string name="settings_ip_network_desc">在不同互联网协议版本中选择。</string>
     <string name="orbot_title">Orbot 与代理</string>
     <string name="settings_http_proxy_error_text1">端口范围在 1024 与 65535 间</string>
-    <string name="settings_http_proxy_hostname">域名</string>
     <string name="settings_socks_forwarding_desc">正转发至 %1$s:%2$s ， %3$s</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="hsf_downtime">（自%1$s起停用）</string>
@@ -270,7 +269,7 @@
     <string name="settings_lock_down_mode_desc">某些选项在 VPN 处于闭关模式时不可用。<u>请移步 VPN 设置</u>。</string>
     <string name="orbot_status_arg_3">DNS 与 TCP</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
-    <string name="settings_http_proxy_desc">正转发至 %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">正转发至 %1$s</string>
     <string name="settings_theme_dialog_title">外观</string>
     <string name="settings_notification_dialog_title">选择通知操作</string>
     <string name="hsf_pause_vpn_failure">无法暂停： Rethink 未启用</string>
@@ -484,7 +483,6 @@
     <string name="orbot_install_dialog_title">是否安装 Orbot ？</string>
     <string name="settings_socks5_vpn_disabled_error">启动 Rethink 以继续。</string>
     <string name="settings_autostart_bootup_heading">设备启动时自启（实验性）</string>
-    <string name="settings_http_proxy_port">端口</string>
     <string name="settings_notification_dialog_option_1">"
 \n暂停 / 停止（默认）：
 \n显示两个按钮来快速暂停与停止 Rethink 。"</string>
@@ -646,7 +644,6 @@
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
     <string name="about_mozilla">Rethink 为 Mozilla Builders MVP 计划的一部分。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) 代理</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) 代理设置仅为对应用程序的一个提醒，它们可选择是否使用代理；但如 Chrome 及 Firefox 等的浏览器则会使用代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
     <string name="whats_new_version_update">&lt;b&gt;本地派对！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：排除私有 IP （局域网 / 本地链路）。&lt;br/&gt; 2. 修复「绕行 DNS 与防火墙」设置。&lt;br/&gt; 3. 在 DNS 日志内为可能已被防火墙拦截的域名显示“或已拦截”。&lt;br/&gt; 4. 于支持处显示自适应图标。&lt;br/&gt; 5. 每一刻钟提示生物认证。&lt;br/&gt; 6. 其他六项 UI 与性能优化。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译此应用&lt;/a&gt;</string>
     <string name="about_website">访问 rethinkdns.com</string>

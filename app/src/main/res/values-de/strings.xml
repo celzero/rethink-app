@@ -124,7 +124,6 @@
     <string name="local_blocklist_redownload_desc">Die geräteinternen Blocklisten sind bereits auf dem neuesten Stand (%1$s).</string>
     <string name="show_logs_disabled_network_message">Die Verbindungsprotokollierung wurde deaktiviert. Um sie wieder zu aktivieren, gehen Sie zu <i>Einstellungen</i> und aktivieren Sie <i>Protokollierung auf dem Gerät aktivieren.</i></string>
     <string name="show_logs_disabled_dns_message">Die Protokollierung von DNS-Anfragen wurde deaktiviert. Um sie wieder zu aktivieren, gehen Sie zu <i>Einstellungen</i> und aktivieren Sie <i>Aktivierung der geräteinterne Protokollierung.</i></string>
-    <string name="http_proxy_dialog_desc">Die HTTP(S)-Proxy-Einstellungen sind nur Hinweise für Anwendungen. Diese können sie verwenden oder auch nicht. Browser wie Chrome und Firefox verwenden sie jedoch. Anwendungen, die HTTP(S)-Proxy verwenden, umgehen sowohl die Firewall als auch die DNS-Regeln.</string>
     <string name="download_update_dialog_message_success">Download der Blockliste erfolgreich.</string>
     <string name="info_dialog_url_copy_toast_msg">URL kopiert</string>
     <string name="info_dialog_rethink_toast_msg">Kopiert als RDNS+ DNS-über-HTTPS URL</string>
@@ -234,9 +233,8 @@
     <string name="settings_app_notification_a13_heading">App-Benachrichtigung</string>
     <string name="settings_theme_heading">Erscheinungsbild</string>
     <string name="settings_theme_desc">Thema dunkel/hell</string>
-    <string name="settings_http_proxy_desc">Weiterleitung an %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Weiterleitung an %1$s</string>
     <string name="settings_http_proxy_toast_success">HTTP-Proxy ist eingestellt</string>
-    <string name="settings_http_proxy_hostname">Hostname</string>
     <string name="settings_dns_proxy_dialog_header">SOCKS5 (TCP) Proxy einstellen</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostname</string>
     <string name="settings_dns_proxy_dialog_port_number">Port-Nummer</string>
@@ -281,7 +279,6 @@
     <string name="settings_http_proxy_error_text4">Verbindung mit dem Host fehlgeschlagen. Versuchen Sie es erneut.</string>
     <string name="settings_ip_dialog_ipv46">Auto (experimentell)
 \nVerbindungsüberprüfungen werden gesendet, um die Verfügbarkeit sicher zu stellen.</string>
-    <string name="settings_http_proxy_port">Port</string>
     <string name="settings_socks5_dialog_hint_password">Passwort (optional)</string>
     <string name="settings_dns_proxy_dialog_app_desc">Die gewählte Anwendung wird vom VPN ausgeschlossen, damit es in Ihrem Namen Verbindungen projizieren kann.</string>
     <string name="settings_ip_dialog_ipv6">IPv6 (experimentell)</string>

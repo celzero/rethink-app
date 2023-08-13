@@ -88,7 +88,6 @@
     <string name="show_logs_disabled_dns_message">DNS 請求日誌已被禁用。若您想要重新啓用，請至<i>設定</i>並打開<i>啓用本地日誌</i>。</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s 解析服務</string>
     <string name="http_proxy_dialog_heading">設定 HTTP(S) 代理</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) 代理設定僅爲對應用程式的一個提醒，它們可選擇是否使用代理；但如 Chrome 及 Firefox 等的瀏覽器則會使用代理。使用 HTTP(S) 代理的應用會同時繞過防火牆及 DNS 規則。</string>
     <string name="download_update_dialog_title">更新可用！</string>
     <string name="download_update_dialog_message">已有新版本可於網站下載。您是否想要繼續？</string>
     <string name="download_update_dialog_message_ok_title">已爲最新！</string>
@@ -360,7 +359,6 @@
     <string name="rt_download">下載攔截清單</string>
     <string name="lbbs_download">更新攔截清單</string>
     <string name="brbs_backup_title">備份</string>
-    <string name="settings_http_proxy_hostname">網域</string>
     <string name="ci_blocked_initial">攔</string>
     <string name="ada_app_unmetered">非計費網路</string>
     <string name="ada_app_exclude">排除</string>
@@ -401,12 +399,11 @@
     <string name="settings_import_export_desc">手動備份或恢復應用資料與設定。</string>
     <string name="settings_theme_heading">外觀</string>
     <string name="settings_theme_desc">暗色/亮色主題</string>
-    <string name="settings_http_proxy_desc">正轉送至 %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">正轉送至 %1$s</string>
     <string name="settings_http_proxy_error_text1">埠範圍在 1024 與 65535 間</string>
     <string name="settings_http_proxy_error_text3">網域爲空</string>
     <string name="settings_http_proxy_error_text4">伺服器連線失敗。請重試。</string>
     <string name="settings_http_proxy_toast_success">HTTP 代理已設定</string>
-    <string name="settings_http_proxy_port">埠</string>
     <string name="settings_dns_proxy_dialog_header">設定 SOCKS5 代理</string>
     <string name="settings_dns_proxy_dialog_app">應用</string>
     <string name="settings_dns_proxy_dialog_hostname">網域</string>

@@ -67,7 +67,6 @@
     <string name="bsct_block" translatable="true">Блокувати, обходити, виключати, ізолювати <u>цей застосунок</u></string>
     <string name="univ_firewall_dialog_message" translatable="true">Видалення цього правила дозволить будь-якому застосунку підключатися до цієї IP-адреси. Ви бажаєте продовжити\?</string>
     <string name="refresh_complete" translatable="true">Повторну синхронізацію списку застосунків завершено.</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Налаштування проксі-сервера HTTP(S) є лише підказкою для застосунку, але вони можуть або не можуть використовувати його; однак такі браузери, як Chrome і Firefox, використовують їх. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
     <string name="search_firewall_network_log" translatable="true"><font size="12">Пошук застосунків, IP-адрес, доменів</font></string>
     <string name="app_mode_dns_firewall" translatable="true">DNS та Брандмауер (за замовчуванням)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>

@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="http_proxy_dialog_desc">La configuración del proxy HTTP(S) es sólo una sugerencia para las aplicaciones, pero éstas pueden utilizarlo o no; sin embargo, navegadores como Chrome y Firefox sí los utilizan. Las aplicaciones que utilizan el proxy HTTP(S) omitirán las reglas del Cortafuegos y del DNS.</string>
     <string name="fapps_unmetered_block_dialog_message">¿Bloquear las conexiones en la red sin límites (WiFi) para las aplicaciones en la <i>lista</i>\?</string>
     <string name="unicode_question_sign">❔</string>
     <string name="network_log_app_name_unnamed">Sin nombre (%1$s)</string>
@@ -67,13 +66,11 @@
     <string name="connection_http3">HTTP3</string>
     <string name="relative_time_today">Hoy</string>
     <string name="relative_time_yesterday">Ayer</string>
-    <string name="settings_http_proxy_desc">Reenviando a %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Reenviando a %1$s</string>
     <string name="settings_http_proxy_dialog_title">URL personalizada del servidor</string>
     <string name="settings_http_proxy_error_text1">El rango de puertos debe ser desde 1024 a 65535</string>
     <string name="settings_http_proxy_error_text2">Puerto no válido</string>
     <string name="settings_http_proxy_toast_success">El proxy HTTP está configurado</string>
-    <string name="settings_http_proxy_hostname">Nombre de servidor</string>
-    <string name="settings_http_proxy_port">Puerto</string>
     <string name="settings_dns_proxy_dialog_header">Configurar el proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_hostname">Nombre de servidor</string>
     <string name="settings_dns_proxy_dialog_port_number">Número de puerto</string>

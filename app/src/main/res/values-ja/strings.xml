@@ -167,8 +167,6 @@
     <string name="settings_http_proxy_error_text2" translatable="true">無効なポート</string>
     <string name="settings_http_proxy_error_text3" translatable="true">ホスト名が空です</string>
     <string name="settings_http_proxy_error_text4" translatable="true">ホスト接続に失敗しました。もう一度やり直してください。</string>
-    <string name="settings_http_proxy_hostname" translatable="true">ホスト名</string>
-    <string name="settings_http_proxy_port" translatable="true">ポート</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">SOCKS5 プロキシの設定</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">アプリ</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">ホスト名</string>
@@ -351,7 +349,6 @@
     <string name="download_update_dialog_trylater_message" translatable="true">現在、更新を実行できません。しばらくしてからもう一度お試しください。</string>
     <string name="http_proxy_dialog_heading" translatable="true">HTTP(S)プロキシを設定する</string>
     <string name="download_update_dialog_trylater_title" translatable="true">現在更新できません</string>
-    <string name="http_proxy_dialog_desc" translatable="true">HTTP(S)プロキシの設定は、アプリケーションにとってヒントでしかありませんが、アプリケーションはこれを使用するかどうかわかりません。しかし、ChromeやFirefoxなどのブラウザはこれを使用します。HTTP(S)プロキシを使用するアプリケーションは、ファイアウォールとDNSの両方のルールを回避することができます。</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">IPアドレスがコピーされました。</string>
     <string name="app_mode_dns_low_battery" translatable="true">DNS (バッテリー セーバー)</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL がコピーされました</string>
@@ -490,7 +487,7 @@
     <string name="orbot_stop_dialog_message" translatable="true">RethinkDNSはOrbotへの接続転送を停止していますが、Orbotはバックグラウンドで動作している可能性があります。</string>
     <string name="settings_https_disabled_error" translatable="true">%1$sに接続されています。続行するにはOFFにしてください。</string>
     <string name="settings_orbot_notification_content" translatable="true">Tor-as-a-Proxy の起動失敗。 Orbotアプリを開き、手動で起動します。</string>
-    <string name="settings_http_proxy_desc" translatable="true">%1$s に転送する :%2$s</string>
+    <string name="settings_http_proxy_desc" translatable="true">%1$s に転送する</string>
     <string name="firewall_status_block_unmetered" translatable="true">定額制 (wifi) ネットワークでブロック</string>
     <string name="hsf_start_dialog_positive" translatable="true">開始</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+を有効にする</string>

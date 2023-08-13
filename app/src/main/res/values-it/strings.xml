@@ -101,7 +101,6 @@
     <string name="configure_dns_connection_name">Connesso a %1$s</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolver</string>
     <string name="http_proxy_dialog_heading">Imposta Proxy HTTP(S)</string>
-    <string name="http_proxy_dialog_desc">Le impostazioni del proxy HTTP(S) sono solo un suggerimento per le applicazioni, le quali possono utilizzarlo o meno; browsers come Chrome e Firefox, ad esempio, le utilizzano. Le applicazioni che utilizzano il proxy HTTP(S) aggirano sia le regole del Firewall che del DNS.</string>
     <string name="download_update_dialog_title">Nuovo aggiornamento!</string>
     <string name="download_update_dialog_message">Una nuova versione dell\'app può essere scaricata dal sito web. Vuoi procedere\?</string>
     <string name="download_update_dialog_message_ok_title">Aggiornato!</string>
@@ -198,7 +197,7 @@
     <string name="settings_import_export_heading">Backup e ripristino</string>
     <string name="settings_import_export_desc">Esegui manualmente il backup o il ripristino dei dati e delle impostazioni dell\'app.</string>
     <string name="settings_theme_heading">Aspetto</string>
-    <string name="settings_http_proxy_desc">Inoltro a %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Inoltro a %1$s</string>
     <string name="settings_theme_desc">Tema scuro/chiaro</string>
     <string name="settings_http_proxy_dialog_title">URL Server personalizzato</string>
     <string name="settings_http_proxy_error_text1">L\'intervallo delle porte deve essere fra 1024–65535</string>
@@ -206,7 +205,6 @@
     <string name="settings_http_proxy_error_text3">Il nome host è vuoto</string>
     <string name="settings_http_proxy_error_text4">Connessione all\'host non riuscita. Riprova.</string>
     <string name="settings_http_proxy_toast_success">Proxy HTTP impostato</string>
-    <string name="settings_http_proxy_hostname">Nome host</string>
     <string name="settings_title_desc">DNS e Firewall ampiamente personalizzabili</string>
     <string name="accessibility_service_description">Rethink utilizza i servizi di accessibilità per rilevare e filtrare le connessioni in background. Rethink non raccoglie o vende alcuna informazione.</string>
     <string name="bsct_conn_desc_blocked">bloccato su %1$s %2$s</string>
@@ -315,7 +313,6 @@
     <string name="brbs_restore_dialog_message">Ripristina da un file di backup le impostazioni dell\'app, della rete e dei registri DNS. L\'applicazione sarà riavviata.</string>
     <string name="brbs_backup_dialog_message">Effettua il backup delle impostazioni dell\'app, della rete e dei registri DNS. La VPN sarà riavviata.</string>
     <string name="brbs_backup_dialog_failure_message">Impossibile eseguire il backup. Vuoi riprovare\?</string>
-    <string name="settings_http_proxy_port">Porta</string>
     <string name="settings_dns_proxy_dialog_header">Imposta proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Nome host</string>

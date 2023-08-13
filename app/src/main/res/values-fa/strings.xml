@@ -153,7 +153,6 @@
     <string name="show_logs_disabled_network_message" translatable="true">ثبت اتصال غیرفعال شده است. برای فعال سازی مجدد، به <i>تنظیمات</i> بروید و <i>گزینه فعال کردن گزارش روی دستگاه را روشن کنید.</i></string>
     <string name="configure_dns_connection_name" translatable="true">متصل به %1$s</string>
     <string name="univ_firewall_dialog_message" translatable="true">حذف این قانون به هر برنامه ای اجازه می دهد تا به این IP متصل شود. آیا می خواهید ادامه دهید؟</string>
-    <string name="http_proxy_dialog_desc" translatable="true">تنظیمات پروکسی HTTP(S) تنها یک اشاره به برنامه ها هستند، اما ممکن است از آن استفاده کنند یا نکنند. با این حال، مرورگرهایی مانند کروم و فایرفاکس از این موارد استفاده می کنند. برنامه‌هایی که از پروکسی HTTP(S) استفاده می‌کنند، قوانین فایروال و DNS را دور خواهند زد.</string>
     <string name="dns_proxy_remove_dialog_title" translatable="true">پروکسی DNS حذف شود؟</string>
     <string name="local_blocklist_download" translatable="true">لیست های مسدود را دانلود کنید</string>
     <string name="dns_crypt_relay_remove_dialog_title" translatable="true">رله DNSCrypt حذف شود؟</string>

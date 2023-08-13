@@ -148,7 +148,6 @@
     <string name="bsct_conn_desc_blocked" translatable="true">bị chặn trên %1$s %2$s</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Xóa điểm cuối DNS qua Https khỏi cấu hình đã lưu.</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">Xóa Proxy DNS khỏi cấu hình đã lưu.</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Cài đặt HTTP(S) Proxy chỉ là một gợi ý cho các ứng dụng nhưng chúng có thể sử dụng hoặc không; tuy nhiên, các trình duyệt như Chrome và Firefox sử dụng những thứ này. Các ứng dụng sử dụng proxy HTTP(S) sẽ bỏ qua cả quy tắc Tường lửa và DNS.</string>
     <string name="download_update_dialog_title" translatable="true">Bản cập nhật mới!</string>
     <string name="download_update_dialog_message" translatable="true">Phiên bản mới của ứng dụng đã có sẵn để tải xuống từ trang web. Bạn có muốn tiếp tục\?</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Đã cập nhật!</string>
@@ -225,12 +224,11 @@
     <string name="settings_app_notification_a13_desc" translatable="true">Kích hoạt quyền thông báo cho ứng dụng</string>
     <string name="settings_theme_heading" translatable="true">Ngoại hình</string>
     <string name="settings_theme_desc" translatable="true">Chủ đề tối / sáng</string>
-    <string name="settings_http_proxy_desc" translatable="true">Đang chuyển tiếp tới %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc" translatable="true">Đang chuyển tiếp tới %1$s</string>
     <string name="settings_http_proxy_error_text2" translatable="true">cổng không hợp lệ</string>
     <string name="settings_http_proxy_error_text3" translatable="true">Tên máy chủ trống</string>
     <string name="settings_http_proxy_error_text4" translatable="true">Kết nối máy chủ không thành công. Thử lại.</string>
     <string name="settings_http_proxy_toast_success" translatable="true">Đã đặt proxy HTTP</string>
-    <string name="settings_http_proxy_port" translatable="true">Cổng</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">Đặt proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">Ứng dụng</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">Số cổng</string>
@@ -313,7 +311,6 @@
     <string name="settings_import_export_desc" translatable="true">Sao lưu hoặc khôi phục cài đặt và dữ liệu ứng dụng theo cách thủ công.</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Thông báo ứng dụng</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">Tên máy chủ</string>
-    <string name="settings_http_proxy_hostname" translatable="true">Tên máy chủ</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Mật khẩu</string>
     <string name="settings_notification_desc3" translatable="true">Không có</string>
     <string name="settings_socks5_dialog_hint_ip" translatable="true">Địa chỉ IP</string>

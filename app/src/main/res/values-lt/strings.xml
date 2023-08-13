@@ -78,7 +78,6 @@
     <string name="configure_dns_connection_name">Prisijungta prie %1$s</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s sprendikliai</string>
     <string name="http_proxy_dialog_heading">Nustatyti HTTP(S) įgaliotąjį serverį</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) įgaliotojo serverio nustatymai yra tik užuomina programėlėms, tačiau jos gali juo naudoti arba nenaudoti; tačiau tokios naršyklės kaip „Chrome“ ir „Firefox“ juos naudoja. Programėlės, naudojančios HTTP(S) įgaliotąjį serverį, apeis ir ugniasienę, ir DNS taisykles.</string>
     <string name="download_update_dialog_message_success">Blokavimo sąrašas atsisiųstas sėkmingai.</string>
     <string name="search_firewall_network_log"><font size="12">Ieškoti programėlių, IP adresų, domenų</font></string>
     <string name="search_firewall_all_apps"><font size="12">Ieškoti programėlių pagal uid, pavadinimą</font></string>
@@ -134,12 +133,11 @@
     <string name="settings_custom_downloader_desc">Jei išjungta, naudojama integruota Android <i>atsisiuntimo tvarkyklė</i>.</string>
     <string name="settings_import_export_heading">Atsarginė kopija ir atkūrimas</string>
     <string name="settings_theme_heading">Išvaizda</string>
-    <string name="settings_http_proxy_desc">Peradresuojama į %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Peradresuojama į %1$s</string>
     <string name="settings_http_proxy_dialog_title">Pasirinktinis serverio URL</string>
     <string name="settings_http_proxy_error_text2">Netinkamas prievadas</string>
     <string name="settings_http_proxy_error_text3">Pagrindinio kompiuterio pavadinimas tuščias</string>
     <string name="settings_http_proxy_toast_success">HTTP įgaliotasis serveris nustatytas</string>
-    <string name="settings_http_proxy_port">Prievadas</string>
     <string name="settings_dns_proxy_dialog_header">Nustatyti SOCKS5 (TCP) įgaliotąjį serverį</string>
     <string name="settings_dns_proxy_dialog_app">Programėlė</string>
     <string name="settings_dns_proxy_dialog_port_number">Prievado numeris</string>
@@ -695,7 +693,6 @@
     <string name="download_update_dialog_trylater_message">Atnaujinimo šiuo metu negalima atlikti, bandykite vėliau.</string>
     <string name="settings_socks5_desc">Peradresuoti ryšius į SOCKS5 galinį punktą.</string>
     <string name="settings_http_proxy_error_text4">Nepavyko prisijungti prie pagrindinio kompiuterio. Pabandyk dar kartą.</string>
-    <string name="settings_http_proxy_hostname">Pagrindinio kompiuterio vardas</string>
     <string name="settings_dns_proxy_dialog_hostname">Pagrindinio kompiuterio vardas</string>
     <string name="settings_dns_proxy_dialog_app_desc">Pasirinkta programėlė bus išskirta iš VPN, kad ji galėtų prisijungti prie įgaliotojo serverio jūsų vardu.</string>
     <string name="settings_socks_forwarding_default_desc">Peradresuoti ryšius į SOCKS5 galinį punktą.</string>
