@@ -67,7 +67,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private const val MAX_BYTES = 500000 // 500 KB
         private const val MAX_TIME_TCP = 120 // seconds
-        private const val MAX_TIME_UDP = 300 // seconds
+        private const val MAX_TIME_UDP = 120 // seconds
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
