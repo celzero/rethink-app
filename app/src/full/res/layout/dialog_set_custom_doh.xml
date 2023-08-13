@@ -67,6 +67,19 @@
             app:layout_constraintTop_toBottomOf="@id/text_input_layout_name" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/dialog_secure_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:buttonTint="?attr/accentGood"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:foregroundTint="?attr/accentGood"
+        android:text="@string/cd_doh_dialog_checkbox_desc"
+        app:layout_constraintTop_toBottomOf="@id/text_input_layout1" />
+
     <TextView
         android:id="@+id/dialog_custom_url_failure_text"
         style="@style/TextAppearance.AppCompat.Body1"
@@ -81,7 +94,7 @@
         android:textColor="@color/colorRed_A400"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@id/text_input_layout1" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_secure_checkbox" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/dialog_custom_url_ok_btn"

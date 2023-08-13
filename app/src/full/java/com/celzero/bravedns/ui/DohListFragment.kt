@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -104,7 +105,7 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         val customURL = dialogBinding.dialogCustomUrlEditText
         val progressBar = dialogBinding.dialogCustomUrlLoading
         val errorTxt = dialogBinding.dialogCustomUrlFailureText
-
+        val checkBox = dialogBinding.dialogSecureCheckbox
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
@@ -124,9 +125,10 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()
+            val isSecure = !checkBox.isChecked
 
             if (checkUrl(url)) {
-                insertDoHEndpoint(name, url)
+                insertDoHEndpoint(name, url, isSecure)
                 dialog.dismiss()
             } else {
                 errorTxt.text = resources.getString(R.string.custom_url_error_invalid_url)
@@ -141,7 +143,7 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
         dialog.show()
     }
 
-    private fun insertDoHEndpoint(name: String, url: String) {
+    private fun insertDoHEndpoint(name: String, url: String, isSecure: Boolean) {
         io {
             var dohName: String = name
             if (name.isBlank()) {
@@ -155,6 +157,7 @@ class DohListFragment : Fragment(R.layout.fragment_doh_list) {
                     dohExplanation = "",
                     isSelected = false,
                     isCustom = true,
+                    isSecure = isSecure,
                     modifiedDataTime = 0,
                     latency = 0
                 )

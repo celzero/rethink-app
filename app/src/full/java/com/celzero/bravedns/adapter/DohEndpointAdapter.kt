@@ -97,7 +97,16 @@ class DohEndpointAdapter(
         }
 
         private fun displayDetails(endpoint: DoHEndpoint) {
-            b.dohEndpointListUrlName.text = endpoint.dohName
+            if (endpoint.isSecure) {
+                b.dohEndpointListUrlName.text = endpoint.dohName
+            } else {
+                b.dohEndpointListUrlName.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        endpoint.dohName,
+                        context.getString(R.string.lbl_insecure)
+                    )
+            }
             b.dohEndpointListUrlExplanation.text = ""
             b.dohEndpointListCheckImage.isChecked = endpoint.isSelected
             Log.i(
