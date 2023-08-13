@@ -75,10 +75,6 @@ import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
 import ipn.Ipn
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Controller
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -86,6 +82,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Controller
 
 class BraveVPNService :
     VpnService(),
@@ -2169,7 +2169,7 @@ class BraveVPNService :
         // uid, downloadBytes, uploadBytes, synack are not applicable for icmp
         val connectionSummary = ConnectionSummary("", s.pid, s.id, 0L, 0L, s.duration, 0, s.msg)
 
-        netLogTracker.updateSummary(connectionSummary)
+        netLogTracker.updateIpSummary(connectionSummary)
     }
 
     override fun onTCPSocketClosed(s: TCPSocketSummary?) {
@@ -2189,7 +2189,7 @@ class BraveVPNService :
                 s.synack,
                 s.msg
             )
-        netLogTracker.updateSummary(connectionSummary)
+        netLogTracker.updateIpSummary(connectionSummary)
     }
 
     override fun onUDPSocketClosed(s: UDPSocketSummary?) {
@@ -2214,7 +2214,7 @@ class BraveVPNService :
                 0,
                 s.msg
             )
-        netLogTracker.updateSummary(connectionSummary)
+        netLogTracker.updateIpSummary(connectionSummary)
     }
 
     override fun flow(
@@ -2336,7 +2336,7 @@ class BraveVPNService :
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
-                        "flow: received rule: orbot, returning Ipn.OrbotS5, $connId, $uid"
+                        "flow: received rule: orbot, returning ${ProxyManager.ID_ORBOT_BASE}, $connId, $uid"
                     )
                 return getFlowResponseString(ProxyManager.ID_ORBOT_BASE, connId, uid)
             }
@@ -2344,14 +2344,20 @@ class BraveVPNService :
 
         if (appConfig.isCustomSocks5Enabled()) {
             if (DEBUG)
-                Log.d(LOG_TAG_VPN, "flow: received rule: http, returning Ipn.SOCKS5, $connId, $uid")
-            return getFlowResponseString(Ipn.SOCKS5, connId, uid)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: received rule: socks5, returning ${ProxyManager.ID_S5_BASE}, $connId, $uid"
+                )
+            return getFlowResponseString(ProxyManager.ID_S5_BASE, connId, uid)
         }
 
         if (appConfig.isCustomHttpProxyEnabled()) {
             if (DEBUG)
-                Log.d(LOG_TAG_VPN, "flow: received rule: http, returning Ipn.HTTP1, $connId, $uid")
-            return getFlowResponseString(Ipn.HTTP1, connId, uid)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: received rule: http, returning ${ProxyManager.ID_HTTP_BASE}, $connId, $uid"
+                )
+            return getFlowResponseString(ProxyManager.ID_HTTP_BASE, connId, uid)
         }
 
         if (DEBUG) Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connId, $uid")
