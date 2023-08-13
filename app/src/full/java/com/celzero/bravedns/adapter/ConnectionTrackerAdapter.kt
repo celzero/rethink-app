@@ -19,6 +19,7 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -64,6 +65,10 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     newConnection: ConnectionTracker
                 ) = oldConnection == newConnection
             }
+
+        private const val MAX_BYTES = 500000 // 500 KB
+        private const val MAX_TIME_TCP = 120 // seconds
+        private const val MAX_TIME_UDP = 300 // seconds
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
@@ -213,7 +218,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
             b.connectionSummaryLl.visibility = View.VISIBLE
             val duration = getDurationInHumanReadableFormat(context, ct.duration)
-            b.connectionDuration.text = context.getString(R.string.symbol_duration, duration)
+            b.connectionDuration.text = context.getString(R.string.single_argument, duration)
             // add unicode for download and upload
             val download =
                 context.getString(
@@ -226,6 +231,26 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     Utilities.humanReadableByteCount(ct.uploadBytes, true)
                 )
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
+            b.connectionDelay.text = ""
+            if (isConnectionHeavier(ct)) {
+                b.connectionDelay.visibility = View.VISIBLE
+                b.connectionDelay.text = context.getString(R.string.symbol_elephant)
+            }
+            if (isConnectionSlower(ct)) {
+                b.connectionDelay.visibility = View.VISIBLE
+                b.connectionDelay.text = b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
+            } else {
+                b.connectionDelay.visibility = View.INVISIBLE
+            }
+        }
+
+        private fun isConnectionHeavier(ct: ConnectionTracker): Boolean {
+            return ct.downloadBytes > MAX_BYTES || ct.uploadBytes > MAX_BYTES
+        }
+
+        private fun isConnectionSlower(ct: ConnectionTracker): Boolean {
+            return (ct.protocol == Protocol.UDP.protocolType && ct.duration >= MAX_TIME_UDP) ||
+                (ct.protocol == Protocol.TCP.protocolType && ct.duration >= MAX_TIME_TCP)
         }
 
         private fun loadAppIcon(drawable: Drawable?) {

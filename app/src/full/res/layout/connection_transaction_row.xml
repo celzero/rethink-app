@@ -268,16 +268,16 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.15"
-                    android:visibility="invisible"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/connection_download"
+                        android:id="@+id/connection_delay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:fontFamily="sans-serif-condensed"
+                        android:maxHeight="16dp"
                         android:maxLines="1"
+                        android:minWidth="16dp"
                         android:singleLine="true"
                         android:textColor="?attr/primaryTextColor"
                         android:textSize="@dimen/default_font_text_view" />
