@@ -50,8 +50,6 @@ import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
-import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.OrbotHelper
@@ -350,10 +348,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.settingsActivityHttpProxySwitch.isChecked = appConfig.isCustomHttpProxyEnabled()
         if (b.settingsActivityHttpProxySwitch.isChecked) {
             b.settingsActivityHttpProxyDesc.text =
-                getString(
-                    R.string.settings_http_proxy_desc,
-                    persistentState.httpProxyHostAddress
-                )
+                getString(R.string.settings_http_proxy_desc, persistentState.httpProxyHostAddress)
         }
     }
 

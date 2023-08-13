@@ -16,12 +16,10 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities
@@ -112,7 +110,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var localBlocklistTimestamp by longPref("local_block_list_downloaded_time").withDefault<Long>(0)
 
     // user set http proxy ip / hostname
-    var httpProxyHostAddress by stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
+    var httpProxyHostAddress by
+        stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     // default: false for fdroid flavour

@@ -16,7 +16,6 @@
 package com.celzero.bravedns.data
 
 import android.content.Context
-import android.net.ProxyInfo
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

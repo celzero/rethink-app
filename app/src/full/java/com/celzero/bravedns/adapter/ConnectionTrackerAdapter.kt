@@ -19,7 +19,6 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -238,7 +237,8 @@ class ConnectionTrackerAdapter(private val context: Context) :
             }
             if (isConnectionSlower(ct)) {
                 b.connectionDelay.visibility = View.VISIBLE
-                b.connectionDelay.text = b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
+                b.connectionDelay.text =
+                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
             } else {
                 b.connectionDelay.visibility = View.INVISIBLE
             }

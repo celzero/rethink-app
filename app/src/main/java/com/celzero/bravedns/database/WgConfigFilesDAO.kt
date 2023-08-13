@@ -55,6 +55,5 @@ interface WgConfigFilesDAO {
     @Query("select count(id) from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")
     fun getConfigCount(): LiveData<Int>
 
-    @Query("update WgConfigFiles set isActive = 0 where id = :id")
-    fun disableConfig(id: Int)
+    @Query("update WgConfigFiles set isActive = 0 where id = :id") fun disableConfig(id: Int)
 }

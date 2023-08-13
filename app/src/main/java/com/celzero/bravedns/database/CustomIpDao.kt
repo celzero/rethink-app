@@ -88,7 +88,9 @@ interface CustomIpDao {
     )
     fun getAppWiseCustomIp(query: String, uid: Int): PagingSource<Int, CustomIp>
 
-    @Query("select * from CustomIp where ipAddress like :query and isActive = 1 and uid != $UID_EVERYBODY order by uid")
+    @Query(
+        "select * from CustomIp where ipAddress like :query and isActive = 1 and uid != $UID_EVERYBODY order by uid"
+    )
     fun getAllCustomIpRules(query: String): PagingSource<Int, CustomIp>
 
     @Query("delete from CustomIp") fun deleteAllRules()

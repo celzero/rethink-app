@@ -75,6 +75,10 @@ import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
 import ipn.Ipn
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Controller
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -82,10 +86,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Controller
 
 class BraveVPNService :
     VpnService(),
@@ -2326,7 +2326,6 @@ class BraveVPNService :
             }
         }*/
 
-        // chose socks5 proxy over http proxy
         if (appConfig.isOrbotProxyEnabled()) {
             val activeId = ProxyManager.getProxyIdForApp(uid)
             if (!activeId.contains(ProxyManager.ID_ORBOT_BASE)) {
@@ -2342,6 +2341,7 @@ class BraveVPNService :
             }
         }
 
+        // chose socks5 proxy over http proxy
         if (appConfig.isCustomSocks5Enabled()) {
             if (DEBUG)
                 Log.d(

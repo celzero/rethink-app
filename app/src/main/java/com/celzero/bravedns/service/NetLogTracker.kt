@@ -25,11 +25,11 @@ import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.util.NetLogBatcher
 import dnsx.Summary
-import java.util.Calendar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.Calendar
 
 class NetLogTracker
 internal constructor(

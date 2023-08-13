@@ -18,7 +18,6 @@ package com.celzero.bravedns.net.go
 
 import android.content.Context
 import android.content.res.Resources
-import android.net.ProxyInfo
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
@@ -47,9 +46,6 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
-import ipn.Ipn
-import java.io.IOException
-import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,6 +53,8 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
+import java.io.IOException
+import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -288,7 +286,7 @@ class GoVpnAdapter(
             tunnelOptions.tunFirewallMode.mode,
             tunnelOptions.ptMode.id
         )
-        //setTcpProxyIfNeeded()
+        // setTcpProxyIfNeeded()
         setWireguardTunnelModeIfNeeded(tunnelOptions.tunProxyMode)
         setSocks5TunnelModeIfNeeded(tunnelOptions.tunProxyMode)
         setHttpProxyIfNeeded(tunnelOptions.tunProxyMode)
@@ -500,11 +498,12 @@ class GoVpnAdapter(
         if (!AppConfig.ProxyType.of(appConfig.getProxyType()).isProxyTypeHasHttp()) return
 
         try {
-            val id = if (tunProxyMode.isTunProxyOrbot()) {
-                ProxyManager.ID_ORBOT_BASE
-            } else {
-                ProxyManager.ID_HTTP_BASE
-            }
+            val id =
+                if (tunProxyMode.isTunProxyOrbot()) {
+                    ProxyManager.ID_ORBOT_BASE
+                } else {
+                    ProxyManager.ID_HTTP_BASE
+                }
             val httpProxyUrl = persistentState.httpProxyHostAddress
             tunnel?.proxies?.addProxy(id, httpProxyUrl)
             Log.i(LOG_TAG_VPN, "Http mode set with url: $httpProxyUrl")
