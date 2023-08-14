@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Jason A. Donenfeld&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva función&lt;/i&gt;: Soporte Multi-VPN con cualquier número de conexiones simultáneas WireGuard.&lt;br/&gt; 2. &lt;i &gt;Nueva función&lt;/i&gt;: indicador de conexión activa (abierta) en los registros de red.&lt;/br&gt; 3. &lt;i&gt;Nueva función&lt;/i&gt;: restringir Tor-como-un-proxy (Orbot) a aplicaciones específicas.&lt; br/&gt; 4. &lt;i&gt;Nueva función&lt;/i&gt;: Las estadísticas muestran ahora agrupaciones basadas en Geolocalización IP.&lt;br/&gt; 5. &lt;i&gt;Nueva función&lt;/i&gt;: Mostrar el uso de datos en los registros de red: bytes de carga y descarga por solicitud.&lt;br/&gt; 6. &lt;i&gt;Nueva función&lt;/i&gt;: Estadísticas de carga y descarga por aplicación.&lt;br/&gt; 7. &lt;i&gt;Nueva función&lt;/i&gt;: Compatibilidad con servidores locales DNS sobre HTTPS (no públicos).&lt;br/&gt; 8. Informes de errores a la carta superdetallados para un mejor diagnóstico.&lt;br/&gt; 9. DNS Booster está ahora activado por defecto.&lt;br/&gt; 10. Mejora de la interfaz para gestionar las reglas de IP y dominio por aplicación.&lt;br/&gt; 11. Mosaicos más grandes en la pantalla de inicio.&lt;br/&gt; 12. Actualización de la interfaz del cortafuegos.&lt; br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: Hacer que HTTP Proxy funcione para túneles CONECTADOS.&lt;/br&gt; 14. &lt;i&gt;Corrección de errores&lt;/i&gt;: Los dominios de confianza (permitir listas) funcionan ahora con los servidores DNS de terceros.&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Jason A. Donenfeld&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva función&lt;/i&gt;: Soporte Multi-VPN con cualquier número de conexiones simultáneas WireGuard.&lt;br/&gt; 2. &lt;i &gt;Nueva función&lt;/i&gt;: indicador de conexión activa (abierta) en los registros de red.&lt;/br&gt; 3. &lt;i&gt;Nueva función&lt;/i&gt;: restringir Tor-como-un-proxy (Orbot) a aplicaciones específicas.&lt; br/&gt; 4. &lt;i&gt;Nueva función&lt;/i&gt;: Las estadísticas muestran ahora agrupaciones basadas en Geolocalización IP.&lt;br/&gt; 5. &lt;i&gt;Nueva función&lt;/i&gt;: Mostrar el uso de datos en los registros de red: bytes de carga y descarga por solicitud.&lt;br/&gt; 6. &lt;i&gt;Nueva función&lt;/i&gt;: Estadísticas de carga y descarga por aplicación.&lt;br/&gt; 7. &lt;i&gt;Nueva función&lt;/i&gt;: Compatibilidad con servidores locales DNS sobre HTTPS (no públicos).&lt;br/&gt; 8. Informes de errores a la carta superdetallados para un mejor diagnóstico.&lt;br/&gt; 9. Refuerzo DNS está ahora activado por defecto.&lt;br/&gt; 10. Mejora de la interfaz para gestionar las reglas de IP y dominio por aplicación.&lt;br/&gt; 11. Mosaicos más grandes en la pantalla de inicio.&lt;br/&gt; 12. Actualización de la interfaz del cortafuegos.&lt; br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: Hacer que HTTP Proxy funcione para túneles CONECTADOS.&lt;/br&gt; 14. &lt;i&gt;Corrección de errores&lt;/i&gt;: Los dominios de confianza (permitir listas) funcionan ahora con los servidores DNS de terceros.&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -845,7 +845,7 @@
     <string name="ada_app_firewall" translatable="true">Cortafuegos</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Omitir DNS y cortafuegos</string>
     <string name="dc_refresh_toast" translatable="true">Actualización de DNS completada</string>
-    <string name="dc_setting_dns_cache_heading" translatable="true">Refuerzo DNS (experimental)</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">Refuerzo DNS</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Fusionar peticiones, respuestas en caché, gestión de errores resistentes</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">No se pueden configurar proxies cuando la VPN se ejecuta en modo sólo DNS.</string>
     <string name="brbs_backup_restore_desc" translatable="true">No funciona en todas las versiones de la aplicación ni en todos los dispositivos</string>
@@ -922,4 +922,28 @@
     <string name="key_contents_error" translatable="true">Caracteres erróneos en la clave</string>
     <string name="key_length_error" translatable="true">Longitud de clave incorrecta</string>
     <string name="parse_error_inet_address" translatable="true">Dirección IP</string>
+    <string name="cd_deleted_toast" translatable="true">Eliminadas todas las reglas de dominio</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Esta conexión se ha desviado al proxy preferido por el usuario.<br/><br/> Para cambiarlo vaya a <i>Proxy</i> en la pantalla <i>Configurar</i>.</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">países más contactados</string>
+    <string name="firewall_rule_proxied" translatable="true">Por proxy</string>
+    <string name="parse_error_integer" translatable="true">número</string>
+    <string name="bad_config_explanation_pka" translatable="true">: Debe ser positivo y no más de 65535</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Punto final</string>
+    <string name="parse_error_inet_network" translatable="true">Red IP</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Debe ser positivo</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Debe ser un número de puerto UDP válido</string>
+    <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
+    <string name="bad_config_error" translatable="true">%1$s en %2$s</string>
+    <string name="generic_error" translatable="true">Error “%s” desconocido</string>
+    <string name="parse_error_generic" translatable="true">cadena</string>
+    <string name="import_error" translatable="true">Imposible importar túnel: %s</string>
+    <string name="parse_error_reason" translatable="true">No se puede analizar %1$s “%2$s”</string>
+    <string name="illegal_filename_error" translatable="true">Nombre de archivo ilegal “%s”</string>
+    <string name="bad_extension_error" translatable="true">El archivo debe ser .conf o .zip</string>
+    <string name="unknown_error" translatable="true">Error desconocido</string>
+    <string name="no_configs_error" translatable="true">No se encontró ninguna configuración</string>
+    <string name="invalid_file_error" translatable="true">archivo no válido</string>
+    <string name="setup_wireguard" translatable="true">Configurar WireGuard</string>
+    <string name="wireguard_description" translatable="true">WireGuard como un proxy.</string>
+    <string name="new_warp_config_desc" translatable="true">Obtener la configuración WARP del servidor</string>
 </resources>
