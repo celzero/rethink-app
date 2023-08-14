@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:minWidth="125dp"
                 android:tag="2"
-                android:text="@string/rt_list_adv_btn_txt"
+                android:text="@string/lbl_advanced"
                 android:textColor="?attr/defaultToggleBtnTxt"
                 app:cornerRadius="16dp" />
         </com.google.android.material.button.MaterialButtonToggleGroup>

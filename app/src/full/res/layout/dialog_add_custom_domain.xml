@@ -86,6 +86,11 @@
             android:id="@+id/dacd_text_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
             android:hint="@string/cd_dialog_edittext_hint"
             app:hintTextColor="?attr/accentGood">
 

@@ -19,6 +19,7 @@ import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.ConnTrackerMetaData
+import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.util.AndroidUidConfig
@@ -54,6 +55,7 @@ internal constructor(
         connTracker.timeStamp = connTrackerMetaData.timestamp
         connTracker.blockedByRule = connTrackerMetaData.blockedByRule
         connTracker.blocklists = connTrackerMetaData.blocklists
+        connTracker.connId = connTrackerMetaData.connId
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         connTracker.dnsQuery = connTrackerMetaData.query
@@ -68,6 +70,10 @@ internal constructor(
 
     suspend fun insertBatch(conns: List<ConnectionTracker>) {
         connectionTrackerRepository.insertBatch(conns)
+    }
+
+    suspend fun updateBatch(summary: List<ConnectionSummary>) {
+        connectionTrackerRepository.updateBatch(summary)
     }
 
     private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {

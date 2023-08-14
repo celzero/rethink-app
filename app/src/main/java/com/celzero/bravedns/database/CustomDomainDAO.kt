@@ -46,7 +46,12 @@ interface CustomDomainDAO {
     @Query("select count(*) from CustomDomain where uid = :uid")
     fun getAppWiseDomainRulesCount(uid: Int): LiveData<Int>
 
+    @Query("select count(*) from CustomDomain where uid != ${Constants.UID_EVERYBODY}")
+    fun getAllDomainRulesCount(): LiveData<Int>
+
     @Query("delete from CustomDomain where uid = :uid") fun deleteRulesByUid(uid: Int)
+
+    @Query("delete from CustomDomain") fun deleteAllRules()
 
     @Query("select * from CustomDomain where status in (1,2) order by modifiedTs desc")
     fun getRulesCursor(): Cursor
@@ -57,4 +62,8 @@ interface CustomDomainDAO {
     @Query("update CustomDomain set status = :status where :clause")
     fun cpUpdate(status: Int, clause: String): Int
 
+    @Query(
+        "select * from CustomDomain where uid != ${Constants.UID_EVERYBODY} and domain like :query order by uid"
+    )
+    fun getAllDomainRules(query: String): PagingSource<Int, CustomDomain>
 }

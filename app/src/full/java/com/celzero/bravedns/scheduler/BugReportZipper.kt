@@ -21,6 +21,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.preference.PreferenceManager
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
@@ -36,12 +37,12 @@ import java.util.zip.ZipOutputStream
 object BugReportZipper {
 
     // Bug report file and directory constants
-    private const val BUG_REPORT_DIR_NAME = "bugreport/"
+    const val BUG_REPORT_DIR_NAME = "bugreport/"
     private const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
     private const val BUG_REPORT_FILE_NAME = "bugreport_"
 
     // maximum number of files allowed as part of bugreport zip file
-    private const val BUG_REPORT_MAX_FILES_ALLOWED = 20
+    private const val BUG_REPORT_MAX_FILES_ALLOWED = 10
 
     // secure sharing of files associated with an app, used in share bugreport file feature
     const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
@@ -53,6 +54,7 @@ object BugReportZipper {
 
         if (file.exists()) {
             Utilities.deleteRecursive(file)
+            file.mkdir()
         } else {
             file.mkdir()
         }
@@ -143,7 +145,7 @@ object BugReportZipper {
         while (entries.hasMoreElements()) {
             val e = entries.nextElement()
             if (ignoreFileName == e.name) {
-                Log.d(LOG_TAG_SCHEDULER, "Ignoring the old file: ${e.name} from bug_report.zip")
+                Log.i(LOG_TAG_SCHEDULER, "Ignoring the old file: ${e.name} from bug_report.zip")
                 continue
             }
 
@@ -176,10 +178,24 @@ object BugReportZipper {
         }\n"
         file.appendText(reportDetails)
 
+        if (Utilities.isAtleastS()) {
+            // above API 31, we can get the traceInputStream for native crashes
+            if (it.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                it.traceInputStream.use { ins -> writeTrace(file, ins) }
+            }
+        }
         // capture traces for ANR exit-infos
         if (it.reason == ApplicationExitInfo.REASON_ANR) {
             it.traceInputStream.use { ins -> writeTrace(file, ins) }
         }
+    }
+
+    fun writePrefs(context: Context, file: File) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val prefsMap = prefs.all
+        val prefsDetails = StringBuilder()
+        prefsMap.forEach { (key, value) -> prefsDetails.append("$key=$value\n") }
+        file.appendText(prefsDetails.toString())
     }
 
     private fun writeZipContents(outputStream: ZipOutputStream, inputStream: InputStream) {

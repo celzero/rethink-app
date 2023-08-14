@@ -21,13 +21,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class NotificationHandlerDialog : AppCompatActivity() {
     enum class TrampolineType {
@@ -111,7 +111,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun handleAccessibilitySettings() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(R.string.lbl_action_required)
         builder.setMessage(R.string.alert_firewall_accessibility_regrant_explanation)
         builder.setPositiveButton(getString(R.string.univ_accessibility_crash_dialog_positive)) {
@@ -133,7 +133,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun showAppPauseDialog(trampolineType: TrampolineType) {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
 
         builder.setTitle(R.string.notif_dialog_pause_dialog_title)
         builder.setMessage(R.string.notif_dialog_pause_dialog_message)

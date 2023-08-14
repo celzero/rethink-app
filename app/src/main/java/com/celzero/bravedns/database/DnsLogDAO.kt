@@ -25,22 +25,25 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
 @Dao
 interface DnsLogDAO {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(dnsLog: DnsLog)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(dnsLog: DnsLog)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insertBatch(dnsLogs: List<DnsLog>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insertBatch(dnsLogs: List<DnsLog>)
 
     // replace order by timeStamp desc with order by id desc, as order by timeStamp desc is building
     // the query with temporary index on the table. This is causing the query to be slow.
     // ref: https://stackoverflow.com/a/50776662 (auto covering index)
     // LIMIT 35000 to avoid the query to be slow
-    @Query("select * from DNSLogs order by id desc LIMIT $MAX_LOGS") fun getAllDnsLogs(): PagingSource<Int, DnsLog>
+    @Query("select * from DNSLogs order by id desc LIMIT $MAX_LOGS")
+    fun getAllDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) order by id desc LIMIT $MAX_LOGS"
     )
     fun getDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc LIMIT $MAX_LOGS")
+    @Query(
+        "select * from DNSLogs where isBlocked = 0 and blockLists = '' order by id desc LIMIT $MAX_LOGS"
+    )
     fun getAllowedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
@@ -56,7 +59,9 @@ interface DnsLogDAO {
     )
     fun getBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
 
-    @Query("select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS")
+    @Query(
+        "select * from DNSLogs where isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS"
+    )
     fun getMaybeBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(

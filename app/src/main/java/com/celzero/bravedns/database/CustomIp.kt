@@ -74,12 +74,12 @@ class CustomIp {
     fun setCustomIpAddress(ipAddress: String) {
         var ip = ipAddress
         try {
-            if (HostName(ipAddress).address.isIPv4) {
+            if (HostName(ipAddress).asAddress().isIPv4) {
                 if (ipAddress.count { it == '.' } < 3) {
                     ip = getPaddedIp(ip)
                 }
             }
-            this.ipAddress = HostName(ip).address.toNormalizedString()
+            this.ipAddress = HostName(ip).asAddress().toNormalizedString()
         } catch (ignored: NullPointerException) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "Invalid IP address added", ignored)
             this.ipAddress = ""
@@ -88,7 +88,9 @@ class CustomIp {
 
     fun setCustomIpAddress(hostName: HostName) {
         try {
-            this.ipAddress = hostName.address.toNormalizedString()
+            this.ipAddress = hostName.asAddress().toNormalizedString()
+            val y = hostName.asAddress().assignPrefixForSingleBlock().toString()
+            val x = hostName.port
         } catch (ignored: NullPointerException) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "Invalid IP address added", ignored)
             this.ipAddress = ""

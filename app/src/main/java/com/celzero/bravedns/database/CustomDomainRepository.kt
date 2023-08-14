@@ -47,6 +47,10 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         customDomainDAO.deleteRulesByUid(uid)
     }
 
+    fun deleteAllRules() {
+        customDomainDAO.deleteAllRules()
+    }
+
     fun getUniversalCustomDomainCount(): LiveData<Int> {
         // get the count of the universal rules
         return customDomainDAO.getAppWiseDomainRulesCount(Constants.UID_EVERYBODY)

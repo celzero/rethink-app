@@ -53,7 +53,7 @@
     <color name="background">#393939</color>
     <color name="divider">#444444</color>
     <color name="border">#77959595</color>
-    <color name="homeScreenBtnBackground">#2d2c2c</color>
+    <color name="homeScreenBtnBackground">#A0444444</color>
     <color name="textViewBackground">#1A000000</color>
     <color name="buttonBackground">#006f67</color>
     <color name="chipBackgroundColor">#006f67</color>
@@ -83,6 +83,7 @@
     <color name="invertedPrimaryText">#18ffff</color>
     <color name="secondaryText">#18ffff</color>
     <color name="textColorAccentBad">#CCC51162</color>
+    <color name="homeScreenHeaderTextColor">#FDFDFD</color>
 
     <color name="fabBackground">#77959595</color>
 
@@ -114,8 +115,8 @@
     <color name="dividerLight">#eeeeee</color>
     <color name="borderLight">#77757575</color>
     <color name="textViewBackgroundLight">#1A000000</color>
-    <color name="homeScreenBtnBackgroundLight">#005cb2</color>
-    <color name="buttonBackgroundLight">#1e88e5</color>
+    <color name="homeScreenBtnBackgroundLight">#F0005cb2</color>
+    <color name="buttonBackgroundLight">#F0005cb2</color>
     <color name="tabIndicatorLight">#ff4081</color>
 
     <color name="switchNormalLight">#757575</color>
@@ -149,6 +150,7 @@
     <color name="invertedPrimaryTextLight">#FFFFFF</color>
     <color name="secondaryTextLight">#005cb2</color>
     <color name="textColorAccentBadLight">#CCC51162</color>
+    <color name="homeScreenHeaderTextColorLight">#FFFFFF</color>
 
     <color name="fabBackgroundLight">#FFFFFF</color>
 
@@ -180,7 +182,7 @@
     <color name="backgroundBlack">#121212</color>
     <color name="dividerBlack">#000000</color>
     <color name="borderBlack">#77959595</color>
-    <color name="homeScreenBtnBackgroundBlack">#2d2c2c</color>
+    <color name="homeScreenBtnBackgroundBlack">#402e2c2c</color>
     <color name="buttonBackgroundBlack">#4fc3f7</color>
     <color name="textViewBackgroundBlack">#000000</color>
     <color name="tabIndicatorBlack">#4fc3f7</color>
@@ -200,6 +202,7 @@
     <color name="invertedPrimaryTextBlack">#4fc3f7</color>
     <color name="secondaryTextBlack">#4fc3f7</color>
     <color name="textColorAccentBadBlack">#CCFF5252</color>
+    <color name="homeScreenHeaderTextColorBlack">#FDFDFD</color>
 
     <color name="chipBgPositiveBlack">#33004D40</color>
     <color name="chipTextPositiveBlack">#CC1DE9B6</color>

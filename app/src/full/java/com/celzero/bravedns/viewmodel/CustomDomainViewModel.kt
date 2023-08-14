@@ -46,12 +46,25 @@ class CustomDomainViewModel(private val customDomainDAO: CustomDomainDAO) : View
                 .cachedIn(viewModelScope)
         }
 
+    val allDomainRules =
+        filteredList.switchMap { input ->
+            Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
+                    customDomainDAO.getAllDomainRules("%$input%")
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
     fun setFilter(filter: String) {
         filteredList.value = filter
     }
 
     fun domainRulesCount(uid: Int): LiveData<Int> {
         return customDomainDAO.getAppWiseDomainRulesCount(uid)
+    }
+
+    fun allDomainRulesCount(): LiveData<Int> {
+        return customDomainDAO.getAllDomainRulesCount()
     }
 
     fun setUid(i: Int) {

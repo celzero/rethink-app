@@ -397,7 +397,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             val contentTitle = context.getString(R.string.notif_download_content_title)
 
             builder
-                .setSmallIcon(R.drawable.dns_icon)
+                .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(contentTitle)
                 .setContentIntent(getPendingIntent(context))
                 .setContentText(contentText)
@@ -459,7 +459,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         val contentTitle = context.getString(R.string.notif_download_content_title)
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(getPendingIntent(context))
             .setContentText(contentText)
@@ -475,7 +475,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         val contentTitle = context.getString(R.string.notif_download_content_title)
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(getPendingIntent(context))
             .setContentText(contentText)
@@ -491,7 +491,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         val contentTitle = context.getString(R.string.notif_download_content_title)
 
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(getPendingIntent(context))
             .setContentText(contentText)

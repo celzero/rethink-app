@@ -48,7 +48,6 @@
     <string name="apps_info_title" translatable="true">Ứng dụng</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + tường lửa</string>
     <string name="dns_mode_info_explanation_new" translatable="true">Theo dõi, chặn, và mã hoá các yêu cầu DNS</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">Sắp có…</string>
     <string name="alert_permission_accessibility" translatable="true">Quyền - Trợ năng</string>
     <string name="alert_firewall_accessibility_exception" translatable="true">Không thể mở Cài đặt trợ năng. Thử lại sau!</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">Chọn chế độ.</string>
@@ -149,7 +148,6 @@
     <string name="bsct_conn_desc_blocked" translatable="true">bị chặn trên %1$s %2$s</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Xóa điểm cuối DNS qua Https khỏi cấu hình đã lưu.</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">Xóa Proxy DNS khỏi cấu hình đã lưu.</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Cài đặt HTTP(S) Proxy chỉ là một gợi ý cho các ứng dụng nhưng chúng có thể sử dụng hoặc không; tuy nhiên, các trình duyệt như Chrome và Firefox sử dụng những thứ này. Các ứng dụng sử dụng proxy HTTP(S) sẽ bỏ qua cả quy tắc Tường lửa và DNS.</string>
     <string name="download_update_dialog_title" translatable="true">Bản cập nhật mới!</string>
     <string name="download_update_dialog_message" translatable="true">Phiên bản mới của ứng dụng đã có sẵn để tải xuống từ trang web. Bạn có muốn tiếp tục\?</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Đã cập nhật!</string>
@@ -213,26 +211,24 @@
     <string name="settings_orbot_desc" translatable="true">Orbot ở chế độ non-vpn với HTTPS/SOCKS5.</string>
     <string name="settings_orbot_install_desc" translatable="true">Nhấn vào đây để cài đặt Orbot</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">Khởi động RethinkDNS để tiếp tục.</string>
-    <string name="settings_socks5_disabled_error" translatable="true">Đã kết nối với Orbot. Tắt để tiếp tục.</string>
-    <string name="settings_https_disabled_error" translatable="true">Đã kết nối với Orbot. Tắt để tiếp tục.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Đã kết nối với %1$s. Tắt để tiếp tục.</string>
+    <string name="settings_https_disabled_error" translatable="true">Đã kết nối với %1$s. Tắt để tiếp tục.</string>
     <string name="settings_orbot_notification_content" translatable="true">Lỗi khởi động Tor-as-a-Proxy. Mở ứng dụng Orbot để khởi động thủ công.</string>
     <string name="settings_orbot_notification_action" translatable="true">Mở Orbot</string>
     <string name="settings_general_header" translatable="true">tổng quan</string>
     <string name="settings_autostart_bootup_heading" translatable="true">Tự khởi động khi bật nguồn (thử nghiệm)</string>
     <string name="settings_network_all_networks" translatable="true">Sử dụng tất cả các mạng có sẵn (thử nghiệm)</string>
-    <string name="settings_all_networks_dialog_title" translatable="true">Chú ý!</string>
     <string name="settings_check_update_heading" translatable="true">Kiểm tra các bản cập nhật ứng dụng</string>
     <string name="settings_check_update_desc" translatable="true">Tự động kiểm tra các bản cập nhật ứng dụng mỗi tuần một lần.</string>
     <string name="settings_custom_downloader_desc" translatable="true">Nếu bị tắt, <i>Trình quản lý tải xuống</i> tích hợp sẵn của Android sẽ được sử dụng.</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Kích hoạt quyền thông báo cho ứng dụng</string>
     <string name="settings_theme_heading" translatable="true">Ngoại hình</string>
     <string name="settings_theme_desc" translatable="true">Chủ đề tối / sáng</string>
-    <string name="settings_http_proxy_desc" translatable="true">Đang chuyển tiếp tới %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc" translatable="true">Đang chuyển tiếp tới %1$s</string>
     <string name="settings_http_proxy_error_text2" translatable="true">cổng không hợp lệ</string>
     <string name="settings_http_proxy_error_text3" translatable="true">Tên máy chủ trống</string>
     <string name="settings_http_proxy_error_text4" translatable="true">Kết nối máy chủ không thành công. Thử lại.</string>
     <string name="settings_http_proxy_toast_success" translatable="true">Đã đặt proxy HTTP</string>
-    <string name="settings_http_proxy_port" translatable="true">Cổng</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">Đặt proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">Ứng dụng</string>
     <string name="settings_dns_proxy_dialog_port_number" translatable="true">Số cổng</string>
@@ -315,7 +311,6 @@
     <string name="settings_import_export_desc" translatable="true">Sao lưu hoặc khôi phục cài đặt và dữ liệu ứng dụng theo cách thủ công.</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Thông báo ứng dụng</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">Tên máy chủ</string>
-    <string name="settings_http_proxy_hostname" translatable="true">Tên máy chủ</string>
     <string name="settings_dns_proxy_dialog_password" translatable="true">Mật khẩu</string>
     <string name="settings_notification_desc3" translatable="true">Không có</string>
     <string name="settings_socks5_dialog_hint_ip" translatable="true">Địa chỉ IP</string>
@@ -348,7 +343,6 @@
     <string name="cd_dns_crypt_dialog_heading" translatable="true">Thêm Trình giải quyết hoặc Chuyển tiếp DNSCrypt</string>
     <string name="cd_dns_crypt_relay_name" translatable="true">DNSRelay %1$s</string>
     <string name="hs_download_positive_default" translatable="true">ok</string>
-    <string name="univ_ip_delete_individual_positive" translatable="true">Xoá</string>
     <string name="lbl_maybe_blocked" translatable="true">Có thể bị chặn</string>
     <string name="lbl_network" translatable="true">mạng</string>
     <string name="settings_enable_logs_desc" translatable="true">Lưu trữ nhật ký DNS và Tường lửa trên bộ nhớ cục bộ</string>
@@ -358,7 +352,6 @@
     <string name="settings_app_list_default_app" translatable="true">không ai</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Xuất ra thư mục Downloads</string>
     <string name="pcap_failure_toast" translatable="true">Lỗi khi tạo tệp pcap, Hãy thử lại!</string>
-    <string name="hsf_vpn_dialog_positive" translatable="true">Tiến hành</string>
     <string name="hsf_start_dialog_positive" translatable="true">Bắt đầu</string>
     <string name="hsf_whats_new_chip_text" translatable="true">Có gì mới</string>
     <string name="hsf_proxy_chip_text" translatable="true">Proxy đang hoạt động</string>
@@ -401,13 +394,10 @@
     <string name="cd_dns_crypt_name_default" translatable="true">DNSCrypt</string>
     <string name="cd_dns_crypt_dialog_title" translatable="true">Thêm Trình giải quyết hoặc Chuyển tiếp DNSCrypt</string>
     <string name="cd_dns_crypt_name" translatable="true">DNSCrypt %1$s</string>
-    <string name="cd_dialog_positive_btn" translatable="true">thêm</string>
     <string name="cd_doh_dialog_heading" translatable="true">Thêm DNS qua HTTPS</string>
     <string name="cd_doh_dialog_resolver_url" translatable="true">Trình giải quyết URL</string>
     <string name="cd_dns_alg_heading" translatable="true">Lọc DNS nâng cao (thử nghiệm)</string>
     <string name="cd_dns_alg_desc" translatable="true">Chỉ áp dụng quy tắc miền khi ứng dụng kết nối</string>
-    <string name="ct_delete_logs_positive_btn" translatable="true">Xóa nhật ký</string>
-    <string name="ctbs_proceed_positive_text" translatable="true">Tiến hành</string>
     <string name="dns_log_dialog_positive" translatable="true">Xóa nhật ký</string>
     <string name="dns_btm_sheet_dialog_ips" translatable="true">" &lt;Data&gt; %1$s %2$s &amp;lt;br/&amp;gt;&lt;Data&gt; "</string>
     <string name="univ_firewall_rule_4" translatable="true">Chặn UDP ngoại trừ DNS và NTP</string>
@@ -415,7 +405,6 @@
     <string name="dns_proxy_name" translatable="true">Tên proxy</string>
     <string name="dns_proxy_ip_address" translatable="true">Địa chỉ IP</string>
     <string name="dns_proxy_port" translatable="true">Số cổng</string>
-    <string name="dns_proxy_positive_btn" translatable="true">thêm</string>
     <string name="fapps_firewall_filter_isolate" translatable="true">Bị cô lập</string>
     <string name="fapps_filter_filter_heading" translatable="true">Kiểu</string>
     <string name="fapps_info_dialog_positive_btn" translatable="true">Được</string>
@@ -425,7 +414,6 @@
     <string name="logs_card_network_count" translatable="true">%1$s các kết nối</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Không thể thiết lập proxy khi VPN đang chạy ở chế độ chỉ DNS hoặc chế độ khóa. <u>Chuyển đến phần cài đặt VPN</u></string>
     <string name="settings_general_customize" translatable="true">tuỳ chỉnh</string>
-    <string name="settings_all_networks_dialog_positive_btn" translatable="true">Vẫn bật</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink cần có quyền để thiết lập VPN cục bộ để mã hoá các yêu cầu DNS, triển khai trình giám sát mạng và thực thi các quy tắc tường lửa.
 \nRethink không thu thập thông tin hay theo dõi bạn dưới bất kì hình thức nào.</string>
     <string name="about_mail_bugreport_text" translatable="true">Gửi email này tới : hello@celzero.com</string>
@@ -437,7 +425,6 @@
     <string name="about_settings_notification" translatable="true">Cài đặt thông báo</string>
     <string name="dc_rethink_dns_radio" translatable="true">Rethink DNS</string>
     <string name="dc_block_heading" translatable="true">quy tắc</string>
-    <string name="dc_other_settings_heading" translatable="true">nâng cao</string>
     <string name="dc_entries" translatable="true">%1$s mục »</string>
     <string name="about_app_contributors" translatable="true">Tác giả</string>
     <string name="dc_local_block_desc_1" translatable="true">Chọn từ hơn 195 danh sách chặn. Nhấn vào đây để tải xuống hoặc định cấu hình danh sách chặn</string>
@@ -497,7 +484,6 @@
     <string name="univ_firewall_rule_3" translatable="true">Chặn khi ứng dụng nguồn không xác định</string>
     <string name="univ_ip_delete_toast_success" translatable="true">Đã xóa tất cả các quy tắc IP.</string>
     <string name="univ_delete_firewall_dialog_title" translatable="true">Xóa tất cả Quy tắc IP\?</string>
-    <string name="dns_delete_positive" translatable="true">Xóa</string>
     <string name="dns_proxy_dialog_message" translatable="true">Tên ứng dụng: %1$s
 \n
 \nĐịa chỉ IP: %2$s
@@ -517,9 +503,6 @@
     <string name="fapps_filter_categories_heading" translatable="true">Hạng mục</string>
     <string name="fapps_filter_parent_system" translatable="true">Hệ thống</string>
     <string name="fapps_info_isolate_msg" translatable="true">Chặn tất cả ngoại trừ các IP đáng tin cậy.</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">Khi được bật, các quy tắc tường lửa ứng dụng cho đồng hồ đo (ví dụ: Di động) và không có đồng hồ đo (ví dụ: WiFi) sẽ không được áp dụng.
-\n
-\n Bạn có muốn tiếp tục\?</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Xuất ra Logcat</string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">Bỏ qua các quy tắc DNS và tường lửa</string>
     <string name="firewall_status_block_metered" translatable="true">Bị chặn trên các mạng có đồng hồ đo (di động)</string>

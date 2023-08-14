@@ -10,8 +10,9 @@
     <dimen name="desc_padding">30dp</dimen>
     <dimen name="default_padding">16dp</dimen>
 
-    <dimen name="defaultStrokeWidth">1dp</dimen>
-    <dimen name="maxSize">1000dp</dimen>
+    <dimen name="default_stroke_width">1dp</dimen>
+    <dimen name="max_size">1000dp</dimen>
+    <dimen name="max_btn_size">340dp</dimen>
 
     <dimen name="mini_font_text_view">8sp</dimen>
     <dimen name="small_font_text_view">10sp</dimen>
@@ -22,5 +23,10 @@
     <dimen name="heading_font_text_view">18sp</dimen>
     <dimen name="home_screen_stat_text">22sp</dimen>
     <dimen name="rethink_header_text">24sp</dimen>
+
+    <dimen name="standard_0">0dp</dimen>
+    <dimen name="standard_55">70dp</dimen>
+    <dimen name="standard_105">140dp</dimen>
+    <dimen name="standard_155">210dp</dimen>
 
 </resources>

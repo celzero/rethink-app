@@ -13,7 +13,6 @@
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="alert_permission_accessibility">Toestemming - Toegankelijkheid</string>
     <string name="dns_firewall_mode_info_explanation_new">Al het bovenstaande + het omzeilen van internetcensuur.</string>
-    <string name="wireguard_mode_info_explanation_new">Binnenkort.</string>
     <string name="dns_proxy_remove_dialog_title">DNS Proxy verwijderen\?</string>
     <string name="bsct_block">Blokkeren, omzeilen, uitsluiten, lockdown <u>deze app</u></string>
     <string name="dns_act_configure_tab">Configureren</string>
@@ -38,18 +37,15 @@
     <string name="settings_https_heading">HTTP(S)-proxy instellen</string>
     <string name="orbot_http_desc">Beveelt aan dat apps de HTTP-proxy van Orbot gebruiken.</string>
     <string name="orbot_stop_dialog_dns_message">RethinkDNS is ingesteld om DNS queries door te sturen naar Orbot. Verander indien nodig.</string>
-    <string name="settings_socks5_disabled_error">Verbonden met Orbot. Zet het uit om verder te gaan.</string>
+    <string name="settings_socks5_disabled_error">Verbonden met %1$s. Zet het uit om verder te gaan.</string>
     <string name="settings_import_export_heading">Back-up &amp; Herstel</string>
-    <string name="settings_https_disabled_error">Verbonden met Orbot. Zet het uit om verder te gaan.</string>
+    <string name="settings_https_disabled_error">Verbonden met %1$s. Zet het uit om verder te gaan.</string>
     <string name="settings_autostart_bootup_desc">Start RethinkDNS bij het opstarten van het apparaat als het actief was voor het afsluiten.</string>
     <string name="settings_autostart_bootup_heading">Auto-start bij opstarten (experimenteel)</string>
-    <string name="settings_all_networks_dialog_message">Indien ingeschakeld, worden app firewall regels voor gemeten (bijv. Mobiel) en niet gemeten (bijv. WiFi) niet gehonoreerd.
-\n
-\nWilt u doorgaan\?</string>
     <string name="settings_custom_downloader_desc">Indien uitgeschakeld, wordt Android\'s ingebouwde <i>Download Manager</i> gebruikt.</string>
     <string name="settings_app_notification_a13_desc">Meldingsrechten voor de app inschakelen</string>
     <string name="settings_http_proxy_error_text3">Hostname is leeg</string>
-    <string name="settings_http_proxy_desc">Doorsturen naar %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Doorsturen naar %1$s</string>
     <string name="settings_http_proxy_error_text1">Het poortbereik moet liggen tussen 1024-65535</string>
     <string name="settings_http_proxy_error_text4">Host verbinding is mislukt. Probeer het opnieuw.</string>
     <string name="settings_http_proxy_toast_success">HTTP proxy is ingesteld</string>
@@ -148,8 +144,6 @@
     <string name="settings_orbot_disabled_error">Schakel HTTP(S) en/of SOCKS5 proxy uit om door te gaan met Tor-as-a-proxy setup.</string>
     <string name="settings_orbot_notification_action">Orbot openen</string>
     <string name="settings_network_all_networks">Alle beschikbare netwerken gebruiken (experimenteel)</string>
-    <string name="settings_all_networks_dialog_title">Attentie!</string>
-    <string name="settings_all_networks_dialog_positive_btn">Toch inschakelen</string>
     <string name="settings_check_update_heading">Controleren op app-updates</string>
     <string name="settings_check_update_desc">Automatisch controleren op app-updates eenmaal per week.</string>
     <string name="settings_custom_downloader_heading">Gebruik in-app downloader</string>
@@ -157,8 +151,6 @@
     <string name="settings_app_notification_a13_heading">App melding</string>
     <string name="settings_theme_desc">Donker/licht thema</string>
     <string name="settings_http_proxy_dialog_title">Aangepaste server-URL</string>
-    <string name="settings_http_proxy_hostname">Hostnaam</string>
-    <string name="settings_http_proxy_port">Poort</string>
     <string name="settings_dns_proxy_dialog_app">App</string>
     <string name="settings_dns_proxy_dialog_hostname">Hostnaam</string>
     <string name="settings_dns_proxy_dialog_port_number">Poortnummer</string>
@@ -313,7 +305,6 @@
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="dns_btm_sheet_chip">+%1$s Andere IP\'s</string>
     <string name="dns_btm_resolved_crypt">opgelost <u>anoniem</u> %1$s door %2$s</string>
-    <string name="ctbs_proceed_positive_text">Doorgaan</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip_no_answer">Geen antwoord</string>
     <string name="hs_download_positive_default">ok</string>
@@ -379,7 +370,6 @@
     <string name="show_logs_disabled_network_message">Het loggen van verbindingen is uitgeschakeld. Om dit opnieuw in te schakelen, gaat u naar <i>Instellingen</i> en schakelt u <i>Inschakelen van on-device logging in.</i></string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvers</string>
-    <string name="http_proxy_dialog_desc">HTTP(S)-proxy-instellingen zijn slechts een hint voor toepassingen, die ze al dan niet gebruiken; browsers zoals Chrome en Firefox gebruiken ze echter wel. Toepassingen die HTTP(S)-proxy gebruiken, omzeilen zowel de firewall als de DNS-regels.</string>
     <string name="download_update_dialog_trylater_title">Ik kan nu niet updaten</string>
     <string name="title_about">Over</string>
     <string name="accessibility_service_description">RethinkDNS gebruikt de toegankelijkheidsdienst om achtergrondtoepassingen te detecteren en te firewarden. RethinkDNS verzamelt of verkoopt geen informatie.</string>
@@ -411,7 +401,7 @@
 \n%2$s omzeild
 \n%3$s uitgesloten
 \n%4$s lockdown</string>
-    <string name="hsf_vpn_dialog_positive">Doorgaan</string>
+    <string name="lbl_proceed">Doorgaan</string>
     <string name="hsf_vpn_prepare_failure">Of de VPN toestemming ontbreekt, of een andere app staat in Always-on VPN mode.</string>
     <string name="hsf_notification_permission_failure">Meldingstoestemming inschakelen vanuit het instellingenscherm</string>
     <string name="hsf_start_dialog_header">Start %1$s</string>
@@ -422,7 +412,6 @@
     <string name="hsf_exclude_error">Uitsluiten niet mogelijk in VPN-lockdownsmodus</string>
     <string name="hsf_chip_appearance">Thema: %1$s</string>
     <string name="hsf_pause_lockdown_failure">Kan niet pauzeren: RethinkDNS in lockdown modus</string>
-    <string name="dc_other_settings_heading">geavanceerd</string>
     <string name="dc_custom_block_heading">Individuele domeinen toestaan of weigeren</string>
     <string name="dc_dns_website_heading">Toon website-icoontje in DNS-logs (experimenteel)</string>
     <string name="about_bravedns_toreport_text">hulp en feedback</string>
@@ -457,13 +446,11 @@
     <string name="univ_firewall_rule_10">Alles blokkeren behalve omzeilde apps en IP\'s</string>
     <string name="univ_view_blocked_ip">ip &amp; poort regels</string>
     <string name="univ_view_blocked_ip_desc">Wijzigen van geblokkeerde of omzeilde IP / Poort regels.</string>
-    <string name="univ_ip_delete_individual_positive">Verwijderen</string>
     <string name="univ_ip_delete_individual_toast">%1$s verwijderd.</string>
     <string name="univ_ip_delete_dialog_positive">Verwijder alles</string>
     <string name="univ_delete_firewall_dialog_title">Alle IP-regels verwijderen\?</string>
     <string name="univ_accessibility_crash_dialog_positive">Ga naar instellingen</string>
     <string name="dns_connected_no_count">Verbonden</string>
-    <string name="dns_delete_positive">Verwijderen</string>
     <string name="dns_info_neutral">Kopieëren</string>
     <string name="dns_proxy_desc_no_app">%1$s:%2$s</string>
     <string name="dns_proxy_dialog_message_no_app">IP adres: %1$s
@@ -472,7 +459,6 @@
     <string name="dns_query_latency">%1$sms</string>
     <string name="dns_proxy_dialog_header_dns">DNS-proxy toevoegen</string>
     <string name="dns_proxy_app">App</string>
-    <string name="dns_proxy_positive_btn">toevoegen</string>
     <string name="fapps_filter_categories_heading">Categorieën</string>
     <string name="fapps_filter_parent_installed">Geïnstalleerd</string>
     <string name="fapps_filter_parent_system">Systeem</string>
@@ -520,9 +506,8 @@
     <string name="cd_dns_crypt_dialog_name">Naam</string>
     <string name="cd_dns_crypt_dialog_stamp">Stempel</string>
     <string name="cd_dns_crypt_dialog_desc">Beschrijving (optioneel)</string>
-    <string name="cd_dialog_positive_btn">toevoegen</string>
+    <string name="lbl_add">toevoegen</string>
     <string name="cd_dns_crypt_error_text_1">Stempel kan niet leeg zijn</string>
-    <string name="ct_delete_logs_positive_btn">Logboeken verwijderen</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s andere app(s)</string>
     <string name="ctbs_block_other_apps">De regels voor %1$s gelden ook voor %2$s andere apps</string>
     <string name="ctbs_dialog_negative_btn">Ga Terug</string>

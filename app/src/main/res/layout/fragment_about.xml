@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
@@ -489,7 +490,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
@@ -559,19 +559,47 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/mozilla_img"
-            android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:contentDescription="@string/about_mozilla"
-            android:src="@drawable/mozilla" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/mozilla_img"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/about_mozilla"
+                android:src="@drawable/mozilla" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/foss_img"
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/about_mozilla"
+                app:srcCompat="@drawable/foss_logo" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/osom_img"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/about_mozilla"
+                android:src="@drawable/osom_logos_horizontal" />
+
+        </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
             android:gravity="center"
             android:text="@string/about_mozilla"
             android:textColor="?attr/primaryLightColorText"

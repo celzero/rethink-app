@@ -26,6 +26,7 @@ import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants
 
 class SummaryStatisticsViewModel(
@@ -34,11 +35,13 @@ class SummaryStatisticsViewModel(
     private val appConfig: AppConfig
 ) : ViewModel() {
     private var networkActivity: MutableLiveData<String> = MutableLiveData()
+    private var countryActivities: MutableLiveData<String> = MutableLiveData()
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var ips: MutableLiveData<String> = MutableLiveData()
 
     init {
         networkActivity.value = ""
+        countryActivities.value = ""
         domains.value = ""
         ips.value = ""
     }
@@ -82,7 +85,12 @@ class SummaryStatisticsViewModel(
                     if (appConfig.getBraveMode().isDnsMode()) {
                         dnsLogDAO.getMostBlockedDomains()
                     } else {
-                        connectionTrackerDAO.getMostBlockedDomains()
+                        // if any app bypasses the dns, then the decision made in flow() call
+                        if (FirewallManager.isAnyAppBypassesDns()) {
+                            connectionTrackerDAO.getMostBlockedDomains()
+                        } else {
+                            dnsLogDAO.getMostBlockedDomains()
+                        }
                     }
                 }
                 .liveData
@@ -102,6 +110,24 @@ class SummaryStatisticsViewModel(
         ips.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getMostBlockedIps()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
+    val getMostContactedCountries =
+        countryActivities.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    connectionTrackerDAO.getMostContactedCountries()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
+    val getMostBlockedCountries =
+        countryActivities.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    connectionTrackerDAO.getMostBlockedCountries()
                 }
                 .liveData
                 .cachedIn(viewModelScope)

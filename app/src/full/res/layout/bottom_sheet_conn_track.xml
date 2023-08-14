@@ -31,14 +31,14 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
-            android:layout_toStartOf="@id/bs_conn_track_app_kill"
+            android:layout_toStartOf="@id/bs_conn_track_app_info"
             android:padding="5dp"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/small_font_text_view"
             android:visibility="visible" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/bs_conn_track_app_kill"
+            android:id="@+id/bs_conn_track_app_info"
             style="@style/ThinnerChip.Action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -133,11 +133,24 @@
         android:layout_marginBottom="10dp"
         android:ellipsize="end"
         android:gravity="center"
+        android:fontFamily="sans-serif-light"
         android:padding="5dp"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"
         android:textSize="@dimen/default_font_text_view"
         android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/connection_upload_download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:gravity="center"
+        android:maxLines="1"
+        android:fontFamily="sans-serif-light"
+        android:singleLine="true"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
@@ -307,20 +320,41 @@
         android:id="@+id/bs_conn_trusted_msg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/trusted_domains_desc"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:gravity="center_vertical"
-        android:textColor="?attr/chipTextNegative"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:fontFamily="monospace"
+        android:gravity="center_vertical"
+        android:text="@string/trusted_domains_desc"
+        android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/small_font_text_view" />
 
-    <TextView
-        android:id="@+id/bs_conn_blocked_time"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/connection_summary_ll"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textSize="@dimen/default_font_text_view" />
+        android:baselineAligned="false"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/connection_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="start"
+            android:fontFamily="sans-serif-light"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="2"
+            android:paddingStart="8dp"
+            android:paddingEnd="10dp"
+            android:scrollHorizontally="true"
+            android:singleLine="false"
+            android:textAppearance="@android:style/TextAppearance.Material.Body1"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
+    </LinearLayout>
+
 </LinearLayout>

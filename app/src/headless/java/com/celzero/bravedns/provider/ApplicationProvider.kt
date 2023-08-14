@@ -143,7 +143,7 @@ class ApplicationProvider : ContentProvider() {
             for (i in 0 until c) {
                 clause = clause.replaceFirst("?", selectionArgs?.get(i) ?: "")
             }
-            Log.d(
+            Log.i(
                 LoggerConstants.LOG_PROVIDER,
                 "selection ${appInfo.appName}, ${appInfo.uid}, ${appInfo.firewallStatus} clause: $clause"
             )

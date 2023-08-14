@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:visibility="visible">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         style="@style/TextAppearance.AppCompat.Subhead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:text="@string/settings_dns_proxy_dialog_header"
         android:textSize="@dimen/large_font_text_view" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -33,7 +33,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -59,7 +59,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -67,7 +67,7 @@
             android:text="@string/settings_dns_proxy_dialog_hostname"
             android:textSize="@dimen/large_font_text_view" />
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/dialog_proxy_edit_ip"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -95,7 +95,7 @@
             android:text="@string/settings_dns_proxy_dialog_port_number"
             android:textSize="@dimen/large_font_text_view" />
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/dialog_proxy_edit_port"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -116,7 +116,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -124,7 +124,7 @@
             android:text="@string/settings_dns_proxy_dialog_username"
             android:textSize="@dimen/large_font_text_view" />
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/dialog_proxy_edit_username"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -152,7 +152,7 @@
             android:text="@string/settings_dns_proxy_dialog_password"
             android:textSize="@dimen/large_font_text_view" />
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/dialog_proxy_edit_password"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -173,7 +173,7 @@
         android:padding="10dp"
         android:weightSum="1">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

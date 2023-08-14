@@ -27,7 +27,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
@@ -44,9 +43,9 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.BuildConfig
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.NonStoreAppUpdater
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
@@ -64,6 +63,7 @@ import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants
@@ -81,6 +81,7 @@ import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
 import com.celzero.bravedns.util.Utilities.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -130,7 +131,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         initUpdateCheck()
 
         observeAppState()
+    }
 
+    override fun onResume() {
+        super.onResume()
         if (persistentState.biometricAuth && !isAppRunningOnTv()) {
             biometricPrompt()
         }
@@ -175,7 +179,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         )
                         showToastUiCentered(
                             applicationContext,
-                            getString(R.string.hs_biometeric_error) + errString,
+                            errString.toString(),
                             Toast.LENGTH_SHORT
                         )
                         finish()
@@ -267,7 +271,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun showRestoreDialog(uri: Uri) {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(R.string.brbs_restore_dialog_title)
         builder.setMessage(R.string.brbs_restore_dialog_message)
         builder.setPositiveButton(getString(R.string.brbs_restore_dialog_positive)) { _, _ ->
@@ -345,6 +349,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
+        // for version v055
+        updateHttpProxyForV55()
+
         // for version v03k
         removeKeyFromSharedPref()
         changeDefaultToMax()
@@ -369,6 +376,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 )
             }
         }
+    }
+
+    private fun updateHttpProxyForV55() {
+        // for version v055
+        val port = persistentState.httpProxyPort
+        // no need to perform below changes if the port / host is not set
+        if (port == INVALID_PORT || persistentState.httpProxyHostAddress.isEmpty()) return
+
+        val ip = persistentState.httpProxyHostAddress
+        val host = "http://$ip:$port/"
+        persistentState.httpProxyHostAddress = host
     }
 
     private fun changeDefaultToMax() {
@@ -645,7 +663,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         title: String,
         message: String
     ) {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(title)
         builder.setMessage(message)
         builder.setCancelable(false)

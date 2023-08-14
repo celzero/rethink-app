@@ -27,6 +27,9 @@ class Constants {
         // rethink base url (modified from download to dl on v053l)
         const val DOWNLOAD_BASE_URL = "https://dl.rethinkdns.com"
 
+        // rethink base url for tcp proxy
+        const val TCP_PROXY_BASE_URL = "https://redir.nile.workers.dev"
+
         const val FILE_TAG = "filetag.json"
 
         // file names which are downloaded as part of on-device blocklists
@@ -124,8 +127,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v054c)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1682978161602
+        // default filetag.json for remote blocklist (stored in assets folder) (v055)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1690926960536
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"
@@ -176,7 +179,8 @@ class Constants {
         // data-time format used as part of network log adapter
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 
-        // constants generated as part of com.celzero.bravedns.BuildConfig.FLAVORS (playstore/fdroid/website)
+        // constants generated as part of com.celzero.bravedns.BuildConfig.FLAVORS
+        // (playstore/fdroid/website)
         const val FLAVOR_PLAY = "play"
         const val FLAVOR_FDROID = "fdroid"
         const val FLAVOR_WEBSITE = "website"
@@ -276,9 +280,10 @@ class Constants {
 
         val DEFAULT_DNS_LIST =
             listOf(
-                DefaultDnsServer(0, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
-                DefaultDnsServer(1, "Google", "https://dns.google.com/dns-query", "DoH"),
-                DefaultDnsServer(2, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
+                DefaultDnsServer(0, "None", "", "None"),
+                DefaultDnsServer(1, "Rethink", "https://zero.rethinkdns.com/dns-query", "DoH"),
+                DefaultDnsServer(2, "Google", "https://dns.google.com/dns-query", "DoH"),
+                DefaultDnsServer(3, "Cloudflare", "https://cloudflare-dns.com/dns-query", "DoH")
             )
 
         // pcap folder name
@@ -292,5 +297,8 @@ class Constants {
 
         // max logs to retrieve from the database, used in the log fragment
         const val MAX_LOGS = 35000
+
+        // wireguard folder name
+        const val WIREGUARD_FOLDER_NAME = "wireguard"
     }
 }

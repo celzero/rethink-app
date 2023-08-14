@@ -54,6 +54,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
+        const val WIREGUARD = "wireguard_enabled_count"
+        const val WIREGUARD_UPDATED = "wireguard_updated"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -112,7 +114,8 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var httpProxyPort by intPref("http_proxy_port").withDefault<Int>(INVALID_PORT)
 
     // user set http proxy ip / hostname
-    var httpProxyHostAddress by stringPref("http_proxy_ipaddress").withDefault<String>("")
+    var httpProxyHostAddress by
+        stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     // default: false for fdroid flavour
@@ -132,12 +135,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user set preference whether firewall should block all connections when device is locked
     private var _blockWhenDeviceLocked by booleanPref("screen_state").withDefault<Boolean>(false)
-
-    // total dns requests the app has served since installation (or post clear data)
-    var numberOfRequests by longPref("dns_number_request").withDefault<Long>(0)
-
-    // total dns requests blocked since installation
-    var numberOfBlockedRequests by longPref("dns_blocked_request").withDefault<Long>(0)
 
     // whether to block connections from apps not in the foreground
     private var _blockAppWhenBackground by
@@ -243,7 +240,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
 
     // enable dns alg
-    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
+    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(true)
 
     // dns crypt relay server
     var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")
@@ -255,7 +252,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var pcapMode by intPref("pcap_mode").withDefault<Int>(PcapMode.NONE.id)
 
     // dns caching in tunnel
-    var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(false)
+    var enableDnsCache by booleanPref("dns_cache").withDefault<Boolean>(true)
 
     // private ips, default false (route private ips to tunnel)
     var privateIps by booleanPref("private_ips").withDefault<Boolean>(false)
@@ -266,12 +263,20 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // go logger level, default 2 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
 
+    // count of wireguard enabled
+    var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
+
+    // wireguard updated
+    var wireguardUpdated by booleanPref("wireguard_updated").withDefault<Boolean>(false)
+
+    // previous data usage check timestamp
+    var prevDataUsageCheck by longPref("prev_data_usage_check").withDefault<Long>(INIT_TIME_MS)
+
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()
-    var dnsBlockedCountLiveData: MutableLiveData<Long> = MutableLiveData()
-    var dnsRequestsCountLiveData: MutableLiveData<Long> = MutableLiveData()
     var vpnEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
     var universalRulesCount: MutableLiveData<Int> = MutableLiveData()
+    var proxyStatus: MutableLiveData<Int> = MutableLiveData()
 
     var remoteBlocklistCount: MutableLiveData<Int> = MutableLiveData()
 
@@ -397,5 +402,39 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     fun getBlockWhenDeviceLocked(): Boolean {
         return _blockWhenDeviceLocked
+    }
+
+    fun getProxyStatus(): Int {
+        if (proxyStatus.value == null) updateProxyStatus()
+        return proxyStatus.value ?: -1
+    }
+
+    fun updateProxyStatus() {
+        val status =
+            when (AppConfig.ProxyProvider.getProxyProvider(proxyProvider)) {
+                AppConfig.ProxyProvider.WIREGUARD -> {
+                    R.string.lbl_wireguard
+                }
+                AppConfig.ProxyProvider.ORBOT -> {
+                    R.string.orbot
+                }
+                AppConfig.ProxyProvider.TCP -> {
+                    R.string.orbot_socks5
+                }
+                AppConfig.ProxyProvider.CUSTOM -> {
+                    val type = AppConfig.ProxyType.of(proxyType)
+                    if (type == AppConfig.ProxyType.SOCKS5) {
+                        R.string.lbl_socks5
+                    } else if (type == AppConfig.ProxyType.HTTP) {
+                        R.string.lbl_http
+                    } else {
+                        R.string.lbl_http_socks5
+                    }
+                }
+                else -> {
+                    -1
+                }
+            }
+        proxyStatus.postValue(status)
     }
 }

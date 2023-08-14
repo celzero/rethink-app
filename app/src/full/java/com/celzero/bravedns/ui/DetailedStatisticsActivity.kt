@@ -100,6 +100,14 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
                 b.dsaTitle.text = getString(R.string.ssv_most_blocked_ips_heading)
                 viewModel.getAllBlockedIps
             }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                b.dsaTitle.text = getString(R.string.ssv_most_contacted_countries_heading)
+                viewModel.getAllContactedCountries
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
+                b.dsaTitle.text = getString(R.string.ssv_most_blocked_countries_heading)
+                viewModel.getAllBlockedCountries
+            }
         }
     }
 }

@@ -28,12 +28,12 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.celzero.bravedns.util.Utilities
 
-@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 4, exportSchema = false)
+@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 5, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LogDatabase : RoomDatabase() {
 
     companion object {
-        private const val LOGS_DATABASE_NAME = "rethink_logs.db"
+        const val LOGS_DATABASE_NAME = "rethink_logs.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
         private const val TABLE_NAME_DNS_LOGS = "DnsLogs"
         // previous table name for dns logs
@@ -61,6 +61,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addCallback(roomCallback)
                 .addMigrations(MIGRATION_2_3)
                 .addMigrations(MIGRATION_3_4)
+                .addMigrations(MIGRATION_4_5)
                 .build()
         }
 
@@ -181,6 +182,30 @@ abstract class LogDatabase : RoomDatabase() {
                     )
                     database.execSQL(
                         "CREATE INDEX IF NOT EXISTS index_ConnectionTracker_blockedByRule ON ConnectionTracker(blockedByRule)"
+                    )
+                }
+            }
+
+        private val MIGRATION_4_5: Migration =
+            object : Migration(4, 5) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "ALTER TABLE ConnectionTracker add column connId TEXT DEFAULT '' NOT NULL"
+                    )
+                    database.execSQL(
+                        "ALTER TABLE ConnectionTracker add column downloadBytes INTEGER DEFAULT 0 NOT NULL"
+                    )
+                    database.execSQL(
+                        "ALTER TABLE ConnectionTracker add column uploadBytes INTEGER DEFAULT 0 NOT NULL"
+                    )
+                    database.execSQL(
+                        "ALTER TABLE ConnectionTracker add column duration INTEGER DEFAULT 0 NOT NULL"
+                    )
+                    database.execSQL(
+                        "ALTER TABLE ConnectionTracker add column synack INTEGER DEFAULT 0 NOT NULL"
+                    )
+                    database.execSQL(
+                        "ALTER TABLE ConnectionTracker add column message TEXT DEFAULT '' NOT NULL"
                     )
                 }
             }

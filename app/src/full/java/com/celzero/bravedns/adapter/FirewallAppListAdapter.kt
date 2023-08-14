@@ -42,6 +42,7 @@ import com.celzero.bravedns.ui.AppInfoActivity
 import com.celzero.bravedns.ui.AppInfoActivity.Companion.UID_INTENT_NAME
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter(
@@ -104,7 +105,7 @@ class FirewallAppListAdapter(
         private fun getFirewallText(
             aStat: FirewallManager.FirewallStatus,
             cStat: FirewallManager.ConnectionStatus
-        ): CharSequence {
+        ): String {
             return when (aStat) {
                 FirewallManager.FirewallStatus.NONE ->
                     when (cStat) {
@@ -387,7 +388,7 @@ class FirewallAppListAdapter(
 
         private fun showDialog(packageList: List<String>, appInfo: AppInfo, isWifi: Boolean) {
 
-            val builderSingle: AlertDialog.Builder = AlertDialog.Builder(context)
+            val builderSingle = MaterialAlertDialogBuilder(context)
 
             builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
             val count = packageList.count()
@@ -403,7 +404,7 @@ class FirewallAppListAdapter(
             builderSingle.setItems(packageList.toTypedArray(), null)
 
             builderSingle
-                .setPositiveButton(context.getString(R.string.ctbs_proceed_positive_text)) {
+                .setPositiveButton(context.getString(R.string.lbl_proceed)) {
                     _: DialogInterface,
                     _: Int ->
                     if (isWifi) {

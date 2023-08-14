@@ -43,9 +43,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         MOST_CONNECTED_APPS(0),
         MOST_BLOCKED_APPS(1),
         MOST_CONTACTED_DOMAINS(2),
-        MOST_BLOCKED_DOMAINS(3),
-        MOST_CONTACTED_IPS(4),
-        MOST_BLOCKED_IPS(5);
+        MOST_CONTACTED_COUNTRIES(3),
+        MOST_BLOCKED_DOMAINS(4),
+        MOST_CONTACTED_IPS(5),
+        MOST_BLOCKED_IPS(6),
+        MOST_BLOCKED_COUNTRIES(7);
 
         companion object {
             fun getType(t: Int): SummaryStatisticsType {
@@ -53,9 +55,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                     MOST_CONNECTED_APPS.tid -> MOST_CONNECTED_APPS
                     MOST_BLOCKED_APPS.tid -> MOST_BLOCKED_APPS
                     MOST_CONTACTED_DOMAINS.tid -> MOST_CONTACTED_DOMAINS
+                    MOST_CONTACTED_COUNTRIES.tid -> MOST_CONTACTED_COUNTRIES
                     MOST_BLOCKED_DOMAINS.tid -> MOST_BLOCKED_DOMAINS
                     MOST_CONTACTED_IPS.tid -> MOST_CONTACTED_IPS
                     MOST_BLOCKED_IPS.tid -> MOST_BLOCKED_IPS
+                    MOST_BLOCKED_COUNTRIES.tid -> MOST_BLOCKED_COUNTRIES
                     // make most contacted apps as default
                     else -> MOST_CONNECTED_APPS
                 }
@@ -74,9 +78,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showAppNetworkActivity()
         showBlockedApps()
         showMostContactedDomain()
+        showMostContactedCountries()
         showBlockedDomains()
         showMostContactedIps()
         showBlockedIps()
+        showMostBlockedCountries()
     }
 
     private fun initClickListeners() {
@@ -99,6 +105,13 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
         b.fssNetworkLogsChipSecond.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_IPS)
+        }
+
+        b.fssCountriesLogsChip.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_CONTACTED_COUNTRIES)
+        }
+        b.fssCountriesChipSecond.setOnClickListener {
+            openDetailedStatsUi(SummaryStatisticsType.MOST_BLOCKED_COUNTRIES)
         }
     }
 
@@ -286,6 +299,41 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
     }
 
+    private fun showMostContactedCountries() {
+        // if firewall is not active, hide the view
+        if (!appConfig.getBraveMode().isFirewallActive()) {
+            b.fssCountriesAllowedLl.visibility = View.GONE
+            return
+        }
+
+        b.fssContactedCountriesRecyclerView.setHasFixedSize(true)
+        val layoutManager = CustomLinearLayoutManager(requireContext())
+        b.fssContactedCountriesRecyclerView.layoutManager = layoutManager
+
+        val recyclerAdapter =
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
+            )
+        viewModel.getMostContactedCountries.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssCountriesAllowedLl.visibility = View.GONE
+                }
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
+        b.fssContactedCountriesRecyclerView.adapter = recyclerAdapter
+    }
+
     private fun showBlockedIps() {
         // if firewall is not active, hide the view
         if (!appConfig.getBraveMode().isFirewallActive()) {
@@ -319,5 +367,40 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
+    }
+
+    private fun showMostBlockedCountries() {
+        // if firewall is not active, hide the view
+        if (!appConfig.getBraveMode().isFirewallActive()) {
+            b.fssCountriesBlockedLl.visibility = View.GONE
+            return
+        }
+
+        b.fssContactedCountriesRecyclerView.setHasFixedSize(true)
+        val layoutManager = CustomLinearLayoutManager(requireContext())
+        b.fssCountriesBlockedRecyclerView.layoutManager = layoutManager
+
+        val recyclerAdapter =
+            SummaryStatisticsAdapter(
+                requireContext(),
+                persistentState,
+                appConfig,
+                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES
+            )
+        viewModel.getMostBlockedCountries.observe(viewLifecycleOwner) {
+            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
+        recyclerAdapter.addLoadStateListener {
+            if (it.append.endOfPaginationReached) {
+                if (recyclerAdapter.itemCount < 1) {
+                    b.fssCountriesBlockedLl.visibility = View.GONE
+                }
+            }
+        }
+        val scale = resources.displayMetrics.density
+        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        b.fssCountriesBlockedRecyclerView.minimumHeight = pixels.toInt()
+        b.fssCountriesBlockedRecyclerView.adapter = recyclerAdapter
     }
 }

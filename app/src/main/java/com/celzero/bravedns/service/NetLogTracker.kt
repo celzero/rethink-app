@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import com.celzero.bravedns.data.ConnTrackerMetaData
+import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
@@ -40,7 +41,7 @@ internal constructor(
 
     private val dnsLatencyTracker by inject<QueryTracker>()
 
-    var scope: CoroutineScope? = null
+    private var scope: CoroutineScope? = null
         private set
 
     private var dnsLogTracker: DnsLogTracker? = null
@@ -48,6 +49,7 @@ internal constructor(
 
     private var dnsNetLogBatcher: NetLogBatcher<DnsLog>? = null
     private var ipNetLogBatcher: NetLogBatcher<ConnectionTracker>? = null
+    private var summaryBatcher: NetLogBatcher<ConnectionSummary>? = null
 
     suspend fun startLogger(s: CoroutineScope) {
         if (ipTracker == null) {
@@ -66,6 +68,9 @@ internal constructor(
 
         dnsNetLogBatcher = NetLogBatcher(dnsLogTracker!!::insertBatch)
         dnsNetLogBatcher!!.begin(scope!!)
+
+        summaryBatcher = NetLogBatcher(ipTracker!!::updateBatch)
+        summaryBatcher!!.begin(scope!!)
     }
 
     fun writeIpLog(info: ConnTrackerMetaData) {
@@ -75,6 +80,12 @@ internal constructor(
             val connTracker = ipTracker?.makeConnectionTracker(info) ?: return@launch
             ipNetLogBatcher?.add(connTracker)
         }
+    }
+
+    fun updateIpSummary(summary: ConnectionSummary) {
+        if (!persistentState.logsEnabled) return
+
+        scope?.launch { summaryBatcher?.add(summary) }
     }
 
     // now, this method is doing multiple things which should be removed.
@@ -88,14 +99,14 @@ internal constructor(
 
         val dnsLog = dnsLogTracker?.makeDnsLogObj(transaction) ?: return
 
+        // TODO: This method should be part of BraveVPNService
+        dnsLogTracker?.updateVpnConnectionState(transaction)
+
         // ideally this check should be carried out before processing the dns object.
         // Now, the ipDomain cache is adding while making the dnsLog object.
         // TODO: move ipDomain cache out of DnsLog object creation
         if (!persistentState.logsEnabled) return
 
-        dnsLogTracker?.updateDnsRequestCount(dnsLog)
         scope?.launch { dnsNetLogBatcher?.add(dnsLog) }
-        // TODO: This method should be part of BraveVPNService
-        dnsLogTracker?.updateVpnConnectionState(transaction)
     }
 }
