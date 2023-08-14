@@ -105,6 +105,7 @@
                             android:layout_marginStart="7dp"
                             android:layout_marginTop="10dp"
                             android:ellipsize="marquee"
+                            android:text="@string/lbl_fast"
                             android:marqueeRepeatLimit="marquee_forever"
                             android:padding="5dp"
                             android:paddingTop="10dp"

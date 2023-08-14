@@ -279,6 +279,10 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return rule.act != R.integer.allow
         }
 
+        fun isProxied(rule: FirewallRuleset): Boolean {
+            return rule.id == RULE12.id
+        }
+
         fun shouldShowHint(rule: String?): Boolean {
             if (rule == null) return false
 

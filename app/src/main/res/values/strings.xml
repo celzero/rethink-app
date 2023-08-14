@@ -82,6 +82,7 @@
     <string name="symbol_elephant" translatable="false">🐘</string>
     <string name="symbol_turtle" translatable="false">🐢</string>
     <string name="symbol_green_circle" translatable="false">🟢</string>
+    <string name="symbol_key" translatable="false">🗝️</string>
 
     <string name="slide_2_title" translatable="true">Welcome</string>
     <string name="slide_2_desc" translatable="true">Rethink is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
@@ -352,17 +353,19 @@
     <string name="whats_dialog_title" translatable="true">What\'s new in v055</string>
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Jason A. Donenfeld</b><br/><br/>
         1. <i>New feature</i>: Multi-VPN support with any number of WireGuard upstreams.<br/>
-        2. Improved UI to manage per-app IP and Domain rules.<br/>
-        3. Bigger UI tiles on the homescreen.<br/>
-        4. Firewall UI refresh.<br/>
-        5. Restrict Tor-as-a-proxy (Orbot) to specific apps.<br/>
-        6. Stats UI now shows Geo IP based grouping.<br/>
-        7. Show data usage in Network Logs: upload and download bytes per-request.<br/>
+        2. <i>New feature</i>: Active (open) connection indicator in Network Logs.</br>
+        3. <i>New feature</i>: Restrict Tor-as-a-proxy (Orbot) to specific apps.<br/>
+        4. <i>New feature</i>: Stats UI now shows Geo IP based grouping.<br/>
+        5. <i>New feature</i>: Show data usage in Network Logs: upload and download bytes per-request.<br/>
+        6. <i>New feature</i>: Per app upload and download stats.<br/>
+        7. <i>New feature</i>: Support for local DNS-over-HTTPS (non-public) resolvers.<br/>
         8. Super detailed on-demand bug reports for better diagnostics.<br/>
-        9. Support for local DNS-over-HTTPS (non-public) resolvers.<br/>
-        10. DNS Booster is now enabled by default.<br/>
-        11. Make HTTP Proxy work for CONNECT tunnels.</br>
-        12. </br></br>
+        9. DNS Booster is now enabled by default.<br/>
+        10. Improved UI to manage per-app IP and Domain rules.<br/>
+        11. Bigger UI tiles on the homescreen.<br/>
+        12. Firewall UI refresh.<br/>
+        13. <i>Bug fix</i>: Make HTTP Proxy work for CONNECT tunnels.</br>
+        14. <i>Bug fix</i>: Trust (allowlisting) domains now works with third-party DNS resolvers.</br></br>
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 

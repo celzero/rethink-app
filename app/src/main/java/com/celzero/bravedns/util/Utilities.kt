@@ -65,7 +65,6 @@ import com.google.common.net.InternetDomainName
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -77,6 +76,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 
 object Utilities {
 
@@ -118,11 +118,7 @@ object Utilities {
             am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
         for (enabledService in enabledServices) {
             val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
-            if (DEBUG)
-                Log.i(
-                    LOG_TAG_VPN,
-                    "Accessibility enabled check for: ${enabledServiceInfo.packageName}"
-                )
+            Log.i(LOG_TAG_VPN, "Accessibility enabled check for: ${enabledServiceInfo.packageName}")
             if (
                 enabledServiceInfo.packageName == context.packageName &&
                     enabledServiceInfo.name == service.name
@@ -130,11 +126,10 @@ object Utilities {
                 return true
             }
         }
-        if (DEBUG)
-            Log.e(
-                LOG_TAG_VPN,
-                "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}"
-            )
+        Log.e(
+            LOG_TAG_VPN,
+            "Accessibility failure, ${context.packageName},  ${service.name}, return size: ${enabledServices.count()}"
+        )
         return false
     }
 
@@ -171,7 +166,7 @@ object Utilities {
                 e
             )
         }
-        if (DEBUG) Log.d(LOG_TAG_VPN, "Accessibility enabled check failed")
+        Log.w(LOG_TAG_VPN, "Accessibility service not enabled via Settings Secure")
         return isAccessibilityServiceEnabled(context, accessibilityService)
     }
 

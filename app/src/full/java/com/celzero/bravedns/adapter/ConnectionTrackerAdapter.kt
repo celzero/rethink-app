@@ -203,6 +203,16 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
                 }
             }
+
+            if (ruleName == null) return
+
+            val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return
+
+            if (FirewallRuleset.isProxied(rule)) {
+                b.connectionSummaryLl.visibility = View.VISIBLE
+                b.connectionDelay.text =
+                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
+            }
         }
 
         private fun displaySummaryDetails(ct: ConnectionTracker) {
@@ -248,7 +258,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
             } else {
-                b.connectionDelay.visibility = View.INVISIBLE
+                // no-op
             }
         }
 

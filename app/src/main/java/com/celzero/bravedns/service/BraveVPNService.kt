@@ -474,6 +474,11 @@ class BraveVPNService :
             return false
         }
 
+        // no need to check for uid if http or socks5 proxy is enabled
+        if (appConfig.isCustomHttpProxyEnabled() || appConfig.isCustomSocks5Enabled()) {
+            return true
+        }
+
         val id = ProxyManager.getProxyIdForApp(uid)
         if (id == ProxyManager.ID_SYSTEM) {
             Log.i(LOG_TAG_VPN, "No proxy enabled for uid=$uid")
