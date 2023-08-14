@@ -695,7 +695,6 @@
     <string name="orbot_bs_status_4">Configuración de Tor-como-un-Proxy (Orbot) con un solo clic.</string>
     <string name="settings_network_all_networks_desc">Cuando está activado, Rethink utiliza todas las redes disponibles para conectarse a Internet. Si no, utiliza la red que Android considere <i>activa</i>.</string>
     <string name="settings_custom_downloader_desc">Si se desactiva, se utilizará el <i>Administrador de descargas</i> integrado en Android</string>
-    <string name="orbot_explanation"></string>
     <string name="orbot_both">Proxy HTTP + TCP</string>
     <string name="orbot_both_desc">Todas las anteriores.</string>
     <string name="orbot_install_activity_error">Algo salió mal, inténtalo después de un tiempo</string>
