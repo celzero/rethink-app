@@ -190,10 +190,11 @@ class DomainRuleProvider : ContentProvider() {
             for (i in 0 until c) {
                 clause = clause.replaceFirst("?", selectionArgs?.get(i) ?: "")
             }
-            Log.d(
-                LoggerConstants.LOG_PROVIDER,
-                "selection ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status} clause: $clause"
-            )
+            if (DEBUG)
+                Log.d(
+                    LoggerConstants.LOG_PROVIDER,
+                    "selection ${customDomain.domain}, ${customDomain.uid}, ${customDomain.status} clause: $clause"
+                )
             val count = customDomainRepository.cpUpdate(customDomain, clause)
             CoroutineScope(Dispatchers.IO).launch { DomainRulesManager.updateCache(customDomain) }
             context.contentResolver?.notifyChange(uri, null)

@@ -51,6 +51,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URI
 import java.util.concurrent.TimeUnit
 
 /**
@@ -290,7 +291,7 @@ class OrbotHelper(
         val contentTitle = context.resources.getString(R.string.lbl_action_required)
         val contentText = context.resources.getString(R.string.settings_orbot_notification_content)
         builder
-            .setSmallIcon(R.drawable.dns_icon)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle(contentTitle)
             .setContentIntent(pendingIntent)
             .setContentText(contentText)
@@ -369,13 +370,22 @@ class OrbotHelper(
 
     private fun handleOrbotHttpUpdate(): Boolean {
         return if (httpsIp != null && httpsPort != null) {
-            persistentState.httpProxyHostAddress = httpsIp!!
-            persistentState.httpProxyPort = httpsPort!!
+            persistentState.httpProxyHostAddress = constructHttpAddress(httpsIp!!, httpsPort!!)
             true
         } else {
             Log.w(LOG_TAG_VPN, "could not setup Orbot http proxy with ${httpsIp}:${httpsPort}")
             false
         }
+    }
+
+    private fun constructHttpAddress(ip: String?, port: Int?): String {
+        val proxyUrl = StringBuilder()
+        // Orbot only supports http proxy
+        proxyUrl.append("http://")
+        proxyUrl.append(ip)
+        proxyUrl.append(":")
+        proxyUrl.append(port)
+        return URI.create(proxyUrl.toString()).toASCIIString()
     }
 
     private fun constructProxy(): ProxyEndpoint? {

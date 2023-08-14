@@ -29,7 +29,6 @@
     <string name="firewall_rules">Reguły Sieci</string>
     <string name="firewall_mode_info_title">Zapora</string>
     <string name="dns_firewall_mode_info_explanation_new">Powyższe + omijanie cenzury Internetu.</string>
-    <string name="wireguard_mode_info_explanation_new">Dostępne wkrótce.</string>
     <string name="pause_title_desc">chwila przerwy…</string>
     <string name="settings_title_desc">Wysoce konfigurowalny DNS i Firewall</string>
     <string name="about_title_desc">Wykrywaj i blokuj zagrożenia bezpieczeństwa sieci</string>
@@ -161,7 +160,6 @@
     <string name="show_logs_disabled_dns_message" translatable="true">Rejestrowanie żądań DNS zostało wyłączone. Aby ponownie włączyć, przejdź do <i>Ustawień</i> i włącz <i>Włącz rejestrowanie na urządzeniu.</i></string>
     <string name="http_proxy_dialog_heading" translatable="true">Ustawianie serwera proxy HTTP (S)</string>
     <string name="download_update_dialog_title" translatable="true">Nowa aktualizacja!</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Ustawienia serwera proxy HTTP (S) są tylko wskazówką dla aplikacji, ale mogą one z niego korzystać lub nie; jednak przeglądarki takie jak Chrome i Firefox używają ich. Aplikacje korzystające z serwera proxy HTTP (S) będą pomijać firewall, jak i dns ustawienia.</string>
     <string name="download_update_dialog_trylater_message" translatable="true">Aktualizacja nie może zostać wykonana teraz, spróbuj ponownie później.</string>
     <string name="search_universal_ips" translatable="true"><font size="12"> Wyszukiwanie adresów IP</font></string>
     <string name="search_custom_domains" translatable="true"><font size="12">Wyszukaj nazwy domen</font></string>
@@ -236,7 +234,7 @@
     <string name="orbot_install_dialog_title" translatable="true">Zainstalować Orbot\?</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Powiadomienia aplikacji</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Włącz uprawnienie do pokazywania powiadomień</string>
-    <string name="settings_http_proxy_desc" translatable="true">Przekierowuję do: %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc" translatable="true">Przekierowuję do: %1$s</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Własny adres URL serwera</string>
     <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
 \n
@@ -247,24 +245,19 @@
 \nOrbot używa <u>Tora</u> do szyfrowania ruchu internetowego, co pomaga <u>ominąć cenzurę</u> i bronić się przed formami <u>inwigilacji</u>, które zagrażają wolności osobistej i prywatności.
 \n<u>Proxy TCP</u>: RethinkDNS przekazuje do Orbota tylko połączenia TCP wszystkich aplikacji poza wykluczonymi.
 \n<u>Proxy HTTP</u>: RethinkDNS <i>ustawia</i> proxy HTTP, ale nie wymusza używania go przez aplikacje. Zwykle używają go przeglądarki takie jak Chrome i Firefox. Aplikacje korzystające z serwera proxy HTTP(S) będą omijać zarówno reguły zapory sieciowej, jak i DNS.</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">Po włączeniu reguły zapory aplikacji dla taryfowych (np. mobilnych) i niemierzonych (np. Wi-Fi) nie będą honorowane.
-\n
-\nCzy chcesz kontynuować\?</string>
     <string name="settings_import_export_heading" translatable="true">Kopia zapasowa i przywracanie</string>
     <string name="settings_import_export_desc" translatable="true">Ręcznie wykonaj kopię zapasową lub przywróć dane i ustawienia aplikacji.</string>
     <string name="settings_orbot_disabled_error" translatable="true">Wyłącz proxy HTTP (S) i/lub SOCKS5, aby kontynuować konfigurację Tor-as-a-proxy.</string>
     <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
     <string name="settings_orbot_install_desc" translatable="true">Kliknij tutaj, aby zainstalować Orbot-a</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">Uruchom RethinkDNS, aby kontynuować.</string>
-    <string name="settings_https_disabled_error" translatable="true">Połączony z Orbotem. Wyłącz ją, aby kontynuować.</string>
+    <string name="settings_https_disabled_error" translatable="true">Połączony z %1$s. Wyłącz ją, aby kontynuować.</string>
     <string name="settings_orbot_notification_content" translatable="true">Błąd uruchamiania Tor-as-a-Proxy. Otwórz aplikację Orbot, aby uruchomić ją ręcznie.</string>
-    <string name="settings_socks5_disabled_error" translatable="true">Połączony z Orbotem. Wyłącz, aby kontynuować.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Połączony z %1$sem. Wyłącz, aby kontynuować.</string>
     <string name="settings_ptrans_heading" translatable="true">Wymuś wyjście IPv4</string>
     <string name="settings_network_all_networks_desc" translatable="true">Po włączeniu RethinkDNS używa wszystkich dostępnych sieci do łączenia się z Internetem. Jeśli nie, używa dowolnej sieci, która zostanie uznana za <i>aktywną</i> przez Androida.</string>
     <string name="settings_autostart_bootup_desc" translatable="true">Po włączeniu urządzenia uruchom RethinkDNS, jeśli był uruchomiony przed zamknięciem.</string>
     <string name="settings_network_all_networks" translatable="true">Użyj wszystkich dostępnych sieci (eksperymentalnie)</string>
-    <string name="settings_all_networks_dialog_title" translatable="true">Uwaga!</string>
-    <string name="settings_all_networks_dialog_positive_btn" translatable="true">Włącz mimo to</string>
     <string name="settings_check_update_heading" translatable="true">Sprawdzanie dostępności aktualizacji aplikacji</string>
     <string name="settings_custom_downloader_heading" translatable="true">Korzystanie z narzędzia do pobierania w aplikacji</string>
     <string name="settings_orbot_notification_action" translatable="true">Otwórz Orbot-a</string>
@@ -342,7 +335,6 @@
     <string name="bsct_block_domain" translatable="true">Zablokuj, zaufaj <u>domenie</u> dla <u>tej aplikacji</u></string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Nie można skonfigurować serwerów proxy, gdy sieć VPN działa w trybie tylko DNS lub w trybie blokady. <u>Przejdź do ustawień VPN</u></string>
     <string name="settings_general_customize" translatable="true">dostosuj</string>
-    <string name="settings_http_proxy_port" translatable="true">Port</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">Ustaw proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="true">Wybrana aplikacja zostanie wykluczona z VPN, aby umożliwić jej połączenia proxy w Twoim imieniu.</string>
     <string name="settings_socks5_dialog_hint_port" translatable="true">Port</string>
@@ -388,7 +380,6 @@
     <string name="cd_custom_doh_dialog_title" translatable="true">Niestandardowy adres URL serwera</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Wewnętrzny</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">Zewnętrzny</string>
-    <string name="ct_delete_logs_positive_btn" translatable="true">Usuń dzienniki (logi)</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s inne aplikacje</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">Wróć</string>
     <string name="dns_btm_sheet_chip" translatable="true">+%1$s Inne IP</string>
@@ -400,13 +391,11 @@
     <string name="dns_proxy_dialog_message_no_app" translatable="true">Adres IP: %1$s
 \n
 \nNumer portu: %2$s</string>
-    <string name="dns_proxy_positive_btn" translatable="true">dodaj</string>
     <string name="fapps_filter_filter_heading" translatable="true">Typ</string>
     <string name="fapps_filter_clear_btn" translatable="true">Oczyść</string>
     <string name="fapps_firewall_filter_excluded" translatable="true">Wykluczony</string>
     <string name="fapps_unmetered_block_dialog_message" translatable="true">Zablokować połączenia w sieci WiFi dla <i>wymienionych</i> aplikacji\?</string>
     <string name="fapps_metered_block_dialog_message" translatable="true">Zablokować połączenia w sieci taryfowej (komórkowej) dla <i>wymienionych</i> aplikacji\?</string>
-    <string name="fapps_all_network_hint" translatable="true"><u>Używaj wszystkich sieci</u>jest włączona. Firewall nie będzie honorował reguł WiFi / komórkowej (taryfowej).</string>
     <string name="fapps_lockdown_hint" translatable="true">VPN jest w trybie blokady. Firewall nie będzie honorować reguł mierzonych/niezmierzonych.</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Wyświetlam wszystkie aplikacje</string>
     <string name="fapps_firewall_filter_desc" translatable="true">Wyświetlanie <u>%1$s</u> %2$s aplikacji</string>
@@ -443,7 +432,6 @@
     <string name="build__flavor_fdroid" translatable="true">fdroid</string>
     <string name="build__flavor_website" translatable="true">strona WWW</string>
     <string name="cd_remove_dialog_title" translatable="true">Usunąć domenę\?</string>
-    <string name="cd_remove_dialog_positive" translatable="true">Usuń</string>
     <string name="cd_remove_dialog_message" translatable="true">Usuń domenę z zapisanej konfiguracji.</string>
     <string name="cd_dialog_desc" translatable="true">Niestandardowy adres URL (domena) lub dzika karta, aby zezwolić lub zablokować. np. *.test.com, test.com/test</string>
     <string name="cd_dialog_title" translatable="true">Dodaj domenę</string>
@@ -473,7 +461,7 @@
     <string name="notif_download_success_content" translatable="true">Pobieranie zakończone sukcesem.</string>
     <string name="rt_dialog_neutral" translatable="true">Kontynuuj</string>
     <string name="rt_edit_dialog_positive" translatable="true">Edytuj</string>
-    <string name="rt_list_adv_btn_txt" translatable="true">zaawansowane</string>
+    <string name="lbl_advanced" translatable="true">zaawansowane</string>
     <string name="rt_filter_parent_selected" translatable="true">Wybrano</string>
     <string name="rt_download_desc" translatable="true">Pobierz listy blokujące (około 60MB), aby korzystać z tej funkcji.</string>
     <string name="rethink_sky_desc" translatable="true">280+ lokalizacji; wyższy uptime; stub resolver działający na cloudflare.com</string>
@@ -611,13 +599,12 @@
     <string name="pcap_failure_toast" translatable="true">Błąd podczas tworzenia pliku pcap, spróbuj ponownie!</string>
     <string name="logs_card_network_count" translatable="true">%1$s połączenia</string>
     <string name="logs_card_dns_count" translatable="true">%1$s zapytania</string>
-    <string name="hsf_vpn_dialog_positive" translatable="true">Przejdź dalej</string>
+    <string name="lbl_proceed" translatable="true">Przejdź dalej</string>
     <string name="hsf_start_dialog_positive" translatable="true">Start</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Przechwytywanie pakietów aktywne</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Przechwytywanie pakietów wyłączone</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Nie można wstrzymać: RethinkDNS nie jest aktywny</string>
     <string name="dc_block_heading" translatable="true">zasady</string>
-    <string name="dc_other_settings_heading" translatable="true">zaawansowane</string>
     <string name="dc_rethink_dns_radio" translatable="true">RethinkDNS</string>
     <string name="dc_dns_leaks_heading" translatable="true">Zapobieganie wyciekom DNS</string>
     <string name="about_bravedns_explantion" translatable="true">RethinkDNS to najprostszy sposób na monitorowanie aktywności aplikacji, obchodzenie cenzury internetowej i zapory aplikacji na urządzeniu z systemem Android.</string>
@@ -658,7 +645,6 @@
     <string name="category_name_sys_components" translatable="true">Komponenty systemu</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Połączenie to zostało dopuszczone, ponieważ domena <i/> jest ustawiona jako zaufana w regułach domeny uniwersalnej.<br/><br/> Aby zmienić to zachowanie przejdź do zakładki <i>Configure DNS</i>.</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">To połączenie zostało zablokowane, ponieważ domena <i/> jest zablokowana przez preferowane przez użytkownika DNS.<br/><br/> Aby zmienić to zachowanie przejdź do zakładki <i>Configure DNS</i>.</string>
-    <string name="ci_header" translatable="true">Reguły IP i portu: %1$s</string>
     <string name="cd_no_rules_text" translatable="true">Nie znaleziono reguł domeny.</string>
     <string name="category_name_installed" translatable="true">Zainstalowane aplikacje</string>
     <string name="category_name_non_app_sys" translatable="true">Usługi systemowe</string>
@@ -686,18 +672,16 @@
     <string name="settings_http_proxy_error_text3" translatable="true">Nazwa hosta jest pusta</string>
     <string name="settings_http_proxy_error_text4" translatable="true">Połączenie z hostem nie powiodło się. Spróbuj ponownie.</string>
     <string name="settings_http_proxy_toast_success" translatable="true">Serwer proxy HTTP jest ustawiony</string>
-    <string name="settings_http_proxy_hostname" translatable="true">Nazwa hosta</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">Aplikacja</string>
     <string name="settings_app_list_default_app" translatable="true">Nikt</string>
     <string name="hsf_whats_new_chip_text" translatable="true">Co nowego\?</string>
-    <string name="cd_dialog_positive_btn" translatable="true">Dodaj</string>
+    <string name="lbl_add" translatable="true">Dodaj</string>
     <string name="cd_doh_dialog_resolver_name" translatable="true">Nazwa resolwera</string>
     <string name="cd_dns_crypt_error_text_1" translatable="true">Pieczęć nie może być pusta</string>
     <string name="cd_doh_dialog_heading" translatable="true">Dodaj DNS przez HTTPS</string>
     <string name="cd_doh_dialog_resolver_url" translatable="true">Adres URL programu rozpoznawania nazw</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">Przekaźniki</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">Nie znaleziono strony z ustawieniami aplikacji</string>
-    <string name="ctbs_proceed_positive_text" translatable="true">Przejdź dalej</string>
     <string name="dns_btm_sheet_dialog_message" translatable="true"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s blocklist(s)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">Brak odpowiedzi</string>
     <string name="dns_btm_sheet_dialog_ips" translatable="true"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -713,12 +697,10 @@
     <string name="univ_firewall_rule_10" translatable="true">Blokuj wszystkie poza pominiętymi aplikacjami i IP</string>
     <string name="univ_view_blocked_ip" translatable="true">reguły ip i portów</string>
     <string name="univ_view_blocked_ip_desc" translatable="true">Zmodyfikuj reguły zablokowanej lub zaufanej domeny, adresu IP / portu.</string>
-    <string name="univ_ip_delete_individual_positive" translatable="true">Usuń</string>
     <string name="univ_ip_delete_individual_toast" translatable="true">Usunięto %1$s</string>
     <string name="univ_accessibility_crash_dialog_positive" translatable="true">Przejdź do ustawień</string>
     <string name="univ_accessibility_dialog_positive" translatable="true">Dotacja</string>
     <string name="dns_connected" translatable="true">Połączony</string>
-    <string name="dns_delete_positive" translatable="true">Skasuj</string>
     <string name="dns_crypt_relay_error_toast" translatable="true">Nie wybrano resolwera</string>
     <string name="dns_proxy_dialog_message" translatable="true">Nazwa aplikacji: %1$s
 \n
@@ -756,7 +738,6 @@
     <string name="ada_app_exclude" translatable="true">Wyklucz</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuj programy typu attentionware, spyware, scareware.</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokowanie treści dla dorosłych i pirackich, hazardu i randek online oraz mediów społecznościowych.</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen" translatable="true">Przejdź dalej</string>
     <string name="rbl_security_desc" description="The text appears as blocklists description in configure screen" translatable="true">Blokuj złośliwe oprogramowanie, ransomware, cryptoware, phisherów i inne zagrożenia.</string>
     <string name="radio_max_btn" translatable="true">Max</string>
     <string name="rt_filter_desc_subgroups" translatable="true">Wyświetlanie <u>%1$s</u> list blokujących w grupie: %2$s i podgrupie: %3$s</string>
@@ -784,7 +765,6 @@
     <string name="hsf_uptime" translatable="true">(aktywny od %1$s; protos: %2$s)</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true">To połączenie zostało dopuszczone, ponieważ &lt;i&gt;docelowe IP&lt;/i&gt; jest ustawione na omijanie wszystkich uniwersalnych reguł firewalla.&lt;br/&gt;&lt;br/&gt; Aby zmienić przejdź do &lt;i&gt;Reguł IP&lt;i&gt; w zakładce &lt;i&gt;Uniwersalne&lt;/i&gt;.</string>
     <string name="cd_toast_deleted" translatable="true">Domena usunięta z listy niestandardowej</string>
-    <string name="cd_dialog_header" translatable="true">Reguły domeny: %1$s</string>
     <string name="notif_channel_desc_vpn_failure" translatable="true">Informuj, gdy RethinkDNS zostanie zatrzymany przez system Android lub inną aplikację VPN</string>
     <string name="notif_channel_vpn_failure" translatable="true">Nieaktywny VPN</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Reguła firewalla ustawiona przez użytkownika zablokowała domenę <i/> .<br/><br/> Aby to zmienić przejdź do ekranu <i>App-specific Firewall</i>.</string>

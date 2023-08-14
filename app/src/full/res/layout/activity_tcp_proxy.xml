@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/background"
+    android:fillViewport="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:id="@+id/settings_proxy"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="55dp"
+            android:layout_marginTop="15dp"
+            android:fontFamily="sans-serif-smallcaps"
+            android:lineSpacingExtra="5dp"
+            android:padding="5dp"
+            android:text="proxy"
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/extra_large_font_text_view"
+            android:textStyle="bold" />
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/tcp_proxy_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/tcp_proxy_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_wireguard_icon" />
+
+                <RelativeLayout
+                    android:id="@+id/tcp_proxy_heading_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_toEndOf="@id/tcp_proxy_icon">
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="Rethink's Proxy"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/tcp_proxy_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="end"
+                        android:padding="10dp" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tcp_proxy_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tcp_proxy_heading_rl"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="2dp"
+                    android:layout_toEndOf="@id/tcp_proxy_icon"
+                    android:padding="5dp"
+                    android:text="Controlled access over the internet. Improves the security and enhances the privacy of the user. Ensured Privacy. Blocked Sites Becomes Accessible."
+                    android:textSize="@dimen/default_font_text_view" />
+
+                <TextView
+                    android:id="@+id/tcp_proxy_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tcp_proxy_desc"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="5dp"
+                    android:padding="5dp"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:layout_toEndOf="@id/tcp_proxy_icon" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/enable_udp_relay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tcp_proxy_status"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_toEndOf="@id/tcp_proxy_icon"
+                    android:buttonTint="?attr/accentGood"
+                    android:foregroundTint="?attr/accentGood"
+                    android:text="Enable UDP Relay" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tcp_proxy_add_apps"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/enable_udp_relay"
+                    android:layout_toEndOf="@id/tcp_proxy_icon"
+                    android:alpha="0.75"
+                    android:text="@string/add_remove_apps"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:textSize="@dimen/large_font_text_view"
+                    app:layout_constraintWidth_max="@dimen/max_btn_size"
+                    app:rippleColor="?attr/secondaryTextColor" />
+
+                <RelativeLayout
+                    android:id="@+id/tcp_error_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tcp_proxy_add_apps"
+                    android:layout_toEndOf="@id/tcp_proxy_icon">
+
+                    <TextView
+                        android:id="@+id/tcp_error_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+                        android:padding="5dp"
+                        android:text="Error"
+                        android:textColor="?attr/accentBad"
+                        android:textSize="@dimen/default_font_text_view"
+                        android:visibility="gone" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/warp_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/warp_top_rl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/warp_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_wireguard_icon" />
+
+                <RelativeLayout
+                    android:id="@+id/warp_heading_rl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/warp_icon">
+
+                    <TextView
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="Cloudflare WARP"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/warp_switch"
+                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="end"
+                        android:padding="10dp" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/warp_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/warp_heading_rl"
+                    android:layout_gravity="center_vertical"
+                    android:layout_toEndOf="@id/warp_icon"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="Modern, fast, and secure way to connect to a VPN server. Secure all your internet traffic with an ultra-secure, lightning-quick VPN service that lets you connect with the WireGuard protocol."
+                    android:textSize="@dimen/default_font_text_view" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/warp_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/warp_desc"
+                    android:layout_marginTop="5dp"
+                    android:layout_toEndOf="@id/warp_icon"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:textSize="@dimen/default_font_text_view" />
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/warp_status"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    android:text="more..." />
+
+            </RelativeLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

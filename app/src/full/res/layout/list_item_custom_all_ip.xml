@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="1dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:alpha="0.2"
+        android:background="?attr/primaryLightColorText" />
+
+    <LinearLayout
+        android:id="@+id/custom_ip_app_name_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/custom_ip_app_icon_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="5dp"
+            android:contentDescription="@string/apps_icon_content_desc"
+            android:maxWidth="48dp"
+            android:maxHeight="48dp"
+            android:src="@drawable/ic_launcher_foreground" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/custom_ip_app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:padding="5dp"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="@dimen/extra_large_font_text_view" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/custom_ip_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/custom_ip_app_name_container"
+        android:padding="5dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/custom_ip_flag"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:alpha="0.75"
+            android:gravity="center"
+            android:minWidth="40dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="30sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/custom_ip_flag"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/custom_ip_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <TextView
+                android:id="@+id/custom_ip_status_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:textSize="@dimen/small_font_subheading_text" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/custom_ip_status_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/custom_ip_edit_icon"
+            android:background="@drawable/rectangle_border_background"
+            android:gravity="center"
+            android:minWidth="25dp"
+            android:padding="5dp"
+            android:text="B"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/custom_ip_edit_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@id/custom_ip_expand_icon"
+            android:alpha="0.5"
+            android:src="@drawable/ic_edit_icon_grey" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/custom_ip_expand_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:alpha="0.5"
+            android:padding="5dp"
+            android:src="@drawable/ic_arrow_down_small" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/custom_ip_toggle_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/custom_ip_container"
+        android:gravity="center"
+        android:visibility="gone"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/custom_ip_tg_no_rule"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="5dp"
+            android:tag="0"
+            android:text="@string/ci_no_rule"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/small_font_subheading_text" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/custom_ip_tg_block"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="5dp"
+            android:tag="1"
+            android:text="@string/ci_block"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/small_font_subheading_text" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/custom_ip_tg_bypass_app"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="5dp"
+            android:tag="2"
+            android:text="@string/ci_trust_rule"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/small_font_subheading_text" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/custom_ip_tg_bypass_univ"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="5dp"
+            android:tag="3"
+            android:text="@string/ci_bypass_universal"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/small_font_subheading_text" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/custom_ip_tg_delete"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="5dp"
+            android:tag="4"
+            android:text="@string/ci_delete"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/small_font_subheading_text" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+</RelativeLayout>

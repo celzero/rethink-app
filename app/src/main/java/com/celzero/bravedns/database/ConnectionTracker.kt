@@ -43,6 +43,12 @@ class ConnectionTracker {
     var flag: String = ""
     var dnsQuery: String? = null
     var timeStamp: Long = INIT_TIME_MS
+    var connId: String = ""
+    var downloadBytes: Long = 0
+    var uploadBytes: Long = 0
+    var duration: Int = 0
+    var synack: Int = 0
+    var message: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is ConnectionTracker) return false

@@ -107,8 +107,9 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            versionCode = 29
-            versionName = "v054c"
+            versionCode = 30
+            versionName = "v055"
+            vectorDrawables.useSupportLibrary = true
         }
     }
 
@@ -210,9 +211,8 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
-
-    download 'com.github.celzero:firestack:37b6b37c99'
-    implementation 'com.github.celzero:firestack:37b6b37c99'
+    download 'com.github.celzero:firestack:7905a346f2:arm64@aar'
+    implementation 'com.github.celzero:firestack:7905a346f2:full@aar'
     // implementation project(":tun2socks")
 
     // Work manager
@@ -241,6 +241,14 @@ dependencies {
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
+
+    // for encrypted file management
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.security:security-app-authenticator:1.0.0-alpha02")
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha02")
+
+    // barcode scanner for wireguard
+    fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903

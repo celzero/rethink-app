@@ -37,8 +37,7 @@ import org.koin.core.component.inject
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
 
-object
-IpRulesManager : KoinComponent {
+object IpRulesManager : KoinComponent {
 
     private val customIpRepository by inject<CustomIpRepository>()
     private val persistentState by inject<PersistentState>()
@@ -116,7 +115,7 @@ IpRulesManager : KoinComponent {
 
         io {
             val customIp = getObj(uid, ipAddress, port)
-            customIpRepository.deleteIpRules(uid, ipAddress, port)
+            customIpRepository.deleteRule(uid, ipAddress, port)
 
             if (customIp == null) return@io
 
@@ -184,8 +183,8 @@ IpRulesManager : KoinComponent {
     private fun updateLocalCache(ip: CustomIp) {
         lock.write {
             if (
-                ip.getCustomIpAddress().address.isMultiple ||
-                    ip.getCustomIpAddress().address.isAnyLocal
+                ip.getCustomIpAddress().asAddress().isMultiple ||
+                    ip.getCustomIpAddress().asAddress().isAnyLocal
             ) {
                 wildCards[CacheKey(ip.getCustomIpAddress(), ip.uid)] = ip
                 return
@@ -197,8 +196,8 @@ IpRulesManager : KoinComponent {
     private fun removeLocalCache(ip: CustomIp) {
         lock.write {
             if (
-                ip.getCustomIpAddress().address.isMultiple ||
-                    ip.getCustomIpAddress().address.isAnyLocal
+                ip.getCustomIpAddress().asAddress().isMultiple ||
+                    ip.getCustomIpAddress().asAddress().isAnyLocal
             ) {
                 wildCards.remove(CacheKey(ip.getCustomIpAddress(), ip.uid))
                 return
@@ -255,21 +254,21 @@ IpRulesManager : KoinComponent {
         }
 
         if (port != null) {
-            status = hasRule(uid, ip.address.toNormalizedString(), null)
+            status = hasRule(uid, ip.asAddress().toNormalizedString(), null)
             resultsCache.put(key, status)
             return status
         }
 
         // no need to carry out below checks if ip is not IPv6
-        if (!IPUtil.isIpV6(ip.address) && !isIpv6ToV4FilterRequired()) {
+        if (!IPUtil.isIpV6(ip.asAddress()) && !isIpv6ToV4FilterRequired()) {
             resultsCache.put(key, status)
             return status
         }
 
         // for IPv4 address in IPv6
         var ipv4: IPAddress? = null
-        if (IPUtil.canMakeIpv4(ip.address)) {
-            ipv4 = IPUtil.toIpV4(ip.address)
+        if (IPUtil.canMakeIpv4(ip.asAddress())) {
+            ipv4 = IPUtil.toIpV4(ip.asAddress())
         }
 
         if (ipv4 != null) {
@@ -308,11 +307,20 @@ IpRulesManager : KoinComponent {
         return persistentState.filterIpv4inIpv6
     }
 
-    fun deleteIpRulesByUid(uid: Int) {
+    fun deleteRulesByUid(uid: Int) {
         io {
-            customIpRepository.deleteIpRulesByUid(uid)
+            customIpRepository.deleteRulesByUid(uid)
             appIpRules = appIpRules.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
             wildCards = wildCards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
+            resultsCache.invalidateAll()
+        }
+    }
+
+    fun deleteAllAppsRules() {
+        io {
+            customIpRepository.deleteAllAppsRules()
+            appIpRules.clear()
+            wildCards.clear()
             resultsCache.invalidateAll()
         }
     }
@@ -330,8 +338,8 @@ IpRulesManager : KoinComponent {
             subnetMap.forEach {
                 // isAnyLocal is true for rules like 0.0.0.0:443
                 if (
-                    it.getCustomIpAddress().address.isMultiple ||
-                        it.getCustomIpAddress().address.isAnyLocal
+                    it.getCustomIpAddress().asAddress().isMultiple ||
+                        it.getCustomIpAddress().asAddress().isAnyLocal
                 ) {
                     wildCards[CacheKey(it.getCustomIpAddress(), it.uid)] = it
                 } else {
@@ -341,33 +349,7 @@ IpRulesManager : KoinComponent {
         }
     }
 
-    private fun constructCustomIpObject(
-        uid: Int,
-        hostName: HostName,
-        status: IpRuleStatus,
-        wildcard: Boolean = false
-    ): CustomIp {
-        val customIp = CustomIp()
-        customIp.setCustomIpAddress(hostName)
-        customIp.port = hostName.port ?: Constants.UNSPECIFIED_PORT
-        customIp.protocol = ""
-        customIp.isActive = true
-        customIp.status = status.id
-        customIp.wildcard = wildcard
-        customIp.modifiedDateTime = System.currentTimeMillis()
-
-        // TODO: is this needed in database?
-        customIp.ruleType =
-            if (hostName.address?.isIPv6 == true) {
-                IPRuleType.IPV6.id
-            } else {
-                IPRuleType.IPV4.id
-            }
-        customIp.uid = uid
-        return customIp
-    }
-
-    private fun constructCustomIpObject(
+    fun constructCustomIpObject(
         uid: Int,
         ipAddress: String,
         port: Int?,
@@ -385,7 +367,7 @@ IpRulesManager : KoinComponent {
 
         // TODO: is this needed in database?
         customIp.ruleType =
-            if (customIp.getCustomIpAddress().address?.isIPv6 == true) {
+            if (customIp.getCustomIpAddress().asAddress()?.isIPv6 == true) {
                 IPRuleType.IPV6.id
             } else {
                 IPRuleType.IPV4.id
@@ -394,24 +376,11 @@ IpRulesManager : KoinComponent {
         return customIp
     }
 
-    fun addIpRule(uid: Int, hostName: HostName, status: IpRuleStatus) {
-        io {
-            Log.i(
-                LOG_TAG_FIREWALL,
-                "IP Rules, add rule for ip: $hostName with status: ${status.name}"
-            )
-            val customIpObj = constructCustomIpObject(uid, hostName, status)
-            customIpRepository.insert(customIpObj)
-            updateLocalCache(customIpObj)
-            resultsCache.invalidateAll()
-        }
-    }
-
     fun addIpRule(uid: Int, ipAddress: String, port: Int?, status: IpRuleStatus) {
         io {
             Log.i(
                 LOG_TAG_FIREWALL,
-                "IP Rules, add rule for ip: $ipAddress with status: ${status.name}"
+                "IP Rules, add rule for ($uid) ip: $ipAddress, $port with status: ${status.name}"
             )
             val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
             customIpRepository.insert(customIpObj)
@@ -420,12 +389,19 @@ IpRulesManager : KoinComponent {
         }
     }
 
-    fun updateIpRule(prevIp: CustomIp, hostName: HostName, status: IpRuleStatus) {
+    fun updateIpRule(prevRule: CustomIp, newRule: CustomIp) {
         io {
-            customIpRepository.deleteIpRules(prevIp.uid, prevIp.ipAddress, prevIp.port)
-            val customIpObj = constructCustomIpObject(prevIp.uid, hostName, status)
-            customIpRepository.insert(customIpObj)
-            updateLocalCache(customIpObj)
+            Log.i(
+                LOG_TAG_FIREWALL,
+                "IP Rules, update rule for (${prevRule.uid}) ip: ${prevRule.getCustomIpAddress().asAddress().toNormalizedString()}, ${prevRule.port} with status: ${newRule.status}"
+            )
+            customIpRepository.deleteRule(
+                prevRule.uid,
+                prevRule.getCustomIpAddress().asAddress().toNormalizedString(),
+                prevRule.port
+            )
+            customIpRepository.insert(newRule)
+            updateLocalCache(newRule)
             resultsCache.invalidateAll()
         }
     }
@@ -435,7 +411,7 @@ IpRulesManager : KoinComponent {
         // TODO: IP/16 and IP/24 is added to the rule.
         wildCards.keys.forEach { w ->
             val wc = w.hostName
-            if (wc.address.contains(hostName.address)) {
+            if (wc.asAddress().contains(hostName.asAddress())) {
                 val rule = wildCards[w]
                 if (rule?.uid == uid && (wc.port == null || wc.port == hostName.port)) {
                     return IpRuleStatus.getStatus(rule.status)
@@ -443,7 +419,8 @@ IpRulesManager : KoinComponent {
                     // no-op
                 }
             } else if (
-                wc.address.isAnyLocal && wc.address.ipVersion == hostName.address.ipVersion
+                wc.asAddress().isAnyLocal &&
+                    wc.asAddress().ipVersion == hostName.asAddress().ipVersion
             ) {
                 // case where the default (0.0.0.0 / [::]) is treated as wildcard
                 val rule = wildCards[w]

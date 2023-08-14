@@ -35,13 +35,13 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
+import com.celzero.bravedns.backup.BackupHelper.Companion.getWireGuardFolder
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.copyWithStream
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
@@ -54,6 +54,8 @@ import java.io.ObjectOutputStream
 import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 // ref:
 // https://gavingt.medium.com/refactoring-my-backup-and-restore-feature-to-comply-with-scoped-storage-e2b6c792c3b
@@ -118,6 +120,19 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 Log.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "failed to add database to temp backup dir, return failure"
+                )
+                return false
+            }
+
+            processCompleted = saveWireGuardConfigToFile(tempDir.path)
+
+            if (processCompleted) {
+                if (DEBUG)
+                    Log.d(LOG_TAG_BACKUP_RESTORE, "wireguard backup is added to the temp dir")
+            } else {
+                Log.w(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "failed to add wireguard to temp backup dir, return failure"
                 )
                 return false
             }
@@ -234,19 +249,48 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         val files = getRethinkDatabase(context)?.listFiles() ?: return false
 
         for (f in files) {
+            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "file ${f.name} found in database dir (${f.absolutePath})")
             // skip journal files, they are not needed for restore
             if (f.path.endsWith("-journal") || f.path.endsWith("-shm") || f.path.endsWith("-wal")) {
                 continue
             }
             val databaseFile =
-                backUpDatabaseFile(f.absolutePath, constructDbFileName(path, f.name))
-                    ?: return false
+                backUpFile(f.absolutePath, constructDbFileName(path, f.name)) ?: return false
             if (DEBUG)
                 Log.d(LOG_TAG_BACKUP_RESTORE, "file ${databaseFile.name} added to backup dir")
             filesPathToZip.add(databaseFile.absolutePath)
         }
 
         return true
+    }
+
+    private fun saveWireGuardConfigToFile(path: String): Boolean {
+        val files = getWireGuardFolder(context)?.listFiles() ?: return true
+
+        for (f in files) {
+            val wgFile =
+                backUpFile(
+                    f.absolutePath,
+                    constructWireGuardFolderPath(path) + File.separator + f.name
+                )
+                    ?: return false
+            if (DEBUG)
+                Log.d(LOG_TAG_BACKUP_RESTORE, "file ${wgFile.name} added to backup dir (${wgFile.absoluteFile})")
+            filesPathToZip.add(wgFile.absolutePath)
+        }
+
+        return true
+    }
+
+    private fun constructWireGuardFolderPath(path: String): String {
+        val wgFolderPath = path + File.separator + Constants.WIREGUARD_FOLDER_NAME
+        Log.i(LOG_TAG_BACKUP_RESTORE, "constructing wg folder path, path: $wgFolderPath")
+        val wgFolder = File(wgFolderPath)
+        if (!wgFolder.exists()) {
+            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "wg folder does not exist, creating it, path: $wgFolderPath")
+            wgFolder.mkdir()
+        }
+        return wgFolderPath
     }
 
     private fun constructDbFileName(path: String, fileName: String): String {
@@ -281,7 +325,7 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         return true
     }
 
-    private fun backUpDatabaseFile(backupFilePath: String?, destFilePath: String?): File? {
+    private fun backUpFile(backupFilePath: String?, destFilePath: String?): File? {
         if (backupFilePath == null || destFilePath == null) {
             Log.w(
                 LOG_TAG_BACKUP_RESTORE,

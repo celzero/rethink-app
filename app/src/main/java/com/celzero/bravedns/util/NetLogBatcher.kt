@@ -109,14 +109,10 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
                 // this can happen if the signal for 'l' is processed
                 // after the fact that 'l' has been swapped out by 'batch'
                 if (batches.size <= 0) {
-                    if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue for buffer")
+                    if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal continue")
                     continue
                 } else {
-                    if (DEBUG)
-                        Log.d(
-                            LoggerConstants.LOG_BATCH_LOGGER,
-                            "signal sleep for $waitms for buffer"
-                        )
+                    if (DEBUG) Log.d(LoggerConstants.LOG_BATCH_LOGGER, "signal sleep $waitms ms")
                 }
 
                 // wait for 'batch' to dispatch
@@ -124,7 +120,7 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
                 if (DEBUG)
                     Log.d(
                         LoggerConstants.LOG_BATCH_LOGGER,
-                        "signal wait over for buf, sz(${batches.size}) / cur-buf(${lsn})"
+                        "signal wait over, sz(${batches.size}) / cur-buf(${lsn})"
                     )
 
                 // 'l' is the current buffer, that is, 'l == i',

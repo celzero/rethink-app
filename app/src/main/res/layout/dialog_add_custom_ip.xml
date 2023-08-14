@@ -30,12 +30,17 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/daci_text_input_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
         android:hint="@string/ci_dialog_edittext_hint"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
         app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/daci_ip_desc">
 

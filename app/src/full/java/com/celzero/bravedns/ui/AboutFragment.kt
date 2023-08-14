@@ -55,25 +55,26 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.UIUtils.openVpnProfile
-import com.celzero.bravedns.util.UIUtils.sendEmailIntent
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.openVpnProfile
+import com.celzero.bravedns.util.UiUtils.sendEmailIntent
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.isAtleastR
+import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -102,6 +103,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutTelegram.setOnClickListener(this)
         b.aboutFaq.setOnClickListener(this)
         b.mozillaImg.setOnClickListener(this)
+        b.fossImg.setOnClickListener(this)
+        b.osomImg.setOnClickListener(this)
         b.aboutAppUpdate.setOnClickListener(this)
         b.aboutWhatsNew.setOnClickListener(this)
         b.aboutAppInfo.setOnClickListener(this)
@@ -116,8 +119,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             val version = getVersionName()
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
-            b.aboutWhatsNew.text =
-                getString(R.string.about_whats_new, version)
+            b.aboutWhatsNew.text = getString(R.string.about_whats_new, version)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
@@ -155,7 +157,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 openActionViewIntent(getString(R.string.about_github_link).toUri())
             }
             b.aboutCrashLog -> {
-                if (isAtleastR()) {
+                if (isAtleastO()) {
                     handleShowAppExitInfo()
                 } else {
                     showNoLogDialog()
@@ -175,6 +177,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             }
             b.mozillaImg -> {
                 openActionViewIntent(getString(R.string.about_mozilla_alumni_link).toUri())
+            }
+            b.fossImg -> {
+                openActionViewIntent(getString(R.string.about_foss_link).toUri())
+            }
+            b.osomImg -> {
+                openActionViewIntent(getString(R.string.about_osom_link).toUri())
             }
             b.aboutAppUpdate -> {
                 (requireContext() as HomeScreenActivity).checkForUpdate(
@@ -206,7 +214,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     }
 
     private fun showNoLogDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(R.string.about_bug_no_log_dialog_title)
         builder.setMessage(R.string.about_bug_no_log_dialog_message)
         builder.setPositiveButton(getString(R.string.about_bug_no_log_dialog_positive_btn)) { _, _
@@ -252,7 +260,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val packageName = requireContext().packageName
         try {
             val intent = Intent()
-            if (Utilities.isAtleastO()) {
+            if (isAtleastO()) {
                 intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
             } else {
@@ -276,7 +284,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
         binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setTitle(getString(R.string.whats_dialog_title))
             .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
@@ -363,8 +371,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
     private fun promptCrashLogAction() {
         val binding =
             DialogViewLogsBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-        val builder: AlertDialog.Builder =
-            AlertDialog.Builder(requireContext()).setView(binding.root)
+        val builder = AlertDialog.Builder(requireContext()).setView(binding.root)
         builder.setTitle(getString(R.string.about_bug_report))
 
         val zipPath = getZipFilePath(requireContext())
@@ -387,24 +394,30 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         io {
             var fin: FileInputStream? = null
             var zin: ZipInputStream? = null
+            // load only 10k characters to avoid ANR
+            val maxLength = 20000
             try {
                 fin = FileInputStream(zipPath)
                 zin = ZipInputStream(fin)
                 var ze: ZipEntry?
-
+                var inputString: String? = ""
+                // don't load more than 20k characters to avoid ANR
+                // TODO: use recycler view instead of textview
                 while (zin.nextEntry.also { ze = it } != null) {
                     val inStream = zipFile.getInputStream(ze)
-                    val inputString = inStream?.bufferedReader().use { it?.readText() }
-                    uiCtx {
-                        if (!isAdded) return@uiCtx
-                        binding.logs.append(inputString)
-                    }
+                    inputString += inStream?.bufferedReader().use { it?.readText() }
+                    if (inputString?.length!! > maxLength) break
+                }
+                uiCtx {
+                    if (!isAdded) return@uiCtx
+                    binding.info.visibility = View.VISIBLE
+                    binding.logs.text = inputString?.slice(0 until maxLength)
                 }
             } catch (e: Exception) {
                 Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)
                 uiCtx {
                     if (!isAdded) return@uiCtx
-
+                    binding.info.visibility = View.GONE
                     binding.logs.text = getString(R.string.error_loading_log_file)
                 }
             } finally {

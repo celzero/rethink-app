@@ -21,7 +21,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -33,13 +32,13 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.CustomIpAdapter
 import com.celzero.bravedns.databinding.DialogAddCustomIpBinding
 import com.celzero.bravedns.databinding.FragmentCustomIpBinding
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.util.Constants.Companion.INTENT_UID
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import inet.ipaddr.HostName
 import inet.ipaddr.HostNameException
 import inet.ipaddr.IPAddress
@@ -55,11 +54,13 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     private val b by viewBinding(FragmentCustomIpBinding::bind)
     private val viewModel: CustomIpViewModel by viewModel()
     private var uid = UID_EVERYBODY
+    private var rules = CustomRulesActivity.RULES.APP_SPECIFIC_RULES
 
     companion object {
-        fun newInstance(uid: Int): CustomIpFragment {
+        fun newInstance(uid: Int, rules: CustomRulesActivity.RULES): CustomIpFragment {
             val args = Bundle()
             args.putInt(INTENT_UID, uid)
+            args.putInt(CustomRulesActivity.INTENT_RULES, rules.type)
             val fragment = CustomIpFragment()
             fragment.arguments = args
             return fragment
@@ -73,34 +74,33 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private fun initView() {
         uid = arguments?.getInt(INTENT_UID, UID_EVERYBODY) ?: UID_EVERYBODY
-
-        b.cipHeading.text = getString(R.string.ci_header, getAppName())
-
+        rules =
+            arguments?.getInt(CustomRulesActivity.INTENT_RULES)?.let {
+                CustomRulesActivity.RULES.getType(it)
+            }
+                ?: CustomRulesActivity.RULES.APP_SPECIFIC_RULES
         b.cipSearchView.setOnQueryTextListener(this)
-        observeCustomRules()
         setupRecyclerView()
         setupClickListeners()
 
         b.cipRecycler.requestFocus()
     }
 
-    private fun getAppName(): String {
-        if (uid == UID_EVERYBODY) {
-            return getString(R.string.firewall_act_universal_tab)
-        }
+    private fun observeAppSpecificRules() {
+        viewModel.ipRulesCount(uid).observe(viewLifecycleOwner) {
+            if (it <= 0) {
+                showNoRulesUi()
+                hideRulesUi()
+                return@observe
+            }
 
-        val appNames = FirewallManager.getAppNamesByUid(uid)
-
-        val packageCount = appNames.count()
-        return if (packageCount >= 2) {
-            getString(R.string.ctbs_app_other_apps, appNames[0], packageCount.minus(1).toString())
-        } else {
-            appNames[0]
+            hideNoRulesUi()
+            showRulesUi()
         }
     }
 
-    private fun observeCustomRules() {
-        viewModel.ipRulesCount(uid).observe(viewLifecycleOwner) {
+    private fun observeAllAppsRules() {
+        viewModel.allIpRulesCount().observe(viewLifecycleOwner) {
             if (it <= 0) {
                 showNoRulesUi()
                 hideRulesUi()
@@ -140,14 +140,32 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private fun setupRecyclerView() {
         layoutManager = CustomLinearLayoutManager(requireContext())
-        b.cipRecycler.setHasFixedSize(true)
         b.cipRecycler.layoutManager = layoutManager
-        val adapter = CustomIpAdapter(requireContext())
+        b.cipRecycler.setHasFixedSize(true)
+        if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+            b.cipAddFab.visibility = View.VISIBLE
+            setupAdapterForApp()
+        } else {
+            b.cipAddFab.visibility = View.GONE
+            setupAdapterForAllApps()
+        }
+    }
 
+    private fun setupAdapterForApp() {
+        observeAppSpecificRules()
+        val adapter =
+            CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.APP_SPECIFIC_RULES)
         viewModel.setUid(uid)
         viewModel.customIpDetails.observe(viewLifecycleOwner) {
             adapter.submitData(this.lifecycle, it)
         }
+        b.cipRecycler.adapter = adapter
+    }
+
+    private fun setupAdapterForAllApps() {
+        observeAllAppsRules()
+        val adapter = CustomIpAdapter(requireContext(), CustomRulesActivity.RULES.ALL_RULES)
+        viewModel.allIpRules.observe(viewLifecycleOwner) { adapter.submitData(this.lifecycle, it) }
         b.cipRecycler.adapter = adapter
     }
 
@@ -220,7 +238,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
             // chances of creating NetworkOnMainThread exception, handling with io operation
             ioCtx {
                 hostName = getHostName(ipString)
-                ip = hostName?.address
+                ip = hostName?.asAddress()
             }
 
             if (ip == null || ipString.isEmpty()) {
@@ -248,7 +266,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     private fun insertCustomIp(ip: HostName?, status: IpRulesManager.IpRuleStatus) {
         if (ip == null) return
 
-        IpRulesManager.addIpRule(uid, ip, status)
+        IpRulesManager.addIpRule(uid, ip.asAddress().toNormalizedString(), ip.port, status)
         Utilities.showToastUiCentered(
             requireContext(),
             getString(R.string.ci_dialog_added_success),
@@ -257,11 +275,15 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     }
 
     private fun showIpRulesDeleteDialog() {
-        val builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
-            IpRulesManager.deleteIpRulesByUid(uid)
+            if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                IpRulesManager.deleteRulesByUid(uid)
+            } else {
+                IpRulesManager.deleteAllAppsRules()
+            }
             Utilities.showToastUiCentered(
                 requireContext(),
                 getString(R.string.univ_ip_delete_toast_success),

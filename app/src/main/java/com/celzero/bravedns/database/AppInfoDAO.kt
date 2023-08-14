@@ -18,6 +18,7 @@ package com.celzero.bravedns.database
 import android.database.Cursor
 import androidx.paging.PagingSource
 import androidx.room.*
+import com.celzero.bravedns.data.DataUsage
 
 @Dao
 interface AppInfoDAO {
@@ -124,4 +125,14 @@ interface AppInfoDAO {
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetailsCursor(): Cursor
 
     @Query("delete from AppInfo where uid = :uid") fun deleteByUid(uid: Int): Int
+
+    @Query(
+        "select uid as uid, downloadBytes as downloadBytes, uploadBytes as uploadBytes from AppInfo where uid = :uid"
+    )
+    fun getDataUsageByUid(uid: Int): DataUsage
+
+    @Query(
+        "update AppInfo set  uploadBytes = :uploadBytes, downloadBytes = :downloadBytes where uid = :uid"
+    )
+    fun updateDataUsageByUid(uid: Int, uploadBytes: Long, downloadBytes: Long)
 }

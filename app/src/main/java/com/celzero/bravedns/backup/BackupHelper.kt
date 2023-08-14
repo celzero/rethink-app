@@ -20,6 +20,7 @@ import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
@@ -95,6 +96,21 @@ class BackupHelper {
                 (context.getDatabasePath(AppDatabase.DATABASE_NAME).parentFile?.path
                     ?: return null) + File.separator
             return File(path)
+        }
+
+        fun getWireGuardFolder(context: Context): File? {
+            val file =
+                File(
+                    context.filesDir.canonicalPath +
+                        File.separator +
+                        Constants.WIREGUARD_FOLDER_NAME +
+                        File.separator
+                )
+            if (!file.exists()) {
+                file.mkdir()
+            }
+
+            return file
         }
 
         fun stopVpn(context: Context) {

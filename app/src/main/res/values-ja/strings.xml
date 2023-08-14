@@ -45,7 +45,6 @@
     <string name="apps_info_title" translatable="true">アプリ</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + ファイアウォール</string>
     <string name="dns_mode_info_explanation_new" translatable="true">DNS リクエストを監視、ブロック、暗号化します。</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">準備中。</string>
     <string name="alert_permission_accessibility" translatable="true">権限 - アクセシビリティ</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">モードを選択してください。</string>
     <string name="conn_track_clear_logs_title" translatable="true">全てのネットワークログを削除しますか？</string>
@@ -159,10 +158,6 @@
     <string name="settings_orbot_desc" translatable="true">HTTPS/SOCKS5 を使用した非 VPN モードの Orbot 。</string>
     <string name="settings_general_header" translatable="true">一般設定</string>
     <string name="settings_autostart_bootup_heading" translatable="true">電源投入時の自動起動(試験的)</string>
-    <string name="settings_all_networks_dialog_title" translatable="true">注意！</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">有効な場合、アプリのファイアウォールルールのうち、従量制（例：モバイル）と非従量制（例：WiFi）のルールは尊重されなくなります。
-\n
-\n続けますか？</string>
     <string name="settings_check_update_heading" translatable="true">アプリの更新をチェック</string>
     <string name="settings_check_update_desc" translatable="true">週に 1 回、アプリの更新を自動的に確認します。</string>
     <string name="settings_custom_downloader_heading" translatable="true">アプリ内ダウンローダーを利用する</string>
@@ -172,8 +167,6 @@
     <string name="settings_http_proxy_error_text2" translatable="true">無効なポート</string>
     <string name="settings_http_proxy_error_text3" translatable="true">ホスト名が空です</string>
     <string name="settings_http_proxy_error_text4" translatable="true">ホスト接続に失敗しました。もう一度やり直してください。</string>
-    <string name="settings_http_proxy_hostname" translatable="true">ホスト名</string>
-    <string name="settings_http_proxy_port" translatable="true">ポート</string>
     <string name="settings_dns_proxy_dialog_header" translatable="true">SOCKS5 プロキシの設定</string>
     <string name="settings_dns_proxy_dialog_app" translatable="true">アプリ</string>
     <string name="settings_dns_proxy_dialog_hostname" translatable="true">ホスト名</string>
@@ -219,7 +212,7 @@
     <string name="hsf_stop_btn_state" translatable="true">停止</string>
     <string name="hsf_vpn_dialog_header" translatable="true">注意！</string>
     <string name="hsf_notification_permission_failure" translatable="true">設定画面から通知機能を有効にする</string>
-    <string name="hsf_vpn_dialog_positive" translatable="true">続行</string>
+    <string name="lbl_proceed" translatable="true">続行</string>
     <string name="about_connect" translatable="true">問い合わせ</string>
     <string name="about_sponsor_link_text" translatable="true">支援者</string>
     <string name="about_email" translatable="true">メール</string>
@@ -256,16 +249,14 @@
     <string name="cd_dns_crypt_relay_heading" translatable="true">リレー</string>
     <string name="cd_dns_crypt_dialog_name" translatable="true">名称</string>
     <string name="cd_dns_crypt_dialog_desc" translatable="true">説明 (オプション)</string>
-    <string name="cd_dialog_positive_btn" translatable="true">追加</string>
+    <string name="lbl_add" translatable="true">追加</string>
     <string name="cd_doh_dialog_resolver_url" translatable="true">リゾルバURL</string>
     <string name="cd_dnscrypt_relay_heading" translatable="true">リレー</string>
     <string name="cd_dns_alg_heading" translatable="true">高度なDNSフィルタリング（試験的）</string>
     <string name="cd_dns_alg_desc" translatable="true">アプリの接続時のみドメインルールを適用する</string>
-    <string name="ct_delete_logs_positive_btn" translatable="true">ログの削除</string>
     <string name="ctbs_app_info_not_available_toast" translatable="true">アプリの設定ページが見つかりません</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s 他のアプリ</string>
     <string name="univ_firewall_rule_2" translatable="true">使用中でないアプリをブロックする</string>
-    <string name="ctbs_proceed_positive_text" translatable="true">続行</string>
     <string name="ctbs_dialog_negative_btn" translatable="true">戻る</string>
     <string name="dns_log_dialog_positive" translatable="true">ログの削除</string>
     <string name="dns_btm_sheet_dialog_ips" translatable="true"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -281,7 +272,6 @@
     <string name="univ_firewall_rule_6" translatable="true">新しくインストールしたアプリケーションを既定でブロックする</string>
     <string name="univ_firewall_rule_7" translatable="true">IPv6でIPv4をブロックする(試験的)</string>
     <string name="univ_firewall_rule_9" translatable="true">従量制 (モバイル) ネットワークでの通信をブロックする</string>
-    <string name="univ_ip_delete_individual_positive" translatable="true">削除</string>
     <string name="univ_view_blocked_ip" translatable="true">IP とポートの規則</string>
     <string name="univ_ip_delete_dialog_positive" translatable="true">すべて削除</string>
     <string name="univ_delete_firewall_dialog_title" translatable="true">すべてのIP規則を削除しますか？</string>
@@ -300,7 +290,6 @@
     <string name="dns_proxy_name" translatable="true">プロキシ名</string>
     <string name="dns_proxy_app" translatable="true">アプリ</string>
     <string name="dns_proxy_port" translatable="true">ポート番号</string>
-    <string name="dns_proxy_positive_btn" translatable="true">追加</string>
     <string name="fapps_filter_filter_heading" translatable="true">タイプ</string>
     <string name="fapps_filter_categories_heading" translatable="true">カテゴリー</string>
     <string name="fapps_info_exclude_msg" translatable="true">DNSとファイアウォールの両方から除外する。</string>
@@ -360,7 +349,6 @@
     <string name="download_update_dialog_trylater_message" translatable="true">現在、更新を実行できません。しばらくしてからもう一度お試しください。</string>
     <string name="http_proxy_dialog_heading" translatable="true">HTTP(S)プロキシを設定する</string>
     <string name="download_update_dialog_trylater_title" translatable="true">現在更新できません</string>
-    <string name="http_proxy_dialog_desc" translatable="true">HTTP(S)プロキシの設定は、アプリケーションにとってヒントでしかありませんが、アプリケーションはこれを使用するかどうかわかりません。しかし、ChromeやFirefoxなどのブラウザはこれを使用します。HTTP(S)プロキシを使用するアプリケーションは、ファイアウォールとDNSの両方のルールを回避することができます。</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">IPアドレスがコピーされました。</string>
     <string name="app_mode_dns_low_battery" translatable="true">DNS (バッテリー セーバー)</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL がコピーされました</string>
@@ -421,11 +409,10 @@
     <string name="settings_theme_desc" translatable="true">ダーク/ライトテーマ</string>
     <string name="settings_general_customize" translatable="true">カスタマイズ</string>
     <string name="settings_orbot_heading" translatable="true">Orbotのセットアップ</string>
-    <string name="settings_socks5_disabled_error" translatable="true">Orbotに接続されています。続行するにはOFFにしてください。</string>
+    <string name="settings_socks5_disabled_error" translatable="true">%1$sに接続されています。続行するにはOFFにしてください。</string>
     <string name="settings_socks5_vpn_disabled_error" translatable="true">Rethinkを起動して始める。</string>
     <string name="settings_orbot_notification_action" translatable="true">Orbotを開く</string>
     <string name="settings_autostart_bootup_desc" translatable="true">デバイスの電源投入時に、シャットダウン前にRethinkDNSが動作していた場合は、RethinkDNSが自動的に起動します。</string>
-    <string name="settings_all_networks_dialog_positive_btn" translatable="true">とにかく有効にする</string>
     <string name="settings_network_all_networks_desc" translatable="true">有効にすると、RethinkDNSは利用可能なすべてのネットワークを使用してインターネットに接続します。そうでない場合は、Androidによって<i>アクティブ</i>と見なされるネットワークを使用します。</string>
     <string name="settings_custom_downloader_desc" translatable="true">無効の場合、Androidの組み込みの<i>ダウンロードマネージャー</i>が使用されます</string>
     <string name="settings_app_notification_a13_heading" translatable="true">アプリの通知</string>
@@ -446,7 +433,6 @@
     <string name="dns_btm_sheet_dialog_message" translatable="true"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s blocklist(s)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
     <string name="dns_crypt_relay_error_toast" translatable="true">リゾルバーが選択されていません</string>
     <string name="univ_view_blocked_ip_desc" translatable="true">ブロックまたは信頼されたドメイン、IP / ポート ルールを変更します。</string>
-    <string name="dns_delete_positive" translatable="true">削除</string>
     <string name="fapps_info_dialog_message" translatable="true">アプリがインターネットに接続できないようにブロックします。インターネットへの接続を制限することで、不当なデータ利用を防ぐとともに、バッテリーの節約にもつながります。</string>
     <string name="dns_connected" translatable="true">接続済み</string>
     <string name="dns_proxy_dialog_message" translatable="true">アプリ名: %1$s
@@ -499,13 +485,12 @@
 \n
 \n%2$s</string>
     <string name="orbot_stop_dialog_message" translatable="true">RethinkDNSはOrbotへの接続転送を停止していますが、Orbotはバックグラウンドで動作している可能性があります。</string>
-    <string name="settings_https_disabled_error" translatable="true">Orbotに接続されています。続行するにはOFFにしてください。</string>
+    <string name="settings_https_disabled_error" translatable="true">%1$sに接続されています。続行するにはOFFにしてください。</string>
     <string name="settings_orbot_notification_content" translatable="true">Tor-as-a-Proxy の起動失敗。 Orbotアプリを開き、手動で起動します。</string>
-    <string name="settings_http_proxy_desc" translatable="true">%1$s に転送する :%2$s</string>
+    <string name="settings_http_proxy_desc" translatable="true">%1$s に転送する</string>
     <string name="firewall_status_block_unmetered" translatable="true">定額制 (wifi) ネットワークでブロック</string>
     <string name="hsf_start_dialog_positive" translatable="true">開始</string>
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">RDNS+を有効にする</string>
-    <string name="dc_other_settings_heading" translatable="true">上級者向け</string>
     <string name="about_bravedns_explantion" translatable="true">RethinkDNSは、アンドロイド端末上のアプリの動作を監視し、インターネット検閲を回避し、アプリをファイアウォールするための最も簡単な方法です。</string>
     <string name="about_bravedns_toreport_text" translatable="true">ヘルプ＆フィードバック</string>
     <string name="about_bug_report_desc" translatable="true">メールクラッシュログ</string>
@@ -584,7 +569,6 @@
     <string name="firewall_rule_exempt_app_bypass_univ" translatable="true">バイパスされたアプリ</string>
     <string name="firewall_rule_block_domain" translatable="true">ドメイン (アプリ)</string>
     <string name="firewall_rule_exempt_orbot_setup" translatable="true">Orbot セットアップ</string>
-    <string name="cd_dialog_header" translatable="true">ドメイン ルール: %1$s</string>
     <string name="cd_remove_dialog_message" translatable="true">保存された設定からドメインを削除する。</string>
     <string name="notif_channel_desc_vpn_failure" translatable="true">RethinkDNSがAndroidまたは別のVPNアプリによって停止されたときに通知する</string>
     <string name="cd_toast_added" translatable="true">ドメインが正常に追加されました</string>
@@ -595,7 +579,6 @@
     <string name="cd_remove_dialog_title" translatable="true">ドメインを削除しますか\?</string>
     <string name="category_name_non_app_sys" translatable="true">システムサービス</string>
     <string name="category_name_installed" translatable="true">インストール済みのアプリ</string>
-    <string name="cd_remove_dialog_positive" translatable="true">削除</string>
     <string name="cd_no_rules_text" translatable="true">ドメインルールはありません。</string>
     <string name="cd_blocked_initial" translatable="true">B</string>
     <string name="ci_no_rule" translatable="true">ルールなし</string>

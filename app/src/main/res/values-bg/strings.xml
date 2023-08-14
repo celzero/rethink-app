@@ -21,7 +21,6 @@
     <string name="firewall_mode_info_title">Защитна стена</string>
     <string name="firewall_mode_info_explanation_new">Наблюдавайте мрежовата активност и защитната стена за всяко приложение или IP адрес.</string>
     <string name="hybrid_mode_info_title">DNS + защитна стена</string>
-    <string name="wireguard_mode_info_explanation_new">Очаквайте скоро…</string>
     <string name="alert_firewall_accessibility_explanation">RethinkDNS използва услуга за достъпност, за да проследява кои приложения се използват (на преден план) спрямо тези, които не се използват (на заден план).
 \n
 \nRethinkDNS не събира никаква информация и не ви шпионира по никакъв начин.</string>

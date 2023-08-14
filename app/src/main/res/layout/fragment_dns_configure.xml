@@ -296,6 +296,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/cd_dns_alg_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -322,7 +323,7 @@
             android:layout_marginStart="55dp"
             android:fontFamily="sans-serif-smallcaps"
             android:padding="5dp"
-            android:text="@string/dc_other_settings_heading"
+            android:text="@string/lbl_advanced"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -382,6 +383,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dc_dns_website_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -437,6 +439,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dc_setting_dns_cache_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -491,6 +494,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/settings_custom_downloader_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -546,6 +550,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dc_check_update_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
@@ -602,6 +607,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dc_dns_leaks_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>

@@ -14,25 +14,10 @@
         app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/cda_heading"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:focusable="true"
-            android:padding="5dp"
-            android:text="@string/cd_dialog_header"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:visibility="gone" />
-
         <RelativeLayout
             android:id="@+id/cda_no_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cda_heading"
             android:layout_centerInParent="true"
             android:visibility="gone">
 
@@ -62,7 +47,6 @@
             android:id="@+id/cda_show_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cda_heading"
             android:orientation="vertical"
             android:visibility="visible">
 
@@ -117,6 +101,7 @@
                 app:drawableStartCompat="@drawable/ic_info_white"
                 android:drawablePadding="10dp"
                 android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
                 android:paddingStart="10dp"
                 android:paddingTop="10dp"
                 android:paddingEnd="10dp"

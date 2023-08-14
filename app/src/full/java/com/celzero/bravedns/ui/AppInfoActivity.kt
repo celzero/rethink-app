@@ -52,13 +52,14 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
-import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UiUtils.openAndroidAppInfo
+import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.celzero.bravedns.viewmodel.CustomIpViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,7 +78,7 @@ class AppInfoActivity :
     private val domainRulesViewModel: CustomDomainViewModel by viewModel()
     private val networkLogsViewModel: AppConnectionsViewModel by viewModel()
 
-    private var uid: Int = 0
+    private var uid: Int = INVALID_UID
     private lateinit var appInfo: AppInfo
 
     private var ipListUiState: Boolean = true
@@ -149,14 +150,11 @@ class AppInfoActivity :
 
         val packages = FirewallManager.getPackageNamesByUid(appInfo.uid)
 
-        if (packages.count() != 1) {
-            b.aadAppInfoIcon.visibility = View.GONE
-        }
-
         b.aadAppDetailName.text = appName(packages.count())
         appStatus = FirewallManager.appStatus(appInfo.uid)
         connStatus = FirewallManager.connectionStatus(appInfo.uid)
         updateFirewallStatusUi(appStatus, connStatus)
+        updateDataUsage()
         // introduce this on v054
         // updateDnsDetails()
 
@@ -209,6 +207,12 @@ class AppInfoActivity :
         }
     }
 
+    private fun updateDataUsage() {
+        val upload = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
+        val download = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
+        b.aadDataUsageStatus.text = getString(R.string.ct_bs_upload_download, upload, download)
+    }
+
     private fun updateFirewallStatusUi(
         firewallStatus: FirewallManager.FirewallStatus,
         connectionStatus: FirewallManager.ConnectionStatus
@@ -255,7 +259,20 @@ class AppInfoActivity :
 
         b.aadConnDetailSearch.setOnQueryTextListener(this)
 
-        b.aadAppInfoIcon.setOnClickListener { openAndroidAppInfo(this, appInfo.packageName) }
+        b.aadAppInfoIcon.setOnClickListener {
+            val packages = FirewallManager.getAppNamesByUid(appInfo.uid)
+            if (packages.count() == 1) {
+                openAndroidAppInfo(this, appInfo.packageName)
+            } else if (packages.count() > 1) {
+                showAppInfoDialog(packages)
+            } else {
+                showToastUiCentered(
+                    this,
+                    this.getString(R.string.ctbs_app_info_not_available_toast),
+                    Toast.LENGTH_SHORT
+                )
+            }
+        }
 
         TooltipCompat.setTooltipText(
             b.aadAppSettingsBypassDnsFirewall,
@@ -376,6 +393,28 @@ class AppInfoActivity :
         b.aadAppDnsRethinkConfigure.setOnClickListener { rethinkListBottomSheet() }
 
         b.aadConnDelete.setOnClickListener { showDeleteConnectionsDialog() }
+    }
+
+    private fun showAppInfoDialog(packages: List<String>) {
+        val builderSingle = MaterialAlertDialogBuilder(this)
+
+        builderSingle.setTitle(this.getString(R.string.about_settings_app_info))
+
+        val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1)
+        arrayAdapter.addAll(packages)
+        builderSingle.setCancelable(false)
+
+        builderSingle.setItems(packages.toTypedArray(), null)
+
+        builderSingle.setPositiveButton(getString(R.string.ada_noapp_dialog_positive)) {
+            dialog: DialogInterface,
+            _: Int ->
+            dialog.dismiss()
+        }
+
+        val alertDialog = builderSingle.create()
+        alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+        alertDialog.show()
     }
 
     private fun setAppDns(url: String) {
@@ -663,7 +702,7 @@ class AppInfoActivity :
     }
 
     private fun showNoAppFoundDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(R.string.ada_noapp_dialog_title))
         builder.setMessage(getString(R.string.ada_noapp_dialog_message))
         builder.setCancelable(false)
@@ -677,13 +716,11 @@ class AppInfoActivity :
     }
 
     private fun showDeleteConnectionsDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(R.string.ada_delete_logs_dialog_title)
         builder.setMessage(R.string.ada_delete_logs_dialog_desc)
         builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.ada_delete_logs_dialog_positive)) { _, _ ->
-            deleteAppLogs()
-        }
+        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ -> deleteAppLogs() }
 
         builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ -> }
         builder.create().show()
@@ -700,7 +737,7 @@ class AppInfoActivity :
         cStat: FirewallManager.ConnectionStatus
     ) {
 
-        val builderSingle: AlertDialog.Builder = AlertDialog.Builder(this)
+        val builderSingle = MaterialAlertDialogBuilder(this)
 
         builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
         val count = packageList.count()

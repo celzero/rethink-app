@@ -72,7 +72,6 @@
     <string name="status_protected_with_http">http ப்ராக்ஸி மூலம் பாதுகாக்கப்படுகிறது</string>
     <string name="firewall_mode_notification_title">பாதுகாக்கப்பட்டது! ஃபயர்வாலுடன் இணைக்கப்பட்டது.</string>
     <string name="dns_explanation_firewall_connected">ஃபயர்வாலுடன் இணைக்கப்பட்டது</string>
-    <string name="wireguard_mode_info_explanation_new">விரைவில் வரும்.</string>
     <string name="hybrid_mode_notification_title">பாதுகாக்கப்பட்டது! டிஎன்எஸ் + தீ சுவர் உடன் இணைக்கப்பட்டது.</string>
     <string name="pause_mode_notification_title">இடைநிறுத்தப்பட்டது! தடுக்கப்பட்ட பயன்பாடுகள் தொடர்ந்து ஃபயர்வால் செய்யப்படும்</string>
     <string name="status_app_error">பயன்பாட்டு பிழை</string>

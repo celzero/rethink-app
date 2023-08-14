@@ -187,6 +187,12 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         R.string.firewall_rule_global_lockdown,
         R.string.firewall_rule_global_lockdown_desc,
         R.integer.block
+    ),
+    RULE12(
+        "Proxy",
+        R.string.firewall_rule_proxied,
+        R.string.firewall_rule_proxied_desc,
+        R.integer.allow
     );
 
     companion object {
@@ -220,6 +226,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE9B.id -> RULE9B
                 RULE10.id -> RULE10
                 RULE11.id -> RULE11
+                RULE12.id -> RULE12
                 else -> null
             }
         }
@@ -255,6 +262,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE9B.id -> R.drawable.ic_orbot
                 RULE10.id -> R.drawable.ic_http
                 RULE11.id -> R.drawable.ic_global_lockdown
+                RULE12.id -> R.drawable.ic_proxy_white
                 else -> R.drawable.bs_dns_home_screen
             }
         }
@@ -271,6 +279,10 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
             return rule.act != R.integer.allow
         }
 
+        fun isProxied(rule: FirewallRuleset): Boolean {
+            return rule.id == RULE12.id
+        }
+
         fun shouldShowHint(rule: String?): Boolean {
             if (rule == null) return false
 
@@ -284,6 +296,7 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
                 RULE2C.id -> true
                 RULE2F.id -> true
                 RULE2I.id -> true
+                RULE12.id -> true
                 else -> false
             }
         }

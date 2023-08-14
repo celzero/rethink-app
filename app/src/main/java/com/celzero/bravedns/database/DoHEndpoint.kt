@@ -28,6 +28,7 @@ class DoHEndpoint {
     var dohExplanation: String? = null
     var isSelected: Boolean = true
     var isCustom: Boolean = true
+    var isSecure: Boolean = true
     var modifiedDataTime: Long = INIT_TIME_MS
     var latency: Int = 0
 
@@ -51,6 +52,7 @@ class DoHEndpoint {
         dohExplanation: String,
         isSelected: Boolean,
         isCustom: Boolean,
+        isSecure: Boolean,
         modifiedDataTime: Long,
         latency: Int
     ) {
@@ -62,6 +64,7 @@ class DoHEndpoint {
         this.dohExplanation = dohExplanation
         this.isSelected = isSelected
         this.isCustom = isCustom
+        this.isSecure = isSecure
         if (modifiedDataTime != INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
         else this.modifiedDataTime = System.currentTimeMillis()
         this.latency = latency

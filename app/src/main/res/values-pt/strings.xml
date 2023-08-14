@@ -27,7 +27,6 @@
     <string name="dns_mode_info_explanation_new">Monitorizar, bloquear e encriptar pedidos DNS.</string>
     <string name="dns_firewall_mode_info_explanation_new">Para além dos dois anteriores (DNS e Firewall), contornar também a censura da Internet.</string>
     <string name="alert_permission_accessibility">Permissão - Acessibilidade</string>
-    <string name="wireguard_mode_info_explanation_new">Brevemente.</string>
     <string name="alert_firewall_accessibility_explanation">O RethinkDNS utiliza o serviço de acessibilidade para rastrear as aplicações estão a ser utilizadas (primeiro plano) e diferenciar as que não estão em utilização (segundo plano).
 \n
 \nO RethinkDNS não recolhe nenhuma informação sua nem o vigia.</string>
@@ -62,7 +61,6 @@
     <string name="show_logs_disabled_network_message">O registo de conexões foi desativado. Para voltar a ativar, vá a <i>Configurações</i> e ative a opção<i>Ativar o registro no dispositivo.</i></string>
     <string name="show_logs_disabled_dns_message">O registo de pedidos DNS foi desativado. Para voltar a ativar, vá a <i>Configurações</i> e ative a opção <i>Ativar o registro no dispositivo.</i></string>
     <string name="configure_dns_connected_doh_status">DNS sobre HTTPS</string>
-    <string name="http_proxy_dialog_desc">As configurações de proxy HTTP(S) são apenas uma dica para as aplicações, mas estas podem ou não usá-los; no entanto, os navegadores como o Chrome e o Firefox usam-nos. As aplicações que usam o proxy HTTP(S) ignorarão as regras de firewall e DNS.</string>
     <string name="download_update_dialog_failure_message">Ou nossos servidores estão inativos ou a conexão não pôde ser estabelecida. Por favor, tente novamente após algum tempo.</string>
     <string name="download_update_dialog_trylater_title">Não é possível atualizar agora</string>
     <string name="download_update_dialog_trylater_message">A atualização não pode ser executada agora, tente novamente mais tarde.</string>
@@ -84,19 +82,14 @@
     <string name="firewall_mode_info_title">Firewall</string>
     <string name="apps_info_title">Aplicações</string>
     <string name="firewall_mode_info_explanation_new">Monitorizar a atividade da rede e aplicar a firewall a qualquer aplicação ou endereço IP.</string>
-    <string name="settings_all_networks_dialog_message">Quando ativado, serão ignoradas as regras de firewall da aplicação para redes limitadas (ex: móvel) e não limitadas (ex: WiFi).
-\n
-\nQuer continuar\?</string>
     <string name="settings_theme_desc">Tema escuro/claro</string>
-    <string name="settings_http_proxy_desc">Encaminhando para %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">Encaminhando para %1$s</string>
     <string name="settings_http_proxy_error_text4">Falha na conexão do host. Tente novamente.</string>
-    <string name="settings_http_proxy_port">Porta</string>
     <string name="settings_socks_forwarding_desc_no_app">Encaminhando para %1$s:%2$s</string>
     <string name="settings_dns_proxy_dialog_header">Definir proxy SOCKS5</string>
     <string name="settings_dns_proxy_dialog_app">Aplicação</string>
     <string name="settings_http_proxy_error_text2">Porta inválida</string>
     <string name="settings_http_proxy_toast_success">O proxy HTTP está configurado</string>
-    <string name="settings_http_proxy_hostname">Nome do host</string>
     <string name="settings_socks_forwarding_default_desc">Encaminhar conexões para o ponto terminal SOCKS5.</string>
     <string name="settings_dns_proxy_dialog_hostname">Nome do host</string>
     <string name="settings_dns_proxy_dialog_app_desc">A aplicação selecionada será excluída da VPN para que possa fazer conexões proxy por sua própria conta.</string>
@@ -129,7 +122,6 @@
     <string name="hsf_stop_btn_state">parar</string>
     <string name="hsf_notification_permission_failure">Ative a permissão de notificação em Configurações</string>
     <string name="hsf_blocklist_updating_text">A ativar…</string>
-    <string name="dc_other_settings_heading">avançado</string>
     <string name="next">Seguinte</string>
     <string name="slide_2_title">Boas-vindas</string>
     <string name="allow">permitir</string>
@@ -237,7 +229,7 @@
     <string name="hsf_uptime">(ativo %1$s; protos: %2$s; tipo: %3$s)</string>
     <string name="hsf_downtime">(inativo desde %1$s)</string>
     <string name="hsf_vpn_dialog_header">Atenção!</string>
-    <string name="hsf_vpn_dialog_positive">Continuar</string>
+    <string name="lbl_proceed">Continuar</string>
     <string name="hsf_vpn_prepare_failure">Falta a permissão de VPN ou então outra aplicação está com a opção \"VPN sempre ativa\".</string>
     <string name="hsf_start_dialog_header">Iniciar %1$s</string>
     <string name="hsf_start_dialog_positive">Começar</string>
@@ -268,7 +260,7 @@
     <string name="firewall_act_universal_tab">universal</string>
     <string name="orbot_app_issue">Não foi possível iniciar o Orbot. Ele está instalado\?</string>
     <string name="settings_socks5_vpn_disabled_error">Inicie o RethinkDNS para prosseguir.</string>
-    <string name="settings_https_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
+    <string name="settings_https_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
     <string name="status_protected_with_proxy_private_dns">protegido com proxy e dns privado</string>
     <string name="always_on_dialog_positive">Parar</string>
     <string name="orbot_bs_status_1">Encaminhando conexões %1$s para Orbot.</string>
@@ -284,7 +276,6 @@
     <string name="settings_check_update_desc">Verifica automaticamente se existem atualizações da aplicação uma vez por semana.</string>
     <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="orbot">Orbot</string>
-    <string name="settings_all_networks_dialog_positive_btn">Ativar mesmo assim</string>
     <string name="settings_ip_network_desc">Escolha entre as versões do Protocolo de Internet.</string>
     <string name="settings_ptrans_desc">Traduzir o tráfego IPv6 de saída para IPv4 no dispositivo. Ative se estiver conectado a uma rede apenas com IPv4.</string>
     <string name="settings_proxy_header">proxy</string>
@@ -311,7 +302,6 @@
     <string name="orbot_stop_dialog_dns_message">O RethinkDNS está configurado para reencaminhar os pedidos do DNS para o Orbot. Altere conforme necessário.</string>
     <string name="orbot_stop_dialog_neutral">Alterar DNS</string>
     <string name="settings_orbot_install_desc">Toque aqui para instalar o Orbot</string>
-    <string name="settings_all_networks_dialog_title">Atenção!</string>
     <string name="finish">Terminar</string>
     <string name="settings_https_heading">Configurar proxy HTTP(S)</string>
     <string name="orbot_bs_status_2">O proxy HTTP está definido (as aplicações podem ignorá-lo).</string>
@@ -342,7 +332,7 @@
 \n
 \n%2$s</string>
     <string name="orbot_install_dialog_positive">Instalar</string>
-    <string name="settings_socks5_disabled_error">Conectado ao Orbot. Desligue-o para continuar.</string>
+    <string name="settings_socks5_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
     <string name="settings_allow_bypass_desc">Permite que as aplicações ignorem a firewall do RethinkDNS. Algumas aplicações de conferências áudio/vídeo como o Zoom e o WhatsApp podem necessitar de contornar a firewall para funcionar corretamente.</string>
     <string name="orbot_http_desc">Recomenda que as aplicações utilizem o proxy HTTP do Orbot.</string>
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
@@ -441,7 +431,6 @@
     <string name="category_name_sys_components">Componentes do sistema</string>
     <string name="category_name_sys_apps">Aplicações do sistema</string>
     <string name="category_name_installed">Aplicações instaladas</string>
-    <string name="cd_dialog_header">Domínios personalizados: %1$s</string>
     <string name="build__flavor_website">Site da web</string>
     <string name="cd_toast_deleted">Domínio removido da lista personalizada</string>
     <string name="cd_dialog_error_invalid_domain">URL (domínio) inválido.</string>
@@ -470,7 +459,6 @@
     <string name="brbs_backup_complete_toast">Cópia de segurança completada</string>
     <string name="dns_btm_resolved_doh_no_server">resolvido %1$s</string>
     <string name="univ_firewall_rule_6">Bloquear aplicações recém-instaladas por padrão</string>
-    <string name="univ_ip_delete_individual_positive">Eliminar</string>
     <string name="univ_ip_delete_dialog_positive">Eliminar tudo</string>
     <string name="univ_view_blocked_ip_desc">Alterar domínios bloqueados ou confiáveis, regras de IP/porta.</string>
     <string name="univ_accessibility_dialog_negative">Negar</string>
@@ -488,7 +476,6 @@
 \nNúmero da porta: %3$s</string>
     <string name="fapps_info_dialog_message">Bloqueie a conexão de aplicações à Internet. Limitar o acesso à Internet ajuda a evitar o uso indevido de dados, além de economizar bateria.</string>
     <string name="fapps_lockdown_hint">A VPN está no modo bloqueado. A firewall não respeitará as regras em redes limitadas / ilimitadas.</string>
-    <string name="fapps_all_network_hint"><u>Usar todas as redes</u> está ativado. A firewall não respeitará as regras em redes limitadas/ilimitadas.</string>
     <string name="fapps_firewall_filter_desc_category">A mostrar aplicações (<u>%1$s</u>, %2$s) nas categorias: %3$s</string>
     <string name="rules_load_failure_heading">Nota</string>
     <string name="settings_local_blocklist_version">Versão: v%1$s</string>
@@ -527,15 +514,13 @@
     <string name="cd_dns_crypt_resolver_heading">Resolver</string>
     <string name="cd_dns_crypt_relay_heading">Relay</string>
     <string name="cd_dns_crypt_dialog_stamp">Carimbo</string>
-    <string name="cd_dialog_positive_btn">adicionar</string>
+    <string name="lbl_add">adicionar</string>
     <string name="cd_dns_crypt_error_text_1">O carimbo não pode ficar vazio</string>
     <string name="cd_doh_dialog_heading">Adicionar DNS sobre HTTPS</string>
     <string name="cd_dnscrypt_relay_heading">Retransmissores</string>
-    <string name="ct_delete_logs_positive_btn">Eliminar registos</string>
     <string name="ct_ip_details">%1$s (%2$s)</string>
     <string name="ctbs_app_other_apps">%1$s + %2$s outras aplicações</string>
     <string name="ctbs_block_other_apps">As regras aplicadas em %1$s também serão aplicadas em %2$s outras aplicações</string>
-    <string name="ctbs_proceed_positive_text">Continuar</string>
     <string name="ctbs_dialog_negative_btn">Voltar</string>
     <string name="dns_log_dialog_positive">Eliminar registos</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
@@ -563,7 +548,6 @@
     <string name="univ_accessibility_dialog_positive">Permitir</string>
     <string name="dns_connected_no_count">Conectado</string>
     <string name="dns_connected">Conectado</string>
-    <string name="dns_delete_positive">Eliminar</string>
     <string name="dns_info_positive">Ok</string>
     <string name="dns_crypt_relay_error_toast">Nenhum resolvedor selecionado</string>
     <string name="dns_proxy_desc">%1$s:%2$s, %3$s</string>
@@ -571,7 +555,6 @@
     <string name="dns_proxy_dialog_message_no_app">Endereço IP: %1$s
 \n
 \nNúmero da porta: %2$s</string>
-    <string name="dns_proxy_positive_btn">adicionar</string>
     <string name="fapps_filter_filter_heading">Tipo</string>
     <string name="fapps_filter_categories_heading">Categorias</string>
     <string name="fapps_filter_clear_btn">Limpar</string>
@@ -659,7 +642,6 @@
     <string name="cd_toast_added">Domínio adicionado com sucesso</string>
     <string name="cd_remove_dialog_title">Eliminar domínio\?</string>
     <string name="cd_remove_dialog_message">Eliminar o domínio da configuração guardada.</string>
-    <string name="cd_remove_dialog_positive">Eliminar</string>
     <string name="cd_dialog_title">Adicionar domínio</string>
     <string name="cd_dialog_desc">URL personalizado (domínio) ou curinga para permitir ou bloquear. por exemplo, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Digite %1$s</string>
@@ -671,7 +653,6 @@
     <string name="ci_dialog_edittext_hint">Endereço IP, sub-rede ou porta</string>
     <string name="ci_dialog_error_invalid_ip">Endereço IP, sub-rede ou porta inválida.</string>
     <string name="ci_dialog_added_success">IP adicionado à lista</string>
-    <string name="ci_header">Regras de IP e porta: %1$s</string>
     <string name="ci_no_rules_text">Nenhuma regra de IP ou porta.</string>
     <string name="ci_bypass_universal_initial">CU</string>
     <string name="ci_bypass_universal_txt">Contorno universal</string>
@@ -715,7 +696,7 @@
     <string name="rt_chip_check_update">Ver se há atualizações</string>
     <string name="rt_re_download">Descarregar novamente as listas de bloqueio</string>
     <string name="rt_list_simple_btn_txt">simples</string>
-    <string name="rt_list_adv_btn_txt">avançado</string>
+    <string name="lbl_advanced">avançado</string>
     <string name="rt_filter_parent_selected">Selecionado</string>
     <string name="rt_download_desc">Descarregar listas de bloqueio (cerca de 60 MB) para usar esta funcionalidade.</string>
     <string name="radio_sky_btn">⛅ Sky</string>
@@ -772,7 +753,6 @@
     <string name="private_dns_error">Não foi possível iniciar o ecrã de dns privado.</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">Limpar registos</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">Limpar todos os registos relacionados com esta aplicação.</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">Continuar</string>
     <string name="title_statistics">Estatísticas</string>
     <string name="isolate">isolar</string>
     <string name="settings_locale_heading">Alterar idioma</string>

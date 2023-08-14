@@ -26,6 +26,7 @@ import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
+import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
 
@@ -40,6 +41,8 @@ class DetailedStatisticsViewModel(
     private var blockedDomains: MutableLiveData<String> = MutableLiveData()
     private var allowedIps: MutableLiveData<String> = MutableLiveData()
     private var blockedIps: MutableLiveData<String> = MutableLiveData()
+    private var allowedCountries: MutableLiveData<String> = MutableLiveData()
+    private var blockedCountries: MutableLiveData<String> = MutableLiveData()
 
     fun setData(type: SummaryStatisticsFragment.SummaryStatisticsType) {
         when (type) {
@@ -60,6 +63,12 @@ class DetailedStatisticsViewModel(
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_IPS -> {
                 blockedIps.value = ""
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                allowedCountries.value = ""
+            }
+            SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
+                blockedCountries.value = ""
             }
         }
     }
@@ -101,7 +110,12 @@ class DetailedStatisticsViewModel(
                     if (appConfig.getBraveMode().isDnsMode()) {
                         dnsLogDAO.getAllBlockedDomains()
                     } else {
-                        connectionTrackerDAO.getAllBlockedDomains()
+                        // if any app bypasses the dns, then the decision made in flow() call
+                        if (FirewallManager.isAnyAppBypassesDns()) {
+                            connectionTrackerDAO.getAllBlockedDomains()
+                        } else {
+                            dnsLogDAO.getAllBlockedDomains()
+                        }
                     }
                 }
                 .liveData
@@ -121,6 +135,24 @@ class DetailedStatisticsViewModel(
         blockedIps.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     connectionTrackerDAO.getAllBlockedIps()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
+    val getAllContactedCountries =
+        allowedCountries.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    connectionTrackerDAO.getAllContactedCountries()
+                }
+                .liveData
+                .cachedIn(viewModelScope)
+        }
+
+    val getAllBlockedCountries =
+        blockedCountries.switchMap { _ ->
+            Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
+                    connectionTrackerDAO.getAllBlockedCountries()
                 }
                 .liveData
                 .cachedIn(viewModelScope)

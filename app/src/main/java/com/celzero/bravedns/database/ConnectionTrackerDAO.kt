@@ -19,6 +19,7 @@ import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.celzero.bravedns.data.AppConnection
+import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
 
 @Dao
@@ -26,10 +27,23 @@ interface ConnectionTrackerDAO {
 
     @Update fun update(connectionTracker: ConnectionTracker)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(connectionTracker: ConnectionTracker)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(connectionTracker: ConnectionTracker)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(connTrackerList: List<ConnectionTracker>)
+
+    @Query(
+        "update ConnectionTracker set downloadBytes = :downloadBytes, uploadBytes = :uploadBytes, duration = :duration, synack = :synack, message = :message where connId = :connId"
+    )
+    fun updateSummary(
+        connId: String,
+        downloadBytes: Long,
+        uploadBytes: Long,
+        duration: Int,
+        synack: Int,
+        message: String
+    )
 
     @Delete fun delete(connectionTracker: ConnectionTracker)
 
@@ -42,17 +56,15 @@ interface ConnectionTrackerDAO {
     fun getConnectionTrackerByName(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
     )
     fun getConnectionTrackerByName(query: String): PagingSource<Int, ConnectionTracker>
 
-    @Query(
-        "select * from ConnectionTracker where isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
-    )
+    @Query("select * from ConnectionTracker where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) and isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
     )
     fun getBlockedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
@@ -75,7 +87,7 @@ interface ConnectionTrackerDAO {
     fun getBlockedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
     )
     fun getBlockedConnectionsFiltered(
         query: String,
@@ -89,13 +101,11 @@ interface ConnectionTrackerDAO {
     @Query("DELETE FROM ConnectionTracker WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
     )
     fun getAllowedConnections(query: String): PagingSource<Int, ConnectionTracker>
 
-    @Query(
-        "select * from ConnectionTracker where isBlocked = 0 order by id desc LIMIT $MAX_LOGS"
-    )
+    @Query("select * from ConnectionTracker where isBlocked = 0 order by id desc LIMIT $MAX_LOGS")
     fun getAllowedConnections(): PagingSource<Int, ConnectionTracker>
 
     @Query(
@@ -104,7 +114,7 @@ interface ConnectionTrackerDAO {
     fun getAllowedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query) and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
+        "select * from ConnectionTracker where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
     )
     fun getAllowedConnectionsFiltered(
         query: String,
@@ -135,6 +145,26 @@ interface ConnectionTrackerDAO {
         "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 group by ipAddress order by count desc LIMIT 7"
     )
     fun getMostContactedIps(): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 group by flag order by count desc LIMIT 7"
+    )
+    fun getMostContactedCountries(): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 group by flag order by count desc"
+    )
+    fun getAllContactedCountries(): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 group by flag order by count desc LIMIT 7"
+    )
+    fun getMostBlockedCountries(): PagingSource<Int, AppConnection>
+
+    @Query(
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 group by flag order by count desc"
+    )
+    fun getAllBlockedCountries(): PagingSource<Int, AppConnection>
 
     @Query(
         "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 group by ipAddress order by count desc"
@@ -172,4 +202,9 @@ interface ConnectionTrackerDAO {
     fun getAllBlockedDomains(): PagingSource<Int, AppConnection>
 
     @Query("select count(id) from ConnectionTracker") fun logsCount(): LiveData<Long>
+
+    @Query(
+        "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :fromTime and timeStamp <= :toTime GROUP BY uid"
+    )
+    fun getDataUsage(fromTime: Long, toTime: Long): List<DataUsage>
 }

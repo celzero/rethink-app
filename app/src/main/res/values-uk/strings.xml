@@ -67,7 +67,6 @@
     <string name="bsct_block" translatable="true">Блокувати, обходити, виключати, ізолювати <u>цей застосунок</u></string>
     <string name="univ_firewall_dialog_message" translatable="true">Видалення цього правила дозволить будь-якому застосунку підключатися до цієї IP-адреси. Ви бажаєте продовжити\?</string>
     <string name="refresh_complete" translatable="true">Повторну синхронізацію списку застосунків завершено.</string>
-    <string name="http_proxy_dialog_desc" translatable="true">Налаштування проксі-сервера HTTP(S) є лише підказкою для застосунку, але вони можуть або не можуть використовувати його; однак такі браузери, як Chrome і Firefox, використовують їх. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
     <string name="search_firewall_network_log" translatable="true"><font size="12">Пошук застосунків, IP-адрес, доменів</font></string>
     <string name="app_mode_dns_firewall" translatable="true">DNS та Брандмауер (за замовчуванням)</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
@@ -114,7 +113,6 @@
     <string name="fapps_metered_block_dialog_title" translatable="true">Блокувати на обмежених</string>
     <string name="fapps_metered_unblock_dialog_message" translatable="true">Дозволити з’єднання в обмеженій (мобільній) мережі для <i>перелічених</i> застосунків\?</string>
     <string name="fapps_lockdown_hint" translatable="true">Vpn знаходиться в режимі блокування. Брандмауер не буде виконувати правила Обмежений /Необмежений.</string>
-    <string name="fapps_all_network_hint" translatable="true"><u>Використовувати всі мережі</u> увімкнено. Брандмауер не буде виконувати правила Обмежений / Необмежений.</string>
     <string name="network_log_app_name_unknown" translatable="true">Невідомо</string>
     <string name="network_log_app_name_unnamed" translatable="true">Без назви (%1$s)</string>
     <string name="accessibility_notification_content" translatable="true">Служба доступності RethinkDNS зупинилася або вийшла з ладу. Більше не блокує фонові застосунки. Натисніть, щоб увімкнути знову.</string>
@@ -237,9 +235,6 @@
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Переадресація на %1$s:%2$s</string>
     <string name="univ_firewall_rule_6" translatable="true">Блокування нових встановлених застосунків за замовчуванням</string>
     <string name="settings_orbot_notification_content" translatable="true">Помилка запуску Tor-as-a-Proxy. Відкрийте застосунок Orbot, щоб запустити його вручну.</string>
-    <string name="settings_all_networks_dialog_message" translatable="true">Якщо увімкнути, правила брандмауера застосунків для обмеженого (наприклад, мобільний) і без обмеження (наприклад, WiFi) не виконуватимуться.
-\n
-\nВи хочете продовжити\?</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Сповіщення застосунку</string>
     <string name="notification_screen_error" translatable="true">Не вдалося запустити екран сповіщень застосунку.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Використовувати вбудований завантажувач</string>
@@ -281,7 +276,6 @@
     <string name="bsct_conn_desc_allowed" translatable="true">дозволено на %1$s %2$s</string>
     <string name="bsct_conn_desc_blocked" translatable="true">заблоковано на %1$s %2$s</string>
     <string name="local_blocklist_download" translatable="true">Завантажити списки блокування</string>
-    <string name="wireguard_mode_info_explanation_new" translatable="true">Вже скоро.</string>
     <string name="bsct_conn_block_desc" translatable="true">заблоковано %1$s за адресою %2$s</string>
     <string name="lbl_network" translatable="true">мережа</string>
     <string name="default_dns_name" translatable="true">RDNS за замовчуванням</string>

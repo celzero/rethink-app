@@ -52,6 +52,14 @@
                     android:padding="5dp"
                     android:textColor="?primaryTextColor"
                     android:textSize="@dimen/default_font_text_view" />
+
+                <TextView
+                    android:id="@+id/aad_data_usage_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:textColor="?primaryTextColor"
+                    android:textSize="@dimen/default_font_text_view" />
             </LinearLayout>
 
             <LinearLayout

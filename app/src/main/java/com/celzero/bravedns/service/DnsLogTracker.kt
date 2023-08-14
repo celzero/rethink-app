@@ -25,7 +25,7 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.ResourceRecordTypes
-import com.celzero.bravedns.util.UIUtils.fetchFavIcon
+import com.celzero.bravedns.util.UiUtils.fetchFavIcon
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
@@ -33,9 +33,6 @@ import com.celzero.bravedns.util.Utilities.normalizeIp
 import dnsx.Summary
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class DnsLogTracker
 internal constructor(
@@ -45,7 +42,6 @@ internal constructor(
 ) {
 
     companion object {
-        private const val PERSISTENCE_STATE_INSERT_SIZE = 100L
         const val DNS_LEAK_TEST = "dnsleaktest"
 
         // Some apps like firefox, instagram do not respect ttls
@@ -60,13 +56,6 @@ internal constructor(
     private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
 
     init {
-        // init values from persistence state
-        numRequests = persistentState.numberOfRequests
-        numBlockedRequests = persistentState.numberOfBlockedRequests
-        // trigger livedata update with init'd values
-        persistentState.dnsRequestsCountLiveData.postValue(numRequests)
-        persistentState.dnsBlockedCountLiveData.postValue(numBlockedRequests)
-
         vpnStateMap[Transaction.Status.COMPLETE] = BraveVPNService.State.WORKING
         vpnStateMap[Transaction.Status.SEND_FAIL] = BraveVPNService.State.NO_INTERNET
         vpnStateMap[Transaction.Status.NO_RESPONSE] = BraveVPNService.State.DNS_SERVER_DOWN
@@ -121,6 +110,7 @@ internal constructor(
         } else {
             dnsLog.typeName = typeName.desc
         }
+
         dnsLog.resolver = transaction.serverName
 
         if (transaction.status === Transaction.Status.COMPLETE) {
@@ -148,6 +138,15 @@ internal constructor(
                     // no ip address found
                     dnsLog.flag =
                         context.getString(R.string.unicode_question_sign) // white question mark
+                    // add the response if it is not empty, in case of HTTP SVCB records, the
+                    // ip address is empty but the response is not
+                    if (transaction.response.isNotEmpty()) {
+                        dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
+                    }
+                    // if the response is empty and blocklist is not empty, then mark it as blocked
+                    if (transaction.blocklist.isNotEmpty()) {
+                        dnsLog.isBlocked = true
+                    }
                 }
             } else {
                 // make sure we don't log too much data
@@ -200,31 +199,5 @@ internal constructor(
         if (transaction == null) return false
 
         return transaction.serverName.isEmpty()
-    }
-
-    fun updateDnsRequestCount(dnsLog: DnsLog) {
-        CoroutineScope(Dispatchers.IO).launch {
-            // Post number of requests and blocked count to livedata.
-            persistentState.dnsRequestsCountLiveData.postValue(++numRequests)
-            if (dnsLog.isBlocked)
-                persistentState.dnsBlockedCountLiveData.postValue(++numBlockedRequests)
-
-            // avoid excessive disk I/O from syncing the counter to disk after every request
-            if (numRequests % PERSISTENCE_STATE_INSERT_SIZE == 0L) {
-                // Blocked request count
-                if (numBlockedRequests > persistentState.numberOfBlockedRequests) {
-                    persistentState.numberOfBlockedRequests = numBlockedRequests
-                } else {
-                    numBlockedRequests = persistentState.numberOfBlockedRequests
-                }
-
-                // Number of request count
-                if (numRequests > persistentState.numberOfRequests) {
-                    persistentState.numberOfRequests = numRequests
-                } else {
-                    numRequests = persistentState.numberOfRequests
-                }
-            }
-        }
     }
 }

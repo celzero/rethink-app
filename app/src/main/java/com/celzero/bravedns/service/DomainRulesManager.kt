@@ -49,10 +49,10 @@ object DomainRulesManager : KoinComponent {
 
     data class CacheKey(val domain: String, val uid: Int)
 
-    var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
-    var trustedDomains: MutableSet<String> = hashSetOf()
-    var trie: dnsx.CritBit = Dnsx.newCritBit()
-    private val trustedTrie: dnsx.CritBit = Dnsx.newCritBit()
+    private var domains: MutableMap<CacheKey, CustomDomain> = hashMapOf()
+    private var trustedDomains: MutableSet<String> = hashSetOf()
+    private var trie: dnsx.RadixTree = Dnsx.newRadixTree()
+    private val trustedTrie: dnsx.RadixTree = Dnsx.newRadixTree()
 
     // stores all the previous response sent
     private val domainLookupCache: Cache<CacheKey, Status> =
@@ -311,20 +311,36 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    fun deleteIpRulesByUid(uid: Int) {
+    fun deleteRulesByUid(uid: Int) {
         io {
             // find the domains that are for the uid and remove them from domains
             val domainsToDelete = domains.filterKeys { it.uid == uid }.toMutableMap()
             // find the domains that are in delete list and remove them from trusted domains
-            val trustedDomainsToDelete = domainsToDelete.filterValues { it.status == Status.TRUST.id }
+            val trustedDomainsToDelete =
+                domainsToDelete.filterValues { it.status == Status.TRUST.id }
 
             customDomainsRepository.deleteRulesByUid(uid)
             domains.entries.removeAll(domainsToDelete.entries)
-            trustedDomains.removeAll(trustedDomainsToDelete.keys.map { it.domain.lowercase(Locale.ROOT) }
-                .toSet())
+            trustedDomains.removeAll(
+                trustedDomainsToDelete.keys.map { it.domain.lowercase(Locale.ROOT) }.toSet()
+            )
             val rulesDeleted = trie.delAll(uid.toString())
             val trustedRulesDeleted = trustedTrie.delAll(uid.toString())
-            Log.i(LOG_TAG_DNS, "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie")
+            Log.i(
+                LOG_TAG_DNS,
+                "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie"
+            )
+            domainLookupCache.invalidateAll()
+        }
+    }
+
+    fun deleteAllRules() {
+        io {
+            customDomainsRepository.deleteAllRules()
+            domains.clear()
+            trustedDomains.clear()
+            trie.clear()
+            trustedTrie.clear()
             domainLookupCache.invalidateAll()
         }
     }

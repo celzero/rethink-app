@@ -6,7 +6,7 @@
     <string name="slide_2_title">欢迎</string>
     <string name="settings_orbot_disabled_error">关闭 HTTP(S) 与/或 SOCKS5 代理以继续设置 Tor 代理。</string>
     <string name="settings_orbot_notification_content">启动 Tor 代理失败。请手动开启 Orbot 应用。</string>
-    <string name="settings_https_disabled_error">已连接至 Orbot 。请先将其关闭。</string>
+    <string name="settings_https_disabled_error">已连接至 %1$s 。请先将其关闭。</string>
     <string name="settings_socks5_dialog_hint_username">帐号（可选）</string>
     <string name="fapps_info_dialog_message">阻止应用连接互联网。限制访问互联网有助于避免不必要的数据使用，也有助于省电。</string>
     <string name="fapps_info_dialog_positive_btn">了解</string>
@@ -16,7 +16,7 @@
     <string name="pause_text">已暂停</string>
     <string name="pause_desc">注意： %1$s 个已拦截的应用将会继续被拦截。</string>
     <string name="default_dns_name">RDNS 默认</string>
-    <string name="settings_socks5_disabled_error">已连接至 Orbot 。请先将其关闭。</string>
+    <string name="settings_socks5_disabled_error">已连接至 %1$s 。请先将其关闭。</string>
     <string name="ada_ip_connection_count_zero">0 个 IP 地址</string>
     <string name="univ_firewall_rule_8">拦截端口 80 （不安全 HTTP ）的流量</string>
     <string name="univ_delete_firewall_dialog_title">是否删除所有 IP 规则？</string>
@@ -40,7 +40,6 @@
     <string name="settings_ip_network_desc">在不同互联网协议版本中选择。</string>
     <string name="orbot_title">Orbot 与代理</string>
     <string name="settings_http_proxy_error_text1">端口范围在 1024 与 65535 间</string>
-    <string name="settings_http_proxy_hostname">域名</string>
     <string name="settings_socks_forwarding_desc">正转发至 %1$s:%2$s ， %3$s</string>
     <string name="settings_ip_text_ipv6">IPv6</string>
     <string name="hsf_downtime">（自%1$s起停用）</string>
@@ -94,7 +93,6 @@
     <string name="fav_icon">fav_icon</string>
     <string name="firewall_rule_foreground">应用未使用</string>
     <string name="new_app_bulk_notification_title">注意</string>
-    <string name="cd_remove_dialog_positive">删除</string>
     <string name="ci_no_rules_text">无 IP 或端口规则。</string>
     <string name="ada_ip_no_connection">此应用无网络日志。</string>
     <string name="ada_app_status_isolate">正处隔离模式中；仅放行信任 IP</string>
@@ -119,7 +117,6 @@
     <string name="about_dialog_positive_button">一起出发</string>
     <string name="about_telegram_link">https://telegram.me/rethinkdns</string>
     <string name="cd_dns_proxy_mode_internal">内部</string>
-    <string name="ctbs_proceed_positive_text">继续</string>
     <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
     <string name="dns_btm_sheet_chip_no_answer">无响应</string>
     <string name="dns_connected_no_count">已连接</string>
@@ -133,7 +130,7 @@
     <string name="ada_firewall_status">此应用<b><i>%1$s</i></b>。</string>
     <string name="rt_chip_update_available">更新可用</string>
     <string name="rt_chip_check_update">检查更新</string>
-    <string name="rt_list_adv_btn_txt">高级</string>
+    <string name="lbl_advanced">高级</string>
     <string name="skip">跳过</string>
     <string name="status_app_error">应用错误</string>
     <string name="brave_dns_connect_mode_change_dns">选择模式。</string>
@@ -144,7 +141,6 @@
     <string name="settings_socks5_desc">将连接转发至 SOCKS5 端点。</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="settings_orbot_install_desc">轻触此处以安装 Orbot</string>
-    <string name="settings_all_networks_dialog_positive_btn">仍要启用</string>
     <string name="settings_custom_downloader_desc">若被禁用，将使用 Android 内附的<i>下载管理器</i></string>
     <string name="settings_ip_dialog_ipv4">IPv4 （默认）</string>
     <string name="settings_notification_dialog_option_3">"
@@ -158,7 +154,6 @@
     <string name="cd_doh_dialog_resolver_name">解析服务名称</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="univ_firewall_rule_10">除绕行应用及 IP 外全部拦截</string>
-    <string name="dns_delete_positive">删除</string>
     <string name="dns_proxy_port">端口</string>
     <string name="copy_clipboard_label">URL</string>
     <string name="firewall_rule_block_app">应用已拦截</string>
@@ -178,7 +173,6 @@
     <string name="orbot_both">TCP + HTTP 代理</string>
     <string name="orbot_bs_status_1">将 %1$s 连接转发至 Orbot。</string>
     <string name="orbot_stop_dialog_negative">停止 Orbot</string>
-    <string name="settings_all_networks_dialog_title">注意！</string>
     <string name="settings_import_export_heading">备份与恢复</string>
     <string name="settings_http_proxy_error_text4">服务器连接失败。请重试。</string>
     <string name="settings_dns_proxy_dialog_hostname">域名</string>
@@ -221,7 +215,6 @@
     <string name="dns_card_latency_inactive">请启用 DNS 模式。</string>
     <string name="hsf_start_dialog_positive">启动</string>
     <string name="dc_other_dns_heading">类型</string>
-    <string name="dc_other_settings_heading">高级</string>
     <string name="dc_dns_website_desc">从 <i>nextdns.io</i> 与 <i>duckduckgo.com</i> 获取网站图标。约占用 350 MB 磁盘空间</string>
     <string name="about_faq">查阅常见问题</string>
     <string name="about_sponsor_link_text">赞助</string>
@@ -276,7 +269,7 @@
     <string name="settings_lock_down_mode_desc">某些选项在 VPN 处于闭关模式时不可用。<u>请移步 VPN 设置</u>。</string>
     <string name="orbot_status_arg_3">DNS 与 TCP</string>
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
-    <string name="settings_http_proxy_desc">正转发至 %1$s:%2$s</string>
+    <string name="settings_http_proxy_desc">正转发至 %1$s</string>
     <string name="settings_theme_dialog_title">外观</string>
     <string name="settings_notification_dialog_title">选择通知操作</string>
     <string name="hsf_pause_vpn_failure">无法暂停： Rethink 未启用</string>
@@ -291,13 +284,11 @@
     <string name="hs_download_negative_default">稍后提醒</string>
     <string name="univ_accessibility_dialog_negative">拒绝</string>
     <string name="dns_proxy_name">代理名称</string>
-    <string name="dns_proxy_positive_btn">添加</string>
     <string name="fapps_metered_unblock_dialog_message">是否于收费网络放行<i>已列出</i>应用？</string>
     <string name="firewall_rule_block_udp_ntp_desc">一项用户定义的防火墙规则拦截了此 <i>UDP</i> 连接。<br/><br/>若需更改，请移步<i>全局</i>选项卡。</string>
     <string name="new_app_notification_action_toast_deny">拦截应用网络连接</string>
     <string name="ada_app_bypass_univ">无条件放行</string>
     <string name="rethink_sky_desc">逾 280 处地点；更长的在线时间；于 cloudflare.com 上运行的中间解析服务</string>
-    <string name="wireguard_mode_info_explanation_new">即将推出。</string>
     <string name="dns_query_clear_logs_message">这会删除所有在设备上保存的 DNS 日志。此操作不可逆。请问您是否想要继续？</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">是否删除 DNSCrypt 解析服务？</string>
     <string name="dns_proxy_remove_success">DNS 代理已删除。</string>
@@ -308,15 +299,12 @@
 \n%2$s</string>
     <string name="orbot_stop_dialog_message">Rethink 已停止向 Orbot 转发连接，但 Orbot 可能仍于后台运行。</string>
     <string name="orbot_install_dialog_positive">安装</string>
-    <string name="settings_all_networks_dialog_message">启用时，应用防火墙规则将不会考虑网络为收费（如移动数据）或非收费（如 WiFi ）。
-\n
-\n您是否想要继续？</string>
     <string name="settings_theme_dialog_themes_2">亮色</string>
     <string name="settings_theme_dialog_themes_3">暗色</string>
     <string name="settings_ip_dialog_ipv6">IPv6 （实验性）</string>
     <string name="settings_notification_desc">与 Rethink 的通知一同显示的操作按钮：%1$s</string>
     <string name="dns_card_latency_active">延迟： %1$sms</string>
-    <string name="cd_dialog_positive_btn">添加</string>
+    <string name="lbl_add">添加</string>
     <string name="dns_btm_sheet_chip">+%1$s 个其他 IP</string>
     <string name="univ_view_blocked_ip">IP 与端口规则</string>
     <string name="univ_ip_delete_toast_success">已删除所有 IP 规则。</string>
@@ -385,7 +373,6 @@
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="error_loading_log_file">读取日志文件错误</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
-    <string name="ct_delete_logs_positive_btn">删除日志</string>
     <string name="dns_btm_resolved_crypt">%1$s 由 %2$s <u>匿名</u>地解析</string>
     <string name="dns_btm_resolved_doh_no_server">已解析 %1$s</string>
     <string name="fapps_firewall_filter_excluded">已排除</string>
@@ -418,13 +405,11 @@
     <string name="ctbs_block_other_apps">应用于 %1$s 的规则亦会应用于其他 %2$s 个应用</string>
     <string name="univ_ip_delete_dialog_positive">全部删除</string>
     <string name="fapps_firewall_filter_isolate">已隔离</string>
-    <string name="fapps_all_network_hint"><u>使用所有可用网络</u>已启用。防火墙将不会遵守收费 / 非收费规则。</string>
     <string name="network_log_app_name_unnamed">未命名（ %1$s ）</string>
     <string name="dns_proxy_connection_failure_lockdown">为 %2$s 而在闭关模式下排除 %1$s 可导致网络问题。</string>
     <string name="firewall_rule_foreground_desc">此连接因原始应用<i>未处于前台</i>而被拦截。<br/><br/>若需变更此行为，请至<i>全局</i>选项卡。</string>
     <string name="new_app_bulk_notification_content">Rethink 拦截了 %1$s 款新应用。轻触以查看或更改。</string>
     <string name="new_app_notification_action_toast_allow">放行应用网络连接</string>
-    <string name="cd_dialog_header">自定义域名：%1$s</string>
     <string name="ada_noapp_dialog_positive">确认</string>
     <string name="ada_app_dns_settings">DNS 设置</string>
     <string name="rbl_privacy">隐私</string>
@@ -460,7 +445,6 @@
     <string name="cd_toast_deleted">域名已从自定义列表中移除</string>
     <string name="cd_no_rule_txt">无规则</string>
     <string name="ci_dialog_error_invalid_ip">无效 IP 地址、子网或端口。</string>
-    <string name="ci_header">IP 与端口规则: %1$s</string>
     <string name="ada_app_exclude">排除</string>
     <string name="rt_dialog_neutral">继续</string>
     <string name="settings_vpn_heading">vpn</string>
@@ -476,7 +460,6 @@
     <string name="about_bug_no_log_dialog_message">无法获取崩溃日志。请问您是否想要手动报告漏洞？</string>
     <string name="about_version_install_source">v%1$s (%2$s)</string>
     <string name="cd_dns_crypt_error_text_1">印戳不能为空</string>
-    <string name="univ_ip_delete_individual_positive">删除</string>
     <string name="dns_query_latency">%1$sms</string>
     <string name="socks5_proxy_toast_parameter">SOCKS5 代理</string>
     <string name="update_complete_snack_message">已下载新版本。</string>
@@ -500,13 +483,12 @@
     <string name="orbot_install_dialog_title">是否安装 Orbot ？</string>
     <string name="settings_socks5_vpn_disabled_error">启动 Rethink 以继续。</string>
     <string name="settings_autostart_bootup_heading">设备启动时自启（实验性）</string>
-    <string name="settings_http_proxy_port">端口</string>
     <string name="settings_notification_dialog_option_1">"
 \n暂停 / 停止（默认）：
 \n显示两个按钮来快速暂停与停止 Rethink 。"</string>
     <string name="hsf_stop_btn_state">停止</string>
     <string name="hsf_uptime">（自%1$s启动；协议：%2$s；类型：%3$s）</string>
-    <string name="hsf_vpn_dialog_positive">继续</string>
+    <string name="lbl_proceed">继续</string>
     <string name="hsf_start_dialog_header">启动 %1$s</string>
     <string name="about_bug_report">漏洞报告</string>
     <string name="about_mail_bugreport_subject">[Rethink]: Bug report</string>
@@ -662,7 +644,6 @@
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
     <string name="about_mozilla">Rethink 为 Mozilla Builders MVP 计划的一部分。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) 代理</string>
-    <string name="http_proxy_dialog_desc">HTTP(S) 代理设置仅为对应用程序的一个提醒，它们可选择是否使用代理；但如 Chrome 及 Firefox 等的浏览器则会使用代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
     <string name="whats_new_version_update">&lt;b&gt;本地派对！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：排除私有 IP （局域网 / 本地链路）。&lt;br/&gt; 2. 修复「绕行 DNS 与防火墙」设置。&lt;br/&gt; 3. 在 DNS 日志内为可能已被防火墙拦截的域名显示“或已拦截”。&lt;br/&gt; 4. 于支持处显示自适应图标。&lt;br/&gt; 5. 每一刻钟提示生物认证。&lt;br/&gt; 6. 其他六项 UI 与性能优化。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译此应用&lt;/a&gt;</string>
     <string name="about_website">访问 rethinkdns.com</string>
@@ -765,7 +746,6 @@
     <string name="ci_trust_txt">信任</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen">清除日志</string>
     <string name="ada_delete_logs_dialog_desc" description="Appears as dialog description to clear the logs in app specific screen">清除所有与此应用有联系的日志。</string>
-    <string name="ada_delete_logs_dialog_positive" description="Appears as dialog positive button to clear the logs in app specific screen">继续</string>
     <string name="rbl_parental_control_desc" description="The text appears as blocklists description in configure screen">拦截成人、盗版内容，线上赌博、约会及社交媒体。</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen">拦截吸睛软件、间谍软件及恐吓软件。</string>
     <string name="private_dns_dialog_heading">关闭私人 DNS</string>

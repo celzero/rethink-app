@@ -14,25 +14,10 @@
         app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/cip_heading"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:visibility="gone"
-            android:focusable="true"
-            android:padding="5dp"
-            android:text="@string/ci_header"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view" />
-
         <RelativeLayout
             android:id="@+id/cip_no_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cip_heading"
             android:layout_centerInParent="true"
             android:visibility="gone">
 
@@ -62,7 +47,6 @@
             android:id="@+id/cip_show_rules_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cip_heading"
             android:orientation="vertical"
             android:visibility="visible">
 

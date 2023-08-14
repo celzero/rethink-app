@@ -22,7 +22,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -35,9 +34,10 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.UIUtils.clipboardCopy
-import com.celzero.bravedns.util.UIUtils.getDnsStatus
+import com.celzero.bravedns.util.UiUtils.clipboardCopy
+import com.celzero.bravedns.util.UiUtils.getDnsStatus
 import com.celzero.bravedns.util.Utilities
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,7 +97,16 @@ class DohEndpointAdapter(
         }
 
         private fun displayDetails(endpoint: DoHEndpoint) {
-            b.dohEndpointListUrlName.text = endpoint.dohName
+            if (endpoint.isSecure) {
+                b.dohEndpointListUrlName.text = endpoint.dohName
+            } else {
+                b.dohEndpointListUrlName.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        endpoint.dohName,
+                        context.getString(R.string.lbl_insecure)
+                    )
+            }
             b.dohEndpointListUrlExplanation.text = ""
             b.dohEndpointListCheckImage.isChecked = endpoint.isSelected
             Log.i(
@@ -157,9 +166,9 @@ class DohEndpointAdapter(
         }
 
         private fun showDohMetadataDialog(title: String, url: String, message: String?) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
-            builder.setMessage(url + "\n\n" + message)
+            builder.setMessage(url + "\n\n" + getDnsDesc(message))
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
                 dialogInterface,
@@ -179,12 +188,29 @@ class DohEndpointAdapter(
             builder.create().show()
         }
 
+        private fun getDnsDesc(message: String?): String {
+            if (message.isNullOrEmpty()) return ""
+
+            return try {
+                if (message.contains("R.string.")) {
+                    val m = message.substringAfter("R.string.")
+                    val resId: Int =
+                        context.resources.getIdentifier(m, "string", context.packageName)
+                    context.getString(resId)
+                } else {
+                    message
+                }
+            } catch (ignored: Exception) {
+                ""
+            }
+        }
+
         private fun showDeleteDnsDialog(id: Int) {
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
             builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
             builder.setCancelable(true)
-            builder.setPositiveButton(context.getString(R.string.dns_delete_positive)) { _, _ ->
+            builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 deleteEndpoint(id)
             }
 

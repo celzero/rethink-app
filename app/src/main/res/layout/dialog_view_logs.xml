@@ -10,6 +10,17 @@
         android:padding="15dp">
 
         <TextView
+            android:id="@+id/info"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:padding="5dp"
+            android:text="@string/logs_disclaimer"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
+
+        <TextView
             android:id="@+id/logs"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
