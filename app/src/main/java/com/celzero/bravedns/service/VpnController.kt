@@ -240,4 +240,8 @@ object VpnController : KoinComponent {
             }
         return t
     }
+
+    fun hasCid(cid: String): Boolean {
+        return braveVpnService?.hasCid(cid) ?: false
+    }
 }

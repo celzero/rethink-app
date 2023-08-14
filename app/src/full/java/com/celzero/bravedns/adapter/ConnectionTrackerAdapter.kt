@@ -34,6 +34,7 @@ import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
@@ -67,7 +68,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private const val MAX_BYTES = 500000 // 500 KB
         private const val MAX_TIME_TCP = 120 // seconds
-        private const val MAX_TIME_UDP = 120 // seconds
+        private const val MAX_TIME_UDP = 135 // seconds
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConnectionTrackerViewHolder {
@@ -211,7 +212,14 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     ct.uploadBytes == 0L &&
                     ct.message.isEmpty()
             ) {
-                b.connectionSummaryLl.visibility = View.GONE
+                if (VpnController.hasCid(ct.connId)) {
+                    b.connectionSummaryLl.visibility = View.VISIBLE
+                    b.connectionDataUsage.text = context.getString(R.string.lbl_active)
+                    b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
+                    b.connectionDelay.text = ""
+                } else {
+                    b.connectionSummaryLl.visibility = View.GONE
+                }
                 return
             }
 
@@ -245,12 +253,12 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun isConnectionHeavier(ct: ConnectionTracker): Boolean {
-            return ct.downloadBytes > MAX_BYTES || ct.uploadBytes > MAX_BYTES
+            return ct.downloadBytes + ct.uploadBytes > MAX_BYTES
         }
 
         private fun isConnectionSlower(ct: ConnectionTracker): Boolean {
-            return (ct.protocol == Protocol.UDP.protocolType && ct.duration >= MAX_TIME_UDP) ||
-                (ct.protocol == Protocol.TCP.protocolType && ct.duration >= MAX_TIME_TCP)
+            return (ct.protocol == Protocol.UDP.protocolType && ct.duration > MAX_TIME_UDP) ||
+                (ct.protocol == Protocol.TCP.protocolType && ct.duration > MAX_TIME_TCP)
         }
 
         private fun loadAppIcon(drawable: Drawable?) {

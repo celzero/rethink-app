@@ -82,6 +82,7 @@ import protect.Controller
 import java.io.IOException
 import java.net.*
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
@@ -153,6 +154,8 @@ class BraveVPNService :
 
     private lateinit var appInfoObserver: Observer<Collection<AppInfo>>
     private lateinit var orbotStartStatusObserver: Observer<Boolean>
+
+    private var trackedCids = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     private var excludedApps: MutableSet<String> = mutableSetOf()
 
@@ -2165,10 +2168,10 @@ class BraveVPNService :
             Log.i(LOG_TAG_VPN, "received null summary for icmp")
             return
         }
-
         // uid, downloadBytes, uploadBytes, synack are not applicable for icmp
         val connectionSummary = ConnectionSummary("", s.pid, s.id, 0L, 0L, s.duration, 0, s.msg)
 
+        trackedCids.remove(s.id)
         netLogTracker.updateIpSummary(connectionSummary)
     }
 
@@ -2177,7 +2180,7 @@ class BraveVPNService :
             Log.i(LOG_TAG_VPN, "received null summary for tcp")
             return
         }
-
+        trackedCids.remove(s.id)
         val connectionSummary =
             ConnectionSummary(
                 s.uid,
@@ -2202,6 +2205,7 @@ class BraveVPNService :
             LOG_TAG_VPN,
             "onUDPSocketClosed: $s, ${s.uid}, ${s.pid}, ${s.id}, ${s.downloadBytes}, ${s.uploadBytes}, ${s.duration}, ${s.msg}"
         )
+        trackedCids.remove(s.id)
         // synack is not applicable for udp
         val connectionSummary =
             ConnectionSummary(
@@ -2260,6 +2264,8 @@ class BraveVPNService :
             if (DEBUG)
                 Log.d(LOG_TAG_VPN, "flow: received rule: block, returning Ipn.Block, $connId, $uid")
             return getFlowResponseString(Ipn.Block, connId, uid)
+        } else {
+            trackedCids.add(connId)
         }
 
         // if no proxy is enabled, return Ipn.Base
@@ -2362,6 +2368,10 @@ class BraveVPNService :
 
         if (DEBUG) Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connId, $uid")
         return getFlowResponseString(Ipn.Base, connId, uid)
+    }
+
+    fun hasCid(connId: String): Boolean {
+        return trackedCids.contains(connId)
     }
 
     private fun getFlowResponseString(proxyId: String, connId: String, uid: Int): String {
