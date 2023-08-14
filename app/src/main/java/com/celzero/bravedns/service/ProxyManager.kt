@@ -56,15 +56,19 @@ object ProxyManager : KoinComponent {
     }
 
     fun updateProxyIdForApp(uid: Int, proxyId: String, proxyName: String) {
-        val appConfigMapping = appConfigMappings.find { it.uid == uid }
+        val appConfigMapping = appConfigMappings.filter { it.uid == uid }
         if (!isValidProxyId(proxyId)) {
             Log.e(LOG_TAG_PROXY, "Invalid config id: $proxyId")
             return
         }
 
-        if (appConfigMapping != null) {
-            appConfigMapping.proxyId = proxyId
-            appConfigMapping.proxyName = proxyName
+        if (appConfigMapping.isNotEmpty()) {
+            appConfigMapping.forEach {
+                if (DEBUG)
+                    Log.d(LOG_TAG_PROXY, "add $proxyId to app ${it.packageName} with uid $uid")
+                it.proxyId = proxyId
+                it.proxyName = proxyName
+            }
         } else {
             Log.e(LOG_TAG_PROXY, "updateProxyIdForApp - appConfigMapping is null for uid $uid")
         }
@@ -106,9 +110,11 @@ object ProxyManager : KoinComponent {
     }
 
     fun removeProxyIdForApp(uid: Int) {
-        val appConfigMapping = appConfigMappings.find { it.uid == uid }
-        if (appConfigMapping != null) {
-            appConfigMappings.remove(appConfigMapping)
+        val appConfigMapping = appConfigMappings.filter { it.uid == uid }
+        if (appConfigMapping.isNotEmpty()) {
+            appConfigMapping.forEach {
+                it.proxyId = ""
+            }
         } else {
             Log.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on removeProxyIdForApp")
         }
@@ -165,11 +171,6 @@ object ProxyManager : KoinComponent {
         io { proxyAppMappingRepository.delete(pam) }
     }
 
-    fun getProxyIdForApp(appInfo: AppInfo): String {
-        val appConfigMapping = appConfigMappings.find { it.uid == appInfo.uid }
-        return appConfigMapping?.proxyId ?: ID_SYSTEM
-    }
-
     fun isAnyAppSelected(proxyId: String): Boolean {
         return appConfigMappings.any { it.proxyId == proxyId }
     }
@@ -183,6 +184,10 @@ object ProxyManager : KoinComponent {
     }
 
     fun getAppCountForProxy(proxyId: String): Int {
+        Log.d(
+            LOG_TAG_PROXY,
+            "getAppCountForProxy: $proxyId, ${appConfigMappings.size}, ${appConfigMappings.count { it.proxyId == proxyId }}"
+        )
         return appConfigMappings.count { it.proxyId == proxyId }
     }
 

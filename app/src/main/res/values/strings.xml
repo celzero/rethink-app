@@ -81,6 +81,7 @@
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
     <string name="symbol_elephant" translatable="false">🐘</string>
     <string name="symbol_turtle" translatable="false">🐢</string>
+    <string name="symbol_green_circle" translatable="false">🟢</string>
 
     <string name="slide_2_title" translatable="true">Welcome</string>
     <string name="slide_2_desc" translatable="true">Rethink is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
@@ -349,7 +350,7 @@
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
     <string name="whats_dialog_title" translatable="true">What\'s new in v055</string>
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>LAN party!</b><br/><br/>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Jason A. Donenfeld</b><br/><br/>
         1. <i>New feature</i>: Multi-VPN support with any number of WireGuard upstreams.<br/>
         2. Improved UI to manage per-app IP and Domain rules.<br/>
         3. Bigger UI tiles on the homescreen.<br/>
@@ -359,7 +360,9 @@
         7. Show data usage in Network Logs: upload and download bytes per-request.<br/>
         8. Super detailed on-demand bug reports for better diagnostics.<br/>
         9. Support for local DNS-over-HTTPS (non-public) resolvers.<br/>
-        10. DNS Booster is now enabled by default.<br/></br>
+        10. DNS Booster is now enabled by default.<br/>
+        11. Make HTTP Proxy work for CONNECT tunnels.</br>
+        12. </br></br>
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 
@@ -498,7 +501,7 @@
     <string name="settings_dns_proxy_dialog_positive_btn" translatable="true">set</string>
     <string name="settings_dns_proxy_dialog_app_desc" translatable="true">The selected app will be excluded from the VPN to let it proxy connections on your behalf.</string>
 
-    <string name="settings_app_list_default_app" translatable="true">Nobody</string>
+    <string name="settings_app_list_default_app" translatable="true">None</string>
 
     <string name="settings_socks_forwarding_desc" translatable="true">Forwarding to %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Forwarding to %1$s:%2$s</string>
@@ -593,8 +596,8 @@
     <string name="dns_card_latency_inactive" translatable="true">Enable DNS mode.</string>
 
     <string name="firewall_card_universal_rules" translatable="true">%1$s universal rule(s)</string>
-    <string name="rules_card_domain_count" translatable="true">%1$s domain rules</string>
-    <string name="apps_card_ips_count" translatable="true">%1$s IP &amp; Port rules</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s domain rule(s)</string>
+    <string name="apps_card_ips_count" translatable="true">%1$s IP &amp; Port rule(s)</string>
 
     <string name="logs_card_network_count" translatable="true">%1$s connections</string>
     <string name="logs_card_dns_count" translatable="true">%1$s queries</string>
@@ -723,7 +726,7 @@
     <string name="error_loading_log_file" translatable="true">Error loading log file</string>
 
     <string name="collecting_logs_progress_text" translatable="true">Capturing…</string>
-    <string name="logs_disclaimer" translatable="true">Displaying the initial 10,000 characters</string>
+    <string name="logs_disclaimer" translatable="true">Showing first 20,000 characters</string>
 
     <string name="contributors_dialog_title" translatable="true">Authors</string>
     <string name="contributors_list" translatable="true"><![CDATA[The <i>Rethink Open Source Project</i> owes its existence to these volunteers who devote countless hours on its development.<br/>
@@ -734,6 +737,7 @@
                                               <a href="https://github.com/hussainmohd-a">hussainmohd-a</a><br/>
                                               <a href="https://github.com/ignoramous">ignoramous</a><br/>
                                               <a href="https://github.com/markwmuller">markwmuller</a><br/>
+                                              <a href="https://github.com/Mygod">Mygod</a><br/>
                                               <a href="https://github.com/Uldiniad">Uldiniad</a><br/>
                                               <a href="https://github.com/Poussinou">Poussinou</a><br/>
                                               <a href="https://github.com/pjosingh">pjosingh</a><br/>
@@ -767,6 +771,7 @@
                                               <a href="https://github.com/shuvashish76">shuvashish76</a><br/>
                                               <br/>⚜ Community mods <br/>
                                               <a href="https://t.me/amithm7">amithm7</a><br/>
+                                              <a href="https://t.me/TronSlayer">Andersen</a><br/>
                                               <a href="https://t.me/ppatra">ppatra</a><br/>
                                                <a href="https://t.me/InFamous23">InFamous23</a><br/>
                                               <a href="https://t.me/TheTr1ckst3r">TheTr1ckst3r</a><br/>
@@ -793,7 +798,7 @@
     <string name="cd_custom_dns_proxy_name_default" translatable="true">Proxy</string>
     <string name="cd_custom_dns_proxy_name" translatable="true">Proxy %1$s</string>
     <string name="cd_custom_dns_proxy_default_ip" translatable="false">127.0.0.1</string>
-    <string name="cd_custom_dns_proxy_default_app" translatable="true">Nobody</string>
+    <string name="cd_custom_dns_proxy_default_app" translatable="true">None</string>
     <string name="cd_dns_proxy_mode_internal" translatable="true">Internal</string>
     <string name="cd_dns_proxy_mode_external" translatable="true">External</string>
     <string name="cd_dns_proxy_error_text_1" translatable="true">Invalid IP address</string>

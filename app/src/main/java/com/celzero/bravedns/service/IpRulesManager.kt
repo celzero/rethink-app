@@ -316,9 +316,9 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    fun deleteAllRules() {
+    fun deleteAllAppsRules() {
         io {
-            customIpRepository.deleteAllRules()
+            customIpRepository.deleteAllAppsRules()
             appIpRules.clear()
             wildCards.clear()
             resultsCache.invalidateAll()

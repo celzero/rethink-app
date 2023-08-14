@@ -63,6 +63,7 @@ import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants
@@ -348,6 +349,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
+        // for version v055
+        updateHttpProxyForV55()
+
         // for version v03k
         removeKeyFromSharedPref()
         changeDefaultToMax()
@@ -372,6 +376,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 )
             }
         }
+    }
+
+    private fun updateHttpProxyForV55() {
+        // for version v055
+        val port = persistentState.httpProxyPort
+        // no need to perform below changes if the port / host is not set
+        if (port == INVALID_PORT || persistentState.httpProxyHostAddress.isEmpty()) return
+
+        val ip = persistentState.httpProxyHostAddress
+        val host = "http://$ip:$port/"
+        persistentState.httpProxyHostAddress = host
     }
 
     private fun changeDefaultToMax() {

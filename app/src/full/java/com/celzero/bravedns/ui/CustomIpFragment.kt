@@ -282,7 +282,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
             if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
                 IpRulesManager.deleteRulesByUid(uid)
             } else {
-                IpRulesManager.deleteAllRules()
+                IpRulesManager.deleteAllAppsRules()
             }
             Utilities.showToastUiCentered(
                 requireContext(),

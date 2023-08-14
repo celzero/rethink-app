@@ -141,13 +141,13 @@ class WgIncludeAppsAdapter(
             } else {
                 if (include) {
                     ProxyManager.updateProxyIdForApp(mapping.uid, proxyId, proxyName)
-                    Log.i(LOG_TAG_PROXY, "App ${mapping.appName} included in wg? $proxyId")
+                    Log.i(LOG_TAG_PROXY, "App ${mapping.appName} included in $proxyId")
                 } else {
                     ProxyManager.removeProxyIdForApp(mapping.uid)
                     b.wgIncludeAppListCheckbox.isChecked = false
                     Log.i(
                         LOG_TAG_PROXY,
-                        "App ${mapping.appName} removed from wg? prev id ${mapping.proxyId}}"
+                        "App ${mapping.appName} removed from wg, id ${mapping.proxyId}}"
                     )
                 }
             }

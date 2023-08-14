@@ -47,7 +47,7 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         return customIpDao.getCustomIpsLiveData()
     }
 
-    fun deleteAllRules() {
-        customIpDao.deleteAllRules()
+    fun deleteAllAppsRules() {
+        customIpDao.deleteAllAppsRules()
     }
 }

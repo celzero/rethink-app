@@ -33,7 +33,7 @@ import com.celzero.bravedns.util.Utilities
 abstract class LogDatabase : RoomDatabase() {
 
     companion object {
-        private const val LOGS_DATABASE_NAME = "rethink_logs.db"
+        const val LOGS_DATABASE_NAME = "rethink_logs.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
         private const val TABLE_NAME_DNS_LOGS = "DnsLogs"
         // previous table name for dns logs

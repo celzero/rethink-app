@@ -64,17 +64,17 @@ import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -395,21 +395,23 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             var fin: FileInputStream? = null
             var zin: ZipInputStream? = null
             // load only 10k characters to avoid ANR
-            val maxLength = 10000
+            val maxLength = 20000
             try {
                 fin = FileInputStream(zipPath)
                 zin = ZipInputStream(fin)
                 var ze: ZipEntry?
-
+                var inputString: String? = ""
                 // don't load more than 20k characters to avoid ANR
+                // TODO: use recycler view instead of textview
                 while (zin.nextEntry.also { ze = it } != null) {
                     val inStream = zipFile.getInputStream(ze)
-                    val inputString = inStream?.bufferedReader().use { it?.readText() }
-                    uiCtx {
-                        if (!isAdded) return@uiCtx
-                        binding.info.visibility = View.VISIBLE
-                        binding.logs.append(inputString?.slice(0 until maxLength))
-                    }
+                    inputString += inStream?.bufferedReader().use { it?.readText() }
+                    if (inputString?.length!! > maxLength) break
+                }
+                uiCtx {
+                    if (!isAdded) return@uiCtx
+                    binding.info.visibility = View.VISIBLE
+                    binding.logs.text = inputString?.slice(0 until maxLength)
                 }
             } catch (e: Exception) {
                 Log.w(LOG_TAG_UI, "Error loading log files to textview: ${e.message}", e)

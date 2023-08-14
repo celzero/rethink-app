@@ -20,6 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
+import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities
@@ -108,6 +109,9 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // the version (which is a unix timestamp) of the current on-device blocklist files
     var localBlocklistTimestamp by longPref("local_block_list_downloaded_time").withDefault<Long>(0)
+
+    // user set http proxy port
+    var httpProxyPort by intPref("http_proxy_port").withDefault<Int>(INVALID_PORT)
 
     // user set http proxy ip / hostname
     var httpProxyHostAddress by

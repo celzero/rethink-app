@@ -162,6 +162,11 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        wgConfigAdapter?.notifyDataSetChanged()
+    }
+
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES

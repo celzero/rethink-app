@@ -45,7 +45,6 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
 
     var apps =
         filteredList.switchMap { searchTxt ->
-            Log.d(LoggerConstants.LOG_TAG_PROXY, "Filtering the apps list - $searchTxt")
             Pager(PagingConfig(LIVEDATA_PAGE_SIZE)) {
                     if (filterType == WgIncludeAppsDialog.TopLevelFilter.SELECTED_APPS) {
                         mappingDAO.getSelectedAppsMapping(searchTxt, proxyId)
@@ -58,7 +57,6 @@ class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingD
         }
 
     fun setFilter(filter: String, type: WgIncludeAppsDialog.TopLevelFilter, pid: String) {
-        Log.d(LoggerConstants.LOG_TAG_PROXY, "Filtering the apps list - $filter")
         filterType = type
         this.proxyId = pid
         filteredList.postValue("%$filter%")
