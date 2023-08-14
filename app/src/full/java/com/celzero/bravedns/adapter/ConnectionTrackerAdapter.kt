@@ -203,16 +203,6 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionStatusIndicator.visibility = View.INVISIBLE
                 }
             }
-
-            if (ruleName == null) return
-
-            val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return
-
-            if (FirewallRuleset.isProxied(rule)) {
-                b.connectionSummaryLl.visibility = View.VISIBLE
-                b.connectionDelay.text =
-                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
-            }
         }
 
         private fun displaySummaryDetails(ct: ConnectionTracker) {
@@ -227,7 +217,12 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionDataUsage.text = context.getString(R.string.lbl_active)
                     b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
                     b.connectionDelay.text = ""
+                }
+                if (isConnectionProxied(ct.blockedByRule)) {
+                    b.connectionSummaryLl.visibility = View.VISIBLE
+                    b.connectionDelay.text = context.getString(R.string.symbol_key)
                 } else {
+                    b.connectionDelay.text = ""
                     b.connectionSummaryLl.visibility = View.GONE
                 }
                 return
@@ -257,9 +252,23 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 b.connectionDelay.visibility = View.VISIBLE
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
-            } else {
-                // no-op
             }
+            if (isConnectionProxied(ct.blockedByRule)) {
+                b.connectionSummaryLl.visibility = View.VISIBLE
+                b.connectionDelay.text =
+                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
+            } else {
+                b.connectionDelay.text = ""
+                b.connectionDelay.visibility = View.GONE
+            }
+        }
+
+        private fun isConnectionProxied(ruleName: String?): Boolean {
+            if (ruleName == null) return false
+
+            val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
+
+            return FirewallRuleset.isProxied(rule)
         }
 
         private fun isConnectionHeavier(ct: ConnectionTracker): Boolean {
