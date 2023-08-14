@@ -792,6 +792,9 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "ALTER TABLE DoHEndpoint ADD COLUMN isSecure INTEGER NOT NULL DEFAULT 1"
                         )
+                        execSQL(
+                            "UPDATE DNSProxyEndpoint set proxyAppName = 'None' where proxyAppName = 'Nobody'"
+                        )
                     }
                 }
             }
