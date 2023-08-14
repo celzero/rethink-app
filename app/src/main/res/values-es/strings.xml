@@ -954,4 +954,5 @@
     <string name="config_delete_dialog_title">Borrar la configuración</string>
     <string name="config_delete_success_toast">Configuración eliminada</string>
     <string name="include_all_app_wg_dialog_title">Incluir todas las aplicaciones</string>
+    <string name="add_peer" translatable="true">Añadir par</string>
 </resources>
