@@ -946,4 +946,12 @@
     <string name="setup_wireguard" translatable="true">Configurar WireGuard</string>
     <string name="wireguard_description" translatable="true">WireGuard como un proxy.</string>
     <string name="new_warp_config_desc" translatable="true">Obtener la configuración WARP del servidor</string>
+    <string name="add_remove_apps" translatable="true">Añadir / Eliminar aplicaciones (%1$s aplicaciones)</string>
+    <string name="new_warp_error_toast" translatable="true">No se puede recuperar la configuración WARP</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Configuración WARP no válida</string>
+    <string name="config_delete_dialog_desc">¿Estás seguro de que quieres borrar esta configuración\?</string>
+    <string name="config_add_success_toast">Configuración añadida</string>
+    <string name="config_delete_dialog_title">Borrar la configuración</string>
+    <string name="config_delete_success_toast">Configuración eliminada</string>
+    <string name="include_all_app_wg_dialog_title">Incluir todas las aplicaciones</string>
 </resources>
