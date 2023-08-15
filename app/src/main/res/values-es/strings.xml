@@ -407,7 +407,7 @@
     <string name="configure_dns_connected_doh_status">DNS sobre HTTPS</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_connection_name">Conectado a %1$s</string>
-    <string name="http_proxy_dialog_heading">Establecer proxy HTTP(S)</string>
+    <string name="http_proxy_dialog_heading">Establecer CONEXIÓN proxy HTTP(S)</string>
     <string name="download_update_dialog_trylater_message">La actualización no puede ejecutarse en este momento, por favor inténtelo de nuevo más tarde.</string>
     <string name="blocklist_update_check_failure">Algo ha ido mal. ¡Vuelve a intentarlo de nuevo!</string>
     <string name="search_firewall_network_log"><font size="12">Buscar aplicaciones, IPs, dominios</font></string>
@@ -423,7 +423,7 @@
     <string name="settings_enable_logs_desc">Almacenar los registros de DNS y Cortafuegos localmente en el dispositivo.</string>
     <string name="settings_enable_logs">Activar el registro en el dispositivo</string>
     <string name="app_mode_choose">Elija el modo</string>
-    <string name="whats_dialog_title">Novedades en la v054c</string>
+    <string name="whats_dialog_title">Novedades en la v055</string>
     <string name="settings_app_notification_a13_desc">Habilita el permiso de notificación para la aplicación</string>
     <string name="settings_theme_heading">Apariencia</string>
     <string name="settings_theme_desc">Tema oscuro/claro</string>
@@ -852,7 +852,7 @@
     <string name="brbs_backup_restore_desc" translatable="true">No funciona en todas las versiones de la aplicación ni en todos los dispositivos</string>
     <string name="settings_allow_lan_heading" translatable="true">No enrutar IPs privadas (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Excluir rutas LAN, loopback, link-local del túnel VPN de Rethink.</string>
-    <string name="trusted_domains_desc" translatable="true">La regla de dominio de confianza sólo funciona con el DNS de <u>Rethink</u>.</string>
+    <string name="trusted_domains_desc" translatable="true">La regla del dominio de confianza funciona mejor con el DNS de <u>Rethink</u>.</string>
     <string name="lbl_network" translatable="true">red</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funciona sólo con el DNS de Rethink</string>
     <string name="lbl_maybe_blocked" translatable="true">Posiblemente bloqueado</string>
