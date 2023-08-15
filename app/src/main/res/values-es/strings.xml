@@ -973,4 +973,7 @@
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
     <string name="crypt_relay_france" translatable="true">Relé DNS anónimo alojado en París, Francia, proporcionado por https://cryptostrom.is/.</string>
     <string name="crypt_relay_netherlands" translatable="true">Relé DNS anónimo alojado en los Países Bajos</string>
+    <string name="wireguard_connection_error">Problema al conectarse a la configuración de WireGuard</string>
+    <string name="wireguard_disclaimer">Esto es WireGuard como proxy TCP y UDP. Mientras que el tráfico DNS se reenvía a %1$s, el tráfico ICMP (por ejemplo: ping) se envía a una red subyacente.</string>
+    <string name="cloudflare_dns_desc" translatable="true">No bloquear ninguna petición DNS. Utiliza el punto final de la DNS 1.1.1.1 de Cloudflare.</string>
 </resources>
