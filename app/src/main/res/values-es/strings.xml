@@ -955,4 +955,8 @@
     <string name="config_delete_success_toast">Configuración eliminada</string>
     <string name="include_all_app_wg_dialog_title">Incluir todas las aplicaciones</string>
     <string name="add_peer" translatable="true">Añadir par</string>
+    <string name="exclude_all_app_wg_dialog_title">Excluir todas las aplicaciones</string>
+    <string name="exclude_all_app_wg_dialog_desc">¿Excluir todas las aplicaciones de este túnel\?</string>
+    <string name="wireguard_enabled_failure">Desactiva otros proxies para habilitar WireGuard</string>
+    <string name="wireguard_no_config_msg">Sin configuraciones para WireGuard</string>
 </resources>
