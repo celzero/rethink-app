@@ -949,7 +949,7 @@
     <string name="add_remove_apps" translatable="true">Añadir / Eliminar aplicaciones (%1$s aplicaciones)</string>
     <string name="new_warp_error_toast" translatable="true">No se puede recuperar la configuración WARP</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Configuración WARP no válida</string>
-    <string name="config_delete_dialog_desc">¿Estás seguro de que quieres borrar esta configuración\?</string>
+    <string name="config_delete_dialog_desc">¿Está seguro que quiere borrar esta configuración\?</string>
     <string name="config_add_success_toast">Configuración añadida</string>
     <string name="config_delete_dialog_title">Borrar la configuración</string>
     <string name="config_delete_success_toast">Configuración eliminada</string>
@@ -957,6 +957,20 @@
     <string name="add_peer" translatable="true">Añadir par</string>
     <string name="exclude_all_app_wg_dialog_title">Excluir todas las aplicaciones</string>
     <string name="exclude_all_app_wg_dialog_desc">¿Excluir todas las aplicaciones de este túnel\?</string>
-    <string name="wireguard_enabled_failure">Desactiva otros proxies para habilitar WireGuard</string>
+    <string name="wireguard_enabled_failure">Desactive otros proxies para habilitar WireGuard</string>
     <string name="wireguard_no_config_msg">Sin configuraciones para WireGuard</string>
+    <string name="include_all_app_wg_dialog_desc">¿Tunelizar todas las aplicaciones a través de este túnel\?</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Bloquea el acceso a todos los sitios para adultos, pornográficos y explícitos. También bloquea los dominios proxy y VPN que se utilizan para eludir los filtros. Los sitios de contenido mixto (como Reddit) también están bloqueados. Google, Bing y Youtube se configuran en Modo Seguro.</string>
+    <string name="crypt_adguard_desc" translatable="true">Protege su dispositivo contra malware y mucho más.</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS con búsqueda segura y bloqueo de contenidos para adultos.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Bloquea contenido malicioso. Utiliza el punto final DNS 1.1.1.2 de Cloudflare.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Bloquea el malware y el contenido para adultos. Utiliza el punto final DNS 1.1.1.3 de Cloudflare.</string>
+    <string name="google_dns_desc" translatable="true">No bloquea ninguna petición DNS. Utiliza el punto final DNS de Google.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">El filtro familiar bloquea el acceso a todos los sitios para adultos, pornográficos y explícitos. También bloquea los dominios proxy y VPN que podrían utilizarse para eludir nuestros filtros. Los sitios de contenido mixto (como Reddit) también están bloqueados. Google, Bing y Youtube están configurados en modo seguro.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">El filtro para adultos bloquea el acceso a todos los sitios para adultos, pornográficos y explícitos. No bloquea proxys ni VPN, ni sitios de contenido mixto. Sitios como Reddit están permitidos. Google y Bing se configuran en Modo Seguro.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 enruta sus consultas DNS a través de una red segura de servidores en todo el mundo.</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_relay_france" translatable="true">Relé DNS anónimo alojado en París, Francia, proporcionado por https://cryptostrom.is/.</string>
+    <string name="crypt_relay_netherlands" translatable="true">Relé DNS anónimo alojado en los Países Bajos</string>
 </resources>
