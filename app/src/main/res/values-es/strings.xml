@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;¡Fiesta en la red local!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva función&lt;/i&gt;: Excluir IPs Privadas (LAN / link-local).&lt;br/&gt; 2. Hacer que funcione el ajuste Omitir DNS y Cortafuegos.&lt;br/&gt; 3. Mostrar posibles bloqueos en los registros DNS para los dominios que pueden estar bloqueados por el cortafuegos.&lt;br/&gt; 4. Mostrar icono adaptativo cuando sea compatible.&lt;br/&gt; 5. Avisos de autenticación biométrica una vez cada 15 minutos.&lt;br/&gt; 6. Otras mejoras en la interfaz de usuario y el rendimiento.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Jason A. Donenfeld&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva función&lt;/i&gt;: Compatibilidad con múltiples VPN con cualquier número de subidas de WireGuard.&lt;br/&gt; 2. &lt;i &gt;Nueva función&lt;/i&gt;: indicador de conexión activa (abierta) en los registros de red.&lt;/br&gt; 3. &lt;i&gt;Nueva función&lt;/i&gt;: restringir Tor-como-proxy (Orbot) a aplicaciones específicas.&lt; br/&gt; 4. &lt;i&gt;Nueva función&lt;/i&gt;: la interfaz de usuario de las estadísticas ahora muestra una agrupación basada en la IP geográfica.&lt;br/&gt; 5. &lt;i&gt;Nueva función&lt;/i&gt;: muestra el uso de los datos en los registros de la red: carga y descarga bytes por solicitud.&lt;br/&gt; 6. &lt;i&gt;Nueva función&lt;/i&gt;: Estadísticas de carga y descarga por aplicación.&lt;br/&gt; 7. &lt;i&gt;Nueva función&lt;/i&gt;: Compatibilidad con DNS local -Resolutores HTTPS (no públicos).&lt;br/&gt; 8. Informes de errores a pedido súper detallados para un mejor diagnóstico.&lt;br/&gt; 9.DNS Booster ahora está habilitado de forma predeterminada.&lt;br/&gt; 10. Interfaz de usuario mejorada para administrar las reglas de dominio e IP por aplicación.&lt;br/&gt; 11. Mosaicos de interfaz de usuario más grandes en la pantalla de inicio.&lt;br/&gt; 12. Actualización de la interfaz de usuario del cortafuegos.&lt; br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: hacer que el proxy HTTP funcione para túneles CONNECT.&lt;/br&gt; 14. &lt;i&gt;Corrección de errores&lt;/i&gt;: los dominios de confianza (listas permitidas) ahora funcionan con dominios de terceros Resolutores de DNS.&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -340,7 +340,7 @@
     <string name="rbl_privacy" description="The text appears as part of the blocklist setup screen as categories or headlines">Privacidad</string>
     <string name="rt_edit_dialog_positive">Editar</string>
     <string name="rt_download_start">Descargando las listas de bloqueo…</string>
-    <string name="rt_download">Descargar listas de bloqueo</string>
+    <string name="rt_download">Descargar las listas de bloqueo</string>
     <string name="rt_chip_update_available">Actualización disponible</string>
     <string name="rt_filter_parent_selected">Seleccionadas</string>
     <string name="rt_filter_hint">Mostrando <u>todas</u> las listas de bloqueo</string>
@@ -387,7 +387,7 @@
     <string name="about_mail_bugreport_text">Envíe este correo electrónico a : hello@celzero.com</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Cortafuegos:
-\nMuestra dos botones para cambiar rápidamente entre el modo DNS de ahorro de batería y el modo normal DNS + Cortafuegos."</string>
+\nMuestra dos botones para cambiar rápidamente entre el modo DNS de ahorro de batería y el modo normal DNS + Firewall."</string>
     <string name="settings_selected_theme">Tema actual: %1$s</string>
     <string name="dns_crypt_relay_remove_dialog_title">¿Borrar el repetidor DNSCrypt\?</string>
     <string name="dns_crypt_relay_remove_success">Repetidor DNSCrypt borrado.</string>
@@ -429,24 +429,27 @@
     <string name="settings_theme_desc">Tema oscuro/claro</string>
     <string name="settings_http_proxy_error_text3">El nombre de host está vacío</string>
     <string name="settings_http_proxy_error_text4">Ha fallado la conexión con el host. Inténtelo de nuevo.</string>
-    <string name="settings_app_list_default_app">Nadie</string>
+    <string name="settings_app_list_default_app">Ninguno</string>
     <string name="settings_socks_forwarding_desc">Reenviando a %1$s:%2$s, %3$s</string>
     <string name="settings_socks_forwarding_desc_no_app">Reenviando a %1$s:%2$s</string>
-    <string name="firewall_card_text_active">%1$s bloqueadas, %2$s omitidas, %3$s excluidas, %4$s aisladas</string>
+    <string name="firewall_card_text_active">%1$s bloqueados
+\n%2$s omitidos
+\n%3$s excluidos
+\n%4$s aislados</string>
     <string name="settings_socks5_dialog_hint_ip">Dirección IP</string>
     <string name="settings_theme_dialog_themes_2">Claro</string>
     <string name="settings_theme_dialog_themes_3">Oscuro</string>
     <string name="settings_notification_desc3">Ninguno</string>
     <string name="settings_notification_dialog_title">Elija la acción de notificación</string>
     <string name="settings_notification_dialog_option_1">"
-\nPausar / Detener (por defecto):
+\nPausa / Parar (por defecto):
 \nMuestra dos botones, para pausar y detener rápidamente Rethink."</string>
     <string name="settings_notification_dialog_option_3">"
 \nNinguno:
 \nNo muestra ningún botón.
 \n"</string>
     <string name="firewall_card_status_active">%1$s aplicaciones</string>
-    <string name="dns_card_latency_active">Latencia: %1$sms</string>
+    <string name="dns_card_latency_active">%1$sms</string>
     <string name="dns_card_latency_inactive">Activar el modo DNS.</string>
     <string name="apps_card_ips_count">%1$s Reglas de IP y puerto</string>
     <string name="hsf_start_btn_state">iniciar</string>
@@ -635,7 +638,7 @@
     <string name="settings_check_update_heading">Buscar actualizaciones de la aplicación</string>
     <string name="settings_custom_downloader_heading">Utilizar el descargador de la aplicación</string>
     <string name="next">Siguiente</string>
-    <string name="orbot_http_desc">Recomienda que las aplicaciones utilicen el proxy HTTP de Orbot.</string>
+    <string name="orbot_http_desc">Establece un túnel HTTP CONNECT con Orbot.</string>
     <string name="orbot_app_issue">No se puede lanzar Orbot. ¿Está instalado\?</string>
     <string name="orbot_stop_dialog_negative">Detener Orbot</string>
     <string name="status_failing" description="This text appears if the connection is currently not working correctly. [CHAR_LIMIT=NONE]">fallando</string>
@@ -645,11 +648,11 @@
     <string name="hybrid_mode_notification_title">¡Protegido! Conectado mediante DNS + Cortafuegos.</string>
     <string name="settings_ptrans_desc">Traduce el tráfico IPv6 saliente a IPv4 en el dispositivo. Habilite esta opción si está conectado a una red de sólo IPv4.</string>
     <string name="orbot_bs_status_1">Reenviando las conexiones de %1$s a Orbot.</string>
-    <string name="orbot_bs_status_2">El proxy HTTP está configurado (las aplicaciones pueden ignorarlo).</string>
+    <string name="orbot_bs_status_2">El proxy HTTP está activado.</string>
     <string name="settings_socks5_vpn_disabled_error">Inicie Rethink para continuar.</string>
     <string name="pause_title_desc">esperando…</string>
     <string name="settings_network_all_networks">Utilizar todas las redes disponibles (en pruebas)</string>
-    <string name="settings_https_heading">Configurar el proxy HTTP(S)</string>
+    <string name="settings_https_heading">Establecer proxy HTTP(S) CONNECT</string>
     <string name="orbot_install_dialog_positive">Instalar</string>
     <string name="orbot_download_link_website">https://github.com/guardianproject/orbot/releases</string>
     <string name="orbot_bs_status_trying_connect">Configurar Orbot…</string>
@@ -660,7 +663,7 @@
     <string name="orbot_install_dialog_neutral">sitio web</string>
     <string name="settings_autostart_bootup_desc">Al encender el dispositivo, se iniciará Rethink si se estaba ejecutando antes de apagarlo.</string>
     <string name="settings_check_update_desc">Comprueba automáticamente las actualizaciones de la aplicación una vez a la semana.</string>
-    <string name="settings_https_desc">Esta configuración es sólo una recomendación y es posible que las aplicaciones la ignoren. Las aplicaciones que utilicen el proxy HTTP(S) omitirán las reglas del Cortafuegos y del DNS.</string>
+    <string name="settings_https_desc">Reenvía las conexiones al punto final HTTP(S) CONNECT.</string>
     <string name="status_dns_error">error de dns</string>
     <string name="settings_socks5_disabled_error">Conectado a %1$s. Apágalo para continuar.</string>
     <string name="settings_orbot_notification_content">Fallo al iniciar Tor-como-un-Proxy. Abra la aplicación Orbot para iniciarla manualmente.</string>
@@ -692,10 +695,7 @@
     <string name="orbot_bs_status_4">Configuración de Tor-como-un-Proxy (Orbot) con un solo clic.</string>
     <string name="settings_network_all_networks_desc">Cuando está activado, Rethink utiliza todas las redes disponibles para conectarse a Internet. Si no, utiliza la red que Android considere <i>activa</i>.</string>
     <string name="settings_custom_downloader_desc">Si se desactiva, se utilizará el <i>Administrador de descargas</i> integrado en Android</string>
-    <string name="orbot_explanation">Orbot es una aplicación proxy libre que permite a otras aplicaciones utilizar Internet de forma más <u>segura</u>.
-\nOrbot utiliza <u>Tor</u> para cifrar su tráfico de Internet, lo que le ayuda a <u>evitar la censura</u> y defenderse contra las formas de <u>vigilancia de la red</u> que amenazan la libertad y la privacidad personal.
-\n<u>Proxy TCP</u>: Rethink solo reenvía a Orbot las conexiones TCP de todas las aplicaciones excepto las excluidas de Orbot.
-\n<u>Proxy HTTP</u>: Rethink <i>configura</i> el proxy HTTP pero no obliga a las aplicaciones a utilizarlo. Normalmente, navegadores como Chrome y Firefox lo utilizan. Las aplicaciones que utilicen el proxy HTTP(S) omitirán tanto las reglas del Cortafuegos como las del DNS.</string>
+    <string name="orbot_explanation"></string>
     <string name="orbot_both">Proxy HTTP + TCP</string>
     <string name="orbot_both_desc">Todas las anteriores.</string>
     <string name="orbot_install_activity_error">Algo salió mal, inténtalo después de un tiempo</string>
@@ -743,7 +743,7 @@
     <string name="dns_crypt_url_remove_success">Servidor de resoluciones DNSCrypt borrado.</string>
     <string name="dns_crypt_url_remove_dialog_message">Borra el servidor de resoluciones DNSCrypt de la configuración guardada.</string>
     <string name="dns_proxy_remove_success">Proxy DNS borrado.</string>
-    <string name="local_blocklist_download">Descargar listas de bloqueo</string>
+    <string name="local_blocklist_download">Descargar las listas de bloqueo</string>
     <string name="local_blocklist_download_desc">¿Quiere descargar las listas de bloqueo (unos 60 MB) para utilizar esta función\?</string>
     <string name="dns_proxy_remove_dialog_message">Borra el Proxy DNS de la configuración guardada.</string>
     <string name="download_update_dialog_message">Una nueva versión de la aplicación está disponible para su descarga en el sitio web. ¿Quiere continuar\?</string>
@@ -816,7 +816,7 @@
     <string name="settings_pcap_dialog_title" translatable="true">PCAP</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">Apagado (por defecto)</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Enviar a la carpeta de Descargas</string>
-    <string name="rules_card_domain_count" translatable="true">%1$s reglas de dominio</string>
+    <string name="rules_card_domain_count" translatable="true">%1$s regla(s) para el/los dominio(s)</string>
     <string name="logs_card_network_count" translatable="true">%1$s conexiones</string>
     <string name="logs_card_dns_count" translatable="true">%1$s consultas</string>
     <string name="hsf_packet_capture_chip_text" translatable="true">Captura de paquetes activada</string>
@@ -848,12 +848,59 @@
     <string name="dc_refresh_toast" translatable="true">Actualización de DNS completada</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Refuerzo DNS (experimental)</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Fusionar peticiones, respuestas en caché, gestión de errores resistentes</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">No se pueden configurar proxies cuando la VPN se ejecuta en modo solo DNS o en modo bloqueo. <u>Ir a la configuración de VPN</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">No se pueden configurar los proxies cuando la VPN se ejecuta en un modo de sólo DNS.</string>
     <string name="brbs_backup_restore_desc" translatable="true">No funciona en todas las versiones de la aplicación ni en todos los dispositivos</string>
     <string name="settings_allow_lan_heading" translatable="true">No enrutar IPs privadas (experimental)</string>
-    <string name="settings_allow_lan_desc" translatable="true">Excluir rutas LAN, loopback, link-local del túnel VPN de Rethink.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Excluir las rutas LAN, loopback, multicast, link-local del túnel VPN de Rethink.</string>
     <string name="trusted_domains_desc" translatable="true">La regla del dominio de confianza funciona mejor con el DNS de <u>Rethink</u>.</string>
     <string name="lbl_network" translatable="true">red</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funciona sólo con el DNS de Rethink</string>
     <string name="lbl_maybe_blocked" translatable="true">Posiblemente bloqueado</string>
+    <string name="lbl_very" translatable="true">muy</string>
+    <string name="lbl_app_wise" translatable="true">por aplicación</string>
+    <string name="lbl_qr_code" translatable="true">Código QR</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_applications" translatable="true">Aplicaciones</string>
+    <string name="lbl_random" translatable="true">(aleatoria)</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(automático)</string>
+    <string name="lbl_import" translatable="true">Importar</string>
+    <string name="lbl_include" translatable="true">Incluir</string>
+    <string name="lbl_delete" translatable="true">Borrar</string>
+    <string name="lbl_generated" translatable="true">(generado)</string>
+    <string name="lbl_select_all" translatable="true">Seleccionar todo</string>
+    <string name="lbl_active" translatable="true">Activo</string>
+    <string name="lbl_inactive" translatable="true">Inactivo</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_create" translatable="true">Crear</string>
+    <string name="lbl_addresses" translatable="true">Direcciones</string>
+    <string name="lbl_public_key" translatable="true">Clave pública</string>
+    <string name="lbl_dns_servers" translatable="true">Servidores DNS</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS y SOCKS5</string>
+    <string name="lbl_min" translatable="true">min</string>
+    <string name="lbl_hour" translatable="true">h</string>
+    <string name="lbl_day" translatable="true">día</string>
+    <string name="lbl_preshared_key" translatable="true">Clave compartida</string>
+    <string name="lbl_insecure" translatable="true">(inseguro)</string>
+    <string name="lbl_optional" translatable="true">(opcional)</string>
+    <string name="lbl_save" translatable="true">guardar</string>
+    <string name="http_proxy_dialog_desc" translatable="true">URL de configuración del formulario, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Por ejemplo: http://proxy.example.com:8080/</string>
+    <string name="search_proxy_add_apps" translatable="true">Buscar las aplicaciones por nombre</string>
+    <string name="lbl_fast" translatable="true">Rápido</string>
+    <string name="lbl_slow" translatable="true">Lento</string>
+    <string name="lbl_sec" translatable="true">s</string>
+    <string name="lbl_private_key" translatable="true">Clave privada</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Keepalive persistente</string>
+    <string name="lbl_allowed_ips" translatable="true">IP permitidas</string>
+    <string name="status_protected_with_wg" translatable="true">protegido con wireguard</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">protegido con wireguard y dns privado</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Clave pública copiada.</string>
+    <string name="orbot_explanation" translatable="true">Orbot es una aplicación proxy gratuita que permite a otras aplicaciones utilizar Internet de forma más <u>segura</u>. 
+\nOrbot utiliza <u>Tor</u> para cifrar su tráfico de Internet, lo que le ayuda a <u>evitar la censura</u> y defenderse de las formas de <u>vigilancia de la red</u> que amenazan la libertad personal y la privacidad. 
+\n<u>Proxy TCP</u>: repensar solo reenvía conexiones TCP de aplicaciones <i>incluidas</i> a Orbot. 
+\n<u>Proxy HTTP</u>: repensar <i>establece</i> un túnel HTTP CONNECT a Orbot y reenvía solo las conexiones TCP de las aplicaciones <i>incluidas</i>.</string>
+    <string name="ct_bs_upload_download" translatable="true">Subir %1$s / Descargar %2$s</string>
+    <string name="lbl_listen_port" translatable="true">Escuchar el puerto</string>
+    <string name="logs_disclaimer" translatable="true">Mostrar los primeros 20.000 caracteres</string>
 </resources>
