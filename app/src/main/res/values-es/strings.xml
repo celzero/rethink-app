@@ -21,7 +21,7 @@
     <string name="about_privacy_policy_link">https://www.rethinkdns.com/privacy</string>
     <string name="about_version">v%1$s</string>
     <string name="cd_dns_proxy_error_text_2">El rango de puertos debe ser de 1024 a 65535</string>
-    <string name="cd_custom_dns_proxy_default_app">Ninguna</string>
+    <string name="cd_custom_dns_proxy_default_app">Ninguno</string>
     <string name="cd_custom_dns_proxy_default_ip">127.0.0.1</string>
     <string name="cd_dns_proxy_mode_internal">Interno</string>
     <string name="cd_dns_proxy_error_text_3">Puerto no válido</string>
@@ -902,4 +902,24 @@
     <string name="ct_bs_upload_download" translatable="true">Subir %1$s / Descargar %2$s</string>
     <string name="lbl_listen_port" translatable="true">Escuchar el puerto</string>
     <string name="logs_disclaimer" translatable="true">Mostrar los primeros 20.000 caracteres</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">No validar los certificados TLS del servidor (habilitar sólo si sabes lo que está haciendo)</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Sección desconocida</string>
+    <string name="key_length_explanation_base64" translatable="true">: Las claves base64 de WireGuard deben tener 44 caracteres (32 bytes)</string>
+    <string name="univ_firewall_heading" translatable="true">Reglas universales para el cortafuegos</string>
+    <string name="app_ip_domain_rules" translatable="true">Reglas IP/Dominio por aplicación</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">Modificar las reglas IP / Dominio por aplicación.</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Omitir las reglas DNS y el cortafuegos.</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">países más bloqueados</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Clave no válida</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Número no válido</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Valor no válido</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Falta el atributo</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Falta una sección</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Error en la sintaxis</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Atributo desconocido</string>
+    <string name="key_length_explanation_binary" translatable="true">: Las claves WireGuard deben ser de 32 bytes</string>
+    <string name="key_length_explanation_hex" translatable="true">: Las claves hexadecimales de WireGuard deben tener 64 caracteres (32 bytes)</string>
+    <string name="key_contents_error" translatable="true">Caracteres erróneos en la clave</string>
+    <string name="key_length_error" translatable="true">Longitud de clave incorrecta</string>
+    <string name="parse_error_inet_address" translatable="true">Dirección IP</string>
 </resources>
