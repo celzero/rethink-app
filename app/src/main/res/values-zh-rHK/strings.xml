@@ -914,8 +914,8 @@
     <string name="crypt_cleanbrowsing_family_desc" translatable="true">攔截對所有成人、色情同露骨網站嘅訪問。佢亦都將會攔截可能用嚟繞過篩檢器嘅代理同埋 VPN 網域。包含混合內容嘅網站（例如 Reddit）都會攔截。Google、Bing 同 YouTube 會被設定做安全模式。</string>
     <string name="crypt_adguard_desc" translatable="true">保護您嘅裝置唔受到惡意軟件等嘅侵擾。</string>
     <string name="crypt_adguard_family_desc" translatable="true">包括安全搜索同成人內容攔截嘅 Adguard DNS。</string>
-    <string name="crypt_quad9_security_desc" translatable="true">Quad9（任撥）DNSSEC／冇日誌／有篩檢器 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
-    <string name="crypt_quad9_desc" translatable="true">Quad9（任撥）DNSSEC／冇日誌／冇篩檢器／ECS 9.9.9.12 – 149.112.112.12</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9（任播）DNSSEC／冇日誌／有篩檢器 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9（任播）DNSSEC／冇日誌／冇篩檢器／ECS 9.9.9.12 – 149.112.112.12</string>
     <string name="crypt_relay_netherlands" translatable="true">喺荷蘭託管嘅匿名 DNS 中繼</string>
     <string name="crypt_relay_singapore" translatable="true">喺新加坡託管嘅匿名 DNS 中繼。</string>
     <string name="public_key_copy_toast_msg" translatable="true">複製咗公鑰。</string>
