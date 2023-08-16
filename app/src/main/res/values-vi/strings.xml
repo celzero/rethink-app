@@ -326,7 +326,7 @@
     <string name="firewall_card_text_inactive" translatable="true">Kích hoạt chế độ tường lửa.</string>
     <string name="lbl_rules" translatable="true">quy tắc</string>
     <string name="lbl_configure" translatable="true">Cấu hình</string>
-    <string name="bypass_universal" translatable="true">Bỏ qua quy tắc universal</string>
+    <string name="bypass_universal" translatable="true">bỏ qua phổ quát</string>
     <string name="bypass_dns_firewall" translatable="true">Bỏ qua DNS và tường lửa</string>
     <string name="bsct_block_ip" translatable="true">Chặn, tin tưởng \u0020<u>địa chỉ IP này</u> cho <u>ứng dụng</u></string>
     <string name="bsct_block_domain" translatable="true">Chặn, tin tưởng <u>tên miền </u> cho <u>ứng dụng này </u></string>
@@ -568,4 +568,17 @@
     <string name="update_complete_snack_message" translatable="true">Phiên bản mới đã được tải xuống</string>
     <string name="update_complete_action_snack" translatable="true">KHỞI ĐỘNG LẠI</string>
     <string name="lbl_applications" translatable="true">Ứng dụng</string>
+    <string name="ada_ip_no_connection" translatable="true">Không có nhật ký mạng cho ứng dụng này</string>
+    <string name="firewall_rule_block_udp_ntp" translatable="true">UDP bị chặn</string>
+    <string name="firewall_rule_exempt_orbot_setup" translatable="true">Thiết lập Orbot</string>
+    <string name="firewall_rule_block_domain" translatable="true">Miền (ứng dụng)</string>
+    <string name="ci_block" translatable="true">Chặn</string>
+    <string name="firewall_rule_dns_blocked" translatable="true">DNS bị chặn</string>
+    <string name="ada_noapp_dialog_positive" translatable="true">Được</string>
+    <string name="ada_firewall_status" translatable="true">Ứng dụng này <b><i>%1$s</i></b></string>
+    <string name="ada_ip_connection_count" translatable="true">Đã kết nối tới (các) địa chỉ IP %1$s</string>
+    <string name="ada_ip_connection_count_zero" translatable="true">0 địa chỉ IP</string>
+    <string name="ada_app_status_block" translatable="true">bị chặn</string>
+    <string name="firewall_rule_unknown" translatable="true">Nguồn không xác định</string>
+    <string name="ada_app_status_allow" translatable="true">được cho phép</string>
 </resources>
