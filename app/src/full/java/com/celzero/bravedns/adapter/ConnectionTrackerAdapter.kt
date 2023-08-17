@@ -221,8 +221,8 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 if (isConnectionProxied(ct.blockedByRule)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text = context.getString(R.string.symbol_key)
-                } else {
-                    b.connectionDelay.text = ""
+                }
+                if (b.connectionDelay.text.isEmpty() && b.connectionDuration.text.isEmpty()) {
                     b.connectionSummaryLl.visibility = View.GONE
                 }
                 return
@@ -245,21 +245,18 @@ class ConnectionTrackerAdapter(private val context: Context) :
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
             b.connectionDelay.text = ""
             if (isConnectionHeavier(ct)) {
-                b.connectionDelay.visibility = View.VISIBLE
                 b.connectionDelay.text = context.getString(R.string.symbol_elephant)
             }
             if (isConnectionSlower(ct)) {
-                b.connectionDelay.visibility = View.VISIBLE
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
             }
             if (isConnectionProxied(ct.blockedByRule)) {
-                b.connectionSummaryLl.visibility = View.VISIBLE
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
-            } else {
-                b.connectionDelay.text = ""
-                b.connectionDelay.visibility = View.GONE
+            }
+            if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
+                b.connectionSummaryLl.visibility = View.GONE
             }
         }
 
