@@ -16,6 +16,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
@@ -239,6 +240,7 @@ object DomainRulesManager : KoinComponent {
     fun whitelist(cd: CustomDomain) {
         io {
             cd.status = Status.TRUST.id
+            cd.modifiedTs = Calendar.getInstance().timeInMillis
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
@@ -263,6 +265,7 @@ object DomainRulesManager : KoinComponent {
     fun block(cd: CustomDomain) {
         io {
             cd.status = Status.BLOCK.id
+            cd.modifiedTs = Calendar.getInstance().timeInMillis
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
@@ -271,6 +274,7 @@ object DomainRulesManager : KoinComponent {
     fun noRule(cd: CustomDomain) {
         io {
             cd.status = Status.NONE.id
+            cd.modifiedTs = Calendar.getInstance().timeInMillis
             dbInsertOrUpdate(cd)
             updateCache(cd)
         }
