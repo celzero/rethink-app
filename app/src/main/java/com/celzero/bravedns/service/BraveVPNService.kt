@@ -2140,6 +2140,12 @@ class BraveVPNService :
         } else if (DomainRulesManager.isDomainTrusted(fqdn)) {
             // return Alg so that the decision is made by in flow() function
             Dnsx.Alg
+        } else if (
+            DomainRulesManager.status(fqdn, UID_EVERYBODY) == DomainRulesManager.Status.BLOCK
+        ) {
+            // if the domain is blocked by global rule then return block all
+            // app-wise trust is already checked above
+            Dnsx.BlockAll
         } else {
             // if the domain is not trusted and no app is bypassed then return preferred or
             // CT+preferred so that if the domain is blocked by upstream then no need to do
