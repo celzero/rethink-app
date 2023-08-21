@@ -249,7 +249,9 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsActivityLanTrafficRl.alpha = 1f
         }
         b.settingsActivityAllowBypassSwitch.isEnabled = !isLockdown
+        b.settingsActivityAllowBypassRl.isEnabled = !isLockdown
         b.settingsActivityLanTrafficSwitch.isEnabled = !isLockdown
+        b.settingsActivityLanTrafficRl.isEnabled = !isLockdown
     }
 
     private fun enableAfterDelay(ms: Long, vararg views: View) {
