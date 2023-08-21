@@ -659,6 +659,13 @@ class GoVpnAdapter(
     }
 
     fun setDnsAlg() {
+        // set translate to false for dns mode (regardless of setting in dns screen),
+        // since apps cannot understand alg ips
+        if (appConfig.getBraveMode().isDnsMode()) {
+            tunnel?.resolver?.gateway()?.translate(false)
+            return
+        }
+
         tunnel?.resolver?.gateway()?.translate(persistentState.enableDnsAlg)
     }
 
