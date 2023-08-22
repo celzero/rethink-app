@@ -103,7 +103,7 @@ object WireguardManager : KoinComponent {
     fun getConfigById(id: Int): Config? {
         val config = configs.find { it.getId() == id }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "Config not found for id: $id, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "getConfigById: wg not found: $id, ${configs.size}")
         }
         return config
     }
@@ -111,7 +111,7 @@ object WireguardManager : KoinComponent {
     fun getConfigFilesById(id: Int): WgConfigFiles? {
         val config = configFileMappings.find { it.id == id }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "Config not found for id: $id, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "getConfigFilesById: wg not found: $id, ${configs.size}")
         }
         return config
     }
@@ -187,7 +187,7 @@ object WireguardManager : KoinComponent {
         }
         val config = configs.find { it.getId() == configFiles.id }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "wg config not found for id: ${configFiles.id}, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "canEnableConfig: wg not found, id: ${configFiles.id}, ${configs.size}")
             return false
         }
         return true
@@ -196,7 +196,7 @@ object WireguardManager : KoinComponent {
     fun getConfigName(configId: Int): String {
         val config = configs.find { it.getId() == configId }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "wg config not found for id: ${configId}, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "getConfigName: wg not found, id: ${configId}, ${configs.size}")
             return ""
         }
         return config.getName()
@@ -217,7 +217,7 @@ object WireguardManager : KoinComponent {
     fun disableConfig(configFiles: WgConfigFiles) {
         val config = configs.find { it.getId() == configFiles.id }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "wg config not found for id: ${configFiles.id}, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "disableConfig: wg not found, id: ${configFiles.id}, ${configs.size}")
             return
         }
         configFiles.isActive = false
@@ -415,7 +415,7 @@ object WireguardManager : KoinComponent {
         // update the interface for the config
         val config = configs.find { it.getId() == configId }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "wg config not found for id: $configId, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "updateInterface: wg not found, id: $configId, ${configs.size}")
             return null
         }
         val cfg =
@@ -448,7 +448,7 @@ object WireguardManager : KoinComponent {
             disableConfig(cfgFiles)
         }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "wg config not found for id: $configId, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "deleteConfig: wg not found, id: $configId, ${configs.size}")
             io {
                 wgConfigFilesRepository.deleteConfig(configId)
                 configFileMappings.remove(configFileMappings.find { it.id == configId })
@@ -476,7 +476,7 @@ object WireguardManager : KoinComponent {
         // add the peer to the config
         val config = configs.find { it.getId() == configId }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "wg config not found for id: $configId, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "addPeer: wg not found, id: $configId, ${configs.size}")
             return
         }
         val peers = config.getPeers() ?: mutableListOf()
@@ -497,7 +497,7 @@ object WireguardManager : KoinComponent {
         // delete the peer from the config
         val config = configs.find { it.getId() == configId }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "wg config not found for id: $configId, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "deletePeer: wg not found, id: $configId, ${configs.size}")
             return
         }
         val peers = config.getPeers()

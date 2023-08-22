@@ -65,10 +65,6 @@ class WgConfigAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
         val item = getItem(position)
-        Log.d(
-            LoggerConstants.LOG_TAG_PROXY,
-            "onBindViewHolder: position - $position, ${item?.name}, ${item?.id}"
-        )
         val wgConfigFiles: WgConfigFiles = item ?: return
         holder.update(wgConfigFiles)
     }
