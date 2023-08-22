@@ -28,7 +28,7 @@
             android:layout_gravity="center"
             android:layout_margin="10dp"
             android:contentDescription="@string/apps_icon_content_desc"
-            android:src="@drawable/ic_launcher_foreground" />
+            android:src="@drawable/default_app_icon" />
 
         <LinearLayout
             android:id="@+id/connection_screen_ll"
@@ -112,6 +112,7 @@
                         android:gravity="center"
                         android:maxHeight="16dp"
                         android:minWidth="16dp"
+                        android:maxWidth="32dp"
                         android:singleLine="true"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         android:textSize="26sp"
