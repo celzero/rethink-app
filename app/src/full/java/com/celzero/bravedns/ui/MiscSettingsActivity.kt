@@ -115,7 +115,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
 
         displayAppThemeUi()
-        displayGoLoggerUi()
         displayNotificationActionUi()
         displayPcapUi()
     }
@@ -195,14 +194,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_theme_dialog_themes_4)
                     )
             }
-        }
-    }
-
-    private fun displayGoLoggerUi() {
-        if (DEBUG) {
-            b.settingsGoLogRl.visibility = View.VISIBLE
-        } else {
-            b.settingsGoLogRl.visibility = View.GONE
         }
     }
 
@@ -412,7 +403,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private fun showGoLoggerDialog() {
         // show dialog with logger options, change log level in GoVpnAdapter based on selection
         val alertBuilder = MaterialAlertDialogBuilder(this)
-        alertBuilder.setTitle(getString(R.string.settings_gologger_dialog_title))
+        alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
         val items =
             arrayOf(
                 getString(R.string.settings_gologger_dialog_option_1),
