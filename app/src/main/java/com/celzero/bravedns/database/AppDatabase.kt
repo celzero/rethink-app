@@ -23,10 +23,10 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.celzero.bravedns.service.WireguardManager.SEC_WARP_FILE_NAME
-import com.celzero.bravedns.service.WireguardManager.SEC_WARP_NAME
-import com.celzero.bravedns.service.WireguardManager.WARP_FILE_NAME
-import com.celzero.bravedns.service.WireguardManager.WARP_NAME
+import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_FILE_NAME
+import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_NAME
+import com.celzero.bravedns.service.WireGuardManager.WARP_FILE_NAME
+import com.celzero.bravedns.service.WireGuardManager.WARP_NAME
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import java.io.File
@@ -51,7 +51,7 @@ import java.io.File
             ProxyApplicationMapping::class,
             TcpProxyEndpoint::class
         ],
-    version = 19,
+    version = 20,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -90,6 +90,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_16_17)
                 .addMigrations(MIGRATION_17_18)
                 .addMigrations(migration1819(context))
+                .addMigrations(MIGRATION_19_20)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -799,6 +800,19 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
 
+        private val MIGRATION_19_20: Migration =
+            object : Migration(19, 20) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    // quad9
+                    database.execSQL(
+                        "UPDATE DnsCryptEndpoint set dnsCryptURL = 'sdns://AQYAAAAAAAAADTkuOS45LjEyOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA' where id = 5"
+                    )
+                    // quad9 security
+                    database.execSQL(
+                        "UPDATE DnsCryptEndpoint set dnsCryptURL = 'sdns://AQMAAAAAAAAAEjE0OS4xMTIuMTEyLjk6ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0' where id = 4"
+                    )
+                }
+            }
     }
 
     // fixme: revisit the links to remove the pragma for each table
