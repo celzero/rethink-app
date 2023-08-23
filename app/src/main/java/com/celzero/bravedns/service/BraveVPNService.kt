@@ -75,10 +75,6 @@ import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
 import ipn.Ipn
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Controller
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -87,6 +83,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Controller
 
 class BraveVPNService :
     VpnService(),
@@ -203,10 +203,7 @@ class BraveVPNService :
                 // no-op is ok, fd is auto-bound to active network
             }
         } catch (e: IOException) {
-            Log.e(
-                LOG_TAG_VPN,
-                "Exception while binding(bind4) the socket for fid: $fid, ${e.message}, $e"
-            )
+            Log.e(LOG_TAG_VPN, "err bind4 for fid: $fid, ${e.message}, $e")
         } finally {
             pfd?.detachFd()
         }
@@ -259,7 +256,7 @@ class BraveVPNService :
         // print the invalid destination ip received
         // 64:ff9b:1:DA19:0100: or 100.
         if (dstIp.startsWith("64:ff9b:1:DA19:0100:") || dstIp.startsWith("100.")) {
-            Log.e(
+            Log.w(
                 LOG_TAG_VPN,
                 "invalid destination ip received:  protocol: $protocol, uid: $uid, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort"
             )
@@ -947,21 +944,19 @@ class BraveVPNService :
                 if (!VpnController.isVpnLockdown()) {
                     excludedApps.forEach {
                         builder = builder.addDisallowedApplication(it)
-                        Log.i(LOG_TAG_VPN, "Excluded package - $it")
+                        Log.i(LOG_TAG_VPN, "builder, exclude package: $it")
                     }
                 } else {
-                    Log.w(LOG_TAG_VPN, "vpn is lockdown, ignoring exclude-apps list")
+                    Log.w(LOG_TAG_VPN, "builder, vpn is lockdown, ignoring exclude-apps list")
                 }
                 builder = builder.addDisallowedApplication(this.packageName)
             }
+
             if (appConfig.isCustomSocks5Enabled()) {
                 // For Socks5 if there is a app selected, add that app in excluded list
                 val socks5ProxyEndpoint = appConfig.getConnectedSocks5Proxy()
                 val appName = socks5ProxyEndpoint?.proxyAppName
-                Log.i(
-                    LOG_TAG_VPN,
-                    "Proxy mode - Socks5 is selected - $socks5ProxyEndpoint, with app name - $appName"
-                )
+                Log.i(LOG_TAG_VPN, "builder, socks5 enabled with package name as $appName")
                 if (
                     appName?.equals(getString(R.string.settings_app_list_default_app)) == false &&
                         isExcludePossible(appName, getString(R.string.socks5_proxy_toast_parameter))
@@ -1414,7 +1409,14 @@ class BraveVPNService :
                 io("allow-bypass") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROXY_TYPE -> {
-                io("proxy") { updateTun(createNewTunnelOptsObj()) }
+                io("proxy") {
+                    // socks5 proxy requires app to be excluded from vpn, so restart vpn
+                    if (appConfig.isCustomSocks5Enabled() || appConfig.isOrbotProxyEnabled()) {
+                        restartVpn(createNewTunnelOptsObj())
+                    } else {
+                        updateTun(createNewTunnelOptsObj())
+                    }
+                }
             }
             PersistentState.NETWORK -> {
                 connectionMonitor?.onUserPreferenceChanged()
@@ -2289,12 +2291,12 @@ class BraveVPNService :
         // check for other proxy rules
         // wireguard
         if (appConfig.isWireguardEnabled()) {
-            val id = WireguardManager.getActiveConfigIdForApp(uid)
+            val id = WireGuardManager.getActiveConfigIdForApp(uid)
             val proxyId = "${ProxyManager.ID_WG_BASE}$id"
             // if no config is assigned / enabled for this app, pass-through
             // add ID_WG_BASE to the id to get the proxyId
             if (
-                id == WireguardManager.INVALID_CONF_ID || !WireguardManager.isConfigActive(proxyId)
+                id == WireGuardManager.INVALID_CONF_ID || !WireGuardManager.isConfigActive(proxyId)
             ) {
                 if (DEBUG)
                     Log.d(
