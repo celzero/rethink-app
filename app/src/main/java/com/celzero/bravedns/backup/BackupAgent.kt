@@ -35,10 +35,8 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.deleteResidue
 import com.celzero.bravedns.backup.BackupHelper.Companion.getFileNameFromPath
 import com.celzero.bravedns.backup.BackupHelper.Companion.getRethinkDatabase
 import com.celzero.bravedns.backup.BackupHelper.Companion.getTempDir
-import com.celzero.bravedns.backup.BackupHelper.Companion.getWireGuardFolder
 import com.celzero.bravedns.backup.BackupHelper.Companion.startVpn
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.copyWithStream
@@ -120,19 +118,6 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
                 Log.w(
                     LOG_TAG_BACKUP_RESTORE,
                     "failed to add database to temp backup dir, return failure"
-                )
-                return false
-            }
-
-            processCompleted = saveWireGuardConfigToFile(tempDir.path)
-
-            if (processCompleted) {
-                if (DEBUG)
-                    Log.d(LOG_TAG_BACKUP_RESTORE, "wireguard backup is added to the temp dir")
-            } else {
-                Log.w(
-                    LOG_TAG_BACKUP_RESTORE,
-                    "failed to add wireguard to temp backup dir, return failure"
                 )
                 return false
             }
@@ -249,11 +234,18 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         val files = getRethinkDatabase(context)?.listFiles() ?: return false
 
         for (f in files) {
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "file ${f.name} found in database dir (${f.absolutePath})")
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_BACKUP_RESTORE,
+                    "file ${f.name} found in database dir (${f.absolutePath})"
+                )
+            // looks like the journal, shm and wal files are needed for proper restore, so
+            // commenting out the below code. still testing it out.
+            // TODO: check if the journal files are needed for restore
             // skip journal files, they are not needed for restore
-            if (f.path.endsWith("-journal") || f.path.endsWith("-shm") || f.path.endsWith("-wal")) {
+            /*if (f.path.endsWith("-journal") || f.path.endsWith("-shm") || f.path.endsWith("-wal")) {
                 continue
-            }
+            }*/
             val databaseFile =
                 backUpFile(f.absolutePath, constructDbFileName(path, f.name)) ?: return false
             if (DEBUG)
@@ -262,35 +254,6 @@ class BackupAgent(val context: Context, workerParams: WorkerParameters) :
         }
 
         return true
-    }
-
-    private fun saveWireGuardConfigToFile(path: String): Boolean {
-        val files = getWireGuardFolder(context)?.listFiles() ?: return true
-
-        for (f in files) {
-            val wgFile =
-                backUpFile(
-                    f.absolutePath,
-                    constructWireGuardFolderPath(path) + File.separator + f.name
-                )
-                    ?: return false
-            if (DEBUG)
-                Log.d(LOG_TAG_BACKUP_RESTORE, "file ${wgFile.name} added to backup dir (${wgFile.absoluteFile})")
-            filesPathToZip.add(wgFile.absolutePath)
-        }
-
-        return true
-    }
-
-    private fun constructWireGuardFolderPath(path: String): String {
-        val wgFolderPath = path + File.separator + Constants.WIREGUARD_FOLDER_NAME
-        Log.i(LOG_TAG_BACKUP_RESTORE, "constructing wg folder path, path: $wgFolderPath")
-        val wgFolder = File(wgFolderPath)
-        if (!wgFolder.exists()) {
-            if (DEBUG) Log.d(LOG_TAG_BACKUP_RESTORE, "wg folder does not exist, creating it, path: $wgFolderPath")
-            wgFolder.mkdir()
-        }
-        return wgFolderPath
     }
 
     private fun constructDbFileName(path: String, fileName: String): String {
