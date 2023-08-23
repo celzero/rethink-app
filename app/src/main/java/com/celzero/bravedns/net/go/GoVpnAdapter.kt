@@ -30,7 +30,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -434,7 +434,7 @@ class GoVpnAdapter(
     private fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
         if (!tunProxyMode.isTunProxyWireguard()) return
 
-        val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
+        val wgConfigs: List<Config> = WireGuardManager.getActiveConfigs()
         if (wgConfigs.isEmpty()) {
             if (persistentState.wireguardEnabledCount > 0) {
                 persistentState.wireguardEnabledCount = 0
@@ -448,7 +448,7 @@ class GoVpnAdapter(
             try {
                 tunnel?.proxies?.addProxy(id, wgUserSpaceString)
             } catch (e: Exception) {
-                WireguardManager.disableConfig(id)
+                WireGuardManager.disableConfig(id)
                 showWireguardFailureToast(
                     e.message ?: context.getString(R.string.wireguard_connection_error)
                 )
@@ -542,7 +542,7 @@ class GoVpnAdapter(
                 LOG_TAG_VPN,
                 "Tcp mode set(${ProxyManager.ID_TCP_BASE}): ${tcpProxyUrl.url}, res: $added"
             )
-        val secWarp = WireguardManager.getSecWarpConfig()
+        val secWarp = WireGuardManager.getSecWarpConfig()
         if (secWarp == null) {
             Log.w(LOG_TAG_VPN, "no sec warp config found")
             return
@@ -662,10 +662,12 @@ class GoVpnAdapter(
         // set translate to false for dns mode (regardless of setting in dns screen),
         // since apps cannot understand alg ips
         if (appConfig.getBraveMode().isDnsMode()) {
+            Log.i(LOG_TAG_VPN, "dns mode, set translate to false")
             tunnel?.resolver?.gateway()?.translate(false)
             return
         }
 
+        Log.i(LOG_TAG_VPN, "set dns alg: ${persistentState.enableDnsAlg}")
         tunnel?.resolver?.gateway()?.translate(persistentState.enableDnsAlg)
     }
 
