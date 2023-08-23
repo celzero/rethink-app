@@ -107,8 +107,8 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            versionCode = 30
-            versionName = "v055"
+            versionCode = 31
+            versionName = "v055a"
             vectorDrawables.useSupportLibrary = true
         }
     }
@@ -211,8 +211,8 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
-    download 'com.github.celzero:firestack:7905a346f2:arm64@aar'
-    implementation 'com.github.celzero:firestack:7905a346f2:full@aar'
+    download 'com.github.celzero:firestack:a2535822ff:arm64@aar'
+    implementation 'com.github.celzero:firestack:a2535822ff:full@aar'
     // implementation project(":tun2socks")
 
     // Work manager

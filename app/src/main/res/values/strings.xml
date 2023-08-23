@@ -350,7 +350,7 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_dialog_title" translatable="true">What\'s new in v055</string>
+    <string name="whats_dialog_title" translatable="true">What\'s new in v055a</string>
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Jason A. Donenfeld</b><br/><br/>
         1. <i>New feature</i>: Multi-VPN support with any number of WireGuard upstreams.<br/>
         2. <i>New feature</i>: Active (open) connection indicator in Network Logs.</br>
