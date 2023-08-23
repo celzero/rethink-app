@@ -67,7 +67,7 @@
     <string name="download_update_dialog_trylater_title">现在无法更新</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_enable_logs">启用本地日志</string>
-    <string name="whats_dialog_title">v054c 的新内容</string>
+    <string name="whats_dialog_title">v055a 的新内容</string>
     <string name="settings_allow_bypass_heading">于网络可见</string>
     <string name="settings_socks5_heading">设置 SOCKS5 代理</string>
     <string name="orbot">Orbot</string>
@@ -109,7 +109,7 @@
     <string name="settings_theme_heading">外观</string>
     <string name="settings_theme_desc">暗色/亮色主题</string>
     <string name="settings_notification_desc2">DNS / DNS + 防火墙</string>
-    <string name="apps_card_ips_count">%1$s IP 与端口规则</string>
+    <string name="apps_card_ips_count">%1$s 项 IP 与端口规则</string>
     <string name="hsf_proxy_chip_removed_toast">已移除代理</string>
     <string name="dc_custom_dns_radio">其他 DNS</string>
     <string name="about_bravedns_whoarewe">Rethink 是一项自由且开源的项目，由来自亚马逊、 IBM 与 Scientific Games 的前工程师领导。</string>
@@ -132,7 +132,7 @@
     <string name="rt_chip_check_update">检查更新</string>
     <string name="lbl_advanced">高级</string>
     <string name="skip">跳过</string>
-    <string name="status_app_error">应用错误</string>
+    <string name="status_app_error">应用程序错误</string>
     <string name="brave_dns_connect_mode_change_dns">选择模式。</string>
     <string name="always_on_dialog">「永久连接的 VPN 」已在此设备上启用。为启动 Rethink ，请移步系统设置并禁用「永久连接的 VPN 」。</string>
     <string name="always_on_dialog_positive_btn">前往设置</string>
@@ -149,7 +149,7 @@
 \n"</string>
     <string name="about_email">电邮联系</string>
     <string name="about_mail_to">hello@celzero.com</string>
-    <string name="cd_custom_dns_proxy_default_app">无应用</string>
+    <string name="cd_custom_dns_proxy_default_app">无</string>
     <string name="cd_dns_crypt_dialog_title">添加 DNSCrypt 解析服务或中继</string>
     <string name="cd_doh_dialog_resolver_name">解析服务名称</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
@@ -169,7 +169,7 @@
     <string name="firewall_rules">网络规则</string>
     <string name="dns_query_clear_logs_title">是否删除所有 DNS 日志？</string>
     <string name="always_on_dialog_heading">禁用永久连接的 VPN</string>
-    <string name="settings_https_heading">设置 HTTP(S) 代理</string>
+    <string name="settings_https_heading">设置 HTTP(S) CONNECT 代理</string>
     <string name="orbot_both">TCP + HTTP 代理</string>
     <string name="orbot_bs_status_1">将 %1$s 连接转发至 Orbot。</string>
     <string name="orbot_stop_dialog_negative">停止 Orbot</string>
@@ -303,7 +303,7 @@
     <string name="settings_theme_dialog_themes_3">暗色</string>
     <string name="settings_ip_dialog_ipv6">IPv6 （实验性）</string>
     <string name="settings_notification_desc">与 Rethink 的通知一同显示的操作按钮：%1$s</string>
-    <string name="dns_card_latency_active">延迟： %1$sms</string>
+    <string name="dns_card_latency_active">%1$sms</string>
     <string name="lbl_add">添加</string>
     <string name="dns_btm_sheet_chip">+%1$s 个其他 IP</string>
     <string name="univ_view_blocked_ip">IP 与端口规则</string>
@@ -386,7 +386,7 @@
     <string name="notif_download_content_title">下载本地屏蔽名单</string>
     <string name="bsrf_clear_filter">清除</string>
     <string name="status_protected_with_proxy_private_dns">已由代理与私人 DNS 保护</string>
-    <string name="apps_info_title">应用</string>
+    <string name="apps_info_title">应用程序</string>
     <string name="dns_firewall_mode_info_explanation_new">上述所有功能及绕过互联网审查。</string>
     <string name="always_on_dialog_stop_heading">永久连接的 VPN</string>
     <string name="local_blocklist_redownload_desc">本地屏蔽名单已为最新版本 v%1$s 。</string>
@@ -449,7 +449,7 @@
     <string name="rt_dialog_neutral">继续</string>
     <string name="settings_vpn_heading">vpn</string>
     <string name="settings_allow_bypass_desc">允许应用请求访问所有可用网络。这些应用可能按需绕过 RethinkDNS 的 VPN 隧道。一些如 Zoom 和 Meet 的音频/视频会议应用可能会需要按需绕行以正常运行。</string>
-    <string name="orbot_bs_status_2">HTTP 代理已设置（应用可能会忽略它）。</string>
+    <string name="orbot_bs_status_2">HTTP 代理已设置。</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_http_proxy_dialog_title">自定义服务器 URL</string>
     <string name="settings_dns_proxy_dialog_password">密码</string>
@@ -572,7 +572,7 @@
     <string name="category_name_sys_apps">系统应用</string>
     <string name="lbbs_enabled">已启用</string>
     <string name="brbs_backup_dialog_positive">备份</string>
-    <string name="orbot_http_desc">推荐应用程序使用 Orbot 的 HTTP 代理。</string>
+    <string name="orbot_http_desc">与 Orbot 的 HTTP 代理建立隧道。</string>
     <string name="about_docs_link">https://docs.rethinkdns.com/</string>
     <string name="ada_app_status_allow">已放行</string>
     <string name="lbbs_copy">复制为 RDNS+ URL</string>
@@ -597,7 +597,7 @@
     <string name="status_protected_with_private_dns">已由私人 DNS 保护</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">私人 DNS 已启用</string>
     <string name="dns_explanation_dns_connected">已连接至 RethinkDNS</string>
-    <string name="universal_firewall_explanation">根据设备事件应用防火墙规则，如在设备被锁定时或未使用某一应用时拦截。</string>
+    <string name="universal_firewall_explanation">根据设备事件应用防火墙规则，如在设备被锁定时或未使用某一应用程序时拦截。</string>
     <string name="notification_action_resume_vpn">恢复</string>
     <string name="bsct_conn_rule_explanation"><u>#1</u>：阻止某应用连接至互联网。
 \n <u>#2</u>：阻止任意应用连接至某特定 IP 。
@@ -626,7 +626,7 @@
     <string name="settings_ip_network_heading">选择 IP 版本</string>
     <string name="hsf_blocklist_chip_text_no_data">启用 RDNS+</string>
     <string name="hsf_exclude_error">VPN 闭关模式下无法排除</string>
-    <string name="settings_https_desc">此设置并非强制性，且应用程序可能会将其忽略。使用 HTTP(S) 代理的应用会同时绕过防火墙与 DNS 规则。</string>
+    <string name="settings_https_desc">将连接转发至 HTTP(S) CONNECT 端点。</string>
     <string name="hsf_start_dialog_message">您距安全的 Android 系统仅有一步之遥：即时查看网络活动，拦截网站、 IP 与不听话的应用。</string>
     <string name="app_info_error">无法打开应用信息。</string>
     <string name="doh_custom_url_remove_dialog_title">是否删除 DNS 端点？</string>
@@ -639,29 +639,32 @@
     <string name="search_firewall_all_apps"><font size="12">以 UID / 应用名搜索应用</font></string>
     <string name="orbot_explanation">Orbot 是一款能让其他程序更<u>安全</u>地连接到互联网的免费代理应用。
 \nOrbot 使用 <u>Tor</u> 来加密您的网络流量，帮您<u>绕过网络审查</u>，并抵御威胁个人自由及隐私的<u>网络监视</u>。
-\n<u>TCP 代理</u>： Rethink 只将未被排除应用的 TCP 连接转发至 Orbot 。
-\n<u>HTTP 代理</u>： Rethink <i>设置</i> HTTP 代理，但不强制应用程序使用它。如 Chrome 和 Firefox 等的浏览器通常会使用 HTTP 代理。使用 HTTP(S) 代理的应用会同时绕过防火墙及 DNS 规则。</string>
+\n<u>TCP 代理</u>： Rethink 只将<i>包含的</i>应用的 TCP 连接转发至 Orbot 。
+\n<u>HTTP 代理</u>： Rethink 向 Orbot <i>建立</i> HTTP CONNECT 隧道，並只转发<i>包含的</i>应用程序的 TCP 连接。</string>
     <string name="dc_dns_leaks_heading">防止 DNS 泄漏</string>
-    <string name="about_mozilla">Rethink 为 Mozilla Builders MVP 计划的一部分。</string>
-    <string name="http_proxy_dialog_heading">设置 HTTP(S) 代理</string>
+    <string name="about_mozilla">Rethink 受来自 Mozilla Builders 、 OSOM Products Inc 与 FOSS United 基金会的支持。</string>
+    <string name="http_proxy_dialog_heading">设置 HTTP(S) CONNECT 代理</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
-    <string name="whats_new_version_update">&lt;b&gt;本地派对！&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：排除私有 IP （局域网 / 本地链路）。&lt;br/&gt; 2. 修复「绕行 DNS 与防火墙」设置。&lt;br/&gt; 3. 在 DNS 日志内为可能已被防火墙拦截的域名显示“或已拦截”。&lt;br/&gt; 4. 于支持处显示自适应图标。&lt;br/&gt; 5. 每一刻钟提示生物认证。&lt;br/&gt; 6. 其他六项 UI 与性能优化。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译此应用&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;杰森・A・多南菲尔德&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意数量 WireGuard 上游的多 VPN 支持。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：网络日志内的活动连接标识。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor （ Orbot ）代理指定应用程序。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：统计屏现可依据 IP 地理位置显示分组。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：网络日志内显示数据使用情況：分请求统计上传下载字节数。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分应用程序统计上传下载。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支持本地 DNS over HTTPS （非公开）解析服务。&lt;br/&gt; 8. 非常精细的按需漏洞报告，以更好地诊断问题。&lt;br/&gt; 9. DNS 加速器现默认启用。&lt;br/&gt; 10. 为分 IP 与域名而改进的 UI 。&lt;br/&gt; 11. 首页上更大的 UI 块。&lt;br/&gt; 12. 煥然一新的防火墙 UI 。&lt;br/&gt; 13. &lt;i&gt;漏洞修复&lt;/i&gt;：使 HTTP 代理在 CONNECT 隧道上工作。&lt;/br&gt; 14. &lt;i&gt;漏洞修复&lt;/i&gt;：信任域名现也可在第三方 DNS 解析服务上工作。&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译此应用程序&lt;/a&gt;</string>
     <string name="about_website">访问 rethinkdns.com</string>
     <string name="settings_network_all_networks_desc">启用时， Rethink 将使用所有可用的网络来连接至互联网。若未启用，则将使用 Android 认为<i>活跃</i>的网络。</string>
     <string name="settings_dns_proxy_dialog_app_desc">所选应用将被排除在 VPN 外，以允许其为您转发连接。</string>
-    <string name="settings_app_list_default_app">无应用</string>
+    <string name="settings_app_list_default_app">无</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
     <string name="cd_dns_crypt_title">解析服务</string>
     <string name="cd_custom_doh_url_name">DoH %1$s</string>
-    <string name="settings_custom_downloader_heading">使用应用内下载器</string>
+    <string name="settings_custom_downloader_heading">使用应用内附下载器</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + 防火墙：
 \n显示两个按钮来快速在省电的 DNS 模式和普通的 DNS + 防火墙模式间切换。"</string>
-    <string name="contributors_list">&lt;i&gt;Rethink 开源项目&lt;/i&gt;的存在归功于这些在其开发工作上倾泻大量时间的志愿者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 应用程序 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 网络引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服务 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社区协管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位置数据库 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻译 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 图标 &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 构建服务器 &lt;br/&gt;&lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">&lt;i&gt;Rethink 开源项目&lt;/i&gt;的存在归功于这些在其开发工作上倾泻大量时间的志愿者。&lt;br/&gt; &lt;br/&gt;🛡️ Android 应用程序 &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 网络引擎 &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 解析服务 &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ 社区协管 &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 IP 地理位置数据库 &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ 翻译 &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 图标 &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 构建服务器 &lt;br/&gt;&lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="hs_download_positive_default">确定</string>
     <string name="firewall_rule_block_app_unmetered_desc">一项用户定义的防火墙规则在此<i>应用</i>尝试连接至<i>非收费网络</i>时将其拦截。<br/><br/>若需更改，请移步<i>所有应用</i>选项卡。</string>
     <string name="settings_protocol_translation_dns_inactive">切换至 DNS 或 DNS + 防火墙模式以启用此设置</string>
-    <string name="firewall_card_text_active">拦截 %1$s 、绕过 %2$s 、排除 %3$s 、隔离 %4$s</string>
+    <string name="firewall_card_text_active">拦截 %1$s
+\n绕过 %2$s
+\n排除 %3$s
+\n隔离 %4$s</string>
     <string name="dc_block_heading">规则</string>
     <string name="cd_custom_doh_url_name_default">DoH</string>
     <string name="ctbs_app_info_not_available_toast">未找到应用设置页</string>
@@ -819,7 +822,7 @@
     <string name="lbl_logs" translatable="true">日志</string>
     <string name="bsct_block_domain" translatable="true">对<u>此应用</u>拦截、信任<u>此域名</u></string>
     <string name="firewall_status_bypass_dns_firewall" translatable="true">已绕过 DNS 与防火墙规则</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">VPN 处于仅 DNS 或闭关模式时无法设定代理。<u>请移步 VPN 设置</u>。</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">VPN 处于仅 DNS 时无法设定代理。</string>
     <string name="settings_general_customize" translatable="true">自定义</string>
     <string name="settings_pcap_dialog_option_1" translatable="true">关闭（默认）</string>
     <string name="settings_default_dns_desc" translatable="true">在极少数情况下，用户偏好的 DNS 无法确定时，将使用回落 DNS 。</string>
@@ -845,14 +848,134 @@
     <string name="firewall_rule_dns_blocked_desc" translatable="true">此连接因<i>域名</i>被用户偏好的 DNS 拦截而被拦截。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">此连接因<i>域名</i>被通用域名规则拦截而被拦截。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">此连接因<i>域名</i>被通用域名规则信任而被放行。<br/><br/>若需变更此行为，请移步 <i>DNS 配置</i>选项卡。</string>
-    <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器（实验性）</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">合并请求，缓存响应，弹性应对错误</string>
     <string name="ada_app_firewall" translatable="true">防火墙</string>
     <string name="brbs_backup_restore_desc" translatable="true">无法跨版本跨设备使用</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 仅于 Rethink 的 DNS 生效</string>
     <string name="lbl_maybe_blocked" translatable="true">或已拦截</string>
     <string name="lbl_network" translatable="true">网络</string>
-    <string name="trusted_domains_desc" translatable="true">信任域名规则仅于 <u>Rethink 的 DNS</u> 生效。</string>
-    <string name="settings_allow_lan_desc" translatable="true">将局域网、环回于本地链路路由排除于 Rethink 的 VPN 隧道外。</string>
+    <string name="trusted_domains_desc" translatable="true">信任域名规则配合 <u>Rethink 的 DNS 服务</u>更有效。</string>
+    <string name="settings_allow_lan_desc" translatable="true">将局域网、环回、多播与本地链路路由排除于 Rethink 的 VPN 隧道外。</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由私有 IP （实验性）</string>
+    <string name="lbl_delete" translatable="true">删除</string>
+    <string name="lbl_private_key" translatable="true">私钥</string>
+    <string name="lbl_inactive" translatable="true">未启用</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">（自动）</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="status_protected_with_wg" translatable="true">已由 WireGuard 保护</string>
+    <string name="public_key_copy_toast_msg" translatable="true">公钥已复制。</string>
+    <string name="ct_bs_upload_download" translatable="true">上传 %1$s / 下载 %2$s</string>
+    <string name="logs_disclaimer" translatable="true">显示前 20000 字符</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">停止验证服务器 TLS 证书（仅当您了解您在做什么时启用）</string>
+    <string name="univ_firewall_heading" translatable="true">全局防火墙规则</string>
+    <string name="app_ip_domain_rules" translatable="true">分应用 IP / 域名规则</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">修改分应用的 IP / 域名规则。</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">此连接已代理并转发至用戶选择的代理。<br/><br/> 若需更改，请移步<i>配置</i>屏下的<i>代理</i>屏。</string>
+    <string name="key_length_explanation_base64" translatable="true">： WireGuard Base64 密钥必须为 44 字符（ 32 字节）</string>
+    <string name="illegal_filename_error" translatable="true">非法文件名“%s”</string>
+    <string name="add_peer" translatable="true">添加对等端点</string>
+    <string name="config_delete_dialog_desc">您是否仍想删除此配置？</string>
+    <string name="config_delete_dialog_title">删除配置</string>
+    <string name="include_all_app_wg_dialog_desc">是否通过此隧道代理所有应用？</string>
+    <string name="exclude_all_app_wg_dialog_title">排除所有应用</string>
+    <string name="wireguard_enabled_failure">关闭其他代理以启用 WireGuard</string>
+    <string name="wireguard_connection_error">连接至 WireGuard 配置时出错</string>
+    <string name="wireguard_disclaimer">此为 WireGuard 作 TCP 与 UDP 代理。当 DNS 流量被转发至 %1$s 时， ICMP 流量将从底层网络发送。</string>
+    <string name="lbl_create" translatable="true">创建</string>
+    <string name="lbl_qr_code" translatable="true">二维码</string>
+    <string name="lbl_import" translatable="true">导入</string>
+    <string name="lbl_public_key" translatable="true">公钥</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_addresses" translatable="true">地址</string>
+    <string name="lbl_dns_servers" translatable="true">DNS 服务器</string>
+    <string name="lbl_applications" translatable="true">应用程序</string>
+    <string name="lbl_include" translatable="true">包含</string>
+    <string name="lbl_select_all" translatable="true">全部选择</string>
+    <string name="lbl_active" translatable="true">已启用</string>
+    <string name="lbl_generated" translatable="true">（生成）</string>
+    <string name="lbl_random" translatable="true">（随机）</string>
+    <string name="lbl_listen_port" translatable="true">监听端口</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS 与 SOCKS5</string>
+    <string name="lbl_very" translatable="true">很</string>
+    <string name="lbl_fast" translatable="true">快</string>
+    <string name="lbl_slow" translatable="true">慢</string>
+    <string name="lbl_preshared_key" translatable="true">预共享密钥</string>
+    <string name="lbl_app_wise" translatable="true">分应用</string>
+    <string name="lbl_min" translatable="true">分</string>
+    <string name="lbl_sec" translatable="true">秒</string>
+    <string name="lbl_hour" translatable="true">小时</string>
+    <string name="lbl_day" translatable="true">天</string>
+    <string name="lbl_insecure" translatable="true">（不安全）</string>
+    <string name="lbl_optional" translatable="true">（可选）</string>
+    <string name="lbl_persistent_keepalive" translatable="true">持续保持活动间隔</string>
+    <string name="lbl_allowed_ips" translatable="true">放行 IP</string>
+    <string name="lbl_save" translatable="true">保存</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">已由 WireGuard 与私人 DNS 保护</string>
+    <string name="http_proxy_dialog_desc" translatable="true">设置符合下述格式的 URL ： &lt;协议&gt;://&lt;帐号&gt;:&lt;密码&gt;@&lt;域名或 IP&gt;:&lt;端口&gt;&lt;路径&gt; 。例如：http://proxy.example.com:8080/</string>
+    <string name="search_proxy_add_apps" translatable="true">以应用名搜索应用程序</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">绕过 DNS 与防火墙规则。</string>
+    <string name="firewall_rule_proxied" translatable="true">代理</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">拦截最多的国家</string>
+    <string name="cd_deleted_toast" translatable="true">已删除所有域名规则</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">连接最多的国家</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">键无效</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">数字无效</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">值无效</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">属性缺失</string>
+    <string name="bad_config_reason_missing_section" translatable="true">区段缺失</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">语法错误</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">属性未知</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">区段未知</string>
+    <string name="key_length_explanation_binary" translatable="true">： WireGuard 密钥必须为 32 字节</string>
+    <string name="key_length_explanation_hex" translatable="true">： WireGuard 十六进制密钥必须为 64 字符（ 32 字节）</string>
+    <string name="key_contents_error" translatable="true">密钥中包含无效字符</string>
+    <string name="key_length_error" translatable="true">密钥长度错误</string>
+    <string name="parse_error_inet_address" translatable="true">IP 地址</string>
+    <string name="parse_error_inet_endpoint" translatable="true">端点</string>
+    <string name="parse_error_inet_network" translatable="true">IP 网络</string>
+    <string name="parse_error_integer" translatable="true">数字</string>
+    <string name="bad_config_explanation_pka" translatable="true">：必须为不超过 65535 的正整数</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">：必须为正数</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">：必须为有效的 UDP 端口</string>
+    <string name="bad_config_context" translatable="true">%1$s的%2$s</string>
+    <string name="bad_config_error" translatable="true">%2$s中%1$s</string>
+    <string name="generic_error" translatable="true">未知「%s」错误</string>
+    <string name="parse_error_generic" translatable="true">字符串</string>
+    <string name="parse_error_reason" translatable="true">无法解析%1$s“%2$s”</string>
+    <string name="unknown_error" translatable="true">未知错误</string>
+    <string name="invalid_file_error" translatable="true">无效文件</string>
+    <string name="import_error" translatable="true">无法导入隧道：%s</string>
+    <string name="no_configs_error" translatable="true">未找到任何配置</string>
+    <string name="bad_extension_error" translatable="true">必须为 .conf 或者 .zip 文件</string>
+    <string name="setup_wireguard" translatable="true">设置 WireGuard</string>
+    <string name="wireguard_description" translatable="true">WireGuard 作代理。</string>
+    <string name="new_warp_config_desc" translatable="true">从服务器获取 WARP 配置</string>
+    <string name="new_warp_error_toast" translatable="true">无法获取 WARP 配置</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">无效 WARP 配置</string>
+    <string name="add_remove_apps" translatable="true">添加/移除应用（ %1$s 个应用）</string>
+    <string name="config_delete_success_toast">配置已删除</string>
+    <string name="config_add_success_toast">配置已添加</string>
+    <string name="include_all_app_wg_dialog_title">包含所有应用</string>
+    <string name="exclude_all_app_wg_dialog_desc">是否从此隧道排除所有应用？</string>
+    <string name="wireguard_no_config_msg">无 WireGuard 配置</string>
+    <string name="cloudflare_dns_desc" translatable="true">不拦截任何 DNS 请求。使用 Cloudflare 的 1.1.1.1 DNS 端点。</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">拦截恶意软件与成人内容。使用 Cloudflare 的 1.1.1.3 DNS 端点。</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">家庭过滤器拦截对所有成人、色情与露骨网站的访问。其亦将拦截可用于绕行过滤器的代理与 VPN 域名。包含混合内容的网站（如 Reddit ）也被拦截。 Google 、 Bing 与 YouTube 被设置为安全模式。</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">拦截恶意内容。使用 Cloudflare 的 1.1.1.2 DNS 端点。</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">成人过滤器拦截对所有成人、色情与露骨网站的访问。其不拦截代理或 VPN ，也不拦截混合内容网站。 Reddit 一类的网站被放行。 Google 与 Bing 会被设置为安全模式。</string>
+    <string name="google_dns_desc" translatable="true">不拦截任何 DNS 请求。使用 Google 的 DNS 端点。</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 将您的 DNS 请求经过一个全球范围内的安全服务器网络路由。</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">拦截对所有成人、色情与露骨网站的访问。其亦将拦截可用于绕行过滤器的代理与 VPN 域名。包含混合内容的网站（如 Reddit ）也被拦截。 Google 、 Bing 与 YouTube 被设置为安全模式。</string>
+    <string name="crypt_adguard_desc" translatable="true">保护您的设备不受恶意软件等的侵扰。</string>
+    <string name="crypt_adguard_family_desc" translatable="true">包含安全搜索与成人内容拦截的 AdGuard DNS 。</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 （任播） DNSSEC/无日志/有过滤器 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 （任播） DNSSEC/无日志/无过滤器/ECS 9.9.9.12 – 149.112.112.12</string>
+    <string name="crypt_relay_netherlands" translatable="true">于尼德兰托管的匿名 DNS 中继</string>
+    <string name="crypt_relay_france" translatable="true">于法国巴黎托管的匿名 DNS 中继，由 https://cryptostrom.is/ 提供。</string>
+    <string name="crypt_relay_sweden" translatable="true">于瑞典托管的匿名 DNS 中继，由 https://cryptostrom.is/ 提供。</string>
+    <string name="crypt_relay_us" translatable="true">于美国洛杉矶托管的匿名 DNS 中继，由 https://cryptostrom.is/ 提供。</string>
+    <string name="crypt_relay_singapore" translatable="true">于新加坡托管的匿名 DNS 中继。</string>
 </resources>
