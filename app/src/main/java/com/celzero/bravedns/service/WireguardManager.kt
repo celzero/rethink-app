@@ -31,13 +31,6 @@ import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import ipn.Ipn
 import ipn.Key
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
@@ -45,8 +38,15 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import retrofit2.converter.gson.GsonConverterFactory
 
-object WireguardManager : KoinComponent {
+object WireGuardManager : KoinComponent {
 
     private val wgConfigFilesRepository: WgConfigFilesRepository by inject()
     private val applicationContext: Context by inject()
@@ -83,7 +83,6 @@ object WireguardManager : KoinComponent {
                 return
             }
 
-            Log.d(LOG_TAG_PROXY, "Loading wg configs")
             configFileMappings = wgConfigFilesRepository.getWgConfigs().toMutableSet()
             configFileMappings.forEach {
                 val path = it.configPath
@@ -98,6 +97,13 @@ object WireguardManager : KoinComponent {
         }
 
         Log.i(LOG_TAG_PROXY, "Loaded wg configs: ${configs.size}")
+    }
+
+    private fun clearLoadedConfigs() {
+        lock.write {
+            configs.clear()
+            configFileMappings.clear()
+        }
     }
 
     fun getConfigById(id: Int): Config? {
@@ -187,7 +193,10 @@ object WireguardManager : KoinComponent {
         }
         val config = configs.find { it.getId() == configFiles.id }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "canEnableConfig: wg not found, id: ${configFiles.id}, ${configs.size}")
+            Log.e(
+                LOG_TAG_PROXY,
+                "canEnableConfig: wg not found, id: ${configFiles.id}, ${configs.size}"
+            )
             return false
         }
         return true
@@ -217,7 +226,10 @@ object WireguardManager : KoinComponent {
     fun disableConfig(configFiles: WgConfigFiles) {
         val config = configs.find { it.getId() == configFiles.id }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "disableConfig: wg not found, id: ${configFiles.id}, ${configs.size}")
+            Log.e(
+                LOG_TAG_PROXY,
+                "disableConfig: wg not found, id: ${configFiles.id}, ${configs.size}"
+            )
             return
         }
         configFiles.isActive = false
@@ -500,18 +512,29 @@ object WireguardManager : KoinComponent {
             Log.e(LOG_TAG_PROXY, "deletePeer: wg not found, id: $configId, ${configs.size}")
             return
         }
-        val peers = config.getPeers()
+        val peers = config.getPeers()?.toMutableList()
         if (peers == null) {
             Log.e(LOG_TAG_PROXY, "Peers not found for config: $configId")
             return
         }
-        val newPeers = peers.filter { it.getPublicKey() != peer.getPublicKey() }
+        val isRemoved =
+            peers.removeIf {
+                it.getPublicKey() == peer.getPublicKey() &&
+                    it.getEndpoint() == peer.getEndpoint() &&
+                    it.getAllowedIps() == peer.getAllowedIps() &&
+                    it.getPreSharedKey() == peer.getPreSharedKey()
+            }
+        if (DEBUG)
+            Log.d(
+                LOG_TAG_PROXY,
+                "New peers: ${peers.size}, ${peer.getPublicKey().base64()} is removed? $isRemoved"
+            )
         val cfg =
             Config.Builder()
                 .setId(config.getId())
                 .setName(config.getName())
                 .setInterface(config.getInterface())
-                .addPeers(newPeers)
+                .addPeers(peers)
                 .build()
         Log.i(LOG_TAG_PROXY, "Deleting peer for config: $configId, ${cfg.getName()}")
         writeConfigAndUpdateDb(cfg)
@@ -589,8 +612,19 @@ object WireguardManager : KoinComponent {
         ProxyManager.updateProxyIdForApp(uid, cfgId, cfgName)
     }*/
 
-    fun getPeers(configId: Int): List<Peer> {
-        return configs.find { it.getId() == configId }?.getPeers() ?: listOf()
+    fun getPeers(configId: Int): MutableList<Peer> {
+        return configs.find { it.getId() == configId }?.getPeers()?.toMutableList()
+            ?: mutableListOf()
+    }
+
+    fun restoreProcessDeleteWireGuardEntries() {
+        // delete the WireGuard entries from the database
+        io {
+            val count = wgConfigFilesRepository.deleteOnAppRestore()
+            ProxyManager.removeWgProxies()
+            Log.i(LOG_TAG_PROXY, "Deleted wg entries: $count")
+            clearLoadedConfigs()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -23,8 +23,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.celzero.bravedns.service.WireguardManager.SEC_WARP_ID
-import com.celzero.bravedns.service.WireguardManager.WARP_ID
+import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_ID
+import com.celzero.bravedns.service.WireGuardManager.WARP_ID
 
 @Dao
 interface WgConfigFilesDAO {
@@ -47,6 +47,9 @@ interface WgConfigFilesDAO {
     fun getWgConfigs(): List<WgConfigFiles>
 
     @Delete fun delete(wgConfigFiles: WgConfigFiles)
+
+    @Query("delete from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")
+    fun deleteOnAppRestore(): Int
 
     @Query("delete from WgConfigFiles where id = :id") fun deleteConfig(id: Int)
 

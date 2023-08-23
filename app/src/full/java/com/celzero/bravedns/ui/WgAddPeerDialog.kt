@@ -25,7 +25,7 @@ import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
-import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -41,6 +41,8 @@ class WgAddPeerDialog(
 ) : Dialog(activity, themeID) {
 
     private lateinit var b: DialogWgAddPeerBinding
+
+    private var isEditing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,9 +61,10 @@ class WgAddPeerDialog(
         )
 
         if (wgPeer != null) {
+            isEditing = true
             b.peerPublicKey.setText(wgPeer.getPublicKey().base64())
             if (wgPeer.getPreSharedKey().isPresent) {
-                b.peerPresharedKey.setText(wgPeer.getPreSharedKey().get().toString())
+                b.peerPresharedKey.setText(wgPeer.getPreSharedKey().get().base64())
             }
             b.peerAllowedIps.setText(wgPeer.getAllowedIps().joinToString { it.toString() })
             if (wgPeer.getEndpoint().isPresent) {
@@ -93,10 +96,14 @@ class WgAddPeerDialog(
                     builder.parsePersistentKeepalive(peerPersistentKeepAlive)
                 if (presharedKey.isNotEmpty()) builder.parsePreSharedKey(presharedKey)
                 if (peerPublicKey.isNotEmpty()) builder.parsePublicKey(peerPublicKey)
-                val wgPeer = builder.build()
+                val newPeer = builder.build()
 
                 ui {
-                    io { WireguardManager.addPeer(configId, wgPeer) }
+                    io {
+                        if (wgPeer != null && isEditing)
+                            WireGuardManager.deletePeer(configId, wgPeer)
+                        WireGuardManager.addPeer(configId, newPeer)
+                    }
                     this.dismiss()
                 }
             } catch (e: Throwable) {

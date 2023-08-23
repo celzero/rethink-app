@@ -25,7 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgPeersBinding
-import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.ui.WgAddPeerDialog
 import com.celzero.bravedns.wireguard.Peer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -38,12 +38,12 @@ class WgPeersAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val themeId: Int,
     private val configId: Int,
-    private var peers: List<Peer>
+    private var peers: MutableList<Peer>
 ) : RecyclerView.Adapter<WgPeersAdapter.WgPeersViewHolder>() {
 
     override fun onBindViewHolder(holder: WgPeersViewHolder, position: Int) {
-        val appInfo: Peer = peers[position]
-        holder.update(appInfo)
+        val peer: Peer = peers[position]
+        holder.update(peer)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WgPeersViewHolder {
@@ -60,7 +60,7 @@ class WgPeersAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun update(wgPeer: Peer) {
-            if (configId == WireguardManager.WARP_ID) {
+            if (configId == WireGuardManager.WARP_ID) {
                 handleWarpPeers()
             }
             if (wgPeer.getEndpoint().isPresent) {
@@ -69,7 +69,12 @@ class WgPeersAdapter(
                 b.endpointText.visibility = View.GONE
                 b.endpointLabel.visibility = View.GONE
             }
-            b.allowedIpsText.text = wgPeer.getAllowedIps().joinToString { it.toString() }
+            if (wgPeer.getAllowedIps().isNotEmpty()) {
+                b.allowedIpsText.text = wgPeer.getAllowedIps().joinToString { it.toString() }
+            } else {
+                b.allowedIpsText.visibility = View.GONE
+                b.allowedIpsLabel.visibility = View.GONE
+            }
             if (wgPeer.persistentKeepalive.isPresent) {
                 b.persistentKeepaliveText.text = wgPeer.persistentKeepalive.get().toString()
             } else {
@@ -99,6 +104,13 @@ class WgPeersAdapter(
         val addPeerDialog = WgAddPeerDialog(context as Activity, themeId, configId, wgPeer)
         addPeerDialog.setCanceledOnTouchOutside(false)
         addPeerDialog.show()
+        addPeerDialog.setOnDismissListener { dataChanged() }
+    }
+
+    fun dataChanged() {
+        peers.clear()
+        peers.addAll(WireGuardManager.getPeers(configId))
+        this?.notifyDataSetChanged()
     }
 
     private fun showDeleteInterfaceDialog(wgPeer: Peer) {
@@ -118,8 +130,10 @@ class WgPeersAdapter(
 
     private fun deletePeer(wgPeer: Peer) {
         ui {
-            ioCtx { WireguardManager.deletePeer(configId, wgPeer) }
-            peers = WireguardManager.getPeers(configId)
+            ioCtx {
+                WireGuardManager.deletePeer(configId, wgPeer)
+                peers = WireGuardManager.getPeers(configId)
+            }
             this.notifyDataSetChanged()
         }
     }

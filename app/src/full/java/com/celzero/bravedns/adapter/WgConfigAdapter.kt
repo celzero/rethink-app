@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -29,10 +28,9 @@ import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgInterfaceBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.ui.WgConfigDetailActivity
 import com.celzero.bravedns.ui.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
-import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UiUtils
 
 class WgConfigAdapter(private val context: Context) :
@@ -124,8 +122,8 @@ class WgConfigAdapter(private val context: Context) :
 
             b.interfaceSwitch.setOnCheckedChangeListener { _, checked ->
                 if (checked) {
-                    if (WireguardManager.canEnableConfig(wgConfigFiles)) {
-                        WireguardManager.enableConfig(wgConfigFiles)
+                    if (WireGuardManager.canEnableConfig(wgConfigFiles)) {
+                        WireGuardManager.enableConfig(wgConfigFiles)
                         updateStatus(wgConfigFiles)
                     } else {
                         b.interfaceSwitch.isChecked = false
@@ -137,7 +135,7 @@ class WgConfigAdapter(private val context: Context) :
                             .show()
                     }
                 } else {
-                    WireguardManager.disableConfig(wgConfigFiles)
+                    WireGuardManager.disableConfig(wgConfigFiles)
                     updateStatus(wgConfigFiles)
                 }
             }
