@@ -73,6 +73,10 @@ class AppDownloadManager(
         SUCCESS(1)
     }
 
+    companion object {
+        private const val INVALID_DOWNLOAD_ID = -1L
+    }
+
     suspend fun isDownloadRequired(type: DownloadType) {
         downloadRequired.postValue(DownloadManagerStatus.IN_PROGRESS)
         val ts = getCurrentBlocklistTimestamp(type)
@@ -203,6 +207,9 @@ class AppDownloadManager(
             val fileName = it.filename
             if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "v: ($timestamp), f: $fileName, u: $it.url")
             downloadIds[i] = enqueueDownload(it.url, fileName, timestamp.toString())
+            if (downloadIds[i] == INVALID_DOWNLOAD_ID) {
+                return DownloadManagerStatus.FAILURE
+            }
         }
         initiateDownloadStatusCheck(downloadIds, timestamp)
         return DownloadManagerStatus.STARTED
@@ -335,20 +342,28 @@ class AppDownloadManager(
     }
 
     private fun enqueueDownload(url: String, fileName: String, timestamp: String): Long {
-        downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val downloadUri = Uri.parse(url)
-        val request = DownloadManager.Request(downloadUri)
-        request.apply {
-            setTitle(fileName)
-            setDescription(fileName)
-            request.setDestinationInExternalFilesDir(
-                context,
-                BlocklistDownloadHelper.getExternalFilePath(timestamp),
-                fileName
-            )
-            val downloadId = downloadManager.enqueue(this)
-            if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename: $fileName, downloadID: $downloadId")
-            return downloadId
+        try {
+            downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val downloadUri = Uri.parse(url)
+            val request = DownloadManager.Request(downloadUri)
+            request.apply {
+                setTitle(fileName)
+                setDescription(fileName)
+                setNotificationVisibility(
+                    DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+                )
+                setDestinationInExternalFilesDir(
+                    context,
+                    BlocklistDownloadHelper.getExternalFilePath(timestamp),
+                    fileName
+                )
+                val downloadId = downloadManager.enqueue(this)
+                if (DEBUG) Log.d(LOG_TAG_DOWNLOAD, "filename: $fileName, downloadID: $downloadId")
+                return downloadId
+            }
+        } catch (e: Exception) {
+            Log.w(LOG_TAG_DOWNLOAD, "Exception while downloading the file: $fileName", e)
         }
+        return INVALID_DOWNLOAD_ID
     }
 }
