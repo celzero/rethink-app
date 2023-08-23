@@ -276,11 +276,19 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         }
 
         b.connectionSummaryLl.visibility = View.VISIBLE
+        b.connectionUploadDownload.visibility = View.VISIBLE
         b.connectionMessage.text = info?.message
-        val uploadBytes = Utilities.humanReadableByteCount(info?.uploadBytes ?: 0L, true)
-        val downloadBytes = Utilities.humanReadableByteCount(info?.downloadBytes ?: 0L, true)
-        b.connectionUploadDownload.text =
-            getString(R.string.ct_bs_upload_download, uploadBytes, downloadBytes)
+        val downloadBytes =
+            getString(
+                R.string.symbol_download,
+                Utilities.humanReadableByteCount(info?.downloadBytes ?: 0L, true)
+            )
+        val uploadBytes =
+            getString(
+                R.string.symbol_upload,
+                Utilities.humanReadableByteCount(info?.uploadBytes ?: 0L, true)
+            )
+        b.connectionUploadDownload.text = getString(R.string.two_argument, uploadBytes, downloadBytes)
     }
 
     private fun lightenUpChip() {

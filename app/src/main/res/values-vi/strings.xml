@@ -554,7 +554,6 @@
     <string name="lbl_hour" translatable="true">giờ</string>
     <string name="lbl_min" translatable="true">phút</string>
     <string name="lbl_sec" translatable="true">giây</string>
-    <string name="ct_bs_upload_download" translatable="true">Tải lên %1$s / Tải xuống %2$s</string>
     <string name="about_dialog_positive_button" translatable="true">Đi nào</string>
     <string name="logs_disclaimer" translatable="true">Hiển thị 20000 ký tự đầu tiên</string>
     <string name="fapps_exclude_block_dialog_title" translatable="true">Loại trừ ứng dụng</string>

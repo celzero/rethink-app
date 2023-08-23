@@ -899,7 +899,6 @@
 \nOrbot utiliza <u>Tor</u> para cifrar su tráfico de Internet, lo que le ayuda a <u>evitar la censura</u> y defenderse de las formas de <u>vigilancia de la red</u> que amenazan la libertad personal y la privacidad.
 \n<u>Proxy TCP</u>: Rethink reenvía a Orbot sólo las conexiones TCP de las aplicaciones <i>incluidas</i>.
 \n<u>Proxy HTTP</u>: Rethink <i>establece</i> un túnel de CONEXIÓN HTTP a Orbot y reenvía solo las conexiones TCP de las aplicaciones <i>incluidas</i>.</string>
-    <string name="ct_bs_upload_download" translatable="true">Subir %1$s / Descargar %2$s</string>
     <string name="lbl_listen_port" translatable="true">Escuchar el puerto</string>
     <string name="logs_disclaimer" translatable="true">Mostrar los primeros 20.000 caracteres</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">No validar los certificados TLS del servidor (habilitar sólo si sabes lo que está haciendo)</string>

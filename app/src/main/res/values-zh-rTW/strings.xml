@@ -902,7 +902,6 @@
     <string name="lbl_select_all" translatable="true">全部選取</string>
     <string name="status_protected_with_wg" translatable="true">已由 WireGuard 保護</string>
     <string name="public_key_copy_toast_msg" translatable="true">公鑰已複製。</string>
-    <string name="ct_bs_upload_download" translatable="true">上載 %1$s / 下載 %2$s</string>
     <string name="logs_disclaimer" translatable="true">顯示前 20000 字元</string>
     <string name="univ_firewall_heading" translatable="true">全局防火牆規則</string>
     <string name="app_ip_domain_rules_desc" translatable="true">修改分應用程式的 IP / 網域規則。</string>

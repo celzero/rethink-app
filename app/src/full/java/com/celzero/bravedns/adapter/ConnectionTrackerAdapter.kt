@@ -212,17 +212,20 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     ct.uploadBytes == 0L &&
                     ct.message.isEmpty()
             ) {
+                var hasMinSummary = false
                 if (VpnController.hasCid(ct.connId)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDataUsage.text = context.getString(R.string.lbl_active)
                     b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
                     b.connectionDelay.text = ""
+                    hasMinSummary = true
                 }
                 if (isConnectionProxied(ct.blockedByRule)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text = context.getString(R.string.symbol_key)
+                    hasMinSummary = true
                 }
-                if (b.connectionDelay.text.isEmpty() && b.connectionDuration.text.isEmpty()) {
+                if (!hasMinSummary) {
                     b.connectionSummaryLl.visibility = View.GONE
                 }
                 return
