@@ -66,9 +66,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.Locale
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 
@@ -264,7 +264,12 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
     }
 
     private fun displaySummaryDetails() {
-        if (info?.message?.isEmpty() == true) {
+        if (
+            info?.message?.isEmpty() == true &&
+                info?.duration == 0 &&
+                info?.downloadBytes == 0L &&
+                info?.uploadBytes == 0L
+        ) {
             b.connectionSummaryLl.visibility = View.GONE
             b.connectionUploadDownload.visibility = View.GONE
             return
