@@ -500,10 +500,7 @@ internal constructor(
 
     fun isWireGuardEnabled(): Boolean {
         val proxyType = ProxyType.of(persistentState.proxyType)
-        // adding extra check of persistentState.wireguardEnabledCount > 0
-        // to make sure the wireguard is enabled and the count is greater than 0
-        // consider removing the check
-        return proxyType.isProxyTypeWireguard() && persistentState.wireguardEnabledCount > 0
+        return proxyType.isProxyTypeWireguard()
     }
 
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {

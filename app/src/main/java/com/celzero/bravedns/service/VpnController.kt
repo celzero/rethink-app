@@ -244,4 +244,12 @@ object VpnController : KoinComponent {
     fun hasCid(cid: String): Boolean {
         return braveVpnService?.hasCid(cid) ?: false
     }
+
+    fun removeWireGuardProxy(id: String) {
+        braveVpnService?.removeWireGuardProxy(id)
+    }
+
+    fun addWireGuardProxy(id: String) {
+        braveVpnService?.addWireGuardProxy(id)
+    }
 }

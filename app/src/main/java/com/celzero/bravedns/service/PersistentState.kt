@@ -54,7 +54,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
-        const val WIREGUARD = "wireguard_enabled_count"
         const val WIREGUARD_UPDATED = "wireguard_updated"
     }
 
@@ -263,7 +262,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // go logger level, default 2 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
 
-    // count of wireguard enabled
+    // count of wireguard enabled, not used remove in future release (current: v055a)
     var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
 
     // wireguard updated

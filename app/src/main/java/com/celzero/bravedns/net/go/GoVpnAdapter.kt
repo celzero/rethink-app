@@ -436,10 +436,7 @@ class GoVpnAdapter(
 
         val wgConfigs: List<Config> = WireGuardManager.getActiveConfigs()
         if (wgConfigs.isEmpty()) {
-            if (persistentState.wireguardEnabledCount > 0) {
-                persistentState.wireguardEnabledCount = 0
-                Log.i(LOG_TAG_VPN, "wireguard enabled count reset to 0 as no config found")
-            }
+            Log.i(LOG_TAG_VPN, "no active wireguard configs found")
             return
         }
         wgConfigs.forEach {
@@ -488,8 +485,7 @@ class GoVpnAdapter(
             val status = tunnel?.proxies?.getProxy(id)?.status()
             if (DEBUG) Log.d(LOG_TAG_VPN, "getProxyStatusById: $id, $status")
             status
-        } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "getProxyStatusById: $id, ${e.message}", e)
+        } catch (ignored: Exception) {
             null
         }
     }
@@ -514,6 +510,28 @@ class GoVpnAdapter(
                 appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
             }
             Log.e(LOG_TAG_VPN, "error setting http proxy: ${e.message}", e)
+        }
+    }
+
+    fun removeWireGuardProxy(id: String) {
+        try {
+            tunnel?.proxies?.removeProxy(id)
+            Log.i(LOG_TAG_VPN, "remove wireguard proxy with id: $id")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error removing wireguard proxy: ${e.message}", e)
+        }
+    }
+
+    fun addWireGuardProxy(id: String) {
+        try {
+            val proxyId: Int = id.substring(ID_WG_BASE.length).toInt()
+            val wgConfig = WireGuardManager.getConfigById(proxyId)
+            val wgUserSpaceString = wgConfig?.toWgUserspaceString()
+            tunnel?.proxies?.addProxy(id, wgUserSpaceString)
+            Log.i(LOG_TAG_VPN, "add wireguard proxy with id: $id")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error adding wireguard proxy: ${e.message}", e)
+            WireGuardManager.disableConfig(id)
         }
     }
 

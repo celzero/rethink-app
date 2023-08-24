@@ -1445,12 +1445,6 @@ class BraveVPNService :
                 // restart vpn to enable/disable route lan traffic
                 io("route_lan_traffic") { restartVpn(createNewTunnelOptsObj()) }
             }
-            PersistentState.WIREGUARD -> {
-                // update wireguard tunnel if wireguard count is more than 1
-                if (persistentState.wireguardEnabledCount > 1) {
-                    io("wireguard") { updateTun(createNewTunnelOptsObj()) }
-                }
-            }
             PersistentState.WIREGUARD_UPDATED -> {
                 // case when wireguard is enabled and user changes the wireguard config
                 if (persistentState.wireguardUpdated) {
@@ -2385,6 +2379,16 @@ class BraveVPNService :
 
     fun hasCid(connId: String): Boolean {
         return trackedCids.contains(connId)
+    }
+
+    fun removeWireGuardProxy(id: String) {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "removeWireGuardProxy: $id")
+        vpnAdapter?.removeWireGuardProxy(id)
+    }
+
+    fun addWireGuardProxy(id: String) {
+        if (DEBUG) Log.d(LOG_TAG_VPN, "addWireGuardProxy: $id")
+        vpnAdapter?.addWireGuardProxy(id)
     }
 
     private fun getFlowResponseString(proxyId: String, connId: String, uid: Int): String {

@@ -31,13 +31,6 @@ import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import ipn.Ipn
 import ipn.Key
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
@@ -45,6 +38,13 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import retrofit2.converter.gson.GsonConverterFactory
 
 object WireGuardManager : KoinComponent {
 
@@ -181,7 +181,10 @@ object WireGuardManager : KoinComponent {
         val proxyType = AppConfig.ProxyType.WIREGUARD
         val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
         appConfig.addProxy(proxyType, proxyProvider)
-        persistentState.wireguardEnabledCount++
+        if (configFileMappings.filter { it.isActive }.size > 1) {
+            Log.w(LOG_TAG_PROXY, "More than one wg config is active")
+            VpnController.addWireGuardProxy(ProxyManager.ID_WG_BASE + configFiles.id)
+        }
         Log.i(LOG_TAG_PROXY, "enable wg config: ${configFiles.id}, ${configFiles.name}")
         return
     }
@@ -235,16 +238,15 @@ object WireGuardManager : KoinComponent {
         configFiles.isActive = false
         io { wgConfigFilesRepository.disableConfig(configFiles.id) }
         configFileMappings.find { it.id == configFiles.id }?.isActive = false
-        persistentState.wireguardEnabledCount--
-        if (persistentState.wireguardEnabledCount <= 0) {
+        if (configFileMappings.none { it.isActive }) {
             val proxyType = AppConfig.ProxyType.WIREGUARD
             val proxyProvider = AppConfig.ProxyProvider.WIREGUARD
             appConfig.removeProxy(proxyType, proxyProvider)
-            persistentState.wireguardEnabledCount = 0
         }
+        VpnController.removeWireGuardProxy(ProxyManager.ID_WG_BASE + configFiles.id)
         Log.i(
             LOG_TAG_PROXY,
-            "disable wg config: ${configFiles.id}, ${configFiles.name}, enabled count: ${persistentState.wireguardEnabledCount}"
+            "disable wg config: ${configFiles.id}, ${configFiles.name}"
         )
         return
     }
@@ -329,7 +331,7 @@ object WireGuardManager : KoinComponent {
     fun getActiveConfigIdForApp(uid: Int): Int {
         val configId = ProxyManager.getProxyIdForApp(uid)
         if (configId == "" || !configId.contains(ProxyManager.ID_WG_BASE)) {
-            Log.e(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
+            Log.i(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
             return INVALID_CONF_ID
         }
 
