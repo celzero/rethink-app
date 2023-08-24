@@ -45,9 +45,7 @@ class WgConfigAdapter(private val context: Context) :
                     oldConnection: WgConfigFiles,
                     newConnection: WgConfigFiles
                 ): Boolean {
-                    return (oldConnection.id == newConnection.id &&
-                        oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive)
+                    return (oldConnection == newConnection)
                 }
 
                 override fun areContentsTheSame(
@@ -56,7 +54,7 @@ class WgConfigAdapter(private val context: Context) :
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
                         oldConnection.name == newConnection.name &&
-                        oldConnection.isActive != newConnection.isActive)
+                        oldConnection.isActive == newConnection.isActive)
                 }
             }
     }
@@ -120,7 +118,9 @@ class WgConfigAdapter(private val context: Context) :
         fun setupClickListeners(wgConfigFiles: WgConfigFiles) {
             b.interfaceNameLayout.setOnClickListener { launchConfigDetail(wgConfigFiles.id) }
 
-            b.interfaceSwitch.setOnCheckedChangeListener { _, checked ->
+            b.interfaceSwitch.setOnCheckedChangeListener(null)
+            b.interfaceSwitch.setOnClickListener {
+                val checked = b.interfaceSwitch.isChecked
                 if (checked) {
                     if (WireGuardManager.canEnableConfig(wgConfigFiles)) {
                         WireGuardManager.enableConfig(wgConfigFiles)

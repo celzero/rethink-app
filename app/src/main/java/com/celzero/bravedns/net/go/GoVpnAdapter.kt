@@ -46,6 +46,8 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
+import java.io.IOException
+import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,8 +55,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
-import java.io.IOException
-import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -532,6 +532,9 @@ class GoVpnAdapter(
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error adding wireguard proxy: ${e.message}", e)
             WireGuardManager.disableConfig(id)
+            showWireguardFailureToast(
+                e.message ?: context.getString(R.string.wireguard_connection_error)
+            )
         }
     }
 
