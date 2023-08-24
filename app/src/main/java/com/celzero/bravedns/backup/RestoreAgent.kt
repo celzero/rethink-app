@@ -38,13 +38,13 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {

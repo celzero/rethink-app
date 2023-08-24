@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 

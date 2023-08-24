@@ -104,8 +104,7 @@ class ConnectionTracer(ctx: Context) {
         // do not cache the DNS request (key: 17|10.111.222.1|10.111.222.3|53)
         if (key == DNS_KEY) return
 
-        if (DEBUG)
-            Log.d(LoggerConstants.LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
+        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
         uidCache.put(key, uid)
     }
 
@@ -115,9 +114,12 @@ class ConnectionTracer(ctx: Context) {
         remote: InetSocketAddress,
         destPort: Int
     ): String {
-        return protocol.toString() + SEPARATOR +
-            local.address.hostAddress + SEPARATOR +
-            remote.address.hostAddress + SEPARATOR +
+        return protocol.toString() +
+            SEPARATOR +
+            local.address.hostAddress +
+            SEPARATOR +
+            remote.address.hostAddress +
+            SEPARATOR +
             destPort
     }
 }

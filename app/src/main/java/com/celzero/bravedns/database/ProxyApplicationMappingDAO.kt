@@ -23,8 +23,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_ID
-import com.celzero.bravedns.service.WireGuardManager.WARP_ID
 
 @Dao
 interface ProxyApplicationMappingDAO {
@@ -73,9 +71,7 @@ interface ProxyApplicationMappingDAO {
     @Query("update ProxyApplicationMapping set proxyId = '', proxyName = '' where proxyId = :cfgId")
     fun removeAllAppsForProxy(cfgId: String)
 
-    @Query(
-        "update ProxyApplicationMapping set proxyId = '', proxyName = '' where proxyId = 'wg%'"
-    )
+    @Query("update ProxyApplicationMapping set proxyId = '', proxyName = '' where proxyId = 'wg%'")
     fun removeAllWgProxies()
 
     @Query("update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName")

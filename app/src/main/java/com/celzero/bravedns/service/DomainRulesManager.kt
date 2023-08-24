@@ -16,7 +16,6 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
-import android.os.SystemClock
 import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData

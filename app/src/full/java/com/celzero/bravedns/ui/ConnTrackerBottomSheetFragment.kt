@@ -66,9 +66,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import java.util.Locale
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
+import java.util.Locale
 
 class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponent {
 
@@ -288,7 +288,8 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                 R.string.symbol_upload,
                 Utilities.humanReadableByteCount(info?.uploadBytes ?: 0L, true)
             )
-        b.connectionUploadDownload.text = getString(R.string.two_argument, uploadBytes, downloadBytes)
+        b.connectionUploadDownload.text =
+            getString(R.string.two_argument, uploadBytes, downloadBytes)
     }
 
     private fun lightenUpChip() {
