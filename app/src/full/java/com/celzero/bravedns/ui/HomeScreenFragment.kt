@@ -1215,10 +1215,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else if (isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
-            } else if (appConfig.isWireguardEnabled() && isPrivateDnsActive(requireContext())) {
+            } else if (appConfig.isWireGuardEnabled() && isPrivateDnsActive(requireContext())) {
                 statusId = R.string.status_protected_with_wg_private_dns
                 colorId = fetchTextColor(R.color.primaryLightColorText)
-            } else if (appConfig.isWireguardEnabled()) {
+            } else if (appConfig.isWireGuardEnabled()) {
                 statusId = R.string.status_protected_with_wg
             }
         }

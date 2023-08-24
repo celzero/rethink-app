@@ -1411,7 +1411,7 @@
 
     <string name="wireguard_no_config_msg">No WireGuard configs</string>
     <string name="wireguard_connection_error">Issue connecting to WireGuard configuration</string>
-    <string name="wireguard_disclaimer">This is WireGuard as TCP and UDP proxy. While DNS traffic is forwarded to %1$s, ICMP traffic (ex: ping) is sent to the underlying network.</string>
+    <string name="wireguard_disclaimer">This is an experimental WireGuard as TCP and UDP proxy. While DNS traffic is forwarded to %1$s, ICMP traffic (ex: ping) is sent to the underlying network.</string>
 
     <!-- dns description -->
     <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
