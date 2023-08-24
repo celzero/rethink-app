@@ -40,12 +40,12 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UiUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class DnsSettingsFragment :
     Fragment(R.layout.fragment_dns_configure),
@@ -127,7 +127,6 @@ class DnsSettingsFragment :
 
     private fun initObservers() {
         observeBraveMode()
-        observeDnscryptStatus()
         observeAppState()
     }
 
@@ -155,6 +154,8 @@ class DnsSettingsFragment :
             AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_crypt_status)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.connectedStatusTitleUrl.text =
@@ -174,16 +175,6 @@ class DnsSettingsFragment :
                 b.connectedStatusTitle.text =
                     resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
-        }
-    }
-
-    // FIXME: Create common observer for dns instead of separate observers
-    private fun observeDnscryptStatus() {
-        appConfig.getDnscryptCountObserver().observe(viewLifecycleOwner) {
-            if (appConfig.getDnsType() != AppConfig.DnsType.DNSCRYPT) return@observe
-
-            val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
-            b.connectedStatusTitle.text = connectedCrypt
         }
     }
 

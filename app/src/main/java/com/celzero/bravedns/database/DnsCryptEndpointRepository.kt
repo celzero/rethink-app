@@ -50,10 +50,6 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
         return dnsCryptEndpointDAO.getConnectedCount()
     }
 
-    fun getConnectedCountLiveData(): LiveData<Int> {
-        return dnsCryptEndpointDAO.getConnectedCountLiveData()
-    }
-
     suspend fun getCount(): Int {
         return dnsCryptEndpointDAO.getCount()
     }

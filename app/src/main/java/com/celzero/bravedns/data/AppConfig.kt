@@ -58,9 +58,9 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
+import java.net.InetAddress
 import protect.Controller
 import settings.Settings
-import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -498,7 +498,7 @@ internal constructor(
         return TcpProxyHelper.getActiveTcpProxy() != null
     }
 
-    fun isWireguardEnabled(): Boolean {
+    fun isWireGuardEnabled(): Boolean {
         val proxyType = ProxyType.of(persistentState.proxyType)
         // adding extra check of persistentState.wireguardEnabledCount > 0
         // to make sure the wireguard is enabled and the count is greater than 0
@@ -508,10 +508,6 @@ internal constructor(
 
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getSelectedProxy()
-    }
-
-    fun getDnscryptCountObserver(): LiveData<Int> {
-        return dnsCryptEndpointRepository.getConnectedCountLiveData()
     }
 
     private suspend fun onDnsChange(dt: DnsType) {
