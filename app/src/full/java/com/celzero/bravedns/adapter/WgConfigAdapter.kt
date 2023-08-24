@@ -56,7 +56,7 @@ class WgConfigAdapter(private val context: Context) :
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
                         oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive)
+                        oldConnection.isActive != newConnection.isActive)
                 }
             }
     }
