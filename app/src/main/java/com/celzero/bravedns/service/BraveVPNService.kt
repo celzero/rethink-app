@@ -75,10 +75,6 @@ import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
 import ipn.Ipn
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Controller
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -87,6 +83,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Controller
 
 class BraveVPNService :
     VpnService(),
@@ -255,7 +255,7 @@ class BraveVPNService :
 
         // print the invalid destination ip received
         // 64:ff9b:1:DA19:0100: or 100.
-        if (dstIp.startsWith("64:ff9b:1:DA19:0100:") || dstIp.startsWith("100.")) {
+        if (dstIp.startsWith("64:ff9b:1:DA19:0100:") || dstIp.startsWith("100.64")) {
             Log.w(
                 LOG_TAG_VPN,
                 "invalid destination ip received:  protocol: $protocol, uid: $uid, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort"
@@ -1621,6 +1621,14 @@ class BraveVPNService :
             val allNetworks = networks.allNet.map { it.network }.toTypedArray()
             setUnderlyingNetworks(allNetworks)
         }
+
+        // Workaround for WireGuard connection issues after network change
+        // WireGuard may fail to connect to the server when the network changes.
+        // refresh will do a configuration refresh in tunnel to ensure a successful
+        // reconnection after detecting a network change event
+        if (appConfig.isWireGuardEnabled()) {
+            VpnController.refreshWireGuardConfig()
+        }
     }
 
     private fun isUnderlyingRoutesChanged(
@@ -2382,13 +2390,17 @@ class BraveVPNService :
     }
 
     fun removeWireGuardProxy(id: String) {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "removeWireGuardProxy: $id")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "remove wg from tunnel: $id")
         vpnAdapter?.removeWireGuardProxy(id)
     }
 
     fun addWireGuardProxy(id: String) {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "addWireGuardProxy: $id")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "add wg from tunnel: $id")
         vpnAdapter?.addWireGuardProxy(id)
+    }
+
+    fun refreshWireGuardConfig() {
+        vpnAdapter?.refreshWireGuardConfig()
     }
 
     private fun getFlowResponseString(proxyId: String, connId: String, uid: Int): String {

@@ -21,6 +21,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,6 +35,8 @@ import com.celzero.bravedns.adapter.WgConfigAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.QrCodeFromFileScanner
 import com.celzero.bravedns.util.Themes
@@ -56,8 +60,18 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private var wgConfigAdapter: WgConfigAdapter? = null
     private val wgConfigViewModel: WgConfigViewModel by viewModel()
 
+    private lateinit var animation: Animation
+
     companion object {
         private const val IMPORT_LAUNCH_INPUT = "*/*"
+
+        private const val REFRESH_TIMEOUT: Long = 4000
+
+        private const val ANIMATION_DURATION = 750L
+        private const val ANIMATION_REPEAT_COUNT = -1
+        private const val ANIMATION_PIVOT_VALUE = 0.5f
+        private const val ANIMATION_START_DEGREE = 0.0f
+        private const val ANIMATION_END_DEGREE = 360.0f
     }
 
     private val tunnelFileImportResultLauncher =
@@ -147,6 +161,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
 
     private fun init() {
         b.settingsNetwork.text = getString(R.string.lbl_wireguard).lowercase()
+        initAnimation()
         collapseFab()
         observeConfig()
         observeDnsName()
@@ -160,6 +175,20 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                 finish()
             }
         }
+    }
+
+    private fun initAnimation() {
+        animation =
+            RotateAnimation(
+                ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE
+            )
+        animation.repeatCount = ANIMATION_REPEAT_COUNT
+        animation.duration = ANIMATION_DURATION
     }
 
     override fun onResume() {
@@ -221,11 +250,28 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
             )
         }
         b.createFab.setOnClickListener { openTunnelEditorActivity() }
+        b.wgRefresh.setOnClickListener { refresh() }
     }
 
     private fun openTunnelEditorActivity() {
         val intent = Intent(this, WgConfigEditorActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun refresh() {
+        b.wgRefresh.isEnabled = false
+        b.wgRefresh.animation = animation
+        b.wgRefresh.startAnimation(animation)
+        VpnController.refreshWireGuardConfig()
+        Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
+            b.wgRefresh.isEnabled = true
+            b.wgRefresh.clearAnimation()
+            Utilities.showToastUiCentered(
+                this,
+                getString(R.string.wireguard_refresh_toast),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     private fun expendFab() {

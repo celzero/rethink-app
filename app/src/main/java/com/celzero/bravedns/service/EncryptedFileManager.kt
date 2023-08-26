@@ -153,7 +153,7 @@ object EncryptedFileManager {
 
     fun write(ctx: Context, data: String, file: File): Boolean {
         try {
-            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "write into $file, $data")
+            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "write into $file")
             val masterKey =
                 MasterKey.Builder(ctx.applicationContext)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)

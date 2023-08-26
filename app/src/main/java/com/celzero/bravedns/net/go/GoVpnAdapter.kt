@@ -538,6 +538,15 @@ class GoVpnAdapter(
         }
     }
 
+    fun refreshWireGuardConfig() {
+        try {
+            val res = tunnel?.proxies?.refreshProxies()
+            Log.i(LOG_TAG_VPN, "refresh proxies: $res")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error refreshing proxies: ${e.message}", e)
+        }
+    }
+
     // v055, unused
     private fun setTcpProxyIfNeeded() {
         if (!appConfig.isTcpProxyEnabled()) {
