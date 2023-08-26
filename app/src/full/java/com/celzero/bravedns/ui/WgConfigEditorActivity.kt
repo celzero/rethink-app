@@ -53,7 +53,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     companion object {
         const val INTENT_EXTRA_WG_ID = "WIREGUARD_TUNNEL_ID"
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
-        private const val DEFAULT_MTU = "0"
+        private const val DEFAULT_MTU = "1500"
         private const val DEFAULT_LISTEN_PORT = "0"
         private const val DEFAULT_DNS_SERVER = "1.1.1.1"
     }

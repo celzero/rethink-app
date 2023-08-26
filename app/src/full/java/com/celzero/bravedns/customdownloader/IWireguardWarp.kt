@@ -18,7 +18,6 @@ package com.celzero.bravedns.customdownloader
 import com.google.gson.JsonObject
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Streaming
 
@@ -34,9 +33,10 @@ interface IWireguardWarp {
     @GET("/warp/renew")
     @Streaming
     suspend fun renewWarpConfig(
-        @Path("fileName") fileName: String,
-        @Query("vcode") vcode: Int,
-        @Query("compressed") compressed: String
+        @Query("id") id: String,
+        @Query("token") token: Int,
+        @Query("device") device: String,
+        @Query("locale") locale: String
     ): Response<JsonObject?>?
 
     @GET("/warp/works") @Streaming suspend fun isWarpConfigWorking(): Response<JsonObject?>?
@@ -44,9 +44,9 @@ interface IWireguardWarp {
     @GET("/warp/quota")
     @Streaming
     suspend fun getWarpQuota(
-        @Path("update") update: String,
-        @Path("blocklist") blocklist: String,
-        @Query("tstamp") tStamp: Long,
-        @Query("vcode") vcode: Int
+        @Query("id") id: String,
+        @Query("token") token: Int,
+        @Query("device") device: String,
+        @Query("locale") locale: String
     ): Response<JsonObject?>?
 }
