@@ -123,7 +123,6 @@ internal constructor(
             if (ResourceRecordTypes.mayContainIP(transaction.type.toInt())) {
                 // reorder the ip address as alg addresses will be placed first if alg is enabled
                 val addresses = reorderIpAddressesIfNeeded(transaction.response)
-                Log.d("TEST", "addresses1 - ${addresses.joinToString(separator = ",")}")
                 val destination = normalizeIp(addresses.getOrNull(0))
 
                 if (destination != null) {
