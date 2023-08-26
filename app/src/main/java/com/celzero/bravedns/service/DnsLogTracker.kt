@@ -17,7 +17,9 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.os.SystemClock
+import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
@@ -31,6 +33,9 @@ import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
 import dnsx.Summary
+import inet.ipaddr.HostName
+import inet.ipaddr.IPAddress
+import inet.ipaddr.IPAddressString
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -116,7 +121,9 @@ internal constructor(
         if (transaction.status === Transaction.Status.COMPLETE) {
 
             if (ResourceRecordTypes.mayContainIP(transaction.type.toInt())) {
-                val addresses = transaction.response.split(",").toTypedArray()
+                // reorder the ip address as alg addresses will be placed first if alg is enabled
+                val addresses = reorderIpAddressesIfNeeded(transaction.response)
+                Log.d("TEST", "addresses1 - ${addresses.joinToString(separator = ",")}")
                 val destination = normalizeIp(addresses.getOrNull(0))
 
                 if (destination != null) {
@@ -163,6 +170,50 @@ internal constructor(
             fetchFavIcon(context, dnsLog)
         }
         return dnsLog
+    }
+
+    private fun reorderIpAddressesIfNeeded(response: String): Array<String> {
+        // parse the response, if it is ipv4 then place the first ip which doesn't start with 100.
+        // and if it is ipv6 place the first ip which doesn't start with 64:ff9b:1:DA19:0100:
+        // if the response is empty, then return the empty array
+        val addresses = response.split(",").toTypedArray()
+        if (addresses.isEmpty()) return emptyArray()
+
+        val firstAddress = addresses[0]
+        val ip = IPAddressString(firstAddress)
+        val isIpv4 = ip.isIPv4
+        val isIpv6 = ip.isIPv6
+        if (!isIpv4 && !isIpv6) return emptyArray()
+
+        val reorderedAddresses = mutableListOf<String>()
+        if (isIpv4) {
+            for (address in addresses) {
+                if (!address.startsWith("100.")) {
+                    reorderedAddresses.add(address)
+                }
+            }
+        } else {
+            for (address in addresses) {
+                if (!address.startsWith("64:ff9b:1:DA19:0100:")) {
+                    reorderedAddresses.add(address)
+                }
+            }
+        }
+        if (reorderedAddresses.isEmpty()) return emptyArray()
+
+        var count = 0
+        val firstElement = reorderedAddresses[0]
+        run breaking@{
+            addresses.forEach {
+                if (firstElement == it && count == 0) {
+                    count++
+                    return@breaking
+                }
+                reorderedAddresses.add(it)
+            }
+        }
+
+        return reorderedAddresses.toTypedArray()
     }
 
     private fun getFlagIfPresent(hostAddress: String?): String {
