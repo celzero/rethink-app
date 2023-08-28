@@ -110,6 +110,7 @@ class LocalSimpleViewAdapter(val context: Context) :
                 RethinkBlocklistManager.updateFiletagsLocal(tagIds.toSet(), selected)
                 val selectedTags = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
                 RethinkBlocklistFragment.updateFileTagList(selectedTags)
+                ui { notifyDataSetChanged() }
             }
         }
 
@@ -189,6 +190,10 @@ class LocalSimpleViewAdapter(val context: Context) :
 
         private fun io(f: suspend () -> Unit) {
             CoroutineScope(Dispatchers.IO).launch { f() }
+        }
+
+        private fun ui(f: () -> Unit) {
+            CoroutineScope(Dispatchers.Main).launch { f() }
         }
     }
 }

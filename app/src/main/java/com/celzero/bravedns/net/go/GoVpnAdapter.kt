@@ -716,13 +716,14 @@ class GoVpnAdapter(
 
             val braveDNS = makeLocalBraveDns()
             if (braveDNS != null) {
-                if (DEBUG) Log.d(LOG_TAG_VPN, "brave dns object is set")
                 tunnel?.resolver?.rdnsLocal = braveDNS
                 tunnel?.resolver?.rdnsLocal?.stamp = stamp
+                Log.i(LOG_TAG_VPN, "local brave dns object is set")
             } else {
                 Log.e(LOG_TAG_VPN, "Issue creating local brave dns object")
             }
         } catch (ex: Exception) {
+            persistentState.blocklistEnabled = false
             Log.e(LOG_TAG_VPN, "could not set local-brave dns: ${ex.message}", ex)
         }
     }
@@ -735,15 +736,31 @@ class GoVpnAdapter(
             }
 
             if (tunnel?.resolver?.rdnsLocal != null) {
+                Log.i(LOG_TAG_VPN, "set local stamp: ${persistentState.localBlocklistStamp}")
                 tunnel?.resolver?.rdnsLocal?.stamp = persistentState.localBlocklistStamp
             } else {
-                Log.w(
-                    LOG_TAG_VPN,
-                    "brave dns mode is not local but trying to set local stamp, this should not happen"
-                )
+                Log.w(LOG_TAG_VPN, "mode is not local, this should not happen")
             }
         } catch (e: java.lang.Exception) {
-            Log.e(LOG_TAG_VPN, "could not set local-brave dns stamp: ${e.message}", e)
+            Log.e(LOG_TAG_VPN, "could not set local stamp: ${e.message}", e)
+        } finally {
+            resetLocalBlocklistFromTunnel()
+        }
+    }
+
+    private fun resetLocalBlocklistFromTunnel() {
+        try {
+            if (tunnel?.resolver?.rdnsLocal == null) {
+                Log.i(LOG_TAG_VPN, "mode is not local, no need to reset local stamp")
+                return
+            }
+
+            persistentState.localBlocklistStamp = tunnel?.resolver?.rdnsLocal?.stamp ?: ""
+            if (DEBUG)
+                Log.d(LOG_TAG_VPN, "reset local stamp: ${persistentState.localBlocklistStamp}")
+        } catch (e: Exception) {
+            persistentState.localBlocklistStamp = ""
+            Log.e(LOG_TAG_VPN, "could not reset local stamp: ${e.message}", e)
         }
     }
 

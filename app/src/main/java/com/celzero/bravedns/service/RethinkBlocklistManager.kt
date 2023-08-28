@@ -40,9 +40,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.BraveDNS
 import dnsx.Dnsx
+import java.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 
@@ -376,10 +376,7 @@ object RethinkBlocklistManager : KoinComponent {
             val flags = convertListToCsv(fileValues)
             getBraveDns(context, blocklistTimestamp(type), type)?.flagsToStamp(flags) ?: ""
         } catch (e: java.lang.Exception) {
-            Log.e(
-                LoggerConstants.LOG_TAG_VPN,
-                "Exception while fetching stamp from tags: ${e.message}, $e "
-            )
+            Log.e(LoggerConstants.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e ")
             ""
         }
     }
@@ -400,7 +397,7 @@ object RethinkBlocklistManager : KoinComponent {
         } catch (e: Exception) {
             Log.e(
                 LoggerConstants.LOG_TAG_VPN,
-                "Exception while fetching tags from stamp: ${e.message}, $e "
+                "err tags2stamp: ${e.message}, $e "
             )
             setOf()
         }

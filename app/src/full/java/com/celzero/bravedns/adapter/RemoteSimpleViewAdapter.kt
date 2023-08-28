@@ -109,6 +109,7 @@ class RemoteSimpleViewAdapter(val context: Context) :
                 RethinkBlocklistManager.updateFiletagsRemote(tagIds.toSet(), selected)
                 val selectedTags = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
                 RethinkBlocklistFragment.updateFileTagList(selectedTags)
+                ui { notifyDataSetChanged() }
             }
         }
 
@@ -188,6 +189,10 @@ class RemoteSimpleViewAdapter(val context: Context) :
 
         private fun io(f: suspend () -> Unit) {
             CoroutineScope(Dispatchers.IO).launch { f() }
+        }
+
+        private fun ui(f: () -> Unit) {
+            CoroutineScope(Dispatchers.Main).launch { f() }
         }
     }
 }

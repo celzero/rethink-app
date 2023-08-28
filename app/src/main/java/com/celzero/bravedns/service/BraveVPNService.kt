@@ -252,16 +252,6 @@ class BraveVPNService :
         dstPort: Int,
         connId: String
     ): Boolean {
-
-        // print the invalid destination ip received
-        // 64:ff9b:1:DA19:0100: or 100.
-        if (dstIp.startsWith("64:ff9b:1:DA19:0100:") || dstIp.startsWith("100.64")) {
-            Log.w(
-                LOG_TAG_VPN,
-                "invalid destination ip received:  protocol: $protocol, uid: $uid, srcIp: $srcIp, srcPort: $srcPort, dstIp: $dstIp, dstPort: $dstPort"
-            )
-        }
-
         val connInfo =
             createConnTrackerMetaData(
                 uid,
