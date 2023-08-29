@@ -32,6 +32,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -39,7 +40,7 @@ object VpnController : KoinComponent {
 
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
-    val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
     var controllerScope: CoroutineScope? = null
         private set
@@ -55,7 +56,7 @@ object VpnController : KoinComponent {
         throw CloneNotSupportedException()
     }
 
-    // TODO: make clients listen on create, start, stop, destory from vpn-service
+    // TODO: make clients listen on create, start, stop, destroy from vpn-service
     fun onVpnCreated(b: BraveVPNService) {
         braveVpnService = b
         controllerScope = CoroutineScope(Dispatchers.IO)
@@ -135,14 +136,13 @@ object VpnController : KoinComponent {
     fun stop(context: Context) {
         Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
-        braveVpnService?.signalStopService(true)
+        braveVpnService?.signalStopServiceLocked(true)
         braveVpnService = null
         onConnectionStateChanged(connectionState)
-        persistentState.setVpnEnabled(false)
     }
 
     fun state(): VpnState {
-        val requested: Boolean = persistentState.getVpnEnabled()
+        val requested: Boolean = persistentState.getVpnEnabledLocked()
         val on = isOn()
         return VpnState(requested, on, connectionState)
     }

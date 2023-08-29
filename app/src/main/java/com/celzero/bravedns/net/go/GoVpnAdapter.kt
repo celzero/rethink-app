@@ -72,8 +72,9 @@ class GoVpnAdapter(
     // The Intra session object from go-tun2socks.  Initially null.
     private var tunnel: Tunnel? = null
 
-    suspend fun start(tunnelOptions: TunnelOptions) {
+    suspend fun startLocked(tunnelOptions: TunnelOptions): Boolean {
         connectTunnel(tunnelOptions)
+        return tunnel != null
     }
 
     private suspend fun connectTunnel(tunnelOptions: TunnelOptions) {
@@ -596,7 +597,7 @@ class GoVpnAdapter(
         }
     }
 
-    fun close() {
+    fun closeLocked() {
         if (tunnel != null) {
             tunnel?.disconnect()
             Log.i(LOG_TAG_VPN, "Tunnel disconnect")
@@ -658,20 +659,19 @@ class GoVpnAdapter(
      * Go, and will not use the Java DoH implementation. If Go-DoH is not enabled, this method has
      * no effect.
      */
-    suspend fun updateTun(tunnelOptions: TunnelOptions) {
+    suspend fun updateTunLocked(tunnelOptions: TunnelOptions): Boolean {
         // changes made in connectTunnel()
         if (tunFd == null) {
             // Adapter is closed.
             Log.e(LOG_TAG_VPN, "updateTun: tunFd is null, returning")
-            return
+            return false
         }
 
         if (tunnel == null) {
             // Attempt to re-create the tunnel.  Creation may have failed originally because the DoH
             // server could not be reached.  This will update the DoH URL as well.
             Log.w(LOG_TAG_VPN, "updateTun: tunnel is null, calling connectTunnel")
-            connectTunnel(tunnelOptions)
-            return
+            return startLocked(tunnelOptions)
         }
         Log.i(LOG_TAG_VPN, "received update tun with opts: $tunnelOptions")
         try {
@@ -686,6 +686,7 @@ class GoVpnAdapter(
             tunnel?.disconnect()
             tunnel = null
         }
+        return tunnel != null
     }
 
     fun setDnsAlg() {

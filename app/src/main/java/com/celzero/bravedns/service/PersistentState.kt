@@ -288,7 +288,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         _vpnEnabled = isOn
     }
 
-    fun getVpnEnabled(): Boolean {
+    fun getVpnEnabledLocked(): Boolean {
         return _vpnEnabled
     }
 

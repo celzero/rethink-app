@@ -1316,18 +1316,24 @@ class BraveVPNService :
                 Log.w(LOG_TAG_VPN, "skip update-tun, connection-monitor missing")
                 return@withLock
             }
-            if (!persistentState.getVpnEnabled()) {
+            // FIXME: protect getVpnEnabledLocked with mutex everywhere
+            if (!persistentState.getVpnEnabledLocked()) {
                 // when persistent-state "thinks" vpn is disabled, stop the service, especially when
                 // we could be here via onStartCommand -> updateTun -> handleVpnAdapterChange while
                 // conn-monitor and go-vpn-adapter exist, but persistent-state tracking vpn goes out
                 // of sync
                 Log.e(LOG_TAG_VPN, "stop-vpn(updateTun), tracking vpn is out of sync")
-                signalStopService(userInitiated = false)
-                return
+                return signalStopServiceLocked(userInitiated = false)
             }
-            vpnAdapter?.updateTun(tunnelOptions)
-            handleVpnAdapterChange()
+            val ok = vpnAdapter?.updateTunLocked(tunnelOptions)
+            // TODO: like Intra, call VpnController#stop instead? (see
+            // VpnController#onStartComplete)
+            if (ok == false) {
+                Log.w(LOG_TAG_VPN, "Cannot handle vpn adapter changes, no tunnel")
+                return signalStopServiceLocked(userInitiated = false)
+            }
         }
+        handleVpnAdapterChange()
     }
 
     override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
@@ -1478,18 +1484,19 @@ class BraveVPNService :
         }
     }
 
-    fun signalStopService(userInitiated: Boolean) {
+    fun signalStopServiceLocked(userInitiated: Boolean) {
         userInitiatedStop = userInitiated
-        stopVpnAdapter()
+        stopVpnAdapterLocked()
         stopSelf()
 
         Log.i(LOG_TAG_VPN, "Stop Foreground")
     }
 
-    private fun stopVpnAdapter() {
+    private fun stopVpnAdapterLocked() {
         io("stopVpn") {
+            // TODO: is it okay to acquire mutex here?
             VpnController.mutex.withLock {
-                vpnAdapter?.close()
+                vpnAdapter?.closeLocked()
                 vpnAdapter = null
                 Log.i(LOG_TAG_VPN, "Stop vpn adapter/controller")
             }
@@ -1516,58 +1523,58 @@ class BraveVPNService :
             if (connectionMonitor == null) {
                 Log.e(
                     LOG_TAG_VPN,
-                    "Cannot restart-vpn, unexpectedly connection monitor null! Was vpn-service start command called?"
+                    "Cannot restart-vpn, conn monitor null! Was onStartCommand called?"
                 )
                 return@withLock
             }
-            if (!persistentState.getVpnEnabled()) {
+            // FIXME: protect getVpnEnabledLocked with mutex everywhere
+            if (!persistentState.getVpnEnabledLocked()) {
                 // when persistent-state "thinks" vpn is disabled, stop the service, especially when
                 // we could be here via onStartCommand -> isNewVpn -> restartVpn while both,
-                // vpn-service
-                // and connection-monitor exist, and persistent-state tracking vpn goes out of sync
+                // vpn-service & conn-monitor exists & vpn-enabled state goes out of sync
                 Log.e(
                     LOG_TAG_VPN,
                     "stop-vpn(restartVpn), tracking vpn is out of sync",
                     java.lang.RuntimeException()
                 )
-                signalStopService(userInitiated = false)
-                return
+                return signalStopServiceLocked(userInitiated = false)
             }
             // attempt seamless hand-off as described in VpnService.Builder.establish() docs
             val oldAdapter: GoVpnAdapter? = vpnAdapter
-            vpnAdapter = makeVpnAdapter()
-            oldAdapter?.close()
+            // FIXME: protect makeVpnAdapter with mutex everywhere
+            vpnAdapter = makeVpnAdapter() // may be null in case tunnel creation fails
+            oldAdapter?.closeLocked()
             Log.i(LOG_TAG_VPN, "restartVpn? ${vpnAdapter != null}")
-            vpnAdapter?.start(tunnelOptions)
-            handleVpnAdapterChange()
+            val ok = vpnAdapter?.startLocked(tunnelOptions)
+            if (ok == false) {
+                Log.w(LOG_TAG_VPN, "Cannot handle vpn adapter changes, no tunnel")
+                return signalStopServiceLocked(userInitiated = false)
+            }
         }
+        handleVpnAdapterChange()
     }
 
     // always called with vpn-controller mutex held
     private fun handleVpnAdapterChange() {
-        // edge-case: mark connection-state as 'failing' when underlying tunnel does not exist
-        // TODO: like Intra, call VpnController#stop instead? (see VpnController#onStartComplete)
-        if (!hasTunnel()) {
-            Log.w(LOG_TAG_VPN, "Cannot handle vpn adapter changes, no tunnel")
-            signalStopService(userInitiated = false)
-            return
-        }
-
         // Case: Set state to working in case of Firewall mode
         if (appConfig.getBraveMode().isFirewallMode()) {
-            return VpnController.onConnectionStateChanged(State.WORKING)
+            VpnController.onConnectionStateChanged(State.WORKING)
         }
     }
 
+    // protected by vpncontroller.mutex
     fun hasTunnel(): Boolean {
+        // FIXME: protect vpnAdapter with mutex
         return vpnAdapter?.hasTunnel() == true
     }
 
     fun isOn(): Boolean {
+        // FIXME: protect vpnAdapter with mutex
         return vpnAdapter != null
     }
 
     fun refresh() {
+        // FIXME: protect vpnAdapter with mutex
         vpnAdapter?.refresh()
     }
 
@@ -1660,6 +1667,7 @@ class BraveVPNService :
         io("set-system-dns") {
             Log.i(LOG_TAG_VPN, "Setting dns servers: $dnsServers")
             appConfig.updateSystemDnsServers(dnsServers)
+            // FIXME: vpnAdapter must be protected by mutex
             // set system dns whenever there is a change in network
             vpnAdapter?.setSystemDns()
             // add appropriate transports to the tunnel, if system dns is enabled
@@ -1686,6 +1694,7 @@ class BraveVPNService :
     }
 
     override fun onDestroy() {
+        // FIXME: protect userInitatedStop with mutex
         if (!userInitiatedStop) {
             val vibrationPattern = longArrayOf(1000) // Vibrate for one second.
             // Show revocation warning
@@ -1812,7 +1821,7 @@ class BraveVPNService :
     private suspend fun establishVpn(): ParcelFileDescriptor? {
         try {
             var builder: VpnService.Builder =
-                newBuilder().setSession("RethinkDNS").setMtu(VPN_INTERFACE_MTU)
+                newBuilder().setSession("Rethink").setMtu(VPN_INTERFACE_MTU)
 
             var has6 = route6()
             // always add ipv4 to the route, even though there is no ipv4 address
