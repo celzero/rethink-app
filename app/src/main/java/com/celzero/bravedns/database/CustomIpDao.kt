@@ -75,7 +75,7 @@ interface CustomIpDao {
     @Query("select count(*) from CustomIp where uid = :uid and isActive = 1")
     fun getAppWiseIpRulesCount(uid: Int): LiveData<Int>
 
-    @Query("select count(*) from CustomIp where isActive = 1")
+    @Query("select count(*) from CustomIp where isActive = 1 and uid != $UID_EVERYBODY")
     fun getIpRulesCountInt(): LiveData<Int>
 
     @Query(

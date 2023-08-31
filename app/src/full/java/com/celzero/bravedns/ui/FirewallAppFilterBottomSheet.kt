@@ -42,7 +42,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         get() = _binding!!
 
     private val persistentState by inject<PersistentState>()
-    private val sortValues = FirewallAppFragment.Filters()
+    private val sortValues = AppListActivity.Filters()
 
     override fun getTheme(): Int =
         Themes.getBottomsheetCurrentTheme(isDarkThemeOn(), persistentState.theme)
@@ -63,11 +63,11 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun initView() {
-        val filters = FirewallAppFragment.filters.value
+        val filters = AppListActivity.filters.value
 
         remakeParentFilterChipsUi()
         if (filters == null) {
-            applyParentFilter(FirewallAppFragment.TopLevelFilter.ALL.id)
+            applyParentFilter(AppListActivity.TopLevelFilter.ALL.id)
             return
         } else {
             sortValues.firewallFilter = filters.firewallFilter
@@ -79,18 +79,18 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun initClickListeners() {
         b.fsApply.setOnClickListener {
-            FirewallAppFragment.filters.postValue(sortValues)
+            AppListActivity.filters.postValue(sortValues)
             this.dismiss()
         }
 
         b.fsClear.setOnClickListener {
-            FirewallAppFragment.filters.postValue(FirewallAppFragment.Filters())
+            AppListActivity.filters.postValue(AppListActivity.Filters())
             this.dismiss()
         }
     }
 
     private fun setFilter(
-        topLevelFilter: FirewallAppFragment.TopLevelFilter,
+        topLevelFilter: AppListActivity.TopLevelFilter,
         categories: MutableSet<String>
     ) {
         val topView: Chip = b.ffaParentChipGroup.findViewWithTag(topLevelFilter.id) ?: return
@@ -118,19 +118,19 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
         val all =
             makeParentChip(
-                FirewallAppFragment.TopLevelFilter.ALL.id,
+                AppListActivity.TopLevelFilter.ALL.id,
                 getString(R.string.lbl_all),
                 true
             )
         val allowed =
             makeParentChip(
-                FirewallAppFragment.TopLevelFilter.INSTALLED.id,
+                AppListActivity.TopLevelFilter.INSTALLED.id,
                 getString(R.string.fapps_filter_parent_installed),
                 false
             )
         val blocked =
             makeParentChip(
-                FirewallAppFragment.TopLevelFilter.SYSTEM.id,
+                AppListActivity.TopLevelFilter.SYSTEM.id,
                 getString(R.string.fapps_filter_parent_system),
                 false
             )
@@ -171,18 +171,18 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
 
     private fun applyParentFilter(tag: Any) {
         when (tag) {
-            FirewallAppFragment.TopLevelFilter.ALL.id -> {
-                sortValues.topLevelFilter = FirewallAppFragment.TopLevelFilter.ALL
+            AppListActivity.TopLevelFilter.ALL.id -> {
+                sortValues.topLevelFilter = AppListActivity.TopLevelFilter.ALL
                 sortValues.categoryFilters.clear()
                 remakeChildFilterChipsUi(FirewallManager.getAllCategories())
             }
-            FirewallAppFragment.TopLevelFilter.INSTALLED.id -> {
-                sortValues.topLevelFilter = FirewallAppFragment.TopLevelFilter.INSTALLED
+            AppListActivity.TopLevelFilter.INSTALLED.id -> {
+                sortValues.topLevelFilter = AppListActivity.TopLevelFilter.INSTALLED
                 sortValues.categoryFilters.clear()
                 remakeChildFilterChipsUi(FirewallManager.getCategoriesForInstalledApps())
             }
-            FirewallAppFragment.TopLevelFilter.SYSTEM.id -> {
-                sortValues.topLevelFilter = FirewallAppFragment.TopLevelFilter.SYSTEM
+            AppListActivity.TopLevelFilter.SYSTEM.id -> {
+                sortValues.topLevelFilter = AppListActivity.TopLevelFilter.SYSTEM
                 sortValues.categoryFilters.clear()
                 remakeChildFilterChipsUi(FirewallManager.getCategoriesForSystemApps())
             }

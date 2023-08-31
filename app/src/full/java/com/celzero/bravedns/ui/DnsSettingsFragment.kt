@@ -127,7 +127,6 @@ class DnsSettingsFragment :
 
     private fun initObservers() {
         observeBraveMode()
-        observeDnscryptStatus()
         observeAppState()
     }
 
@@ -155,6 +154,8 @@ class DnsSettingsFragment :
             AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_crypt_status)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.connectedStatusTitleUrl.text =
@@ -174,16 +175,6 @@ class DnsSettingsFragment :
                 b.connectedStatusTitle.text =
                     resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
-        }
-    }
-
-    // FIXME: Create common observer for dns instead of separate observers
-    private fun observeDnscryptStatus() {
-        appConfig.getDnscryptCountObserver().observe(viewLifecycleOwner) {
-            if (appConfig.getDnsType() != AppConfig.DnsType.DNSCRYPT) return@observe
-
-            val connectedCrypt = getString(R.string.configure_dns_crypt, it.toString())
-            b.connectedStatusTitle.text = connectedCrypt
         }
     }
 
@@ -320,7 +311,7 @@ class DnsSettingsFragment :
             b.dcRefresh.isEnabled = false
             b.dcRefresh.animation = animation
             b.dcRefresh.startAnimation(animation)
-            VpnController.refresh()
+            io { VpnController.refresh() }
             Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (isAdded) {
                     b.dcRefresh.isEnabled = true

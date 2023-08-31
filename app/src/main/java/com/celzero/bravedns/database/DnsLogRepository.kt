@@ -38,4 +38,8 @@ class DnsLogRepository(private val dnsLogDAO: DnsLogDAO) {
     fun logsCount(): LiveData<Long> {
         return dnsLogDAO.logsCount()
     }
+
+    fun getLeastLoggedTime(): Long {
+        return dnsLogDAO.getLeastLoggedTime()
+    }
 }

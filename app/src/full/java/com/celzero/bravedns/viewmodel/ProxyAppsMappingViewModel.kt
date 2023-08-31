@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,7 +27,6 @@ import androidx.paging.liveData
 import com.celzero.bravedns.database.ProxyApplicationMappingDAO
 import com.celzero.bravedns.ui.WgIncludeAppsDialog
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
-import com.celzero.bravedns.util.LoggerConstants
 
 class ProxyAppsMappingViewModel(private val mappingDAO: ProxyApplicationMappingDAO) : ViewModel() {
 

@@ -68,7 +68,7 @@
             android:name=".ui.TunnelSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.AppDetailActivity"
+            android:name=".ui.AppListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.DetailedStatisticsActivity"

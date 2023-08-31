@@ -47,6 +47,10 @@ class ProxyAppMappingRepository(
         proxyApplicationMappingDAO.removeAllAppsForProxy(proxyId)
     }
 
+    suspend fun removeAllWgProxies() {
+        proxyApplicationMappingDAO.removeAllWgProxies()
+    }
+
     suspend fun updateProxyForAllApps(proxyId: String, proxyName: String) {
         proxyApplicationMappingDAO.updateProxyForAllApps(proxyId, proxyName)
     }

@@ -49,12 +49,11 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val PROTOCOL_TRANSLATION = "protocol_translation"
         const val DEFAULT_DNS_SERVER = "default_dns_server"
         const val PCAP_MODE = "pcap_mode"
-        const val REMOTE_BLOCK_LIST_STAMP = "remote_block_list_count"
+        const val RETHINK_REMOTE_CHANGES = "rethink_remote_updates"
         const val REMOTE_BLOCKLIST_UPDATE = "remote_block_list_downloaded_time"
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
-        const val WIREGUARD = "wireguard_enabled_count"
         const val WIREGUARD_UPDATED = "wireguard_updated"
     }
 
@@ -82,6 +81,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // total blocklists set by the user for RethinkDNS+ (server-side dns blocking)
     private var numberOfRemoteBlocklists by intPref("remote_block_list_count").withDefault<Int>(0)
+
+    // changes in rethink remote, in case of stamp change and max/sky switch, shared pref won't
+    // update
+    var rethinkRemoteUpdate by booleanPref("rethink_remote_updates").withDefault<Boolean>(false)
 
     // total blocklists set by the user (on-device dns blocking)
     var numberOfLocalBlocklists by intPref("local_block_list_count").withDefault<Int>(0)
@@ -263,7 +266,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // go logger level, default 2 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
 
-    // count of wireguard enabled
+    // count of wireguard enabled, not used remove in future release (current: v055a)
     var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
 
     // wireguard updated
@@ -289,7 +292,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         _vpnEnabled = isOn
     }
 
-    fun getVpnEnabled(): Boolean {
+    fun getVpnEnabledLocked(): Boolean {
         return _vpnEnabled
     }
 

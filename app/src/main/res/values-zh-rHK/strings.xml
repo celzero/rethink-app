@@ -919,7 +919,6 @@
     <string name="crypt_relay_netherlands" translatable="true">喺荷蘭託管嘅匿名 DNS 中繼</string>
     <string name="crypt_relay_singapore" translatable="true">喺新加坡託管嘅匿名 DNS 中繼。</string>
     <string name="public_key_copy_toast_msg" translatable="true">複製咗公鑰。</string>
-    <string name="ct_bs_upload_download" translatable="true">上載 %1$s / 下載 %2$s</string>
     <string name="logs_disclaimer" translatable="true">顯示頭 20000 隻字</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">唔好驗證伺服器嘅 TLS 證書（只有當您知道自己做緊乜嘅時候先好啓用）</string>
     <string name="app_ip_domain_rules_desc" translatable="true">改分應用 IP／網域規則。</string>

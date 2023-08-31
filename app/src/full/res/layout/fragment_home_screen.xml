@@ -105,12 +105,12 @@
                             android:layout_marginStart="7dp"
                             android:layout_marginTop="10dp"
                             android:ellipsize="marquee"
-                            android:text="@string/lbl_fast"
                             android:marqueeRepeatLimit="marquee_forever"
                             android:padding="5dp"
                             android:paddingTop="10dp"
                             android:paddingBottom="10dp"
                             android:singleLine="true"
+                            android:text="@string/lbl_fast"
                             android:textSize="@dimen/rethink_header_text" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -388,6 +388,21 @@
                             android:textSize="@dimen/extra_large_font_text_view"
                             android:visibility="visible" />
 
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_card_logs_duration"
+                            style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="10dp"
+                            android:layout_below="@id/fhs_card_dns_logs_count"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:padding="5dp"
+                            android:singleLine="true"
+                            android:visibility="gone"
+                            android:textSize="@dimen/small_font_text_view" />
 
                     </RelativeLayout>
                 </androidx.cardview.widget.CardView>
@@ -451,8 +466,8 @@
                             style="@style/TextAppearance.Widget.HomeScreen.Desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
                             android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
                             android:background="@drawable/rounded_text_view"
                             android:gravity="center"
                             android:padding="5dp"
@@ -463,10 +478,10 @@
                             style="@style/TextAppearance.Widget.HomeScreen.Desc"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
                             android:layout_centerVertical="true"
-                            android:maxLines="5"
+                            android:layout_marginStart="10dp"
                             android:layout_toEndOf="@id/fhs_card_apps_status"
+                            android:maxLines="5"
                             android:padding="5dp"
                             android:textSize="@dimen/default_font_text_view" />
 
@@ -475,78 +490,7 @@
 
             </androidx.cardview.widget.CardView>
 
-
         </LinearLayout>
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            android:scrollbars="none"
-            android:visibility="gone">
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipsPrograms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
-                app:chipSpacing="8dp"
-                app:singleSelection="false">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_whats_new_chip"
-                    style="@style/Chip.HomeScreen.Entry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hsf_whats_new_chip_text"
-                    app:chipIcon="@drawable/ic_whats_new" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_proxy_chip"
-                    style="@style/Chip.HomeScreen.Entry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hsf_proxy_chip_text"
-                    app:chipIcon="@drawable/ic_socks5" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_pcap_chip"
-                    style="@style/Chip.HomeScreen.Entry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hsf_packet_capture_chip_text"
-                    app:chipIcon="@drawable/ic_pcap" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_dns_configure_chip"
-                    style="@style/Chip.HomeScreen.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hsf_blocklist_chip_text_no_data"
-                    app:chipIcon="@drawable/ic_local_blocklist" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_theme_chip"
-                    style="@style/Chip.HomeScreen.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hsf_chip_appearance"
-                    app:chipIcon="@drawable/ic_appearance" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/fhs_sponsor_chip"
-                    style="@style/Chip.HomeScreen.Action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/about_sponsor_link_text"
-                    app:chipIcon="@drawable/ic_heart" />
-
-            </com.google.android.material.chip.ChipGroup>
-        </HorizontalScrollView>
-
 
         <LinearLayout
             android:layout_width="match_parent"

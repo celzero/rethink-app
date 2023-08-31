@@ -72,8 +72,8 @@ internal constructor(
     private val dnsCryptRelayEndpointRepository: DnsCryptRelayEndpointRepository,
     private val proxyEndpointRepository: ProxyEndpointRepository,
     private val persistentState: PersistentState,
-    networkLogs: ConnectionTrackerRepository,
-    dnsLogs: DnsLogRepository
+    private val networkLogs: ConnectionTrackerRepository,
+    private val dnsLogs: DnsLogRepository
 ) {
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
@@ -498,20 +498,13 @@ internal constructor(
         return TcpProxyHelper.getActiveTcpProxy() != null
     }
 
-    fun isWireguardEnabled(): Boolean {
+    fun isWireGuardEnabled(): Boolean {
         val proxyType = ProxyType.of(persistentState.proxyType)
-        // adding extra check of persistentState.wireguardEnabledCount > 0
-        // to make sure the wireguard is enabled and the count is greater than 0
-        // consider removing the check
-        return proxyType.isProxyTypeWireguard() && persistentState.wireguardEnabledCount > 0
+        return proxyType.isProxyTypeWireguard()
     }
 
     private suspend fun getDNSProxyServerDetails(): DnsProxyEndpoint? {
         return dnsProxyEndpointRepository.getSelectedProxy()
-    }
-
-    fun getDnscryptCountObserver(): LiveData<Int> {
-        return dnsCryptEndpointRepository.getConnectedCountLiveData()
     }
 
     private suspend fun onDnsChange(dt: DnsType) {
@@ -542,7 +535,11 @@ internal constructor(
 
                 connectedDns.postValue(endpoint.name)
                 persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
-                persistentState.connectedDnsName = endpoint.name
+                if (persistentState.connectedDnsName != endpoint.name) {
+                    persistentState.connectedDnsName = endpoint.name
+                } else {
+                    persistentState.rethinkRemoteUpdate = true
+                }
             }
             DnsType.NETWORK_DNS -> {
                 connectedDns.postValue(context.getString(R.string.network_dns))
@@ -562,7 +559,6 @@ internal constructor(
     suspend fun switchRethinkDnsToMax() {
         rethinkDnsEndpointRepository.switchToMax()
         if (isRethinkDnsConnected()) {
-            persistentState.connectedDnsName = ""
             onDnsChange(DnsType.RETHINK_REMOTE)
         }
     }
@@ -570,7 +566,6 @@ internal constructor(
     suspend fun switchRethinkDnsToSky() {
         rethinkDnsEndpointRepository.switchToSky()
         if (isRethinkDnsConnected()) {
-            persistentState.connectedDnsName = ""
             onDnsChange(DnsType.RETHINK_REMOTE)
         }
     }
@@ -1085,6 +1080,16 @@ internal constructor(
     suspend fun insertOrbotProxy(proxyEndpoint: ProxyEndpoint) {
         proxyEndpointRepository.clearOrbotData()
         proxyEndpointRepository.insert(proxyEndpoint)
+    }
+
+    suspend fun getLeastLoggedNetworkLogs(): Long {
+        val a =
+            if (getBraveMode().isDnsMode()) {
+                dnsLogs.getLeastLoggedTime()
+            } else {
+                networkLogs.getLeastLoggedTime()
+            }
+        return a
     }
 
     val networkLogsCount: LiveData<Long> = networkLogs.logsCount()

@@ -94,4 +94,7 @@ interface DnsLogDAO {
     fun getAllBlockedDomains(): PagingSource<Int, AppConnection>
 
     @Query("select count(id) from DNSLogs") fun logsCount(): LiveData<Long>
+
+    @Query("select time from DNSLogs where id = (select min(id) from DNSLogs)")
+    fun getLeastLoggedTime(): Long
 }

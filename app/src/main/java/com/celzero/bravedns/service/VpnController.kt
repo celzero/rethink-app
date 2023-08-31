@@ -39,7 +39,7 @@ object VpnController : KoinComponent {
 
     private var braveVpnService: BraveVPNService? = null
     private var connectionState: BraveVPNService.State? = null
-    val persistentState by inject<PersistentState>()
+    private val persistentState by inject<PersistentState>()
     private var states: Channel<BraveVPNService.State?>? = null
     var controllerScope: CoroutineScope? = null
         private set
@@ -48,6 +48,8 @@ object VpnController : KoinComponent {
 
     val mutex: Mutex = Mutex()
 
+    // FIXME: Publish VpnState through this live-data to relieve direct access
+    // into VpnController's state(), isOn(), hasTunnel() etc.
     var connectionStatus: MutableLiveData<BraveVPNService.State?> = MutableLiveData()
 
     @Throws(CloneNotSupportedException::class)
@@ -55,7 +57,7 @@ object VpnController : KoinComponent {
         throw CloneNotSupportedException()
     }
 
-    // TODO: make clients listen on create, start, stop, destory from vpn-service
+    // TODO: make clients listen on create, start, stop, destroy from vpn-service
     fun onVpnCreated(b: BraveVPNService) {
         braveVpnService = b
         controllerScope = CoroutineScope(Dispatchers.IO)
@@ -128,21 +130,19 @@ object VpnController : KoinComponent {
         // on or after Android O, context.startForegroundService(intent) should be invoked.
         ContextCompat.startForegroundService(context, startServiceIntent)
 
-        onConnectionStateChanged(state().connectionState)
+        onConnectionStateChanged(connectionState)
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
     fun stop(context: Context) {
         Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
-        braveVpnService?.signalStopService(true)
-        braveVpnService = null
         onConnectionStateChanged(connectionState)
-        persistentState.setVpnEnabled(false)
+        braveVpnService?.signalStopService(userInitiated = true)
     }
 
     fun state(): VpnState {
-        val requested: Boolean = persistentState.getVpnEnabled()
+        val requested: Boolean = persistentState.getVpnEnabledLocked()
         val on = isOn()
         return VpnState(requested, on, connectionState)
     }
@@ -151,7 +151,7 @@ object VpnController : KoinComponent {
         return braveVpnService?.isOn() == true
     }
 
-    fun refresh() {
+    suspend fun refresh() {
         braveVpnService?.refresh()
     }
 
@@ -243,5 +243,17 @@ object VpnController : KoinComponent {
 
     fun hasCid(cid: String): Boolean {
         return braveVpnService?.hasCid(cid) ?: false
+    }
+
+    fun removeWireGuardProxy(id: String) {
+        braveVpnService?.removeWireGuardProxy(id)
+    }
+
+    fun addWireGuardProxy(id: String) {
+        braveVpnService?.addWireGuardProxy(id)
+    }
+
+    fun refreshWireGuardConfig() {
+        braveVpnService?.refreshWireGuardConfig()
     }
 }

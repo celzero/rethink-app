@@ -56,6 +56,7 @@ import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
@@ -421,11 +422,11 @@ class RethinkBlocklistFragment :
     }
 
     private fun setStamp(stamp: String?) {
-        Log.i(
-            LoggerConstants.LOG_TAG_VPN,
-            "Rethink dns, set stamp for blocklist type: ${type.name} with $stamp"
-        )
-        if (stamp == null) return
+        Log.i(LOG_TAG_UI, "set stamp for blocklist type: ${type.name} with $stamp")
+        if (stamp == null) {
+            Log.i(LOG_TAG_UI, "stamp is null")
+            return
+        }
 
         io {
             val blocklistCount =
@@ -434,6 +435,7 @@ class RethinkBlocklistFragment :
                 persistentState.localBlocklistStamp = stamp
                 persistentState.numberOfLocalBlocklists = blocklistCount
                 persistentState.blocklistEnabled = true
+                Log.i(LOG_TAG_UI, "set stamp for local blocklist with $stamp, $blocklistCount")
             } else {
                 // set stamp for remote blocklist
                 appConfig.updateRethinkEndpoint(

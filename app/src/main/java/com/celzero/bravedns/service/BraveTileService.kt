@@ -25,12 +25,16 @@ import androidx.annotation.RequiresApi
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.PrepareVpnActivity
 import com.celzero.bravedns.util.Utilities
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-class BraveTileService : TileService() {
+class BraveTileService : TileService(), KoinComponent {
+
+    private val persistentState by inject<PersistentState>()
 
     override fun onCreate() {
-        VpnController.persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
+        persistentState.vpnEnabledLiveData.observeForever(this::updateTile)
     }
 
     private fun updateTile(enabled: Boolean) {
@@ -42,9 +46,8 @@ class BraveTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
-        val vpnState: VpnState = VpnController.state()
 
-        if (vpnState.on) {
+        if (VpnController.isOn()) {
             VpnController.stop(this)
         } else if (VpnService.prepare(this) == null) {
             // Start VPN service when VPN permission has been granted.

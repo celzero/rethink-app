@@ -75,8 +75,8 @@
     <string name="lbl_allowed_ips" translatable="true">Allowed IPs</string>
     <string name="lbl_save" translatable="true">save</string>
 
-    <string name="symbol_upload" translatable="false">%1$s \u2B06</string>
-    <string name="symbol_download" translatable="false">%1$s \u2B07</string>
+    <string name="symbol_upload" translatable="false">%1$s 🔺</string>
+    <string name="symbol_download" translatable="false">%1$s 🔻</string>
     <string name="single_argument" translatable="false">%1$s</string>
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
     <string name="symbol_elephant" translatable="false">🐘</string>
@@ -350,7 +350,7 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_dialog_title" translatable="true">What\'s new in v055</string>
+    <string name="whats_dialog_title" translatable="true">What\'s new in v055a</string>
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Jason A. Donenfeld</b><br/><br/>
         1. <i>New feature</i>: Multi-VPN support with any number of WireGuard upstreams.<br/>
         2. <i>New feature</i>: Active (open) connection indicator in Network Logs.</br>
@@ -364,8 +364,8 @@
         10. Improved UI to manage per-app IP and Domain rules.<br/>
         11. Bigger UI tiles on the homescreen.<br/>
         12. Firewall UI refresh.<br/>
-        13. <i>Bug fix</i>: Make HTTP Proxy work for CONNECT tunnels.</br>
-        14. <i>Bug fix</i>: Trust (allowlisting) domains now works with third-party DNS resolvers.</br></br>
+        13. <i>Bug fix</i>: Make HTTP Proxy work for CONNECT tunnels.<br/>
+        14. <i>Bug fix</i>: Trust (allowlisting) domains now works with third-party DNS resolvers.<br/><br/>
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 
@@ -476,16 +476,14 @@
     <string name="settings_theme_heading" translatable="true">Appearance</string>
     <string name="settings_theme_desc" translatable="true">Dark/light theme</string>
 
-    <string name="settings_go_log_heading" translatable="false">Tun2socks logger</string>
-    <string name="settings_go_log_desc" translatable="false">Choose log level for Tun2socks</string>
+    <string name="settings_go_log_heading" translatable="true">Log level</string>
+    <string name="settings_go_log_desc" translatable="true">For debugging purposes</string>
 
-    <string name="settings_gologger_dialog_title" translatable="false">Select logger level</string>
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
     <string name="settings_gologger_dialog_option_2" translatable="false">Debug</string>
-    <string name="settings_gologger_dialog_option_3" translatable="false">Info</string>
+    <string name="settings_gologger_dialog_option_3" translatable="false">Info (default)</string>
     <string name="settings_gologger_dialog_option_4" translatable="false">Warn</string>
     <string name="settings_gologger_dialog_option_5" translatable="false">Error</string>
-
 
     <string name="settings_http_proxy_desc" translatable="true">Forwarding to %1$s</string>
     <string name="settings_http_proxy_dialog_title" translatable="true">Custom Server URL</string>
@@ -565,7 +563,7 @@
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
 
-    <!-- FirewallAppFragment -->
+    <!-- AppDetailActivity -->
     <string name="apps_icon_content_desc" translatable="true">Application Icon</string>
 
     <string name="firewall_status_allow" translatable="true">allowed</string>
@@ -580,7 +578,6 @@
 
     <!--Connection tracker bottom sheet -->
     <string name="ct_bs_app_info_error" translatable="true">App Info not found</string>
-    <string name="ct_bs_upload_download" translatable="true">Upload %1$s / Download %2$s</string>
 
     <!-- Home screen activity -->
     <string name="hs_biometeric_title" translatable="true">Unlock Rethink</string>
@@ -610,6 +607,8 @@
 
     <string name="hsf_uptime" translatable="true">(active %1$s; protos: %2$s; type: %3$s)</string>
     <string name="hsf_downtime" translatable="true">(inactive since %1$s)</string>
+
+    <string name="logs_card_duration" translatable="true">since %1$s</string>
 
     <string name="hsf_vpn_dialog_header" translatable="true">Attention!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethink does not collect any information or spy on you in any way.</string>
@@ -1412,9 +1411,11 @@
 
     <string name="wireguard_enabled_failure">Turn off other proxies to enable WireGuard</string>
 
+    <string name="wireguard_refresh_toast">Proxies refresh complete</string>
+
     <string name="wireguard_no_config_msg">No WireGuard configs</string>
     <string name="wireguard_connection_error">Issue connecting to WireGuard configuration</string>
-    <string name="wireguard_disclaimer">This is WireGuard as TCP and UDP proxy. While DNS traffic is forwarded to %1$s, ICMP traffic (ex: ping) is sent to the underlying network.</string>
+    <string name="wireguard_disclaimer">This is an experimental WireGuard as TCP and UDP proxy. While DNS traffic is forwarded to %1$s, ICMP traffic (ex: ping) is sent to the underlying network.</string>
 
     <!-- dns description -->
     <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>

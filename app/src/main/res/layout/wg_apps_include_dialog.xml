@@ -85,6 +85,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:padding="2dp"
+                    app:selectionRequired="true"
                     app:singleLine="true"
                     app:singleSelection="true" />
             </HorizontalScrollView>
@@ -135,7 +136,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:text="@string/lbl_dismiss"
+        android:text="@string/ada_noapp_dialog_positive"
         android:textColor="?attr/accentGood"
         android:textSize="@dimen/large_font_text_view" />
 

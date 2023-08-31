@@ -30,7 +30,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -72,11 +72,14 @@ class GoVpnAdapter(
     // The Intra session object from go-tun2socks.  Initially null.
     private var tunnel: Tunnel? = null
 
-    suspend fun start(tunnelOptions: TunnelOptions) {
-        connectTunnel(tunnelOptions)
+    // protected by VpnController.mutex
+    suspend fun startLocked(tunnelOptions: TunnelOptions): Boolean {
+        connectTunnelLocked(tunnelOptions)
+        return tunnel != null
     }
 
-    private suspend fun connectTunnel(tunnelOptions: TunnelOptions) {
+    // protected by VpnController.mutex
+    private suspend fun connectTunnelLocked(tunnelOptions: TunnelOptions) {
         if (tunnel != null) {
             return
         }
@@ -111,7 +114,7 @@ class GoVpnAdapter(
 
             setTunnelMode(tunnelOptions)
             addTransport()
-            setDnsAlg()
+            setDnsAlgLocked()
             setBraveDnsBlocklistMode()
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
@@ -434,12 +437,9 @@ class GoVpnAdapter(
     private fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
         if (!tunProxyMode.isTunProxyWireguard()) return
 
-        val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
+        val wgConfigs: List<Config> = WireGuardManager.getActiveConfigs()
         if (wgConfigs.isEmpty()) {
-            if (persistentState.wireguardEnabledCount > 0) {
-                persistentState.wireguardEnabledCount = 0
-                Log.i(LOG_TAG_VPN, "wireguard enabled count reset to 0 as no config found")
-            }
+            Log.i(LOG_TAG_VPN, "no active wireguard configs found")
             return
         }
         wgConfigs.forEach {
@@ -448,7 +448,7 @@ class GoVpnAdapter(
             try {
                 tunnel?.proxies?.addProxy(id, wgUserSpaceString)
             } catch (e: Exception) {
-                WireguardManager.disableConfig(id)
+                WireGuardManager.disableConfig(id)
                 showWireguardFailureToast(
                     e.message ?: context.getString(R.string.wireguard_connection_error)
                 )
@@ -488,8 +488,8 @@ class GoVpnAdapter(
             val status = tunnel?.proxies?.getProxy(id)?.status()
             if (DEBUG) Log.d(LOG_TAG_VPN, "getProxyStatusById: $id, $status")
             status
-        } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "getProxyStatusById: $id, ${e.message}", e)
+        } catch (ignored: Exception) {
+            Log.e(LOG_TAG_VPN, "err getProxy($id): ${ignored.message}", ignored)
             null
         }
     }
@@ -514,6 +514,40 @@ class GoVpnAdapter(
                 appConfig.removeProxy(AppConfig.ProxyType.HTTP, AppConfig.ProxyProvider.CUSTOM)
             }
             Log.e(LOG_TAG_VPN, "error setting http proxy: ${e.message}", e)
+        }
+    }
+
+    fun removeWgProxyLocked(id: String) {
+        try {
+            tunnel?.proxies?.removeProxy(id)
+            Log.i(LOG_TAG_VPN, "remove wireguard proxy with id: $id")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error removing wireguard proxy: ${e.message}", e)
+        }
+    }
+
+    fun addWgProxyLocked(id: String) {
+        try {
+            val proxyId: Int = id.substring(ID_WG_BASE.length).toInt()
+            val wgConfig = WireGuardManager.getConfigById(proxyId)
+            val wgUserSpaceString = wgConfig?.toWgUserspaceString()
+            tunnel?.proxies?.addProxy(id, wgUserSpaceString)
+            Log.i(LOG_TAG_VPN, "add wireguard proxy with id: $id")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error adding wireguard proxy: ${e.message}", e)
+            WireGuardManager.disableConfig(id)
+            showWireguardFailureToast(
+                e.message ?: context.getString(R.string.wireguard_connection_error)
+            )
+        }
+    }
+
+    fun refreshProxiesLocked() {
+        try {
+            val res = tunnel?.proxies?.refreshProxies()
+            Log.i(LOG_TAG_VPN, "refresh proxies: $res")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "error refreshing proxies: ${e.message}", e)
         }
     }
 
@@ -542,7 +576,7 @@ class GoVpnAdapter(
                 LOG_TAG_VPN,
                 "Tcp mode set(${ProxyManager.ID_TCP_BASE}): ${tcpProxyUrl.url}, res: $added"
             )
-        val secWarp = WireguardManager.getSecWarpConfig()
+        val secWarp = WireGuardManager.getSecWarpConfig()
         if (secWarp == null) {
             Log.w(LOG_TAG_VPN, "no sec warp config found")
             return
@@ -560,13 +594,15 @@ class GoVpnAdapter(
         return (tunnel != null)
     }
 
-    fun refresh() {
+    // protected by VpnController.mutex
+    fun refreshLocked() {
         if (tunnel != null) {
             tunnel?.resolver?.refresh()
         }
     }
 
-    fun close() {
+    // protected by VpnController.mutex
+    fun closeLocked() {
         if (tunnel != null) {
             tunnel?.disconnect()
             Log.i(LOG_TAG_VPN, "Tunnel disconnect")
@@ -595,7 +631,8 @@ class GoVpnAdapter(
         return Intra.newDoHTransport(Dnsx.Default, url, dohIPs)
     }
 
-    fun setSystemDns() {
+    // protected by VpnController.mutex
+    fun setSystemDnsLocked() {
         if (tunnel != null) {
             val systemDns = appConfig.getSystemDns()
             var dnsProxy: HostName? = null
@@ -627,28 +664,29 @@ class GoVpnAdapter(
      * Updates the DOH server URL for the VPN. If Go-DoH is enabled, DNS queries will be handled in
      * Go, and will not use the Java DoH implementation. If Go-DoH is not enabled, this method has
      * no effect.
+     *
+     * protected by VpnController.mutex
      */
-    suspend fun updateTun(tunnelOptions: TunnelOptions) {
+    suspend fun updateTunLocked(tunnelOptions: TunnelOptions): Boolean {
         // changes made in connectTunnel()
         if (tunFd == null) {
             // Adapter is closed.
             Log.e(LOG_TAG_VPN, "updateTun: tunFd is null, returning")
-            return
+            return false
         }
 
         if (tunnel == null) {
             // Attempt to re-create the tunnel.  Creation may have failed originally because the DoH
             // server could not be reached.  This will update the DoH URL as well.
             Log.w(LOG_TAG_VPN, "updateTun: tunnel is null, calling connectTunnel")
-            connectTunnel(tunnelOptions)
-            return
+            return startLocked(tunnelOptions)
         }
         Log.i(LOG_TAG_VPN, "received update tun with opts: $tunnelOptions")
         try {
             setTunnelMode(tunnelOptions)
             // add transport to resolver, no need to set default transport on updateTunnel
             addTransport()
-            setDnsAlg()
+            setDnsAlgLocked()
             // Set brave dns to tunnel - Local/Remote
             setBraveDnsBlocklistMode()
         } catch (e: Exception) {
@@ -656,9 +694,20 @@ class GoVpnAdapter(
             tunnel?.disconnect()
             tunnel = null
         }
+        return tunnel != null
     }
 
-    fun setDnsAlg() {
+    // protected by VpnController.mutex
+    fun setDnsAlgLocked() {
+        // set translate to false for dns mode (regardless of setting in dns screen),
+        // since apps cannot understand alg ips
+        if (appConfig.getBraveMode().isDnsMode()) {
+            Log.i(LOG_TAG_VPN, "dns mode, set translate to false")
+            tunnel?.resolver?.gateway()?.translate(false)
+            return
+        }
+
+        Log.i(LOG_TAG_VPN, "set dns alg: ${persistentState.enableDnsAlg}")
         tunnel?.resolver?.gateway()?.translate(persistentState.enableDnsAlg)
     }
 
@@ -677,18 +726,20 @@ class GoVpnAdapter(
 
             val braveDNS = makeLocalBraveDns()
             if (braveDNS != null) {
-                if (DEBUG) Log.d(LOG_TAG_VPN, "brave dns object is set")
                 tunnel?.resolver?.rdnsLocal = braveDNS
                 tunnel?.resolver?.rdnsLocal?.stamp = stamp
+                Log.i(LOG_TAG_VPN, "local brave dns object is set")
             } else {
                 Log.e(LOG_TAG_VPN, "Issue creating local brave dns object")
             }
         } catch (ex: Exception) {
+            persistentState.blocklistEnabled = false
             Log.e(LOG_TAG_VPN, "could not set local-brave dns: ${ex.message}", ex)
         }
     }
 
-    fun setBraveDnsStamp() {
+    // protected by VpnController.mutex
+    fun setBraveDnsStampLocked() {
         try {
             if (tunnel == null) {
                 Log.e(LOG_TAG_VPN, "tunnel is null, not setting brave dns stamp")
@@ -696,15 +747,31 @@ class GoVpnAdapter(
             }
 
             if (tunnel?.resolver?.rdnsLocal != null) {
+                Log.i(LOG_TAG_VPN, "set local stamp: ${persistentState.localBlocklistStamp}")
                 tunnel?.resolver?.rdnsLocal?.stamp = persistentState.localBlocklistStamp
             } else {
-                Log.w(
-                    LOG_TAG_VPN,
-                    "brave dns mode is not local but trying to set local stamp, this should not happen"
-                )
+                Log.w(LOG_TAG_VPN, "mode is not local, this should not happen")
             }
         } catch (e: java.lang.Exception) {
-            Log.e(LOG_TAG_VPN, "could not set local-brave dns stamp: ${e.message}", e)
+            Log.e(LOG_TAG_VPN, "could not set local stamp: ${e.message}", e)
+        } finally {
+            resetLocalBlocklistFromTunnel()
+        }
+    }
+
+    private fun resetLocalBlocklistFromTunnel() {
+        try {
+            if (tunnel?.resolver?.rdnsLocal == null) {
+                Log.i(LOG_TAG_VPN, "mode is not local, no need to reset local stamp")
+                return
+            }
+
+            persistentState.localBlocklistStamp = tunnel?.resolver?.rdnsLocal?.stamp ?: ""
+            if (DEBUG)
+                Log.d(LOG_TAG_VPN, "reset local stamp: ${persistentState.localBlocklistStamp}")
+        } catch (e: Exception) {
+            persistentState.localBlocklistStamp = ""
+            Log.e(LOG_TAG_VPN, "could not reset local stamp: ${e.message}", e)
         }
     }
 

@@ -135,7 +135,7 @@ class Peer private constructor(builder: Builder) {
      */
     fun toWgQuickString(): String {
         val sb = StringBuilder()
-        if (!allowedIps.isEmpty())
+        if (allowedIps.isNotEmpty())
             sb.append("AllowedIPs = ").append(Attribute.join(allowedIps)).append('\n')
         endpoint.ifPresent(
             Consumer<InetEndpoint> { ep: InetEndpoint? ->

@@ -36,8 +36,16 @@ class WgConfigFilesRepository(private val wgConfigFilesDAO: WgConfigFilesDAO) {
         return wgConfigFilesDAO.getWgConfigs()
     }
 
+    suspend fun getLastAddedConfigId(): Int {
+        return wgConfigFilesDAO.getLastAddedConfigId()
+    }
+
     suspend fun delete(wgConfigFiles: WgConfigFiles) {
         wgConfigFilesDAO.delete(wgConfigFiles)
+    }
+
+    suspend fun deleteOnAppRestore(): Int {
+        return wgConfigFilesDAO.deleteOnAppRestore()
     }
 
     suspend fun deleteConfig(id: Int) {

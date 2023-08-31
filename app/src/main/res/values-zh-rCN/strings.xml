@@ -866,7 +866,6 @@
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="status_protected_with_wg" translatable="true">已由 WireGuard 保护</string>
     <string name="public_key_copy_toast_msg" translatable="true">公钥已复制。</string>
-    <string name="ct_bs_upload_download" translatable="true">上传 %1$s / 下载 %2$s</string>
     <string name="logs_disclaimer" translatable="true">显示前 20000 字符</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">停止验证服务器 TLS 证书（仅当您了解您在做什么时启用）</string>
     <string name="univ_firewall_heading" translatable="true">全局防火墙规则</string>

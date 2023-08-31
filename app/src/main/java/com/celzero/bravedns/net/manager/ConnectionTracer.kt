@@ -22,7 +22,8 @@ class ConnectionTracer(ctx: Context) {
         private const val CACHE_BUILDER_WRITE_EXPIRE_SEC: Long = 300
         private const val CACHE_BUILDER_MAX_SIZE: Long = 1000
         // key format (Prot 17|Src 10.111.222.1| Dst 10.111.222.3| Dst port 53)
-        private const val KEY_TO_IGNORE = "1710.111.222.110.111.222.353"
+        private const val DNS_KEY = "17|10.111.222.1|10.111.222.3|53"
+        private const val SEPARATOR = "|"
     }
     private val cm: ConnectivityManager
     private val uidCache: Cache<String, Int>
@@ -81,18 +82,18 @@ class ConnectionTracer(ctx: Context) {
             if (DEBUG)
                 Log.d(
                     LoggerConstants.LOG_TAG_VPN,
-                    "UID from getConnectionOwnerUid(): $uid, $key, ${uidCache.getIfPresent(key)}, ${local.address.hostAddress}, ${remote.address.hostAddress}"
+                    "getConnectionOwnerUid(): $uid, $key, ${uidCache.getIfPresent(key)}, ${local.address.hostAddress}, ${remote.address.hostAddress}"
                 )
             if (uid != Constants.INVALID_UID) {
                 addUidToCache(key, uid)
                 return uid
             }
         } catch (secEx: SecurityException) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "Exception in getUidQ: " + secEx.message, secEx)
+            Log.e(LoggerConstants.LOG_TAG_VPN, "err getUidQ: " + secEx.message, secEx)
         } catch (ex: InterruptedException) { // InterruptedException is thrown by runBlocking
-            Log.e(LoggerConstants.LOG_TAG_VPN, "Exception in getUidQ: " + ex.message, ex)
+            Log.e(LoggerConstants.LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         } catch (ex: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "Exception in getUidQ: " + ex.message, ex)
+            Log.e(LoggerConstants.LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         }
         // If the uid is not in connectivity manager, then return the uid from cache.
         uid = uidCache.getIfPresent(key) ?: Constants.INVALID_UID
@@ -100,11 +101,10 @@ class ConnectionTracer(ctx: Context) {
     }
 
     private fun addUidToCache(key: String, uid: Int) {
-        // do not cache the DNS request (key: 1710.111.222.110.111.222.353)
-        if (key == KEY_TO_IGNORE) return
+        // do not cache the DNS request (key: 17|10.111.222.1|10.111.222.3|53)
+        if (key == DNS_KEY) return
 
-        if (DEBUG)
-            Log.d(LoggerConstants.LOG_TAG_VPN, "UID from getConnectionOwnerUid() put: $uid, $key")
+        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
         uidCache.put(key, uid)
     }
 
@@ -115,8 +115,11 @@ class ConnectionTracer(ctx: Context) {
         destPort: Int
     ): String {
         return protocol.toString() +
+            SEPARATOR +
             local.address.hostAddress +
+            SEPARATOR +
             remote.address.hostAddress +
+            SEPARATOR +
             destPort
     }
 }

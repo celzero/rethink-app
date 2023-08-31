@@ -208,9 +208,11 @@ class AppInfoActivity :
     }
 
     private fun updateDataUsage() {
-        val upload = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
-        val download = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
-        b.aadDataUsageStatus.text = getString(R.string.ct_bs_upload_download, upload, download)
+        val u = Utilities.humanReadableByteCount(appInfo.uploadBytes, true)
+        val uploadBytes = getString(R.string.symbol_upload, u)
+        val d = Utilities.humanReadableByteCount(appInfo.downloadBytes, true)
+        val downloadBytes = getString(R.string.symbol_download, d)
+        b.aadDataUsageStatus.text = getString(R.string.two_argument, uploadBytes, downloadBytes)
     }
 
     private fun updateFirewallStatusUi(

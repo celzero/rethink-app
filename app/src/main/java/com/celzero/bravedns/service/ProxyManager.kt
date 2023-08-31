@@ -46,7 +46,7 @@ object ProxyManager : KoinComponent {
     private var appConfigMappings = mutableSetOf<ProxyApplicationMapping>()
 
     suspend fun load() {
-        WireguardManager.load()
+        WireGuardManager.load()
         appConfigMappings = proxyAppMappingRepository.getApps().toMutableSet()
     }
 
@@ -81,7 +81,7 @@ object ProxyManager : KoinComponent {
         } else if (proxyId.contains(ID_ORBOT_BASE)) {
             appConfig.isOrbotProxyEnabled()
         } else if (proxyId.contains(ID_WG_BASE)) {
-            WireguardManager.isConfigActive(proxyId)
+            WireGuardManager.isConfigActive(proxyId)
         } else if (proxyId.contains(ID_TCP_BASE)) {
             TcpProxyHelper.isTcpProxyEnabled()
         } else if (proxyId.contains(ID_S5_BASE)) {
@@ -112,9 +112,7 @@ object ProxyManager : KoinComponent {
     fun removeProxyIdForApp(uid: Int) {
         val appConfigMapping = appConfigMappings.filter { it.uid == uid }
         if (appConfigMapping.isNotEmpty()) {
-            appConfigMapping.forEach {
-                it.proxyId = ""
-            }
+            appConfigMapping.forEach { it.proxyId = "" }
         } else {
             Log.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on removeProxyIdForApp")
         }
@@ -184,11 +182,13 @@ object ProxyManager : KoinComponent {
     }
 
     fun getAppCountForProxy(proxyId: String): Int {
-        Log.d(
-            LOG_TAG_PROXY,
-            "getAppCountForProxy: $proxyId, ${appConfigMappings.size}, ${appConfigMappings.count { it.proxyId == proxyId }}"
-        )
         return appConfigMappings.count { it.proxyId == proxyId }
+    }
+
+    fun removeWgProxies() {
+        // remove all the wg proxies from the app config mappings, during restore process
+        appConfigMappings.filter { it.proxyId.contains(ID_WG_BASE) }.forEach { it.proxyId = "" }
+        io { proxyAppMappingRepository.removeAllWgProxies() }
     }
 
     private fun io(f: suspend () -> Unit) {

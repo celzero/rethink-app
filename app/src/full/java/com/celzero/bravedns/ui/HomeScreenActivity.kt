@@ -61,6 +61,7 @@ import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
@@ -253,6 +254,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 refreshDatabase.refreshAppInfoDatabase()
                 IpRulesManager.loadIpRules()
                 DomainRulesManager.load()
+                WireGuardManager.restoreProcessDeleteWireGuardEntries()
             }
         }
     }

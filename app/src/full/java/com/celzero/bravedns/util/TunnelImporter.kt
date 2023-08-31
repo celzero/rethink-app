@@ -24,7 +24,8 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
+import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import kotlinx.coroutines.Dispatchers
@@ -102,13 +103,13 @@ object TunnelImporter : KoinComponent {
                                 }
                                 ?.let {
                                     config = it
-                                    WireguardManager.addConfig(config)
+                                    WireGuardManager.addConfig(config)
                                 }
                         }
                     }
                 } else {
                     config = Config.parse(contentResolver.openInputStream(uri)!!)
-                    WireguardManager.addConfig(config)
+                    WireGuardManager.addConfig(config)
                 }
 
                 if (config == null) {
@@ -133,10 +134,10 @@ object TunnelImporter : KoinComponent {
 
     fun importTunnel(configText: String, messageCallback: (CharSequence) -> Unit) {
         try {
-            Log.d(LoggerConstants.LOG_TAG_PROXY, "Importing tunnel: $configText")
+            if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "Importing tunnel: $configText")
             val config =
                 Config.parse(ByteArrayInputStream(configText.toByteArray(StandardCharsets.UTF_8)))
-            WireguardManager.addConfig(config)
+            WireGuardManager.addConfig(config)
         } catch (e: Throwable) {
             onTunnelImportFinished(listOf(e), messageCallback)
         }
@@ -158,7 +159,9 @@ object TunnelImporter : KoinComponent {
         if (idx >= 0) {
             message = message.substring(idx + 1).trim { it <= ' ' }
         }
-        message = if (throwables.isEmpty()) "New config added successfully" else "$message"
+        message =
+            if (throwables.isEmpty()) context.getString(R.string.config_add_success_toast)
+            else message
 
         messageCallback(message)
     }

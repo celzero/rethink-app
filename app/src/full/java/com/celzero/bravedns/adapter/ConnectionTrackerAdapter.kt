@@ -67,7 +67,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
             }
 
         private const val MAX_BYTES = 500000 // 500 KB
-        private const val MAX_TIME_TCP = 120 // seconds
+        private const val MAX_TIME_TCP = 135 // seconds
         private const val MAX_TIME_UDP = 135 // seconds
     }
 
@@ -212,17 +212,20 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     ct.uploadBytes == 0L &&
                     ct.message.isEmpty()
             ) {
+                var hasMinSummary = false
                 if (VpnController.hasCid(ct.connId)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDataUsage.text = context.getString(R.string.lbl_active)
                     b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
                     b.connectionDelay.text = ""
+                    hasMinSummary = true
                 }
                 if (isConnectionProxied(ct.blockedByRule)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text = context.getString(R.string.symbol_key)
-                } else {
-                    b.connectionDelay.text = ""
+                    hasMinSummary = true
+                }
+                if (!hasMinSummary) {
                     b.connectionSummaryLl.visibility = View.GONE
                 }
                 return
@@ -245,21 +248,18 @@ class ConnectionTrackerAdapter(private val context: Context) :
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
             b.connectionDelay.text = ""
             if (isConnectionHeavier(ct)) {
-                b.connectionDelay.visibility = View.VISIBLE
                 b.connectionDelay.text = context.getString(R.string.symbol_elephant)
             }
             if (isConnectionSlower(ct)) {
-                b.connectionDelay.visibility = View.VISIBLE
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
             }
             if (isConnectionProxied(ct.blockedByRule)) {
-                b.connectionSummaryLl.visibility = View.VISIBLE
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
-            } else {
-                b.connectionDelay.text = ""
-                b.connectionDelay.visibility = View.GONE
+            }
+            if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
+                b.connectionSummaryLl.visibility = View.GONE
             }
         }
 

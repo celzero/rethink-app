@@ -141,8 +141,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     /**
      * Handles user preference changes, ie, when the user elects to see either multiple underlying
      * networks, or just one (the active network).
+     *
+     * protected by VpnController.mutex
      */
-    fun onUserPreferenceChanged() {
+    fun onUserPreferenceChangedLocked() {
         if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
         handleNetworkChange(isForceUpdate = true)
     }
@@ -150,8 +152,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     /**
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
      * the VPN start is completed.
+     *
+     * protected by VpnController.mutex
      */
-    fun onVpnStart() {
+    fun onVpnStartLocked() {
         Log.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
         handleNetworkChange(isForceUpdate = true)
     }

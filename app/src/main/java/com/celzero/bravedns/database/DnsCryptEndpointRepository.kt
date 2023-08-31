@@ -15,7 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.Transaction
 
 class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpointDAO) {
@@ -48,10 +47,6 @@ class DnsCryptEndpointRepository(private val dnsCryptEndpointDAO: DnsCryptEndpoi
 
     suspend fun getConnectedCount(): Int {
         return dnsCryptEndpointDAO.getConnectedCount()
-    }
-
-    fun getConnectedCountLiveData(): LiveData<Int> {
-        return dnsCryptEndpointDAO.getConnectedCountLiveData()
     }
 
     suspend fun getCount(): Int {

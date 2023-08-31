@@ -40,7 +40,6 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.backup.BackupHelper
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityMiscSettingsBinding
@@ -115,7 +114,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         }
 
         displayAppThemeUi()
-        displayGoLoggerUi()
         displayNotificationActionUi()
         displayPcapUi()
     }
@@ -195,14 +193,6 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                         getString(R.string.settings_theme_dialog_themes_4)
                     )
             }
-        }
-    }
-
-    private fun displayGoLoggerUi() {
-        if (DEBUG) {
-            b.settingsGoLogRl.visibility = View.VISIBLE
-        } else {
-            b.settingsGoLogRl.visibility = View.GONE
         }
     }
 
@@ -412,7 +402,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
     private fun showGoLoggerDialog() {
         // show dialog with logger options, change log level in GoVpnAdapter based on selection
         val alertBuilder = MaterialAlertDialogBuilder(this)
-        alertBuilder.setTitle(getString(R.string.settings_gologger_dialog_title))
+        alertBuilder.setTitle(getString(R.string.settings_go_log_heading))
         val items =
             arrayOf(
                 getString(R.string.settings_gologger_dialog_option_1),

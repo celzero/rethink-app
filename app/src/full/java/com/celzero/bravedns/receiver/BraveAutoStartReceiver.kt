@@ -51,6 +51,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
         if (VpnController.state().activationRequested && !VpnController.isAlwaysOn(context)) {
             val prepareVpnIntent: Intent? =
                 try {
+                    Log.i(LOG_TAG_VPN, "Attempting to auto-start VPN")
                     VpnService.prepare(context)
                 } catch (e: NullPointerException) {
                     Log.w(LOG_TAG_VPN, "Device does not support system-wide VPN mode")
@@ -58,6 +59,7 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
                 }
 
             if (prepareVpnIntent == null) {
+                Log.i(LOG_TAG_VPN, "VPN is already prepared, invoking start")
                 VpnController.start(context)
                 return
             }

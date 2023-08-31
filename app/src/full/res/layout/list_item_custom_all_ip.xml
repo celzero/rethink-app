@@ -28,7 +28,7 @@
             android:contentDescription="@string/apps_icon_content_desc"
             android:maxWidth="48dp"
             android:maxHeight="48dp"
-            android:src="@drawable/ic_launcher_foreground" />
+            android:src="@drawable/default_app_icon" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/custom_ip_app_name"
