@@ -32,7 +32,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -49,6 +48,8 @@ object VpnController : KoinComponent {
 
     val mutex: Mutex = Mutex()
 
+    // FIXME: Publish VpnState through this live-data to relieve direct access
+    // into VpnController's state(), isOn(), hasTunnel() etc.
     var connectionStatus: MutableLiveData<BraveVPNService.State?> = MutableLiveData()
 
     @Throws(CloneNotSupportedException::class)
@@ -129,16 +130,15 @@ object VpnController : KoinComponent {
         // on or after Android O, context.startForegroundService(intent) should be invoked.
         ContextCompat.startForegroundService(context, startServiceIntent)
 
-        onConnectionStateChanged(state().connectionState)
+        onConnectionStateChanged(connectionState)
         Log.i(LOG_TAG_VPN, "VPNController - Start(Synchronized) executed - $context")
     }
 
     fun stop(context: Context) {
         Log.i(LOG_TAG_VPN, "VPN Controller stop with context: $context")
         connectionState = null
-        braveVpnService?.signalStopServiceLocked(true)
-        braveVpnService = null
         onConnectionStateChanged(connectionState)
+        braveVpnService?.signalStopService(userInitiated = true)
     }
 
     fun state(): VpnState {
@@ -151,7 +151,7 @@ object VpnController : KoinComponent {
         return braveVpnService?.isOn() == true
     }
 
-    fun refresh() {
+    suspend fun refresh() {
         braveVpnService?.refresh()
     }
 

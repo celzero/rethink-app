@@ -30,6 +30,7 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock.elapsedRealtime
+import android.os.SystemClock.sleep
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
@@ -158,8 +159,6 @@ class BraveVPNService :
     private var trackedCids = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     private var excludedApps: MutableSet<String> = mutableSetOf()
-
-    private var userInitiatedStop: Boolean = false
 
     var underlyingNetworks: ConnectionMonitor.UnderlyingNetworks? = null
 
@@ -1218,6 +1217,7 @@ class BraveVPNService :
                 // then simply update the existing tunnel
                 if (connectionMonitor == null) {
                     connectionMonitor = ConnectionMonitor(this, this)
+                    connectionMonitor?.onVpnStartLocked()
                 } else {
                     isNewVpn = false
                 }
@@ -1257,9 +1257,6 @@ class BraveVPNService :
 
                     restartVpn(opts)
                 }
-
-                connectionMonitor?.onVpnStart()
-
                 // call this *after* a new vpn is created #512
                 observeChanges()
             }
@@ -1309,7 +1306,8 @@ class BraveVPNService :
     }
 
     private suspend fun updateTun(tunnelOptions: AppConfig.TunnelOptions) {
-        VpnController.mutex.withLock {
+        Log.i(LOG_TAG_VPN, "update-tun with new pre-set tunnel options")
+        VpnController.mutex.withLock("updateTun") {
             // Connection monitor can be null if onDestroy() of service
             // is called, in that case no need to call updateTun()
             if (connectionMonitor == null) {
@@ -1323,14 +1321,16 @@ class BraveVPNService :
                 // conn-monitor and go-vpn-adapter exist, but persistent-state tracking vpn goes out
                 // of sync
                 Log.e(LOG_TAG_VPN, "stop-vpn(updateTun), tracking vpn is out of sync")
-                return signalStopServiceLocked(userInitiated = false)
+                io("outOfSync") { signalStopService(userInitiated = false) }
+                return
             }
             val ok = vpnAdapter?.updateTunLocked(tunnelOptions)
-            // TODO: like Intra, call VpnController#stop instead? (see
-            // VpnController#onStartComplete)
+            // TODO: like Intra, call VpnController#stop instead? see
+            // VpnController#onStartComplete
             if (ok == false) {
                 Log.w(LOG_TAG_VPN, "Cannot handle vpn adapter changes, no tunnel")
-                return signalStopServiceLocked(userInitiated = false)
+                io("noTunnel") { signalStopService(userInitiated = false) }
+                return
             }
         }
         handleVpnAdapterChange()
@@ -1343,14 +1343,15 @@ class BraveVPNService :
         if (DEBUG) Log.d(LOG_TAG_VPN, "on pref change, key: $key")
         when (key) {
             PersistentState.BRAVE_MODE -> {
-                io("brave-mode-change") { restartVpn(createNewTunnelOptsObj()) }
+                io("modeChange") { restartVpn(createNewTunnelOptsObj()) }
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
-                io("local-blocklist") { updateTun(createNewTunnelOptsObj()) }
+                io("localBlocklistEnable") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.LOCAL_BLOCK_LIST_UPDATE -> {
-                io("local-blocklist-update") { updateTun(createNewTunnelOptsObj()) }
+                // FIXME: update just that local bravedns obj, not the entire tunnel
+                io("localBlocklistDownload") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.BACKGROUND_MODE -> {
                 if (persistentState.getBlockAppWhenBackground()) {
@@ -1359,17 +1360,20 @@ class BraveVPNService :
                     unregisterAccessibilityServiceState()
                 }
             }
-            PersistentState
-                .LOCAL_BLOCK_LIST_STAMP -> { // update tunnel on local blocklist stamp change
+            PersistentState.LOCAL_BLOCK_LIST_STAMP -> { // update on local blocklist stamp change
                 spawnLocalBlocklistStampUpdate()
             }
-            PersistentState
-                .REMOTE_BLOCK_LIST_STAMP -> { // update tunnel on remote blocklist stamp change.
-                io("remote-blocklist") { updateTun(createNewTunnelOptsObj()) }
+            PersistentState.RETHINK_REMOTE_CHANGES -> { // update on remote blocklist stamp change.
+                // FIXME: update just that remote bravedns obj, not the entire tunnel
+                if (persistentState.rethinkRemoteUpdate) {
+                    io("remoteRethinkUpdates") { updateTun(createNewTunnelOptsObj()) }
+                    persistentState.rethinkRemoteUpdate = false
+                }
             }
             PersistentState.REMOTE_BLOCKLIST_UPDATE -> {
                 // update tunnel on remote blocklist update
-                io("remote-blocklist-update") { updateTun(createNewTunnelOptsObj()) }
+                // FIXME: update just that remote bravedns obj, not the entire tunnel
+                io("remoteBlocklistUpdate") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.DNS_CHANGE -> {
                 /*
@@ -1378,7 +1382,8 @@ class BraveVPNService :
                  * DNSCrypt - Set the tunnel with DNSCrypt mode once the live servers size is not 0.
                  * DOH - Overwrites the tunnel values with new values.
                  */
-                io("dns-change") {
+                // FIXME: update just that dns proxy, not the entire tunnel
+                io("dnsChange") {
                     when (appConfig.getDnsType()) {
                         AppConfig.DnsType.DOH -> {
                             updateTun(createNewTunnelOptsObj())
@@ -1399,10 +1404,11 @@ class BraveVPNService :
                 }
             }
             PersistentState.DNS_RELAYS -> {
-                io("update-dnscrypt") { updateTun(createNewTunnelOptsObj()) }
+                // FIXME: add relay using vpnAdapter; no update needed
+                io("updateDnscrypt") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.ALLOW_BYPASS -> {
-                io("allow-bypass") { restartVpn(createNewTunnelOptsObj()) }
+                io("allowBypass") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PROXY_TYPE -> {
                 io("proxy") {
@@ -1415,35 +1421,40 @@ class BraveVPNService :
                 }
             }
             PersistentState.NETWORK -> {
-                connectionMonitor?.onUserPreferenceChanged()
+                io("useAllNetworks") { notifyConnectionMonitor() }
             }
             PersistentState.NOTIFICATION_ACTION -> {
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.INTERNET_PROTOCOL -> {
-                connectionMonitor?.onUserPreferenceChanged()
-                io("Internet-protocol-change") { restartVpn(createNewTunnelOptsObj()) }
+                io("chooseIpVersion") {
+                    notifyConnectionMonitor()
+                    restartVpn(createNewTunnelOptsObj())
+                }
             }
             PersistentState.PROTOCOL_TRANSLATION -> {
-                io("protocol-translation") { updateTun(createNewTunnelOptsObj()) }
+                io("forceV4Egress") { updateTun(createNewTunnelOptsObj()) }
             }
             PersistentState.DEFAULT_DNS_SERVER -> {
-                io("default-dns-server") { restartVpn(createNewTunnelOptsObj()) }
+                io("defaultDnsServer") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.PCAP_MODE -> {
                 // restart vpn to enable/disable pcap
                 io("pcap") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.DNS_ALG -> {
-                io("dns-alg") { updateDnsAlg() }
+                io("dnsAlg") { updateDnsAlg() }
             }
             PersistentState.PRIVATE_IPS -> {
                 // restart vpn to enable/disable route lan traffic
-                io("route_lan_traffic") { restartVpn(createNewTunnelOptsObj()) }
+                io("routeLanTraffic") { restartVpn(createNewTunnelOptsObj()) }
             }
+            // FIXME: get rid of this persistent state, and use a direct call in to braveVpnService
+            // via VpnController from wherever this is being set
             PersistentState.WIREGUARD_UPDATED -> {
                 // case when wireguard is enabled and user changes the wireguard config
                 if (persistentState.wireguardUpdated) {
+                    // FIXME: update just that wireguard proxy
                     io("wireguard") { updateTun(createNewTunnelOptsObj()) }
                     persistentState.wireguardUpdated = false
                 }
@@ -1468,37 +1479,32 @@ class BraveVPNService :
 
     private fun spawnLocalBlocklistStampUpdate() {
         io("dnsStampUpdate") {
-            VpnController.mutex.withLock {
-                if (connectionMonitor == null) return@withLock
-
-                vpnAdapter?.setBraveDnsStamp()
-            }
+            VpnController.mutex.withLock { vpnAdapter?.setBraveDnsStampLocked() }
         }
+    }
+
+    private suspend fun notifyConnectionMonitor() {
+        VpnController.mutex.withLock { connectionMonitor?.onUserPreferenceChangedLocked() }
     }
 
     private suspend fun updateDnsAlg() {
-        VpnController.mutex.withLock {
-            if (connectionMonitor == null) return@withLock
-
-            vpnAdapter?.setDnsAlg()
-        }
+        VpnController.mutex.withLock { vpnAdapter?.setDnsAlgLocked() }
     }
 
-    fun signalStopServiceLocked(userInitiated: Boolean) {
-        userInitiatedStop = userInitiated
-        stopVpnAdapterLocked()
+    fun signalStopService(userInitiated: Boolean = true) {
+        if (!userInitiated) notifyUserOnVpnFailure()
+        stopVpnAdapter()
         stopSelf()
-
-        Log.i(LOG_TAG_VPN, "Stop Foreground")
+        Log.i(LOG_TAG_VPN, "stopped vpn adapter and vpn service")
     }
 
-    private fun stopVpnAdapterLocked() {
+    private fun stopVpnAdapter() {
         io("stopVpn") {
             // TODO: is it okay to acquire mutex here?
             VpnController.mutex.withLock {
                 vpnAdapter?.closeLocked()
                 vpnAdapter = null
-                Log.i(LOG_TAG_VPN, "Stop vpn adapter/controller")
+                Log.i(LOG_TAG_VPN, "stop vpn adapter")
             }
         }
     }
@@ -1523,7 +1529,7 @@ class BraveVPNService :
             if (connectionMonitor == null) {
                 Log.e(
                     LOG_TAG_VPN,
-                    "Cannot restart-vpn, conn monitor null! Was onStartCommand called?"
+                    "cannot restart-vpn, conn monitor null! Was onStartCommand called?"
                 )
                 return@withLock
             }
@@ -1537,18 +1543,20 @@ class BraveVPNService :
                     "stop-vpn(restartVpn), tracking vpn is out of sync",
                     java.lang.RuntimeException()
                 )
-                return signalStopServiceLocked(userInitiated = false)
+                io("outOfSyncRestart") { signalStopService(userInitiated = false) }
+                return
             }
             // attempt seamless hand-off as described in VpnService.Builder.establish() docs
             val oldAdapter: GoVpnAdapter? = vpnAdapter
             // FIXME: protect makeVpnAdapter with mutex everywhere
-            vpnAdapter = makeVpnAdapter() // may be null in case tunnel creation fails
+            vpnAdapter = makeVpnAdapterLocked() // may be null in case tunnel creation fails
             oldAdapter?.closeLocked()
             Log.i(LOG_TAG_VPN, "restartVpn? ${vpnAdapter != null}")
             val ok = vpnAdapter?.startLocked(tunnelOptions)
             if (ok == false) {
-                Log.w(LOG_TAG_VPN, "Cannot handle vpn adapter changes, no tunnel")
-                return signalStopServiceLocked(userInitiated = false)
+                Log.w(LOG_TAG_VPN, "cannot handle vpn adapter changes, no tunnel")
+                io("noTunnelRestart") { signalStopService(userInitiated = false) }
+                return
             }
         }
         handleVpnAdapterChange()
@@ -1573,12 +1581,12 @@ class BraveVPNService :
         return vpnAdapter != null
     }
 
-    fun refresh() {
-        // FIXME: protect vpnAdapter with mutex
-        vpnAdapter?.refresh()
+    suspend fun refresh() {
+        VpnController.mutex.withLock { vpnAdapter?.refreshLocked() }
     }
 
-    private suspend fun makeVpnAdapter(): GoVpnAdapter? {
+    // protected by VpnController.mutex
+    private suspend fun makeVpnAdapterLocked(): GoVpnAdapter? {
         val tunFd = establishVpn()
         return establish(this, vpnScope, tunFd)
     }
@@ -1664,12 +1672,12 @@ class BraveVPNService :
                 // no-op
             }
         }
-        io("set-system-dns") {
+        io("setSystemDns") {
             Log.i(LOG_TAG_VPN, "Setting dns servers: $dnsServers")
             appConfig.updateSystemDnsServers(dnsServers)
             // FIXME: vpnAdapter must be protected by mutex
             // set system dns whenever there is a change in network
-            vpnAdapter?.setSystemDns()
+            VpnController.mutex.withLock { vpnAdapter?.setSystemDnsLocked() }
             // add appropriate transports to the tunnel, if system dns is enabled
             if (appConfig.isSystemDns()) {
                 updateTun(createNewTunnelOptsObj())
@@ -1679,7 +1687,7 @@ class BraveVPNService :
 
     private fun handleVpnLockdownStateAsync() {
         if (!syncLockdownState()) return
-        io("lockdown-sync") {
+        io("lockdownSync") {
             Log.i(LOG_TAG_VPN, "vpn lockdown mode change, restarting")
             restartVpnWithExistingAppConfig()
         }
@@ -1693,9 +1701,8 @@ class BraveVPNService :
         return ret
     }
 
-    override fun onDestroy() {
-        // FIXME: protect userInitatedStop with mutex
-        if (!userInitiatedStop) {
+    fun notifyUserOnVpnFailure() {
+        ui {
             val vibrationPattern = longArrayOf(1000) // Vibrate for one second.
             // Show revocation warning
             val builder: NotificationCompat.Builder
@@ -1730,7 +1737,9 @@ class BraveVPNService :
                 .setAutoCancel(true)
             notificationManager.notify(0, builder.build())
         }
+    }
 
+    override fun onDestroy() {
         try {
             unregisterAccessibilityServiceState()
             orbotHelper.unregisterReceiver()
@@ -1745,7 +1754,9 @@ class BraveVPNService :
         unobserveAppInfos()
         persistentState.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
 
+        // FIXME: protect connectionMonitor with VpnController.mutex
         connectionMonitor?.onVpnStop()
+        connectionMonitor = null
         VpnController.onVpnDestroyed()
         vpnScope.cancel("VpnService onDestroy")
 
@@ -2215,10 +2226,6 @@ class BraveVPNService :
             return
         }
 
-        Log.d(
-            LOG_TAG_VPN,
-            "onUDPSocketClosed: $s, ${s.uid}, ${s.pid}, ${s.id}, ${s.downloadBytes}, ${s.uploadBytes}, ${s.duration}, ${s.msg}"
-        )
         trackedCids.remove(s.id)
         // synack is not applicable for udp
         val connectionSummary =
@@ -2366,7 +2373,7 @@ class BraveVPNService :
             if (DEBUG)
                 Log.d(
                     LOG_TAG_VPN,
-                    "flow: received rule: socks5, returning ${ProxyManager.ID_S5_BASE}, $connId, $uid"
+                    "flow: rule: socks5, use ${ProxyManager.ID_S5_BASE}, $connId, $uid"
                 )
             return getFlowResponseString(ProxyManager.ID_S5_BASE, connId, uid)
         }
@@ -2375,7 +2382,7 @@ class BraveVPNService :
             if (DEBUG)
                 Log.d(
                     LOG_TAG_VPN,
-                    "flow: received rule: http, returning ${ProxyManager.ID_HTTP_BASE}, $connId, $uid"
+                    "flow: rule: http, use ${ProxyManager.ID_HTTP_BASE}, $connId, $uid"
                 )
             return getFlowResponseString(ProxyManager.ID_HTTP_BASE, connId, uid)
         }
@@ -2390,16 +2397,16 @@ class BraveVPNService :
 
     fun removeWireGuardProxy(id: String) {
         if (DEBUG) Log.d(LOG_TAG_VPN, "remove wg from tunnel: $id")
-        vpnAdapter?.removeWireGuardProxy(id)
+        io("removeWg") { VpnController.mutex.withLock { vpnAdapter?.removeWgProxyLocked(id) } }
     }
 
     fun addWireGuardProxy(id: String) {
         if (DEBUG) Log.d(LOG_TAG_VPN, "add wg from tunnel: $id")
-        vpnAdapter?.addWireGuardProxy(id)
+        io("addWg") { VpnController.mutex.withLock { vpnAdapter?.addWgProxyLocked(id) } }
     }
 
     fun refreshWireGuardConfig() {
-        vpnAdapter?.refreshWireGuardConfig()
+        io("refreshWg") { VpnController.mutex.withLock { vpnAdapter?.refreshProxiesLocked() } }
     }
 
     private fun getFlowResponseString(proxyId: String, connId: String, uid: Int): String {
@@ -2536,6 +2543,7 @@ class BraveVPNService :
         )
     }
 
+    // FIXME: acquire VpnController.mutex before calling into vpnAdapter
     fun getProxyStatusById(id: String): Long? {
         return if (vpnAdapter != null) {
             val status = vpnAdapter?.getProxyStatusById(id)

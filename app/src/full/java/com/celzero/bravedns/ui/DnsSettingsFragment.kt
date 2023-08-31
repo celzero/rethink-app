@@ -311,7 +311,7 @@ class DnsSettingsFragment :
             b.dcRefresh.isEnabled = false
             b.dcRefresh.animation = animation
             b.dcRefresh.startAnimation(animation)
-            VpnController.refresh()
+            io { VpnController.refresh() }
             Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
                 if (isAdded) {
                     b.dcRefresh.isEnabled = true

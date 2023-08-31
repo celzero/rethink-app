@@ -46,9 +46,8 @@ class BraveTileService : TileService(), KoinComponent {
 
     override fun onClick() {
         super.onClick()
-        val vpnState: VpnState = VpnController.state()
 
-        if (vpnState.on) {
+        if (VpnController.isOn()) {
             VpnController.stop(this)
         } else if (VpnService.prepare(this) == null) {
             // Start VPN service when VPN permission has been granted.

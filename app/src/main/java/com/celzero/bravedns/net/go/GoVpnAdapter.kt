@@ -72,12 +72,14 @@ class GoVpnAdapter(
     // The Intra session object from go-tun2socks.  Initially null.
     private var tunnel: Tunnel? = null
 
+    // protected by VpnController.mutex
     suspend fun startLocked(tunnelOptions: TunnelOptions): Boolean {
-        connectTunnel(tunnelOptions)
+        connectTunnelLocked(tunnelOptions)
         return tunnel != null
     }
 
-    private suspend fun connectTunnel(tunnelOptions: TunnelOptions) {
+    // protected by VpnController.mutex
+    private suspend fun connectTunnelLocked(tunnelOptions: TunnelOptions) {
         if (tunnel != null) {
             return
         }
@@ -112,7 +114,7 @@ class GoVpnAdapter(
 
             setTunnelMode(tunnelOptions)
             addTransport()
-            setDnsAlg()
+            setDnsAlgLocked()
             setBraveDnsBlocklistMode()
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, e.message, e)
@@ -487,6 +489,7 @@ class GoVpnAdapter(
             if (DEBUG) Log.d(LOG_TAG_VPN, "getProxyStatusById: $id, $status")
             status
         } catch (ignored: Exception) {
+            Log.e(LOG_TAG_VPN, "err getProxy($id): ${ignored.message}", ignored)
             null
         }
     }
@@ -514,7 +517,7 @@ class GoVpnAdapter(
         }
     }
 
-    fun removeWireGuardProxy(id: String) {
+    fun removeWgProxyLocked(id: String) {
         try {
             tunnel?.proxies?.removeProxy(id)
             Log.i(LOG_TAG_VPN, "remove wireguard proxy with id: $id")
@@ -523,7 +526,7 @@ class GoVpnAdapter(
         }
     }
 
-    fun addWireGuardProxy(id: String) {
+    fun addWgProxyLocked(id: String) {
         try {
             val proxyId: Int = id.substring(ID_WG_BASE.length).toInt()
             val wgConfig = WireGuardManager.getConfigById(proxyId)
@@ -539,7 +542,7 @@ class GoVpnAdapter(
         }
     }
 
-    fun refreshWireGuardConfig() {
+    fun refreshProxiesLocked() {
         try {
             val res = tunnel?.proxies?.refreshProxies()
             Log.i(LOG_TAG_VPN, "refresh proxies: $res")
@@ -591,12 +594,14 @@ class GoVpnAdapter(
         return (tunnel != null)
     }
 
-    fun refresh() {
+    // protected by VpnController.mutex
+    fun refreshLocked() {
         if (tunnel != null) {
             tunnel?.resolver?.refresh()
         }
     }
 
+    // protected by VpnController.mutex
     fun closeLocked() {
         if (tunnel != null) {
             tunnel?.disconnect()
@@ -626,7 +631,8 @@ class GoVpnAdapter(
         return Intra.newDoHTransport(Dnsx.Default, url, dohIPs)
     }
 
-    fun setSystemDns() {
+    // protected by VpnController.mutex
+    fun setSystemDnsLocked() {
         if (tunnel != null) {
             val systemDns = appConfig.getSystemDns()
             var dnsProxy: HostName? = null
@@ -658,6 +664,8 @@ class GoVpnAdapter(
      * Updates the DOH server URL for the VPN. If Go-DoH is enabled, DNS queries will be handled in
      * Go, and will not use the Java DoH implementation. If Go-DoH is not enabled, this method has
      * no effect.
+     *
+     * protected by VpnController.mutex
      */
     suspend fun updateTunLocked(tunnelOptions: TunnelOptions): Boolean {
         // changes made in connectTunnel()
@@ -678,7 +686,7 @@ class GoVpnAdapter(
             setTunnelMode(tunnelOptions)
             // add transport to resolver, no need to set default transport on updateTunnel
             addTransport()
-            setDnsAlg()
+            setDnsAlgLocked()
             // Set brave dns to tunnel - Local/Remote
             setBraveDnsBlocklistMode()
         } catch (e: Exception) {
@@ -689,7 +697,8 @@ class GoVpnAdapter(
         return tunnel != null
     }
 
-    fun setDnsAlg() {
+    // protected by VpnController.mutex
+    fun setDnsAlgLocked() {
         // set translate to false for dns mode (regardless of setting in dns screen),
         // since apps cannot understand alg ips
         if (appConfig.getBraveMode().isDnsMode()) {
@@ -729,7 +738,8 @@ class GoVpnAdapter(
         }
     }
 
-    fun setBraveDnsStamp() {
+    // protected by VpnController.mutex
+    fun setBraveDnsStampLocked() {
         try {
             if (tunnel == null) {
                 Log.e(LOG_TAG_VPN, "tunnel is null, not setting brave dns stamp")
