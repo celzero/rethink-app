@@ -17,9 +17,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.os.SystemClock
-import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
@@ -33,9 +31,6 @@ import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
 import dnsx.Summary
-import inet.ipaddr.HostName
-import inet.ipaddr.IPAddress
-import inet.ipaddr.IPAddressString
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 

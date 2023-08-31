@@ -40,9 +40,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.BraveDNS
 import dnsx.Dnsx
-import java.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 
@@ -395,10 +395,7 @@ object RethinkBlocklistManager : KoinComponent {
                 getBraveDns(context, blocklistTimestamp(type), type)?.stampToFlags(stamp)
             )
         } catch (e: Exception) {
-            Log.e(
-                LoggerConstants.LOG_TAG_VPN,
-                "err tags2stamp: ${e.message}, $e "
-            )
+            Log.e(LoggerConstants.LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e ")
             setOf()
         }
     }

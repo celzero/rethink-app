@@ -58,9 +58,9 @@ import dnsx.BraveDNS
 import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Listener
-import java.net.InetAddress
 import protect.Controller
 import settings.Settings
+import java.net.InetAddress
 
 class AppConfig
 internal constructor(

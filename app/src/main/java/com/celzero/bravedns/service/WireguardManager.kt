@@ -31,13 +31,6 @@ import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import ipn.Ipn
 import ipn.Key
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
-import java.util.Locale
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.write
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,6 +38,13 @@ import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import java.util.Locale
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.write
 
 object WireGuardManager : KoinComponent {
 
@@ -207,10 +207,7 @@ object WireGuardManager : KoinComponent {
         }
         val config = configs.find { it.getId() == map.id }
         if (config == null) {
-            Log.e(
-                LOG_TAG_PROXY,
-                "canEnableConfig: wg not found, id: ${map.id}, ${configs.size}"
-            )
+            Log.e(LOG_TAG_PROXY, "canEnableConfig: wg not found, id: ${map.id}, ${configs.size}")
             return false
         }
         return true
@@ -622,8 +619,7 @@ object WireGuardManager : KoinComponent {
     }
 
     fun getPeers(id: Int): MutableList<Peer> {
-        return configs.find { it.getId() == id }?.getPeers()?.toMutableList()
-            ?: mutableListOf()
+        return configs.find { it.getId() == id }?.getPeers()?.toMutableList() ?: mutableListOf()
     }
 
     fun restoreProcessDeleteWireGuardEntries() {

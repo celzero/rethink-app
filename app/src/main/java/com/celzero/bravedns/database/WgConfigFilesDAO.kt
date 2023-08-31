@@ -46,10 +46,7 @@ interface WgConfigFilesDAO {
     )
     fun getWgConfigs(): List<WgConfigFiles>
 
-    @Query(
-        "select max(id) from WgConfigFiles"
-    )
-    fun getLastAddedConfigId(): Int
+    @Query("select max(id) from WgConfigFiles") fun getLastAddedConfigId(): Int
 
     @Delete fun delete(wgConfigFiles: WgConfigFiles)
 

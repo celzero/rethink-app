@@ -394,7 +394,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         io {
             var fin: FileInputStream? = null
             var zin: ZipInputStream? = null
-            // load only 10k characters to avoid ANR
+            // load only 20k characters to avoid ANR
             val maxLength = 20000
             try {
                 fin = FileInputStream(zipPath)

@@ -30,7 +30,6 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock.elapsedRealtime
-import android.os.SystemClock.sleep
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
@@ -76,6 +75,10 @@ import intra.Listener
 import intra.TCPSocketSummary
 import intra.UDPSocketSummary
 import ipn.Ipn
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Controller
 import java.io.IOException
 import java.net.*
 import java.util.*
@@ -84,10 +87,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Controller
 
 class BraveVPNService :
     VpnService(),

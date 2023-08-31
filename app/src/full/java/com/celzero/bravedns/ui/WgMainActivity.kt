@@ -36,7 +36,6 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.QrCodeFromFileScanner
 import com.celzero.bravedns.util.Themes
