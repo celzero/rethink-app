@@ -104,7 +104,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun launchFirewallActivityAndFinish() {
-        val intent = Intent(this, AppDetailActivity::class.java)
+        val intent = Intent(this, AppListActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
         finish()

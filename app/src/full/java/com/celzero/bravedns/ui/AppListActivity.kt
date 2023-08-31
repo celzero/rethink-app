@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 RethinkDNS and its authors
+ * Copyright 2022 RethinkDNS and its authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -26,10 +27,10 @@ import android.view.animation.RotateAnimation
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -37,10 +38,12 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.FirewallAppListAdapter
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.databinding.FragmentFirewallAppListBinding
+import com.celzero.bravedns.databinding.ActivityAppListBinding
+import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UiUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
@@ -51,9 +54,9 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class FirewallAppFragment :
-    Fragment(R.layout.fragment_firewall_app_list), SearchView.OnQueryTextListener {
-    private val b by viewBinding(FragmentFirewallAppListBinding::bind)
+class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchView.OnQueryTextListener  {
+    private val persistentState by inject<PersistentState>()
+    private val b by viewBinding(ActivityAppListBinding::bind)
 
     private val appInfoViewModel: AppInfoViewModel by viewModel()
     private val refreshDatabase by inject<RefreshDatabase>()
@@ -65,8 +68,6 @@ class FirewallAppFragment :
     private lateinit var animation: Animation
 
     companion object {
-        fun newInstance() = FirewallAppFragment()
-
         val filters = MutableLiveData<Filters>()
 
         private const val ANIMATION_DURATION = 750L
@@ -174,8 +175,14 @@ class FirewallAppFragment :
         var searchString: String = ""
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun Context.isDarkThemeOn(): Boolean {
+        return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
+        super.onCreate(savedInstanceState)
         initView()
         initObserver()
         setupClickListener()
@@ -198,7 +205,7 @@ class FirewallAppFragment :
     }
 
     private fun initObserver() {
-        filters.observe(this.viewLifecycleOwner) {
+        filters.observe(this) {
             // update the ui based on the filter
             resetFirewallIcons(BlockType.UNMETER)
 
@@ -213,11 +220,11 @@ class FirewallAppFragment :
     }
 
     private fun updateFilterText(filter: Filters) {
-        val filterLabel = filter.topLevelFilter.getLabel(requireContext())
-        val firewallLabel = filter.firewallFilter.getLabel(requireContext())
+        val filterLabel = filter.topLevelFilter.getLabel(this)
+        val firewallLabel = filter.firewallFilter.getLabel(this)
         if (filter.categoryFilters.isEmpty()) {
             b.firewallAppLabelTv.text =
-                updateHtmlEncodedText(
+                UiUtils.updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc,
                         firewallLabel.lowercase(),
@@ -226,7 +233,7 @@ class FirewallAppFragment :
                 )
         } else {
             b.firewallAppLabelTv.text =
-                updateHtmlEncodedText(
+                UiUtils.updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc_category,
                         firewallLabel.lowercase(),
@@ -238,9 +245,9 @@ class FirewallAppFragment :
         b.firewallAppLabelTv.isSelected = true
     }
 
-    override fun onDetach() {
+    override fun onPause() {
         filters.postValue(Filters())
-        super.onDetach()
+        super.onPause()
     }
 
     override fun onQueryTextSubmit(query: String): Boolean {
@@ -250,7 +257,7 @@ class FirewallAppFragment :
 
     override fun onQueryTextChange(query: String): Boolean {
         Utilities.delay(QUERY_TEXT_TIMEOUT, lifecycleScope) {
-            if (isAdded) {
+            if (!this.isFinishing) {
                 addQueryToFilters(query)
             }
         }
@@ -278,11 +285,11 @@ class FirewallAppFragment :
             b.ffaRefreshList.startAnimation(animation)
             refreshDatabase()
             Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
-                if (isAdded) {
+                if (!this.isFinishing) {
                     b.ffaRefreshList.isEnabled = true
                     b.ffaRefreshList.clearAnimation()
                     Utilities.showToastUiCentered(
-                        requireContext(),
+                        this,
                         getString(R.string.refresh_complete),
                         Toast.LENGTH_SHORT
                     )
@@ -447,9 +454,13 @@ class FirewallAppFragment :
         }
     }
 
-    private fun showBulkRulesUpdateDialog(title: String, message: String, type: BlockType) {
+    private fun showBulkRulesUpdateDialog(
+        title: String,
+        message: String,
+        type: BlockType
+    ) {
         val builder =
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(getString(R.string.lbl_apply)) { _, _ -> updateBulkRules(type) }
@@ -483,10 +494,9 @@ class FirewallAppFragment :
     }
 
     private fun showInfoDialog() {
-        val li =
-            requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val li = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view: View = li.inflate(R.layout.dialog_info_firewall_rules, null)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(view)
+        val builder = MaterialAlertDialogBuilder(this).setView(view)
         builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { dialog, _ ->
             dialog.dismiss()
         }
@@ -505,11 +515,24 @@ class FirewallAppFragment :
     private fun remakeFirewallChipsUi() {
         b.ffaFirewallChipGroup.removeAllViews()
 
-        val none = makeFirewallChip(FirewallFilter.ALL.id, getString(R.string.lbl_all), true)
+        val none =
+            makeFirewallChip(
+                FirewallFilter.ALL.id,
+                getString(R.string.lbl_all),
+                true
+            )
         val allowed =
-            makeFirewallChip(FirewallFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
+            makeFirewallChip(
+                FirewallFilter.ALLOWED.id,
+                getString(R.string.lbl_allowed),
+                false
+            )
         val blocked =
-            makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
+            makeFirewallChip(
+                FirewallFilter.BLOCKED.id,
+                getString(R.string.lbl_blocked),
+                false
+            )
         val bypassUniversal =
             makeFirewallChip(
                 FirewallFilter.BYPASS.id,
@@ -572,7 +595,7 @@ class FirewallAppFragment :
     private fun colorUpChipIcon(chip: Chip) {
         val colorFilter =
             PorterDuffColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.primaryText),
+                ContextCompat.getColor(this, R.color.primaryText),
                 PorterDuff.Mode.SRC_IN
             )
         chip.checkedIcon?.colorFilter = colorFilter
@@ -728,18 +751,18 @@ class FirewallAppFragment :
 
     private fun initListAdapter() {
         b.ffaAppList.setHasFixedSize(true)
-        layoutManager = CustomLinearLayoutManager(requireContext())
+        layoutManager = CustomLinearLayoutManager(this)
         b.ffaAppList.layoutManager = layoutManager
-        val recyclerAdapter = FirewallAppListAdapter(requireContext(), viewLifecycleOwner)
-        appInfoViewModel.appInfo.observe(viewLifecycleOwner) {
-            recyclerAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+        val recyclerAdapter = FirewallAppListAdapter(this, this)
+        appInfoViewModel.appInfo.observe(this) {
+            recyclerAdapter.submitData(this.lifecycle, it)
         }
         b.ffaAppList.adapter = recyclerAdapter
     }
 
     private fun openFilterBottomSheet() {
         val bottomSheetFragment = FirewallAppFilterBottomSheet()
-        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
+        bottomSheetFragment.show(this.supportFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun addAnimation() {

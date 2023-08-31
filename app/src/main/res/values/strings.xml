@@ -563,7 +563,7 @@
 
     <string name="pcap_failure_toast" translatable="true">Error creating pcap file, Try again!</string>
 
-    <!-- FirewallAppFragment -->
+    <!-- AppDetailActivity -->
     <string name="apps_icon_content_desc" translatable="true">Application Icon</string>
 
     <string name="firewall_status_allow" translatable="true">allowed</string>

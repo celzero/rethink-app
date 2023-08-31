@@ -19,13 +19,9 @@ import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.content.res.TypedArray
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -33,10 +29,8 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
-import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -51,8 +45,6 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
-import com.celzero.bravedns.database.RethinkDnsEndpoint
-import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.util.*
@@ -61,23 +53,21 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.UiUtils.openNetworkSettings
 import com.celzero.bravedns.util.UiUtils.openVpnProfile
-import com.celzero.bravedns.util.UiUtils.sendEmailIntent
 import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
-import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -711,7 +701,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
         // no need to check for app modes to open this activity
         // one use case: https://github.com/celzero/rethink-app/issues/611
-        val intent = Intent(requireContext(), AppDetailActivity::class.java)
+        val intent = Intent(requireContext(), AppListActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
     }
