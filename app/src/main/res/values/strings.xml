@@ -608,6 +608,8 @@
     <string name="hsf_uptime" translatable="true">(active %1$s; protos: %2$s; type: %3$s)</string>
     <string name="hsf_downtime" translatable="true">(inactive since %1$s)</string>
 
+    <string name="logs_card_duration" translatable="true">since %1$s</string>
+
     <string name="hsf_vpn_dialog_header" translatable="true">Attention!</string>
     <string name="hsf_vpn_dialog_message" translatable="true">Rethink needs permission to set up a local VPN to encrypt the device\'s DNS requests, implement a network monitor, and enforce firewall rules. \n\nRethink does not collect any information or spy on you in any way.</string>
 

@@ -204,6 +204,11 @@ interface ConnectionTrackerDAO {
     @Query("select count(id) from ConnectionTracker") fun logsCount(): LiveData<Long>
 
     @Query(
+        "select timeStamp from ConnectionTracker where id = (select min(id) from ConnectionTracker)"
+    )
+    fun getLeastLoggedTime(): Long
+
+    @Query(
         "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :fromTime and timeStamp <= :toTime GROUP BY uid"
     )
     fun getDataUsage(fromTime: Long, toTime: Long): List<DataUsage>

@@ -32,6 +32,7 @@ import android.net.NetworkCapabilities
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.util.TypedValue
@@ -71,12 +72,12 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -603,6 +604,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun disableLogsCard() {
         b.fhsCardNetworkLogsCount.text = getString(R.string.firewall_card_text_inactive)
         b.fhsCardDnsLogsCount.text = getString(R.string.lbl_disabled)
+        b.fhsCardLogsDuration.visibility = View.GONE
     }
 
     private fun disableProxyCard() {
@@ -676,6 +678,25 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun observeLogsCount() {
+        io {
+            val time = appConfig.getLeastLoggedNetworkLogs()
+            if (time == 0L) return@io
+
+            val now = System.currentTimeMillis()
+            // returns a string describing 'time' as a time relative to 'now'
+            val t =
+                DateUtils.getRelativeTimeSpanString(
+                    time,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE
+                )
+            uiCtx {
+                b.fhsCardLogsDuration.visibility = View.VISIBLE
+                b.fhsCardLogsDuration.text = getString(R.string.logs_card_duration, t)
+            }
+        }
+
         appConfig.dnsLogsCount.observe(viewLifecycleOwner) {
             val count = formatDecimal(it)
             b.fhsCardDnsLogsCount.text = getString(R.string.logs_card_dns_count, count)
@@ -893,7 +914,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
      * be initiated.
      */
     private fun maybeAutoStartVpn() {
-        if (isVpnActivated && !VpnController.state().on) {
+        if (isVpnActivated && !VpnController.isOn()) {
             Log.i(LOG_TAG_VPN, "start VPN (previous state)")
             prepareAndStartVpn()
         }
