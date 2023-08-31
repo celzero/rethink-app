@@ -250,4 +250,7 @@
     <string name="orbot_stop_dialog_neutral" translatable="true">DNS را تغییر دهید</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Orbot را متوقف کنید</string>
     <string name="orbot_status_arg_3" translatable="true">DNS و TCP</string>
+    <string name="lbl_create" translatable="true">ایجاد</string>
+    <string name="lbl_qr_code" translatable="true">کیوآر کد</string>
+    <string name="lbl_import" translatable="true">وارد کردن</string>
 </resources>

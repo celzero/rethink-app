@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_about" translatable="true">O aplikaci</string>
+    <string name="title_settings" translatable="true">Nastavení</string>
+    <string name="title_statistics" translatable="true">Statistiky</string>
+    <string name="lbl_rules" translatable="true">pravidla</string>
+    <string name="lbl_configure" translatable="true">Konfigurace</string>
+    <string name="lbl_logs" translatable="true">záznamy</string>
+    <string name="lbl_network" translatable="true">síť</string>
+    <string name="lbl_create" translatable="true">Vytvořit</string>
+    <string name="lbl_qr_code" translatable="true">QR kód</string>
+    <string name="lbl_public_key" translatable="true">Veřejný klíč</string>
+    <string name="lbl_addresses" translatable="true">Adresy</string>
+    <string name="lbl_ip_rules" translatable="true">IP pravidla</string>
+    <string name="lbl_delete" translatable="true">Smazat</string>
+    <string name="lbl_private_key" translatable="true">Privátní klíč</string>
+    <string name="lbl_generated" translatable="true">(generováno)</string>
+    <string name="lbl_random" translatable="true">(náhodné)</string>
+    <string name="lbl_select_all" translatable="true">vybrat vše</string>
+    <string name="lbl_day" translatable="true">den</string>
+    <string name="about_title_desc" translatable="true">Detekce a blokování hrozeb zabezpečení sítě</string>
+    <string name="txt_home" translatable="true">Domů</string>
+    <string name="next" translatable="true">Další</string>
+    <string name="finish" translatable="true">Dokončení</string>
+    <string name="lbl_dismiss" translatable="true">Odmítnout</string>
+    <string name="skip" translatable="true">Přeskočit</string>
+    <string name="lbl_cancel" translatable="true">Zrušit</string>
+    <string name="lbl_apply" translatable="true">Použít</string>
+    <string name="lbl_blocked" translatable="true">Blokováno</string>
+    <string name="lbl_allowed" translatable="true">Povolené</string>
+    <string name="lbl_dns_servers" translatable="true">DNS servery</string>
+    <string name="lbl_applications" translatable="true">Aplikace</string>
+    <string name="lbl_slow" translatable="true">pomalé</string>
+    <string name="lbl_fast" translatable="true">rychle</string>
+    <string name="lbl_very" translatable="true">velmi</string>
+    <string name="lbl_add" translatable="true">přidat</string>
+    <string name="lbl_save" translatable="true">uložit</string>
+    <string name="slide_2_desc" translatable="true">Rethink je nejjednodušší způsob, jak sledovat síťovou aktivitu, obcházet cenzuru internetu a aplikovat firewall na aplikace v zařízení se systémem Android.</string>
+    <string name="slide_2_title" translatable="true">Vítejte</string>
+</resources>
