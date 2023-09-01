@@ -27,8 +27,9 @@ import java.io.InputStreamReader
 class LocalBlocklistUtil(val context: Context, val persistentState: PersistentState) {
 
     fun init() {
+        // use older JsonParser API to support headless build
         val jsonObject: JsonObject =
-            JsonParser.parseReader(
+            JsonParser().parse(
                 InputStreamReader(
                     context.assets.open(
                         ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG.removePrefix(File.separator)

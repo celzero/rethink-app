@@ -32,8 +32,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
-import com.celzero.bravedns.util.UiUtils
-import com.celzero.bravedns.util.UiUtils.clipboardCopy
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -114,7 +114,7 @@ class DnsCryptEndpointAdapter(
 
             b.dnsCryptEndpointListUrlExplanation.text =
                 if (endpoint.isSelected) {
-                    context.getString(UiUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
+                    context.getString(UIUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
                 } else {
                     ""
                 }

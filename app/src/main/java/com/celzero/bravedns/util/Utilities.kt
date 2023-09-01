@@ -620,16 +620,6 @@ object Utilities {
         return CharMatcher.`is`('.').trimTrailingFrom(s)
     }
 
-    fun getAccentColor(appTheme: Int): Int {
-        return when (appTheme) {
-            Themes.SYSTEM_DEFAULT.id -> R.color.accentGoodBlack
-            Themes.DARK.id -> R.color.accentGood
-            Themes.LIGHT.id -> R.color.accentGoodLight
-            Themes.TRUE_BLACK.id -> R.color.accentGoodBlack
-            else -> R.color.accentGoodBlack
-        }
-    }
-
     // https://medium.com/androiddevelopers/all-about-pendingintents-748c8eb8619
     fun getActivityPendingIntent(
         context: Context,

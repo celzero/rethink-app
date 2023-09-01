@@ -34,7 +34,7 @@ import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.databinding.FragmentDnsLogsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.UiUtils.formatToRelativeTime
+import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

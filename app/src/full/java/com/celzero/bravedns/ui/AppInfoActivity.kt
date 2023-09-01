@@ -52,8 +52,8 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils.openAndroidAppInfo
-import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.viewmodel.AppConnectionsViewModel
