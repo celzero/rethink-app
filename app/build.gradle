@@ -1,10 +1,10 @@
 plugins {
+    id 'com.android.application'
+    id 'com.google.devtools.ksp'
     // to download blocklists for the headless variant
     id "de.undercouch.download" version "5.3.0"
+    id 'kotlin-android'
 }
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -66,10 +66,6 @@ android {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kapt {
-        correctErrorTypes true
     }
 
     packagingOptions {
@@ -147,7 +143,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0'
     fullImplementation 'androidx.appcompat:appcompat:1.6.1'
     fullImplementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
@@ -160,7 +156,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     download "androidx.room:room-paging:$room_version"
     implementation "androidx.room:room-paging:$room_version"
@@ -189,7 +185,7 @@ dependencies {
         exclude group: 'glide-parent'
     }
     // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
-    kaptFull 'com.github.bumptech.glide:compiler:4.15.1'
+    kspFull 'com.github.bumptech.glide:compiler:4.15.1'
 
     // Swipe button animation
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'

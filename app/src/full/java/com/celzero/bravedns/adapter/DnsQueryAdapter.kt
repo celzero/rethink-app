@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.target.CustomViewTarget
@@ -40,7 +41,6 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.ui.DnsBlocklistBottomSheetFragment
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
@@ -139,7 +139,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         }
 
         private fun clearFavIcon() {
-            GlideApp.with(context.applicationContext).clear(b.favIcon)
+            Glide.with(context.applicationContext).clear(b.favIcon)
         }
 
         private fun displayDetails(dnsLog: DnsLog) {
@@ -179,7 +179,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
             val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(trim)
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                GlideApp.with(context.applicationContext)
+                Glide.with(context.applicationContext)
                     .load(nextDnsUrl)
                     .onlyRetrieveFromCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
@@ -226,13 +226,13 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String) {
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                GlideApp.with(context.applicationContext)
+                Glide.with(context.applicationContext)
                     .load(url)
                     .onlyRetrieveFromCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
                     .error(
-                        GlideApp.with(context.applicationContext)
+                        Glide.with(context.applicationContext)
                             .load(subDomainURL)
                             .onlyRetrieveFromCache(true)
                     )

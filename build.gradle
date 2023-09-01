@@ -17,6 +17,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.google.devtools.ksp' version '1.8.22-1.0.11' apply false
+}
+
 allprojects {
     repositories {
         google()

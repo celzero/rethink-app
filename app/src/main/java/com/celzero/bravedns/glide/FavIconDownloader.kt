@@ -18,6 +18,7 @@ package com.celzero.bravedns.glide
 import android.content.Context
 import android.os.Process
 import android.util.Log
+import com.bumptech.glide.Glide
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -88,7 +89,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
     private fun fetchFromNextDns(url: String) {
         val subUrl = constructFavIcoUrlNextDns(url)
         val futureTarget: FutureTarget<File> =
-            GlideApp.with(context.applicationContext)
+            Glide.with(context.applicationContext)
                 .downloadOnly()
                 .load(subUrl)
                 .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
@@ -105,7 +106,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
                 true
             )
         } finally {
-            GlideApp.with(context.applicationContext).clear(futureTarget)
+            Glide.with(context.applicationContext).clear(futureTarget)
         }
     }
 
@@ -113,7 +114,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
     // https://github.com/bumptech/glide/issues/509
     private fun updateImage(fdqnUrl: String, subUrl: String, url: String, retry: Boolean) {
         val futureTarget: FutureTarget<File> =
-            GlideApp.with(context.applicationContext)
+            Glide.with(context.applicationContext)
                 .downloadOnly()
                 .load(subUrl)
                 .submit(SIZE_ORIGINAL, SIZE_ORIGINAL)
@@ -134,7 +135,7 @@ class FavIconDownloader(val context: Context, private val url: String) : Runnabl
             }
             Log.e(LOG_TAG_DNS_LOG, "Glide, no fav icon available for the url: $subUrl")
         } finally {
-            GlideApp.with(context.applicationContext).clear(futureTarget)
+            Glide.with(context.applicationContext).clear(futureTarget)
         }
     }
 }
