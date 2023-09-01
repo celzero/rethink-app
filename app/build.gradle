@@ -112,6 +112,9 @@ android {
             vectorDrawables.useSupportLibrary = true
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 
     tasks.configureEach { task ->
         if (task.name.toLowerCase().contains('headless')) {
@@ -120,11 +123,6 @@ android {
                 task.enabled false
             }
         }
-    }
-
-    //TODO: resolve linter issues and re-enable abortOnError
-    lintOptions {
-        abortOnError false
     }
 
 }
