@@ -19,7 +19,6 @@ import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -34,7 +33,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -63,9 +61,6 @@ import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.INVALID_PORT
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
@@ -75,24 +70,21 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.getPackageMetadata
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.isWebsiteFlavour
-import com.celzero.bravedns.util.Utilities.oldLocalBlocklistDownloadDir
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.io.File
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -351,67 +343,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun removeThisMethod() {
-        // for version v055
-        updateHttpProxyForV55()
-
-        // for version v03k
-        removeKeyFromSharedPref()
-        changeDefaultToMax()
-
-        // for version v054
-        updateIfRethinkConnectedv053x()
         moveRemoteBlocklistFileFromAsset()
-
-        io {
-            moveLocalBlocklistFiles()
-
-            // path: /data/data/com.celzero.bravedns/files
-            val oldFolder = File(this.filesDir.canonicalPath)
-            deleteUnwantedFolders(oldFolder)
-
-            // already there is a local blocklist file available, complete the initial filetag read
-            if (persistentState.localBlocklistTimestamp != INIT_TIME_MS) {
-                RethinkBlocklistManager.readJson(
-                    this,
-                    RethinkBlocklistManager.DownloadType.LOCAL,
-                    persistentState.localBlocklistTimestamp
-                )
-            }
-        }
-    }
-
-    private fun updateHttpProxyForV55() {
-        // for version v055
-        val port = persistentState.httpProxyPort
-        // no need to perform below changes if the port / host is not set
-        if (port == INVALID_PORT || persistentState.httpProxyHostAddress.isEmpty()) return
-
-        val ip = persistentState.httpProxyHostAddress
-        val host = "http://$ip:$port/"
-        persistentState.httpProxyHostAddress = host
-    }
-
-    private fun changeDefaultToMax() {
-        // only change the rethink dns to max for website and f-droid build
-        if (isPlayStoreFlavour()) return
-
-        io { appConfig.switchRethinkDnsToMax() }
-    }
-
-    private fun removeKeyFromSharedPref() {
-        // below keys are not used, remove from shared pref
-        val removeLocal = "local_blocklist_update_check"
-        val removeRemote = "remote_blocklist_update_check"
-        val killApp = "kill_app_on_firewall"
-        val dnsCryptRelay = "dnscrypt_relay"
-
-        val sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = sharedPref.edit()
-        editor.remove(removeLocal)
-        editor.remove(removeRemote)
-        editor.remove(killApp)
-        editor.remove(dnsCryptRelay)
-        editor.apply()
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
@@ -431,60 +363,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             }
 
             RemoteFileTagUtil.moveFileToLocalDir(this.applicationContext, persistentState)
-        }
-    }
-
-    private fun updateIfRethinkConnectedv053x() {
-        if (!appConfig.isRethinkDnsConnectedv053x()) return
-
-        io {
-            appConfig.updateRethinkPlusCountv053x(persistentState.getRemoteBlocklistCount())
-            persistentState.dnsType = AppConfig.DnsType.RETHINK_REMOTE.type
-            appConfig.enableRethinkDnsPlus()
-        }
-    }
-
-    private fun moveLocalBlocklistFiles() {
-        val path = oldLocalBlocklistDownloadDir(this, persistentState.localBlocklistTimestamp)
-        val blocklistsExist =
-            Constants.ONDEVICE_BLOCKLISTS_ADM.all {
-                File(path + File.separator + it.filename).exists()
-            }
-        if (!blocklistsExist) return
-
-        changeDefaultLocalBlocklistLocation()
-    }
-
-    // move the files of local blocklist to specific folder (../files/local_blocklist/<timestamp>)
-    private fun changeDefaultLocalBlocklistLocation() {
-        val baseDir =
-            blocklistDownloadBasePath(
-                this,
-                LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                persistentState.localBlocklistTimestamp
-            )
-        File(baseDir).mkdirs()
-        Constants.ONDEVICE_BLOCKLISTS_ADM.forEach {
-            val currentFile =
-                File(
-                    oldLocalBlocklistDownloadDir(this, persistentState.localBlocklistTimestamp) +
-                        it.filename
-                )
-            val newFile = File(baseDir + File.separator + it.filename)
-            com.google.common.io.Files.move(currentFile, newFile)
-        }
-    }
-
-    private fun deleteUnwantedFolders(fileOrDirectory: File) {
-        // TODO: delete the old folders with timestamp in the files dir (../files/<timestamp>)
-        // this operation is performed after moving the local blocklist to
-        // specific folder
-
-        if (fileOrDirectory.name.startsWith("16")) {
-            if (fileOrDirectory.isDirectory) {
-                fileOrDirectory.listFiles()?.forEach { child -> deleteUnwantedFolders(child) }
-            }
-            fileOrDirectory.delete()
         }
     }
 
