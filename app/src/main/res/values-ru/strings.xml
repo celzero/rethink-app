@@ -938,7 +938,6 @@
     <string name="status_protected_with_wg_private_dns" translatable="true">защищено wireguard &amp; частный dns</string>
     <string name="search_proxy_add_apps" translatable="true">Поиск приложений по названию</string>
     <string name="public_key_copy_toast_msg" translatable="true">Публичный ключ скопирован.</string>
-    <string name="ct_bs_upload_download" translatable="true">Загрузка %1$s / Скачивание %2$s</string>
     <string name="logs_disclaimer" translatable="true">Показать первые 20,000 символов</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Не проверять TLS-сертификаты сервера (включайте только если знаете, что делаете)</string>
     <string name="app_ip_domain_rules" translatable="true">IP на каждое приложение / Правила домена</string>
