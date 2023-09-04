@@ -297,7 +297,7 @@ class OrbotHelper(
             .setContentText(contentText)
         builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
         builder.color =
-            ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
+            ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
         val openIntent = getOrbotOpenIntent()
         val notificationAction: NotificationCompat.Action =
             NotificationCompat.Action(

@@ -32,12 +32,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.databinding.DialogAddCustomDomainBinding
 import com.celzero.bravedns.databinding.ListItemCustomAllDomainBinding
 import com.celzero.bravedns.databinding.ListItemCustomDomainBinding
-import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
@@ -45,8 +45,8 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.UiUtils.fetchColor
-import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -126,7 +126,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
-        GlideApp.with(context)
+        Glide.with(context)
             .load(drawable)
             .error(Utilities.getDefaultIcon(context))
             .into(mIconImageView)

@@ -27,10 +27,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.databinding.ListItemWgIncludeAppsBinding
-import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
@@ -124,7 +124,7 @@ class WgIncludeAppsAdapter(
         }
 
         private fun displayIcon(drawable: Drawable?) {
-            GlideApp.with(context)
+            Glide.with(context)
                 .load(drawable)
                 .error(getDefaultIcon(context))
                 .into(b.wgIncludeAppListApkIconIv)

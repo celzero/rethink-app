@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.util
+package com.celzero.bravedns.service
 
-import android.content.Context
-import com.celzero.bravedns.R
-import com.celzero.bravedns.database.DnsLog
+import com.celzero.bravedns.database.TcpProxyEndpoint
+import org.koin.core.component.KoinComponent
 
-object UIUtils {
-    fun fetchFavIcon(context: Context, dnsLog: DnsLog) {}
+object TcpProxyHelper : KoinComponent {
+    const val TCP_FOLDER_NAME = "tcp"
 
-    fun getAccentColor(appTheme: Int): Int {
-        return R.color.accentGoodBlack
+    suspend fun load() {}
+
+    fun getActiveTcpProxy(): TcpProxyEndpoint? {
+        return null
+    }
+
+    fun getFolderName(): String {
+        return TCP_FOLDER_NAME
     }
 }

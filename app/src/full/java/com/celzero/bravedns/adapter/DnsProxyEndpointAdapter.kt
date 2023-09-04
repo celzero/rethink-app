@@ -32,7 +32,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DnsProxyListItemBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.UiUtils.clipboardCopy
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

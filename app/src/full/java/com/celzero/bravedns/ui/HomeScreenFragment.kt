@@ -51,9 +51,9 @@ import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
-import com.celzero.bravedns.util.UiUtils.openNetworkSettings
-import com.celzero.bravedns.util.UiUtils.openVpnProfile
-import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.openNetworkSettings
+import com.celzero.bravedns.util.UIUtils.openVpnProfile
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn

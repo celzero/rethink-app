@@ -43,7 +43,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.AppInfoViewModel
 import com.google.android.material.chip.Chip
@@ -224,7 +224,7 @@ class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchVie
         val firewallLabel = filter.firewallFilter.getLabel(this)
         if (filter.categoryFilters.isEmpty()) {
             b.firewallAppLabelTv.text =
-                UiUtils.updateHtmlEncodedText(
+                UIUtils.updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc,
                         firewallLabel.lowercase(),
@@ -233,7 +233,7 @@ class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchVie
                 )
         } else {
             b.firewallAppLabelTv.text =
-                UiUtils.updateHtmlEncodedText(
+                UIUtils.updateHtmlEncodedText(
                     getString(
                         R.string.fapps_firewall_filter_desc_category,
                         firewallLabel.lowercase(),

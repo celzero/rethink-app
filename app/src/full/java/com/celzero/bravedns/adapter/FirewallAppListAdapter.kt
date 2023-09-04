@@ -32,10 +32,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ListItemFirewallAppBinding
-import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.updateFirewallStatus
 import com.celzero.bravedns.ui.AppInfoActivity
@@ -267,7 +267,7 @@ class FirewallAppListAdapter(
         }
 
         private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
-            GlideApp.with(context)
+            Glide.with(context)
                 .load(drawable)
                 .error(Utilities.getDefaultIcon(context))
                 .into(mIconImageView)

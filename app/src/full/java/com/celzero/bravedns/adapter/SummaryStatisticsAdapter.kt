@@ -27,19 +27,19 @@ import android.widget.Toast
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
-import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
 import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.AppInfoActivity
@@ -47,8 +47,8 @@ import com.celzero.bravedns.ui.NetworkLogsActivity
 import com.celzero.bravedns.ui.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.UiUtils.getCountryNameFromFlag
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import kotlin.math.log2
@@ -272,7 +272,7 @@ class SummaryStatisticsAdapter(
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            GlideApp.with(context)
+            Glide.with(context)
                 .load(drawable)
                 .error(Utilities.getDefaultIcon(context))
                 .into(itemBinding.ssIcon)
@@ -430,7 +430,7 @@ class SummaryStatisticsAdapter(
             val duckduckgoDomainURL = FavIconDownloader.getDomainUrlFromFdqnDuckduckgo(query)
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                GlideApp.with(context.applicationContext)
+                Glide.with(context.applicationContext)
                     .load(nextDnsUrl)
                     .onlyRetrieveFromCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
@@ -462,7 +462,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (BuildConfig.DEBUG)
+                if (DEBUG)
                     Log.d(LoggerConstants.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
             }
@@ -478,13 +478,13 @@ class SummaryStatisticsAdapter(
         private fun displayDuckduckgoFavIcon(url: String, subDomainURL: String) {
             try {
                 val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-                GlideApp.with(context.applicationContext)
+                Glide.with(context.applicationContext)
                     .load(url)
                     .onlyRetrieveFromCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                     .error(
-                        GlideApp.with(context.applicationContext)
+                        Glide.with(context.applicationContext)
                             .load(subDomainURL)
                             .onlyRetrieveFromCache(true)
                     )
@@ -511,7 +511,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (BuildConfig.DEBUG)
+                if (DEBUG)
                     Log.d(LoggerConstants.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()

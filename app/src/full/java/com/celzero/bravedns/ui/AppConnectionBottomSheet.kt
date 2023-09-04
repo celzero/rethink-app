@@ -34,7 +34,7 @@ import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 

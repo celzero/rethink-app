@@ -30,7 +30,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils.clipboardCopy
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgInterface

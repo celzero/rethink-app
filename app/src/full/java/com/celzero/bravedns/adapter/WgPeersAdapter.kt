@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgPeersBinding
 import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireGuardManager.WARP_ID
 import com.celzero.bravedns.ui.WgAddPeerDialog
 import com.celzero.bravedns.wireguard.Peer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -60,7 +61,7 @@ class WgPeersAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun update(wgPeer: Peer) {
-            if (configId == WireGuardManager.WARP_ID) {
+            if (configId == WARP_ID) {
                 handleWarpPeers()
             }
             if (wgPeer.getEndpoint().isPresent) {

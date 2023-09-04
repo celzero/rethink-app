@@ -47,7 +47,7 @@ import java.util.TimeZone
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-object UiUtils {
+object UIUtils {
 
     fun getDnsStatus(): Int {
         val status = VpnController.state()
@@ -570,5 +570,15 @@ object UiUtils {
                 "🇿🇼" to "Zimbabwe"
             )
         return flagCodePoints[flag] ?: "Unknown"
+    }
+
+    fun getAccentColor(appTheme: Int): Int {
+        return when (appTheme) {
+            Themes.SYSTEM_DEFAULT.id -> R.color.accentGoodBlack
+            Themes.DARK.id -> R.color.accentGood
+            Themes.LIGHT.id -> R.color.accentGoodLight
+            Themes.TRUE_BLACK.id -> R.color.accentGoodBlack
+            else -> R.color.accentGoodBlack
+        }
     }
 }
