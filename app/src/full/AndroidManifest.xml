@@ -4,7 +4,8 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <application android:name=".RethinkDnsApplication">
+    <application android:name=".RethinkDnsApplication"
+        android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />

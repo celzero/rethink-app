@@ -39,6 +39,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
 import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
@@ -404,7 +405,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
             builder.setProgress(100, 0, false)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.color =
-                ContextCompat.getColor(context, Utilities.getAccentColor(persistentState.theme))
+                ContextCompat.getColor(context, UIUtils.getAccentColor(persistentState.theme))
 
             // Secret notifications are not shown on the lock screen.  No need for this app to show
             // there.

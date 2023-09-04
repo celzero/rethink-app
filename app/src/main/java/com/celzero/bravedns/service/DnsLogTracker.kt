@@ -25,7 +25,7 @@ import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
 import com.celzero.bravedns.util.ResourceRecordTypes
-import com.celzero.bravedns.util.UiUtils.fetchFavIcon
+import com.celzero.bravedns.util.UIUtils.fetchFavIcon
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair

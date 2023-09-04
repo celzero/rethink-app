@@ -43,9 +43,9 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_SEARCH_URL
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
-import com.celzero.bravedns.util.UiUtils.clipboardCopy
-import com.celzero.bravedns.util.UiUtils.fetchToggleBtnColors
-import com.celzero.bravedns.util.UiUtils.openUrl
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.convertLongToTime
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

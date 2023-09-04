@@ -32,6 +32,7 @@ import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
@@ -47,15 +48,14 @@ import com.celzero.bravedns.databinding.BottomSheetDnsLogBinding
 import com.celzero.bravedns.databinding.DialogInfoRulesLayoutBinding
 import com.celzero.bravedns.databinding.DialogIpDetailsLayoutBinding
 import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.ResourceRecordTypes
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils.fetchColor
-import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
@@ -509,7 +509,7 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
             if (DEBUG)
                 Log.d(LOG_TAG_DNS_LOG, "Glide, TransactionViewHolder lookupForImageNextDns :$url")
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-            GlideApp.with(requireContext().applicationContext)
+            Glide.with(requireContext().applicationContext)
                 .load(url)
                 .onlyRetrieveFromCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
@@ -561,13 +561,13 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                     "Glide - TransactionViewHolder lookupForImageDuckduckgo: $url, $domainUrl"
                 )
             val factory = DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build()
-            GlideApp.with(requireContext().applicationContext)
+            Glide.with(requireContext().applicationContext)
                 .load(url)
                 .onlyRetrieveFromCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                 .error(
-                    GlideApp.with(requireContext().applicationContext)
+                    Glide.with(requireContext().applicationContext)
                         .load(domainUrl)
                         .onlyRetrieveFromCache(true)
                 )

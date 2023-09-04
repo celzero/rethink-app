@@ -18,6 +18,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_ID
 import com.celzero.bravedns.service.WireGuardManager.WARP_ID
 import com.celzero.bravedns.service.WireGuardManager.isWarpWorking
 import com.celzero.bravedns.util.LoggerConstants
@@ -160,7 +161,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
                     val alreadyDownloaded = WireGuardManager.isSecWarpAvailable()
                     if (alreadyDownloaded) {
                         val cf =
-                            WireGuardManager.getConfigFilesById(WireGuardManager.SEC_WARP_ID)
+                            WireGuardManager.getConfigFilesById(SEC_WARP_ID)
                                 ?: return@io
                         WireGuardManager.enableConfig(cf)
                     } else {
@@ -171,7 +172,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
                 io {
                     val cf =
-                        WireGuardManager.getConfigFilesById(WireGuardManager.SEC_WARP_ID)
+                        WireGuardManager.getConfigFilesById(SEC_WARP_ID)
                             ?: return@io
                     WireGuardManager.disableConfig(cf)
                 }
@@ -244,7 +245,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     }
 
     private suspend fun fetchWarpConfigFromServer() {
-        val config = WireGuardManager.getNewWarpConfig(WireGuardManager.SEC_WARP_ID)
+        val config = WireGuardManager.getNewWarpConfig(SEC_WARP_ID)
         Log.i(LoggerConstants.LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()

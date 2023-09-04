@@ -32,7 +32,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
@@ -129,7 +129,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             }
         }
 
-        b.settingsActivityVpnLockdownDesc.setOnClickListener { UiUtils.openVpnProfile(this) }
+        b.settingsActivityVpnLockdownDesc.setOnClickListener { UIUtils.openVpnProfile(this) }
 
         b.settingsActivityIpRl.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityIpRl)

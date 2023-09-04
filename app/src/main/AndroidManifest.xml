@@ -40,8 +40,7 @@
         android:largeHeap="true"
         android:memtagMode="off"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppThemeInitial">
+        android:supportsRtl="true">
 
         <activity
             android:name=".ui.PrepareVpnActivity"

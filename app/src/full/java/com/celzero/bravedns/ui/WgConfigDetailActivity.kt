@@ -41,7 +41,7 @@ import com.celzero.bravedns.service.WireGuardManager.WARP_ID
 import com.celzero.bravedns.service.WireGuardManager.isWarpWorking
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.celzero.bravedns.wireguard.Config
@@ -267,7 +267,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
 
         b.publicKeyLabel.setOnClickListener {
-            UiUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
+            UIUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
             Utilities.showToastUiCentered(
                 this,
                 getString(R.string.public_key_copy_toast_msg),
@@ -276,7 +276,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
 
         b.publicKeyText.setOnClickListener {
-            UiUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
+            UIUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
             Utilities.showToastUiCentered(
                 this,
                 getString(R.string.public_key_copy_toast_msg),

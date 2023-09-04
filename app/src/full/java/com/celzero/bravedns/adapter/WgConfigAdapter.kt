@@ -31,7 +31,7 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireGuardManager
 import com.celzero.bravedns.ui.WgConfigDetailActivity
 import com.celzero.bravedns.ui.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
-import com.celzero.bravedns.util.UiUtils
+import com.celzero.bravedns.util.UIUtils
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -88,7 +88,7 @@ class WgConfigAdapter(private val context: Context) :
             if (config.isActive) {
                 val statusId = VpnController.getProxyStatusById(id)
                 if (statusId != null) {
-                    val resId = UiUtils.getProxyStatusStringRes(statusId)
+                    val resId = UIUtils.getProxyStatusStringRes(statusId)
                     b.interfaceStatus.text =
                         context.getString(
                             R.string.about_version_install_source,

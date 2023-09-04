@@ -54,8 +54,8 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
-import com.celzero.bravedns.util.UiUtils
-import com.celzero.bravedns.util.UiUtils.openUrl
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.openUrl
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -380,7 +380,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             val id = ProxyManager.ID_WG_BASE + it.getId()
             val statusId = VpnController.getProxyStatusById(id)
             if (statusId != null) {
-                val resId = UiUtils.getProxyStatusStringRes(statusId)
+                val resId = UIUtils.getProxyStatusStringRes(statusId)
                 val s = getString(resId).replaceFirstChar(Char::titlecase)
                 wgStatus += getString(R.string.ci_ip_label, it.getName(), s.padStart(1, ' ')) + "\n"
                 if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "current proxy status for $id: $s")

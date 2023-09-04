@@ -34,8 +34,8 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoHEndpoint
 import com.celzero.bravedns.databinding.DohEndpointListItemBinding
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.UiUtils.clipboardCopy
-import com.celzero.bravedns.util.UiUtils.getDnsStatus
+import com.celzero.bravedns.util.UIUtils.clipboardCopy
+import com.celzero.bravedns.util.UIUtils.getDnsStatus
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers

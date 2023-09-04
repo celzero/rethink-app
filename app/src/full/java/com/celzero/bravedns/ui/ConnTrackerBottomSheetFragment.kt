@@ -55,9 +55,9 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils
-import com.celzero.bravedns.util.UiUtils.fetchColor
-import com.celzero.bravedns.util.UiUtils.updateHtmlEncodedText
+import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
@@ -169,7 +169,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
 
         if (domain.isNullOrEmpty() || uid == null) {
             b.bsConnDnsCacheText.visibility = View.VISIBLE
-            b.bsConnDnsCacheText.text = UiUtils.getCountryNameFromFlag(flag)
+            b.bsConnDnsCacheText.text = UIUtils.getCountryNameFromFlag(flag)
             b.bsConnDomainRuleLl.visibility = View.GONE
             b.bsConnTrustedMsg.visibility = View.GONE
             return
@@ -180,7 +180,7 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         b.bsConnDnsCacheText.visibility = View.VISIBLE
         b.bsConnDnsCacheText.text =
             requireContext()
-                .getString(R.string.two_argument, UiUtils.getCountryNameFromFlag(flag), domain)
+                .getString(R.string.two_argument, UIUtils.getCountryNameFromFlag(flag), domain)
 
         if (showTrustDomainTip(status)) {
             b.bsConnTrustedMsg.visibility = View.VISIBLE

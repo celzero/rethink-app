@@ -23,7 +23,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UiUtils.fetchColor
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import ipn.Ipn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

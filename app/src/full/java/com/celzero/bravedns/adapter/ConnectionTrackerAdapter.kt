@@ -28,10 +28,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
-import com.celzero.bravedns.glide.GlideApp
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.VpnController
@@ -281,7 +281,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            GlideApp.with(context)
+            Glide.with(context)
                 .load(drawable)
                 .error(Utilities.getDefaultIcon(context))
                 .into(b.connectionAppIcon)
