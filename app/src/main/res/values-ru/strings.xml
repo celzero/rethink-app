@@ -58,7 +58,7 @@
     <string name="about_app_contributors">Авторы</string>
     <string name="local_blocklist_redownload">Актуально!</string>
     <string name="accessibility_service_description">RethinkDNS использует службу специальных возможностей для обнаружения и блокирования фоновых приложений. RethinkDNS не собирает и не продает какую-либо информацию.</string>
-    <string name="slide_2_desc">RethinkDNS — это самый простой обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
+    <string name="slide_2_desc">RethinkDNS — это самый простой способ обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
     <string name="title_about">О программе</string>
     <string name="next">Следующий</string>
     <string name="slide_1_title">Свободный и с открытым исходным кодом</string>
@@ -440,7 +440,7 @@
     <string name="dc_dns_website_desc">Получает иконки сайтов с <i>nextdns.io</i> и <i>duckduckgo.com</i>. Потребляет до 350 мб дискового пространства</string>
     <string name="dc_local_block_heading">Блокирующие списки на устройствах</string>
     <string name="dc_dns_leaks_heading">Предотвращение утечек DNS</string>
-    <string name="about_bravedns_explantion">Rethink — это самый простой обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
+    <string name="about_bravedns_explantion">Rethink — это самый простой способ обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
     <string name="about_bug_no_log_dialog_positive_btn">Отправить письмо</string>
     <string name="dc_dns_leaks_desc">Если включено, Rethink перехватывает все пакеты на порту 53 и направляет их на заданную пользователем конечную точку DNS</string>
     <string name="about_website">Посетите rethinkdns.com</string>
