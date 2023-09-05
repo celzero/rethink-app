@@ -171,7 +171,6 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
             b.bsConnDnsCacheText.visibility = View.VISIBLE
             b.bsConnDnsCacheText.text = UIUtils.getCountryNameFromFlag(flag)
             b.bsConnDomainRuleLl.visibility = View.GONE
-            b.bsConnTrustedMsg.visibility = View.GONE
             return
         }
 
@@ -181,17 +180,6 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
         b.bsConnDnsCacheText.text =
             requireContext()
                 .getString(R.string.two_argument, UIUtils.getCountryNameFromFlag(flag), domain)
-
-        if (showTrustDomainTip(status)) {
-            b.bsConnTrustedMsg.visibility = View.VISIBLE
-        } else {
-            b.bsConnTrustedMsg.visibility = View.GONE
-        }
-    }
-
-    private fun showTrustDomainTip(status: DomainRulesManager.Status): Boolean {
-        return status == DomainRulesManager.Status.TRUST &&
-            !appConfig.getDnsType().isRethinkRemote()
     }
 
     private fun updateConnDetailsChip() {
@@ -456,12 +444,6 @@ class ConnTrackerBottomSheetFragment : BottomSheetDialogFragment(), KoinComponen
                             fid
                     )
                         return
-
-                    if (showTrustDomainTip(fid)) {
-                        b.bsConnTrustedMsg.visibility = View.VISIBLE
-                    } else {
-                        b.bsConnTrustedMsg.visibility = View.GONE
-                    }
 
                     applyDomainRule(fid)
                 }

@@ -119,7 +119,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         b.bsacDomainRuleTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block_domain))
 
         setupRecycler()
-        updateTrustedTipUi()
     }
 
     private fun setupRecycler() {
@@ -136,14 +135,6 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
 
         val recyclerAdapter = DomainRulesBtmSheetAdapter(requireContext(), uid, list)
         b.bsacDomainList.adapter = recyclerAdapter
-    }
-
-    private fun updateTrustedTipUi() {
-        if (domains.isEmpty() || !appConfig.getDnsType().isRethinkRemote()) {
-            b.bsacTrustTip.visibility = View.VISIBLE
-        } else {
-            b.bsacTrustTip.visibility = View.GONE
-        }
     }
 
     private fun setRulesUi() {

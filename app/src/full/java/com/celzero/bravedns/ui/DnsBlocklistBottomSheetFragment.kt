@@ -145,12 +145,6 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         val d = domain.dropLastWhile { it == '.' }.lowercase()
         val status = DomainRulesManager.getDomainRule(d, Constants.UID_EVERYBODY)
         b.bsdlDomainRuleSpinner.setSelection(status.id)
-
-        if (showTrustDomainTip(status)) {
-            b.bsdlTrustedDomainsDesc.visibility = View.VISIBLE
-        } else {
-            b.bsdlTrustedDomainsDesc.visibility = View.GONE
-        }
     }
 
     private fun displayRecordTypeChip() {
@@ -195,12 +189,6 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
                         return
                     }
 
-                    if (showTrustDomainTip(status)) {
-                        b.bsdlTrustedDomainsDesc.visibility = View.VISIBLE
-                    } else {
-                        b.bsdlTrustedDomainsDesc.visibility = View.GONE
-                    }
-
                     applyDnsRule(status)
                 }
 
@@ -240,17 +228,10 @@ class DnsBlocklistBottomSheetFragment : BottomSheetDialogFragment() {
         handleResponseIpsChip()
     }
 
-    // show the trusted domains description only if the domain is in the trust list and selected
-    // dns type is not rethink
-    private fun showTrustDomainTip(status: DomainRulesManager.Status): Boolean {
-        return status == DomainRulesManager.Status.TRUST &&
-            !appConfig.getDnsType().isRethinkRemote()
-    }
-
     private fun handleResponseIpsChip() {
         b.dnsBlockIpsChip.visibility = View.VISIBLE
         lightenUpChip(b.dnsBlockIpsChip, BlockType.ALLOWED)
-        if (ResourceRecordTypes.mayContainIp(log!!.typeName) && log!!.responseIps == "--") {
+        if (ResourceRecordTypes.mayContainIp(log!!.typeName) && log!!.responseIps == "") {
             b.dnsBlockIpsChip.text = getString(R.string.dns_btm_sheet_chip_no_answer)
             return
         }
