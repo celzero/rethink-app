@@ -109,6 +109,8 @@ object TcpProxyHelper : KoinComponent {
     }
 
     fun isCloudflareIp(ip: String): Boolean {
+        // do not check for cloudflare ips for now
+        return false
         return try {
             cfIpTrie.hasAny(ip)
         } catch (e: Exception) {
