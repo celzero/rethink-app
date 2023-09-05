@@ -38,8 +38,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingBottom="5dp">
+                android:orientation="vertical">
 
                 <RelativeLayout
                     android:id="@+id/universal_firewall_rl"
@@ -182,70 +181,62 @@
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingBottom="5dp">
+            <RelativeLayout
+                android:id="@+id/app_wise_ip_domain_rl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp">
 
-                <RelativeLayout
-                    android:id="@+id/app_wise_ip_domain_rl"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/app_wise_ip_domain_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_ip_address" />
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/app_wise_ip_domain_icon"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/app_wise_ip_domain_switch_img"
+                    android:layout_toEndOf="@id/app_wise_ip_domain_icon"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/app_wise_ip_domain_txt"
+                        style="@style/TextAppearance.AppCompat.Subhead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_ip_address" />
+                        android:text="@string/app_ip_domain_rules"
+                        android:textSize="@dimen/large_font_text_view" />
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/app_wise_ip_domain_desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/app_wise_ip_domain_switch_img"
-                        android:layout_toEndOf="@id/app_wise_ip_domain_icon"
-                        android:orientation="vertical">
+                        android:paddingTop="5dp"
+                        android:text="@string/app_ip_domain_rules_desc"
+                        android:textSize="@dimen/default_font_text_view" />
+                </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/app_wise_ip_domain_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/app_ip_domain_rules"
-                            android:textSize="@dimen/large_font_text_view" />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/app_wise_ip_domain_switch_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_right_arrow_white" />
 
-                        <TextView
-                            android:id="@+id/app_wise_ip_domain_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="@string/app_ip_domain_rules_desc"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/app_wise_ip_domain_switch_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="10dp"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_right_arrow_white" />
-
-                </RelativeLayout>
-
-            </LinearLayout>
+            </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
