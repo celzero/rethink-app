@@ -1,1 +1,1 @@
-Firewall apps, monitor network activity, block malware, change DNS.
+Firewall apps, use WireGuard VPN, monitor network, block malware, change DNS.
