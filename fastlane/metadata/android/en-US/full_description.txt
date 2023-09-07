@@ -1,34 +1,31 @@
 Say hello to a safer, transparent, and secure Android.
 
-Open:
-Protects from DNS manipulation typically employed to censor websites, social media, and messaging apps.
+VPN: Connects to multiple WireGuard VPNs of your choice.
 
-Safe:
-Reveals network activity of installed apps and lets you disable, uninstall, or firewall them.
+Safe: Reveals network activity of installed apps and lets you disable, uninstall, or firewall them.
 
-Secure:
-First line of defense against spyware, ransomware, and malware that steal personal information and takeover accounts.
+Secure: First line of defense against spyware, ransomware, and malware that steal personal information and takeover accounts. Protects from DNS manipulation typically employed to censor websites, social media, and messaging apps.
 
-Fast:
-DNS Servers are deployed to 200+ locations world-wide to ensure your internet is as fast and highly available as it can be.
+Fast: DNS Servers deployed to 300+ locations world-wide to ensure your internet is as fast and highly available as it can be.
 
-Transparent:
-Open source and free of any trackers.
+Open: Open source and free of any trackers.
 
 ***Features***
 
-App Firewall:
-Prevent apps from connecting to the Internet.
+Firewall: Prevent apps from connecting to the Internet. Block spyware, malware, ransomware and more.
+     
+A firewall blocks any app connecting to the Internet over WiFi or Mobile data. Since most forms of surveillance require the data to be sent the network to a server, firewalling them effectively mitigates the threat (File Managers, Alarm Clock, Calculator are few such examples of apps that do not require any Internet access to function). The firewall feature uses Accessibility Service to detect and firewall background applications.
 
-A firewall blocks any app connecting to the Internet over Wifi or Mobile data. Since most forms of surveillance require the data to be sent the network to a server, firewalling them effectively mitigates the threat (File Managers, Alarm Clock, Calculator are few such examples of apps that do not require any Internet access to function).
+Monitoring: Keep tabs on incoming and outgoing Internet traffic. 
 
-Monitoring:
-Keep tabs on incoming and outgoing Internet traffic.
+If enabled, the connectivity logs are collected and analyzed. Automated reports flag previously unknown or suspicious connections, and reveal the extent of attempt to steal data by spyware networks. In our tests, around 60% of the traffic is flagged and reported as being initiated by known spyware. Logs generated are made available in near-real time to the user for their own analysis.
 
-If enabled, the connectivity (DNS) logs are collected and analyzed. Automated reports flag previously unknown or suspicious connections, and reveal the extent of attempt to steal data by spyware networks. In our tests, around 60% of the traffic is flagged and reported as being initiated by known spyware. Logs generated are made available in near-real time to the user for their own analysis.Content Blocking:
-Block spyware, malware and more.
+WireGuard: Secure outgoing Internet traffic.
 
-Anti-Censorship:
-The app encrypts your internet connection to Domain Name System (DNS) server run by rethinkdns with presence in our 200+ locations world-wide. DNS servers are the address book of the internet: A DNS server provides the exact addresses you need to visit a website or open an app.
+The app uses fast, modern, light-weight, and secure WireGuard protocol to encrypt outgoing connections to any compatible VPN provider of your choice.
 
-However, it is common to alter responses sent by DNS servers to block access or redirect to fake websites. By encrypting the connection to DNS servers on your Android device, rethinkdns helps ensure that the results can’t be manipulated, so you can safely access the internet.
+Anti-censorship: 
+
+The app encrypts your internet connection to Domain Name System (DNS) server run by Rethink with presence in our 300+ locations world-wide. DNS servers are the address book of the internet: A DNS server provides the exact addresses you need to visit a website or open an app.
+
+Data Monitor: Track per-app and per-connection Mobile or WiFi data usage.
