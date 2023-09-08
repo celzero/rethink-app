@@ -893,7 +893,6 @@
     <string name="status_protected_with_wg" translatable="true">Dilindungi oleh WireGuard</string>
     <string name="search_proxy_add_apps" translatable="true">Cari aplikasi berdasarkan nama</string>
     <string name="public_key_copy_toast_msg" translatable="true">Kunci publik telah disalin.</string>
-    <string name="ct_bs_upload_download" translatable="true">Unggah %1$s / Unduh %2$s</string>
     <string name="http_proxy_dialog_desc" translatable="true">Atur URL dalam format berikut, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;nama-domain-atau-IP&gt;:&lt;port&gt;&lt;path&gt;. Misalnya: http://proxy.example.com:8080/</string>
     <string name="lbl_slow" translatable="true">lambat</string>
     <string name="wireguard_description" translatable="true">WireGuard sebagai proxy.</string>

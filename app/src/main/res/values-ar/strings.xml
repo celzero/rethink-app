@@ -792,4 +792,7 @@
     <string name="lbl_domain" translatable="true">نطاق</string>
     <string name="lbl_action_required" translatable="true">الإجراء مطلوب</string>
     <string name="lbl_ip_rules" translatable="true">قواعد IP</string>
+    <string name="lbl_create" translatable="true">إنشاء</string>
+    <string name="lbl_qr_code" translatable="true">كود QR</string>
+    <string name="lbl_import" translatable="true">إستيراد</string>
 </resources>
