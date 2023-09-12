@@ -119,7 +119,7 @@ class WorkScheduler(val context: Context) {
         WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 APP_EXIT_INFO_JOB_TAG,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 appExitInfoCollector
             )
     }
@@ -136,10 +136,11 @@ class WorkScheduler(val context: Context) {
                 .addTag(PURGE_CONNECTION_LOGS_JOB_TAG)
                 .build()
 
+        if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "purge connection logs job scheduled")
         WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 PURGE_CONNECTION_LOGS_JOB_TAG,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 purgeLogs
             )
     }
@@ -182,7 +183,7 @@ class WorkScheduler(val context: Context) {
         WorkManager.getInstance(context.applicationContext)
             .enqueueUniquePeriodicWork(
                 BLOCKLIST_UPDATE_CHECK_JOB_TAG,
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 blocklistUpdateCheck
             )
     }
