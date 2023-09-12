@@ -378,6 +378,16 @@ abstract class AppDatabase : RoomDatabase() {
                         execSQL(
                             "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Quad9 Secure','https://dns.quad9.net/dns-query','Quad9 routes your DNS queries through a secure network of servers around the globe.',0,0,0,0)"
                         )
+                        execSQL(
+                            "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Mullvad DNS','https://dns.mullvad.net/dns-query','Mullvad's DNS server is a no-logging service, usable even if you're not a Mullvad customer.',0,0,0,0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Mullvad DNS AdBlock','https://adblock.dns.mullvad.net/dns-query','Mullvad's AdBlock DNS blocks both ads and trackers.',0,0,0,0)"
+                        )
+                        execSQL(
+                            "INSERT OR REPLACE INTO DoHEndpoint(dohName,dohURL,dohExplanation, isSelected,isCustom,modifiedDataTime,latency) values('Mullvad DNS Anti-Malware/AdBlock','https://base.dns.mullvad.net/dns-query','Mullvad's Base DNS blocks both ads, trackers and malware.',0,0,0,0)"
+                        )
+                        
                     }
                 }
 
