@@ -408,7 +408,7 @@
     <string name="settings_socks5_vpn_disabled_error">Mulai Rethink untuk melanjutkan.</string>
     <string name="settings_http_proxy_desc">Meneruskan ke %1$s</string>
     <string name="about_connect">kontak</string>
-    <string name="cd_dns_proxy_mode_internal">Internal</string>
+    <string name="cd_dns_proxy_mode_internal">Dalam</string>
     <string name="settings_https_heading">Atur KONEKSI Proksi HTTP(S)</string>
     <string name="settings_http_proxy_toast_success">Proksi HTTP telah diatur</string>
     <string name="dc_dns_proxy">Proksi DNS</string>
@@ -800,7 +800,7 @@
     <string name="lbl_blocked" translatable="true">Diblokir</string>
     <string name="firewall_rule_block_domain" translatable="true">Domain (Aplikasi)</string>
     <string name="lbl_disabled" translatable="true">Dinonaktifkan</string>
-    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="lbl_domain" translatable="true">Daerah</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>Domain</i>.<br/><br/> Untuk mengubahnya, pergi ke tampilan <i>Firewall khusus aplikasi</i>.</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domain Tepercaya (Aplikasi)</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Sambungan ini diizinkan karena <i>domain</i> ditetapkan sebagai domain tepercaya.<br/><br/> Untuk mengubahnya, buka tampilan <i>Firewall khusus aplikasi</i>.</string>
@@ -845,7 +845,7 @@
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplikasi yang Dipintaskan/Di-Bypass</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS Diblokir</string>
-    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domain (Univ)</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Daerah (Universal)</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Sambungan ini diblokir karena <i>domain</i> diblokir oleh DNS pilihan pengguna.<br/><br/> Untuk mengubah perilaku ini, buka tab <i>Konfigurasi DNS</i>.</string>
     <string name="lbl_maybe_blocked" translatable="true">Mungkin Diblokir</string>
     <string name="lbl_network" translatable="true">jaringan</string>
@@ -919,7 +919,7 @@
     <string name="key_length_explanation_binary" translatable="true">: Kunci WireGuard harus 32 byte</string>
     <string name="key_length_explanation_hex" translatable="true">: Kunci hex WireGuard harus 64 karakter (32 byte)</string>
     <string name="crypt_relay_singapore" translatable="true">Penghubung DNS anonim yang dihosting di Singapura.</string>
-    <string name="lbl_persistent_keepalive" translatable="true">Pertahankan interval aktif</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Pertahankan tetap-hidup</string>
     <string name="wireguard_enabled_failure">Matikan proksi lain untuk mengaktifkan WireGuard</string>
     <string name="add_peer" translatable="true">Tambahkan Peer</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Memblokir malware dan konten dewasa. Gunakan titik akhir DNS 1.1.1.3 Cloudflare.</string>
