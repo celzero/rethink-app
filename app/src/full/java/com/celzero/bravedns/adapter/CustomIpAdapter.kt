@@ -42,7 +42,7 @@ import com.celzero.bravedns.databinding.ListItemCustomAllIpBinding
 import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.CustomRulesActivity
+import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchColor

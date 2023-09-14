@@ -35,7 +35,7 @@ import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.ui.ConnTrackerBottomSheetFragment
+import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -112,11 +112,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 return
             }
 
-            val bottomSheetFragment = ConnTrackerBottomSheetFragment()
+            val bottomSheetFragment = ConnTrackerBottomSheet()
             // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
             bundle.putString(
-                ConnTrackerBottomSheetFragment.INSTANCE_STATE_IPDETAILS,
+                ConnTrackerBottomSheet.INSTANCE_STATE_IPDETAILS,
                 Gson().toJson(ct)
             )
             bottomSheetFragment.arguments = bundle

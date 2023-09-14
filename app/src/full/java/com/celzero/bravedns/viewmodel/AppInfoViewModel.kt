@@ -13,7 +13,7 @@ import androidx.paging.liveData
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.AppListActivity
+import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
 
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {

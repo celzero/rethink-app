@@ -290,7 +290,7 @@ class Constants {
         const val PCAP_FOLDER_NAME = "Rethink"
 
         // pcap file name
-        const val PCAP_FILE_NAME_PART = "Rethink_PCAP_"
+        const val PCAP_FILE_NAME_PART = "rethink_pcap_"
 
         // pcap file extension
         const val PCAP_FILE_EXTENSION = ".pcap"

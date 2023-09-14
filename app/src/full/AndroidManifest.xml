@@ -17,10 +17,10 @@
             android:value="true" />
 
         <activity
-            android:name=".ui.FirewallActivity"
+            android:name=".ui.activity.FirewallActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.HomeScreenActivity"
+            android:name=".ui.activity.HomeScreenActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -44,68 +44,68 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.DnsDetailActivity"
+            android:name=".ui.activity.DnsDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WelcomeActivity"
+            android:name=".ui.activity.WelcomeActivity"
             android:finishOnTaskLaunch="true"
             android:noHistory="true" />
         <activity
-            android:name=".ui.AppInfoActivity"
+            android:name=".ui.activity.AppInfoActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.PauseActivity"
+            android:name=".ui.activity.PauseActivity"
             android:launchMode="singleInstance" />
         <activity
-            android:name=".ui.DnsListActivity"
+            android:name=".ui.activity.DnsListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.CustomRulesActivity"
+            android:name=".ui.activity.CustomRulesActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.ConfigureRethinkBasicActivity"
+            android:name=".ui.activity.ConfigureRethinkBasicActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.ProxySettingsActivity"
+            android:name=".ui.activity.ProxySettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.MiscSettingsActivity"
+            android:name=".ui.activity.MiscSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.TunnelSettingsActivity"
+            android:name=".ui.activity.TunnelSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.AppListActivity"
+            android:name=".ui.activity.AppListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.DetailedStatisticsActivity"
+            android:name=".ui.activity.DetailedStatisticsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.NetworkLogsActivity"
+            android:name=".ui.activity.NetworkLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WgMainActivity"
+            android:name=".ui.activity.WgMainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WgConfigEditorActivity"
+            android:name=".ui.activity.WgConfigEditorActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WgConfigDetailActivity"
+            android:name=".ui.activity.WgConfigDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.CheckoutActivity"
+            android:name=".ui.activity.CheckoutActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.TcpProxyMainActivity"
+            android:name=".ui.activity.TcpProxyMainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.UniversalFirewallSettingsActivity"
+            android:name=".ui.activity.UniversalFirewallSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.ConfigureOtherDnsActivity"
+            android:name=".ui.activity.ConfigureOtherDnsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.NotificationHandlerDialog"
+            android:name=".ui.dialog.NotificationHandlerDialog"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:taskAffinity=""
