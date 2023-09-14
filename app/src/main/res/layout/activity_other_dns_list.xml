@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/other_dns_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background"
     android:orientation="vertical">
 
-    <com.google.android.material.tabs.TabLayout
+    <!--<com.google.android.material.tabs.TabLayout
         android:id="@+id/other_dns_act_tabLayout"
         style="@style/TabbedLayoutDefault"
         android:layout_width="match_parent"
@@ -23,6 +24,111 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:nestedScrollingEnabled="true"
-        android:orientation="horizontal" />
+        android:orientation="horizontal" />-->
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/doh_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/doh_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:padding="20dp"
+            android:text="@string/other_dns_list_tab1"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            app:drawableEndCompat="@drawable/ic_right_arrow_white" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/dns_proxy_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dns_proxy_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:padding="20dp"
+            android:text="@string/other_dns_list_tab3"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            app:drawableEndCompat="@drawable/ic_right_arrow_white" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/dot_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dot_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:padding="20dp"
+            android:text="@string/lbl_dot"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            app:drawableEndCompat="@drawable/ic_right_arrow_white" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/dns_crypt_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dns_crypt_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:padding="20dp"
+            android:text="@string/other_dns_list_tab2"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            app:drawableEndCompat="@drawable/ic_right_arrow_white" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/odoh_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/odoh_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:padding="20dp"
+            android:text="@string/lbl_dot"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="16sp"
+            app:drawableEndCompat="@drawable/ic_right_arrow_white" />
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

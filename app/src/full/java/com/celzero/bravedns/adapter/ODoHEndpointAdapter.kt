@@ -1,5 +1,5 @@
 /*
-Copyright 2020 RethinkDNS and its authors
+Copyright 2023 RethinkDNS and its authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.DoHEndpoint
+import com.celzero.bravedns.database.ODoHEndpoint
 import com.celzero.bravedns.databinding.ListItemEndpointBinding
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
@@ -42,26 +42,26 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DohEndpointAdapter(
+class ODoHEndpointAdapter(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
     private val appConfig: AppConfig
-) : PagingDataAdapter<DoHEndpoint, DohEndpointAdapter.DoHEndpointViewHolder>(DIFF_CALLBACK) {
+) : PagingDataAdapter<ODoHEndpoint, ODoHEndpointAdapter.ODoHEndpointViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<DoHEndpoint>() {
+            object : DiffUtil.ItemCallback<ODoHEndpoint>() {
                 override fun areItemsTheSame(
-                    oldConnection: DoHEndpoint,
-                    newConnection: DoHEndpoint
+                    oldConnection: ODoHEndpoint,
+                    newConnection: ODoHEndpoint
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
                         oldConnection.isSelected == newConnection.isSelected)
                 }
 
                 override fun areContentsTheSame(
-                    oldConnection: DoHEndpoint,
-                    newConnection: DoHEndpoint
+                    oldConnection: ODoHEndpoint,
+                    newConnection: ODoHEndpoint
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
                         oldConnection.isSelected != newConnection.isSelected)
@@ -69,47 +69,38 @@ class DohEndpointAdapter(
             }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoHEndpointViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ODoHEndpointViewHolder {
         val itemBinding =
             ListItemEndpointBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DoHEndpointViewHolder(itemBinding)
+        return ODoHEndpointViewHolder(itemBinding)
     }
 
-    override fun onBindViewHolder(holder: DoHEndpointViewHolder, position: Int) {
-        val doHEndpoint: DoHEndpoint = getItem(position) ?: return
-        holder.update(doHEndpoint)
+    override fun onBindViewHolder(holder: ODoHEndpointViewHolder, position: Int) {
+        val endpoint: ODoHEndpoint = getItem(position) ?: return
+        holder.update(endpoint)
     }
 
-    inner class DoHEndpointViewHolder(private val b: ListItemEndpointBinding) :
+    inner class ODoHEndpointViewHolder(private val b: ListItemEndpointBinding) :
         RecyclerView.ViewHolder(b.root) {
 
-        fun update(endpoint: DoHEndpoint) {
+        fun update(endpoint: ODoHEndpoint) {
             displayDetails(endpoint)
             setupClickListeners(endpoint)
         }
 
-        private fun setupClickListeners(endpoint: DoHEndpoint) {
+        private fun setupClickListeners(endpoint: ODoHEndpoint) {
             b.root.setOnClickListener { updateConnection(endpoint) }
             b.endpointInfoImg.setOnClickListener { showExplanationOnImageClick(endpoint) }
             b.endpointCheck.setOnClickListener { updateConnection(endpoint) }
         }
 
-        private fun displayDetails(endpoint: DoHEndpoint) {
-            if (endpoint.isSecure) {
-                b.endpointName.text = endpoint.dohName
-            } else {
-                b.endpointName.text =
-                    context.getString(
-                        R.string.ci_desc,
-                        endpoint.dohName,
-                        context.getString(R.string.lbl_insecure)
-                    )
-            }
+        private fun displayDetails(endpoint: ODoHEndpoint) {
+            b.endpointName.text = endpoint.name
             b.endpointDesc.text = ""
             b.endpointCheck.isChecked = endpoint.isSelected
             Log.i(
                 LOG_TAG_DNS,
-                "connected to doh: ${endpoint.dohName} isSelected? ${endpoint.isSelected}"
+                "connected to ODoH: ${endpoint.name} isSelected? ${endpoint.isSelected}"
             )
             if (endpoint.isSelected) {
                 b.endpointDesc.text =
@@ -120,7 +111,7 @@ class DohEndpointAdapter(
             showIcon(endpoint)
         }
 
-        private fun showIcon(endpoint: DoHEndpoint) {
+        private fun showIcon(endpoint: ODoHEndpoint) {
             if (endpoint.isDeletable()) {
                 b.endpointInfoImg.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_fab_uninstall)
@@ -132,21 +123,21 @@ class DohEndpointAdapter(
             }
         }
 
-        private fun updateConnection(endpoint: DoHEndpoint) {
+        private fun updateConnection(endpoint: ODoHEndpoint) {
             if (DEBUG)
                 Log.d(
                     LOG_TAG_DNS,
-                    "on doh change - ${endpoint.dohName}, ${endpoint.dohURL}, ${endpoint.isSelected}"
+                    "on-ODoH change ${endpoint.name}, ${endpoint.proxy}, ${endpoint.resolver}, ${endpoint.isSelected}"
                 )
             io {
                 endpoint.isSelected = true
-                appConfig.handleDoHChanges(endpoint)
+                appConfig.handleODoHChanges(endpoint)
             }
         }
 
         private fun deleteEndpoint(id: Int) {
             io {
-                appConfig.deleteDohEndpoint(id)
+                appConfig.deleteODoHEndpoint(id)
                 uiCtx {
                     Toast.makeText(
                             context,
@@ -158,15 +149,26 @@ class DohEndpointAdapter(
             }
         }
 
-        private fun showExplanationOnImageClick(endpoint: DoHEndpoint) {
-            if (endpoint.isDeletable()) showDeleteDnsDialog(endpoint.id)
-            else showDohMetadataDialog(endpoint.dohName, endpoint.dohURL, endpoint.dohExplanation)
+        private fun showExplanationOnImageClick(endpoint: ODoHEndpoint) {
+            if (endpoint.isDeletable()) showDeleteDialog(endpoint.id)
+            else
+                showDoTMetadataDialog(
+                    endpoint.name,
+                    endpoint.proxy,
+                    endpoint.resolver,
+                    endpoint.desc
+                )
         }
 
-        private fun showDohMetadataDialog(title: String, url: String, message: String?) {
+        private fun showDoTMetadataDialog(
+            title: String,
+            proxy: String,
+            resolver: String,
+            message: String?
+        ) {
             val builder = MaterialAlertDialogBuilder(context)
             builder.setTitle(title)
-            builder.setMessage(url + "\n\n" + getDnsDesc(message))
+            builder.setMessage(proxy + "\n\n" + resolver + "\n\n" + getDnsDesc(message))
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.dns_info_positive)) {
                 dialogInterface,
@@ -176,7 +178,7 @@ class DohEndpointAdapter(
             builder.setNeutralButton(context.getString(R.string.dns_info_neutral)) {
                 _: DialogInterface,
                 _: Int ->
-                clipboardCopy(context, url, context.getString(R.string.copy_clipboard_label))
+                clipboardCopy(context, proxy, context.getString(R.string.copy_clipboard_label))
                 Utilities.showToastUiCentered(
                     context,
                     context.getString(R.string.info_dialog_url_copy_toast_msg),
@@ -203,10 +205,10 @@ class DohEndpointAdapter(
             }
         }
 
-        private fun showDeleteDnsDialog(id: Int) {
+        private fun showDeleteDialog(id: Int) {
             val builder = MaterialAlertDialogBuilder(context)
-            builder.setTitle(R.string.doh_custom_url_remove_dialog_title)
-            builder.setMessage(R.string.doh_custom_url_remove_dialog_message)
+            builder.setTitle(R.string.dot_custom_url_remove_dialog_title)
+            builder.setMessage(R.string.dot_custom_url_remove_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 deleteEndpoint(id)

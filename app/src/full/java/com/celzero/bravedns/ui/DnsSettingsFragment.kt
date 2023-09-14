@@ -40,12 +40,12 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class DnsSettingsFragment :
     Fragment(R.layout.fragment_dns_configure),
@@ -151,6 +151,11 @@ class DnsSettingsFragment :
                 b.connectedStatusTitle.text =
                     resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
+            AppConfig.DnsType.DOT -> {
+                b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_dot)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+            }
             AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_crypt_status)
@@ -172,6 +177,12 @@ class DnsSettingsFragment :
             AppConfig.DnsType.NETWORK_DNS -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+                b.connectedStatusTitle.text =
+                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+            }
+            AppConfig.DnsType.ODOH -> {
+                b.connectedStatusTitleUrl.text =
+                    resources.getString(R.string.lbl_odoh)
                 b.connectedStatusTitle.text =
                     resources.getString(R.string.configure_dns_connection_name, connectedDns)
             }
@@ -218,6 +229,12 @@ class DnsSettingsFragment :
             }
             AppConfig.DnsType.NETWORK_DNS -> {
                 resources.getString(R.string.dc_dns_proxy)
+            }
+            AppConfig.DnsType.DOT -> {
+                resources.getString(R.string.lbl_dot)
+            }
+            AppConfig.DnsType.ODOH -> {
+                resources.getString(R.string.lbl_odoh)
             }
         }
     }
@@ -355,29 +372,8 @@ class DnsSettingsFragment :
 
     private fun showCustomDns() {
         val intent = Intent(requireContext(), DnsListActivity::class.java)
-        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, customDnsScreenToLoad())
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
-    }
-
-    private fun customDnsScreenToLoad(): Int {
-        return when (appConfig.getDnsType()) {
-            AppConfig.DnsType.RETHINK_REMOTE -> {
-                DnsListActivity.Tabs.DOH.screen
-            }
-            AppConfig.DnsType.DOH -> {
-                DnsListActivity.Tabs.DOH.screen
-            }
-            AppConfig.DnsType.DNSCRYPT -> {
-                DnsListActivity.Tabs.DNSCRYPT.screen
-            }
-            AppConfig.DnsType.DNS_PROXY -> {
-                DnsListActivity.Tabs.DNSPROXY.screen
-            }
-            AppConfig.DnsType.NETWORK_DNS -> {
-                DnsListActivity.Tabs.DOH.screen
-            }
-        }
     }
 
     private fun setNetworkDns() {

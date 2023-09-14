@@ -49,9 +49,11 @@ import java.io.File
             RemoteBlocklistPacksMap::class,
             WgConfigFiles::class,
             ProxyApplicationMapping::class,
-            TcpProxyEndpoint::class
+            TcpProxyEndpoint::class,
+            DoTEndpoint::class,
+            ODoHEndpoint::class
         ],
-    version = 20,
+    version = 21,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -91,6 +93,8 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_17_18)
                 .addMigrations(migration1819(context))
                 .addMigrations(MIGRATION_19_20)
+                .addMigrations(MIGRATION_20_21)
+                .addMigrations(MIGRATION_21_22)
                 .build()
 
         private val MIGRATION_1_2: Migration =
@@ -813,6 +817,18 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                 }
             }
+
+        private val MIGRATION_20_21: Migration =
+            object : Migration(20, 21) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "CREATE TABLE 'DoTEndpoint' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'url' TEXT NOT NULL, 'desc' TEXT, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL, 'isSecure' INTEGER NOT NULL, 'latency' INTEGER NOT NULL, 'modifiedDataTime' INTEGER NOT NULL, PRIMARY KEY (id))"
+                    )
+                    database.execSQL(
+                        "CREATE TABLE 'ODoHEndpoint' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'proxy' TEXT NOT NULL, 'resolver' TEXT NOT NULL, 'proxyIps' TEXT NOT NULL, 'desc' TEXT, 'isSelected' INTEGER NOT NULL, 'isCustom' INTEGER NOT NULL, 'latency' INTEGER NOT NULL, 'modifiedDataTime' INTEGER NOT NULL, PRIMARY KEY (id))"
+                    )
+                }
+            }
     }
 
     // fixme: revisit the links to remove the pragma for each table
@@ -840,6 +856,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun wgConfigFilesDAO(): WgConfigFilesDAO
     abstract fun wgApplicationMappingDao(): ProxyApplicationMappingDAO
     abstract fun tcpProxyEndpointDao(): TcpProxyDAO
+    abstract fun dotEndpointDao(): DoTEndpointDAO
+    abstract fun odohEndpointDao(): ODoHEndpointDAO
 
     fun appInfoRepository() = AppInfoRepository(appInfoDAO())
     fun dohEndpointRepository() = DoHEndpointRepository(dohEndpointsDAO())
@@ -861,4 +879,6 @@ abstract class AppDatabase : RoomDatabase() {
     fun wgConfigFilesRepository() = WgConfigFilesRepository(wgConfigFilesDAO())
     fun wgApplicationMappingRepository() = ProxyAppMappingRepository(wgApplicationMappingDao())
     fun tcpProxyEndpointRepository() = TcpProxyRepository(tcpProxyEndpointDao())
+    fun dotEndpointRepository() = DoTEndpointRepository(dotEndpointDao())
+    fun odohEndpointRepository() = ODoHEndpointRepository(odohEndpointDao())
 }

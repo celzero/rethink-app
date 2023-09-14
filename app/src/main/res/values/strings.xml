@@ -74,6 +74,8 @@
     <string name="lbl_persistent_keepalive" translatable="true">Persistent keepalive</string>
     <string name="lbl_allowed_ips" translatable="true">Allowed IPs</string>
     <string name="lbl_save" translatable="true">save</string>
+    <string name="lbl_dot" translatable="false">DoT</string>
+    <string name="lbl_odoh" translatable="false">ODoH</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
@@ -276,6 +278,9 @@
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Delete DoH endpoint?</string>
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Delete the DNS over Https endpoint from saved configuration.</string>
     <string name="doh_custom_url_remove_success" translatable="true">Endpoint deleted.</string>
+
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Delete DoT endpoint?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Delete the DNS over TLS endpoint from saved configuration.</string>
 
     <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Delete DNSCrypt resolver?</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">Delete the DNSCrypt resolver from saved configuration.</string>

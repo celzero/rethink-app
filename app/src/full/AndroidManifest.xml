@@ -3,8 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage" />
 
-    <application android:name=".RethinkDnsApplication"
+    <application
+        android:name=".RethinkDnsApplication"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
@@ -94,6 +100,9 @@
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.UniversalFirewallSettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.ConfigureOtherDnsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"

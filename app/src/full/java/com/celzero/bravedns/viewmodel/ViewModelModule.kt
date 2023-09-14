@@ -40,6 +40,8 @@ object ViewModelModule {
         viewModel { RemoteBlocklistPacksMapViewModel(get()) }
         viewModel { ProxyAppsMappingViewModel(get()) }
         viewModel { WgConfigViewModel(get()) }
+        viewModel { DoTEndpointViewModel(get()) }
+        viewModel { ODoHEndpointViewModel(get()) }
     }
 
     val modules = listOf(viewModelModule)
