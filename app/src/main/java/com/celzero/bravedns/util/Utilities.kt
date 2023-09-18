@@ -65,7 +65,6 @@ import com.google.common.net.InternetDomainName
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -77,6 +76,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 
 object Utilities {
 
@@ -726,15 +726,5 @@ object Utilities {
         val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
         val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
         return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
-    }
-
-    // get time in seconds and add "sec" or "min" or "hr" or "day" accordingly
-    fun getDurationInHumanReadableFormat(context: Context, sec: Int): String {
-        return when {
-            sec < 60 -> "$sec ${context.getString(R.string.lbl_sec)}"
-            sec < 3600 -> "${sec / 60} ${context.getString(R.string.lbl_min)}"
-            sec < 86400 -> "${sec / 3600} ${context.getString(R.string.lbl_hour)}"
-            else -> "${sec / 86400} ${context.getString(R.string.lbl_day)}"
-        }
     }
 }

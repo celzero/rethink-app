@@ -581,4 +581,36 @@ object UIUtils {
             else -> R.color.accentGoodBlack
         }
     }
+
+    // get time in seconds and add "sec" or "min" or "hr" or "day" accordingly
+    fun getDurationInHumanReadableFormat(context: Context, inputSeconds: Int): String {
+        // calculate the time in seconds and return the value in seconds or minutes or hours or days
+        val secondsInMinute = 60
+        val secondsInHour = 3600
+        val secondsInDay = 86400
+
+        val days = inputSeconds / secondsInDay
+        val remainingSecondsAfterDays = inputSeconds % secondsInDay
+        val hours = remainingSecondsAfterDays / secondsInHour
+        val remainingSecondsAfterHours = remainingSecondsAfterDays % secondsInHour
+        val minutes = remainingSecondsAfterHours / secondsInMinute
+        val seconds = remainingSecondsAfterHours % secondsInMinute
+
+        val result = StringBuilder()
+
+        if (days > 0) {
+            result.append("$days ${context.getString(R.string.lbl_day)} ")
+        }
+        if (hours > 0) {
+            result.append("$hours ${context.getString(R.string.lbl_hour)} ")
+        }
+        if (minutes > 0) {
+            result.append("$minutes ${context.getString(R.string.lbl_min)} ")
+        }
+        if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+            result.append("$seconds ${context.getString(R.string.lbl_sec)} ")
+        }
+
+        return result.toString().trim()
+    }
 }
