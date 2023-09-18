@@ -43,7 +43,7 @@ class WorkScheduler(val context: Context) {
         const val DATA_USAGE_JOB_TAG = "ScheduledDataUsageJob"
 
         const val APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS: Long = 7
-        const val PURGE_LOGS_TIME_INTERVAL_DAYS: Long = 7
+        const val PURGE_LOGS_TIME_INTERVAL_DAYS: Long = 1
         const val BLOCKLIST_UPDATE_CHECK_INTERVAL_DAYS: Long = 3
         const val DATA_USAGE_TIME_INTERVAL_MINS: Long = 20
 
