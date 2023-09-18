@@ -37,6 +37,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ActivityWelcomeBinding
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Themes
 import org.koin.android.ext.android.inject
 

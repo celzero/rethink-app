@@ -22,7 +22,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import com.celzero.bravedns.ui.activity.HomeScreenActivity
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.PrepareVpnActivity
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent

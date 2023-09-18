@@ -32,6 +32,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PauseTimer.PAUSE_VPN_EXTRA_MILLIS
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.humanReadableTime

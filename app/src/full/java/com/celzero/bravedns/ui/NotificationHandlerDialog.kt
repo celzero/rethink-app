@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.celzero.bravedns.ui.dialog
+package com.celzero.bravedns.ui
 
 import android.content.Context
 import android.content.Intent
@@ -26,7 +26,6 @@ import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppListActivity
-import com.celzero.bravedns.ui.activity.HomeScreenActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants

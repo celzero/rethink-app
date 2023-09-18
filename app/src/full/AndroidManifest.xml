@@ -20,7 +20,7 @@
             android:name=".ui.activity.FirewallActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.activity.HomeScreenActivity"
+            android:name=".ui.HomeScreenActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -105,7 +105,7 @@
             android:name=".ui.activity.ConfigureOtherDnsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.dialog.NotificationHandlerDialog"
+            android:name=".ui.NotificationHandlerDialog"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:taskAffinity=""
