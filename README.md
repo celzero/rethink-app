@@ -63,6 +63,8 @@ To turn Android devices into user-agents: Something that users can control as th
 To deliver the promise of open-internet for all: With the inevitable ESNI standardization and the imminent adoption of DNS over HTTPS and DNS over TLS across operating systems, we're that much closer to an open internet. Of course, *Deep Packet Inspection* remains a credible threat that can't be mitigated with this, but it is one example of delivering maximum impact (circumvent internet censorship in most countries) with minimal effort (not requiring use of a VPN or access via IPFS, for example). Rethink would continue to make these technologies accessible in the most simplest way possible, especially the ones that get 90% of the way there with 10% effort.
 
 ## Development
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/celzero/rethink-app/badge)](https://securityscorecards.dev/viewer/?uri=github.com/celzero/rethink-app)
+
 1. Feel free to fork and send along a pull request for any reproducible bug fixes.
   1. The codebase is raw and is lacking documentation and comprehensive tests. If you need help, feel free to create a Wikipage to highlight the pain with building, testing, writing, committing code.
   2. Write descriptive commit messages that explain concisely the changes made. 

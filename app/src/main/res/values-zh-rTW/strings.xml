@@ -112,7 +112,7 @@
     <string name="info_dialog_url_copy_toast_msg">已複製 URL</string>
     <string name="info_dialog_rethink_toast_msg">已作爲 RDNS+ DNS-over-HTTPS URL 複製</string>
     <string name="settings_enable_logs_desc">於本地儲存 DNS 與防火牆日誌。</string>
-    <string name="whats_dialog_title">v055a 的新內容</string>
+    <string name="whats_dialog_title">v055b 的新內容</string>
     <string name="settings_ip_network_desc">在不同互聯網協定版本中選擇。</string>
     <string name="settings_ptrans_heading">強制 IPv4 出站</string>
     <string name="settings_ptrans_desc">於本地將出站的 IPv6 流量轉換爲 IPv4 流量。在您連線至僅有 IPv4 的網路時使用。</string>
@@ -224,7 +224,7 @@
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>
-    <string name="whats_new_version_update">&lt;b&gt;傑森・A・多南菲爾德&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意數量 WireGuard 上游的多 VPN 支援。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內的活動連線指示器。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor （ Orbot ）代理指定應用程式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區現可依據 IP 地理位址顯示分組。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內顯示資料使用情況：分請求統計上載下載位元組。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分應用程式統計上載下載。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支援本地 DNS over HTTPS （非公開）解析服務。&lt;br/&gt; 8. 非常精細的按需漏洞報告，以更好地診斷問題。&lt;br/&gt; 9. DNS 加速器現默認啓用。&lt;br/&gt; 10. 爲分 IP 與網域而改進的 UI 。&lt;br/&gt; 11. 首頁上更大的 UI 塊。&lt;br/&gt; 12. 煥然一新的防火牆 UI 。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：使 HTTP 代理在 CONNECT 隧道上工作。&lt;/br&gt; 14. &lt;i&gt;漏洞修復&lt;/i&gt;：信任網域現也可在第三方 DNS 解析服務上工作。&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;協助翻譯此應用程式&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;傑森・A・多南菲爾德&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意數量 WireGuard 上游的多 VPN 支援。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內的活動連線指示器。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor （ Orbot ）代理指定應用程式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區現可依據 IP 地理位址顯示分組。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內顯示資料使用情況：分請求統計上載下載位元組。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分應用程式統計上載下載。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支援本地 DNS over HTTPS （非公開）解析服務。&lt;br/&gt; 8. 非常精細的按需漏洞報告，以更好地診斷問題。&lt;br/&gt; 9. DNS 加速器現默認啓用。&lt;br/&gt; 10. 爲分 IP 與網域而改進的 UI 。&lt;br/&gt; 11. 首頁上更大的 UI 塊。&lt;br/&gt; 12. 煥然一新的防火牆 UI 。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：使 HTTP 代理在 CONNECT 隧道上工作。&lt;br/&gt; 14. &lt;i&gt;漏洞修復&lt;/i&gt;：信任網域現也可在第三方 DNS 解析服務上工作。&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;協助翻譯此應用程式&lt;/a&gt;</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
@@ -959,7 +959,7 @@
     <string name="wireguard_enabled_failure">關閉其他代理以啓用 WireGuard</string>
     <string name="wireguard_no_config_msg">無 WireGuard 配置</string>
     <string name="wireguard_connection_error">連線至 WireGuard 配置時出錯</string>
-    <string name="wireguard_disclaimer">此爲 WireGuard 作 TCP 與 UDP 代理。當 DNS 流量被轉送至 %1$s 時， ICMP 流量將從底層網路發送。</string>
+    <string name="wireguard_disclaimer">此爲實驗性的 WireGuard 作 TCP 與 UDP 代理。當 DNS 流量被轉送至 %1$s 時， ICMP 流量將從底層網路發送。</string>
     <string name="cloudflare_dns_desc" translatable="true">不攔截任何 DNS 請求。使用 Cloudflare 的 1.1.1.1 DNS 端點。</string>
     <string name="cloudflare_family_dns_desc" translatable="true">攔截惡意軟體與成人內容。使用 Cloudflare 的 1.1.1.3 DNS 端點。</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">家庭篩檢器攔截對所有成人、色情與露骨網站的訪問。其亦將攔截可用於繞行篩檢器的代理與 VPN 網域。包含混合內容的網站（如 Reddit ）也被攔截。 Google 、 Bing 與 YouTube 被設定爲安全模式。</string>
@@ -977,4 +977,8 @@
     <string name="crypt_relay_us" translatable="true">於美國洛杉磯託管的匿名 DNS 中繼，由 https://cryptostrom.is/ 提供。</string>
     <string name="crypt_relay_netherlands" translatable="true">於尼德蘭託管的匿名 DNS 中繼</string>
     <string name="crypt_relay_singapore" translatable="true">於新加坡託管的匿名 DNS 中繼。</string>
+    <string name="settings_go_log_desc" translatable="true">便於調試</string>
+    <string name="settings_go_log_heading" translatable="true">日誌層級</string>
+    <string name="wireguard_refresh_toast">代理刷新完畢</string>
+    <string name="logs_card_duration" translatable="true">自 %1$s 以來</string>
 </resources>

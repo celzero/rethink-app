@@ -324,4 +324,45 @@
     <string name="doh_custom_url_remove_dialog_title" translatable="true">Видалити кінцеву точку DoH\?</string>
     <string name="dns_proxy_remove_dialog_title" translatable="true">Видалити DNS проксі\?</string>
     <string name="dns_proxy_remove_dialog_message" translatable="true">Видалити DNS-проксі зі збереженої конфігурації.</string>
+    <string name="lbl_import" translatable="true">Імпортувати</string>
+    <string name="lbl_allowed_ips" translatable="true">Дозволені IP-адреси</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_add" translatable="true">додати</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_sec" translatable="true">с</string>
+    <string name="lbl_proceed" translatable="true">Продовжити</string>
+    <string name="lbl_hour" translatable="true">год</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Постійно активне</string>
+    <string name="lbl_save" translatable="true">зберегти</string>
+    <string name="lbl_optional" translatable="true">(додатково)</string>
+    <string name="lbl_delete" translatable="true">Видалити</string>
+    <string name="lbl_qr_code" translatable="true">QR-код</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_generated" translatable="true">(згенеровано)</string>
+    <string name="lbl_auto" translatable="true">(авто)</string>
+    <string name="lbl_slow" translatable="true">повільно</string>
+    <string name="lbl_day" translatable="true">д</string>
+    <string name="lbl_fast" translatable="true">швидко</string>
+    <string name="lbl_inactive" translatable="true">Неактивне</string>
+    <string name="lbl_addresses" translatable="true">Адреси</string>
+    <string name="lbl_active" translatable="true">Активне</string>
+    <string name="lbl_dns_servers" translatable="true">DNS Сервери</string>
+    <string name="lbl_app_wise" translatable="true">на програму</string>
+    <string name="status_protected_with_wg" translatable="true">захищено wireguard</string>
+    <string name="lbl_public_key" translatable="true">Відкритий ключ</string>
+    <string name="lbl_insecure" translatable="true">(несекретно)</string>
+    <string name="lbl_min" translatable="true">хв</string>
+    <string name="lbl_private_key" translatable="true">Приватний ключ</string>
+    <string name="lbl_preshared_key" translatable="true">Загальний ключ</string>
+    <string name="lbl_applications" translatable="true">Програми</string>
+    <string name="lbl_include" translatable="true">Долучити</string>
+    <string name="lbl_very" translatable="true">дуже</string>
+    <string name="lbl_select_all" translatable="true">позначити все</string>
+    <string name="lbl_create" translatable="true">Створити</string>
+    <string name="local_blocklist_redownload" translatable="true">Оновлено!</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">захищено wireguard &amp; приватний dns</string>
+    <string name="lbl_listen_port" translatable="true">Слухати порт</string>
+    <string name="lbl_random" translatable="true">(випадково)</string>
 </resources>

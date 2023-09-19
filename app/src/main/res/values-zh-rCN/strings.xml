@@ -67,7 +67,7 @@
     <string name="download_update_dialog_trylater_title">现在无法更新</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_enable_logs">启用本地日志</string>
-    <string name="whats_dialog_title">v055a 的新内容</string>
+    <string name="whats_dialog_title">v055b 的新内容</string>
     <string name="settings_allow_bypass_heading">于网络可见</string>
     <string name="settings_socks5_heading">设置 SOCKS5 代理</string>
     <string name="orbot">Orbot</string>
@@ -645,7 +645,7 @@
     <string name="about_mozilla">Rethink 受来自 Mozilla Builders 、 OSOM Products Inc 与 FOSS United 基金会的支持。</string>
     <string name="http_proxy_dialog_heading">设置 HTTP(S) CONNECT 代理</string>
     <string name="search_dns_logs"><font size="12">搜索域名或 IP</font></string>
-    <string name="whats_new_version_update">&lt;b&gt;杰森・A・多南菲尔德&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意数量 WireGuard 上游的多 VPN 支持。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：网络日志内的活动连接标识。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor （ Orbot ）代理指定应用程序。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：统计屏现可依据 IP 地理位置显示分组。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：网络日志内显示数据使用情況：分请求统计上传下载字节数。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分应用程序统计上传下载。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支持本地 DNS over HTTPS （非公开）解析服务。&lt;br/&gt; 8. 非常精细的按需漏洞报告，以更好地诊断问题。&lt;br/&gt; 9. DNS 加速器现默认启用。&lt;br/&gt; 10. 为分 IP 与域名而改进的 UI 。&lt;br/&gt; 11. 首页上更大的 UI 块。&lt;br/&gt; 12. 煥然一新的防火墙 UI 。&lt;br/&gt; 13. &lt;i&gt;漏洞修复&lt;/i&gt;：使 HTTP 代理在 CONNECT 隧道上工作。&lt;/br&gt; 14. &lt;i&gt;漏洞修复&lt;/i&gt;：信任域名现也可在第三方 DNS 解析服务上工作。&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译此应用程序&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;杰森・A・多南菲尔德&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意数量 WireGuard 上游的多 VPN 支持。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：网络日志内的活动连接标识。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor （ Orbot ）代理指定应用程序。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：统计屏现可依据 IP 地理位置显示分组。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：网络日志内显示数据使用情況：分请求统计上传下载字节数。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分应用程序统计上传下载。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支持本地 DNS over HTTPS （非公开）解析服务。&lt;br/&gt; 8. 非常精细的按需漏洞报告，以更好地诊断问题。&lt;br/&gt; 9. DNS 加速器现默认启用。&lt;br/&gt; 10. 为分 IP 与域名而改进的 UI 。&lt;br/&gt; 11. 首页上更大的 UI 块。&lt;br/&gt; 12. 煥然一新的防火墙 UI 。&lt;br/&gt; 13. &lt;i&gt;漏洞修复&lt;/i&gt;：使 HTTP 代理在 CONNECT 隧道上工作。&lt;br/&gt; 14. &lt;i&gt;漏洞修复&lt;/i&gt;：信任域名现也可在第三方 DNS 解析服务上工作。&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;帮助翻译此应用程序&lt;/a&gt;</string>
     <string name="about_website">访问 rethinkdns.com</string>
     <string name="settings_network_all_networks_desc">启用时， Rethink 将使用所有可用的网络来连接至互联网。若未启用，则将使用 Android 认为<i>活跃</i>的网络。</string>
     <string name="settings_dns_proxy_dialog_app_desc">所选应用将被排除在 VPN 外，以允许其为您转发连接。</string>
@@ -881,7 +881,7 @@
     <string name="exclude_all_app_wg_dialog_title">排除所有应用</string>
     <string name="wireguard_enabled_failure">关闭其他代理以启用 WireGuard</string>
     <string name="wireguard_connection_error">连接至 WireGuard 配置时出错</string>
-    <string name="wireguard_disclaimer">此为 WireGuard 作 TCP 与 UDP 代理。当 DNS 流量被转发至 %1$s 时， ICMP 流量将从底层网络发送。</string>
+    <string name="wireguard_disclaimer">此为实验性的 WireGuard 作 TCP 与 UDP 代理。当 DNS 流量被转发至 %1$s 时， ICMP 流量将从底层网络发送。</string>
     <string name="lbl_create" translatable="true">创建</string>
     <string name="lbl_qr_code" translatable="true">二维码</string>
     <string name="lbl_import" translatable="true">导入</string>
@@ -977,4 +977,8 @@
     <string name="crypt_relay_sweden" translatable="true">于瑞典托管的匿名 DNS 中继，由 https://cryptostrom.is/ 提供。</string>
     <string name="crypt_relay_us" translatable="true">于美国洛杉矶托管的匿名 DNS 中继，由 https://cryptostrom.is/ 提供。</string>
     <string name="crypt_relay_singapore" translatable="true">于新加坡托管的匿名 DNS 中继。</string>
+    <string name="settings_go_log_desc" translatable="true">便于调试</string>
+    <string name="settings_go_log_heading" translatable="true">日志级别</string>
+    <string name="wireguard_refresh_toast">代理刷新完毕</string>
+    <string name="logs_card_duration" translatable="true">自 %1$s 以来</string>
 </resources>

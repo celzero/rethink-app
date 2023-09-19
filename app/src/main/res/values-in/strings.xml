@@ -62,7 +62,7 @@
     <string name="univ_firewall_dialog_message">Menghapus aturan ini akan memungkinkan aplikasi apa pun terhubung ke alamat IP ini. Apakah Anda ingin melanjutkan\?</string>
     <string name="download_update_dialog_message">Versi baru tersedia untuk diunduh dari situs web. Apakah Anda ingin melanjutkan\?</string>
     <string name="search_universal_ips"><font size="12">Cari IP</font></string>
-    <string name="whats_dialog_title">Apa yang baru di v055</string>
+    <string name="whats_dialog_title">Apa yang baru di v055a</string>
     <string name="settings_ip_network_desc">Pilih versi Protokol Jaringan.</string>
     <string name="orbot_stop_dialog_dns_message">Rethink disiapkan untuk meneruskan permintaan DNS ke Orbot. Silahkan ubah sesuai kebutuhan.</string>
     <string name="orbot_bs_status_1">Meneruskan koneksi %1$s ke Orbot.</string>
@@ -356,7 +356,7 @@
     <string name="cd_dialog_error_invalid_domain">URL (domain) tidak valid.</string>
     <string name="settings_socks5_dialog_hint_username">Nama pengguna (tidak wajib)</string>
     <string name="settings_theme_dialog_themes_3">Gelap</string>
-    <string name="lbl_proceed">Lanjutkan</string>
+    <string name="lbl_proceed">Melanjutkan</string>
     <string name="bypass_universal">memintas (bypass) aturan secara universal</string>
     <string name="dns_crypt_relay_remove_dialog_title">Hapus Jembatan Penghubung (Relay) DNSCrypt\?</string>
     <string name="univ_ip_delete_individual_toast">%1$s telah dihapus.</string>
@@ -408,7 +408,7 @@
     <string name="settings_socks5_vpn_disabled_error">Mulai Rethink untuk melanjutkan.</string>
     <string name="settings_http_proxy_desc">Meneruskan ke %1$s</string>
     <string name="about_connect">kontak</string>
-    <string name="cd_dns_proxy_mode_internal">Internal</string>
+    <string name="cd_dns_proxy_mode_internal">Dalam</string>
     <string name="settings_https_heading">Atur KONEKSI Proksi HTTP(S)</string>
     <string name="settings_http_proxy_toast_success">Proksi HTTP telah diatur</string>
     <string name="dc_dns_proxy">Proksi DNS</string>
@@ -536,7 +536,7 @@
     <string name="firewall_rule_block_metered">Terukur (Data Selular)</string>
     <string name="settings_notification_dialog_option_1">"
 \nJeda / Hentikan (bawaan):
-\nMenampilkan dua tombol, untuk menjeda atau menghentikan Rethink dengan cepat."</string>
+\nMenampilkan dua tombol, untuk menjeda dan menghentikan Rethink dengan cepat."</string>
     <string name="hsf_proxy_chip_removed_toast">Proksi dihapus</string>
     <string name="firewall_rule_global_lockdown">Penguncian penuh</string>
     <string name="cd_dns_crypt_dialog_title">Tambahkan Penyelesai (Resolver) atau Jembatan-Penghubung (Relay) DNSCrypt</string>
@@ -568,7 +568,7 @@
     <string name="fapps_info_dialog_message">Blokir aplikasi agar tidak terhubung ke internet. Membatasi akses ke internet membantu menghindari penggunaan data yang tidak perlu dan juga membantu menghemat baterai.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>aplikasi</i> ini ketika mencoba terhubung dengan jaringan yang <i>Tidak Terukur</i>.<br/><br/> Untuk mengubahnya, buka tab <i>Semua Aplikasi</i>.</string>
     <string name="pause_title_desc">sedang rehat…</string>
-    <string name="whats_new_version_update">&lt;b&gt;Pesta LAN!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Fitur baru&lt;/i&gt;: Kecualikan IP Pribadi (LAN / link-local).&lt;br/&gt; 2. Buat Bypass DNS &amp; Setelan firewall berfungsi.&lt;br/&gt; 3. Tampilkan Mungkin Diblokir di Log DNS untuk domain yang mungkin diblokir oleh Firewall.&lt;br/&gt; 4. Tampilkan ikon adaptif jika didukung.&lt;br/&gt; 5. Permintaan autentikasi biometrik setiap 15 menit sekali.&lt;br/&gt; 6. 6 peningkatan UI dan kinerja lainnya.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Bantu terjemahkan aplikasi ini&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Jason A. Donenfeld&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Fitur baru&lt;/i&gt;: Dukungan multi-VPN dengan sejumlah koneksi WireGuard secara bersamaan.&lt;br/&gt; 2. &lt; i &gt;Fitur Baru&lt;/i&gt;: Indikator koneksi aktif (terbuka) di log jaringan.&lt;/br&gt; 3. &lt;i&gt;Fitur Baru&lt;/i&gt;: Membatasi Tor-as-a-proxy (Orbot) untuk aplikasi tertentu. &lt; br/&gt; 4. &lt;i&gt;Fitur baru&lt;/i&gt;: Statistik kini menunjukkan pengelompokan berdasarkan Geolokasi IP.&lt;br/&gt; 5. &lt;i&gt;Fitur baru&lt;/i&gt;: Menampilkan penggunaan data dalam log jaringan: unggah dan unduh byte per permintaan.&lt;br/&gt; 6. &lt;i&gt;Fitur baru&lt;/i&gt;: Unggah dan unduh statistik per aplikasi.&lt;br/&gt; 7. &lt;i&gt;Fitur baru&lt; /i&gt;: Dukungan untuk server DNS lokal melalui HTTPS (non-publik).&lt;br/&gt; 8. Pelaporan kesalahan on-demand yang sangat detail untuk diagnosis yang lebih baik.&lt;br/&gt; 9. Penguatan DNS kini diaktifkan secara default.&lt;br /&gt; 10. Peningkatan antarmuka untuk mengelola IP dan aturan domain per aplikasi.&lt;br/&gt; 11. Ubin yang lebih besar di layar beranda.&lt;br/&gt; 12. Antarmuka firewall yang diperbarui.&lt; br/ &gt; 13. &lt;i&gt;Perbaikan Bug&lt;/i&gt;: Jadikan Proxy HTTP berfungsi untuk CONNECTED terowongan.&lt;br/&gt; 14. &lt;i&gt;Perbaikan Bug&lt;/i&gt;: Domain tepercaya (daftar yang diizinkan) sekarang berfungsi dengan server DNS pihak ketiga.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc .rethinkdns.com/r/translate&gt;Bantu menerjemahkan aplikasi ini&lt;/a&gt;</string>
     <string name="brbs_restore_dialog_failure_positive">Ulangi Pemulihan</string>
     <string name="brbs_restore_complete_toast">Pemulihan selesai, memulai ulang aplikasi…</string>
     <string name="settings_import_export_heading">Pencadangan &amp; Pemulihan</string>
@@ -669,8 +669,8 @@
     <string name="fapps_info_dialog_positive_btn">Oke</string>
     <string name="orbot_explanation">Orbot adalah aplikasi proksi gratis yang memungkinkan sambungan internet pada aplikasi menjadi tempat yang<u>lebih aman</u>.
 \nOrbot menggunakan<u>Tor</u> untuk mengenkripsi lalu lintas internet anda, juga membantu <u>melewati penyensoran</u>dan sebagai bentuk pertahanan diri dari berbagai macam<u>pengawasan jaringan</u> yang bisa membahayakan kebebasan pribadi dan privasi.
-\n<u>Proksi TCP</u>: Rethink meneruskan koneksi TCP semua aplikasi menuju Orbot, kecuali aplikasi yang dikecualikan.
-\n<u>Proksi HTTP</u>: Rethink<i>menyiapkan</i>Proksi HTTP, tidak memaksa semua aplikasi untuk menggunakannya. Biasanya, digunakan oleh browser seperti Chrome dan Firefox. Aplikasi yang menggunakan proksi HTTP(S) akan mengabaikan aturan Firewall dan DNS.</string>
+\n<u>Proksi TCP</u>: Rethink hanya meneruskan koneksi TCP untuk aplikasi <i>yang ada</i> menuju Orbot.
+\n<u>Proksi HTTP</u>: Rethink<i>membangun</i> terowongan HTTP CONNECT ke Orbot dan hanya meneruskan koneksi TCP untuk aplikasi <i>yang ada</i>.</string>
     <string name="settings_autostart_bootup_heading">Mulai otomatis saat device dinyalakan (eksperimental)</string>
     <string name="settings_app_list_default_app">Tidak ada</string>
     <string name="settings_autostart_bootup_desc">Pada saat perangkat dihidupkan, Rethink akan memulai sendiri jika aplikasi ini sebelumnya tidak dimatikan.</string>
@@ -753,7 +753,7 @@
     <string name="firewall_rule_exempt_dns_proxied_desc">Koneksi DNS ini dialihkan dan diteruskan ke titik akhir DNS yang dipilih pengguna.<br/><br/> Untuk mengubah, menonaktifkan<i>Mencegah kebocoran DNS</i> dari DNS <i>konfigurasi</i> layar.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Sambungan ini diizinkan karena penyetelan <i>Tor-sebagai-proksi sekali klik</i> melalui Orbot sedang berlangsung.</string>
     <string name="cd_blocked_initial">B</string>
-    <string name="contributors_list">&lt;i&gt;Rethink Proyek Sumber Terbuka&lt;/i&gt; berutang keberadaannya kepada para sukarelawan yang mencurahkan banyak waktu untuk pengembangannya.&lt;br/&gt; &lt;br/&gt;🛡️ Aplikasi Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Mesin jaringan &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Server Penyelesai (Resolver) &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Moderator Komunitas &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icons &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
+    <string name="contributors_list">&lt;i&gt;Rethink Proyek Sumber Terbuka&lt;/i&gt; berutang keberadaannya kepada para sukarelawan yang mencurahkan banyak waktu untuk pengembangannya.&lt;br/&gt; &lt;br/&gt;🛡️ Aplikasi Android &lt;br/&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Mygod&gt;Mygod&lt;/a&gt;&lt;br/&gt;&lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🚂 Mesin jaringan &lt;br/&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📚 Server Penyelesai (Resolver) &lt;br/&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;⚜ Moderator Komunitas &lt;br/&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TronSlayer&gt;Andersen&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br/&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📌 Geo-IP &lt;br/&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;❇ Translations &lt;br/&gt; &lt;a href=https://weblate.org/en/&gt;Weblate&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;🦆 Icons &lt;br/&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br/&gt; &lt;br/&gt;📦 Build servers &lt;br/&gt; &lt;a href=https://jitpack.io/&gt;JitPack&lt;/a&gt;&lt;br/&gt; &lt;a href=https://github.com/&gt;GitHub&lt;/a&gt;&lt;br/&gt;</string>
     <string name="title_statistics">Statistik</string>
     <string name="settings_biometeric_heading">Aktifkan penguncian aplikasi</string>
     <string name="hs_biometeric_failed">Otentikasi biometrik gagal</string>
@@ -800,7 +800,7 @@
     <string name="lbl_blocked" translatable="true">Diblokir</string>
     <string name="firewall_rule_block_domain" translatable="true">Domain (Aplikasi)</string>
     <string name="lbl_disabled" translatable="true">Dinonaktifkan</string>
-    <string name="lbl_domain" translatable="true">Domain</string>
+    <string name="lbl_domain" translatable="true">Daerah</string>
     <string name="firewall_rule_block_domain_desc" translatable="true">Aturan firewall yang diterapkan \"Pengguna\" memblokir <i>Domain</i>.<br/><br/> Untuk mengubahnya, pergi ke tampilan <i>Firewall khusus aplikasi</i>.</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domain Tepercaya (Aplikasi)</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Sambungan ini diizinkan karena <i>domain</i> ditetapkan sebagai domain tepercaya.<br/><br/> Untuk mengubahnya, buka tampilan <i>Firewall khusus aplikasi</i>.</string>
@@ -814,7 +814,7 @@
     <string name="lbl_configure" translatable="true">Konfigurasi</string>
     <string name="lbl_logs" translatable="true">riwayat</string>
     <string name="bypass_dns_firewall" translatable="true">lewati (bypass) dns &amp; firewall</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">Tidak dapat menyiapkan proksi ketika VPN berjalan dalam mode \"hanya DNS\"</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Tidak dapat menyiapkan proksi ketika VPN berjalan dalam mode hanya DNS.</string>
     <string name="settings_general_customize" translatable="true">sesuaikan</string>
     <string name="settings_pcap_dialog_option_2" translatable="true">Keluaran ke Logcat</string>
     <string name="settings_pcap_dialog_option_3" translatable="true">Keluaran ke folder Unduhan</string>
@@ -839,13 +839,13 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">akan mengabaikan aturan dns &amp; firewall universal</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Lewati DNS &amp; Firewall</string>
     <string name="dc_refresh_toast" translatable="true">Penyegaran DNS selesai</string>
-    <string name="dc_setting_dns_cache_heading" translatable="true">Penguat DNS (eksperimental)</string>
+    <string name="dc_setting_dns_cache_heading" translatable="true">Penguat DNS</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Menggabungkan permintaan, menyimpan tembolok (cache), menanggapi kesalahan dengan tangguh</string>
     <string name="brbs_backup_restore_desc" translatable="true">Tidak berfungsi di berbagai versi aplikasi atau perangkat</string>
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplikasi yang Dipintaskan/Di-Bypass</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS Diblokir</string>
-    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domain (Univ)</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Daerah (Universal)</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Sambungan ini diblokir karena <i>domain</i> diblokir oleh DNS pilihan pengguna.<br/><br/> Untuk mengubah perilaku ini, buka tab <i>Konfigurasi DNS</i>.</string>
     <string name="lbl_maybe_blocked" translatable="true">Mungkin Diblokir</string>
     <string name="lbl_network" translatable="true">jaringan</string>
@@ -893,7 +893,6 @@
     <string name="status_protected_with_wg" translatable="true">Dilindungi oleh WireGuard</string>
     <string name="search_proxy_add_apps" translatable="true">Cari aplikasi berdasarkan nama</string>
     <string name="public_key_copy_toast_msg" translatable="true">Kunci publik telah disalin.</string>
-    <string name="ct_bs_upload_download" translatable="true">Unggah %1$s / Unduh %2$s</string>
     <string name="http_proxy_dialog_desc" translatable="true">Atur URL dalam format berikut, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;nama-domain-atau-IP&gt;:&lt;port&gt;&lt;path&gt;. Misalnya: http://proxy.example.com:8080/</string>
     <string name="lbl_slow" translatable="true">lambat</string>
     <string name="wireguard_description" translatable="true">WireGuard sebagai proxy.</string>
@@ -903,4 +902,82 @@
     <string name="new_warp_error_toast" translatable="true">Tidak dapat memperoleh konfigurasi WARP</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Konfigurasi WARP tidak valid</string>
     <string name="add_remove_apps" translatable="true">Tambah / Hapus Aplikasi (%1$s aplikasi)</string>
+    <string name="config_delete_success_toast">Konfigurasi dihapus</string>
+    <string name="bad_config_explanation_pka" translatable="true">: Harus berupa bilangan bulat positif tidak melebihi 65535</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">Jangan memvalidasi sertifikat TLS server (dimungkinkan hanya jika Anda tahu apa yang Anda lakukan)</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Kunci tidak valid</string>
+    <string name="parse_error_inet_network" translatable="true">IP jaringan</string>
+    <string name="parse_error_inet_address" translatable="true">Alamat IP</string>
+    <string name="crypt_adguard_desc" translatable="true">Lindungi perangkat anda dari malware dan banyak lagi.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 merutekan permintaan DNS Anda melalui jaringan global server aman.</string>
+    <string name="univ_firewall_heading" translatable="true">Peraturan firewall universal</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Memblokir konten berbahaya. Gunakan titik akhir DNS 1.1.1.2 Cloudflare.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Koneksi ini dialihkan ke proksi yang dipilih pengguna. <br/><br/> Untuk mengubahnya kunjungi <i>Proksi</i> dari menu <i>Konfigurasi</i>.</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Nomor tidak valid</string>
+    <string name="parse_error_integer" translatable="true">nomor</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Lewati aturan DNS &amp; Firewall.</string>
+    <string name="key_length_explanation_binary" translatable="true">: Kunci WireGuard harus 32 byte</string>
+    <string name="key_length_explanation_hex" translatable="true">: Kunci hex WireGuard harus 64 karakter (32 byte)</string>
+    <string name="crypt_relay_singapore" translatable="true">Penghubung DNS anonim yang dihosting di Singapura.</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Pertahankan tetap-hidup</string>
+    <string name="wireguard_enabled_failure">Matikan proksi lain untuk mengaktifkan WireGuard</string>
+    <string name="add_peer" translatable="true">Tambahkan Peer</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Memblokir malware dan konten dewasa. Gunakan titik akhir DNS 1.1.1.3 Cloudflare.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="cd_deleted_toast" translatable="true">Hapus semua aturan domain</string>
+    <string name="settings_go_log_desc" translatable="true">Untuk tujuan debugging</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Filter keluarga memblokir akses ke semua situs dewasa, pornografi, dan situs seksual eksplisit. Ini juga akan memblokir domain proksi dan VPN yang dapat digunakan untuk melewati filter. Situs yang berisi konten campuran, seperti Reddit, juga diblokir. Google, Bing, dan YouTube disetel ke mode aman.</string>
+    <string name="logs_disclaimer" translatable="true">Menunjukkan karakter 20,000 pertama</string>
+    <string name="import_error" translatable="true">Gagal mengimpor terowongan: %s</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Atribut tidak dikenal</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">Modifikasi tiap IP aplikasi / Aturan domain.</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Atribut hilang</string>
+    <string name="key_length_explanation_base64" translatable="true">: Kunci base64 WireGuard nengharuskan 44 karakter (32 byte)</string>
+    <string name="wireguard_disclaimer">Ini adalah WireGuard eksperimental sebagai proksi TCP dan UDP. Saat lalu lintas DNS diteruskan ke %1$s, lalu lintas ICMP dikirim dari jaringan yang mendasarinya.</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Harus berupa bilangan positif</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Bagian yang hilang</string>
+    <string name="wireguard_no_config_msg">Tidak ada konfigurasi WireGuard</string>
+    <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
+    <string name="settings_go_log_heading" translatable="true">Tingkat log</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Harus berupa port UDP yang valid</string>
+    <string name="google_dns_desc" translatable="true">Tidak memblokir permintaan DNS apa pun. Titik akhir menggunakan DNS Google.</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Nilai tidak valid</string>
+    <string name="wireguard_refresh_toast">Pembaruan proksi selesai</string>
+    <string name="unknown_error" translatable="true">Kesalahan tidak diketahui</string>
+    <string name="crypt_relay_sweden" translatable="true">Penghubung DNS anonim yang dihosting di Swedia yang disediakan oleh https://cryptostrom.is/.</string>
+    <string name="include_all_app_wg_dialog_title">Sertakan semua aplikasi</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">Negara yang paling banyak dihubungi</string>
+    <string name="cloudflare_dns_desc" translatable="true">Tidak memblokir permintaan DNS apa pun. Titik akhir menggunakan DNS 1.1.1.1 dari Cloudflare.</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">Negara yang paling banyak diblokir</string>
+    <string name="config_add_success_toast">Konfigurasi ditambahkan</string>
+    <string name="key_contents_error" translatable="true">Karakter buruk dalam kunci</string>
+    <string name="crypt_relay_us" translatable="true">Penghubung DNS anonim yang dihosting di US - Los Angeles, CA yang disediakan oleh https://cryptostrom.is/.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Memblokir akses ke semua situs dewasa, pornografi, dan situs seksual eksplisit. Itu juga memblokir domain proksi dan VPN yang digunakan untuk melewati filter. Situs konten campuran (seperti Reddit) juga diblokir. Google, Bing dan Youtube diatur ke Safe Mode.</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Bagian yang tidak diketahui</string>
+    <string name="crypt_relay_netherlands" translatable="true">Penghubung DNS anonim yang dihosting di Belanda</string>
+    <string name="invalid_file_error" translatable="true">File yang tidak valid</string>
+    <string name="include_all_app_wg_dialog_desc">Bungkus semua aplikasi melalui terowongan ini\?</string>
+    <string name="key_length_error" translatable="true">Panjang kunci salah</string>
+    <string name="config_delete_dialog_title">Hapus Konfigurasi</string>
+    <string name="logs_card_duration" translatable="true">sejak %1$s</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Filter dewasa memblokir akses ke semua situs dewasa, pornografi, dan situs seksual eksplisit. Itu tidak memblokir proksi atau VPN, juga tidak memblokir situs web konten campuran. Situs seperti Reddit diizinkan. Google dan Bing akan disetel ke mode aman.</string>
+    <string name="config_delete_dialog_desc">Apakah Anda yakin ingin menghapus konfigurasi ini\?</string>
+    <string name="parse_error_reason" translatable="true">Tidak dapat menguraikan %1$s \"%2$s\"</string>
+    <string name="parse_error_generic" translatable="true">garis</string>
+    <string name="generic_error" translatable="true">Kesalahan \"%s\" tidak diketahui</string>
+    <string name="app_ip_domain_rules" translatable="true">Per aplikasi IP / Aturan domain</string>
+    <string name="bad_config_error" translatable="true">%1$s dalam %2$s</string>
+    <string name="lbl_create" translatable="true">Buat</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Titik akhir</string>
+    <string name="exclude_all_app_wg_dialog_title">Kecualikan semua aplikasi</string>
+    <string name="exclude_all_app_wg_dialog_desc">Kecualikan semua aplikasi dari terowongan ini\?</string>
+    <string name="no_configs_error" translatable="true">Tidak ada konfigurasi yang ditemukan</string>
+    <string name="firewall_rule_proxied" translatable="true">Terproksi</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS dengan pencarian aman dan pemblokiran konten dewasa.</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Kesalahan sintaks</string>
+    <string name="crypt_relay_france" translatable="true">Penghubung DNS anonim yang dihosting di Paris, Prancis yang disediakan oleh https://cryptostrom.is/.</string>
+    <string name="lbl_listen_port" translatable="true">Pelabuhan (port) dengar</string>
+    <string name="wireguard_connection_error">Terjadi kesalahan saat menyambung ke konfigurasi WireGuard</string>
+    <string name="illegal_filename_error" translatable="true">Nama file ilegal \"%s\"</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-log/tanpa–filter/ecs 9.9.9.12 – 149.112.112.12</string>
 </resources>
