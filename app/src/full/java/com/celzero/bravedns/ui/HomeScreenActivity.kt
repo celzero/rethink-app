@@ -49,7 +49,6 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
@@ -215,8 +214,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // or exceeds the requirements for Class 2(formerly Weak), as defined by the Android CDD.
         if (
             BiometricManager.from(this)
-                .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) ==
-                BiometricManager.BIOMETRIC_SUCCESS
+                .canAuthenticate(
+                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                ) == BiometricManager.BIOMETRIC_SUCCESS
         ) {
             biometricPrompt.authenticate(promptInfo)
         } else {
