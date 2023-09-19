@@ -1342,11 +1342,11 @@ class BraveVPNService :
                 notificationManager.notify(SERVICE_ID, updateNotificationBuilder().build())
             }
             PersistentState.LOCAL_BLOCK_LIST -> {
-                io("localBlocklistEnable") { setBraveDnsBlocklistMode() }
+                io("localBlocklistEnable") { setRDNS() }
             }
             PersistentState.LOCAL_BLOCK_LIST_UPDATE -> {
                 // FIXME: update just that local bravedns obj, not the entire tunnel
-                io("localBlocklistDownload") { setBraveDnsBlocklistMode() }
+                io("localBlocklistDownload") { setRDNS() }
             }
             PersistentState.BACKGROUND_MODE -> {
                 if (persistentState.getBlockAppWhenBackground()) {
@@ -1363,7 +1363,7 @@ class BraveVPNService :
                 if (persistentState.rethinkRemoteUpdate) {
                     io("remoteRethinkUpdates") {
                         addTransport()
-                        setBraveDnsBlocklistMode()
+                        setRDNS()
                     }
                     persistentState.rethinkRemoteUpdate = false
                 }
@@ -1371,7 +1371,7 @@ class BraveVPNService :
             PersistentState.REMOTE_BLOCKLIST_UPDATE -> {
                 io("remoteBlocklistUpdate") {
                     addTransport()
-                    setBraveDnsBlocklistMode()
+                    setRDNS()
                 }
             }
             PersistentState.DNS_CHANGE -> {
@@ -1465,9 +1465,9 @@ class BraveVPNService :
         }
     }
 
-    private suspend fun setBraveDnsBlocklistMode() {
+    private suspend fun setRDNS() {
         if (DEBUG) Log.d(LOG_TAG_VPN, "set brave dns mode, local/remote")
-        VpnController.mutex.withLock { vpnAdapter?.setBraveDnsBlocklistModeLocked() }
+        VpnController.mutex.withLock { vpnAdapter?.setRDNSLocked() }
     }
 
     private suspend fun addTransport() {
@@ -2697,6 +2697,14 @@ class BraveVPNService :
         } else {
             Log.w(LOG_TAG_VPN, "error while fetching proxy status: vpnAdapter is null")
             null
+        }
+    }
+
+    fun syncP50Latency() {
+        io("syncP50Latency") {
+            VpnController.mutex.withLock {
+                vpnAdapter?.syncP50LatencyLocked()
+            }
         }
     }
 }

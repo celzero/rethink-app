@@ -36,7 +36,7 @@ class QueryTracker(private var persistentState: PersistentState) {
     }
 
     companion object {
-        private const val HISTORY_SIZE = 1000
+        private const val HISTORY_SIZE = 100
     }
 
     private fun reinitializeQuantileEstimator() {
@@ -44,7 +44,7 @@ class QueryTracker(private var persistentState: PersistentState) {
         numRequests = 1
     }
 
-    fun recordTransaction(transaction: Transaction) {
+    suspend fun recordTransaction(transaction: Transaction) {
         // if server-ip is nil and blocklists are not empty, skip because this tx was resolved
         // locally
         if (TextUtils.isEmpty(transaction.serverName) && !TextUtils.isEmpty(transaction.blocklist))
@@ -52,8 +52,13 @@ class QueryTracker(private var persistentState: PersistentState) {
         ++numRequests
         if (numRequests % HISTORY_SIZE == 0L) {
             reinitializeQuantileEstimator()
+            //refreshP50Latency()
         }
         sync(transaction)
+    }
+
+    suspend fun refreshP50Latency() {
+        VpnController.syncP50Latency()
     }
 
     fun sync(transaction: Transaction?) {

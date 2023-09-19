@@ -42,24 +42,15 @@ import com.celzero.bravedns.database.RethinkDnsEndpointRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
-import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_RD
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
-import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TD
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
 import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.PcapMode
-import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getDnsPort
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import dnsx.BraveDNS
-import dnsx.Dnsx
 import inet.ipaddr.IPAddressString
 import intra.Bridge
 import java.net.InetAddress
@@ -83,7 +74,6 @@ internal constructor(
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var systemDns: SystemDns = SystemDns("", DNS_PORT)
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
-    private var braveDns: BraveDNS? = null
     private var pcapFilePath: String = ""
 
     companion object {
@@ -95,47 +85,6 @@ internal constructor(
     init {
         connectedDns.postValue(persistentState.connectedDnsName)
         setDnsMode()
-        createBraveDnsObjectIfNeeded()
-    }
-
-    private fun createBraveDnsObjectIfNeeded() {
-        if (!persistentState.blocklistEnabled) return
-
-        try {
-            val path: String =
-                Utilities.blocklistDownloadBasePath(
-                    context,
-                    LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
-                    persistentState.localBlocklistTimestamp
-                )
-            braveDns =
-                Dnsx.newBraveDNSLocal(
-                    path + ONDEVICE_BLOCKLIST_FILE_TD,
-                    path + ONDEVICE_BLOCKLIST_FILE_RD,
-                    path + ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                    path + ONDEVICE_BLOCKLIST_FILE_TAG
-                )
-        } catch (e: Exception) {
-            // Set local blocklist enabled to false and reset the timestamp
-            // if there is a failure creating bravedns
-            persistentState.blocklistEnabled = false
-            Log.e(LOG_TAG_VPN, "Local brave dns set exception :${e.message}", e)
-            // Set local blocklist enabled to false and reset the timestamp to make sure
-            // user is prompted to download blocklists again on the next try
-            persistentState.localBlocklistTimestamp = INIT_TIME_MS
-        }
-    }
-
-    fun getBraveDnsObj(): BraveDNS? {
-        if (braveDns == null) {
-            createBraveDnsObjectIfNeeded()
-        }
-
-        return braveDns
-    }
-
-    fun recreateBraveDnsObj() {
-        createBraveDnsObjectIfNeeded()
     }
 
     data class TunnelOptions(

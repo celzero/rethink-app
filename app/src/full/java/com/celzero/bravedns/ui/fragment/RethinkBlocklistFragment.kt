@@ -72,12 +72,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
@@ -179,7 +179,7 @@ class RethinkBlocklistFragment :
         selectedFileTags.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
-            modifiedStamp = RethinkBlocklistManager.getStamp(requireContext(), it, type)
+            io { modifiedStamp = RethinkBlocklistManager.getStamp(it, type) }
         }
 
         filters.observe(viewLifecycleOwner) {
@@ -235,11 +235,6 @@ class RethinkBlocklistFragment :
             uiCtx {
                 val blocklistsExist = withContext(Dispatchers.IO) { hasBlocklists() }
                 if (blocklistsExist) {
-                    RethinkBlocklistManager.createBraveDns(
-                        requireContext(),
-                        currentBlocklistTimeStamp(),
-                        type
-                    )
                     setListAdapter()
                     setSimpleAdapter()
                     showConfigureUi()
@@ -430,8 +425,7 @@ class RethinkBlocklistFragment :
         }
 
         io {
-            val blocklistCount =
-                RethinkBlocklistManager.getTagsFromStamp(requireContext(), stamp, type).size
+            val blocklistCount = RethinkBlocklistManager.getTagsFromStamp(stamp, type).size
             if (type.isLocal()) {
                 persistentState.localBlocklistStamp = stamp
                 persistentState.numberOfLocalBlocklists = blocklistCount
@@ -496,14 +490,17 @@ class RethinkBlocklistFragment :
     }
 
     private fun setListAdapter() {
-        processSelectedFileTags(getStamp())
-
-        if (type.isLocal()) {
-            setLocalAdapter()
-        } else {
-            setRemoteAdapter()
+        io {
+            processSelectedFileTags(getStamp())
+            uiCtx {
+                if (type.isLocal()) {
+                    setLocalAdapter()
+                } else {
+                    setRemoteAdapter()
+                }
+                showList(b.lbSimpleToggleBtn.tag.toString())
+            }
         }
-        showList(b.lbSimpleToggleBtn.tag.toString())
     }
 
     private fun setSimpleAdapter() {
@@ -514,32 +511,30 @@ class RethinkBlocklistFragment :
         }
     }
 
-    private fun processSelectedFileTags(stamp: String) {
-        val list = RethinkBlocklistManager.getTagsFromStamp(requireContext(), stamp, type)
+    private suspend fun processSelectedFileTags(stamp: String) {
+        val list = RethinkBlocklistManager.getTagsFromStamp(stamp, type)
         updateSelectedFileTags(list.toMutableSet())
     }
 
-    private fun updateSelectedFileTags(selectedTags: MutableSet<Int>) {
-        io {
-            // clear the residues if the selected tags are empty
-            if (selectedTags.isEmpty()) {
-                if (type.isLocal()) {
-                    RethinkBlocklistManager.clearTagsSelectionLocal()
-                } else {
-                    RethinkBlocklistManager.clearTagsSelectionRemote()
-                }
-                return@io
-            }
-
+    private suspend fun updateSelectedFileTags(selectedTags: MutableSet<Int>) {
+        // clear the residues if the selected tags are empty
+        if (selectedTags.isEmpty()) {
             if (type.isLocal()) {
-                RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
-                val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
-                updateFileTagList(list)
+                RethinkBlocklistManager.clearTagsSelectionLocal()
             } else {
-                RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
-                val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
-                updateFileTagList(list)
+                RethinkBlocklistManager.clearTagsSelectionRemote()
             }
+            return
+        }
+
+        if (type.isLocal()) {
+            RethinkBlocklistManager.updateFiletagsLocal(selectedTags, 1 /* isSelected: true */)
+            val list = RethinkBlocklistManager.getSelectedFileTagsLocal().toSet()
+            updateFileTagList(list)
+        } else {
+            RethinkBlocklistManager.updateFiletagsRemote(selectedTags, 1 /* isSelected: true */)
+            val list = RethinkBlocklistManager.getSelectedFileTagsRemote().toSet()
+            updateFileTagList(list)
         }
     }
 
@@ -576,7 +571,7 @@ class RethinkBlocklistFragment :
         // split: https://max.rethinkdns.com/1:IAAgAA== [https:, , max.rethinkdns.com, 1:IAAgAA==]
         split.forEach {
             if (it.contains("$RETHINK_STAMP_VERSION:") && isBase64(it)) {
-                selectTagsForStamp(it)
+                io { processSelectedFileTags(it) }
                 showToastUiCentered(requireContext(), "Blocklists restored", Toast.LENGTH_SHORT)
                 return true
             }
@@ -599,10 +594,6 @@ class RethinkBlocklistFragment :
 
         val result = versionSplit.replace(whitespaceRegex, "")
         return pattern.matcher(result).matches()
-    }
-
-    private fun selectTagsForStamp(stamp: String) {
-        processSelectedFileTags(stamp)
     }
 
     fun filterObserver(): MutableLiveData<Filters> {

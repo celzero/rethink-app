@@ -25,6 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
+import dnsx.RDNS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -206,6 +207,10 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStatusById(id)
     }
 
+    suspend fun syncP50Latency() {
+        braveVpnService?.syncP50Latency()
+    }
+
     fun protocols(): String {
         val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: -1
         val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: -1
@@ -255,5 +260,9 @@ object VpnController : KoinComponent {
 
     fun refreshWireGuardConfig() {
         braveVpnService?.refreshWireGuardConfig()
+    }
+
+    suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
+        return braveVpnService?.getRDNS(type)
     }
 }

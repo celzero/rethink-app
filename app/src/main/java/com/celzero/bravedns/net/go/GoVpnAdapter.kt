@@ -29,18 +29,21 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
+import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.blocklistFile
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
-import dnsx.BraveDNS
 import dnsx.Dnsx
+import dnsx.RDNS
 import dnsx.Transport
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
@@ -84,7 +87,7 @@ class GoVpnAdapter : KoinComponent {
         // part of v055
         val dohURL: String = getDefaultDohUrl()
 
-        val transport: Transport = makeDefaultTransport(dohURL) // may throw exception
+        val transport: Transport = makeDefaultTransportLocked(dohURL) // may throw exception
         Log.i(LOG_TAG_VPN, "Connect with opts $opts, url: $dohURL")
 
         // no need to connect tunnel if already connected, just reset the tunnel with new
@@ -122,7 +125,7 @@ class GoVpnAdapter : KoinComponent {
         setPcapModeLocked(appConfig.getPcapFilePath())
         addTransportLocked()
         setDnsAlgLocked()
-        setBraveDnsBlocklistMode()
+        setRDNSLocked()
     }
 
     fun setPcapModeLocked(pcapFilePath: String) {
@@ -366,24 +369,25 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private fun setBraveDnsBlocklistMode() {
-        if (DEBUG) Log.d(LOG_TAG_VPN, "init rdns modes")
+    fun setRDNSLocked() {
+        // Set brave dns to tunnel - Local/Remote
+        if (DEBUG) Log.d(LOG_TAG_VPN, "set brave dns to tunnel (local/remote)")
 
         // enable local blocklist if enabled
         io {
             if (persistentState.blocklistEnabled) {
-                setBraveDNSLocalMode()
+                setRDNSLocalLocked()
             } else {
                 // remove local blocklist, if any
-                tunnel.resolver?.rdnsLocal = null
+                tunnel.resolver?.setRdnsLocal(null, null, null, null)
             }
 
             // always set the remote blocklist
-            setBraveDNSRemoteMode()
+            setRDNSRemoteLocked()
         }
     }
 
-    private fun setBraveDNSRemoteMode() {
+    private fun setRDNSRemoteLocked() {
         if (DEBUG) Log.d(LOG_TAG_VPN, "init remote rdns mode")
         try {
             val remoteDir =
@@ -396,7 +400,7 @@ class GoVpnAdapter : KoinComponent {
             val remoteFile =
                 blocklistFile(remoteDir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
             if (remoteFile.exists()) {
-                tunnel.resolver?.rdnsRemote = Dnsx.newBraveDNSRemote(remoteFile.absolutePath)
+                tunnel.resolver?.setRdnsRemote(remoteFile.absolutePath)
                 Log.i(LOG_TAG_VPN, "remote-rdns enabled")
             } else {
                 Log.w(LOG_TAG_VPN, "filetag.json for remote-rdns missing")
@@ -524,6 +528,11 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    fun setCustomProxyLocked(tunProxyMode: AppConfig.TunProxyMode) {
+        setSocks5TunnelModeIfNeeded(tunProxyMode)
+        setHttpProxyIfNeeded(tunProxyMode)
+    }
+
     private fun setSocks5TunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
         if (!tunProxyMode.isTunProxySocks5() && !tunProxyMode.isTunProxyOrbot()) return
 
@@ -632,8 +641,16 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
+        return if (type.isLocal()) {
+            tunnel.resolver?.rdnsLocal
+        } else {
+            tunnel.resolver?.rdnsRemote
+        }
+    }
+
     // v055, unused
-    private fun setTcpProxyIfNeeded() {
+    fun setTcpProxyLocked() {
         if (!appConfig.isTcpProxyEnabled()) {
             Log.i(LOG_TAG_VPN, "tcp proxy not enabled")
             return
@@ -694,7 +711,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     @Throws(Exception::class)
-    private fun makeDefaultTransport(url: String?): Transport {
+    fun makeDefaultTransportLocked(url: String?): Transport {
         // when the user has selected none as the dns mode, we use the grounded transport
         if (url.isNullOrEmpty()) {
             Log.i(LOG_TAG_VPN, "using grounded transport as default dns is set to none")
@@ -736,12 +753,6 @@ class GoVpnAdapter : KoinComponent {
         if (appConfig.isSystemDns()) {
             addTransportLocked()
         }
-    }
-
-    fun setBraveDnsBlocklistModeLocked() {
-        // Set brave dns to tunnel - Local/Remote
-        if (DEBUG) Log.d(LOG_TAG_VPN, "set brave dns to tunnel (local/remote)")
-        setBraveDnsBlocklistMode()
     }
 
     suspend fun updateLinkLocked(tunFd: ParcelFileDescriptor, opts: TunnelOptions): Boolean {
@@ -803,31 +814,8 @@ class GoVpnAdapter : KoinComponent {
         return persistentState.defaultDnsUrl
     }
 
-    private fun setBraveDNSLocalMode() {
-        try {
-            val stamp: String = persistentState.localBlocklistStamp
-            Log.i(LOG_TAG_VPN, "local blocklist stamp: $stamp")
-            // no need to set braveDNS to tunnel when stamp is empty
-            if (stamp.isEmpty()) {
-                return
-            }
-
-            val braveDNS = makeLocalBraveDns()
-            if (braveDNS != null) {
-                tunnel.resolver?.rdnsLocal = braveDNS
-                tunnel.resolver?.rdnsLocal?.stamp = stamp
-                Log.i(LOG_TAG_VPN, "local brave dns object is set")
-            } else {
-                Log.e(LOG_TAG_VPN, "Issue creating local brave dns object")
-            }
-        } catch (ex: Exception) {
-            persistentState.blocklistEnabled = false
-            Log.e(LOG_TAG_VPN, "could not set local-brave dns: ${ex.message}", ex)
-        }
-    }
-
     // protected by VpnController.mutex
-    fun setBraveDnsStampLocked() {
+    fun setRDNSStampLocked() {
         try {
             if (tunnel.resolver?.rdnsLocal != null) {
                 Log.i(LOG_TAG_VPN, "set local stamp: ${persistentState.localBlocklistStamp}")
@@ -838,11 +826,11 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: java.lang.Exception) {
             Log.e(LOG_TAG_VPN, "could not set local stamp: ${e.message}", e)
         } finally {
-            resetLocalBlocklistFromTunnel()
+            resetLocalBlocklistStampFromTunnel()
         }
     }
 
-    private fun resetLocalBlocklistFromTunnel() {
+    private fun resetLocalBlocklistStampFromTunnel() {
         try {
             if (tunnel.resolver?.rdnsLocal == null) {
                 Log.i(LOG_TAG_VPN, "mode is not local, no need to reset local stamp")
@@ -858,8 +846,34 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private fun makeLocalBraveDns(): BraveDNS? {
-        return appConfig.getBraveDnsObj()
+    private fun setRDNSLocalLocked() {
+        try {
+            val stamp: String = persistentState.localBlocklistStamp
+            Log.i(LOG_TAG_VPN, "local blocklist stamp: $stamp")
+
+            val path: String =
+                Utilities.blocklistDownloadBasePath(
+                    context,
+                    Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
+                    persistentState.localBlocklistTimestamp
+                )
+            tunnel.resolver?.setRdnsLocal(
+                path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
+                path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
+                path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                path + ONDEVICE_BLOCKLIST_FILE_TAG
+            )
+            tunnel.resolver?.rdnsLocal?.stamp = stamp
+            Log.i(LOG_TAG_VPN, "local brave dns object is set")
+        } catch (ex: Exception) {
+            // Set local blocklist enabled to false and reset the timestamp
+            // if there is a failure creating bravedns
+            persistentState.blocklistEnabled = false
+            // Set local blocklist enabled to false and reset the timestamp to make sure
+            // user is prompted to download blocklists again on the next try
+            persistentState.localBlocklistTimestamp = Constants.INIT_TIME_MS
+            Log.e(LOG_TAG_VPN, "could not set local-brave dns: ${ex.message}", ex)
+        }
     }
 
     companion object {
@@ -881,6 +895,16 @@ class GoVpnAdapter : KoinComponent {
         fun setLogLevel(level: Long) {
             // 0 - verbose, 1 - debug, 2 - info, 3 - warn, 4 - error, 5 - fatal
             Tun2socks.logLevel(level)
+        }
+    }
+
+    fun syncP50LatencyLocked() {
+        try {
+            val transport = tunnel.resolver?.get(Dnsx.Preferred)
+            val p50 = transport?.p50() ?: return
+            persistentState.setMedianLatency(p50)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "err getP50: ${e.message}", e)
         }
     }
 

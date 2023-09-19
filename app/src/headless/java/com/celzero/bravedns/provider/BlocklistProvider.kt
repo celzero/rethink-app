@@ -181,7 +181,7 @@ class BlocklistProvider : ContentProvider() {
 
         val context = context ?: return 0
         val localFileTags = RethinkLocalFileTag(values)
-        val count = RethinkBlocklistManager.cpSelectFileTag(context, localFileTags)
+        val count = RethinkBlocklistManager.cpSelectFileTag(localFileTags)
         context.contentResolver?.notifyChange(uri, null)
         return count
     }

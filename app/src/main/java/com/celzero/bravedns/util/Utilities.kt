@@ -62,6 +62,7 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
+import com.google.gson.JsonParser
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
@@ -77,6 +78,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.launch
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
 
 object Utilities {
 
@@ -726,5 +731,38 @@ object Utilities {
         val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
         val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
         return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+    }
+
+    fun calculateMd5(filePath: String): String {
+        // HashingSink will update the md5sum with every write call and then call down
+        // to blackholeSink(), ref: https://stackoverflow.com/a/61217039
+        return File(filePath).source().buffer().use { source ->
+            HashingSink.md5(blackholeSink()).use { sink ->
+                source.readAll(sink)
+                sink.hash.hex()
+            }
+        }
+    }
+
+    fun getTagValueFromJson(path: String, tag: String): String {
+        var tagValue = ""
+        try {
+            // Read the JSON file
+            val jsonContent = File(path).readText()
+
+            // Parse JSON using JsonParser
+            val jsonObject = JsonParser.parseString(jsonContent).asJsonObject
+
+            // Extract the specific tag value
+            if (jsonObject.has(tag)) {
+                tagValue = jsonObject.get(tag).asString
+                Log.i(LOG_TAG_DOWNLOAD, "get tag value: $tagValue, for tag: $tag")
+            } else {
+                Log.i(LOG_TAG_DOWNLOAD, "tag not found: $tag")
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_DOWNLOAD, "err parsing the json file: ${e.message}", e)
+        }
+        return tagValue
     }
 }

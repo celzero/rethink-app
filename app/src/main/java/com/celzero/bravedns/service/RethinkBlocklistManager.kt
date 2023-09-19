@@ -38,16 +38,15 @@ import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import dnsx.BraveDNS
-import dnsx.Dnsx
+import dnsx.RDNS
+import java.io.IOException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
-
-    private var braveDnsLocal: BraveDNS? = null
-    private var braveDnsRemote: BraveDNS? = null
 
     private val remoteFileTagRepository by inject<RethinkRemoteFileTagRepository>()
     private val remoteBlocklistPacksMapRepository by inject<RemoteBlocklistPacksMapRepository>()
@@ -347,53 +346,42 @@ object RethinkBlocklistManager : KoinComponent {
         localFileTagRepository.clearSelectedTags()
     }
 
-    fun cpSelectFileTag(context: Context, localFileTags: RethinkLocalFileTag): Int {
-        val selectedTags =
-            getTagsFromStamp(
-                    context,
-                    persistentState.localBlocklistStamp,
-                    RethinkBlocklistType.LOCAL
-                )
-                .toMutableSet()
+    fun cpSelectFileTag(localFileTags: RethinkLocalFileTag): Int {
+        io {
+            val selectedTags =
+                getTagsFromStamp(persistentState.localBlocklistStamp, RethinkBlocklistType.LOCAL)
+                    .toMutableSet()
 
-        // remove the tag from the local blocklist if it exists and current selection is 0
-        if (selectedTags.contains(localFileTags.value) && !localFileTags.isSelected) {
-            selectedTags.remove(localFileTags.value)
-        } else if (!selectedTags.contains(localFileTags.value) && localFileTags.isSelected) {
-            // only add the tag if it is not already present
-            selectedTags.add(localFileTags.value)
-        } else {
-            // no-op
+            // remove the tag from the local blocklist if it exists and current selection is 0
+            if (selectedTags.contains(localFileTags.value) && !localFileTags.isSelected) {
+                selectedTags.remove(localFileTags.value)
+            } else if (!selectedTags.contains(localFileTags.value) && localFileTags.isSelected) {
+                // only add the tag if it is not already present
+                selectedTags.add(localFileTags.value)
+            } else {
+                // no-op
+            }
+
+            val stamp = getStamp(selectedTags, RethinkBlocklistType.LOCAL)
+            persistentState.localBlocklistStamp = stamp
         }
-
-        val stamp = getStamp(context, selectedTags, RethinkBlocklistType.LOCAL)
-        persistentState.localBlocklistStamp = stamp
         return localFileTagRepository.contentUpdate(localFileTags)
     }
 
-    fun getStamp(context: Context, fileValues: Set<Int>, type: RethinkBlocklistType): String {
+    suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
-            getBraveDns(context, blocklistTimestamp(type), type)?.flagsToStamp(flags) ?: ""
+            Log.d("TEST","flags: $flags, type: $type, isRdnsNull(${getRDNS(type)}, getRDNS: ${getRDNS(type)?.flagsToStamp(flags)})}")
+            getRDNS(type)?.flagsToStamp(flags) ?: ""
         } catch (e: java.lang.Exception) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e ")
             ""
         }
     }
 
-    private fun blocklistTimestamp(type: RethinkBlocklistType): Long {
-        return if (type.isLocal()) {
-            persistentState.localBlocklistTimestamp
-        } else {
-            persistentState.remoteBlocklistTimestamp
-        }
-    }
-
-    fun getTagsFromStamp(context: Context, stamp: String, type: RethinkBlocklistType): Set<Int> {
+    suspend fun getTagsFromStamp(stamp: String, type: RethinkBlocklistType): Set<Int> {
         return try {
-            convertCsvToList(
-                getBraveDns(context, blocklistTimestamp(type), type)?.stampToFlags(stamp)
-            )
+            convertCsvToList(getRDNS(type)?.stampToFlags(stamp))
         } catch (e: Exception) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e ")
             setOf()
@@ -410,82 +398,11 @@ object RethinkBlocklistManager : KoinComponent {
         return s.joinToString(",")
     }
 
-    private fun getBraveDnsRemote(context: Context, timestamp: Long): BraveDNS? {
-        if (braveDnsRemote != null) {
-            return braveDnsRemote
-        }
-
-        val dir =
-            Utilities.blocklistDir(context, REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
-                ?: return null
-        val file =
-            Utilities.blocklistFile(dir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
-
-        braveDnsRemote =
-            try {
-                if (file.exists()) {
-                    Dnsx.newBraveDNSRemote(file.absolutePath)
-                } else {
-                    Log.e(
-                        LoggerConstants.LOG_TAG_VPN,
-                        "File does not exist in path: ${file.absolutePath}"
-                    )
-                    null
-                }
-            } catch (e: Exception) {
-                Log.e(
-                    LoggerConstants.LOG_TAG_VPN,
-                    "Exception creating BraveDNS object, ${e.message}, $e "
-                )
-                null
-            }
-        return braveDnsRemote
+    private suspend fun getRDNS(type: RethinkBlocklistType): RDNS? {
+        return VpnController.getRDNS(type)
     }
 
-    private fun getBraveDnsLocal(context: Context, timestamp: Long): BraveDNS? {
-        if (braveDnsLocal != null) {
-            return braveDnsLocal
-        }
-
-        val dir =
-            Utilities.blocklistDir(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
-                ?: return null
-        val file =
-            Utilities.blocklistFile(dir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return null
-        braveDnsLocal =
-            try {
-                if (file.exists()) {
-                    Dnsx.newBraveDNSRemote(file.absolutePath)
-                } else {
-                    Log.e(
-                        LoggerConstants.LOG_TAG_VPN,
-                        "File does not exist in path: ${file.absolutePath}"
-                    )
-                    null
-                }
-            } catch (e: Exception) {
-                Log.e(
-                    LoggerConstants.LOG_TAG_VPN,
-                    "Exception creating BraveDNS object, ${e.message}, $e "
-                )
-                null
-            }
-        return braveDnsLocal
-    }
-
-    private fun getBraveDns(
-        context: Context,
-        timestamp: Long,
-        type: RethinkBlocklistType
-    ): BraveDNS? {
-        if (type.isRemote()) {
-            return getBraveDnsRemote(context, timestamp)
-        }
-
-        return getBraveDnsLocal(context, timestamp)
-    }
-
-    fun createBraveDns(context: Context, timestamp: Long, type: RethinkBlocklistType) {
-        getBraveDns(context, timestamp, type)
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }
