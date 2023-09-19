@@ -55,6 +55,7 @@ internal constructor(
         connTracker.timeStamp = connTrackerMetaData.timestamp
         connTracker.blockedByRule = connTrackerMetaData.blockedByRule
         connTracker.blocklists = connTrackerMetaData.blocklists
+        connTracker.proxyDetails = connTrackerMetaData.proxyDetails
         connTracker.connId = connTrackerMetaData.connId
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)

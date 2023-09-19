@@ -22,6 +22,7 @@ import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
+import ipn.Ipn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -189,6 +190,14 @@ object ProxyManager : KoinComponent {
         // remove all the wg proxies from the app config mappings, during restore process
         appConfigMappings.filter { it.proxyId.contains(ID_WG_BASE) }.forEach { it.proxyId = "" }
         io { proxyAppMappingRepository.removeAllWgProxies() }
+    }
+
+    fun isProxied(proxyId: String): Boolean {
+        if (proxyId == "") return false
+
+        // determine whether the connection is proxied or not
+        // if the connection is not Ipn.Base, Ipn.Block then it is proxied
+        return proxyId != Ipn.Base && proxyId != Ipn.Block
     }
 
     private fun io(f: suspend () -> Unit) {

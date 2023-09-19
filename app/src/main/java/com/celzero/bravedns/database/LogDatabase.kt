@@ -28,7 +28,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.celzero.bravedns.util.Utilities
 
-@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 5, exportSchema = false)
+@Database(entities = [ConnectionTracker::class, DnsLog::class], version = 6, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LogDatabase : RoomDatabase() {
 
@@ -62,6 +62,7 @@ abstract class LogDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_2_3)
                 .addMigrations(MIGRATION_3_4)
                 .addMigrations(MIGRATION_4_5)
+                .addMigrations(MIGRATION_5_6)
                 .build()
         }
 
@@ -206,6 +207,15 @@ abstract class LogDatabase : RoomDatabase() {
                     )
                     database.execSQL(
                         "ALTER TABLE ConnectionTracker add column message TEXT DEFAULT '' NOT NULL"
+                    )
+                }
+            }
+
+        private val MIGRATION_5_6: Migration =
+            object : Migration(5, 6) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "ALTER TABLE ConnectionTracker ADD COLUMN proxyDetails TEXT DEFAULT '' NOT NULL"
                     )
                 }
             }

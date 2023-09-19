@@ -26,6 +26,7 @@ data class ConnTrackerMetaData(
     val timestamp: Long,
     var isBlocked: Boolean,
     var blockedByRule: String,
+    var proxyDetails: String,
     var blocklists: String,
     val protocol: Int,
     var query: String,

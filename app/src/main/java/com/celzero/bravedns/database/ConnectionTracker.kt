@@ -40,6 +40,7 @@ class ConnectionTracker {
     var isBlocked: Boolean = false
     var blockedByRule: String = ""
     var blocklists: String = ""
+    var proxyDetails: String = ""
     var flag: String = ""
     var dnsQuery: String? = null
     var timeStamp: Long = INIT_TIME_MS

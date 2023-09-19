@@ -51,8 +51,8 @@ import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_ID
-import com.celzero.bravedns.ui.activity.HomeScreenActivity
-import com.celzero.bravedns.ui.dialog.NotificationHandlerDialog
+import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
@@ -67,6 +67,7 @@ import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.common.collect.Sets
 import dnsx.Dnsx
+import dnsx.RDNS
 import dnsx.Summary
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
@@ -246,7 +247,7 @@ class BraveVPNService :
         dstIp: String,
         dstPort: Int,
         connId: String
-    ): Boolean {
+    ): ConnTrackerMetaData? {
         val connInfo =
             createConnTrackerMetaData(
                 uid,
@@ -1426,14 +1427,20 @@ class BraveVPNService :
             PersistentState.INTERNET_PROTOCOL -> {
                 io("chooseIpVersion") {
                     notifyConnectionMonitor()
-                    restartVpn(createNewTunnelOptsObj())
+                    VpnController.mutex.withLock {
+                        vpnAdapter?.setRouteLocked(appConfig.getInternetProtocol().value())
+                    }
                 }
             }
             PersistentState.PROTOCOL_TRANSLATION -> {
                 io("forceV4Egress") { setTunMode() }
             }
             PersistentState.DEFAULT_DNS_SERVER -> {
-                io("defaultDnsServer") { restartVpn(createNewTunnelOptsObj()) }
+                io("defaultDnsServer") {
+                    VpnController.mutex.withLock {
+                        vpnAdapter?.makeDefaultTransportLocked(persistentState.defaultDnsUrl)
+                    }
+                }
             }
             PersistentState.PCAP_MODE -> {
                 io("pcap") { setPcapMode() }
@@ -1479,7 +1486,7 @@ class BraveVPNService :
                 // no-op
             }
             AppConfig.ProxyProvider.TCP -> {
-                // yet to implement
+                VpnController.mutex.withLock { vpnAdapter?.setTcpProxyLocked() }
             }
             AppConfig.ProxyProvider.WIREGUARD -> {
                 // update wireguard config
@@ -1488,14 +1495,12 @@ class BraveVPNService :
                 }
             }
             AppConfig.ProxyProvider.ORBOT -> {
-                // restart vpn as it requires app to be excluded from vpn
-                restartVpn(createNewTunnelOptsObj())
+                // update orbot config, its treated as SOCKS5 or HTTP proxy internally
+                VpnController.mutex.withLock { vpnAdapter?.setCustomProxyLocked(tunProxyMode) }
             }
             AppConfig.ProxyProvider.CUSTOM -> {
                 // custom either means socks5 or http proxy
-                // restart vpn as it requires app to be excluded from vpn
-                // further optimization: restart vpn only if app is selected as part of proxy
-                restartVpn(createNewTunnelOptsObj())
+                VpnController.mutex.withLock { vpnAdapter?.setCustomProxyLocked(tunProxyMode) }
             }
         }
     }
@@ -1514,9 +1519,7 @@ class BraveVPNService :
     }
 
     private fun spawnLocalBlocklistStampUpdate() {
-        io("dnsStampUpdate") {
-            VpnController.mutex.withLock { vpnAdapter?.setBraveDnsStampLocked() }
-        }
+        io("dnsStampUpdate") { VpnController.mutex.withLock { vpnAdapter?.setRDNSStampLocked() } }
     }
 
     private suspend fun notifyConnectionMonitor() {
@@ -2363,27 +2366,45 @@ class BraveVPNService :
         // provides the hexadecimal value as a string for connId
         val connId = Utilities.getRandomString(8)
 
-        val isBlocked =
+        // connection tracker is null in case
+        val connTracker =
             if (realIps?.isEmpty() == true || d?.isEmpty() == true) {
                 block(protocol, uid, srcIp, srcPort, dstIp, dstPort, connId)
             } else {
                 blockAlg(protocol, uid, src, dest, realIps, d, blocklists, connId)
             }
 
-        if (isBlocked) {
+        if (connTracker == null) {
+            // dns-request (isDns(dstPort) && isVpnDns(dstIp)), return Ipn.Base,
+            // no need to check for other proxies
+            return persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
+        }
+
+        if (connTracker.isBlocked) {
             // return Ipn.Block, no need to check for other rules
             if (DEBUG)
                 Log.d(LOG_TAG_VPN, "flow: received rule: block, returning Ipn.Block, $connId, $uid")
-            return getFlowResponseString(Ipn.Block, connId, uid)
-        } else {
-            trackedCids.add(connId)
+            return persistAndConstructFlowResponse(connTracker, Ipn.Block, connId, uid)
         }
 
+        // add to trackedCids, so that the connection can be removed from the list when the
+        // connection is closed (onTCPSocketClosed, onUDPSocketClosed, onICMPClosed)
+        // use: ui to show the active connections
+        trackedCids.add(connId)
+
+        return determineProxyDetails(connTracker, connId, uid)
+    }
+
+    private fun determineProxyDetails(
+        connTracker: ConnTrackerMetaData?,
+        connId: String,
+        uid: Int
+    ): String {
         // if no proxy is enabled, return Ipn.Base
         if (!appConfig.isProxyEnabled()) {
             if (DEBUG)
                 Log.d(LOG_TAG_VPN, "flow: no proxy enabled, returning Ipn.Base, $connId, $uid")
-            return getFlowResponseString(Ipn.Base, connId, uid)
+            return persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
         }
 
         // check for other proxy rules
@@ -2408,7 +2429,7 @@ class BraveVPNService :
                         LOG_TAG_VPN,
                         "flow: wireguard is enabled and app is included, returning $proxyId, $connId, $uid"
                     )
-                return getFlowResponseString(proxyId, connId, uid)
+                return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
             }
         }
 
@@ -2419,12 +2440,13 @@ class BraveVPNService :
                 Log.e(LOG_TAG_VPN, "flow: tcp proxy is enabled but app is not included")
                 // pass-through
             } else {
-                val ip = realDestIp.ifEmpty { dstIp }
+                val ip = connTracker?.destIP ?: ""
                 val isCloudflareIp = TcpProxyHelper.isCloudflareIp(ip)
-                Log.d(
-                    LOG_TAG_VPN,
-                    "flow: tcp proxy enabled, checking for cloudflare: $realDestIp, $isCloudflareIp"
-                )
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: tcp proxy enabled, checking for cloudflare: $ip, $isCloudflareIp"
+                    )
                 if (isCloudflareIp) {
                     val proxyId = "${Ipn.WG}${SEC_WARP_ID}"
                     if (DEBUG)
@@ -2432,14 +2454,19 @@ class BraveVPNService :
                             LOG_TAG_VPN,
                             "flow: tcp proxy enabled, but destination is cloudflare, returning $proxyId, $connId, $uid"
                         )
-                    return getFlowResponseString(proxyId, connId, uid)
+                    return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
                 }
                 if (DEBUG)
                     Log.d(
                         LOG_TAG_VPN,
                         "flow: tcp proxy enabled, returning ${ProxyManager.ID_TCP_BASE}, $connId, $uid"
                     )
-                return getFlowResponseString(ProxyManager.ID_TCP_BASE, connId, uid)
+                return persistAndConstructFlowResponse(
+                    connTracker,
+                    ProxyManager.ID_TCP_BASE,
+                    connId,
+                    uid
+                )
             }
         }
 
@@ -2454,7 +2481,12 @@ class BraveVPNService :
                         LOG_TAG_VPN,
                         "flow: received rule: orbot, returning ${ProxyManager.ID_ORBOT_BASE}, $connId, $uid"
                     )
-                return getFlowResponseString(ProxyManager.ID_ORBOT_BASE, connId, uid)
+                return persistAndConstructFlowResponse(
+                    connTracker,
+                    ProxyManager.ID_ORBOT_BASE,
+                    connId,
+                    uid
+                )
             }
         }
 
@@ -2465,7 +2497,12 @@ class BraveVPNService :
                     LOG_TAG_VPN,
                     "flow: rule: socks5, use ${ProxyManager.ID_S5_BASE}, $connId, $uid"
                 )
-            return getFlowResponseString(ProxyManager.ID_S5_BASE, connId, uid)
+            return persistAndConstructFlowResponse(
+                connTracker,
+                ProxyManager.ID_S5_BASE,
+                connId,
+                uid
+            )
         }
 
         if (appConfig.isCustomHttpProxyEnabled()) {
@@ -2474,11 +2511,16 @@ class BraveVPNService :
                     LOG_TAG_VPN,
                     "flow: rule: http, use ${ProxyManager.ID_HTTP_BASE}, $connId, $uid"
                 )
-            return getFlowResponseString(ProxyManager.ID_HTTP_BASE, connId, uid)
+            return persistAndConstructFlowResponse(
+                connTracker,
+                ProxyManager.ID_HTTP_BASE,
+                connId,
+                uid
+            )
         }
 
         if (DEBUG) Log.d(LOG_TAG_VPN, "flow: no proxy enabled2, returning Ipn.Base, $connId, $uid")
-        return getFlowResponseString(Ipn.Base, connId, uid)
+        return persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
     }
 
     fun hasCid(connId: String): Boolean {
@@ -2499,7 +2541,23 @@ class BraveVPNService :
         io("refreshWg") { VpnController.mutex.withLock { vpnAdapter?.refreshProxiesLocked() } }
     }
 
-    private fun getFlowResponseString(proxyId: String, connId: String, uid: Int): String {
+    suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
+        return VpnController.mutex.withLock { vpnAdapter?.getRDNS(type) }
+    }
+
+    private fun persistAndConstructFlowResponse(
+        connTracker: ConnTrackerMetaData?,
+        proxyId: String,
+        connId: String,
+        uid: Int
+    ): String {
+        // persist the connTracker
+        if (connTracker != null) {
+            connTracker.proxyDetails = proxyId
+            netLogTracker.writeIpLog(connTracker)
+            if (DEBUG) Log.d(LOG_TAG_VPN, "flow: connTracker: $connTracker")
+        }
+
         // "proxyId, connId, uid"
         return StringBuilder()
             .apply {
@@ -2521,15 +2579,15 @@ class BraveVPNService :
         d: String?,
         blocklists: String,
         connId: String
-    ): Boolean {
+    ): ConnTrackerMetaData? {
         Log.d(LOG_TAG_VPN, "block-alg: $uid, $src, $dest, $realIps, $d, $blocklists")
-        if (d == null) return true
+        if (d == null) return null
 
         // TODO: handle multiple domains, for now, use the first domain
         val domains: Set<String> = d.split(",").toSet()
         if (domains.isEmpty()) {
             Log.w(LOG_TAG_VPN, "block-alg domains are empty")
-            return true
+            return null
         }
 
         val first = HostName(src)
@@ -2557,6 +2615,7 @@ class BraveVPNService :
                 realDestIp,
                 dstPort,
                 protocol,
+                proxyDetails = "", // set later
                 blocklists,
                 domains.first(),
                 connId
@@ -2569,7 +2628,7 @@ class BraveVPNService :
         metadata: ConnTrackerMetaData,
         anyRealIpBlocked: Boolean = false,
         blocklists: String = ""
-    ): Boolean {
+    ): ConnTrackerMetaData? {
         // skip the block-ceremony for dns conns
         Log.d(
             LOG_TAG_VPN,
@@ -2577,7 +2636,7 @@ class BraveVPNService :
         )
         if (isDns(metadata.destPort) && isVpnDns(metadata.destIP)) {
             if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule dns-request no-op on conn $metadata")
-            return false
+            return null
         }
 
         val rule = firewall(metadata, anyRealIpBlocked)
@@ -2588,12 +2647,7 @@ class BraveVPNService :
         val blocked = FirewallRuleset.ground(rule)
         metadata.isBlocked = blocked
 
-        if (DEBUG) Log.d(LOG_TAG_VPN, "firewall-rule $rule on conn $metadata")
-
-        // write to conntrack, written in background
-        connTrack(metadata)
-
-        return blocked
+        return metadata
     }
 
     private fun createConnTrackerMetaData(
@@ -2603,6 +2657,7 @@ class BraveVPNService :
         dstIp: String,
         dstPort: Int,
         protocol: Int,
+        proxyDetails: String = "",
         blocklists: String = "",
         query: String = "",
         connId: String
@@ -2626,6 +2681,7 @@ class BraveVPNService :
             System.currentTimeMillis(),
             false, /*blocked?*/
             "", /*rule*/
+            proxyDetails,
             blocklists,
             protocol,
             query,

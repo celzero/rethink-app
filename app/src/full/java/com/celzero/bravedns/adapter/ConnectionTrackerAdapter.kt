@@ -34,14 +34,15 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
 import com.celzero.bravedns.util.Constants.Companion.TIME_FORMAT_1
 import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
 import java.util.Locale
@@ -115,10 +116,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
             val bottomSheetFragment = ConnTrackerBottomSheet()
             // see AppIpRulesAdapter.kt#openBottomSheet()
             val bundle = Bundle()
-            bundle.putString(
-                ConnTrackerBottomSheet.INSTANCE_STATE_IPDETAILS,
-                Gson().toJson(ct)
-            )
+            bundle.putString(ConnTrackerBottomSheet.INSTANCE_STATE_IPDETAILS, Gson().toJson(ct))
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
@@ -220,7 +218,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionDelay.text = ""
                     hasMinSummary = true
                 }
-                if (isConnectionProxied(ct.blockedByRule)) {
+                if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text = context.getString(R.string.symbol_key)
                     hasMinSummary = true
@@ -254,7 +252,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
             }
-            if (isConnectionProxied(ct.blockedByRule)) {
+            if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
                 b.connectionDelay.text =
                     b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
             }
@@ -263,12 +261,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
             }
         }
 
-        private fun isConnectionProxied(ruleName: String?): Boolean {
+        private fun isConnectionProxied(ruleName: String?, proxyDetails: String): Boolean {
             if (ruleName == null) return false
-
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
-
-            return FirewallRuleset.isProxied(rule)
+            val proxy = ProxyManager.isProxied(proxyDetails)
+            return FirewallRuleset.isProxied(rule) || proxy
         }
 
         private fun isConnectionHeavier(ct: ConnectionTracker): Boolean {
