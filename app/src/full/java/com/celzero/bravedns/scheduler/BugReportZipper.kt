@@ -37,7 +37,7 @@ import java.util.zip.ZipOutputStream
 object BugReportZipper {
 
     // Bug report file and directory constants
-    const val BUG_REPORT_DIR_NAME = "bugreport/"
+    private const val BUG_REPORT_DIR_NAME = "bugreport"
     private const val BUG_REPORT_ZIP_FILE_NAME = "rethinkdns.bugreport.zip"
     private const val BUG_REPORT_FILE_NAME = "bugreport_"
 
