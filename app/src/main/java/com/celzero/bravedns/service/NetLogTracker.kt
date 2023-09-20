@@ -94,19 +94,15 @@ internal constructor(
         val transaction = dnsLogTracker?.processOnResponse(summary) ?: return
 
         transaction.responseCalendar = Calendar.getInstance()
-        // quantile estimator
-        dnsLatencyTracker.recordTransaction(transaction)
-
-        val dnsLog = dnsLogTracker?.makeDnsLogObj(transaction) ?: return
+        // refresh latency from GoVpnAdapter
+        scope?.launch { dnsLatencyTracker.refreshLatencyIfNeeded(transaction) }
 
         // TODO: This method should be part of BraveVPNService
         dnsLogTracker?.updateVpnConnectionState(transaction)
 
-        // ideally this check should be carried out before processing the dns object.
-        // Now, the ipDomain cache is adding while making the dnsLog object.
-        // TODO: move ipDomain cache out of DnsLog object creation
         if (!persistentState.logsEnabled) return
 
+        val dnsLog = dnsLogTracker?.makeDnsLogObj(transaction) ?: return
         scope?.launch { dnsNetLogBatcher?.add(dnsLog) }
     }
 }

@@ -110,7 +110,6 @@
                             android:paddingTop="10dp"
                             android:paddingBottom="10dp"
                             android:singleLine="true"
-                            android:text="@string/lbl_fast"
                             android:textSize="@dimen/rethink_header_text" />
 
                         <androidx.appcompat.widget.AppCompatTextView
