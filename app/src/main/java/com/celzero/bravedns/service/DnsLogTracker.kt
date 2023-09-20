@@ -91,12 +91,7 @@ internal constructor(
 
         dnsLog.blockLists = transaction.blocklist
         dnsLog.resolverId = transaction.id
-        if (transaction.transportType.isDnsCrypt()) {
-            dnsLog.relayIP = transaction.relayName
-        } else {
-            // fixme: handle for DoH and Dns proxy
-            dnsLog.relayIP = ""
-        }
+        dnsLog.relayIP = transaction.relayName
         dnsLog.dnsType = transaction.transportType.ordinal
         dnsLog.latency = transaction.responseTime
         dnsLog.queryStr = transaction.name

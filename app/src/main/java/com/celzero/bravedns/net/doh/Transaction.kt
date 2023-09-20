@@ -62,10 +62,6 @@ class Transaction {
         DNS_CRYPT(Dnsx.DNSCrypt),
         DNS_PROXY(Dnsx.DNS53);
 
-        fun isDnsCrypt(): Boolean {
-            return this == DNS_CRYPT
-        }
-
         companion object {
             fun getType(type: String): TransportType {
                 return when (type) {
