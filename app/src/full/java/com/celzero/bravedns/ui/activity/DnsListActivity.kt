@@ -49,7 +49,7 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
 
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
-                b.dnsCryptText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.dohText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.dnsProxyText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))

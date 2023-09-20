@@ -120,8 +120,8 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
             val resolver = customResolver.text.toString()
             val name = customName.text.toString()
 
-            // check both proxy and resolver are valid URLs
-            if (checkUrl(proxy) && checkUrl(resolver)) {
+            // check if the url is valid for resolver, proxy is optional
+            if (checkUrl(resolver)) {
                 insert(name, proxy, resolver)
                 dialog.dismiss()
             } else {
