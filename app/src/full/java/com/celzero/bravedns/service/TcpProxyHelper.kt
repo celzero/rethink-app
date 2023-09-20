@@ -18,6 +18,9 @@ import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import dnsx.Dnsx
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,9 +28,6 @@ import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 object TcpProxyHelper : KoinComponent {
 
@@ -110,7 +110,7 @@ object TcpProxyHelper : KoinComponent {
 
     fun isCloudflareIp(ip: String): Boolean {
         // do not check for cloudflare ips for now
-        return false
+        // return false
         return try {
             cfIpTrie.hasAny(ip)
         } catch (e: Exception) {
@@ -131,7 +131,7 @@ object TcpProxyHelper : KoinComponent {
         try {
             val retrofit =
                 RetrofitManager.getTcpProxyBaseBuilder(
-                        RetrofitManager.Companion.OkHttpDnsType.DEFAULT
+                        RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS
                     )
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
@@ -157,7 +157,11 @@ object TcpProxyHelper : KoinComponent {
                 Log.w(LOG_TAG_PROXY, "unsuccessful response for ${response?.raw()?.request?.url}")
             }
         } catch (e: Exception) {
-            Log.w(LOG_TAG_PROXY, "publicKeyUsable: exception while checking public key", e)
+            Log.e(
+                LOG_TAG_PROXY,
+                "publicKeyUsable: exception while checking public key: ${e.message}",
+                e
+            )
         }
         return works
     }

@@ -75,7 +75,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         try {
             val retrofit =
                 RetrofitManager.getTcpProxyBaseBuilder(
-                        RetrofitManager.Companion.OkHttpDnsType.DEFAULT
+                        RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS
                     )
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

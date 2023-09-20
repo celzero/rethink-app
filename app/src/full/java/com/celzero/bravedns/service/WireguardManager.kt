@@ -31,13 +31,6 @@ import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import ipn.Ipn
 import ipn.Key
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.json.JSONObject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.InputStream
@@ -45,6 +38,13 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import retrofit2.converter.gson.GsonConverterFactory
 
 object WireGuardManager : KoinComponent {
 
@@ -83,13 +83,13 @@ object WireGuardManager : KoinComponent {
     suspend fun load() {
         // go through all files in the wireguard directory and load them
         // parse the files as those are encrypted
+        // increment the id by 1, as the first config id is 0
+        lastAddedConfigId = wgConfigFilesRepository.getLastAddedConfigId() + 1
         lock.write {
             if (configs.isNotEmpty()) {
                 Log.i(LOG_TAG_PROXY, "configs already loaded")
                 return
             }
-            // increment the id by 1, as the first config id is 0
-            lastAddedConfigId = wgConfigFilesRepository.getLastAddedConfigId() + 1
             mappings = wgConfigFilesRepository.getWgConfigs().toMutableSet()
             mappings.forEach {
                 val path = it.configPath
@@ -165,7 +165,6 @@ object WireGuardManager : KoinComponent {
     }
 
     fun getSecWarpConfig(): Config? {
-        // warp config will always be the first config in the list
         return configs.firstOrNull { it.getId() == SEC_WARP_ID }
     }
 
@@ -265,7 +264,7 @@ object WireGuardManager : KoinComponent {
             val locale = Locale.getDefault().toString()
 
             val retrofit =
-                RetrofitManager.getWarpBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
+                RetrofitManager.getWarpBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(IWireguardWarp::class.java)
@@ -304,7 +303,7 @@ object WireGuardManager : KoinComponent {
         var works = false
         try {
             val retrofit =
-                RetrofitManager.getWarpBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
+                RetrofitManager.getWarpBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(IWireguardWarp::class.java)
