@@ -65,7 +65,7 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
         )
         intent.putExtra(
             CustomRulesActivity.INTENT_RULES,
-            CustomRulesActivity.RULES.APP_SPECIFIC_RULES
+            CustomRulesActivity.RULES.APP_SPECIFIC_RULES.type
         )
         intent.putExtra(INTENT_UID, UID_EVERYBODY)
         startActivity(intent)
