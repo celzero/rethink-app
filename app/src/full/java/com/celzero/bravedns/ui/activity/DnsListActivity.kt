@@ -46,28 +46,6 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     }
 
     private fun init() {
-
-        when (appConfig.getDnsType()) {
-            AppConfig.DnsType.DOH -> {
-                b.dohText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-            }
-            AppConfig.DnsType.DNS_PROXY -> {
-                b.dnsProxyText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-            }
-            AppConfig.DnsType.DNSCRYPT -> {
-                b.dnsCryptText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-            }
-            AppConfig.DnsType.DOT -> {
-                b.dotText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-            }
-            AppConfig.DnsType.ODOH -> {
-                b.odohText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-            }
-            else -> {
-                // no-op
-            }
-        }
-
         b.dnsCryptCard.setOnClickListener {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
@@ -111,6 +89,30 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
                     ConfigureOtherDnsActivity.DnsScreen.ODOH.index
                 )
             )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        when (appConfig.getDnsType()) {
+            AppConfig.DnsType.DOH -> {
+                b.dohText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+            }
+            AppConfig.DnsType.DNS_PROXY -> {
+                b.dnsProxyText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+            }
+            AppConfig.DnsType.DNSCRYPT -> {
+                b.dnsCryptText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+            }
+            AppConfig.DnsType.DOT -> {
+                b.dotText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+            }
+            AppConfig.DnsType.ODOH -> {
+                b.odohText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+            }
+            else -> {
+                // no-op
+            }
         }
     }
 }
