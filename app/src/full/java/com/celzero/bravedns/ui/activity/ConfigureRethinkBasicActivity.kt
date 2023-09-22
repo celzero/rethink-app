@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
@@ -48,13 +49,27 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        loadFragment()
+        val type = intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)
+        val fl = FragmentLoader.values()[type]
+        val fragment = fragment(fl)
+
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.root_container, fragment, fragment.javaClass.simpleName)
+                .commit()
+        } else {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.root_container, fragment, fragment.javaClass.simpleName)
+                .commit()
+        }
     }
 
-    private fun loadFragment() {
-        // add fragments to the activity based on the received intent
-        when (intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)) {
-            FragmentLoader.REMOTE.ordinal -> {
+    private fun fragment(fl: FragmentLoader): Fragment {
+        // return fragment based on the received intent
+        return when (fl) {
+            FragmentLoader.REMOTE -> {
                 val name = intent.getStringExtra(RETHINK_BLOCKLIST_NAME) ?: ""
                 val url = intent.getStringExtra(RETHINK_BLOCKLIST_URL) ?: ""
 
@@ -67,13 +82,9 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
                     )
                 bundle = updateBundle(bundle, RETHINK_BLOCKLIST_NAME, name)
                 rr.arguments = updateBundle(bundle, RETHINK_BLOCKLIST_URL, url)
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.root_container, rr, rr.javaClass.simpleName)
-                    .commit()
-                return
+                rr
             }
-            FragmentLoader.LOCAL.ordinal -> {
+            FragmentLoader.LOCAL -> {
                 // load the local blocklist configure screen
                 val rl = RethinkBlocklistFragment.newInstance()
                 rl.arguments =
@@ -81,21 +92,13 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
                         RETHINK_BLOCKLIST_TYPE,
                         RethinkBlocklistManager.RethinkBlocklistType.LOCAL.ordinal
                     )
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.root_container, rl, rl.javaClass.simpleName)
-                    .commit()
-                return
+                rl
             }
-            FragmentLoader.DB_LIST.ordinal -> {
+            FragmentLoader.DB_LIST -> {
                 // load the list of already added rethink doh urls
                 val r = RethinkListFragment.newInstance()
                 r.arguments = createBundle(UID, Constants.MISSING_UID)
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.root_container, r, r.javaClass.simpleName)
-                    .commit()
-                return
+                r
             }
         }
     }

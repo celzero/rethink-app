@@ -31,7 +31,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.work.BackoffPolicy
 import androidx.work.Data
@@ -615,7 +615,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun setupNavigationItemSelectedListener() {
-        val navController = this.findNavController(R.id.fragment_container)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
         val btmNavView = findViewById<BottomNavigationView>(R.id.nav_view)
         btmNavView.setupWithNavController(navController)
     }
