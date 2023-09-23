@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -27,7 +28,10 @@ import com.celzero.bravedns.databinding.FragmentSummaryStatisticsBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
 import com.celzero.bravedns.util.CustomLinearLayoutManager
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -76,6 +80,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initView() {
+        highlightToggleBtn()
         showAppNetworkActivity()
         showBlockedApps()
         showMostContactedDomain()
@@ -86,7 +91,16 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showMostBlockedCountries()
     }
 
+    private fun highlightToggleBtn() {
+        val timeCategory = "0" // default is 3 hours, "0" tag is 3 hours
+        val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
+        btn.isChecked = true
+        selectToggleBtnUi(btn)
+    }
+
     private fun initClickListeners() {
+        b.toggleGroup.addOnButtonCheckedListener(listViewToggleListener)
+
         b.fssAppInfoChip.setOnClickListener {
             openDetailedStatsUi(SummaryStatisticsType.MOST_CONNECTED_APPS)
         }
@@ -116,9 +130,34 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
     }
 
+    private val listViewToggleListener =
+        MaterialButtonToggleGroup.OnButtonCheckedListener { _, checkedId, isChecked ->
+            val mb: MaterialButton = b.toggleGroup.findViewById(checkedId)
+            if (isChecked) {
+                selectToggleBtnUi(mb)
+                val tcValue = (mb.tag as String).toInt()
+                val timeCategory = SummaryStatisticsViewModel.TimeCategory.fromValue(tcValue)
+                viewModel.timeCategoryChanged(timeCategory)
+                return@OnButtonCheckedListener
+            }
+
+            unselectToggleBtnUi(mb)
+        }
+
+    private fun selectToggleBtnUi(mb: MaterialButton) {
+        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.secondaryTextColor))
+    }
+
+    private fun unselectToggleBtnUi(mb: MaterialButton) {
+        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+    }
+
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {
+        val mb = b.toggleGroup.checkedButtonId
+        val timeCategory = (b.toggleGroup.findViewById<MaterialButton>(mb).tag as String).toInt()
         val intent = Intent(requireContext(), DetailedStatisticsActivity::class.java)
         intent.putExtra(DetailedStatisticsActivity.INTENT_TYPE, type.tid)
+        intent.putExtra(DetailedStatisticsActivity.INTENT_TIME_CATEGORY, timeCategory)
         startActivity(intent)
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -19,6 +20,7 @@ import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.viewmodel.DetailedStatisticsViewModel
+import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -36,6 +38,7 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
 
     companion object {
         const val INTENT_TYPE = "STATISTICS_TYPE"
+        const val INTENT_TIME_CATEGORY = "TIME_CATEGORY"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,17 +50,39 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
                 INTENT_TYPE,
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS.tid
             )
+        val tc = intent.getIntExtra(INTENT_TIME_CATEGORY, 0)
+        val timeCategory = SummaryStatisticsViewModel.TimeCategory.fromValue(tc)
         val statType = SummaryStatisticsFragment.SummaryStatisticsType.getType(type)
-        setRecyclerView(statType)
+        setSubTitle(timeCategory)
+        setRecyclerView(statType, timeCategory)
     }
 
-    private fun setRecyclerView(type: SummaryStatisticsFragment.SummaryStatisticsType) {
+    private fun setSubTitle(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
+        when (timeCategory) {
+            SummaryStatisticsViewModel.TimeCategory.THREE_HOURS -> {
+                b.dsaSubtitle.text = "Last 3 " + getString(R.string.lbl_hour)
+            }
+            SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOURS -> {
+                b.dsaSubtitle.text = "Last 24 " + getString(R.string.lbl_hour)
+            }
+            SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
+                b.dsaSubtitle.text = "Last 7 " + getString(R.string.lbl_day)
+            }
+        }
+    }
+
+    private fun setRecyclerView(
+        type: SummaryStatisticsFragment.SummaryStatisticsType,
+        timeCategory: SummaryStatisticsViewModel.TimeCategory
+    ) {
+
         b.dsaRecycler.setHasFixedSize(true)
         val layoutManager = CustomLinearLayoutManager(this)
         b.dsaRecycler.layoutManager = layoutManager
 
         val recyclerAdapter = SummaryStatisticsAdapter(this, persistentState, appConfig, type)
 
+        viewModel.timeCategoryChanged(timeCategory)
         handleStatType(type).observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
 
         // remove the view if there is no data

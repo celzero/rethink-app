@@ -41,6 +41,56 @@
 
         </LinearLayout>
 
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_group"
+            style="@style/toggleButtonNoStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:checkedButton="@id/tb_recent_toggle_btn"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tb_recent_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="0"
+                android:text="3 hrs"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tb_daily_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="1"
+                android:text="24 hrs"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tb_weekly_toggle_btn"
+                style="@style/toggleButtonNoStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"
+                android:tag="2"
+                android:text="7 days"
+                android:textAllCaps="false"
+                android:textColor="?attr/defaultToggleBtnTxt"
+                android:textSize="@dimen/default_font_text_view"
+                app:cornerRadius="16dp" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/fss_app_allowed_ll"
             android:layout_width="match_parent"

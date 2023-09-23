@@ -34,6 +34,16 @@
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_large_font_text_view" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/dsa_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view"
+            />
+
     </LinearLayout>
 
     <RelativeLayout
