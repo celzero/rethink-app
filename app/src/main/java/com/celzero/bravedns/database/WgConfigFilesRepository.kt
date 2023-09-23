@@ -52,6 +52,14 @@ class WgConfigFilesRepository(private val wgConfigFilesDAO: WgConfigFilesDAO) {
         wgConfigFilesDAO.deleteConfig(id)
     }
 
+    suspend fun updateLockdownConfig(id: Int, isLockdown: Boolean) {
+        wgConfigFilesDAO.updateLockdownConfig(id, isLockdown)
+    }
+
+    suspend fun updateCatchAllConfig(id: Int, isCatchAll: Boolean) {
+        wgConfigFilesDAO.updateCatchAllConfig(id, isCatchAll)
+    }
+
     suspend fun isConfigAdded(id: Int): WgConfigFiles? {
         return wgConfigFilesDAO.isConfigAdded(id)
     }

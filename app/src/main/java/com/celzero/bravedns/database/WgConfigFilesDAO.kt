@@ -55,6 +55,12 @@ interface WgConfigFilesDAO {
 
     @Query("delete from WgConfigFiles where id = :id") fun deleteConfig(id: Int)
 
+    @Query("update WgConfigFiles set isCatchAll = :isCatchAll where id = :id")
+    fun updateCatchAllConfig(id: Int, isCatchAll: Boolean)
+
+    @Query("update WgConfigFiles set isLockdown = :isLockdown where id = :id")
+    fun updateLockdownConfig(id: Int, isLockdown: Boolean)
+
     @Query("select * from WgConfigFiles where id = :id") fun isConfigAdded(id: Int): WgConfigFiles?
 
     @Query("select count(id) from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID")

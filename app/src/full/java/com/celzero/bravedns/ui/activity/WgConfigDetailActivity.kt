@@ -108,6 +108,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         handleWarpConfigView()
         handleAppsCount()
         val config = WireGuardManager.getConfigById(configId)
+        val mapping = WireGuardManager.getConfigFilesById(configId)
+        if (mapping != null) {
+            b.lockdownCheck.isChecked = mapping.isLockdown
+        }
         if (config == null && configId == WARP_ID) {
             showNewWarpConfigLayout()
             return
@@ -284,6 +288,19 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 getString(R.string.public_key_copy_toast_msg),
                 Toast.LENGTH_SHORT
             )
+        }
+
+        b.lockdownCheck.setOnCheckedChangeListener { _, isChecked ->
+            io {
+                WireGuardManager.updateLockdownConfig(configId, isChecked)
+                uiCtx {
+                    Toast.makeText(
+                        this,
+                        "Lockdown config updated successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 

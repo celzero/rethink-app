@@ -264,7 +264,9 @@ object WireGuardManager : KoinComponent {
             val locale = Locale.getDefault().toString()
 
             val retrofit =
-                RetrofitManager.getWarpBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS)
+                RetrofitManager.getWarpBaseBuilder(
+                        RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS
+                    )
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(IWireguardWarp::class.java)
@@ -303,7 +305,9 @@ object WireGuardManager : KoinComponent {
         var works = false
         try {
             val retrofit =
-                RetrofitManager.getWarpBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS)
+                RetrofitManager.getWarpBaseBuilder(
+                        RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS
+                    )
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(IWireguardWarp::class.java)
@@ -333,16 +337,16 @@ object WireGuardManager : KoinComponent {
         return works
     }
 
-    fun getActiveConfigIdForApp(uid: Int): Int {
+    fun getConfigIdForApp(uid: Int): WgConfigFiles? {
         val configId = ProxyManager.getProxyIdForApp(uid)
         if (configId == "" || !configId.contains(ProxyManager.ID_WG_BASE)) {
             Log.i(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
-            return INVALID_CONF_ID
+            return null
         }
 
         val id = convertStringIdToId(configId)
-        val config = mappings.find { it.id == id } ?: return INVALID_CONF_ID
-        return if (config.isActive) config.id else INVALID_CONF_ID
+        val config = mappings.find { it.id == id } ?: return null
+        return config
     }
 
     private fun convertStringIdToId(id: String): Int {
@@ -495,6 +499,32 @@ object WireGuardManager : KoinComponent {
         }
     }
 
+    suspend fun updateLockdownConfig(id: Int, isLockdown: Boolean) {
+        val config = configs.find { it.getId() == id }
+        if (config == null) {
+            Log.e(LOG_TAG_PROXY, "updateLockdownConfig: wg not found, id: $id, ${configs.size}")
+            return
+        }
+        Log.i(LOG_TAG_PROXY, "updating lockdown for config: $id, ${config.getName()}")
+        wgConfigFilesRepository.updateLockdownConfig(id, isLockdown)
+        lock.write {
+            mappings.find { it.id == id }?.isLockdown = isLockdown
+        }
+    }
+
+    suspend fun updateCatchAllConfig(id: Int, isCatchAll: Boolean) {
+        val config = configs.find { it.getId() == id }
+        if (config == null) {
+            Log.e(LOG_TAG_PROXY, "updateCatchAllConfig: wg not found, id: $id, ${configs.size}")
+            return
+        }
+        Log.i(LOG_TAG_PROXY, "updating catch all for config: $id, ${config.getName()}")
+        wgConfigFilesRepository.updateCatchAllConfig(id, isCatchAll)
+        lock.write {
+            mappings.find { it.id == id }?.isCatchAll = isCatchAll
+        }
+    }
+
     suspend fun addPeer(id: Int, peer: Peer) {
         // add the peer to the config
         val config = configs.find { it.getId() == id }
@@ -564,7 +594,16 @@ object WireGuardManager : KoinComponent {
         }
         val file = wgConfigFilesRepository.isConfigAdded(cfg.getId())
         if (file == null) {
-            val wgf = WgConfigFiles(cfg.getId(), cfg.getName(), path, serverResponse, false)
+            val wgf =
+                WgConfigFiles(
+                    cfg.getId(),
+                    cfg.getName(),
+                    path,
+                    serverResponse,
+                    isActive = false,
+                    isCatchAll = false,
+                    isLockdown = false
+                )
             wgConfigFilesRepository.insert(wgf)
         } else {
             file.name = cfg.getName()
@@ -600,7 +639,16 @@ object WireGuardManager : KoinComponent {
     ) {
         lock.write {
             if (file == null) {
-                val wgf = WgConfigFiles(cfg.getId(), cfg.getName(), path, serverResponse, false)
+                val wgf =
+                    WgConfigFiles(
+                        cfg.getId(),
+                        cfg.getName(),
+                        path,
+                        serverResponse,
+                        isActive = false,
+                        isCatchAll = false,
+                        isLockdown = false
+                    )
                 mappings.add(wgf)
             } else {
                 val configFile = mappings.find { it.id == cfg.getId() }

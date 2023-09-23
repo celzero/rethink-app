@@ -50,7 +50,6 @@ import com.celzero.bravedns.net.go.GoVpnAdapter
 import com.celzero.bravedns.net.manager.ConnectionTracer
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
-import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_ID
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.*
@@ -2400,6 +2399,54 @@ class BraveVPNService :
         connId: String,
         uid: Int
     ): String {
+        // check for other proxy rules
+        // wireguard, do not check for wireguard enabled, as wireguard has lockdown scenario
+        val config = WireGuardManager.getConfigIdForApp(uid)
+        val proxyId = "${ProxyManager.ID_WG_BASE}${config?.id}"
+        // if no config is assigned / enabled for this app, pass-through
+        // add ID_WG_BASE to the id to get the proxyId
+        if (config == null || config.id == WireGuardManager.INVALID_CONF_ID) {
+            // wireguard is not enabled for this app, pass-through
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: wireguard is not enabled for this app, pass-through, $connId, $uid"
+                )
+        } else if (!config.isActive) {
+            // app is included in the config, but the config is not active
+            // check for catch-all and lockdown
+            if (config.isCatchAll) {
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: wireguard is not enabled for this app, but catch-all is enabled, returning $proxyId, $connId, $uid"
+                    )
+                return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
+            } else if (config.isLockdown) {
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: wireguard is not enabled for this app, but lockdown is enabled, returning $proxyId, $connId, $uid"
+                    )
+                return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
+            } else {
+                if (DEBUG)
+                    Log.d(
+                        LOG_TAG_VPN,
+                        "flow: wireguard is enabled but app is not included, proceed for other checks, $connId, $uid"
+                    )
+                // pass-through, no wireguard config is enabled for this app
+            }
+        } else {
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "flow: wireguard is enabled and app is included, returning $proxyId, $connId, $uid"
+                )
+            return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
+        }
+
+        // carry out this check after wireguard, because wireguard has catchAll and lockdown
         // if no proxy is enabled, return Ipn.Base
         if (!appConfig.isProxyEnabled()) {
             if (DEBUG)
@@ -2407,34 +2454,8 @@ class BraveVPNService :
             return persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
         }
 
-        // check for other proxy rules
-        // wireguard
-        if (appConfig.isWireGuardEnabled()) {
-            val id = WireGuardManager.getActiveConfigIdForApp(uid)
-            val proxyId = "${ProxyManager.ID_WG_BASE}$id"
-            // if no config is assigned / enabled for this app, pass-through
-            // add ID_WG_BASE to the id to get the proxyId
-            if (
-                id == WireGuardManager.INVALID_CONF_ID || !WireGuardManager.isConfigActive(proxyId)
-            ) {
-                if (DEBUG)
-                    Log.d(
-                        LOG_TAG_VPN,
-                        "flow: wireguard is enabled but app is not included, proceed for other checks, $connId, $uid"
-                    )
-                // pass-through, no wireguard config is enabled for this app
-            } else {
-                if (DEBUG)
-                    Log.d(
-                        LOG_TAG_VPN,
-                        "flow: wireguard is enabled and app is included, returning $proxyId, $connId, $uid"
-                    )
-                return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
-            }
-        }
-
         // comment out tcp proxy for v055 release
-        if (appConfig.isTcpProxyEnabled()) {
+        /*if (appConfig.isTcpProxyEnabled()) {
             val activeId = ProxyManager.getProxyIdForApp(uid)
             if (!activeId.contains(ProxyManager.ID_TCP_BASE)) {
                 Log.e(LOG_TAG_VPN, "flow: tcp proxy is enabled but app is not included")
@@ -2468,7 +2489,7 @@ class BraveVPNService :
                     uid
                 )
             }
-        }
+        }*/
 
         if (appConfig.isOrbotProxyEnabled()) {
             val activeId = ProxyManager.getProxyIdForApp(uid)
@@ -2701,10 +2722,6 @@ class BraveVPNService :
     }
 
     fun syncP50Latency() {
-        io("syncP50Latency") {
-            VpnController.mutex.withLock {
-                vpnAdapter?.syncP50LatencyLocked()
-            }
-        }
+        io("syncP50Latency") { VpnController.mutex.withLock { vpnAdapter?.syncP50LatencyLocked() } }
     }
 }

@@ -253,18 +253,49 @@
                         app:barrierDirection="bottom"
                         app:constraint_referenced_ids="listen_port_text,mtu_text" />
 
+                    <RelativeLayout
+                        android:id="@+id/lockdown_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/listen_port_mtu_barrier">
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/lockdown_check"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="?attr/accentGood"
+                            android:foregroundTint="?attr/accentGood"
+                            android:layout_alignParentStart="true"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:layout_toStartOf="@id/lockdown_info"
+                            android:text="Enable lockdown"
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/lockdown_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_info_white" />
+
+                    </RelativeLayout>
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/applications_btn"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/add_remove_apps"
+                        android:alpha="0.75"
+                        android:text="Add / Remove apps"
                         android:textColor="?attr/secondaryTextColor"
                         android:textSize="@dimen/large_font_text_view"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/listen_port_mtu_barrier"
+                        app:layout_constraintTop_toBottomOf="@id/lockdown_ll"
                         app:layout_constraintWidth_max="@dimen/max_btn_size"
                         app:rippleColor="?attr/secondaryTextColor" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -273,6 +304,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/peers_list"
                 android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tunnel_detail_card" />
