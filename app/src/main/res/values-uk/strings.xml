@@ -393,4 +393,6 @@
     <string name="about_join_telegram" translatable="true">Telegram</string>
     <string name="about_faq" translatable="true">Переглянути ЧаПи</string>
     <string name="about_github" translatable="true">Зробити внесок на GitHub</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Блоклисти останньої версії.</string>
+    <string name="blocklist_update_check_failure" translatable="true">Щось пішло не так. Спробуйте пізніше!</string>
 </resources>
