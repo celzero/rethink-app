@@ -9,7 +9,7 @@
     <string name="finish">Закінчити</string>
     <string name="slide_2_title">Ласкаво просимо</string>
     <string name="slide_1_title">Вільний і з відкритим вихідним кодом</string>
-    <string name="slide_1_desc">Rethink - це ПЗ з відкритим вихідним кодом, яке підтримується програмою Mozilla Builders MVP.</string>
+    <string name="slide_1_desc">Rethink - це програмне забезпечення з відкритим вихідним кодом, яке підтримується програмою Mozilla Builders MVP.</string>
     <string name="block">блокувати</string>
     <string name="exclude">виключити</string>
     <string name="isolate">ізолювати</string>
@@ -21,7 +21,7 @@
     <string name="always_on_dialog_neutral">Налаштування</string>
     <string name="app_name">RethinkDNS</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="settings_title_desc">DNS і Брандмауер, що легко налаштовуються</string>
+    <string name="settings_title_desc">DNS та брандмауер, що легко налаштовуються</string>
     <string name="always_on_dialog_lockdown_stop_message">Rethink запускає VPN у режимі <i>Блокування</i>. Його зупинка призведе до втрати підключення до Інтернету для цього профілю користувача. Ви все одно хочете продовжити\?</string>
     <string name="private_dns_dialog_heading">Вимкнути Приватний DNS</string>
     <string name="about_title_desc">Виявлення та блокування загроз мережевої безпеки</string>
@@ -63,7 +63,7 @@
     <string name="dns_mode_info_title">DNS</string>
     <string name="firewall_rules">Правила мережі</string>
     <string name="firewall_mode_info_title">Брандмауер</string>
-    <string name="universal_firewall_explanation" translatable="true">Застосовувати правила брандмауера до всіх застосунків на основі подій пристрою, наприклад, брандмауер, коли пристрій заблоковано або коли певний застосунок не використовується.</string>
+    <string name="universal_firewall_explanation" translatable="true">Застосовуйте правила брандмауера до всіх застосунків на основі подій на пристрої, наприклад, коли пристрій заблоковано або коли певна програма не використовується.</string>
     <string name="bsct_block" translatable="true">Блокувати, обходити, виключати, ізолювати <u>цей застосунок</u></string>
     <string name="univ_firewall_dialog_message" translatable="true">Видалення цього правила дозволить будь-якому застосунку підключатися до цієї IP-адреси. Ви бажаєте продовжити\?</string>
     <string name="refresh_complete" translatable="true">Повторну синхронізацію списку застосунків завершено.</string>
@@ -90,8 +90,8 @@
     <string name="ctbs_app_info_not_available_toast" translatable="true">Сторінку налаштувань застосунку не знайдено</string>
     <string name="ctbs_app_other_apps" translatable="true">%1$s + %2$s інший(-і) застосунок(-ки)</string>
     <string name="ctbs_block_other_apps" translatable="true">Правила, що застосовуються для %1$s, будуть також застосовні для інших застосунків %2$s</string>
-    <string name="univ_firewall_rule_1" translatable="true">Блокувати всі застосунки , коли пристрій заблоковано</string>
-    <string name="univ_firewall_rule_10" translatable="true">Блокувати всіх, крім заблокованих застосунків та IP-адрес</string>
+    <string name="univ_firewall_rule_1" translatable="true">Блокувати всі застосунки, коли пристрій заблоковано</string>
+    <string name="univ_firewall_rule_10" translatable="true">Блокувати усе, крім обраних застосунків та IP-адрес</string>
     <string name="univ_delete_firewall_dialog_message" translatable="true">Видалення цих правил дозволило б будь-якому застосунку підключатися до заблокованих на даний момент IP-адрес.</string>
     <string name="dns_proxy_dialog_message" translatable="true">Назва застосунку: %1$s
 \n
@@ -167,7 +167,7 @@
     <string name="apps_icon_content_desc" translatable="true">Іконка застосунку</string>
     <string name="ct_bs_app_info_error" translatable="true">Інформація про застосунок не знайдено</string>
     <string name="hsf_chip_appearance" translatable="true">Тема: %1$s</string>
-    <string name="about_bravedns_explantion" translatable="true">RethinkDNS — це найпростіший спосіб відстежувати активність застосунків, обходити інтернет-цензуру та брандмауери на вашому пристрої Android.</string>
+    <string name="about_bravedns_explantion" translatable="true">Rethink — це найпростіший спосіб відстежувати активність застосунків, обходити інтернет-цензуру та брандмауери на вашому пристрої Android.</string>
     <string name="about_app" translatable="true">застосунок</string>
     <string name="about_settings_app_info" translatable="true">Інформація про застосунок</string>
     <string name="about_app_translate" translatable="true">Перекласти</string>
@@ -233,7 +233,7 @@
 \n<u>HTTP-проксі</u>: RethinkDNS <i>встановлює</i> HTTP-проксі, але не вимагає, щоб застосунки використовували його. Зазвичай такі браузери, як Chrome і Firefox, використовують його. Застосунки, які використовують проксі HTTP(S), обходять правила брандмауера та DNS.</string>
     <string name="settings_import_export_desc" translatable="true">Вручну створіть резервну копію або відновіть дані та налаштування застосунку.</string>
     <string name="settings_socks_forwarding_desc_no_app" translatable="true">Переадресація на %1$s:%2$s</string>
-    <string name="univ_firewall_rule_6" translatable="true">Блокування нових встановлених застосунків за замовчуванням</string>
+    <string name="univ_firewall_rule_6" translatable="true">Блокувати нові встановлені застосунки за замовчуванням</string>
     <string name="settings_orbot_notification_content" translatable="true">Помилка запуску Tor-as-a-Proxy. Відкрийте застосунок Orbot, щоб запустити його вручну.</string>
     <string name="settings_app_notification_a13_heading" translatable="true">Сповіщення застосунку</string>
     <string name="notification_screen_error" translatable="true">Не вдалося запустити екран сповіщень застосунку.</string>
@@ -289,20 +289,20 @@
     <string name="cd_dialog_error_invalid_wildcard" translatable="true">Неправильний підставний символ.</string>
     <string name="title_statistics" translatable="true">Статистика</string>
     <string name="lbl_cancel" translatable="true">Скасувати</string>
-    <string name="lbl_allowed" translatable="true">Дозволено</string>
+    <string name="lbl_allowed" translatable="true">Дозволені</string>
     <string name="lbl_apply" translatable="true">Застосувати</string>
-    <string name="lbl_disabled" translatable="true">Вимкнено</string>
+    <string name="lbl_disabled" translatable="true">Вимкнені</string>
     <string name="lbl_domain" translatable="true">Домен</string>
     <string name="lbl_action_required" translatable="true">Необхідні дії</string>
     <string name="lbl_ip_rules" translatable="true">Правила IP</string>
     <string name="lbl_domain_rules" translatable="true">Правила домену</string>
     <string name="lbl_wildcard" translatable="true">Підставний символ</string>
-    <string name="lbl_all" translatable="true">Всі</string>
+    <string name="lbl_all" translatable="true">Усі</string>
     <string name="dns_crypt_relay_remove_dialog_title" translatable="true">Видалити DNSCrypt Relay\?</string>
     <string name="lbl_dismiss" translatable="true">Відхилити</string>
     <string name="lbl_configure" translatable="true">Налаштування</string>
-    <string name="lbl_blocked" translatable="true">Заблоковано</string>
-    <string name="lbl_maybe_blocked" translatable="true">Можливо, заблоковано.</string>
+    <string name="lbl_blocked" translatable="true">Заблоковані</string>
+    <string name="lbl_maybe_blocked" translatable="true">Можливо заблоковані</string>
     <string name="lbl_logs" translatable="true">журнали</string>
     <string name="dns_firewall_mode_info_explanation_new" translatable="true">Все перераховане вище + обхід інтернет-цензури.</string>
     <string name="conn_track_clear_logs_title" translatable="true">Видалити всі мережеві журнали\?</string>
@@ -336,7 +336,7 @@
     <string name="lbl_hour" translatable="true">год</string>
     <string name="lbl_persistent_keepalive" translatable="true">Постійно активне</string>
     <string name="lbl_save" translatable="true">зберегти</string>
-    <string name="lbl_optional" translatable="true">(додатково)</string>
+    <string name="lbl_optional" translatable="true">(необов\'язково)</string>
     <string name="lbl_delete" translatable="true">Видалити</string>
     <string name="lbl_qr_code" translatable="true">QR-код</string>
     <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
@@ -348,21 +348,51 @@
     <string name="lbl_inactive" translatable="true">Неактивне</string>
     <string name="lbl_addresses" translatable="true">Адреси</string>
     <string name="lbl_active" translatable="true">Активне</string>
-    <string name="lbl_dns_servers" translatable="true">DNS Сервери</string>
-    <string name="lbl_app_wise" translatable="true">на програму</string>
+    <string name="lbl_dns_servers" translatable="true">DNS сервери</string>
+    <string name="lbl_app_wise" translatable="true">на застосунок</string>
     <string name="status_protected_with_wg" translatable="true">захищено wireguard</string>
-    <string name="lbl_public_key" translatable="true">Відкритий ключ</string>
-    <string name="lbl_insecure" translatable="true">(несекретно)</string>
+    <string name="lbl_public_key" translatable="true">Публічний ключ</string>
+    <string name="lbl_insecure" translatable="true">(незахищено)</string>
     <string name="lbl_min" translatable="true">хв</string>
     <string name="lbl_private_key" translatable="true">Приватний ключ</string>
     <string name="lbl_preshared_key" translatable="true">Загальний ключ</string>
-    <string name="lbl_applications" translatable="true">Програми</string>
+    <string name="lbl_applications" translatable="true">Застосунки</string>
     <string name="lbl_include" translatable="true">Долучити</string>
     <string name="lbl_very" translatable="true">дуже</string>
-    <string name="lbl_select_all" translatable="true">позначити все</string>
+    <string name="lbl_select_all" translatable="true">обрати все</string>
     <string name="lbl_create" translatable="true">Створити</string>
     <string name="local_blocklist_redownload" translatable="true">Оновлено!</string>
     <string name="status_protected_with_wg_private_dns" translatable="true">захищено wireguard &amp; приватний dns</string>
     <string name="lbl_listen_port" translatable="true">Слухати порт</string>
     <string name="lbl_random" translatable="true">(випадково)</string>
+    <string name="univ_firewall_rule_8" translatable="true">Блокувати трафік через 80 порт (незахищений HTTP)</string>
+    <string name="about_whats_new" translatable="true">Що нового у %1$s</string>
+    <string name="about_bravedns_whoarewe" translatable="true">Rethink – це безкоштовний проєкт з відкритим вихідним кодом, який очолюють колишні інженери з Amazon, IBM та Scientific Games.</string>
+    <string name="univ_firewall_heading" translatable="true">Універсальні правила брандмауера</string>
+    <string name="about_website" translatable="true">Відвідайте rethinkdns.com</string>
+    <string name="about_email" translatable="true">Напишіть нам</string>
+    <string name="about_bug_report" translatable="true">Звіт про помилку</string>
+    <string name="about_docs" translatable="true">Читати документацію</string>
+    <string name="firewall_rule_block_http" translatable="true">Незахищенний HTTP</string>
+    <string name="about_sponsor_link_text" translatable="true">Спонсорувати</string>
+    <string name="univ_firewall_rule_4" translatable="true">Блокувати UDP, крім DNS та NTP</string>
+    <string name="univ_view_blocked_ip" translatable="true">Правила IP та портів</string>
+    <string name="about_web" translatable="true">посилання</string>
+    <string name="about_bravedns_toreport_text" translatable="true">допомога та зворотний зв\'язок</string>
+    <string name="univ_firewall_rule_5" translatable="true">Блокувати у разі обходу DNS</string>
+    <string name="univ_view_blocked_ip_desc" translatable="true">Зміна заблокованих та довірених правил для доменів, IP чи портів.</string>
+    <string name="about_mail_bugreport_subject" translatable="true">[Rethink]: Звіт про помилку</string>
+    <string name="about_bug_report_dialog_positive_btn" translatable="true">Надіслати</string>
+    <string name="hsf_whats_new_chip_text" translatable="true">Що нового</string>
+    <string name="about_bug_report_desc" translatable="true">ел. пошта</string>
+    <string name="about_privacy_policy" translatable="true">Читати політику конфіденційності</string>
+    <string name="hs_download_positive_website" translatable="true">Відвідайте вебсайт</string>
+    <string name="about_bug_no_log_dialog_title" translatable="true">Звіт про помилку</string>
+    <string name="about_connect" translatable="true">зв\'язок</string>
+    <string name="whats_dialog_title" translatable="true">Що нового у v055a</string>
+    <string name="about_join_telegram" translatable="true">Telegram</string>
+    <string name="about_faq" translatable="true">Переглянути ЧаПи</string>
+    <string name="about_github" translatable="true">Зробити внесок на GitHub</string>
+    <string name="blocklist_update_check_not_required" translatable="true">Блоклисти останньої версії.</string>
+    <string name="blocklist_update_check_failure" translatable="true">Щось пішло не так. Спробуйте пізніше!</string>
 </resources>
