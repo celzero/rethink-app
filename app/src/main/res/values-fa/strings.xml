@@ -7,17 +7,17 @@
     <string name="next">بعدی</string>
     <string name="firewall_rules">قوانین شبکه</string>
     <string name="orbot_install_dialog_title">Orbot نصب شود؟</string>
-    <string name="pause_mode_notification_title">متوقف شد! برنامه های مسدود شده همچنان فایروال می شوند.</string>
+    <string name="pause_mode_notification_title">متوقف شد! برنامه های مسدود شده همچنان دیوار آتش می شوند.</string>
     <string name="orbot_install_dialog_message">Orbot ویژگی ها و عملکرد Tor را به اندروید می آورد.</string>
     <string name="pause_text">متوقف شده</string>
     <string name="app_name">RethinkDNS</string>
     <string name="settings_title_desc">DNS و فایروال بسیار قابل تنظیم</string>
     <string name="orbot_install_dialog_positive">نصب</string>
     <string name="about_title_desc">شناسایی و مسدود کردن تهدیدات امنیتی شبکه</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">هشدار: RethinkDNS غیرفعال شده است</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">هشدار: Rethink غیرفعال شده است</string>
     <string name="slide_2_title">خوش آمدید</string>
     <string name="dns_mode_notification_title">حفاظت شده! متصل به DNS سریع و امن.</string>
-    <string name="firewall_mode_notification_title">حفاظت شده! متصل به فایروال.</string>
+    <string name="firewall_mode_notification_title">حفاظت شده! متصل به دیوار آتش.</string>
     <string name="status_dns_error">خطای dns</string>
     <string name="status_app_error">خطای برنامه</string>
     <string name="other_dns_list_tab2">Dnscrypt</string>
@@ -25,12 +25,12 @@
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">در انتظار</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="dns_mode_info_explanation_new">درخواست های DNS را نظارت، مسدود و رمزگذاری کنید.</string>
-    <string name="dns_firewall_mode_info_explanation_new">همه موارد بالا + دور زدن سانسور اینترنت.</string>
-    <string name="universal_firewall_explanation">قوانین دیوار آتش را بر روی همه برنامه ها بر اساس رویدادهای دستگاه اعمال کنید، به عنوان مثال، زمانی که دستگاه قفل است یا زمانی که یک برنامه خاص در حال استفاده نیست دیوار آتش فعال باشد.</string>
+    <string name="dns_firewall_mode_info_explanation_new">همه موارد فوق + دور زدن سانسور اینترنت.</string>
+    <string name="universal_firewall_explanation">قوانین دیوار آتش را بر روی همه برنامه ها بر اساس رویدادهای دستگاه اعمال کنید، به عنوان مثال، دیوار آتش زمانی که دستگاه قفل است یا زمانی که یک برنامه خاص در حال استفاده نیست.</string>
     <string name="accessibility_service_description">RethinkDNS از سرویس دسترس پذیری برای شناسایی و فایروال برنامه های پس زمینه استفاده می کند. RethinkDNS هیچ اطلاعاتی را جمع آوری یا نمی فروشد.</string>
     <string name="status_protected_with_http_private_dns">محافظت شده با پروکسی http و dns خصوصی</string>
     <string name="slide_2_desc">RethinkDNS ساده ترین راه برای نظارت بر فعالیت شبکه، دور زدن سانسور اینترنت و برنامه های فایروال در دستگاه اندرویدی شما است.</string>
-    <string name="slide_1_desc">RethinkDNS یک نرم افزار متن باز است که توسط برنامه Mozilla Builders MVP حمایت می شود.</string>
+    <string name="slide_1_desc">Rethink یک نرم افزار متن باز است که توسط برنامه Mozilla Builders MVP حمایت می شود.</string>
     <string name="status_protected_with_proxy_private_dns">محافظت شده با پروکسی و dns خصوصی</string>
     <string name="slide_1_title">رایگان و متن‌باز</string>
     <string name="hybrid_mode_info_title">DNS + دیوار آتش</string>
@@ -44,16 +44,16 @@
     <string name="status_protected_with_socks5">محافظت شده با پروکسی socks</string>
     <string name="status_protected_with_socks5_private_dns">محافظت شده با socks5 و dns خصوصی</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">محافظت نشده</string>
-    <string name="notification_action_stop_vpn">توقف</string>
+    <string name="notification_action_stop_vpn">متوقف کردن</string>
     <string name="rethink_plus">RethinkDNS پلاس</string>
-    <string name="notification_action_dns_firewall_mode">DNS + فایروال</string>
+    <string name="notification_action_dns_firewall_mode">DNS + دیوار آتش</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">برای تغییر تنظیمات حفاظت ضربه بزنید</string>
     <string name="notification_action_dns_mode">DNS</string>
     <string name="skip">رد شدن</string>
     <string name="apps_info_title">برنامه ها</string>
     <string name="rdns_plus">RDNS پلاس</string>
     <string name="status_strict" description="This is similar to dns_on, but the protection is being provided by the operating system, not by Rethink.  It is not color-highlighted.">dns خصوصی فعال است</string>
-    <string name="status_protected_with_http" translatable="true">محافظت شده با http proxy</string>
+    <string name="status_protected_with_http" translatable="true">محافظت شده با http پروکسی</string>
     <string name="lbl_rules" translatable="true">قوانین</string>
     <string name="lbl_configure" translatable="true">پیکربندی</string>
     <string name="lbl_logs" translatable="true">گزارشها</string>
@@ -71,12 +71,12 @@
     <string name="lbl_domain" translatable="true">دامنه</string>
     <string name="lbl_cancel" translatable="true">لغو</string>
     <string name="lbl_apply" translatable="true">اعمال</string>
-    <string name="dns_explanation_firewall_connected" translatable="true">به فایروال وصل شد</string>
+    <string name="dns_explanation_firewall_connected" translatable="true">به دیوار آتش وصل شد</string>
     <string name="status_no_internet" translatable="true">بدون اینترنت</string>
     <string name="status_protected_with_proxy" translatable="true">محافظت شده با پروکسی</string>
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">حفاظت شده</string>
     <string name="pause_title_desc" translatable="true">ایجاد وقفه …</string>
-    <string name="hybrid_mode_notification_title" translatable="true">حفاظت شده! به DNS + فایروال متصل است.</string>
+    <string name="hybrid_mode_notification_title" translatable="true">حفاظت شده! به DNS + دیوار آتش متصل است.</string>
     <string name="custom_url_error_invalid_url" translatable="true">نشانی نامعتبر</string>
     <string name="conn_track_clear_logs_title" translatable="true">همه گزارش های شبکه حذف شود؟</string>
     <string name="bsct_conn_block_desc_device" translatable="true">%1$s را در دستگاه مسدود کرد</string>
@@ -99,7 +99,7 @@
     <string name="conn_track_clear_logs_message" translatable="true">این ulg فقط \'chvahj شبکه را حذف می کند اما قوانین فایروال را حذف نمی کند. این عمل برگشت پذیر نیست. آیا می خواهید ادامه دهید؟</string>
     <string name="notification_action_pause_vpn" translatable="true">مکث</string>
     <string name="bypass_universal" translatable="true">دور زدن کلی</string>
-    <string name="allow" translatable="true">اجازه</string>
+    <string name="allow" translatable="true">همیشه</string>
     <string name="status_protected_with_private_dns" translatable="true">محافظت شده با DNS خصوصی</string>
     <string name="notification_action_resume_vpn" translatable="true">ادامه</string>
     <string name="status_protected_with_tor" translatable="true">محافظت شده توسط تور</string>
@@ -109,9 +109,9 @@
     <string name="exclude" translatable="true">مستثنی</string>
     <string name="always_on_dialog_heading" translatable="true">VPN همیشه روشن را غیرفعال کنید</string>
     <string name="untracked" translatable="true">ردیابی نشده</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">RethinkDNS از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink از سرویس دسترسی برای ردیابی برنامه هایی که در حال استفاده هستند (پیش زمینه) در برابر برنامه هایی که در حال استفاده نیستند (پس زمینه) استفاده می کند.
 \n
-\nRethinkDNS هیچ اطلاعاتی را جمع آوری نکرده و به هیچ وجه از شما جاسوسی نمی کند.</string>
+\nRethink هیچ اطلاعاتی را جمع آوری نکرده و به هیچ وجه از شما جاسوسی نمی کند.</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">متصل به DNS و دیوار آتش Rethink</string>
     <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">سرویس دسترسی RethinkDNS متوقف شده یا از کار افتاده است. <i><b>به تنظیمات رفته و RethinkDNS را اجباراً متوقف کنید</b></i> و دوباره آن را برای استفاده از <i>ویژگی مسدود کردن هر برنامه‌ای که از آن</i> استفاده نمی‌کنید، راه‌اندازی کنید.
 \n
@@ -253,4 +253,59 @@
     <string name="lbl_create" translatable="true">ایجاد</string>
     <string name="lbl_qr_code" translatable="true">کیوآر کد</string>
     <string name="lbl_import" translatable="true">وارد کردن</string>
+    <string name="lbl_wireguard" translatable="true">وایرگارد</string>
+    <string name="lbl_addresses" translatable="true">آدرس ها</string>
+    <string name="lbl_public_key" translatable="true">کلید عمومی</string>
+    <string name="lbl_allowed_ips" translatable="true">IP های مجاز</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_add" translatable="true">اضافه کردن</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="settings_http_proxy_error_text1" translatable="true">محدوده پورت باید از 1024-65535 باشد</string>
+    <string name="settings_http_proxy_error_text4" translatable="true">اتصال میزبان انجام نشد. دوباره امتحان کنید.</string>
+    <string name="lbl_mtu" translatable="true">حداکثر واحد انتقال</string>
+    <string name="lbl_sec" translatable="true">ثانیه</string>
+    <string name="lbl_proceed" translatable="true">ادامه دهید</string>
+    <string name="lbl_hour" translatable="true">ساعت</string>
+    <string name="lbl_persistent_keepalive" translatable="true">ماندگار</string>
+    <string name="settings_http_proxy_dialog_title" translatable="true">لینک سرور سفارشی</string>
+    <string name="settings_ip_dialog_ipv4" translatable="true">IPv4 (پیش‌فرض)</string>
+    <string name="lbl_save" translatable="true">ذخیره</string>
+    <string name="lbl_optional" translatable="true">(اختیاری)</string>
+    <string name="settings_go_log_desc" translatable="true">برای اهداف اشکال زدایی</string>
+    <string name="settings_theme_dialog_themes_3" translatable="true">تاریک</string>
+    <string name="lbl_delete" translatable="true">حذف</string>
+    <string name="dns_proxy_toast_parameter" translatable="true">DNS پروکسی</string>
+    <string name="settings_http_proxy_desc" translatable="true">ارسال به %1$s</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="settings_theme_dialog_title" translatable="true">ظاهر</string>
+    <string name="settings_ip_dialog_title" translatable="true">نسخه IP را انتخاب کنید</string>
+    <string name="lbl_generated" translatable="true">تولید شده</string>
+    <string name="settings_go_log_heading" translatable="true">سطح گزارش</string>
+    <string name="lbl_auto" translatable="true">(خودکار)</string>
+    <string name="settings_http_proxy_toast_success" translatable="true">پروکسی HTTP تنظیم شده است</string>
+    <string name="lbl_slow" translatable="true">آهسته</string>
+    <string name="settings_ip_dialog_ipv6" translatable="true">IPv6 (آزمایشی)</string>
+    <string name="lbl_day" translatable="true">روز</string>
+    <string name="lbl_fast" translatable="true">سریع</string>
+    <string name="lbl_inactive" translatable="true">غیر فعال</string>
+    <string name="settings_http_proxy_error_text2" translatable="true">‌پورت نامعتبر است</string>
+    <string name="lbl_active" translatable="true">فعال</string>
+    <string name="lbl_dns_servers" translatable="true">سرورهای DNS</string>
+    <string name="lbl_app_wise" translatable="true">در هر برنامه</string>
+    <string name="status_protected_with_wg" translatable="true">محافظت شده با وایرگارد</string>
+    <string name="lbl_insecure" translatable="true">(ناامن)</string>
+    <string name="lbl_min" translatable="true">دقیقه</string>
+    <string name="settings_theme_desc" translatable="true">تاریک/روشن ظاهر</string>
+    <string name="lbl_private_key" translatable="true">کلید خصوصی</string>
+    <string name="lbl_preshared_key" translatable="true">کلید از پیش به اشتراک گذاشته شده</string>
+    <string name="settings_theme_dialog_themes_4" translatable="true">سیاه واقعی</string>
+    <string name="lbl_applications" translatable="true">برنامه ( ابزار ) های کاربردی</string>
+    <string name="lbl_include" translatable="true">عبارتند از</string>
+    <string name="settings_theme_heading" translatable="true">ظاهر</string>
+    <string name="lbl_very" translatable="true">خیلی</string>
+    <string name="lbl_select_all" translatable="true">انتخاب همه</string>
+    <string name="settings_http_proxy_error_text3" translatable="true">نام میزبان خالی است</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">محافظت شده با وایرگارد و dns خصوصی</string>
+    <string name="lbl_listen_port" translatable="true">پورت‌های مشغول</string>
+    <string name="lbl_random" translatable="true">(تصادفی)</string>
 </resources>
