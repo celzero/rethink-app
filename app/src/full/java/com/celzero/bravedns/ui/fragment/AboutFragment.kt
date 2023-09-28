@@ -132,7 +132,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 requireContext().packageManager,
                 requireContext().packageName
             )
-        return pInfo?.versionName ?: ""
+        // take first 7 characters of the version name
+        return pInfo?.versionName?.slice(0..6) ?: ""
     }
 
     private fun getDownloadSource(): String {
@@ -285,9 +286,11 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
             DialogWhatsnewBinding.inflate(LayoutInflater.from(requireContext()), null, false)
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
         binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
+        // replace the version name in the title
+        val title = getString(R.string.about_whats_new, getVersionName())
         MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
-            .setTitle(getString(R.string.whats_dialog_title))
+            .setTitle(title)
             .setPositiveButton(getString(R.string.about_dialog_positive_button)) {
                 dialogInterface,
                 _ ->
