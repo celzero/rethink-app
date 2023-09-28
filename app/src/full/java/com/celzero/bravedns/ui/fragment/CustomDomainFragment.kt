@@ -223,8 +223,7 @@ class CustomDomainFragment :
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(true)
         dialog.window?.attributes = lp
 
         dBind.dacdUrlTitle.text = getString(R.string.cd_dialog_title)

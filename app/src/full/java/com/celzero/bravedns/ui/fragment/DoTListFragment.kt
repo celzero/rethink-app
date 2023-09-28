@@ -86,8 +86,7 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(true)
         dialog.window?.attributes = lp
 
         val heading = dialogBinding.dialogCustomUrlTop

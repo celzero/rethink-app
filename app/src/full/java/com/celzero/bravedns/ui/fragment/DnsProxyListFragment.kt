@@ -95,8 +95,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(true)
 
         // TODO: figure out why window maybe null
         dialog.window?.attributes = lp

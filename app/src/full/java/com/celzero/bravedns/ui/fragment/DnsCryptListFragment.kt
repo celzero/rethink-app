@@ -120,8 +120,7 @@ class DnsCryptListFragment : Fragment(R.layout.fragment_dns_crypt_list) {
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(true)
         dialog.window?.attributes = lp
 
         val radioServer = dialogBinding.dialogDnsCryptRadioServer

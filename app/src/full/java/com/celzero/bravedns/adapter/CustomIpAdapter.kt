@@ -717,8 +717,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(true)
         dialog.window?.attributes = lp
 
         dBind.daciIpTitle.text = context.getString(R.string.ci_dialog_title)

@@ -295,7 +295,6 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
         dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
         dialog.window?.attributes = lp
 
         dBind.dacdUrlTitle.text = context.getString(R.string.cd_dialog_title)
