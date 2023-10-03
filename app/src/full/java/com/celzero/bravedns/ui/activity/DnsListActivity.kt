@@ -37,7 +37,7 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        init()
+        setupClickListeners()
     }
 
     private fun Context.isDarkThemeOn(): Boolean {
@@ -45,8 +45,8 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
             Configuration.UI_MODE_NIGHT_YES
     }
 
-    private fun init() {
-        b.dnsCryptCard.setOnClickListener {
+    private fun setupClickListeners() {
+        b.cardDnscrypt.setOnClickListener {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -55,7 +55,7 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.dnsProxyCard.setOnClickListener {
+        b.cardDnsproxy.setOnClickListener {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -64,7 +64,7 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.dohCard.setOnClickListener {
+        b.cardDoh.setOnClickListener {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -73,7 +73,7 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.dotCard.setOnClickListener {
+        b.cardDot.setOnClickListener {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -82,7 +82,7 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
             )
         }
 
-        b.odohCard.setOnClickListener {
+        b.cardOdoh.setOnClickListener {
             startActivity(
                 ConfigureOtherDnsActivity.getIntent(
                     this,
@@ -94,21 +94,44 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
 
     override fun onResume() {
         super.onResume()
+        resetUI()
+        updateUI()
+    }
+
+    private fun resetUI() {
+        b.initialDoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.abbrDoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.initialDnsproxy.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.abbrDnsproxy.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.initialDnscrypt.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.abbrDnscrypt.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.initialDot.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.abbrDot.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.initialOdoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.abbrOdoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+    }
+
+    private fun updateUI() {
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
-                b.dohText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.abbrDoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.DNS_PROXY -> {
-                b.dnsProxyText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDnsproxy.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.abbrDnsproxy.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.DNSCRYPT -> {
-                b.dnsCryptText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDnscrypt.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.abbrDnscrypt.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.DOT -> {
-                b.dotText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDot.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.abbrDot.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.ODOH -> {
-                b.odohText.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialOdoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.abbrOdoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             else -> {
                 // no-op
