@@ -418,4 +418,21 @@
     <string name="ssv_most_blocked_domain_heading" description="This label will appear on the stats screen as a header for most blocked domains" translatable="true">найбільш заблоковані домени</string>
     <string name="configure_dns_connected_doh_status" translatable="true">DNS через HTTPS</string>
     <string name="ssv_see_more" translatable="true">Показати усе</string>
+    <string name="download_update_dialog_title" translatable="true">Нове оновлення!</string>
+    <string name="info_dialog_copy_toast_msg" translatable="true">IP адрес скопійовано.</string>
+    <string name="download_update_dialog_message_success" translatable="true">Блоклист завантажено успішно.</string>
+    <string name="search_dns_logs" translatable="true"><font size="12">Пошук доменів чи IP</font></string>
+    <string name="public_key_copy_toast_msg" translatable="true">Публійчний ключ скопійовано.</string>
+    <string name="download_update_dialog_failure_title" translatable="true">Щось пішло не так!</string>
+    <string name="download_update_dialog_failure_message" translatable="true">Або наші сервери не працюють, або не вдалося встановити з\'єднання. Будь ласка, спробуйте ще раз через деякий час.</string>
+    <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Пошук блоклистів</font></string>
+    <string name="download_update_dialog_trylater_message" translatable="true">Оновлення неможливо виконати зараз, будь ласка, спробуйте пізніше.</string>
+    <string name="search_custom_domains" translatable="true"><font size="12">Пошук доменів</font></string>
+    <string name="download_update_dialog_trylater_title" translatable="true">Неможливо оновити зараз</string>
+    <string name="settings_vpn_heading" translatable="true">vpn</string>
+    <string name="download_update_dialog_message_ok" translatable="true">Ви вже використовуєте останню версію.</string>
+    <string name="search_universal_ips" translatable="true"><font size="12">Пошук IP</font></string>
+    <string name="trusted_domains_desc" translatable="true">Правило дозволу домену краще працює з <u>Rethink\'s DNS</u>.</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">Актуально!</string>
+    <string name="info_dialog_url_copy_toast_msg" translatable="true">URL-адреса скопійована</string>
 </resources>
