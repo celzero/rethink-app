@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -59,10 +58,10 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
 
     private fun setSubTitle(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
         when (timeCategory) {
-            SummaryStatisticsViewModel.TimeCategory.THREE_HOURS -> {
-                b.dsaSubtitle.text = "Last 3 " + getString(R.string.lbl_hour)
+            SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
+                b.dsaSubtitle.text = "Last 1 " + getString(R.string.lbl_hour)
             }
-            SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOURS -> {
+            SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
                 b.dsaSubtitle.text = "Last 24 " + getString(R.string.lbl_hour)
             }
             SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {

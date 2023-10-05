@@ -77,12 +77,12 @@ class DetailedStatisticsViewModel(
 
     fun timeCategoryChanged(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
         when (timeCategory) {
-            SummaryStatisticsViewModel.TimeCategory.THREE_HOURS -> {
-                fromTime.value = System.currentTimeMillis() - SummaryStatisticsViewModel.TIME_3_HOURS
+            SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
+                fromTime.value = System.currentTimeMillis() - SummaryStatisticsViewModel.TIME_1_HOUR
                 toTime.value = System.currentTimeMillis()
             }
-            SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOURS -> {
-                fromTime.value = System.currentTimeMillis() - SummaryStatisticsViewModel.TIME_24_HOURS
+            SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
+                fromTime.value = System.currentTimeMillis() - SummaryStatisticsViewModel.TIME_24_HOUR
                 toTime.value = System.currentTimeMillis()
             }
             SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {

@@ -43,14 +43,14 @@ class SummaryStatisticsViewModel(
     private var toTime: MutableLiveData<Long> = MutableLiveData()
 
     companion object {
-        const val TIME_3_HOURS = 3 * 60 * 60 * 1000L
-        const val TIME_24_HOURS = 24 * 60 * 60 * 1000L
+        const val TIME_1_HOUR = 1 * 60 * 60 * 1000L
+        const val TIME_24_HOUR = 24 * 60 * 60 * 1000L
         const val TIME_7_DAYS = 7 * 24 * 60 * 60 * 1000L
     }
 
     enum class TimeCategory(val value: Int) {
-        THREE_HOURS(0),
-        TWENTY_FOUR_HOURS(1),
+        ONE_HOUR(0),
+        TWENTY_FOUR_HOUR(1),
         SEVEN_DAYS(2);
 
         companion object {
@@ -64,18 +64,18 @@ class SummaryStatisticsViewModel(
         domains.value = ""
         ips.value = ""
         // set from and to time to current and 3 hrs before
-        fromTime.value = System.currentTimeMillis() - TIME_3_HOURS
+        fromTime.value = System.currentTimeMillis() - TIME_1_HOUR
         toTime.value = System.currentTimeMillis()
     }
 
     fun timeCategoryChanged(timeCategory: TimeCategory) {
         when (timeCategory) {
-            TimeCategory.THREE_HOURS -> {
-                fromTime.value = System.currentTimeMillis() - TIME_3_HOURS
+            TimeCategory.ONE_HOUR -> {
+                fromTime.value = System.currentTimeMillis() - TIME_1_HOUR
                 toTime.value = System.currentTimeMillis()
             }
-            TimeCategory.TWENTY_FOUR_HOURS -> {
-                fromTime.value = System.currentTimeMillis() - TIME_24_HOURS
+            TimeCategory.TWENTY_FOUR_HOUR -> {
+                fromTime.value = System.currentTimeMillis() - TIME_24_HOUR
                 toTime.value = System.currentTimeMillis()
             }
             TimeCategory.SEVEN_DAYS -> {
