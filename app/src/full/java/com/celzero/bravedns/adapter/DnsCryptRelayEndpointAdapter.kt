@@ -31,10 +31,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptRelayEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -112,8 +114,7 @@ class DnsCryptRelayEndpointAdapter(
         private fun displayDetails(endpoint: DnsCryptRelayEndpoint) {
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptRelayName
             if (endpoint.isSelected) {
-                b.dnsCryptEndpointListUrlExplanation.text =
-                    context.getString(UIUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
+                updateSelectedStatus()
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
@@ -127,6 +128,18 @@ class DnsCryptRelayEndpointAdapter(
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_info)
                 )
+            }
+        }
+
+        private fun updateSelectedStatus() {
+            io {
+                // always use the id as Dnsx.Preffered as it is the primary dns id for now
+                val state = VpnController.getDnsStatus(Dnsx.Preferred)
+                val status = UIUtils.getDnsStatusStringRes(state)
+                uiCtx {
+                    b.dnsCryptEndpointListUrlExplanation.text =
+                        context.getString(status).replaceFirstChar(Char::titlecase)
+                }
             }
         }
 

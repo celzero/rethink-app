@@ -32,10 +32,12 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DnsCryptEndpoint
 import com.celzero.bravedns.databinding.DnsCryptEndpointListItemBinding
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -112,12 +114,11 @@ class DnsCryptEndpointAdapter(
             b.dnsCryptEndpointListUrlName.text = endpoint.dnsCryptName
             b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
 
-            b.dnsCryptEndpointListUrlExplanation.text =
-                if (endpoint.isSelected) {
-                    context.getString(UIUtils.getDnsStatus()).replaceFirstChar(Char::titlecase)
-                } else {
-                    ""
-                }
+            if (endpoint.isSelected) {
+                updateSelectedStatus()
+            } else {
+                b.dnsCryptEndpointListUrlExplanation.text = ""
+            }
 
             if (endpoint.isDeletable()) {
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
@@ -127,6 +128,18 @@ class DnsCryptEndpointAdapter(
                 b.dnsCryptEndpointListInfoImage.setImageDrawable(
                     ContextCompat.getDrawable(context, R.drawable.ic_info)
                 )
+            }
+        }
+
+        private fun updateSelectedStatus() {
+            io {
+                // always use the id as Dnsx.Preffered as it is the primary dns id for now
+                val state = VpnController.getDnsStatus(Dnsx.Preferred)
+                val status = UIUtils.getDnsStatusStringRes(state)
+                uiCtx {
+                    b.dnsCryptEndpointListUrlExplanation.text =
+                        context.getString(status).replaceFirstChar(Char::titlecase)
+                }
             }
         }
 

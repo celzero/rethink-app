@@ -37,9 +37,8 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
-import com.celzero.bravedns.service.BraveVPNService
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
-import com.celzero.bravedns.service.VpnController
 import ipn.Ipn
 import java.util.Calendar
 import java.util.Date
@@ -49,37 +48,37 @@ import java.util.regex.Pattern
 
 object UIUtils {
 
-    fun getDnsStatus(): Int {
-        val status = VpnController.state()
+    fun getDnsStatusStringRes(status: Long?): Int {
+        if (status == null) return R.string.rt_filter_parent_selected
 
-        return if (status.on) {
-            when {
-                status.connectionState === BraveVPNService.State.NEW -> {
-                    // app's starting here, but such a status confuses users
-                    // R.string.status_starting
-                    R.string.dns_connected
-                }
-                status.connectionState === BraveVPNService.State.WORKING -> {
-                    R.string.dns_connected
-                }
-                status.connectionState === BraveVPNService.State.APP_ERROR -> {
-                    R.string.status_app_error
-                }
-                status.connectionState === BraveVPNService.State.DNS_ERROR -> {
-                    R.string.status_dns_error
-                }
-                status.connectionState === BraveVPNService.State.DNS_SERVER_DOWN -> {
-                    R.string.status_dns_server_down
-                }
-                status.connectionState === BraveVPNService.State.NO_INTERNET -> {
-                    R.string.status_no_internet
-                }
-                else -> {
-                    R.string.status_failing
-                }
+        return when (Transaction.Status.fromId(status)) {
+            Transaction.Status.START -> {
+                R.string.rt_filter_parent_selected
             }
-        } else {
-            R.string.rt_filter_parent_selected
+            Transaction.Status.COMPLETE -> {
+                R.string.dns_connected
+            }
+            Transaction.Status.SEND_FAIL -> {
+                R.string.status_no_internet
+            }
+            Transaction.Status.TRANSPORT_ERROR -> {
+                R.string.status_dns_server_down
+            }
+            Transaction.Status.NO_RESPONSE -> {
+                R.string.status_dns_server_down
+            }
+            Transaction.Status.BAD_RESPONSE -> {
+                R.string.status_dns_error
+            }
+            Transaction.Status.BAD_QUERY -> {
+                R.string.status_dns_error
+            }
+            Transaction.Status.CLIENT_ERROR -> {
+                R.string.status_dns_error
+            }
+            Transaction.Status.INTERNAL_ERROR -> {
+                R.string.status_failing
+            }
         }
     }
 

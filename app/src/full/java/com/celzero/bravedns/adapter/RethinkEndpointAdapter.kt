@@ -35,12 +35,14 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.databinding.RethinkEndpointListItemBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -122,24 +124,28 @@ class RethinkEndpointAdapter(
         private fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
             if (!endpoint.isActive) return
 
-            // show blocklist count and status as connected if endpoint is active
-            val status = UIUtils.getDnsStatus()
+            io {
+                val state = VpnController.getDnsStatus(Dnsx.Preferred)
+                val status = UIUtils.getDnsStatusStringRes(state)
 
-            // show the status as it is if it is not connected
-            if (status != R.string.dns_connected) {
-                b.rethinkEndpointListUrlExplanation.text =
-                    context.getString(status).replaceFirstChar(Char::titlecase)
-                return
-            }
+                uiCtx {
+                    // show the status as it is if it is not connected
+                    if (status != R.string.dns_connected) {
+                        b.rethinkEndpointListUrlExplanation.text =
+                            context.getString(status).replaceFirstChar(Char::titlecase)
+                        return@uiCtx
+                    }
 
-            if (endpoint.blocklistCount > 0) {
-                b.rethinkEndpointListUrlExplanation.text =
-                    context.getString(
-                        R.string.dns_connected_rethink_plus,
-                        endpoint.blocklistCount.toString()
-                    )
-            } else {
-                b.rethinkEndpointListUrlExplanation.text = context.getString(status)
+                    if (endpoint.blocklistCount > 0) {
+                        b.rethinkEndpointListUrlExplanation.text =
+                            context.getString(
+                                R.string.dns_connected_rethink_plus,
+                                endpoint.blocklistCount.toString()
+                            )
+                    } else {
+                        b.rethinkEndpointListUrlExplanation.text = context.getString(status)
+                    }
+                }
             }
         }
 
@@ -212,6 +218,10 @@ class RethinkEndpointAdapter(
             intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_NAME, endpoint.name)
             intent.putExtra(ConfigureRethinkBasicActivity.RETHINK_BLOCKLIST_URL, endpoint.url)
             context.startActivity(intent)
+        }
+
+        private suspend fun uiCtx(f: suspend () -> Unit) {
+            withContext(Dispatchers.Main) { f() }
         }
 
         private fun io(f: suspend () -> Unit) {

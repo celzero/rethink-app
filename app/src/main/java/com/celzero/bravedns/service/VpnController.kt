@@ -262,6 +262,10 @@ object VpnController : KoinComponent {
         braveVpnService?.refreshWireGuardConfig()
     }
 
+    suspend fun getDnsStatus(id: String): Long? {
+        return braveVpnService?.getDnsStatus(id)
+    }
+
     suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
         return braveVpnService?.getRDNS(type)
     }

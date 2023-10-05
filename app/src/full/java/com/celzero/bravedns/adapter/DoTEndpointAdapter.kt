@@ -33,11 +33,13 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.DoTEndpoint
 import com.celzero.bravedns.databinding.ListItemEndpointBinding
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
-import com.celzero.bravedns.util.UIUtils.getDnsStatus
+import com.celzero.bravedns.util.UIUtils.getDnsStatusStringRes
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -90,9 +92,7 @@ class DoTEndpointAdapter(
 
         private fun setupClickListeners(endpoint: DoTEndpoint) {
             b.root.setOnClickListener { updateConnection(endpoint) }
-            b.endpointInfoImg.setOnClickListener {
-                showExplanationOnImageClick(endpoint)
-            }
+            b.endpointInfoImg.setOnClickListener { showExplanationOnImageClick(endpoint) }
             b.endpointCheck.setOnClickListener { updateConnection(endpoint) }
         }
 
@@ -114,12 +114,23 @@ class DoTEndpointAdapter(
                 "connected to dot: ${endpoint.name} isSelected? ${endpoint.isSelected}"
             )
             if (endpoint.isSelected) {
-                b.endpointDesc.text =
-                    context.getString(getDnsStatus()).replaceFirstChar(Char::titlecase)
+                updateSelectedStatus()
             }
 
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
+        }
+
+        private fun updateSelectedStatus() {
+            io {
+                // always use the id as Dnsx.Preffered as it is the primary dns id for now
+                val state = VpnController.getDnsStatus(Dnsx.Preferred)
+                val status = getDnsStatusStringRes(state)
+                uiCtx {
+                    b.endpointDesc.text =
+                        context.getString(status).replaceFirstChar(Char::titlecase)
+                }
+            }
         }
 
         private fun showIcon(endpoint: DoTEndpoint) {
