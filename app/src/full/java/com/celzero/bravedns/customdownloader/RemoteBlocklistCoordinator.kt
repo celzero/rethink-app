@@ -28,13 +28,13 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
 import com.google.gson.JsonObject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import retrofit2.converter.gson.GsonConverterFactory
 
 class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), KoinComponent {
@@ -93,7 +93,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
         Log.i(LoggerConstants.LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
 
         val retrofit =
-            RetrofitManager.getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS)
+            RetrofitManager.getBlocklistBaseBuilder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
@@ -150,8 +150,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                     context,
                     Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     timestamp
-                )
-                    ?: return null
+                ) ?: return null
 
             if (!dir.exists()) {
                 dir.mkdirs()

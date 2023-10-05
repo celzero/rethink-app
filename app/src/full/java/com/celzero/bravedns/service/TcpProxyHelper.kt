@@ -86,7 +86,9 @@ object TcpProxyHelper : KoinComponent {
         INVALID(5);
 
         fun isPaid() = this == PAID
+
         fun isFailed() = this == FAILED
+
         fun isNotPaid() = this == NOT_PAID
     }
 
@@ -130,9 +132,7 @@ object TcpProxyHelper : KoinComponent {
         var works = false
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder(
-                        RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS
-                    )
+                RetrofitManager.getTcpProxyBaseBuilder()
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)

@@ -223,10 +223,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
 
         // create okhttp client with base url
-        val retrofit =
-            getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS)
-                .build()
-                .create(IBlocklistDownload::class.java)
+        val retrofit = getBlocklistBaseBuilder().build().create(IBlocklistDownload::class.java)
         val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
 
         return if (response?.isSuccessful == true) {
