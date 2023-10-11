@@ -43,7 +43,7 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         return customDomainDAO.getAllDomains()
     }
 
-    fun deleteRulesByUid(uid: Int) {
+    suspend fun deleteRulesByUid(uid: Int) {
         customDomainDAO.deleteRulesByUid(uid)
     }
 

@@ -36,6 +36,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
@@ -67,9 +68,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.Locale
 
 class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
@@ -401,16 +405,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     iv?.visibility = View.VISIBLE
                     val fid = IpRulesManager.IpRuleStatus.getStatus(position)
 
-                    // no need to apply rule, prev selection and current selection are same
-                    if (
-                        IpRulesManager.isIpRuleAvailable(
-                            info!!.uid,
-                            info!!.ipAddress,
-                            info!!.port
-                        ) == fid
-                    )
-                        return
-
                     applyIpRule(fid)
                 }
 
@@ -503,9 +497,10 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun updateIpRulesUi(uid: Int, ipAddress: String, port: Int) {
-        b.bsConnIpRuleSpinner.setSelection(
-            IpRulesManager.isIpRuleAvailable(uid, ipAddress, port).id
-        )
+        io {
+            val rule = IpRulesManager.isIpRuleAvailable(uid, ipAddress, port)
+            uiCtx { b.bsConnIpRuleSpinner.setSelection(rule.id) }
+        }
     }
 
     private fun showFirewallRulesDialog(blockedRule: String?) {
@@ -619,7 +614,15 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             LOG_TAG_FIREWALL,
             "Apply ip rule for ${connRules.ipAddress}, ${FirewallRuleset.RULE2.name}"
         )
-        IpRulesManager.updateRule(info!!.uid, connRules.ipAddress, connRules.port, ipRuleStatus)
+        io {
+            // no need to apply rule, prev selection and current selection are same
+            if (
+                IpRulesManager.isIpRuleAvailable(info!!.uid, info!!.ipAddress, info!!.port) ==
+                    ipRuleStatus
+            )
+                return@io
+            IpRulesManager.updateRule(info!!.uid, connRules.ipAddress, connRules.port, ipRuleStatus)
+        }
     }
 
     private fun applyDomainRule(domainRuleStatus: DomainRulesManager.Status) {
@@ -627,12 +630,14 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             LOG_TAG_FIREWALL,
             "Apply domain rule for ${info!!.dnsQuery}, ${domainRuleStatus.name}"
         )
-        DomainRulesManager.addDomainRule(
-            info!!.dnsQuery!!,
-            domainRuleStatus,
-            DomainRulesManager.DomainType.DOMAIN,
-            info!!.uid,
-        )
+        io {
+            DomainRulesManager.addDomainRule(
+                info!!.dnsQuery!!,
+                domainRuleStatus,
+                DomainRulesManager.DomainType.DOMAIN,
+                info!!.uid,
+            )
+        }
     }
 
     private fun getAppName(): String {
@@ -692,5 +697,13 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         val alertDialog = builderSingle.create()
         alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
         alertDialog.show()
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

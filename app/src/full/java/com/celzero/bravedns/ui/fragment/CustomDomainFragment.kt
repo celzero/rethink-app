@@ -25,6 +25,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -42,6 +43,9 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.removeLeadingAndTrailingDots
 import com.celzero.bravedns.viewmodel.CustomDomainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class CustomDomainFragment :
@@ -76,8 +80,7 @@ class CustomDomainFragment :
         rule =
             arguments?.getInt(CustomRulesActivity.INTENT_RULES)?.let {
                 CustomRulesActivity.RULES.getType(it)
-            }
-                ?: CustomRulesActivity.RULES.APP_SPECIFIC_RULES
+            } ?: CustomRulesActivity.RULES.APP_SPECIFIC_RULES
 
         b.cdaSearchView.setOnQueryTextListener(this)
         setupRecyclerView()
@@ -277,7 +280,7 @@ class CustomDomainFragment :
         type: DomainRulesManager.DomainType,
         status: DomainRulesManager.Status
     ) {
-        DomainRulesManager.addDomainRule(domain, status, type, uid = uid)
+        io { DomainRulesManager.addDomainRule(domain, status, type, uid = uid) }
         Utilities.showToastUiCentered(
             requireContext(),
             resources.getString(R.string.cd_toast_added),
@@ -300,10 +303,12 @@ class CustomDomainFragment :
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
-            if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
-                DomainRulesManager.deleteRulesByUid(uid)
-            } else {
-                DomainRulesManager.deleteAllRules()
+            io {
+                if (rule == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                    DomainRulesManager.deleteRulesByUid(uid)
+                } else {
+                    DomainRulesManager.deleteAllRules()
+                }
             }
             Utilities.showToastUiCentered(
                 requireContext(),
@@ -318,5 +323,9 @@ class CustomDomainFragment :
 
         builder.setCancelable(true)
         builder.create().show()
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

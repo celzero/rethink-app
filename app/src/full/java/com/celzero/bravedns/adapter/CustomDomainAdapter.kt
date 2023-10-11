@@ -29,6 +29,8 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -51,6 +53,9 @@ import com.celzero.bravedns.util.Utilities
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RULES) :
     PagingDataAdapter<CustomDomain, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
@@ -133,28 +138,30 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     }
 
     private fun changeDomainStatus(id: DomainRulesManager.Status, cd: CustomDomain) {
-        when (id) {
-            DomainRulesManager.Status.NONE -> {
-                noRule(cd)
-            }
-            DomainRulesManager.Status.BLOCK -> {
-                block(cd)
-            }
-            DomainRulesManager.Status.TRUST -> {
-                whitelist(cd)
+        io {
+            when (id) {
+                DomainRulesManager.Status.NONE -> {
+                    noRule(cd)
+                }
+                DomainRulesManager.Status.BLOCK -> {
+                    block(cd)
+                }
+                DomainRulesManager.Status.TRUST -> {
+                    whitelist(cd)
+                }
             }
         }
     }
 
-    private fun whitelist(cd: CustomDomain) {
+    private suspend fun whitelist(cd: CustomDomain) {
         DomainRulesManager.whitelist(cd)
     }
 
-    private fun block(cd: CustomDomain) {
+    private suspend fun block(cd: CustomDomain) {
         DomainRulesManager.block(cd)
     }
 
-    private fun noRule(cd: CustomDomain) {
+    private suspend fun noRule(cd: CustomDomain) {
         DomainRulesManager.noRule(cd)
     }
 
@@ -215,7 +222,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         builder.setMessage(R.string.cd_remove_dialog_message)
         builder.setCancelable(true)
         builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
-            DomainRulesManager.deleteDomain(customDomain)
+            io { DomainRulesManager.deleteDomain(customDomain) }
             Utilities.showToastUiCentered(
                 context,
                 context.getString(R.string.cd_toast_deleted),
@@ -348,10 +355,17 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             }
         }
 
-        insertDomain(Utilities.removeLeadingAndTrailingDots(url), selectedType, prevDomain, status)
+        io {
+            insertDomain(
+                Utilities.removeLeadingAndTrailingDots(url),
+                selectedType,
+                prevDomain,
+                status
+            )
+        }
     }
 
-    private fun insertDomain(
+    private suspend fun insertDomain(
         domain: String,
         type: DomainRulesManager.DomainType,
         prevDomain: CustomDomain,
@@ -369,6 +383,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customDomain: CustomDomain
+
         fun update(cd: CustomDomain) {
             b.customDomainAppName.text = getAppName(cd.uid)
             val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
@@ -551,6 +566,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customDomain: CustomDomain
+
         fun update(cd: CustomDomain) {
             this.customDomain = cd
             b.customDomainLabelTv.text = customDomain.domain
@@ -695,5 +711,9 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             b.customDomainStatusIcon.setTextColor(t.txtColor)
             b.customDomainStatusIcon.backgroundTintList = ColorStateList.valueOf(t.bgColor)
         }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

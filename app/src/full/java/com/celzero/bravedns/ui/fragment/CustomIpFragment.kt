@@ -78,8 +78,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         rules =
             arguments?.getInt(CustomRulesActivity.INTENT_RULES)?.let {
                 CustomRulesActivity.RULES.getType(it)
-            }
-                ?: CustomRulesActivity.RULES.APP_SPECIFIC_RULES
+            } ?: CustomRulesActivity.RULES.APP_SPECIFIC_RULES
         b.cipSearchView.setOnQueryTextListener(this)
         setupRecyclerView()
         setupClickListeners()
@@ -266,7 +265,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     private fun insertCustomIp(ip: HostName?, status: IpRulesManager.IpRuleStatus) {
         if (ip == null) return
 
-        IpRulesManager.addIpRule(uid, ip.asAddress().toNormalizedString(), ip.port, status)
+        io { IpRulesManager.addIpRule(uid, ip.asAddress().toNormalizedString(), ip.port, status) }
         Utilities.showToastUiCentered(
             requireContext(),
             getString(R.string.ci_dialog_added_success),
@@ -279,10 +278,12 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         builder.setTitle(R.string.univ_delete_firewall_dialog_title)
         builder.setMessage(R.string.univ_delete_firewall_dialog_message)
         builder.setPositiveButton(getString(R.string.univ_ip_delete_dialog_positive)) { _, _ ->
-            if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
-                IpRulesManager.deleteRulesByUid(uid)
-            } else {
-                IpRulesManager.deleteAllAppsRules()
+            io {
+                if (rules == CustomRulesActivity.RULES.APP_SPECIFIC_RULES) {
+                    IpRulesManager.deleteRulesByUid(uid)
+                } else {
+                    IpRulesManager.deleteAllAppsRules()
+                }
             }
             Utilities.showToastUiCentered(
                 requireContext(),
@@ -301,6 +302,10 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
     private fun ui(f: suspend () -> Unit) {

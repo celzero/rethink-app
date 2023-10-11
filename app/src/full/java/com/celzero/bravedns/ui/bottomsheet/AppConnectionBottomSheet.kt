@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.AppConnectionAdapter
 import com.celzero.bravedns.adapter.DomainRulesBtmSheetAdapter
@@ -36,6 +37,9 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes.Companion.getBottomsheetCurrentTheme
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class AppConnectionBottomSheet : BottomSheetDialogFragment() {
@@ -138,21 +142,25 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun setRulesUi() {
-        // no need to send port number for the app info screen
-        ipRule = IpRulesManager.isIpRuleAvailable(uid, ipAddress, null)
-        Log.d("FirewallManager", "Set selection of ip: $ipAddress, ${ipRule.id}")
-        when (ipRule) {
-            IpRulesManager.IpRuleStatus.TRUST -> {
-                enableTrustUi()
-            }
-            IpRulesManager.IpRuleStatus.BLOCK -> {
-                enableBlockUi()
-            }
-            IpRulesManager.IpRuleStatus.NONE -> {
-                noRuleUi()
-            }
-            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                noRuleUi()
+        io {
+            // no need to send port number for the app info screen
+            ipRule = IpRulesManager.isIpRuleAvailable(uid, ipAddress, null)
+            Log.d("FirewallManager", "Set selection of ip: $ipAddress, ${ipRule.id}")
+            uiCtx {
+                when (ipRule) {
+                    IpRulesManager.IpRuleStatus.TRUST -> {
+                        enableTrustUi()
+                    }
+                    IpRulesManager.IpRuleStatus.BLOCK -> {
+                        enableBlockUi()
+                    }
+                    IpRulesManager.IpRuleStatus.NONE -> {
+                        noRuleUi()
+                    }
+                    IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                        noRuleUi()
+                    }
+                }
             }
         }
     }
@@ -195,7 +203,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         )
         ipRule = status
         // set port number as null for all the rules applied from this screen
-        IpRulesManager.addIpRule(uid, ipAddress, null, status)
+        io { IpRulesManager.addIpRule(uid, ipAddress, null, status) }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -228,5 +236,13 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
         b.blockIcon.setImageDrawable(
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_block)
         )
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }
