@@ -19,14 +19,14 @@ try {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
     // https://developer.android.com/studio/build/configure-app-module
     namespace 'com.celzero.bravedns'
 
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
-        targetSdkVersion 33
+        targetSdkVersion 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
