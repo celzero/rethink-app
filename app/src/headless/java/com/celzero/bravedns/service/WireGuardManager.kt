@@ -19,7 +19,7 @@ import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.wireguard.Config
 import org.koin.core.component.KoinComponent
 
-object WireGuardManager : KoinComponent {
+object WireguardManager : KoinComponent {
     const val SEC_WARP_NAME = "SEC_WARP"
     const val SEC_WARP_ID = 0
     const val SEC_WARP_FILE_NAME = "wg0.conf"
@@ -49,7 +49,7 @@ object WireGuardManager : KoinComponent {
         return false
     }
 
-    fun getConfigById(configId: Int): Config? {
+    fun getConfigById(id: Int): Config? {
         return null
     }
 

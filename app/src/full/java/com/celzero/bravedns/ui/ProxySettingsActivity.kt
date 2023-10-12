@@ -48,7 +48,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
@@ -369,7 +369,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayWireguardUi() {
-        val activeWgs = WireGuardManager.getActiveConfigs()
+        val activeWgs = WireguardManager.getActiveConfigs()
         if (activeWgs.isEmpty()) {
             b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
             return

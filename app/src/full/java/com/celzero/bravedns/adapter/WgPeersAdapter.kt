@@ -25,8 +25,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgPeersBinding
-import com.celzero.bravedns.service.WireGuardManager
-import com.celzero.bravedns.service.WireGuardManager.WARP_ID
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.WARP_ID
 import com.celzero.bravedns.ui.WgAddPeerDialog
 import com.celzero.bravedns.wireguard.Peer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -110,7 +110,7 @@ class WgPeersAdapter(
 
     fun dataChanged() {
         peers.clear()
-        peers.addAll(WireGuardManager.getPeers(configId))
+        peers.addAll(WireguardManager.getPeers(configId))
         this?.notifyDataSetChanged()
     }
 
@@ -132,8 +132,8 @@ class WgPeersAdapter(
     private fun deletePeer(wgPeer: Peer) {
         ui {
             ioCtx {
-                WireGuardManager.deletePeer(configId, wgPeer)
-                peers = WireGuardManager.getPeers(configId)
+                WireguardManager.deletePeer(configId, wgPeer)
+                peers = WireguardManager.getPeers(configId)
             }
             this.notifyDataSetChanged()
         }

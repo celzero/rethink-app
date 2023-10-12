@@ -19,14 +19,14 @@ try {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
     // https://developer.android.com/studio/build/configure-app-module
     namespace 'com.celzero.bravedns'
 
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
-        targetSdkVersion 33
+        targetSdkVersion 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -132,7 +132,7 @@ configurations {
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
     def room_version = "2.5.2"
-    def paging_version = "3.2.0"
+    def paging_version = "3.2.1"
 
     implementation 'com.google.guava:guava:32.1.1-android'
 
@@ -142,7 +142,7 @@ dependencies {
 
     fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0'
     fullImplementation 'androidx.appcompat:appcompat:1.6.1'
-    fullImplementation 'androidx.core:core-ktx:1.10.1'
+    fullImplementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     fullImplementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     fullImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -151,7 +151,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
     // For liveData implementation
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
@@ -162,13 +162,13 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
 
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     fullImplementation 'androidx.fragment:fragment-ktx:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     fullImplementation 'com.squareup.okhttp3:okhttp:4.11.0'
@@ -229,8 +229,8 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.7.4'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
@@ -246,7 +246,7 @@ dependencies {
 }
 
 // github.com/michel-kraemer/gradle-download-task/issues/131#issuecomment-464476903
-task downloadBlocklists(type: Download) {
+tasks.register('downloadBlocklists', Download) {
     // def assetsDir = new File(projectDir, 'src/main/assets'
     def assetsDir = android.sourceSets.headless.assets.srcDirs[0]
     // the filenames are ignored by dl, but acts as a hint for the output
@@ -271,7 +271,7 @@ task downloadBlocklists(type: Download) {
     overwrite true
 }
 
-task downloadDependencies(type: Copy) {
+tasks.register('downloadDependencies', Copy) {
     dependsOn downloadBlocklists
     from configurations.download
     into "libs"

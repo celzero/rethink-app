@@ -46,7 +46,7 @@ import java.util.Locale
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write
 
-object WireGuardManager : KoinComponent {
+object WireguardManager : KoinComponent {
 
     private val wgConfigFilesRepository: WgConfigFilesRepository by inject()
     private val applicationContext: Context by inject()

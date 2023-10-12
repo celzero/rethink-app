@@ -35,7 +35,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.unzip
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.database.LogDatabase
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Utilities
 import org.koin.core.component.KoinComponent
@@ -283,7 +283,7 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
     private fun wireGuardCleanup() {
         // delete WireGuard related entries from database
         Log.i(LOG_TAG_BACKUP_RESTORE, "wireguard cleanup process")
-        WireGuardManager.restoreProcessDeleteWireGuardEntries()
+        WireguardManager.restoreProcessDeleteWireGuardEntries()
     }
 
     private fun isMetadataCompatible(tempDirectory: String?): Boolean {

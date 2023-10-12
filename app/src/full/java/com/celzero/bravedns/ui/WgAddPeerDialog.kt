@@ -25,7 +25,7 @@ import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -101,8 +101,8 @@ class WgAddPeerDialog(
                 ui {
                     io {
                         if (wgPeer != null && isEditing)
-                            WireGuardManager.deletePeer(configId, wgPeer)
-                        WireGuardManager.addPeer(configId, newPeer)
+                            WireguardManager.deletePeer(configId, wgPeer)
+                        WireguardManager.addPeer(configId, newPeer)
                     }
                     this.dismiss()
                 }
