@@ -2298,12 +2298,12 @@ class BraveVPNService :
         // check for other proxy rules
         // wireguard
         if (appConfig.isWireGuardEnabled()) {
-            val id = WireGuardManager.getActiveConfigIdForApp(uid)
+            val id = WireguardManager.getActiveConfigIdForApp(uid)
             val proxyId = "${ProxyManager.ID_WG_BASE}$id"
             // if no config is assigned / enabled for this app, pass-through
             // add ID_WG_BASE to the id to get the proxyId
             if (
-                id == WireGuardManager.INVALID_CONF_ID || !WireGuardManager.isConfigActive(proxyId)
+                id == WireguardManager.INVALID_CONF_ID || !WireguardManager.isConfigActive(proxyId)
             ) {
                 if (DEBUG)
                     Log.d(

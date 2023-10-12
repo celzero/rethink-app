@@ -28,7 +28,7 @@ import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgInterfaceBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.WgConfigDetailActivity
 import com.celzero.bravedns.ui.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
@@ -122,8 +122,8 @@ class WgConfigAdapter(private val context: Context) :
             b.interfaceSwitch.setOnClickListener {
                 val checked = b.interfaceSwitch.isChecked
                 if (checked) {
-                    if (WireGuardManager.canEnableConfig(config)) {
-                        WireGuardManager.enableConfig(config)
+                    if (WireguardManager.canEnableConfig(config)) {
+                        WireguardManager.enableConfig(config)
                         updateStatus(config)
                     } else {
                         b.interfaceSwitch.isChecked = false
@@ -135,7 +135,7 @@ class WgConfigAdapter(private val context: Context) :
                             .show()
                     }
                 } else {
-                    WireGuardManager.disableConfig(config)
+                    WireguardManager.disableConfig(config)
                     updateStatus(config)
                 }
             }

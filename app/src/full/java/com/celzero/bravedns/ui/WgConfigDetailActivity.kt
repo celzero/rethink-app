@@ -35,10 +35,10 @@ import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.WireGuardManager
-import com.celzero.bravedns.service.WireGuardManager.INVALID_CONF_ID
-import com.celzero.bravedns.service.WireGuardManager.WARP_ID
-import com.celzero.bravedns.service.WireGuardManager.isWarpWorking
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
+import com.celzero.bravedns.service.WireguardManager.WARP_ID
+import com.celzero.bravedns.service.WireguardManager.isWarpWorking
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
@@ -105,7 +105,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun init() {
         handleWarpConfigView()
         handleAppsCount()
-        val config = WireGuardManager.getConfigById(configId)
+        val config = WireguardManager.getConfigById(configId)
         if (config == null && configId == WARP_ID) {
             showNewWarpConfigLayout()
             return
@@ -172,7 +172,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private suspend fun fetchWarpConfigFromServer() {
-        val config = WireGuardManager.getNewWarpConfig(WARP_ID)
+        val config = WireguardManager.getNewWarpConfig(WARP_ID)
         Log.i(LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()
@@ -202,7 +202,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun isWarpConfAvailable(): Boolean {
-        return WireGuardManager.getWarpConfig() != null
+        return WireguardManager.getWarpConfig() != null
     }
 
     private fun showNewWarpConfigLayout() {
@@ -293,7 +293,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private fun openAppsDialog() {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val proxyId = ProxyManager.ID_WG_BASE + configId
-        val proxyName = WireGuardManager.getConfigName(configId)
+        val proxyName = WireguardManager.getConfigName(configId)
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         val includeAppsDialog =
@@ -308,7 +308,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         builder.setMessage(getString(R.string.config_delete_dialog_desc))
         builder.setCancelable(true)
         builder.setPositiveButton(this.getString(R.string.lbl_delete)) { _, _ ->
-            WireGuardManager.deleteConfig(configId)
+            WireguardManager.deleteConfig(configId)
             Toast.makeText(
                     this,
                     getString(R.string.config_delete_success_toast),

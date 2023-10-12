@@ -27,7 +27,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
@@ -61,7 +61,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireGuardManager.INVALID_CONF_ID)
+        configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireguardManager.INVALID_CONF_ID)
         init()
         setupClickListeners()
     }
@@ -73,7 +73,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
 
     private fun init() {
         observeDnsName()
-        wgConfig = WireGuardManager.getConfigById(configId)
+        wgConfig = WireguardManager.getConfigById(configId)
         wgInterface = wgConfig?.getInterface()
 
         b.interfaceNameText.setText(wgConfig?.getName())
@@ -166,7 +166,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                     .parseDnsServers(dnsServers)
                     .parseMtu(mtu)
                     .build()
-            ioCtx { wgConfig = WireGuardManager.addOrUpdateInterface(configId, name, wgInterface) }
+            ioCtx { wgConfig = WireguardManager.addOrUpdateInterface(configId, name, wgInterface) }
             return wgConfig
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]

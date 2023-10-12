@@ -25,7 +25,7 @@ import android.provider.OpenableColumns
 import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import kotlinx.coroutines.Dispatchers
@@ -103,13 +103,13 @@ object TunnelImporter : KoinComponent {
                                 }
                                 ?.let {
                                     config = it
-                                    WireGuardManager.addConfig(config)
+                                    WireguardManager.addConfig(config)
                                 }
                         }
                     }
                 } else {
                     config = Config.parse(contentResolver.openInputStream(uri)!!)
-                    WireGuardManager.addConfig(config)
+                    WireguardManager.addConfig(config)
                 }
 
                 if (config == null) {
@@ -137,7 +137,7 @@ object TunnelImporter : KoinComponent {
             if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "Importing tunnel: $configText")
             val config =
                 Config.parse(ByteArrayInputStream(configText.toByteArray(StandardCharsets.UTF_8)))
-            WireGuardManager.addConfig(config)
+            WireguardManager.addConfig(config)
         } catch (e: Throwable) {
             onTunnelImportFinished(listOf(e), messageCallback)
         }

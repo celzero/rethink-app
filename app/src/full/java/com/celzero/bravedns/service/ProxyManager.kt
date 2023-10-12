@@ -46,7 +46,7 @@ object ProxyManager : KoinComponent {
     private var appConfigMappings = mutableSetOf<ProxyApplicationMapping>()
 
     suspend fun load() {
-        WireGuardManager.load()
+        WireguardManager.load()
         appConfigMappings = proxyAppMappingRepository.getApps().toMutableSet()
     }
 
@@ -81,7 +81,7 @@ object ProxyManager : KoinComponent {
         } else if (proxyId.contains(ID_ORBOT_BASE)) {
             appConfig.isOrbotProxyEnabled()
         } else if (proxyId.contains(ID_WG_BASE)) {
-            WireGuardManager.isConfigActive(proxyId)
+            WireguardManager.isConfigActive(proxyId)
         } else if (proxyId.contains(ID_TCP_BASE)) {
             TcpProxyHelper.isTcpProxyEnabled()
         } else if (proxyId.contains(ID_S5_BASE)) {

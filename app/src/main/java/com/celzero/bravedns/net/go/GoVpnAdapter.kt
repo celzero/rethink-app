@@ -30,7 +30,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
@@ -437,7 +437,7 @@ class GoVpnAdapter(
     private fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
         if (!tunProxyMode.isTunProxyWireguard()) return
 
-        val wgConfigs: List<Config> = WireGuardManager.getActiveConfigs()
+        val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
         if (wgConfigs.isEmpty()) {
             Log.i(LOG_TAG_VPN, "no active wireguard configs found")
             return
@@ -448,7 +448,7 @@ class GoVpnAdapter(
             try {
                 tunnel?.proxies?.addProxy(id, wgUserSpaceString)
             } catch (e: Exception) {
-                WireGuardManager.disableConfig(id)
+                WireguardManager.disableConfig(id)
                 showWireguardFailureToast(
                     e.message ?: context.getString(R.string.wireguard_connection_error)
                 )
@@ -529,13 +529,13 @@ class GoVpnAdapter(
     fun addWgProxyLocked(id: String) {
         try {
             val proxyId: Int = id.substring(ID_WG_BASE.length).toInt()
-            val wgConfig = WireGuardManager.getConfigById(proxyId)
+            val wgConfig = WireguardManager.getConfigById(proxyId)
             val wgUserSpaceString = wgConfig?.toWgUserspaceString()
             tunnel?.proxies?.addProxy(id, wgUserSpaceString)
             Log.i(LOG_TAG_VPN, "add wireguard proxy with id: $id")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error adding wireguard proxy: ${e.message}", e)
-            WireGuardManager.disableConfig(id)
+            WireguardManager.disableConfig(id)
             showWireguardFailureToast(
                 e.message ?: context.getString(R.string.wireguard_connection_error)
             )
@@ -576,7 +576,7 @@ class GoVpnAdapter(
                 LOG_TAG_VPN,
                 "Tcp mode set(${ProxyManager.ID_TCP_BASE}): ${tcpProxyUrl.url}, res: $added"
             )
-        val secWarp = WireGuardManager.getSecWarpConfig()
+        val secWarp = WireguardManager.getSecWarpConfig()
         if (secWarp == null) {
             Log.w(LOG_TAG_VPN, "no sec warp config found")
             return

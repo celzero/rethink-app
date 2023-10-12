@@ -17,10 +17,10 @@ import com.celzero.bravedns.databinding.ActivityTcpProxyBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.service.WireGuardManager
-import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_ID
-import com.celzero.bravedns.service.WireGuardManager.WARP_ID
-import com.celzero.bravedns.service.WireGuardManager.isWarpWorking
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.SEC_WARP_ID
+import com.celzero.bravedns.service.WireguardManager.WARP_ID
+import com.celzero.bravedns.service.WireguardManager.isWarpWorking
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
@@ -92,13 +92,13 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     }
 
     private fun displayWarpStatus() {
-        val config = WireGuardManager.getWarpConfig()
+        val config = WireguardManager.getWarpConfig()
         if (config == null) {
             b.warpStatus.text = "Fetch from server" // getString(R.string.tcp_proxy_description)
             b.warpSwitch.isChecked = false
             return
         }
-        if (WireGuardManager.getConfigFilesById(WARP_ID)?.isActive == true) {
+        if (WireguardManager.getConfigFilesById(WARP_ID)?.isActive == true) {
             b.warpStatus.text = "Active" // getString(R.string.tcp_proxy_description_active)
             b.warpSwitch.isChecked = true
         } else {
@@ -109,7 +109,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
     private fun setupClickListeners() {
         b.tcpProxySwitch.setOnCheckedChangeListener { _, checked ->
-            if (checked && WireGuardManager.isConfigActive(ProxyManager.ID_WG_BASE + WARP_ID)) {
+            if (checked && WireguardManager.isConfigActive(ProxyManager.ID_WG_BASE + WARP_ID)) {
                 b.tcpProxySwitch.isChecked = false
                 Utilities.showToastUiCentered(
                     this,
@@ -158,12 +158,12 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
         b.enableUdpRelay.setOnCheckedChangeListener { _, b ->
             if (b) {
                 io {
-                    val alreadyDownloaded = WireGuardManager.isSecWarpAvailable()
+                    val alreadyDownloaded = WireguardManager.isSecWarpAvailable()
                     if (alreadyDownloaded) {
                         val cf =
-                            WireGuardManager.getConfigFilesById(SEC_WARP_ID)
+                            WireguardManager.getConfigFilesById(SEC_WARP_ID)
                                 ?: return@io
-                        WireGuardManager.enableConfig(cf)
+                        WireguardManager.enableConfig(cf)
                     } else {
                         createConfigOrShowErrorLayout()
                     }
@@ -172,9 +172,9 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
                 io {
                     val cf =
-                        WireGuardManager.getConfigFilesById(SEC_WARP_ID)
+                        WireguardManager.getConfigFilesById(SEC_WARP_ID)
                             ?: return@io
-                    WireGuardManager.disableConfig(cf)
+                    WireguardManager.disableConfig(cf)
                 }
             }
         }
@@ -202,12 +202,12 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
             }
 
             val configFiles =
-                WireGuardManager.getConfigFilesById(WARP_ID) ?: return@setOnCheckedChangeListener
+                WireguardManager.getConfigFilesById(WARP_ID) ?: return@setOnCheckedChangeListener
             if (checked) {
-                WireGuardManager.enableConfig(configFiles)
+                WireguardManager.enableConfig(configFiles)
                 b.warpStatus.text = "Active" // getString(R.string.tcp_proxy_description_active)
             } else {
-                WireGuardManager.disableConfig(configFiles)
+                WireguardManager.disableConfig(configFiles)
                 b.warpStatus.text = "Not active" // getString(R.string.tcp_proxy_description)
             }
         }
@@ -245,7 +245,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     }
 
     private suspend fun fetchWarpConfigFromServer() {
-        val config = WireGuardManager.getNewWarpConfig(SEC_WARP_ID)
+        val config = WireguardManager.getNewWarpConfig(SEC_WARP_ID)
         Log.i(LoggerConstants.LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()
