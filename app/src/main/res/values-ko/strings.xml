@@ -9,7 +9,7 @@
     <string name="txt_home" translatable="true">홈</string>
     <string name="next" translatable="true">다음</string>
     <string name="skip" translatable="true">넘기기</string>
-    <string name="lbl_dismiss" translatable="true">해제</string>
+    <string name="lbl_dismiss" translatable="true">그만두기</string>
     <string name="accessibility_service_description" translatable="true">Rethink는 접근성 서비스를 사용하여 백그라운드 애플리케이션을 탐지하고 방화벽을 차단합니다. Rethink는 어떤 정보도 수집하거나 판매하지 않습니다.</string>
     <string name="finish" translatable="true">끝내기</string>
     <string name="lbl_cancel" translatable="true">취소</string>
@@ -138,7 +138,7 @@
     <string name="lbl_maybe_blocked" translatable="true">차단되었을 수 있음</string>
     <string name="lbl_rules" translatable="true">규칙</string>
     <string name="lbl_all" translatable="true">전부</string>
-    <string name="lbl_allowed" translatable="true">허용된</string>
+    <string name="lbl_allowed" translatable="true">허용됨</string>
     <string name="lbl_disabled" translatable="true">비활성</string>
     <string name="lbl_action_required" translatable="true">조치 필요</string>
 </resources>
