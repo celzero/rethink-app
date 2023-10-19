@@ -852,7 +852,7 @@
     <string name="dc_setting_dns_cache_desc" translatable="true">合併請求、快取應答、彈性應對錯誤</string>
     <string name="ada_app_firewall" translatable="true">防火牆</string>
     <string name="brbs_backup_restore_desc" translatable="true">無法跨版本跨設備使用</string>
-    <string name="lbl_maybe_blocked" translatable="true">或已攔截</string>
+    <string name="lbl_maybe_blocked" translatable="true">可能被封锁</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由專有 IP （實驗性）</string>
     <string name="settings_allow_lan_desc" translatable="true">將 LAN 、環回、多播與本地鏈路路由排除於 Rethink 的 VPN 隧道外。</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 僅於 Rethink 的 DNS 上生效</string>
