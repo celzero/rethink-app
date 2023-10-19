@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_title_desc" translatable="true">Tunnista ja estä verkon tietoturvauhat</string>
+    <string name="lbl_cancel" translatable="true">Peruuta</string>
+    <string name="next" translatable="true">Seuraava</string>
+    <string name="lbl_apply" translatable="true">Käytä</string>
+    <string name="title_statistics" translatable="true">Tilastot</string>
+    <string name="txt_home" translatable="true">Koti</string>
+    <string name="title_about" translatable="true">Tietoja</string>
+    <string name="settings_title_desc" translatable="true">Erittäin muokattavissa oleva DNS ja palomuuri</string>
+    <string name="skip" translatable="true">Ohita</string>
+    <string name="accessibility_service_description" translatable="true">Rethink käyttää esteettömyyspalvelua taustasovellusten tunnistamiseen ja palomuuriin. Rethink ei kerää tai myy mitään tietoa.</string>
+    <string name="title_settings" translatable="true">Asetukset</string>
+</resources>

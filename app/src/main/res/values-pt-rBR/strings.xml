@@ -806,4 +806,11 @@
     <string name="lbl_maybe_blocked" translatable="true">Talvez bloqueado</string>
     <string name="lbl_network" translatable="true">rede</string>
     <string name="trusted_domains_desc" translatable="true">A regra de domínio confiável funciona somente com o <u>DNS do Rethink</u>.</string>
+    <string name="lbl_import" translatable="true">Importar</string>
+    <string name="lbl_qr_code" translatable="true">Código QR</string>
+    <string name="lbl_addresses" translatable="true">Endereços</string>
+    <string name="lbl_dns_servers" translatable="true">Servidores DNS</string>
+    <string name="lbl_public_key" translatable="true">Chave Pública</string>
+    <string name="lbl_applications" translatable="true">Aplicativos</string>
+    <string name="lbl_create" translatable="true">Criar</string>
 </resources>
