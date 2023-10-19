@@ -132,4 +132,13 @@
     <string name="slide_2_title" translatable="true">환영합니다</string>
     <string name="conn_track_clear_logs_message" translatable="true">네트워크 로그만 삭제되고 방화벽 규칙은 삭제되지 않습니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까\?</string>
     <string name="lbl_random" translatable="true">(무작위)</string>
+    <string name="lbl_blocked" translatable="true">차단됨</string>
+    <string name="lbl_domain" translatable="true">도메인</string>
+    <string name="lbl_wildcard" translatable="true">와일드카드</string>
+    <string name="lbl_maybe_blocked" translatable="true">차단되었을 수 있음</string>
+    <string name="lbl_rules" translatable="true">규칙</string>
+    <string name="lbl_all" translatable="true">전부</string>
+    <string name="lbl_allowed" translatable="true">허용된</string>
+    <string name="lbl_disabled" translatable="true">비활성</string>
+    <string name="lbl_action_required" translatable="true">조치 필요</string>
 </resources>
