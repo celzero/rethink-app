@@ -812,7 +812,7 @@
     <string name="lbl_logs" translatable="true">journaux</string>
     <string name="bypass_dns_firewall" translatable="true">contourner dns &amp; firewall</string>
     <string name="bsct_block_domain" translatable="true">Bloquer, faire confiance à <u> ce domaine</u> pour <u>cette applicaation</u></string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">Impossible de configurer les proxies lorsque le VPN fonctionne en mode DNS uniquement ou en mode verrouillage. <u>Allez dans les paramètres VPN</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Impossible de configurer les proxies lorsque le VPN fonctionne en mode DNS uniquement.</string>
     <string name="settings_general_customize" translatable="true">personnaliser</string>
     <string name="settings_default_dns_heading" translatable="true">Choisissez le DNS de secours</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Capture de paquets désactivée</string>
@@ -849,9 +849,54 @@
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">contournera les règles universelles de DNS et de pare-feu</string>
     <string name="lbl_network" translatable="true">réseau</string>
-    <string name="trusted_domains_desc" translatable="true">La règle du domaine de confiance ne fonctionne qu\'avec <u>le DNS de Rethink</u>.</string>
+    <string name="trusted_domains_desc" translatable="true">La règle du domaine de confiance fonctionne mieux avec <u>le DNS de Rethink</u>.</string>
     <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqué</string>
     <string name="bypass_dns_firewall_tooltip">%1$s fonctionne uniquement avec le DNS de Rethink</string>
     <string name="settings_allow_lan_heading" translatable="true">Ne pas acheminer les IP privées (expérimental)</string>
-    <string name="settings_allow_lan_desc" translatable="true">Exclure les routes LAN, loopback, link-local du tunnel VPN de Rethink.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Exclure les routes LAN, loopback, multicast, link-local du tunnel VPN de Rethink.</string>
+    <string name="bad_config_reason_invalid_key" translatable="true">Clé invalide</string>
+    <string name="parse_error_inet_network" translatable="true">Réseau IP</string>
+    <string name="parse_error_inet_address" translatable="true">Adresse IP</string>
+    <string name="lbl_import" translatable="true">Importer</string>
+    <string name="bad_config_reason_invalid_number" translatable="true">Numéro invalide</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="parse_error_integer" translatable="true">nombre</string>
+    <string name="key_length_explanation_binary" translatable="true">: Les clés WireGuard doivent être de 32 octets</string>
+    <string name="key_length_explanation_hex" translatable="true">: Les clés hexagonales WireGuard doivent être de 64 caractères (32 octets)</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Clé publique copiée.</string>
+    <string name="bad_config_reason_unknown_attribute" translatable="true">Attribut inconnu</string>
+    <string name="lbl_delete" translatable="true">Supprimer</string>
+    <string name="lbl_qr_code" translatable="true">QR Code</string>
+    <string name="bad_config_reason_missing_attribute" translatable="true">Attribut manquant</string>
+    <string name="key_length_explanation_base64" translatable="true">: les clés WireGuard base64 doivent être de 44 caractères (32 octets)</string>
+    <string name="lbl_generated" translatable="true">(généré)</string>
+    <string name="bad_config_reason_missing_section" translatable="true">Section manquante</string>
+    <string name="lbl_slow" translatable="true">lent</string>
+    <string name="bad_config_reason_invalid_value" translatable="true">Valeur invalide</string>
+    <string name="lbl_day" translatable="true">jour</string>
+    <string name="lbl_fast" translatable="true">rapide</string>
+    <string name="search_proxy_add_apps" translatable="true">Chercher les applications par nom</string>
+    <string name="lbl_inactive" translatable="true">Inactif</string>
+    <string name="lbl_addresses" translatable="true">Adresses</string>
+    <string name="lbl_active" translatable="true">Actif</string>
+    <string name="lbl_dns_servers" translatable="true">Serveurs DNS</string>
+    <string name="ssv_most_contacted_countries_heading" description="This label will appear on the stats screen as a header for most visited domains by country" translatable="true">pays les plus contactés</string>
+    <string name="ssv_most_blocked_countries_heading" description="This label will appear on the stats screen as a header for most blocked domains by country" translatable="true">pays les plus bloqués</string>
+    <string name="lbl_app_wise" translatable="true">par application</string>
+    <string name="status_protected_with_wg" translatable="true">protégé avec wireguard</string>
+    <string name="lbl_public_key" translatable="true">Clé publique</string>
+    <string name="key_contents_error" translatable="true">Mauvais caractères dans la clé</string>
+    <string name="lbl_private_key" translatable="true">Clé privée</string>
+    <string name="bad_config_reason_unknown_section" translatable="true">Section inconnue</string>
+    <string name="lbl_applications" translatable="true">Applications</string>
+    <string name="lbl_include" translatable="true">Inclure</string>
+    <string name="key_length_error" translatable="true">Taille de clé incorrecte</string>
+    <string name="lbl_very" translatable="true">très</string>
+    <string name="lbl_select_all" translatable="true">Tout sélectionner</string>
+    <string name="lbl_create" translatable="true">Créer</string>
+    <string name="http_proxy_dialog_desc" translatable="true">Configuration de l\'URL de forme, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exemple: http://proxy.example.com:8080/</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">protégé avec wireguard &amp; dns privé</string>
+    <string name="bad_config_reason_syntax_error" translatable="true">Erreur de syntaxe</string>
+    <string name="lbl_listen_port" translatable="true">Port d\'écoute</string>
+    <string name="lbl_random" translatable="true">(au hasard)</string>
 </resources>
