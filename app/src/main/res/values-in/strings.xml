@@ -835,7 +835,7 @@
     <string name="cd_dns_alg_desc" translatable="true">Tetapkan IP unik di setiap permintaan DNS</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Penangkapan paket dinonaktifkan</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Pintaskan (Bypass) Aplikasi</string>
-    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domain Tepercaya (Univ)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domain Tepercaya (Universal)</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">akan mengabaikan aturan dns &amp; firewall universal</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">Lewati DNS &amp; Firewall</string>
     <string name="dc_refresh_toast" translatable="true">Penyegaran DNS selesai</string>
@@ -906,10 +906,10 @@
     <string name="bad_config_explanation_pka" translatable="true">: Harus berupa bilangan bulat positif tidak melebihi 65535</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Jangan memvalidasi sertifikat TLS server (dimungkinkan hanya jika Anda tahu apa yang Anda lakukan)</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Kunci tidak valid</string>
-    <string name="parse_error_inet_network" translatable="true">IP jaringan</string>
+    <string name="parse_error_inet_network" translatable="true">Jaringan IP</string>
     <string name="parse_error_inet_address" translatable="true">Alamat IP</string>
     <string name="crypt_adguard_desc" translatable="true">Lindungi perangkat anda dari malware dan banyak lagi.</string>
-    <string name="quad9_dns_desc" translatable="true">Quad9 merutekan permintaan DNS Anda melalui jaringan global server aman.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 merutekan permintaan DNS Anda melalui jaringan server global yang aman.</string>
     <string name="univ_firewall_heading" translatable="true">Peraturan firewall universal</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Memblokir konten berbahaya. Gunakan titik akhir DNS 1.1.1.2 Cloudflare.</string>
     <string name="firewall_rule_proxied_desc" translatable="true">Koneksi ini dialihkan ke proksi yang dipilih pengguna. <br/><br/> Untuk mengubahnya kunjungi <i>Proksi</i> dari menu <i>Konfigurasi</i>.</string>
@@ -923,7 +923,7 @@
     <string name="wireguard_enabled_failure">Matikan proksi lain untuk mengaktifkan WireGuard</string>
     <string name="add_peer" translatable="true">Tambahkan Peer</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Memblokir malware dan konten dewasa. Gunakan titik akhir DNS 1.1.1.3 Cloudflare.</string>
-    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-riwayat/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
     <string name="cd_deleted_toast" translatable="true">Hapus semua aturan domain</string>
     <string name="settings_go_log_desc" translatable="true">Untuk tujuan debugging</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">Filter keluarga memblokir akses ke semua situs dewasa, pornografi, dan situs seksual eksplisit. Ini juga akan memblokir domain proksi dan VPN yang dapat digunakan untuk melewati filter. Situs yang berisi konten campuran, seperti Reddit, juga diblokir. Google, Bing, dan YouTube disetel ke mode aman.</string>
@@ -932,7 +932,7 @@
     <string name="bad_config_reason_unknown_attribute" translatable="true">Atribut tidak dikenal</string>
     <string name="app_ip_domain_rules_desc" translatable="true">Modifikasi tiap IP aplikasi / Aturan domain.</string>
     <string name="bad_config_reason_missing_attribute" translatable="true">Atribut hilang</string>
-    <string name="key_length_explanation_base64" translatable="true">: Kunci base64 WireGuard nengharuskan 44 karakter (32 byte)</string>
+    <string name="key_length_explanation_base64" translatable="true">: Kunci base64 WireGuard harus 44 karakter (32 byte)</string>
     <string name="wireguard_disclaimer">Ini adalah WireGuard eksperimental sebagai proksi TCP dan UDP. Saat lalu lintas DNS diteruskan ke %1$s, lalu lintas ICMP dikirim dari jaringan yang mendasarinya.</string>
     <string name="bad_config_explanation_positive_number" translatable="true">: Harus berupa bilangan positif</string>
     <string name="bad_config_reason_missing_section" translatable="true">Bagian yang hilang</string>
@@ -978,6 +978,6 @@
     <string name="crypt_relay_france" translatable="true">Penghubung DNS anonim yang dihosting di Paris, Prancis yang disediakan oleh https://cryptostrom.is/.</string>
     <string name="lbl_listen_port" translatable="true">Pelabuhan (port) dengar</string>
     <string name="wireguard_connection_error">Terjadi kesalahan saat menyambung ke konfigurasi WireGuard</string>
-    <string name="illegal_filename_error" translatable="true">Nama file ilegal \"%s\"</string>
-    <string name="crypt_quad9_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-log/tanpa–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="illegal_filename_error" translatable="true">Nama berkas ilegal \"%s\"</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-riwayat/tanpa–filter/ecs 9.9.9.12 – 149.112.112.12</string>
 </resources>
