@@ -975,4 +975,5 @@
     <string name="wireguard_connection_error">Problème de connexion à la configuration WireGuard</string>
     <string name="illegal_filename_error" translatable="true">Nom de fichier illégal “%s”</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="parse_error_inet_endpoint" translatable="true">Serveur distant</string>
 </resources>
