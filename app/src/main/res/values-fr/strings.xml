@@ -192,7 +192,10 @@
     <string name="settings_protocol_translation_dns_inactive">Passez en mode DNS/DNS+Pare-feu pour activer ce paramètre</string>
     <string name="firewall_status_whitelisted">contourne les règles du pare-feu global</string>
     <string name="firewall_card_status_active">%1$s applis</string>
-    <string name="firewall_card_text_active">%1$s bloquée(s), %2$s avec exception(s), %3$s exclue(s), %4$s confinée(s)</string>
+    <string name="firewall_card_text_active">%1$s bloquée(s)
+\n%2$s avec exception(s)
+\n %3$s exclue(s)
+\n %4$s confinée(s)</string>
     <string name="firewall_status_isolate">confinée</string>
     <string name="firewall_card_text_inactive">Activez le mode pare-feu.</string>
     <string name="dns_card_latency_active">Latence : %1$sms</string>
@@ -899,4 +902,77 @@
     <string name="bad_config_reason_syntax_error" translatable="true">Erreur de syntaxe</string>
     <string name="lbl_listen_port" translatable="true">Port d\'écoute</string>
     <string name="lbl_random" translatable="true">(au hasard)</string>
+    <string name="config_delete_success_toast">Configuration supprimée</string>
+    <string name="bad_config_explanation_pka" translatable="true">: Doit être positif et pas plus de 65535</string>
+    <string name="cd_doh_dialog_checkbox_desc" translatable="true">Ne pas validez les certificats TLS du serveur (uniquement si vous savez ce que vous faites)</string>
+    <string name="crypt_adguard_desc" translatable="true">Protège votre appareil des logiciels malveillants et plus encore.</string>
+    <string name="wireguard_description" translatable="true">WireGuard comme proxy.</string>
+    <string name="quad9_dns_desc" translatable="true">Quad9 dirige vos requêtes DNS via un réseau sécurisé de serveurs à travers le monde.</string>
+    <string name="univ_firewall_heading" translatable="true">Règles universelles du pare-feu</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Bloque le contenu malveillant. Utilise le paramètre DNS 1.1.1.2 de Cloudflare.</string>
+    <string name="firewall_rule_proxied_desc" translatable="true">Cette connexion a été transmise à Proxy <br/><br/> Pour changer, allez à <i>Proxy</i> de l\'écran <i>Configure</i>.</string>
+    <string name="lbl_allowed_ips" translatable="true">IP autorisées</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="add_remove_apps" translatable="true">Ajouter / supprimer Applications (%1$s apps)</string>
+    <string name="bad_extension_error" translatable="true">Le fichier doit être .conf ou .zip</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_sec" translatable="true">s</string>
+    <string name="fapps_info_bypass_dns_firewall_msg" translatable="true">Détourner les règles du DNS et du pare-feu.</string>
+    <string name="setup_wireguard" translatable="true">Configurer WireGuard</string>
+    <string name="crypt_relay_singapore" translatable="true">Relais DNS anonyme hébergé à Singapour.</string>
+    <string name="lbl_hour" translatable="true">h</string>
+    <string name="wireguard_enabled_failure">Éteignez les autres proxies pour activer WireGuard</string>
+    <string name="add_peer" translatable="true">Ajouter Pair</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Bloque les logiciels malveillants et le contenu pour adultes. Utilise le point de terminaison DNS 1.1.1.3 de Cloudflare.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no-log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112.112.112</string>
+    <string name="lbl_save" translatable="true">enregistrer</string>
+    <string name="cd_deleted_toast" translatable="true">Toutes les règles de domaine supprimées</string>
+    <string name="lbl_optional" translatable="true">(facultatif)</string>
+    <string name="settings_go_log_desc" translatable="true">Pour du débogage</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">Le filtre familial bloque l\'accès à tous les sites pour adultes, pornographiques et explicites. Il bloque également les domaines proxy et VPN qui pourraient être utilisés pour contourner nos filtres. Les sites à contenu mixte (comme Reddit) sont également bloqués. Google, Bing et Youtube sont configurés en mode SafeSearch.</string>
+    <string name="logs_disclaimer" translatable="true">Afficher les 20.000 premiers caractères</string>
+    <string name="import_error" translatable="true">Impossible d\'importer un tunnel : %s</string>
+    <string name="new_warp_invalid_config_toast" translatable="true">Configuration WARP invalide</string>
+    <string name="app_ip_domain_rules_desc" translatable="true">Modifier par application IP / Règles de domaine.</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="wireguard_disclaimer">Il s\'agit d\'un WireGuard expérimental en tant que proxy TCP et UDP. Alors que le trafic DNS est transféré vers %1$s, le trafic ICMP (ex : ping) est envoyé au réseau sous-jacent.</string>
+    <string name="bad_config_explanation_positive_number" translatable="true">: Doit être positif</string>
+    <string name="wireguard_no_config_msg">Pas de configurations WireGuard</string>
+    <string name="new_warp_error_toast" translatable="true">Impossible de récupérer la configuration WARP</string>
+    <string name="bad_config_context" translatable="true">%1$s\'s %2$s</string>
+    <string name="settings_go_log_heading" translatable="true">Niveau de journalisation</string>
+    <string name="lbl_auto" translatable="true">(auto)</string>
+    <string name="bad_config_explanation_udp_port" translatable="true">: Doit être un numéro de port UDP valide</string>
+    <string name="google_dns_desc" translatable="true">Ne bloque aucune demande DNS. Utilisez le paramètre DNS de Google.</string>
+    <string name="wireguard_refresh_toast">Actualisation des proxys terminée</string>
+    <string name="unknown_error" translatable="true">Erreur inconnue</string>
+    <string name="crypt_relay_sweden" translatable="true">Relais DNS anonyme hébergé en Suède fourni par https://cryptostrom.is/.</string>
+    <string name="include_all_app_wg_dialog_title">Inclure toutes les applications</string>
+    <string name="cloudflare_dns_desc" translatable="true">Ne bloque aucune demande DNS. Utilise le paramètre DNS 1.1.1.1 de Cloudflare.</string>
+    <string name="config_add_success_toast">Configuration ajoutée</string>
+    <string name="lbl_min" translatable="true">min</string>
+    <string name="crypt_relay_us" translatable="true">Relais DNS anonyme hébergé aux États-Unis - Los Angeles, CA fourni par https://cryptostrom.is/.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Bloque l\'accès à tous les sites pour adultes, pornographiques et explicites. Il bloque également les domaines proxy et VPN qui pourraient être utilisés pour contourner nos filtres. Les sites à contenu mixte (comme Reddit) sont également bloqués. Google, Bing et Youtube sont configurés en mode SafeSearch.</string>
+    <string name="lbl_preshared_key" translatable="true">Clé pré-partagée</string>
+    <string name="crypt_relay_netherlands" translatable="true">Relais DNS anonyme hébergé aux Pays-Bas</string>
+    <string name="invalid_file_error" translatable="true">Fichier invalide</string>
+    <string name="include_all_app_wg_dialog_desc">Tunneller toutes les applications dans ce tunnel \?</string>
+    <string name="config_delete_dialog_title">Supprimer la configuration</string>
+    <string name="logs_card_duration" translatable="true">depuis %1$s</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">Les filtres adultes bloquent l\'accès à tous les sites adultes, pornographiques et explicites. Il ne bloque pas les sites proxy ou VPN, ni les sites de contenu mixte. Les sites comme Reddit sont autorisés. Google et Bing sont mis sur le mode SafeSearch.</string>
+    <string name="config_delete_dialog_desc">Voulez-vous vraiment supprimer cette configuration \?</string>
+    <string name="new_warp_config_desc" translatable="true">Récupérer la configuration WARP du serveur</string>
+    <string name="parse_error_generic" translatable="true">chaîne</string>
+    <string name="generic_error" translatable="true">Erreur inconnue “%s”</string>
+    <string name="app_ip_domain_rules" translatable="true">Par application IP / Règles de domaine</string>
+    <string name="bad_config_error" translatable="true">%1$s dans %2$s</string>
+    <string name="exclude_all_app_wg_dialog_title">Exclure toutes les applications</string>
+    <string name="exclude_all_app_wg_dialog_desc">Exclure toutes les applications de ce tunnel \?</string>
+    <string name="no_configs_error" translatable="true">Aucune configuration trouvée</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS avec la recherche sécuritaire et le blocage des contenus adultes.</string>
+    <string name="crypt_relay_france" translatable="true">Relais DNS anonyme hébergé à Paris, France fourni par https://cryptostrom.is/.</string>
+    <string name="wireguard_connection_error">Problème de connexion à la configuration WireGuard</string>
+    <string name="illegal_filename_error" translatable="true">Nom de fichier illégal “%s”</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
 </resources>
