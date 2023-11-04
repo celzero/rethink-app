@@ -32,6 +32,7 @@ import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -62,8 +63,11 @@ import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import org.koin.android.ext.android.inject
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 
 class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -201,14 +205,15 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to apply dns rules")
             return
         }
-
-        DomainRulesManager.changeStatus(
-            log!!.queryStr,
-            Constants.UID_EVERYBODY,
-            log!!.responseIps,
-            DomainRulesManager.DomainType.DOMAIN,
-            status
-        )
+        io {
+            DomainRulesManager.changeStatus(
+                log!!.queryStr,
+                Constants.UID_EVERYBODY,
+                log!!.responseIps,
+                DomainRulesManager.DomainType.DOMAIN,
+                status
+            )
+        }
     }
 
     private fun displayDnsTransactionDetails() {
@@ -433,7 +438,8 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt
-            val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP)
+            val u = uptime + " " + log!!.relayIP
+            val text = getString(R.string.dns_btm_resolved_crypt, u, log!!.serverIP)
             b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
         } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)
@@ -590,5 +596,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
             b.dnsBlockFavIcon.visibility = View.GONE
         }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.BottomSheetFirewallSortFilterBinding
 import com.celzero.bravedns.service.FirewallManager
@@ -32,6 +33,9 @@ import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Themes
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
@@ -118,11 +122,7 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         b.ffaParentChipGroup.removeAllViews()
 
         val all =
-            makeParentChip(
-                AppListActivity.TopLevelFilter.ALL.id,
-                getString(R.string.lbl_all),
-                true
-            )
+            makeParentChip(AppListActivity.TopLevelFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed =
             makeParentChip(
                 AppListActivity.TopLevelFilter.INSTALLED.id,
@@ -175,17 +175,26 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             AppListActivity.TopLevelFilter.ALL.id -> {
                 sortValues.topLevelFilter = AppListActivity.TopLevelFilter.ALL
                 sortValues.categoryFilters.clear()
-                remakeChildFilterChipsUi(FirewallManager.getAllCategories())
+                io {
+                    val categories = FirewallManager.getAllCategories()
+                    uiCtx { remakeChildFilterChipsUi(categories) }
+                }
             }
             AppListActivity.TopLevelFilter.INSTALLED.id -> {
                 sortValues.topLevelFilter = AppListActivity.TopLevelFilter.INSTALLED
                 sortValues.categoryFilters.clear()
-                remakeChildFilterChipsUi(FirewallManager.getCategoriesForInstalledApps())
+                io {
+                    val categories = FirewallManager.getCategoriesForInstalledApps()
+                    uiCtx { remakeChildFilterChipsUi(categories) }
+                }
             }
             AppListActivity.TopLevelFilter.SYSTEM.id -> {
                 sortValues.topLevelFilter = AppListActivity.TopLevelFilter.SYSTEM
                 sortValues.categoryFilters.clear()
-                remakeChildFilterChipsUi(FirewallManager.getCategoriesForSystemApps())
+                io {
+                    val categories = FirewallManager.getCategoriesForSystemApps()
+                    uiCtx { remakeChildFilterChipsUi(categories) }
+                }
             }
         }
     }
@@ -215,5 +224,13 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
         } else {
             sortValues.categoryFilters.remove(tag.toString())
         }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

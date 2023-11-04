@@ -144,115 +144,145 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
         b.bsOrbotRadioSocks5.setOnCheckedChangeListener(null)
         b.bsOrbotRadioSocks5.setOnClickListener {
-            if (!isAnyAppSelected()) {
-                Toast.makeText(
-                        context,
-                        "Select atleast one app to enable Orbot",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioSocks5.isChecked = false
-                return@setOnClickListener
-            }
-            if (!b.bsOrbotRadioSocks5.isSelected) {
-                persistentState.orbotConnectionStatus.postValue(true)
-                enableSocks5Orbot()
+            io {
+                val isSelected = isAnyAppSelected()
+                uiCtx {
+                    if (!isSelected) {
+                        Toast.makeText(
+                                context,
+                                getString(R.string.orbot_no_app_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        b.bsOrbotRadioNone.isChecked = true
+                        b.bsOrbotRadioSocks5.isChecked = false
+                        return@uiCtx
+                    }
+                    if (!b.bsOrbotRadioSocks5.isSelected) {
+                        persistentState.orbotConnectionStatus.postValue(true)
+                        enableSocks5Orbot()
+                    }
+                }
             }
         }
 
         b.bsSocks5OrbotRl.setOnClickListener {
-            if (!isAnyAppSelected()) {
-                Toast.makeText(
-                        context,
-                        "Select atleast one app to enable Orbot",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioSocks5.isChecked = false
-                return@setOnClickListener
-            }
-            if (!b.bsOrbotRadioSocks5.isChecked) {
-                b.bsOrbotRadioSocks5.isChecked = true
-                persistentState.orbotConnectionStatus.postValue(true)
-                enableSocks5Orbot()
+            io {
+                val isSelected = isAnyAppSelected()
+                uiCtx {
+                    if (!isSelected) {
+                        Toast.makeText(
+                                context,
+                                getString(R.string.orbot_no_app_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        b.bsOrbotRadioNone.isChecked = true
+                        b.bsOrbotRadioSocks5.isChecked = false
+                        return@uiCtx
+                    }
+                    if (!b.bsOrbotRadioSocks5.isChecked) {
+                        b.bsOrbotRadioSocks5.isChecked = true
+                        persistentState.orbotConnectionStatus.postValue(true)
+                        enableSocks5Orbot()
+                    }
+                }
             }
         }
 
         b.bsOrbotRadioHttp.setOnCheckedChangeListener(null)
         b.bsOrbotRadioHttp.setOnClickListener {
-            if (!isAnyAppSelected()) {
-                Toast.makeText(
-                        context,
-                        "Select atleast one app to enable Orbot",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioHttp.isChecked = false
-                return@setOnClickListener
-            }
-            if (!b.bsOrbotRadioHttp.isSelected) {
-                persistentState.orbotConnectionStatus.postValue(true)
-                enableHttpOrbot()
+            io {
+                val isSelected = isAnyAppSelected()
+                uiCtx {
+                    if (!isSelected) {
+                        Toast.makeText(
+                                context,
+                                getString(R.string.orbot_no_app_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        b.bsOrbotRadioNone.isChecked = true
+                        b.bsOrbotRadioHttp.isChecked = false
+                        return@uiCtx
+                    }
+                    if (!b.bsOrbotRadioHttp.isSelected) {
+                        persistentState.orbotConnectionStatus.postValue(true)
+                        enableHttpOrbot()
+                    }
+                }
             }
         }
 
         b.bsOrbotHttpRl.setOnClickListener {
-            if (!isAnyAppSelected()) {
-                Toast.makeText(
-                        context,
-                        "Select atleast one app to enable Orbot",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioHttp.isChecked = false
-                return@setOnClickListener
-            }
-            if (!b.bsOrbotRadioHttp.isChecked) {
-                persistentState.orbotConnectionStatus.postValue(true)
-                b.bsOrbotRadioHttp.isChecked = true
-                enableHttpOrbot()
+            io {
+                val isSelected = isAnyAppSelected()
+                uiCtx {
+                    if (!isSelected) {
+                        Toast.makeText(
+                                context,
+                                getString(R.string.orbot_no_app_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        b.bsOrbotRadioNone.isChecked = true
+                        b.bsOrbotRadioHttp.isChecked = false
+                        return@uiCtx
+                    }
+                    if (!b.bsOrbotRadioHttp.isChecked) {
+                        persistentState.orbotConnectionStatus.postValue(true)
+                        b.bsOrbotRadioHttp.isChecked = true
+                        enableHttpOrbot()
+                    }
+                }
             }
         }
 
         b.bsOrbotRadioBoth.setOnCheckedChangeListener(null)
         b.bsOrbotRadioBoth.setOnClickListener {
-            if (!isAnyAppSelected()) {
-                Toast.makeText(
-                        context,
-                        "Select atleast one app to enable Orbot",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioBoth.isChecked = false
-                return@setOnClickListener
-            }
-            if (!b.bsOrbotRadioBoth.isSelected) {
-                persistentState.orbotConnectionStatus.postValue(true)
-                enableSocks5HttpOrbot()
+            io {
+                val isSelected = isAnyAppSelected()
+                uiCtx {
+                    if (!isSelected) {
+                        Toast.makeText(
+                                context,
+                                getString(R.string.orbot_no_app_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        b.bsOrbotRadioNone.isChecked = true
+                        b.bsOrbotRadioBoth.isChecked = false
+                        return@uiCtx
+                    }
+                    if (!b.bsOrbotRadioBoth.isSelected) {
+                        persistentState.orbotConnectionStatus.postValue(true)
+                        enableSocks5HttpOrbot()
+                    }
+                }
             }
         }
 
         b.bsOrbotBothRl.setOnClickListener {
-            if (!isAnyAppSelected()) {
-                Toast.makeText(
-                        context,
-                        "Select atleast one app to enable Orbot",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-                b.bsOrbotRadioNone.isChecked = true
-                b.bsOrbotRadioBoth.isChecked = false
-                return@setOnClickListener
-            }
-            if (!b.bsOrbotRadioBoth.isChecked) {
-                persistentState.orbotConnectionStatus.postValue(true)
-                b.bsOrbotRadioBoth.isChecked = true
-                enableSocks5HttpOrbot()
+            io {
+                val isSelected = isAnyAppSelected()
+                uiCtx {
+                    if (!isSelected) {
+                        Toast.makeText(
+                                context,
+                                getString(R.string.orbot_no_app_toast),
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        b.bsOrbotRadioNone.isChecked = true
+                        b.bsOrbotRadioBoth.isChecked = false
+                        return@uiCtx
+                    }
+                    if (!b.bsOrbotRadioBoth.isChecked) {
+                        persistentState.orbotConnectionStatus.postValue(true)
+                        b.bsOrbotRadioBoth.isChecked = true
+                        enableSocks5HttpOrbot()
+                    }
+                }
             }
         }
 
@@ -277,7 +307,7 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
         b.includeApplications.setOnClickListener { openAppsDialog() }
     }
 
-    private fun isAnyAppSelected(): Boolean {
+    private suspend fun isAnyAppSelected(): Boolean {
         return ProxyManager.isAnyAppSelected(ProxyManager.ID_ORBOT_BASE)
     }
 
@@ -467,18 +497,23 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
     /** Start the Orbot(OrbotHelper) - Intent action. */
     private fun startOrbot(type: String) {
-        if (!FirewallManager.isOrbotInstalled()) {
-            return
-        }
+        io {
+            val isOrbotInstalled = FirewallManager.isOrbotInstalled()
+            uiCtx {
+                if (!isOrbotInstalled) {
+                    return@uiCtx
+                }
 
-        if (VpnController.hasTunnel()) {
-            go { uiCtx { orbotHelper.startOrbot(type) } }
-        } else {
-            Utilities.showToastUiCentered(
-                requireContext(),
-                getString(R.string.settings_socks5_vpn_disabled_error),
-                Toast.LENGTH_LONG
-            )
+                if (VpnController.hasTunnel()) {
+                    orbotHelper.startOrbot(type)
+                } else {
+                    Utilities.showToastUiCentered(
+                        requireContext(),
+                        getString(R.string.settings_socks5_vpn_disabled_error),
+                        Toast.LENGTH_LONG
+                    )
+                }
+            }
         }
     }
 
@@ -546,10 +581,6 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
 
         okBtn.setOnClickListener { dialog.dismiss() }
         dialog.show()
-    }
-
-    private fun go(f: suspend () -> Unit) {
-        lifecycleScope.launch { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

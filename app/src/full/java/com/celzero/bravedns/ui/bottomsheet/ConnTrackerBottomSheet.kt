@@ -40,7 +40,6 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.FirewallStatusSpinnerAdapter
-import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.ConnectionRules
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
@@ -84,7 +83,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         get() = _binding!!
 
     private var info: ConnectionTracker? = null
-    private val appConfig by inject<AppConfig>()
 
     companion object {
         const val INSTANCE_STATE_IPDETAILS = "IPDETAILS"
@@ -137,20 +135,20 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
         // updates the application name and other details
         updateAppDetails()
+        // updates the connection detail chip
+        updateConnDetailsChip()
+        // updates the blocked rules chip
+        updateBlockedRulesChip()
+        // assigns color for the blocked rules chip
+        lightenUpChip()
+        // updates the summary details
+        displaySummaryDetails()
         // setup click and item selected listeners
         setupClickListeners()
         // updates the ip rules button
         updateIpRulesUi(info!!.uid, info!!.ipAddress, info!!.port)
-        // updates the blocked rules chip
-        updateBlockedRulesChip()
-        // updates the connection detail chip
-        updateConnDetailsChip()
-        // assigns color for the blocked rules chip
-        lightenUpChip()
         // updates the value from dns request cache if available
         updateDnsIfAvailable()
-        // updates the summary details
-        displaySummaryDetails()
     }
 
     override fun onResume() {
@@ -161,10 +159,11 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         }
         // updates the app firewall's button
-        updateFirewallRulesUi(
-            FirewallManager.appStatus(info!!.uid),
-            FirewallManager.connectionStatus(info!!.uid)
-        )
+        io {
+            val appStatus = FirewallManager.appStatus(info!!.uid)
+            val connStatus = FirewallManager.connectionStatus(info!!.uid)
+            uiCtx { updateFirewallRulesUi(appStatus, connStatus) }
+        }
     }
 
     private fun updateDnsIfAvailable() {
@@ -231,28 +230,37 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun updateAppDetails() {
         if (info == null) return
-
-        val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
-
-        val appCount = appNames.count()
-        if (appCount >= 1) {
-            b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-            b.bsConnTrackAppName.text =
-                if (appCount >= 2) {
-                    getString(
-                        R.string.ctbs_app_other_apps,
-                        appNames[0],
-                        appCount.minus(1).toString()
-                    ) + "      ❯"
+        io {
+            val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
+            if (appNames.isEmpty()) {
+                handleNonApp()
+                return@io
+            }
+            val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
+            uiCtx {
+                val appCount = appNames.count()
+                if (appCount >= 1) {
+                    b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
+                    b.bsConnTrackAppName.text =
+                        if (appCount >= 2) {
+                            getString(
+                                R.string.ctbs_app_other_apps,
+                                appNames[0],
+                                appCount.minus(1).toString()
+                            ) + "      ❯"
+                        } else {
+                            appNames[0] + "      ❯"
+                        }
+                    if (pkgName == null) return@uiCtx
+                    b.bsConnTrackAppIcon.setImageDrawable(
+                        getIcon(requireContext(), pkgName, info?.appName)
+                    )
                 } else {
-                    appNames[0] + "      ❯"
+                    // apps which are not available in cache are treated as non app.
+                    // TODO: check packageManager#getApplicationInfo() for appInfo
+                    handleNonApp()
                 }
-            val pkgName = FirewallManager.getPackageNameByAppName(appNames[0]) ?: return
-            b.bsConnTrackAppIcon.setImageDrawable(getIcon(requireContext(), pkgName, info?.appName))
-        } else {
-            // apps which are not available in cache are treated as non app.
-            // TODO: check packageManager#getApplicationInfo() for appInfo
-            handleNonApp()
+            }
         }
     }
 
@@ -338,18 +346,21 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         b.bsConnTrackAppInfo.setOnClickListener { showFirewallRulesDialog(info!!.blockedByRule) }
 
         b.bsConnTrackAppNameHeader.setOnClickListener {
-            val ai = FirewallManager.getAppInfoByUid(info!!.uid)
-            // case: app is uninstalled but still available in RethinkDNS database
-            if (ai == null || info?.uid == Constants.INVALID_UID) {
-                showToastUiCentered(
-                    requireContext(),
-                    getString(R.string.ct_bs_app_info_error),
-                    Toast.LENGTH_SHORT
-                )
-                return@setOnClickListener
+            io {
+                uiCtx {
+                    val ai = FirewallManager.getAppInfoByUid(info!!.uid)
+                    // case: app is uninstalled but still available in RethinkDNS database
+                    if (ai == null || info?.uid == Constants.INVALID_UID) {
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.ct_bs_app_info_error),
+                            Toast.LENGTH_SHORT
+                        )
+                        return@uiCtx
+                    }
+                }
+                openAppDetailActivity(info!!.uid)
             }
-
-            openAppDetailActivity(info!!.uid)
         }
 
         // spinner to show firewall rules
@@ -372,17 +383,19 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                     val connStatus = FirewallManager.ConnectionStatus.getStatusByLabel(position)
 
                     // no change, prev selection and current selection are same
-                    if (
-                        FirewallManager.appStatus(info!!.uid) == fStatus &&
-                            FirewallManager.connectionStatus(info!!.uid) == connStatus
-                    )
-                        return
+                    io {
+                        val a = FirewallManager.appStatus(info!!.uid)
+                        val c = FirewallManager.connectionStatus(info!!.uid)
+                        uiCtx {
+                            if (a == fStatus && c == connStatus) return@uiCtx
 
-                    Log.i(
-                        LOG_TAG_FIREWALL,
-                        "Change in firewall rule for app uid: ${info?.uid}, firewall status: $fStatus, conn status: $connStatus"
-                    )
-                    applyFirewallRule(fStatus, connStatus)
+                            Log.i(
+                                LOG_TAG_FIREWALL,
+                                "Change in firewall rule for app uid: ${info?.uid}, firewall status: $fStatus, conn status: $connStatus"
+                            )
+                            applyFirewallRule(fStatus, connStatus)
+                        }
+                    }
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -595,15 +608,21 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         firewallStatus: FirewallManager.FirewallStatus,
         connStatus: FirewallManager.ConnectionStatus
     ) {
-        val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
-        if (appNames.count() > 1) {
-            val prevStatus = FirewallManager.appStatus(info!!.uid)
-            showFirewallDialog(appNames, firewallStatus, prevStatus, connStatus)
-            return
-        }
+        io {
+            val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
+            uiCtx {
+                if (appNames.count() > 1) {
+                    val prevStatus = FirewallManager.appStatus(info!!.uid)
+                    showFirewallDialog(appNames, firewallStatus, prevStatus, connStatus)
+                    return@uiCtx
+                }
 
-        FirewallManager.updateFirewallStatus(info!!.uid, firewallStatus, connStatus)
-        updateFirewallRulesUi(firewallStatus, connStatus)
+                ioCtx {
+                    FirewallManager.updateFirewallStatus(info!!.uid, firewallStatus, connStatus)
+                }
+                updateFirewallRulesUi(firewallStatus, connStatus)
+            }
+        }
     }
 
     private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
@@ -640,9 +659,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
     }
 
-    private fun getAppName(): String {
-        val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
-
+    private fun getAppName(appNames: List<String>): String {
         val packageCount = appNames.count()
         return if (packageCount >= 2) {
             getString(R.string.ctbs_app_other_apps, appNames[0], packageCount.minus(1).toString())
@@ -657,46 +674,62 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         prevStatus: FirewallManager.FirewallStatus,
         connStatus: FirewallManager.ConnectionStatus
     ) {
+        io {
+            val apps = FirewallManager.getAppNamesByUid(info!!.uid)
+            val cs = FirewallManager.connectionStatus(info!!.uid)
 
-        val builderSingle = MaterialAlertDialogBuilder(requireContext())
+            uiCtx {
+                val builderSingle = MaterialAlertDialogBuilder(requireContext())
 
-        builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
-        val count = packageList.count()
-        builderSingle.setTitle(
-            this.getString(R.string.ctbs_block_other_apps, getAppName(), count.toString())
-        )
+                builderSingle.setIcon(R.drawable.ic_firewall_block_grey)
+                val count = packageList.count()
+                builderSingle.setTitle(
+                    this.getString(
+                        R.string.ctbs_block_other_apps,
+                        getAppName(apps),
+                        count.toString()
+                    )
+                )
 
-        val arrayAdapter =
-            ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_activated_1)
-        arrayAdapter.addAll(packageList)
-        builderSingle.setCancelable(false)
+                val arrayAdapter =
+                    ArrayAdapter<String>(
+                        requireContext(),
+                        android.R.layout.simple_list_item_activated_1
+                    )
+                arrayAdapter.addAll(packageList)
+                builderSingle.setCancelable(false)
 
-        builderSingle.setItems(packageList.toTypedArray(), null)
+                builderSingle.setItems(packageList.toTypedArray(), null)
 
-        builderSingle
-            .setPositiveButton(getString(getLabelForStatus(status, connStatus))) {
-                dialog: DialogInterface,
-                _: Int ->
-                // call dialog.dismiss() before updating the details.
-                // Without dismissing this dialog, the bottom sheet dialog is not
-                // refreshing/updating its UI. One way is to dismiss the dialog
-                // before updating the UI.
-                // b.root.invalidate()/ b.root.notify didn't help in this case.
-                dialog.dismiss()
+                builderSingle
+                    .setPositiveButton(getString(getLabelForStatus(status, connStatus))) {
+                        dialog: DialogInterface,
+                        _: Int ->
+                        // call dialog.dismiss() before updating the details.
+                        // Without dismissing this dialog, the bottom sheet dialog is not
+                        // refreshing/updating its UI. One way is to dismiss the dialog
+                        // before updating the UI.
+                        // b.root.invalidate()/ b.root.notify didn't help in this case.
+                        dialog.dismiss()
 
-                Log.i(LOG_TAG_FIREWALL, "Apply firewall rule for uid: ${info?.uid}, ${status.name}")
-                FirewallManager.updateFirewallStatus(info!!.uid, status, connStatus)
-                updateFirewallRulesUi(status, connStatus)
+                        Log.i(
+                            LOG_TAG_FIREWALL,
+                            "Apply firewall rule for uid: ${info?.uid}, ${status.name}"
+                        )
+                        io { FirewallManager.updateFirewallStatus(info!!.uid, status, connStatus) }
+                        updateFirewallRulesUi(status, connStatus)
+                    }
+                    .setNeutralButton(this.getString(R.string.ctbs_dialog_negative_btn)) {
+                        _: DialogInterface,
+                        _: Int ->
+                        updateFirewallRulesUi(prevStatus, cs)
+                    }
+
+                val alertDialog = builderSingle.create()
+                alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
+                alertDialog.show()
             }
-            .setNeutralButton(this.getString(R.string.ctbs_dialog_negative_btn)) {
-                _: DialogInterface,
-                _: Int ->
-                updateFirewallRulesUi(prevStatus, FirewallManager.connectionStatus(info!!.uid))
-            }
-
-        val alertDialog = builderSingle.create()
-        alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
-        alertDialog.show()
+        }
     }
 
     private fun io(f: suspend () -> Unit) {
@@ -705,5 +738,9 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    private suspend fun ioCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.IO) { f() }
     }
 }

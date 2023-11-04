@@ -35,10 +35,11 @@ import com.celzero.bravedns.scheduler.WorkScheduler.Companion.BLOCKLIST_UPDATE_C
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
 import com.celzero.bravedns.ui.activity.DnsListActivity
-import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
 import com.celzero.bravedns.ui.activity.PauseActivity
+import com.celzero.bravedns.ui.bottomsheet.LocalBlocklistsBottomSheet
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
@@ -62,6 +63,7 @@ class DnsSettingsFragment :
 
     companion object {
         fun newInstance() = DnsSettingsFragment()
+
         private const val REFRESH_TIMEOUT: Long = 4000
 
         private const val ANIMATION_DURATION = 750L
@@ -147,47 +149,80 @@ class DnsSettingsFragment :
     }
 
     private fun updateConnectedStatus(connectedDns: String) {
-        when (appConfig.getDnsType()) {
-            AppConfig.DnsType.DOH -> {
-                b.connectedStatusTitleUrl.text =
-                    resources.getString(R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
-            }
-            AppConfig.DnsType.DOT -> {
-                b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_dot)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
-            }
-            AppConfig.DnsType.DNSCRYPT -> {
-                b.connectedStatusTitleUrl.text =
-                    resources.getString(R.string.configure_dns_connected_dns_crypt_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
-            }
-            AppConfig.DnsType.DNS_PROXY -> {
-                b.connectedStatusTitleUrl.text =
-                    resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
-            }
-            AppConfig.DnsType.RETHINK_REMOTE -> {
-                b.connectedStatusTitleUrl.text =
-                    resources.getString(R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
-            }
-            AppConfig.DnsType.NETWORK_DNS -> {
-                b.connectedStatusTitleUrl.text =
-                    resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
-            }
-            AppConfig.DnsType.ODOH -> {
-                b.connectedStatusTitleUrl.text =
-                    resources.getString(R.string.lbl_odoh)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+        io {
+            val oneWg = oneWireGuard()
+            uiCtx {
+                if (oneWg) {
+                    b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_wireguard)
+                    b.connectedStatusTitle.text = ""
+                    disableAllDns()
+                    b.wireguardRb.isEnabled = true
+                    return@uiCtx
+                }
+
+                when (appConfig.getDnsType()) {
+                    AppConfig.DnsType.DOH -> {
+                        b.connectedStatusTitleUrl.text =
+                            resources.getString(R.string.configure_dns_connected_doh_status)
+                        b.connectedStatusTitle.text =
+                            resources.getString(
+                                R.string.configure_dns_connection_name,
+                                connectedDns
+                            )
+                    }
+                    AppConfig.DnsType.DOT -> {
+                        b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_dot)
+                        b.connectedStatusTitle.text =
+                            resources.getString(
+                                R.string.configure_dns_connection_name,
+                                connectedDns
+                            )
+                    }
+                    AppConfig.DnsType.DNSCRYPT -> {
+                        b.connectedStatusTitleUrl.text =
+                            resources.getString(R.string.configure_dns_connected_dns_crypt_status)
+                        b.connectedStatusTitle.text =
+                            resources.getString(
+                                R.string.configure_dns_connection_name,
+                                connectedDns
+                            )
+                    }
+                    AppConfig.DnsType.DNS_PROXY -> {
+                        b.connectedStatusTitleUrl.text =
+                            resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+                        b.connectedStatusTitle.text =
+                            resources.getString(
+                                R.string.configure_dns_connection_name,
+                                connectedDns
+                            )
+                    }
+                    AppConfig.DnsType.RETHINK_REMOTE -> {
+                        b.connectedStatusTitleUrl.text =
+                            resources.getString(R.string.configure_dns_connected_doh_status)
+                        b.connectedStatusTitle.text =
+                            resources.getString(
+                                R.string.configure_dns_connection_name,
+                                connectedDns
+                            )
+                    }
+                    AppConfig.DnsType.SYSTEM_DNS -> {
+                        b.connectedStatusTitleUrl.text =
+                            resources.getString(R.string.configure_dns_connected_dns_proxy_status)
+                        b.connectedStatusTitle.text =
+                            resources.getString(
+                                R.string.configure_dns_connection_name,
+                                connectedDns
+                            )
+                    }
+                    AppConfig.DnsType.ODOH -> {
+                        b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_odoh)
+                        b.connectedStatusTitle.text =
+                            resources.getString(
+                                R.string.configure_dns_connection_name,
+                                connectedDns
+                            )
+                    }
+                }
             }
         }
     }
@@ -201,19 +236,49 @@ class DnsSettingsFragment :
     }
 
     private fun updateSelectedDns() {
+        io {
+            val oneWg = oneWireGuard()
+            uiCtx {
+                if (oneWg) {
+                    b.wireguardRb.visibility = View.VISIBLE
+                    b.wireguardRb.isChecked = true
+                    b.wireguardRb.isEnabled = true
+                    disableAllDns()
+                    return@uiCtx
+                } else {
+                    b.wireguardRb.visibility = View.GONE
+                }
 
-        if (isSystemDns()) {
-            b.networkDnsRb.isChecked = true
-            return
+                if (isSystemDns()) {
+                    b.networkDnsRb.isChecked = true
+                    return@uiCtx
+                }
+
+                if (isRethinkDns()) {
+                    b.rethinkPlusDnsRb.isChecked = true
+                    return@uiCtx
+                }
+
+                // connected to custom dns, update the dns details
+                b.customDnsRb.isChecked = true
+            }
         }
+    }
 
-        if (isRethinkDns()) {
-            b.rethinkPlusDnsRb.isChecked = true
-            return
-        }
+    private fun disableAllDns() {
+        b.rethinkPlusDnsRb.isChecked = false
+        b.customDnsRb.isChecked = false
+        b.networkDnsRb.isChecked = false
+        b.rethinkPlusDnsRb.isEnabled = false
+        b.customDnsRb.isEnabled = false
+        b.networkDnsRb.isEnabled = false
+        b.rethinkPlusDnsRb.isClickable = false
+        b.customDnsRb.isClickable = false
+        b.networkDnsRb.isClickable = false
+    }
 
-        // connected to custom dns, update the dns details
-        b.customDnsRb.isChecked = true
+    private suspend fun oneWireGuard(): Boolean {
+        return WireguardManager.oneWireGuardEnabled()
     }
 
     private fun getConnectedDnsType(): String {
@@ -230,7 +295,7 @@ class DnsSettingsFragment :
             AppConfig.DnsType.DNS_PROXY -> {
                 resources.getString(R.string.dc_dns_proxy)
             }
-            AppConfig.DnsType.NETWORK_DNS -> {
+            AppConfig.DnsType.SYSTEM_DNS -> {
                 resources.getString(R.string.dc_dns_proxy)
             }
             AppConfig.DnsType.DOT -> {
@@ -309,6 +374,14 @@ class DnsSettingsFragment :
         b.networkDnsRb.setOnClickListener {
             // network dns proxy
             setNetworkDns()
+        }
+
+        b.wireguardRb.setOnClickListener {
+            Utilities.showToastUiCentered(
+                requireContext(),
+                "Connected to One-WireGuard",
+                Toast.LENGTH_LONG
+            )
         }
 
         b.dcDownloaderRl.setOnClickListener {
@@ -396,6 +469,10 @@ class DnsSettingsFragment :
 
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 
     override fun onBtmSheetDismiss() {

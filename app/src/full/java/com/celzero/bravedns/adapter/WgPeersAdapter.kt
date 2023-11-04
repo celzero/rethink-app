@@ -25,8 +25,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgPeersBinding
-import com.celzero.bravedns.service.WireGuardManager
-import com.celzero.bravedns.service.WireGuardManager.WARP_ID
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.WARP_ID
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.wireguard.Peer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -110,8 +110,11 @@ class WgPeersAdapter(
 
     fun dataChanged() {
         peers.clear()
-        peers.addAll(WireGuardManager.getPeers(configId))
-        this?.notifyDataSetChanged()
+        io {
+            val p = WireguardManager.getPeers(configId)
+            peers.addAll(p)
+            uiCtx { this?.notifyDataSetChanged() }
+        }
     }
 
     private fun showDeleteInterfaceDialog(wgPeer: Peer) {
@@ -130,20 +133,18 @@ class WgPeersAdapter(
     }
 
     private fun deletePeer(wgPeer: Peer) {
-        ui {
-            ioCtx {
-                WireGuardManager.deletePeer(configId, wgPeer)
-                peers = WireGuardManager.getPeers(configId)
-            }
-            this.notifyDataSetChanged()
+        io {
+            WireguardManager.deletePeer(configId, wgPeer)
+            peers = WireguardManager.getPeers(configId)
+            uiCtx { this.notifyDataSetChanged() }
         }
     }
 
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) { f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 
-    private fun ui(f: suspend () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

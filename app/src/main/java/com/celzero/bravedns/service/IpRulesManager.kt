@@ -39,18 +39,20 @@ object IpRulesManager : KoinComponent {
 
     private val customIpRepository by inject<CustomIpRepository>()
     private val persistentState by inject<PersistentState>()
-    private val lock: Mutex = Mutex()
 
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
     private var appIpRules: MutableMap<CacheKey, CustomIp> = hashMapOf()
     private var wildCards: MutableMap<CacheKey, CustomIp> = hashMapOf()
+    // protects both appIpRules and wildCards
+    private val lock: Mutex = Mutex()
 
     // key-value object for ip look-up
     data class CacheKey(val hostName: HostName, val uid: Int)
 
     // stores the response for the look-up request from the BraveVpnService
+    // especially useful for storing results of subnetMatch() function as it is expensive
     private val resultsCache: Cache<CacheKey, IpRuleStatus> =
         CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
 

@@ -39,6 +39,7 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
+import com.celzero.bravedns.service.DnsConfig
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Constants
@@ -83,7 +84,9 @@ internal constructor(
     }
 
     init {
-        connectedDns.postValue(persistentState.connectedDnsName)
+        // now connectedDnsName has the dns name and url, extract the dns name and update
+        val dnsName = persistentState.connectedDnsName.split(",").first()
+        connectedDns.postValue(dnsName)
         setDnsMode()
     }
 
@@ -93,6 +96,7 @@ internal constructor(
         val tunProxyMode: TunProxyMode,
         val ptMode: ProtoTranslationMode,
         val bridge: Bridge,
+        val defaultDns: String,
         val fakeDns: String,
         val preferredEngine: InternetProtocol,
         val mtu: Int
@@ -152,7 +156,7 @@ internal constructor(
         DNSCRYPT(2),
         DNS_PROXY(3),
         RETHINK_REMOTE(4),
-        NETWORK_DNS(5),
+        SYSTEM_DNS(5),
         DOT(6),
         ODOH(7);
 
@@ -164,8 +168,8 @@ internal constructor(
             return this == RETHINK_REMOTE
         }
 
-        fun isNetworkDns(): Boolean {
-            return this == NETWORK_DNS
+        fun isSystemDns(): Boolean {
+            return this == SYSTEM_DNS
         }
 
         fun isValidDnsType(): Boolean {
@@ -173,7 +177,7 @@ internal constructor(
                 this == DNSCRYPT ||
                 this == DNS_PROXY ||
                 this == RETHINK_REMOTE ||
-                this == NETWORK_DNS ||
+                this == SYSTEM_DNS ||
                 this == DOT ||
                 this == ODOH
         }
@@ -185,7 +189,7 @@ internal constructor(
                     DNSCRYPT.type -> DNSCRYPT
                     DNS_PROXY.type -> DNS_PROXY
                     RETHINK_REMOTE.type -> RETHINK_REMOTE
-                    NETWORK_DNS.type -> NETWORK_DNS
+                    SYSTEM_DNS.type -> SYSTEM_DNS
                     DOT.type -> DOT
                     ODOH.type -> ODOH
                     else -> DOH
@@ -338,7 +342,7 @@ internal constructor(
     enum class ProtoTranslationMode(val id: Long) {
         PTMODEAUTO(Settings.PtModeAuto),
         PTMODEFORCE64(Settings.PtModeForce64),
-        PTMODEMAYBE46(Settings.PtModeMaybe46)
+        PTMODEMAYBE46(Settings.PtModeNo46)
     }
 
     fun getInternetProtocol(): InternetProtocol {
@@ -389,7 +393,7 @@ internal constructor(
             DnsType.DNSCRYPT.type -> DnsType.DNSCRYPT
             DnsType.DNS_PROXY.type -> DnsType.DNS_PROXY
             DnsType.RETHINK_REMOTE.type -> DnsType.RETHINK_REMOTE
-            DnsType.NETWORK_DNS.type -> DnsType.NETWORK_DNS
+            DnsType.SYSTEM_DNS.type -> DnsType.SYSTEM_DNS
             DnsType.DOT.type -> DnsType.DOT
             DnsType.ODOH.type -> DnsType.ODOH
             else -> {
@@ -454,12 +458,24 @@ internal constructor(
         return oDoHEndpointRepository.getConnectedODoH()
     }
 
-    suspend fun getSocks5ProxyDetails(): ProxyEndpoint? {
-        return proxyEndpointRepository.getConnectedProxy()
+    suspend fun getSocks5ProxyDetails(): ProxyEndpoint {
+        return proxyEndpointRepository.getCustomSocks5Endpoint()
     }
 
-    suspend fun getOrbotProxyDetails(): ProxyEndpoint? {
+    suspend fun getHttpProxyDetails(): ProxyEndpoint {
+        return proxyEndpointRepository.getHttpProxyDetails()
+    }
+
+    suspend fun getConnectedOrbotProxy(): ProxyEndpoint? {
         return proxyEndpointRepository.getConnectedOrbotProxy()
+    }
+
+    suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint {
+        return proxyEndpointRepository.getOrbotSocks5Endpoint()
+    }
+
+    suspend fun getOrbotHttpEndpoint(): ProxyEndpoint {
+        return proxyEndpointRepository.getOrbotHttpEndpoint()
     }
 
     fun isTcpProxyEnabled(): Boolean {
@@ -484,48 +500,44 @@ internal constructor(
             DnsType.DOH -> {
                 val endpoint = getDOHDetails() ?: return
 
-                connectedDns.postValue(endpoint.dohName)
-                persistentState.connectedDnsName = endpoint.dohName
+                updateConnectedDnsName(endpoint.dohName, endpoint.dohURL)
             }
             DnsType.DOT -> {
                 val endpoint = getDOTDetails() ?: return
 
-                connectedDns.postValue(endpoint.name)
-                persistentState.connectedDnsName = endpoint.name
+                updateConnectedDnsName(endpoint.name, endpoint.url)
             }
             DnsType.ODOH -> {
                 val endpoint = getODoHDetails() ?: return
 
-                connectedDns.postValue(endpoint.name)
-                persistentState.connectedDnsName = endpoint.name
+                updateConnectedDnsName(endpoint.name, endpoint.resolver)
             }
             DnsType.DNSCRYPT -> {
                 val endpoint = getConnectedDnscryptServer()
-                connectedDns.postValue(endpoint.dnsCryptName)
-                persistentState.connectedDnsName = endpoint.dnsCryptName
+                updateConnectedDnsName(endpoint.dnsCryptName, endpoint.dnsCryptURL)
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
 
-                connectedDns.postValue(endpoint.proxyName)
-                persistentState.connectedDnsName = endpoint.proxyName
+                val url = endpoint.proxyIP + ":" + endpoint.proxyPort
+                updateConnectedDnsName(endpoint.proxyName, url)
             }
             DnsType.RETHINK_REMOTE -> {
                 val endpoint = getRemoteRethinkEndpoint() ?: return
 
-                connectedDns.postValue(endpoint.name)
                 persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
-                if (persistentState.connectedDnsName != endpoint.name) {
-                    persistentState.connectedDnsName = endpoint.name
-                } else {
-                    persistentState.rethinkRemoteUpdate = true
-                }
+                updateConnectedDnsName(endpoint.name, endpoint.url)
             }
-            DnsType.NETWORK_DNS -> {
-                connectedDns.postValue(context.getString(R.string.network_dns))
-                persistentState.connectedDnsName = context.getString(R.string.network_dns)
+            DnsType.SYSTEM_DNS -> {
+                val url = systemDns.ipAddress + ":" + systemDns.port
+                updateConnectedDnsName(context.getString(R.string.network_dns), url)
             }
         }
+    }
+
+    private fun updateConnectedDnsName(name: String, url: String) {
+        connectedDns.postValue(name)
+        persistentState.connectedDnsName = "$name,$url"
     }
 
     private fun isValidDnsType(dt: DnsType): Boolean {
@@ -533,7 +545,7 @@ internal constructor(
             dt == DnsType.DNSCRYPT ||
             dt == DnsType.DNS_PROXY ||
             dt == DnsType.RETHINK_REMOTE ||
-            dt == DnsType.NETWORK_DNS ||
+            dt == DnsType.SYSTEM_DNS ||
             dt == DnsType.DOT ||
             dt == DnsType.ODOH)
     }
@@ -595,6 +607,7 @@ internal constructor(
             getTunProxyMode(),
             ptMode,
             bridge,
+            getDefaultDns(),
             fakeDns,
             preferredEngine,
             mtu
@@ -717,7 +730,12 @@ internal constructor(
         dnsCryptRelayEndpointRepository.unselectRelay(stamp)
     }
 
-    suspend fun getDefaultDns(): String {
+    fun getDefaultDns(): String {
+        if (persistentState.defaultDnsUrl.isEmpty()) {
+            val dnsConfig = DnsConfig(context)
+            val dns = dnsConfig.getDnsConfigAsString()
+            persistentState.defaultDnsUrl = dns
+        }
         return persistentState.defaultDnsUrl
     }
 
@@ -747,24 +765,16 @@ internal constructor(
         onDnsChange(DnsType.RETHINK_REMOTE)
     }
 
-    fun isRethinkDnsConnectedv053x(): Boolean {
-        return persistentState.connectedDnsName == context.getString(R.string.rethink_plus)
-    }
-
-    suspend fun updateRethinkPlusCountv053x(count: Int) {
-        rethinkDnsEndpointRepository.updatePlusBlocklistCount(count)
-    }
-
     fun isRethinkDnsConnected(): Boolean {
         return getDnsType() == DnsType.RETHINK_REMOTE
     }
 
     suspend fun enableSystemDns() {
-        if (getDnsType() != DnsType.NETWORK_DNS) {
+        if (getDnsType() != DnsType.SYSTEM_DNS) {
             removeConnectionStatus()
         }
 
-        onDnsChange(DnsType.NETWORK_DNS)
+        onDnsChange(DnsType.SYSTEM_DNS)
     }
 
     fun updateSystemDnsServers(dnsServers: List<InetAddress>?) {
@@ -807,7 +817,7 @@ internal constructor(
     }
 
     fun isSystemDns(): Boolean {
-        return getDnsType().isNetworkDns()
+        return getDnsType().isSystemDns()
     }
 
     suspend fun isDnscryptRelaySelectable(): Boolean {
@@ -839,7 +849,7 @@ internal constructor(
             DnsType.RETHINK_REMOTE -> {
                 rethinkDnsEndpointRepository.removeConnectionStatus()
             }
-            DnsType.NETWORK_DNS -> {
+            DnsType.SYSTEM_DNS -> {
                 // no-op, no need to remove connection status
             }
         }
@@ -1095,23 +1105,22 @@ internal constructor(
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderOrbot())
     }
 
-    suspend fun getConnectedSocks5Proxy(): ProxyEndpoint? {
-        return proxyEndpointRepository.getConnectedProxy()
-    }
-
-    fun insertCustomHttpProxy(host: String) {
-        persistentState.httpProxyHostAddress = host
-    }
-
-    suspend fun insertCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {
-        proxyEndpointRepository.clearAllData()
-        proxyEndpointRepository.insert(proxyEndpoint)
+    suspend fun updateCustomSocks5Proxy(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointRepository.update(proxyEndpoint)
         addProxy(ProxyType.SOCKS5, ProxyProvider.CUSTOM)
     }
 
-    suspend fun insertOrbotProxy(proxyEndpoint: ProxyEndpoint) {
-        proxyEndpointRepository.clearOrbotData()
-        proxyEndpointRepository.insert(proxyEndpoint)
+    suspend fun updateOrbotProxy(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointRepository.update(proxyEndpoint)
+    }
+
+    suspend fun updateCustomHttpProxy(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointRepository.update(proxyEndpoint)
+        addProxy(ProxyType.HTTP, ProxyProvider.CUSTOM)
+    }
+
+    suspend fun updateOrbotHttpProxy(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointRepository.update(proxyEndpoint)
     }
 
     suspend fun getLeastLoggedNetworkLogs(): Long {

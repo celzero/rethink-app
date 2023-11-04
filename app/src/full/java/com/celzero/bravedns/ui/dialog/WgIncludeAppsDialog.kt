@@ -256,19 +256,15 @@ class WgIncludeAppsDialog(
             else context.getString(R.string.exclude)
         ) { _, _ ->
             // add all if the list is empty or remove all if the list is full
-            if (toAdd) {
-                Log.i(LOG_TAG_PROXY, "Adding all apps to proxy $proxyId, $proxyName")
-                ProxyManager.updateProxyIdForAllApps(proxyId, proxyName)
-            } else {
-                Log.i(LOG_TAG_PROXY, "Removing all apps from proxy $proxyId, $proxyName")
-                ProxyManager.removeProxyForAllApps()
+            io {
+                if (toAdd) {
+                    Log.i(LOG_TAG_PROXY, "Adding all apps to proxy $proxyId, $proxyName")
+                    ProxyManager.updateProxyIdForAllApps(proxyId, proxyName)
+                } else {
+                    Log.i(LOG_TAG_PROXY, "Removing all apps from proxy $proxyId, $proxyName")
+                    ProxyManager.removeProxyForAllApps()
+                }
             }
-            Toast.makeText(
-                    context,
-                    "All apps are ${if (toAdd) "included" else "excluded"}",
-                    Toast.LENGTH_SHORT
-                )
-                .show()
         }
 
         builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->

@@ -50,16 +50,18 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 class RefreshDatabase
 internal constructor(
@@ -76,7 +78,7 @@ internal constructor(
         const val PENDING_INTENT_REQUEST_CODE_DENY = 0x20000000
     }
 
-    private val refreshMutex = ReentrantReadWriteLock()
+    private val refreshMutex: Mutex = Mutex()
     private val randomNotifId: Random = Random
 
     @GuardedBy("refreshMutex") @Volatile private var isRefreshInProgress: Boolean = false
@@ -88,13 +90,7 @@ internal constructor(
     suspend fun refreshAppInfoDatabase() {
         if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info")
 
-        refreshMutex.read {
-            if (isRefreshInProgress) {
-                return
-            }
-        }
-
-        refreshMutex.write {
+        refreshMutex.withLock {
             if (isRefreshInProgress) {
                 return
             }
@@ -137,13 +133,8 @@ internal constructor(
                         .toHashSet()
 
                 // packages which are all available in installed apps list but not in database
-                val packagesToAdd =
-                    Sets.difference(installedApps, trackedApps)
-                        .filter {
-                            // Remove this package
-                            it.packageName != context.packageName
-                        }
-                        .toHashSet()
+                // also add rethink's package name to the list
+                val packagesToAdd = Sets.difference(installedApps, trackedApps).toHashSet()
 
                 handleDeletedPackages(packagesToDelete)
 
@@ -156,7 +147,7 @@ internal constructor(
                 Log.e(LOG_TAG_APP_DB, e.message, e)
                 throw e
             } finally {
-                withContext(NonCancellable) { refreshMutex.write { isRefreshInProgress = false } }
+                withContext(NonCancellable) { refreshMutex.withLock { isRefreshInProgress = false } }
             }
         }
     }
@@ -211,7 +202,8 @@ internal constructor(
 
         // add apps missing from app-info-repository
         apps.forEach {
-            if (it.packageName == context.applicationContext.packageName) return@forEach
+            // no need to avoid adding Rethink app to the database, so commenting the below line
+            //if (it.packageName == context.applicationContext.packageName) return@forEach
 
             val appInfo = Utilities.getApplicationInfo(context, it.packageName) ?: return@forEach
 
@@ -233,7 +225,7 @@ internal constructor(
         val waitSliceMs = TimeUnit.SECONDS.toMillis(3L)
         while (remainingTimeMs > 0) {
             val startMs = SystemClock.elapsedRealtime()
-            refreshMutex.read {
+            refreshMutex.withLock {
                 if (!isRefreshInProgress) {
                     remainingTimeMs = 0 // break out
                 }
@@ -243,7 +235,7 @@ internal constructor(
             if (remainingTimeMs > 0) delay(waitSliceMs)
         }
 
-        refreshMutex.read {
+        refreshMutex.withLock {
             if (isRefreshInProgress) {
                 Log.i(LOG_TAG_APP_DB, "wait timeout on insert new app")
                 return
@@ -326,9 +318,26 @@ internal constructor(
             "AppDatabase",
             "refreshing proxy mapping, size: ${proxyMapping.size}, trackedApps: ${trackedApps.size}"
         )
+
+        // remove duplicate uid, packageName entries from proxy mapping also delete from database
+        val proxyMappingSet = proxyMapping.toHashSet()
+        proxyMappingSet.forEach {
+            if (proxyMapping.count { p -> p.uid == it.uid && p.packageName == it.packageName } > 1) {
+                ProxyManager.deleteApp(FirewallManager.AppInfoTuple(it.uid, it.packageName))
+            }
+        }
+
         proxyMapping.forEach {
             if (!trackedApps.contains(it)) {
                 ProxyManager.deleteApp(FirewallManager.AppInfoTuple(it.uid, it.packageName))
+            }
+        }
+
+        // add the apps which are not tracked by proxy mapping
+        trackedApps.forEach {
+            if (!proxyMapping.contains(it)) {
+                val appInfo = FirewallManager.getAppInfoByUid(it.uid) ?: return@forEach
+                ProxyManager.addNewApp(appInfo)
             }
         }
     }
@@ -361,7 +370,7 @@ internal constructor(
         ProxyManager.addNewApp(entry)
     }
 
-    private fun handleNewAppNotification(apps: HashSet<FirewallManager.AppInfoTuple>) {
+    private suspend fun handleNewAppNotification(apps: HashSet<FirewallManager.AppInfoTuple>) {
         // no need to notify if the Universal setting is off
         if (!persistentState.getBlockNewlyInstalledApp()) return
 
@@ -444,7 +453,7 @@ internal constructor(
         )
     }
 
-    private fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
+    private suspend fun showNewAppNotificationIfNeeded(app: FirewallManager.AppInfoTuple) {
         // no need to notify if the Universal setting is off
         if (!persistentState.getBlockNewlyInstalledApp()) return
 
@@ -556,7 +565,7 @@ internal constructor(
         intentExtra: String,
         uid: Int,
         requestCode: Int
-    ): PendingIntent? {
+    ): PendingIntent {
         val intent = Intent(context, NotificationActionReceiver::class.java)
         intent.putExtra(Constants.NOTIFICATION_ACTION, intentExtra)
         intent.putExtra(Constants.NOTIF_INTENT_EXTRA_APP_UID, uid)

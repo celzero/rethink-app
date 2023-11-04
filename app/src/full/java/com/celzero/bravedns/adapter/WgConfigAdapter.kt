@@ -20,6 +20,8 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -28,10 +30,13 @@ import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgInterfaceBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -82,8 +87,14 @@ class WgConfigAdapter(private val context: Context) :
         }
 
         private fun updateStatus(config: WgConfigFiles) {
-            val id = ProxyManager.ID_WG_BASE + config.id
-            val apps = ProxyManager.getAppCountForProxy(id).toString()
+            io {
+                val id = ProxyManager.ID_WG_BASE + config.id
+                val apps = ProxyManager.getAppCountForProxy(id).toString()
+                uiCtx { updateStatusUI(config, id, apps) }
+            }
+        }
+
+        private fun updateStatusUI(config: WgConfigFiles, id: String, apps: String) {
             val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
                 val statusId = VpnController.getProxyStatusById(id)
@@ -121,22 +132,26 @@ class WgConfigAdapter(private val context: Context) :
             b.interfaceSwitch.setOnCheckedChangeListener(null)
             b.interfaceSwitch.setOnClickListener {
                 val checked = b.interfaceSwitch.isChecked
-                if (checked) {
-                    if (WireGuardManager.canEnableConfig(config)) {
-                        WireGuardManager.enableConfig(config)
-                        updateStatus(config)
+                io {
+                    if (checked) {
+                        if (WireguardManager.canEnableConfig(config)) {
+                            WireguardManager.enableConfig(config)
+                            uiCtx { updateStatus(config) }
+                        } else {
+                            uiCtx {
+                                b.interfaceSwitch.isChecked = false
+                                Toast.makeText(
+                                        context,
+                                        context.getString(R.string.wireguard_enabled_failure),
+                                        Toast.LENGTH_LONG
+                                    )
+                                    .show()
+                            }
+                        }
                     } else {
-                        b.interfaceSwitch.isChecked = false
-                        Toast.makeText(
-                                context,
-                                context.getString(R.string.wireguard_enabled_failure),
-                                Toast.LENGTH_LONG
-                            )
-                            .show()
+                        WireguardManager.disableConfig(config)
+                        uiCtx { updateStatus(config) }
                     }
-                } else {
-                    WireGuardManager.disableConfig(config)
-                    updateStatus(config)
                 }
             }
         }
@@ -146,5 +161,13 @@ class WgConfigAdapter(private val context: Context) :
             intent.putExtra(INTENT_EXTRA_WG_ID, id)
             context.startActivity(intent)
         }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

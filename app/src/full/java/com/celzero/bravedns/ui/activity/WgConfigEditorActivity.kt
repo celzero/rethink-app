@@ -27,7 +27,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
@@ -55,13 +55,12 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
         private const val DEFAULT_MTU = "1500"
         private const val DEFAULT_LISTEN_PORT = "0"
-        private const val DEFAULT_DNS_SERVER = "1.1.1.1"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
-        configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireGuardManager.INVALID_CONF_ID)
+        configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireguardManager.INVALID_CONF_ID)
         init()
         setupClickListeners()
     }
@@ -73,16 +72,20 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
 
     private fun init() {
         observeDnsName()
-        wgConfig = WireGuardManager.getConfigById(configId)
+        io {
+            wgConfig = WireguardManager.getConfigById(configId)
+            b.interfaceNameText.setText(wgConfig?.getName())
+        }
         wgInterface = wgConfig?.getInterface()
 
-        b.interfaceNameText.setText(wgConfig?.getName())
         b.privateKeyText.setText(wgInterface?.getKeyPair()?.getPrivateKey()?.base64())
         b.publicKeyText.setText(wgInterface?.getKeyPair()?.getPublicKey()?.base64())
         if (wgInterface?.dnsServers?.isEmpty() != true) {
             b.dnsServersText.setText(
                 wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
             )
+        } else {
+            b.dnsServersText.setText(wgInterface?.dnsSearchDomains?.joinToString { it })
         }
         if (wgInterface?.getAddresses()?.isEmpty() != true) {
             b.addressesLabelText.setText(
@@ -113,15 +116,17 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
 
         b.saveTunnel.setOnClickListener {
-            ui {
+            io {
                 if (addWgInterface() != null) {
-                    Toast.makeText(
-                            this,
-                            getString(R.string.config_add_success_toast),
-                            Toast.LENGTH_LONG
-                        )
-                        .show()
-                    finish()
+                    uiCtx {
+                        Toast.makeText(
+                                this,
+                                getString(R.string.config_add_success_toast),
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+                        finish()
+                    }
                 } else {
                     // no-op, addWgInterface() will show the error message
                 }
@@ -154,7 +159,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         val addresses = b.addressesLabelText.text.toString()
         val mtu = b.mtuText.text.toString().ifEmpty { DEFAULT_MTU }
         val listenPort = b.listenPortText.text.toString().ifEmpty { DEFAULT_LISTEN_PORT }
-        val dnsServers = b.dnsServersText.text.toString().ifEmpty { DEFAULT_DNS_SERVER }
+        val dnsServers = b.dnsServersText.text.toString()
         val privateKey = b.privateKeyText.text.toString()
         try {
             // parse the wg interface to check for errors
@@ -166,7 +171,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                     .parseDnsServers(dnsServers)
                     .parseMtu(mtu)
                     .build()
-            ioCtx { wgConfig = WireGuardManager.addOrUpdateInterface(configId, name, wgInterface) }
+            wgConfig = WireguardManager.addOrUpdateInterface(configId, name, wgInterface)
             return wgConfig
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]
@@ -176,11 +181,11 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
     }
 
-    private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) { f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

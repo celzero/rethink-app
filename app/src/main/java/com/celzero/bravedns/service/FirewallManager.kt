@@ -35,17 +35,16 @@ import com.google.common.collect.Multimap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 object FirewallManager : KoinComponent {
 
     private val appInfoRepository by inject<AppInfoRepository>()
-    private val lock = ReentrantReadWriteLock()
+    private val lock: Mutex = Mutex()
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
@@ -233,36 +232,36 @@ object FirewallManager : KoinComponent {
 
     @Volatile private var isFirewallRulesLoaded: Boolean = false
 
-    fun isUidFirewalled(uid: Int): Boolean {
+    suspend fun isUidFirewalled(uid: Int): Boolean {
         return connectionStatus(uid) != ConnectionStatus.ALLOW
     }
 
-    fun isUidSystemApp(uid: Int): Boolean {
-        lock.read {
+    suspend fun isUidSystemApp(uid: Int): Boolean {
+        lock.withLock {
             return appInfos.get(uid).any { it.isSystemApp }
         }
     }
 
-    fun getTotalApps(): Int {
-        lock.read {
+    suspend fun getTotalApps(): Int {
+        lock.withLock {
             return appInfos.values().count()
         }
     }
 
-    fun getAllAppsUid(): List<AppInfoTuple> {
-        lock.read {
+    suspend fun getAllAppsUid(): List<AppInfoTuple> {
+        lock.withLock {
             return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }
         }
     }
 
-    fun getPackageNames(): Set<AppInfoTuple> {
-        lock.read {
+    suspend fun getPackageNames(): Set<AppInfoTuple> {
+        lock.withLock {
             return appInfos.values().map { AppInfoTuple(it.uid, it.packageName) }.toHashSet()
         }
     }
 
-    fun deletePackages(packagesToDelete: Set<AppInfoTuple>) {
-        lock.write {
+    suspend fun deletePackages(packagesToDelete: Set<AppInfoTuple>) {
+        lock.withLock {
             packagesToDelete.forEach { tuple ->
                 appInfos
                     .get(tuple.uid)
@@ -270,45 +269,41 @@ object FirewallManager : KoinComponent {
                     .forEach { ai -> appInfos.remove(tuple.uid, ai) }
             }
         }
-        io {
-            // Delete the uninstalled apps from database
-            appInfoRepository.deleteByPackageName(packagesToDelete.map { it.packageName })
-        }
+        // Delete the uninstalled apps from database
+        appInfoRepository.deleteByPackageName(packagesToDelete.map { it.packageName })
     }
 
-    fun deletePackage(packageName: String) {
-        lock.write {
+    suspend fun deletePackage(packageName: String) {
+        lock.withLock {
             appInfos
                 .values()
                 .filter { it.packageName == packageName }
                 .forEach { appInfos.remove(it.uid, it) }
         }
-        io {
-            // Delete the uninstalled apps from database
-            appInfoRepository.deleteByPackageName(listOf(packageName))
-        }
+        // Delete the uninstalled apps from database
+        appInfoRepository.deleteByPackageName(listOf(packageName))
     }
 
-    fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
-        lock.read {
+    suspend fun getNonFirewalledAppsPackageNames(): List<AppInfo> {
+        lock.withLock {
             return appInfos.values().filter { it.connectionStatus == ConnectionStatus.ALLOW.id }
         }
     }
 
     // TODO: Use the package-manager API instead
-    fun isOrbotInstalled(): Boolean {
-        lock.read {
+    suspend fun isOrbotInstalled(): Boolean {
+        lock.withLock {
             return appInfos.values().any { it.packageName == OrbotHelper.ORBOT_PACKAGE_NAME }
         }
     }
 
-    fun hasUid(uid: Int): Boolean {
-        lock.read {
+    suspend fun hasUid(uid: Int): Boolean {
+        lock.withLock {
             return appInfos.containsKey(uid)
         }
     }
 
-    fun appStatus(uid: Int): FirewallStatus {
+    suspend fun appStatus(uid: Int): FirewallStatus {
         val appInfo = getAppInfoByUid(uid) ?: return FirewallStatus.UNTRACKED
 
         return when (appInfo.firewallStatus) {
@@ -321,7 +316,7 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    fun connectionStatus(uid: Int): ConnectionStatus {
+    suspend fun connectionStatus(uid: Int): ConnectionStatus {
         val appInfo = getAppInfoByUid(uid) ?: return ConnectionStatus.ALLOW
         return when (appInfo.connectionStatus) {
             ConnectionStatus.METERED.id -> ConnectionStatus.METERED
@@ -336,8 +331,8 @@ object FirewallManager : KoinComponent {
         return appInfosLiveData
     }
 
-    fun getExcludedApps(): MutableSet<String> {
-        lock.read {
+    suspend fun getExcludedApps(): MutableSet<String> {
+        lock.withLock {
             return appInfos
                 .values()
                 .filter { it.firewallStatus == FirewallStatus.EXCLUDE.id }
@@ -347,70 +342,70 @@ object FirewallManager : KoinComponent {
     }
 
     // any app is bypassed both dns and firewall
-    fun isAnyAppBypassesDns(): Boolean {
-        lock.read {
+    suspend fun isAnyAppBypassesDns(): Boolean {
+        lock.withLock {
             return appInfos.values().any {
                 it.firewallStatus == FirewallStatus.BYPASS_DNS_FIREWALL.id
             }
         }
     }
 
-    fun getPackageNameByAppName(appName: String): String? {
-        lock.read {
+    suspend fun getPackageNameByAppName(appName: String?): String? {
+        lock.withLock {
             return appInfos.values().firstOrNull { it.appName == appName }?.packageName
         }
     }
 
-    fun getAppNamesByUid(uid: Int): List<String> {
-        lock.read {
+    suspend fun getAppNamesByUid(uid: Int): List<String> {
+        lock.withLock {
             return appInfos.get(uid).map { it.appName }
         }
     }
 
-    fun getPackageNamesByUid(uid: Int): List<String> {
-        lock.read {
+    suspend fun getPackageNamesByUid(uid: Int): List<String> {
+        lock.withLock {
             return appInfos.get(uid).map { it.packageName }
         }
     }
 
-    fun getAllAppNames(): List<String> {
+    suspend fun getAllAppNames(): List<String> {
         return getAppInfos().map { it.appName }.sortedBy { it.lowercase() }
     }
 
-    fun getAppNameByUid(uid: Int): String? {
-        lock.read {
+    suspend fun getAppNameByUid(uid: Int): String? {
+        lock.withLock {
             return appInfos.get(uid).firstOrNull()?.appName
         }
     }
 
-    fun getAppInfoByPackage(packageName: String?): AppInfo? {
+    suspend fun getAppInfoByPackage(packageName: String?): AppInfo? {
         if (packageName.isNullOrBlank()) return null
-        lock.read {
+        lock.withLock {
             return appInfos.values().firstOrNull { it.packageName == packageName }
         }
     }
 
-    fun getAppInfoByUid(uid: Int): AppInfo? {
-        lock.read {
+    suspend fun getAppInfoByUid(uid: Int): AppInfo? {
+        lock.withLock {
             return appInfos.get(uid).firstOrNull()
         }
     }
 
-    fun getPackageNameByUid(uid: Int): String? {
-        lock.read {
+    suspend fun getPackageNameByUid(uid: Int): String? {
+        lock.withLock {
             return appInfos.get(uid).firstOrNull()?.packageName
         }
     }
 
-    fun getCategoriesForSystemApps(): List<String> {
+    suspend fun getCategoriesForSystemApps(): List<String> {
         return getAppInfos().filter { it.isSystemApp }.map { it.appCategory }.distinct().sorted()
     }
 
-    fun getCategoriesForInstalledApps(): List<String> {
+    suspend fun getCategoriesForInstalledApps(): List<String> {
         return getAppInfos().filter { !it.isSystemApp }.map { it.appCategory }.distinct().sorted()
     }
 
-    fun getAllCategories(): List<String> {
+    suspend fun getAllCategories(): List<String> {
         return getAppInfos().map { it.appCategory }.distinct().sorted()
     }
 
@@ -420,12 +415,12 @@ object FirewallManager : KoinComponent {
         withContext(Dispatchers.IO) { reloadAppList() }
     }
 
-    private fun invalidateFirewallStatus(
+    private suspend fun invalidateFirewallStatus(
         uid: Int,
         firewallStatus: FirewallStatus,
         connectionStatus: ConnectionStatus
     ) {
-        lock.write {
+        lock.withLock {
             appInfos.get(uid).forEach {
                 it.firewallStatus = firewallStatus.id
                 it.connectionStatus = connectionStatus.id
@@ -437,7 +432,7 @@ object FirewallManager : KoinComponent {
     suspend fun persistAppInfo(appInfo: AppInfo) {
         appInfoRepository.insert(appInfo)
 
-        lock.write { appInfos.put(appInfo.uid, appInfo) }
+        lock.withLock { appInfos.put(appInfo.uid, appInfo) }
         informObservers()
     }
 
@@ -449,7 +444,7 @@ object FirewallManager : KoinComponent {
             return
         }
 
-        lock.write {
+        lock.withLock {
             appInfos.clear()
             apps.forEach { appInfos.put(it.uid, it) }
             isFirewallRulesLoaded = true
@@ -497,18 +492,16 @@ object FirewallManager : KoinComponent {
         return locked && isForeground
     }
 
-    fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
-        io {
-            invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
-            appInfoRepository.updateFirewallStatusByUid(
-                uid,
-                FirewallStatus.NONE.id,
-                connectionStatus.id
-            )
-        }
+    suspend fun updateFirewalledApps(uid: Int, connectionStatus: ConnectionStatus) {
+        invalidateFirewallStatus(uid, FirewallStatus.NONE, connectionStatus)
+        appInfoRepository.updateFirewallStatusByUid(
+            uid,
+            FirewallStatus.NONE.id,
+            connectionStatus.id
+        )
     }
 
-    fun updateFirewallStatus(
+    suspend fun updateFirewallStatus(
         uid: Int,
         firewallStatus: FirewallStatus,
         connectionStatus: ConnectionStatus
@@ -517,19 +510,17 @@ object FirewallManager : KoinComponent {
             LOG_TAG_FIREWALL,
             "Apply firewall rule for uid: ${uid}, ${firewallStatus.name}, ${connectionStatus.name}"
         )
-        io {
-            invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
-            appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
-        }
+        invalidateFirewallStatus(uid, firewallStatus, connectionStatus)
+        appInfoRepository.updateFirewallStatusByUid(uid, firewallStatus.id, connectionStatus.id)
     }
 
-    private fun getAppInfos(): Collection<AppInfo> {
-        lock.read {
+    private suspend fun getAppInfos(): Collection<AppInfo> {
+        lock.withLock {
             return ImmutableList.copyOf(appInfos.values())
         }
     }
 
-    private fun informObservers() {
+    private suspend fun informObservers() {
         val v = getAppInfos()
         v.let { appInfosLiveData.postValue(v) }
     }
@@ -567,7 +558,7 @@ object FirewallManager : KoinComponent {
         }
     }
 
-    private fun io(f: suspend () -> Unit) {
+    fun io(f: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

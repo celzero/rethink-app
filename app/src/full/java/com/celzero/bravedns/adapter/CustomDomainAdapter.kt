@@ -385,12 +385,22 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         private lateinit var customDomain: CustomDomain
 
         fun update(cd: CustomDomain) {
-            b.customDomainAppName.text = getAppName(cd.uid)
-            val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
-            displayIcon(
-                Utilities.getIcon(context, appInfo?.packageName ?: "", appInfo?.appName ?: ""),
-                b.customDomainAppIconIv
-            )
+
+            io {
+                val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
+                val appName = getAppName(cd.uid)
+                uiCtx {
+                    b.customDomainAppName.text = appName
+                    displayIcon(
+                        Utilities.getIcon(
+                            context,
+                            appInfo?.packageName ?: "",
+                            appInfo?.appName ?: ""
+                        ),
+                        b.customDomainAppIconIv
+                    )
+                }
+            }
 
             this.customDomain = cd
             b.customDomainLabelTv.text = customDomain.domain
@@ -415,7 +425,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             b.customDomainContainer.setOnClickListener { toggleActionsUi() }
         }
 
-        private fun getAppName(uid: Int): String {
+        private suspend fun getAppName(uid: Int): String {
             if (uid == Constants.UID_EVERYBODY) {
                 return context
                     .getString(R.string.firewall_act_universal_tab)
@@ -715,5 +725,9 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
     private fun io(f: suspend () -> Unit) {
         (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

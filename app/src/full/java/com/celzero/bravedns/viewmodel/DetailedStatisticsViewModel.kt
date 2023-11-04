@@ -29,6 +29,9 @@ import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DetailedStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
@@ -46,6 +49,13 @@ class DetailedStatisticsViewModel(
     private var fromTime: MutableLiveData<Long> = MutableLiveData()
     private var toTime: MutableLiveData<Long> = MutableLiveData()
 
+    companion object {
+        private const val TIME_1_HOUR = 1 * 60 * 60 * 1000L
+        private const val TIME_24_HOUR = 24 * 60 * 60 * 1000L
+        private const val TIME_7_DAYS = 7 * 24 * 60 * 60 * 1000L
+        private const val IS_APP_BYPASSED = "true"
+    }
+
     fun setData(type: SummaryStatisticsFragment.SummaryStatisticsType) {
         when (type) {
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
@@ -58,7 +68,14 @@ class DetailedStatisticsViewModel(
                 allowedDomains.value = ""
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                blockedDomains.value = ""
+                io {
+                    val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
+                    if (isAppBypassed) {
+                        blockedDomains.postValue(IS_APP_BYPASSED)
+                    } else {
+                        blockedDomains.postValue("")
+                    }
+                }
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONTACTED_IPS -> {
                 allowedIps.value = ""
@@ -78,15 +95,16 @@ class DetailedStatisticsViewModel(
     fun timeCategoryChanged(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
         when (timeCategory) {
             SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
-                fromTime.value = System.currentTimeMillis() - SummaryStatisticsViewModel.TIME_1_HOUR
+                fromTime.value = System.currentTimeMillis() - TIME_1_HOUR
                 toTime.value = System.currentTimeMillis()
             }
             SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
-                fromTime.value = System.currentTimeMillis() - SummaryStatisticsViewModel.TIME_24_HOUR
+                fromTime.value =
+                    System.currentTimeMillis() - TIME_24_HOUR
                 toTime.value = System.currentTimeMillis()
             }
             SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
-                fromTime.value = System.currentTimeMillis() - SummaryStatisticsViewModel.TIME_7_DAYS
+                fromTime.value = System.currentTimeMillis() - TIME_7_DAYS
                 toTime.value = System.currentTimeMillis()
             }
         }
@@ -130,7 +148,7 @@ class DetailedStatisticsViewModel(
         }
 
     val getAllBlockedDomains =
-        blockedDomains.switchMap { _ ->
+        blockedDomains.switchMap { isAppBypassed ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     val from = fromTime.value ?: 0L
                     val to = toTime.value ?: 0L
@@ -138,7 +156,7 @@ class DetailedStatisticsViewModel(
                         dnsLogDAO.getAllBlockedDomains(from, to)
                     } else {
                         // if any app bypasses the dns, then the decision made in flow() call
-                        if (FirewallManager.isAnyAppBypassesDns()) {
+                        if (isAppBypassed.isNotEmpty()) {
                             connectionTrackerDAO.getAllBlockedDomains(from, to)
                         } else {
                             dnsLogDAO.getAllBlockedDomains(from, to)
@@ -192,4 +210,8 @@ class DetailedStatisticsViewModel(
                 .liveData
                 .cachedIn(viewModelScope)
         }
+
+    private fun io(f: suspend () -> Unit) {
+        viewModelScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
 }

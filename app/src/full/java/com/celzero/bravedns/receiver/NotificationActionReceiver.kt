@@ -143,7 +143,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             }
 
         Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
-        FirewallManager.updateFirewalledApps(uid, connectionStatus)
+        io { FirewallManager.updateFirewalledApps(uid, connectionStatus) }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -140,33 +140,56 @@ class AppInfoActivity :
     }
 
     private fun init() {
-        val ai = FirewallManager.getAppInfoByUid(uid)
-        // case: app is uninstalled but still available in RethinkDNS database
-        if (ai == null || uid == INVALID_UID) {
-            showNoAppFoundDialog()
-            return
+        io {
+            val ai = FirewallManager.getAppInfoByUid(uid)
+            // case: app is uninstalled but still available in RethinkDNS database
+            if (ai == null || uid == INVALID_UID) {
+                uiCtx { showNoAppFoundDialog() }
+                return@io
+            }
+
+            appInfo = ai
+
+            val packages = FirewallManager.getPackageNamesByUid(appInfo.uid)
+            appStatus = FirewallManager.appStatus(appInfo.uid)
+            connStatus = FirewallManager.connectionStatus(appInfo.uid)
+            uiCtx {
+                b.aadAppDetailName.text = appName(packages.count())
+                updateDataUsage()
+                displayIcon(
+                    Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
+                    b.aadAppDetailIcon
+                )
+                showNetworkLogsIfAny(appInfo.uid)
+
+                // do not show the firewall status if the app is Rethink
+                if (appInfo.packageName == this.packageName) {
+                    b.aadFirewallStatus.visibility = View.GONE
+                    hideFirewallStatusUi()
+                    hideDomainBlockUi()
+                    hideIpBlockUi()
+                    return@uiCtx
+                }
+
+                // introduce this on v056
+                // updateDnsDetails()
+                updateFirewallStatusUi(appStatus, connStatus)
+                toggleFirewallUiState(firewallUiState)
+                toggleNetworkLogState(ipListUiState)
+            }
         }
+    }
 
-        appInfo = ai
+    private fun hideFirewallStatusUi() {
+        b.aadAppSettingsCard.visibility = View.GONE
+    }
 
-        val packages = FirewallManager.getPackageNamesByUid(appInfo.uid)
+    private fun hideDomainBlockUi() {
+        b.aadDomainBlockCard.visibility = View.GONE
+    }
 
-        b.aadAppDetailName.text = appName(packages.count())
-        appStatus = FirewallManager.appStatus(appInfo.uid)
-        connStatus = FirewallManager.connectionStatus(appInfo.uid)
-        updateFirewallStatusUi(appStatus, connStatus)
-        updateDataUsage()
-        // introduce this on v054
-        // updateDnsDetails()
-
-        displayIcon(
-            Utilities.getIcon(this, appInfo.packageName, appInfo.appName),
-            b.aadAppDetailIcon
-        )
-
-        showNetworkLogsIfAny(appInfo.uid)
-        toggleFirewallUiState(firewallUiState)
-        toggleNetworkLogState(ipListUiState)
+    private fun hideIpBlockUi() {
+        b.aadIpBlockCard.visibility = View.GONE
     }
 
     override fun onResume() {
@@ -263,17 +286,21 @@ class AppInfoActivity :
         b.aadConnDetailSearch.setOnQueryTextListener(this)
 
         b.aadAppInfoIcon.setOnClickListener {
-            val packages = FirewallManager.getAppNamesByUid(appInfo.uid)
-            if (packages.count() == 1) {
-                openAndroidAppInfo(this, appInfo.packageName)
-            } else if (packages.count() > 1) {
-                showAppInfoDialog(packages)
-            } else {
-                showToastUiCentered(
-                    this,
-                    this.getString(R.string.ctbs_app_info_not_available_toast),
-                    Toast.LENGTH_SHORT
-                )
+            io {
+                val packages = FirewallManager.getAppNamesByUid(appInfo.uid)
+                uiCtx {
+                    if (packages.count() == 1) {
+                        openAndroidAppInfo(this, appInfo.packageName)
+                    } else if (packages.count() > 1) {
+                        showAppInfoDialog(packages)
+                    } else {
+                        showToastUiCentered(
+                            this,
+                            this.getString(R.string.ctbs_app_info_not_available_toast),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                }
             }
         }
 
@@ -465,23 +492,27 @@ class AppInfoActivity :
         // if unmetered -> none(app status) + both(connection status)
         // if metered -> none(app status) + allow(connection status)
         // if both -> none(app status) + unmetered(connection status)
-        val cStat =
-            when (FirewallManager.connectionStatus(appInfo.uid)) {
-                FirewallManager.ConnectionStatus.METERED -> {
-                    FirewallManager.ConnectionStatus.ALLOW
-                }
-                FirewallManager.ConnectionStatus.UNMETERED -> {
-                    FirewallManager.ConnectionStatus.BOTH
-                }
-                FirewallManager.ConnectionStatus.BOTH -> {
-                    FirewallManager.ConnectionStatus.UNMETERED
-                }
-                FirewallManager.ConnectionStatus.ALLOW -> {
-                    FirewallManager.ConnectionStatus.METERED
-                }
+        io {
+            val connStatus = FirewallManager.connectionStatus(appInfo.uid)
+            uiCtx {
+                val cStat =
+                    when (connStatus) {
+                        FirewallManager.ConnectionStatus.METERED -> {
+                            FirewallManager.ConnectionStatus.ALLOW
+                        }
+                        FirewallManager.ConnectionStatus.UNMETERED -> {
+                            FirewallManager.ConnectionStatus.BOTH
+                        }
+                        FirewallManager.ConnectionStatus.BOTH -> {
+                            FirewallManager.ConnectionStatus.UNMETERED
+                        }
+                        FirewallManager.ConnectionStatus.ALLOW -> {
+                            FirewallManager.ConnectionStatus.METERED
+                        }
+                    }
+                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
             }
-
-        updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
+        }
     }
 
     private fun toggleWifi(appInfo: AppInfo) {
@@ -490,36 +521,45 @@ class AppInfoActivity :
         // if MOBILE DATA -> none(app status) + both(connection status)
         // if BOTH -> none(app status) + mobile data(connection status)
         // if ALLOW -> none(app status) + wifi(connection status)
-        val cStat =
-            when (FirewallManager.connectionStatus(appInfo.uid)) {
-                FirewallManager.ConnectionStatus.UNMETERED -> {
-                    FirewallManager.ConnectionStatus.ALLOW
-                }
-                FirewallManager.ConnectionStatus.BOTH -> {
-                    FirewallManager.ConnectionStatus.METERED
-                }
-                FirewallManager.ConnectionStatus.METERED -> {
-                    FirewallManager.ConnectionStatus.BOTH
-                }
-                FirewallManager.ConnectionStatus.ALLOW -> {
-                    FirewallManager.ConnectionStatus.UNMETERED
-                }
-            }
+        io {
+            val connStatus = FirewallManager.connectionStatus(appInfo.uid)
+            uiCtx {
+                val cStat =
+                    when (connStatus) {
+                        FirewallManager.ConnectionStatus.UNMETERED -> {
+                            FirewallManager.ConnectionStatus.ALLOW
+                        }
+                        FirewallManager.ConnectionStatus.BOTH -> {
+                            FirewallManager.ConnectionStatus.METERED
+                        }
+                        FirewallManager.ConnectionStatus.METERED -> {
+                            FirewallManager.ConnectionStatus.BOTH
+                        }
+                        FirewallManager.ConnectionStatus.ALLOW -> {
+                            FirewallManager.ConnectionStatus.UNMETERED
+                        }
+                    }
 
-        updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
+                updateFirewallStatus(FirewallManager.FirewallStatus.NONE, cStat)
+            }
+        }
     }
 
     private fun updateFirewallStatus(
         aStat: FirewallManager.FirewallStatus,
         cStat: FirewallManager.ConnectionStatus
     ) {
-        val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
-        if (appNames.count() > 1) {
-            showDialog(appNames, appInfo, aStat, cStat)
-            return
-        }
+        io {
+            val appNames = FirewallManager.getAppNamesByUid(appInfo.uid)
+            uiCtx {
+                if (appNames.count() > 1) {
+                    showDialog(appNames, appInfo, aStat, cStat)
+                    return@uiCtx
+                }
 
-        completeFirewallChanges(aStat, cStat)
+                completeFirewallChanges(aStat, cStat)
+            }
+        }
     }
 
     private fun completeFirewallChanges(
@@ -528,7 +568,7 @@ class AppInfoActivity :
     ) {
         appStatus = aStat
         connStatus = cStat
-        updateFirewallStatus(appInfo.uid, aStat, cStat)
+        io { updateFirewallStatus(appInfo.uid, aStat, cStat) }
         updateFirewallStatusUi(aStat, cStat)
     }
 
@@ -772,10 +812,7 @@ class AppInfoActivity :
     }
 
     private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
-        Glide.with(this)
-            .load(drawable)
-            .error(Utilities.getDefaultIcon(this))
-            .into(mIconImageView)
+        Glide.with(this).load(drawable).error(Utilities.getDefaultIcon(this)).into(mIconImageView)
     }
 
     private fun Context.isDarkThemeOn(): Boolean {

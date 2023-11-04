@@ -24,6 +24,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +39,9 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Utilities.getDefaultIcon
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WgIncludeAppsAdapter(
     private val context: Context,
@@ -131,21 +136,27 @@ class WgIncludeAppsAdapter(
         }
 
         private fun updateInterfaceDetails(mapping: ProxyApplicationMapping, include: Boolean) {
-            val appUidList = FirewallManager.getAppNamesByUid(mapping.uid)
+            io {
+                val appUidList = FirewallManager.getAppNamesByUid(mapping.uid)
+                uiCtx {
+                    if (appUidList.count() > 1) {
+                        showDialog(appUidList, mapping, include)
+                    } else {
+                        updateProxyIdForApp(mapping, include)
+                    }
+                }
+            }
+        }
 
-            if (appUidList.count() > 1) {
-                showDialog(appUidList, mapping, include)
-            } else {
+        private fun updateProxyIdForApp(mapping: ProxyApplicationMapping, include: Boolean) {
+            io {
                 if (include) {
                     ProxyManager.updateProxyIdForApp(mapping.uid, proxyId, proxyName)
-                    Log.i(LOG_TAG_PROXY, "App ${mapping.appName} included in $proxyId")
+                    Log.i(LOG_TAG_PROXY, "Included apps: ${mapping.uid}, $proxyId, $proxyName")
                 } else {
                     ProxyManager.removeProxyIdForApp(mapping.uid)
-                    b.wgIncludeAppListCheckbox.isChecked = false
-                    Log.i(
-                        LOG_TAG_PROXY,
-                        "App ${mapping.appName} removed from wg, id ${mapping.proxyId}}"
-                    )
+                    uiCtx { b.wgIncludeAppListCheckbox.isChecked = false }
+                    Log.i(LOG_TAG_PROXY, "Removed apps: ${mapping.uid}, $proxyId, $proxyName")
                 }
             }
         }
@@ -179,14 +190,7 @@ class WgIncludeAppsAdapter(
 
             builderSingle
                 .setPositiveButton(positiveTxt) { _: DialogInterface, _: Int ->
-                    if (included) {
-                        ProxyManager.updateProxyIdForApp(mapping.uid, proxyId, proxyName)
-                        Log.i(LOG_TAG_PROXY, "Included apps: ${mapping.uid}, $proxyId, $proxyName")
-                    } else {
-                        ProxyManager.removeProxyIdForApp(mapping.uid)
-                        b.wgIncludeAppListCheckbox.isChecked = false
-                        Log.i(LOG_TAG_PROXY, "Removed apps: ${mapping.uid}, $proxyId, $proxyName")
-                    }
+                    updateProxyIdForApp(mapping, included)
                 }
                 .setNeutralButton(context.getString(R.string.ctbs_dialog_negative_btn)) {
                     _: DialogInterface,
@@ -197,5 +201,13 @@ class WgIncludeAppsAdapter(
             alertDialog.listView.setOnItemClickListener { _, _, _, _ -> }
             alertDialog.setCancelable(false)
         }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }
