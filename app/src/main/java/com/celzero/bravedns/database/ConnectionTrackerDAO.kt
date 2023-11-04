@@ -122,12 +122,12 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by appName order by count desc LIMIT 7"
+        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(uploadBytes+downloadBytes) as totalBytes from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by appName order by totalBytes desc LIMIT 7"
     )
     fun getAllowedAppNetworkActivity(from: Long, to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by appName order by count desc"
+        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(uploadBytes+downloadBytes) as totalBytes from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by appName order by totalBytes desc"
     )
     fun getAllAllowedAppNetworkActivity(from: Long, to: Long): PagingSource<Int, AppConnection>
 

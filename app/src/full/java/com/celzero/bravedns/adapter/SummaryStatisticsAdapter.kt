@@ -24,6 +24,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -52,6 +54,9 @@ import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
 import kotlin.math.log2
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SummaryStatisticsAdapter(
     private val context: Context,
@@ -102,8 +107,8 @@ class SummaryStatisticsAdapter(
         holder.bind(appNetworkActivity)
     }
 
-    private fun calculatePercentage(c: Int): Int {
-        val value = (log2(c.toDouble()) * 100).toInt()
+    private fun calculatePercentage(c: Double): Int {
+        val value = (log2(c) * 100).toInt()
         // maxValue will be based on the count returned by the database query (order by count desc)
         if (value > maxValue) {
             maxValue = value
@@ -122,40 +127,86 @@ class SummaryStatisticsAdapter(
         fun bind(appConnection: AppConnection) {
             setName(appConnection)
             setIcon(appConnection)
-            setProgress(appConnection.count, appConnection.blocked)
+            showDataUsage(appConnection)
+            setProgress(appConnection)
             setConnectionCount(appConnection)
-            setClickListeners(appConnection)
+            setupClickListeners(appConnection)
         }
 
         private fun setConnectionCount(appConnection: AppConnection) {
             itemBinding.ssCount.text = appConnection.count.toString()
         }
 
+        private fun showDataUsage(appConnection: AppConnection) {
+            if (appConnection.downloadBytes == null || appConnection.uploadBytes == null) {
+                val count =
+                    context.getString(
+                        R.string.logs_card_network_count,
+                        appConnection.count.toString()
+                    )
+                itemBinding.ssDataUsage.text = count
+                return
+            }
+
+            if (appConnection.downloadBytes == 0L && appConnection.uploadBytes == 0L) {
+                val count =
+                    context.getString(
+                        R.string.logs_card_network_count,
+                        appConnection.count.toString()
+                    )
+                itemBinding.ssDataUsage.text = count
+                return
+            }
+
+            val download =
+                context.getString(
+                    R.string.symbol_download,
+                    Utilities.humanReadableByteCount(appConnection.downloadBytes, true)
+                )
+            val upload =
+                context.getString(
+                    R.string.symbol_upload,
+                    Utilities.humanReadableByteCount(appConnection.uploadBytes, true)
+                )
+            val total = context.getString(R.string.two_argument, download, upload)
+            val count =
+                context.getString(R.string.logs_card_network_count, appConnection.count.toString())
+            itemBinding.ssDataUsage.text = context.getString(R.string.ct_ip_port, total, count)
+        }
+
         private fun setIcon(appConnection: AppConnection) {
             when (type) {
                 SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                    val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
-                    itemBinding.ssIcon.visibility = View.VISIBLE
-                    itemBinding.ssFlag.visibility = View.GONE
-                    loadAppIcon(
-                        Utilities.getIcon(
-                            context,
-                            appInfo?.packageName ?: "",
-                            appInfo?.appName ?: ""
-                        )
-                    )
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            itemBinding.ssIcon.visibility = View.VISIBLE
+                            itemBinding.ssFlag.visibility = View.GONE
+                            loadAppIcon(
+                                Utilities.getIcon(
+                                    context,
+                                    appInfo?.packageName ?: "",
+                                    appInfo?.appName ?: ""
+                                )
+                            )
+                        }
+                    }
                 }
                 SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                    val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
-                    itemBinding.ssIcon.visibility = View.VISIBLE
-                    itemBinding.ssFlag.visibility = View.GONE
-                    loadAppIcon(
-                        Utilities.getIcon(
-                            context,
-                            appInfo?.packageName ?: "",
-                            appInfo?.appName ?: ""
-                        )
-                    )
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            itemBinding.ssIcon.visibility = View.VISIBLE
+                            itemBinding.ssFlag.visibility = View.GONE
+                            loadAppIcon(
+                                Utilities.getIcon(
+                                    context,
+                                    appInfo?.packageName ?: "",
+                                    appInfo?.appName ?: ""
+                                )
+                            )
+                        }
+                    }
                 }
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     itemBinding.ssFlag.text = appConnection.flag
@@ -210,10 +261,16 @@ class SummaryStatisticsAdapter(
         private fun setName(appConnection: AppConnection) {
             when (type) {
                 SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                    itemBinding.ssName.text = getAppName(appConnection)
+                    io {
+                        val appName = getAppName(appConnection)
+                        uiCtx { itemBinding.ssName.text = appName }
+                    }
                 }
                 SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                    itemBinding.ssName.text = getAppName(appConnection)
+                    io {
+                        val appName = getAppName(appConnection)
+                        uiCtx { itemBinding.ssName.text = appName }
+                    }
                 }
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     // remove the trailing dot
@@ -240,7 +297,7 @@ class SummaryStatisticsAdapter(
             }
         }
 
-        private fun getAppName(appConnection: AppConnection): String? {
+        private suspend fun getAppName(appConnection: AppConnection): String? {
             return if (appConnection.appOrDnsName.isNullOrEmpty()) {
                 val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
                 if (appInfo?.appName.isNullOrEmpty()) {
@@ -253,8 +310,17 @@ class SummaryStatisticsAdapter(
             }
         }
 
-        private fun setProgress(count: Int, isBlocked: Boolean = false) {
-            val percentage = calculatePercentage(count)
+        private fun setProgress(appConnection: AppConnection) {
+            val c =
+                if (type == SummaryStatisticsType.MOST_CONNECTED_APPS) {
+                    val d = appConnection.downloadBytes ?: 0L
+                    val u = appConnection.uploadBytes ?: 0L
+                    (d + u).toDouble()
+                } else {
+                    appConnection.count.toDouble()
+                }
+            val isBlocked = appConnection.blocked
+            val percentage = calculatePercentage(c)
             if (isBlocked) {
                 itemBinding.ssProgress.setIndicatorColor(
                     fetchToggleBtnColors(context, R.color.accentBad)
@@ -278,7 +344,7 @@ class SummaryStatisticsAdapter(
                 .into(itemBinding.ssIcon)
         }
 
-        private fun setClickListeners(appConnection: AppConnection) {
+        private fun setupClickListeners(appConnection: AppConnection) {
             itemBinding.ssContainer.setOnClickListener {
                 when (type) {
                     SummaryStatisticsType.MOST_CONNECTED_APPS -> {
@@ -302,13 +368,18 @@ class SummaryStatisticsAdapter(
                             showDnsLogs(appConnection)
                         } else {
                             // if any app bypasses the dns, then the decision made in flow() call
-                            if (FirewallManager.isAnyAppBypassesDns()) {
-                                showNetworkLogs(
-                                    appConnection,
-                                    SummaryStatisticsType.MOST_BLOCKED_DOMAINS
-                                )
-                            } else {
-                                showDnsLogs(appConnection)
+                            // will be to show the network logs. Else, show the dns logs.
+                            io {
+                                if (FirewallManager.isAnyAppBypassesDns()) {
+                                    uiCtx {
+                                        showNetworkLogs(
+                                            appConnection,
+                                            SummaryStatisticsType.MOST_BLOCKED_DOMAINS
+                                        )
+                                    }
+                                } else {
+                                    uiCtx { showDnsLogs(appConnection) }
+                                }
                             }
                         }
                     }
@@ -535,5 +606,13 @@ class SummaryStatisticsAdapter(
         private fun hideFlag() {
             itemBinding.ssFlag.visibility = View.GONE
         }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

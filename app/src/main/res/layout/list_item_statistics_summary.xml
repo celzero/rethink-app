@@ -75,6 +75,20 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ss_data_usage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:ellipsize="start"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:padding="2dp"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view" />
+
+
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/ss_progress"
                 android:layout_width="match_parent"
@@ -99,6 +113,7 @@
             android:layout_toStartOf="@id/ss_indicator"
             android:gravity="center_vertical"
             android:padding="2dp"
+            android:visibility="gone"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/heading_font_text_view" />
 

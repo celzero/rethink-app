@@ -28,6 +28,9 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SummaryStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
@@ -43,9 +46,10 @@ class SummaryStatisticsViewModel(
     private var toTime: MutableLiveData<Long> = MutableLiveData()
 
     companion object {
-        const val TIME_1_HOUR = 1 * 60 * 60 * 1000L
-        const val TIME_24_HOUR = 24 * 60 * 60 * 1000L
-        const val TIME_7_DAYS = 7 * 24 * 60 * 60 * 1000L
+        private const val TIME_1_HOUR = 1 * 60 * 60 * 1000L
+        private const val TIME_24_HOUR = 24 * 60 * 60 * 1000L
+        private const val TIME_7_DAYS = 7 * 24 * 60 * 60 * 1000L
+        private const val IS_APP_BYPASSED = "true"
     }
 
     enum class TimeCategory(val value: Int) {
@@ -85,7 +89,14 @@ class SummaryStatisticsViewModel(
         }
         networkActivity.value = ""
         countryActivities.value = ""
-        domains.value = ""
+        io {
+            val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
+            if (isAppBypassed) {
+                domains.postValue(IS_APP_BYPASSED)
+            } else {
+                domains.postValue("")
+            }
+        }
         ips.value = ""
     }
 
@@ -131,7 +142,7 @@ class SummaryStatisticsViewModel(
         }
 
     val getMostBlockedDomains =
-        domains.switchMap { _ ->
+        domains.switchMap { isAppBypassed ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     if (appConfig.getBraveMode().isDnsMode()) {
                         val from = fromTime.value ?: 0L
@@ -141,7 +152,7 @@ class SummaryStatisticsViewModel(
                         // if any app bypasses the dns, then the decision made in flow() call
                         val from = fromTime.value ?: 0L
                         val to = toTime.value ?: 0L
-                        if (FirewallManager.isAnyAppBypassesDns()) {
+                        if (isAppBypassed.isNotEmpty()) {
                             connectionTrackerDAO.getMostBlockedDomains(from, to)
                         } else {
                             dnsLogDAO.getMostBlockedDomains(from, to)
@@ -195,4 +206,8 @@ class SummaryStatisticsViewModel(
                 .liveData
                 .cachedIn(viewModelScope)
         }
+
+    private fun io(f: suspend () -> Unit) {
+        viewModelScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
 }

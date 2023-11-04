@@ -57,7 +57,6 @@
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
                 android:tag="0"
-                android:text="3 hrs"
                 android:textAllCaps="false"
                 android:textColor="?attr/defaultToggleBtnTxt"
                 android:textSize="@dimen/default_font_text_view"
@@ -70,7 +69,6 @@
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
                 android:tag="1"
-                android:text="24 hrs"
                 android:textAllCaps="false"
                 android:textColor="?attr/defaultToggleBtnTxt"
                 android:textSize="@dimen/default_font_text_view"
@@ -83,7 +81,6 @@
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"
                 android:tag="2"
-                android:text="7 days"
                 android:textAllCaps="false"
                 android:textColor="?attr/defaultToggleBtnTxt"
                 android:textSize="@dimen/default_font_text_view"
@@ -150,7 +147,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="5dp"
+            android:paddingTop="25dp"
             android:paddingBottom="5dp">
 
             <RelativeLayout
@@ -203,7 +200,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="5dp"
+            android:paddingTop="25dp"
             android:paddingBottom="5dp">
 
             <RelativeLayout
@@ -259,7 +256,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="5dp"
+            android:paddingTop="25dp"
             android:paddingBottom="5dp">
 
             <RelativeLayout
@@ -314,7 +311,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="5dp"
+            android:paddingTop="25dp"
             android:paddingBottom="5dp">
 
             <RelativeLayout
@@ -370,7 +367,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="5dp"
+            android:paddingTop="25dp"
             android:paddingBottom="5dp">
 
             <RelativeLayout
@@ -423,7 +420,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="5dp"
+            android:paddingTop="25dp"
             android:paddingBottom="5dp">
 
             <RelativeLayout
@@ -477,7 +474,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="5dp"
+            android:paddingTop="25dp"
             android:paddingBottom="5dp">
 
             <RelativeLayout

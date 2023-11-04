@@ -17,7 +17,6 @@ package com.celzero.bravedns.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -80,6 +79,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun initView() {
+        setTabbedViewTxt()
         highlightToggleBtn()
         showAppNetworkActivity()
         showBlockedApps()
@@ -89,6 +89,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showMostContactedIps()
         showBlockedIps()
         showMostBlockedCountries()
+    }
+
+    private fun setTabbedViewTxt() {
+        b.tbRecentToggleBtn.text = getString(R.string.ci_desc, "1", getString(R.string.lbl_hour))
+        b.tbDailyToggleBtn.text = getString(R.string.ci_desc, "24", getString(R.string.lbl_hour))
+        b.tbWeeklyToggleBtn.text = getString(R.string.ci_desc, "7", getString(R.string.lbl_day))
     }
 
     private fun highlightToggleBtn() {
@@ -167,7 +173,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     companion object {
         fun newInstance() = SummaryStatisticsFragment()
-        private const val RECYCLER_ITEM_VIEW_HEIGHT = 420
+
+        private const val RECYCLER_ITEM_VIEW_HEIGHT = 480
     }
 
     private fun showAppNetworkActivity() {
