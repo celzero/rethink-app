@@ -49,12 +49,12 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val PROTOCOL_TRANSLATION = "protocol_translation"
         const val DEFAULT_DNS_SERVER = "default_dns_server"
         const val PCAP_MODE = "pcap_mode"
-        const val RETHINK_REMOTE_CHANGES = "rethink_remote_updates"
         const val REMOTE_BLOCKLIST_UPDATE = "remote_block_list_downloaded_time"
         const val DNS_ALG = "dns_alg"
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
-        const val WIREGUARD_UPDATED = "wireguard_updated"
+        const val RETHINK_IN_RETHINK = "route_rethink_in_rethink"
+        const val USE_MAX_MTU = "use_max_mtu"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -81,10 +81,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // total blocklists set by the user for RethinkDNS+ (server-side dns blocking)
     private var numberOfRemoteBlocklists by intPref("remote_block_list_count").withDefault<Int>(0)
-
-    // changes in rethink remote, in case of stamp change and max/sky switch, shared pref won't
-    // update
-    var rethinkRemoteUpdate by booleanPref("rethink_remote_updates").withDefault<Boolean>(false)
 
     // total blocklists set by the user (on-device dns blocking)
     var numberOfLocalBlocklists by intPref("local_block_list_count").withDefault<Int>(0)
@@ -118,7 +114,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user set http proxy ip / hostname
     var httpProxyHostAddress by
-        stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
+    stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     // default: false for fdroid flavour
@@ -130,7 +126,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         intPref("dns_type")
             .withDefault<Int>(
                 if (!Utilities.isHeadlessFlavour()) AppConfig.DnsType.RETHINK_REMOTE.type
-                else AppConfig.DnsType.NETWORK_DNS.type
+                else AppConfig.DnsType.SYSTEM_DNS.type
             )
 
     // whether the app must attempt to startup on reboot if it was running before shutdown
@@ -146,7 +142,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // whether to check for app updates once-a-week (on website / play-store builds)
     var checkForAppUpdate by booleanPref("check_for_app_update").withDefault<Boolean>(true)
 
-    // last connected dns label name
+    // last connected dns label name and url
     var connectedDnsName by
         stringPref("connected_dns_name")
             .withDefault<String>(context.getString(R.string.default_dns_name))
@@ -266,14 +262,14 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     // go logger level, default 2 -> info
     var goLoggerLevel by longPref("go_logger_level").withDefault<Long>(2)
 
-    // count of wireguard enabled, not used remove in future release (current: v055a)
-    var wireguardEnabledCount by intPref("wireguard_enabled_count").withDefault<Int>(0)
-
-    // wireguard updated
-    var wireguardUpdated by booleanPref("wireguard_updated").withDefault<Boolean>(false)
-
     // previous data usage check timestamp
     var prevDataUsageCheck by longPref("prev_data_usage_check").withDefault<Long>(INIT_TIME_MS)
+
+    // route rethink in rethink
+    var routeRethinkInRethink by booleanPref("route_rethink_in_rethink").withDefault<Boolean>(false)
+
+    // use max mtu
+    var useMaxMtu by booleanPref("use_max_mtu").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

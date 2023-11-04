@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui.activity
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -90,6 +91,17 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
                 )
             )
         }
+
+        b.cardRethinkDns.setOnClickListener { invokeRethinkActivity() }
+    }
+
+    private fun invokeRethinkActivity() {
+        val intent = Intent(this, ConfigureRethinkBasicActivity::class.java)
+        intent.putExtra(
+            ConfigureRethinkBasicActivity.INTENT,
+            ConfigureRethinkBasicActivity.FragmentLoader.DB_LIST.ordinal
+        )
+        startActivity(intent)
     }
 
     override fun onResume() {

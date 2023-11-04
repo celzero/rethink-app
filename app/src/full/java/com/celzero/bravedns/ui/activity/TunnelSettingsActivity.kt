@@ -65,8 +65,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         // allow apps part of the vpn to request networks outside of it, effectively letting it
         // bypass the vpn itself
         b.settingsActivityAllowBypassSwitch.isChecked = persistentState.allowBypass
-        // use all internet-capable networks, not just the active network, as underlying transports
-        // for the vpn tunnel
+        // use multiple networks
         b.settingsActivityAllNetworkSwitch.isChecked = persistentState.useMultipleNetworks
         // route lan traffic
         b.settingsActivityLanTrafficSwitch.isChecked = persistentState.privateIps
@@ -78,7 +77,10 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsActivityPtransSwitch.isChecked = false
         }
 
+        b.settingsActivityMtuSwitch.isChecked = persistentState.useMaxMtu
+
         displayInternetProtocolUi()
+        displayUseMultipleNetworksUi()
     }
 
     private fun setupClickListeners() {
@@ -91,6 +93,24 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             _: CompoundButton,
             b: Boolean ->
             persistentState.useMultipleNetworks = b
+            // if the user disables the use multiple networks option, then disable the
+            // rethink in rethink option as well
+            if (!b) {
+                persistentState.routeRethinkInRethink = false
+                displayRethinkInRethinkUi()
+            }
+            displayUseMultipleNetworksUi()
+        }
+
+        b.settingsRInRRl.setOnClickListener {
+            b.settingsRInRSwitch.isChecked = !b.settingsRInRSwitch.isChecked
+        }
+
+        b.settingsRInRSwitch.setOnCheckedChangeListener {
+            _: CompoundButton,
+            b: Boolean ->
+            persistentState.routeRethinkInRethink = b
+            displayRethinkInRethinkUi()
         }
 
         b.settingsActivityAllowBypassRl.setOnClickListener {
@@ -154,6 +174,14 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
+
+        b.settingsActivityMtuSwitch.setOnCheckedChangeListener { _, isSelected ->
+            persistentState.useMaxMtu = isSelected
+        }
+
+        b.settingsActivityMtuRl.setOnClickListener {
+            b.settingsActivityMtuSwitch.isChecked = !b.settingsActivityMtuSwitch.isChecked
+        }
     }
 
     private fun showDefaultDnsDialog() {
@@ -209,6 +237,24 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
+        }
+    }
+
+    private fun displayUseMultipleNetworksUi() {
+        if (persistentState.useMultipleNetworks) {
+            b.settingsRInRRl.visibility = View.VISIBLE
+            displayRethinkInRethinkUi()
+        } else {
+            b.settingsRInRRl.visibility = View.GONE
+        }
+    }
+
+    private fun displayRethinkInRethinkUi() {
+        b.settingsRInRSwitch.isChecked = persistentState.routeRethinkInRethink
+        if (persistentState.routeRethinkInRethink) {
+            b.genRInRDesc.text = "Rethink will route its own traffic through the VPN"
+        } else {
+            b.genRInRDesc.text = "Rethink will not route its own traffic through the VPN"
         }
     }
 
