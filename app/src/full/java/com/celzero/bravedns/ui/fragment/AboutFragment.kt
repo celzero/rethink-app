@@ -65,17 +65,17 @@ import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
 class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, KoinComponent {
     private val b by viewBinding(FragmentAboutBinding::bind)
@@ -117,10 +117,12 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppTranslate.setOnClickListener(this)
 
         try {
+            // take first 7 characters of the version name
             val version = getVersionName()
+            val slicedVersion = version.slice(0..6) ?: ""
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
-            b.aboutWhatsNew.text = getString(R.string.about_whats_new, version)
+            b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
@@ -133,7 +135,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 requireContext().packageName
             )
         // take first 7 characters of the version name
-        return pInfo?.versionName?.slice(0..6) ?: ""
+        return pInfo?.versionName ?: ""
     }
 
     private fun getDownloadSource(): String {
@@ -287,7 +289,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         binding.desc.movementMethod = LinkMovementMethod.getInstance()
         binding.desc.text = updateHtmlEncodedText(getString(R.string.whats_new_version_update))
         // replace the version name in the title
-        val title = getString(R.string.about_whats_new, getVersionName())
+        val v = getVersionName().slice(0..6)
+        val title = getString(R.string.about_whats_new, v)
         MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setTitle(title)
