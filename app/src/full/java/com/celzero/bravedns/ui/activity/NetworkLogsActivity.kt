@@ -32,6 +32,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
 import com.celzero.bravedns.ui.fragment.DnsLogFragment
+import com.celzero.bravedns.ui.fragment.RethinkLogFragment
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.google.android.material.tabs.TabLayoutMediator
@@ -47,7 +48,8 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
 
     enum class Tabs(val screen: Int) {
         NETWORK_LOGS(0),
-        DNS_LOGS(1)
+        DNS_LOGS(1),
+        RETHINK_LOGS(2)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,38 +90,72 @@ class NetworkLogsActivity : AppCompatActivity(R.layout.activity_network_logs) {
     }
 
     private fun getCount(): Int {
+        var count = 0
+        if (persistentState.routeRethinkInRethink) {
+            count = 1
+        }
         return when (appConfig.getBraveMode()) {
-            AppConfig.BraveMode.DNS -> 1
-            AppConfig.BraveMode.FIREWALL -> 1
-            AppConfig.BraveMode.DNS_FIREWALL -> 2
+            AppConfig.BraveMode.DNS -> count + 1
+            AppConfig.BraveMode.FIREWALL -> count + 1
+            AppConfig.BraveMode.DNS_FIREWALL -> count + 2
         }
     }
 
     private fun getFragment(position: Int): Fragment {
-        return if (appConfig.getBraveMode().isDnsMode()) {
-            DnsLogFragment.newInstance(searchParam)
-        } else if (appConfig.getBraveMode().isFirewallMode()) {
-            ConnectionTrackerFragment.newInstance(searchParam)
-        } else {
-            when (position) {
-                Tabs.NETWORK_LOGS.screen -> ConnectionTrackerFragment.newInstance(searchParam)
-                Tabs.DNS_LOGS.screen -> DnsLogFragment.newInstance(searchParam)
-                else -> ConnectionTrackerFragment.newInstance(searchParam)
+        return when (position) {
+            0 -> {
+                if (appConfig.getBraveMode().isDnsMode()) {
+                    DnsLogFragment.newInstance(searchParam)
+                } else if (appConfig.getBraveMode().isFirewallMode()) {
+                    ConnectionTrackerFragment.newInstance(searchParam)
+                } else {
+                    ConnectionTrackerFragment.newInstance(searchParam)
+                }
+            }
+            1 -> {
+                if (appConfig.getBraveMode().isDnsMode()) {
+                    RethinkLogFragment.newInstance(searchParam)
+                } else if (appConfig.getBraveMode().isFirewallMode()) {
+                    RethinkLogFragment.newInstance(searchParam)
+                } else {
+                    DnsLogFragment.newInstance(searchParam)
+                }
+            }
+            2 -> {
+                RethinkLogFragment.newInstance(searchParam)
+            }
+            else -> {
+                ConnectionTrackerFragment.newInstance(searchParam)
             }
         }
     }
 
     // get tab text based on brave mode
     private fun getTabText(position: Int): String {
-        return if (appConfig.getBraveMode().isDnsMode()) {
-            getString(R.string.dns_mode_info_title)
-        } else if (appConfig.getBraveMode().isFirewallMode()) {
-            getString(R.string.firewall_act_network_monitor_tab)
-        } else {
-            when (position) {
-                Tabs.NETWORK_LOGS.screen -> getString(R.string.firewall_act_network_monitor_tab)
-                Tabs.DNS_LOGS.screen -> getString(R.string.dns_mode_info_title)
-                else -> getString(R.string.firewall_act_network_monitor_tab)
+        return when (position) {
+            0 -> {
+                if (appConfig.getBraveMode().isDnsMode()) {
+                    getString(R.string.dns_mode_info_title)
+                } else if (appConfig.getBraveMode().isFirewallMode()) {
+                    getString(R.string.firewall_act_network_monitor_tab)
+                } else {
+                    getString(R.string.firewall_act_network_monitor_tab)
+                }
+            }
+            1 -> {
+                if (appConfig.getBraveMode().isDnsMode()) {
+                    getString(R.string.app_name)
+                } else if (appConfig.getBraveMode().isFirewallMode()) {
+                    getString(R.string.app_name)
+                } else {
+                    getString(R.string.dns_mode_info_title)
+                }
+            }
+            2 -> {
+                getString(R.string.app_name)
+            }
+            else -> {
+                getString(R.string.firewall_act_network_monitor_tab)
             }
         }
     }
