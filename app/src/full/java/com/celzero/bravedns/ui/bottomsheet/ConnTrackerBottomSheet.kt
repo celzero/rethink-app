@@ -265,6 +265,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun displaySummaryDetails() {
+        b.connectionMessage.text = info?.message
         if (
             info?.message?.isEmpty() == true &&
                 info?.duration == 0 &&
@@ -278,7 +279,6 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
         b.connectionSummaryLl.visibility = View.VISIBLE
         b.connectionUploadDownload.visibility = View.VISIBLE
-        b.connectionMessage.text = info?.message
         val downloadBytes =
             getString(
                 R.string.symbol_download,
