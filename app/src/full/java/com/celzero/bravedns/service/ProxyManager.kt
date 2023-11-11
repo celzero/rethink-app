@@ -250,7 +250,7 @@ object ProxyManager : KoinComponent {
         if (proxyId == "") return false
 
         // determine whether the connection is proxied or not
-        // if the connection is not Ipn.Base, Ipn.Block then it is proxied
-        return proxyId != Ipn.Base && proxyId != Ipn.Block
+        // if the connection is not Ipn.Base, Ipn.Block, Ipn.Exit then it is proxied
+        return proxyId != Ipn.Base && proxyId != Ipn.Block && proxyId != Ipn.Exit
     }
 }
