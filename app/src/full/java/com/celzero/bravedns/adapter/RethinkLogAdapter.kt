@@ -210,8 +210,7 @@ class RethinkLogAdapter(private val context: Context) :
                 log.duration == 0 &&
                     log.downloadBytes == 0L &&
                     log.uploadBytes == 0L &&
-                    log.message.isEmpty() &&
-                    connType.isNone()
+                    log.message.isEmpty()
             ) {
                 var hasMinSummary = false
                 if (VpnController.hasCid(log.connId)) {
@@ -221,6 +220,7 @@ class RethinkLogAdapter(private val context: Context) :
                     b.connectionDelay.text = ""
                     hasMinSummary = true
                 }
+                b.connectionDelay.text = ""
                 if (connType.isMetered()) {
                     b.connectionDelay.text = "📶"
                 } else if (connType.isUnmetered()) {
