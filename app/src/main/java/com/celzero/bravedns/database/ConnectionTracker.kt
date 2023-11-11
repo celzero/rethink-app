@@ -50,6 +50,7 @@ class ConnectionTracker {
     var duration: Int = 0
     var synack: Int = 0
     var message: String = ""
+    var connType: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is ConnectionTracker) return false
@@ -59,5 +60,45 @@ class ConnectionTracker {
 
     override fun hashCode(): Int {
         return this.id.hashCode()
+    }
+
+    enum class ConnType(val id: Int, val value: String) {
+        NONE(0, "None"),
+        METERED(1, "Metered"),
+        UNMETERED(2, "Unmetered");
+
+        fun isMetered(): Boolean {
+            return this == METERED
+        }
+
+        fun isUnmetered(): Boolean {
+            return this == UNMETERED
+        }
+
+        fun isNone(): Boolean {
+            return this == NONE
+        }
+
+        companion object {
+            fun get(v: Int?): ConnType {
+                if (v == null) return NONE
+                return when (v) {
+                    NONE.id -> NONE
+                    METERED.id -> METERED
+                    UNMETERED.id -> UNMETERED
+                    else -> NONE
+                }
+            }
+
+            fun get(v: String?): ConnType {
+                if (v == null) return NONE
+                return when (v) {
+                    NONE.value -> NONE
+                    METERED.value -> METERED
+                    UNMETERED.value -> UNMETERED
+                    else -> NONE
+                }
+            }
+        }
     }
 }
