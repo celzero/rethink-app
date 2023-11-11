@@ -106,7 +106,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         }
 
-        b.bsConnConnectionTypeHeading.text = info!!.ipAddress + " (" + info!!.connType + ")"
+        b.bsConnConnectionTypeHeading.text = info!!.ipAddress
         b.bsConnConnectionFlag.text = info!!.flag
 
         b.bsConnBlockAppTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block))
