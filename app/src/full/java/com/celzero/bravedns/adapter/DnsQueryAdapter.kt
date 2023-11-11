@@ -100,6 +100,8 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         }
 
         private fun displayLogEntryHint(dnsLog: DnsLog) {
+            // TODO: make the entry as maybe blocked if there is a universal rule blocking the
+            // domain / ip
             if (dnsLog.isBlocked) {
                 b.queryLogIndicator.visibility = View.VISIBLE
                 b.queryLogIndicator.setBackgroundColor(
@@ -161,10 +163,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
 
             val bottomSheetFragment = DnsBlocklistBottomSheet()
             val bundle = Bundle()
-            bundle.putString(
-                DnsBlocklistBottomSheet.INSTANCE_STATE_DNSLOGS,
-                Gson().toJson(dnsLog)
-            )
+            bundle.putString(DnsBlocklistBottomSheet.INSTANCE_STATE_DNSLOGS, Gson().toJson(dnsLog))
             bottomSheetFragment.arguments = bundle
             bottomSheetFragment.show(context.supportFragmentManager, bottomSheetFragment.tag)
         }
