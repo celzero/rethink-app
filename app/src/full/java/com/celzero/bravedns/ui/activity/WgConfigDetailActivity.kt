@@ -35,10 +35,10 @@ import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.service.WireGuardManager
-import com.celzero.bravedns.service.WireGuardManager.INVALID_CONF_ID
-import com.celzero.bravedns.service.WireGuardManager.WARP_ID
-import com.celzero.bravedns.service.WireGuardManager.isWarpWorking
+import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
+import com.celzero.bravedns.service.WireguardManager.WARP_ID
+import com.celzero.bravedns.service.WireguardManager.isWarpWorking
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
@@ -105,22 +105,33 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
-        handleWarpConfigView()
-        handleAppsCount()
-        val config = WireGuardManager.getConfigById(configId)
-        val mapping = WireGuardManager.getConfigFilesById(configId)
-        if (mapping != null) {
-            b.lockdownCheck.isChecked = mapping.isLockdown
+        io {
+            val config = WireguardManager.getConfigById(configId)
+            val mapping = WireguardManager.getConfigFilesById(configId)
+            uiCtx {
+                //handleWarpConfigView()
+                if (mapping != null) {
+                    b.lockdownCheck.isChecked = mapping.isLockdown
+                    b.catchAllCheck.isChecked = mapping.isCatchAll
+                    b.oneWgCheck.isChecked = mapping.oneWireGuard
+                }
+                if (mapping?.oneWireGuard == true) {
+                    b.applicationsBtn.isEnabled = !mapping.oneWireGuard
+                    b.applicationsBtn.text = "All apps included"
+                } else {
+                    handleAppsCount()
+                }
+                /*if (config == null && configId == WARP_ID) {
+                    showNewWarpConfigLayout()
+                    return@uiCtx
+                }*/
+                if (config == null) {
+                    finish()
+                    return@uiCtx
+                }
+                prefillWarpConfig(config)
+            }
         }
-        if (config == null && configId == WARP_ID) {
-            showNewWarpConfigLayout()
-            return
-        }
-        if (config == null) {
-            finish()
-            return
-        }
-        prefillWarpConfig(config)
     }
 
     private fun prefillWarpConfig(config: Config) {
@@ -162,14 +173,14 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }*/
     }
 
-    private suspend fun createConfigOrShowErrorLayout() {
+    /*private suspend fun createConfigOrShowErrorLayout() {
         val works = isWarpWorking()
         if (works) {
             fetchWarpConfigFromServer()
         } else {
             showConfigCreationError()
         }
-    }
+    }*/
 
     private suspend fun showConfigCreationError() {
         uiCtx {
@@ -177,8 +188,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
     }
 
-    private suspend fun fetchWarpConfigFromServer() {
-        val config = WireGuardManager.getNewWarpConfig(WARP_ID)
+    /*private suspend fun fetchWarpConfigFromServer() {
+        val config = WireguardManager.getNewWarpConfig(WARP_ID)
         Log.i(LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()
@@ -188,9 +199,9 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             showWarpConfig()
             prefillWarpConfig(config)
         }
-    }
+    }*/
 
-    private fun handleWarpConfigView() {
+   /* private suspend fun handleWarpConfigView() {
         if (configId == WARP_ID) {
             if (isWarpConfAvailable()) {
                 if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config already available")
@@ -205,21 +216,21 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.interfaceRefresh.visibility = View.GONE
             b.addPeerFab.visibility = View.VISIBLE
         }
+    }*/
+
+    private suspend fun isWarpConfAvailable(): Boolean {
+        return WireguardManager.getWarpConfig() != null
     }
 
-    private fun isWarpConfAvailable(): Boolean {
-        return WireGuardManager.getWarpConfig() != null
-    }
-
-    private fun showNewWarpConfigLayout() {
-        b.tunnelDetailCard.visibility = View.GONE
+    /*private fun showNewWarpConfigLayout() {
+        b.interfaceDetailCard.visibility = View.GONE
         b.peersList.visibility = View.GONE
         b.addPeerFab.visibility = View.GONE
         b.newConfLayout.visibility = View.VISIBLE
     }
 
     private fun showWarpConfig() {
-        b.tunnelDetailCard.visibility = View.VISIBLE
+        b.interfaceDetailCard.visibility = View.VISIBLE
         b.peersList.visibility = View.VISIBLE
         b.addPeerFab.visibility = View.GONE
         b.interfaceEdit.visibility = View.GONE
@@ -230,12 +241,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun hideNewWarpConfLayout() {
         b.newConfLayout.visibility = View.GONE
-        b.tunnelDetailCard.visibility = View.VISIBLE
+        b.interfaceDetailCard.visibility = View.VISIBLE
         b.peersList.visibility = View.VISIBLE
     }
-
+*/
     private fun handleAppsCount() {
         val id = ProxyManager.ID_WG_BASE + configId
+        b.applicationsBtn.isEnabled = true
         mappingViewModel.getAppCountById(id).observe(this) {
             b.applicationsBtn.text = getString(R.string.add_remove_apps, it.toString())
         }
@@ -250,21 +262,26 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
         b.addPeerFab.setOnClickListener { openAddPeerDialog() }
 
-        b.applicationsBtn.setOnClickListener { openAppsDialog() }
+        b.applicationsBtn.setOnClickListener {
+            io {
+                val proxyName = WireguardManager.getConfigName(configId)
+                uiCtx { openAppsDialog(proxyName) }
+            }
+        }
 
         b.interfaceDelete.setOnClickListener { showDeleteInterfaceDialog() }
 
-        b.newConfLayout.setOnClickListener {
+        /*b.newConfLayout.setOnClickListener {
             b.newConfProgressBar.visibility = View.VISIBLE
             io { createConfigOrShowErrorLayout() }
-        }
+        }*/
 
         b.interfaceRefresh.setOnClickListener {
             b.interfaceRefresh.isEnabled = false
             b.interfaceRefresh.animation = animation
             b.interfaceRefresh.startAnimation(animation)
             io {
-                createConfigOrShowErrorLayout()
+                //createConfigOrShowErrorLayout()
                 uiCtx {
                     b.interfaceRefresh.isEnabled = true
                     b.interfaceRefresh.clearAnimation()
@@ -290,17 +307,66 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             )
         }
 
-        b.lockdownCheck.setOnCheckedChangeListener { _, isChecked ->
-            io {
-                WireGuardManager.updateLockdownConfig(configId, isChecked)
-                uiCtx {
-                    Toast.makeText(
-                        this,
-                        "Lockdown config updated successfully",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+        b.lockdownCheck.setOnClickListener {
+            if (b.lockdownCheck.isChecked) {
+                b.lockdownCheck.isChecked = false
+                showConfirmationDialog(
+                    "Lockdown",
+                    "If enabled, all requests from the selected apps will be forwarded to this WireGuard connection. If this configuration fails, it will result in a connection failure for the selected apps. Do you want to proceed?",
+                    1
+                )
+            } else {
+                updateLockdown(false)
             }
+        }
+
+        b.catchAllCheck.setOnClickListener {
+            if (b.catchAllCheck.isChecked) {
+                b.catchAllCheck.isChecked = false
+                showConfirmationDialog(
+                    "Catch-all",
+                    "This will capture all the apps that are not part of other WireGuard configurations and forward those requests to this WireGuard connection. Do you want to proceed?",
+                    2
+                )
+            } else {
+                updateCatchAll(false)
+            }
+        }
+
+        b.oneWgCheck.setOnClickListener {
+            if (b.oneWgCheck.isChecked) {
+                b.oneWgCheck.isChecked = false
+                showConfirmationDialog(
+                    "One WireGuard",
+                    "This will disable all other WireGuard configurations. All connections, including DNS, will be forwarded to this WireGuard configuration. Do you want to proceed?",
+                    3
+                )
+            } else {
+                // enable add apps button, if one-wireguard is disabled
+                handleAppsCount()
+                updateOneWireGuard(false)
+            }
+        }
+
+        b.lockdownInfo.setOnClickListener {
+            showInfoDialog(
+                "Lockdown",
+                "If enabled, all requests from the selected apps will be forwarded to this WireGuard connection. If this configuration fails, it will result in a connection failure for the selected apps."
+            )
+        }
+
+        b.catchAllInfo.setOnClickListener {
+            showInfoDialog(
+                "Catch-all",
+                "This will capture all the apps that are not part of other WireGuard configurations and forward those requests to this WireGuard connection."
+            )
+        }
+
+        b.oneWgInfo.setOnClickListener {
+            showInfoDialog(
+                "One WireGuard",
+                "This will disable all other WireGuard configurations. All connections, including DNS, will be forwarded to this WireGuard configuration."
+            )
         }
     }
 
@@ -309,10 +375,87 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         animation.duration = ANIMATION_DURATION
     }
 
-    private fun openAppsDialog() {
+    private fun showConfirmationDialog(title: String, message: String, type: Int) {
+        // type represents, 1 - lock, 2 - catch-all, 3 - one-wireguard
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ ->
+            when (type) {
+                1 -> {
+                    b.lockdownCheck.isChecked = true
+                    updateLockdown(true)
+                }
+                2 -> {
+                    b.catchAllCheck.isChecked = true
+                    updateCatchAll(true)
+                }
+                3 -> {
+                    b.oneWgCheck.isChecked = true
+                    updateOneWireGuard(true)
+                }
+            }
+        }
+
+        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+            // no-op
+        }
+        builder.create().show()
+    }
+
+    private fun showInfoDialog(title: String, message: String) {
+        val builder = MaterialAlertDialogBuilder(this)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setCancelable(true)
+        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { _, _ ->
+            // no-op
+        }
+
+        builder.create().show()
+    }
+
+    private fun updateLockdown(enabled: Boolean) {
+        io {
+            WireguardManager.updateLockdownConfig(configId, enabled)
+            uiCtx {
+                Toast.makeText(this, "Lockdown config updated successfully", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    private fun updateCatchAll(enabled: Boolean) {
+        io {
+            WireguardManager.updateCatchAllConfig(configId, enabled)
+            uiCtx {
+                Toast.makeText(this, "Catch all config updated successfully", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    private fun updateOneWireGuard(enabled: Boolean) {
+        io {
+            WireguardManager.updateOneWireGuardConfig(configId, enabled)
+            uiCtx {
+                // disable add apps button
+                b.applicationsBtn.isEnabled = !enabled
+                b.applicationsBtn.text = "All apps included"
+                Toast.makeText(
+                        this,
+                        "One WireGuard config updated successfully",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            }
+        }
+    }
+
+    private fun openAppsDialog(proxyName: String) {
         val themeId = Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme)
         val proxyId = ProxyManager.ID_WG_BASE + configId
-        val proxyName = WireGuardManager.getConfigName(configId)
         val appsAdapter = WgIncludeAppsAdapter(this, proxyId, proxyName)
         mappingViewModel.apps.observe(this) { appsAdapter.submitData(lifecycle, it) }
         val includeAppsDialog =
@@ -327,14 +470,18 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         builder.setMessage(getString(R.string.config_delete_dialog_desc))
         builder.setCancelable(true)
         builder.setPositiveButton(this.getString(R.string.lbl_delete)) { _, _ ->
-            WireGuardManager.deleteConfig(configId)
-            Toast.makeText(
-                    this,
-                    getString(R.string.config_delete_success_toast),
-                    Toast.LENGTH_SHORT
-                )
-                .show()
-            finish()
+            io {
+                WireguardManager.deleteConfig(configId)
+                uiCtx {
+                    Toast.makeText(
+                            this,
+                            getString(R.string.config_delete_success_toast),
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
+                    finish()
+                }
+            }
         }
 
         builder.setNegativeButton(this.getString(R.string.lbl_cancel)) { _, _ ->
