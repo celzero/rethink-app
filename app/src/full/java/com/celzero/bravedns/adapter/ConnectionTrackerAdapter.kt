@@ -25,6 +25,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +48,9 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ConnectionTrackerAdapter(private val context: Context) :
     PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
@@ -140,28 +145,30 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private fun displayAppDetails(ct: ConnectionTracker) {
             b.connectionAppName.text = ct.appName
+            io {
+                val apps = FirewallManager.getPackageNamesByUid(ct.uid)
+                uiCtx {
+                    if (apps.isEmpty()) {
+                        loadAppIcon(Utilities.getDefaultIcon(context))
+                        return@uiCtx
+                    }
 
-            val apps = FirewallManager.getPackageNamesByUid(ct.uid)
+                    val count = apps.count()
+                    val appName =
+                        if (count > 1) {
+                            context.getString(
+                                R.string.ctbs_app_other_apps,
+                                ct.appName,
+                                (count).minus(1).toString()
+                            )
+                        } else {
+                            ct.appName
+                        }
 
-            if (apps.isNullOrEmpty()) {
-                loadAppIcon(Utilities.getDefaultIcon(context))
-                return
-            }
-
-            val count = apps.count()
-            val appName =
-                if (count > 1) {
-                    context.getString(
-                        R.string.ctbs_app_other_apps,
-                        ct.appName,
-                        (count).minus(1).toString()
-                    )
-                } else {
-                    ct.appName
+                    b.connectionAppName.text = appName
+                    loadAppIcon(getIcon(context, apps[0], /*No app name */ ""))
                 }
-
-            b.connectionAppName.text = appName
-            loadAppIcon(getIcon(context, apps[0], /*No app name */ ""))
+            }
         }
 
         private fun displayProtocolDetails(port: Int, proto: Int) {
@@ -204,6 +211,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun displaySummaryDetails(ct: ConnectionTracker) {
+            val connType = ConnectionTracker.ConnType.get(ct.connType)
             if (
                 ct.duration == 0 &&
                     ct.downloadBytes == 0L &&
@@ -218,9 +226,16 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionDelay.text = ""
                     hasMinSummary = true
                 }
+                if (connType.isMetered()) {
+                    b.connectionDelay.text = "📶"
+                } else if (connType.isUnmetered()) {
+                    b.connectionDelay.text = "🌐"
+                }
+
                 if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
-                    b.connectionDelay.text = context.getString(R.string.symbol_key)
+                    b.connectionDelay.text =
+                        b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
                     hasMinSummary = true
                 }
                 if (!hasMinSummary) {
@@ -245,6 +260,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 )
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
             b.connectionDelay.text = ""
+            if (connType.isMetered()) {
+                b.connectionDelay.text = "📶"
+            } else if (connType.isUnmetered()) {
+                b.connectionDelay.text = "🌐"
+            }
             if (isConnectionHeavier(ct)) {
                 b.connectionDelay.text = context.getString(R.string.symbol_elephant)
             }
@@ -283,5 +303,13 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 .error(Utilities.getDefaultIcon(context))
                 .into(b.connectionAppIcon)
         }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }
