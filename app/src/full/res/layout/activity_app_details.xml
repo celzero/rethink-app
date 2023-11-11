@@ -24,7 +24,7 @@
                 android:id="@+id/aad_app_detail_icon"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_gravity="center"
+                android:layout_centerVertical="true"
                 android:src="@drawable/dns_icon" />
 
             <LinearLayout
@@ -85,6 +85,7 @@
         </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/aad_app_settings_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
@@ -157,7 +158,6 @@
                             android:visibility="gone"
                             app:drawableTopCompat="@drawable/ic_firewall_allow_grey" />
 
-
                         <TextView
                             android:id="@+id/aad_app_settings_block_wifi"
                             android:layout_width="0dp"
@@ -202,7 +202,6 @@
                             android:textColor="?primaryTextColor"
                             android:textSize="@dimen/default_font_text_view"
                             app:drawableTopCompat="@drawable/ic_firewall_lockdown_off" />
-
 
                     </LinearLayout>
 

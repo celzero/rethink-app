@@ -32,8 +32,8 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             app:cardCornerRadius="16dp"
+            android:visibility="gone"
             app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
