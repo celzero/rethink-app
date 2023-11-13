@@ -1094,6 +1094,7 @@ class BraveVPNService :
 
         builder.setSmallIcon(R.drawable.ic_notification_icon).setContentIntent(pendingIntent)
         builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
+        builder.setOngoing(true)
 
         // New action button options in the notification
         // 1. Pause / Resume, Stop action button.
