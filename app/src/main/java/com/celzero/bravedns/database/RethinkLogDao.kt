@@ -50,7 +50,7 @@ interface RethinkLogDao {
     // replace order by timeStamp desc with order by id desc, as order by timeStamp desc is building
     // the query with temporary index on the table. This is causing the query to be slow.
     // ref: https://stackoverflow.com/a/50776662 (auto covering index)
-    // explain QUERY plan SELECT * from RethinkConnectionLog ORDER by timeStamp desc
+    // explain QUERY plan SELECT * from RethinkLog ORDER by timeStamp desc
     // add LIMIT 35000 (Constants.MAX_LOGS) to the query to avoid the query to be slow
     @Query("select * from RethinkLog order by id desc LIMIT $MAX_LOGS")
     fun getRethinkLogByName(): PagingSource<Int, RethinkLog>
@@ -84,12 +84,12 @@ interface RethinkLogDao {
     fun getAppConnectionsCount(uid: Int): LiveData<Int>
 
     @Query(
-        "select * from RethinkConnectionLog where isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
+        "select * from RethinkLog where isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
     )
     fun getBlockedConnectionsFiltered(): PagingSource<Int, RethinkLog>
 
     @Query(
-        "select * from RethinkConnectionLog where isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from RethinkLog where isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
     )
     fun getBlockedConnectionsFiltered(query: String): PagingSource<Int, RethinkLog>
 
@@ -101,12 +101,12 @@ interface RethinkLogDao {
     fun purgeLogsByDate(date: Long)
 
     @Query(
-        "select * from RethinkConnectionLog where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
+        "select * from RethinkLog where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
     )
     fun getAllowedConnections(query: String): PagingSource<Int, RethinkLog>
 
     @Query(
-        "select * from RethinkConnectionLog where isBlocked = 0 order by id desc LIMIT $MAX_LOGS"
+        "select * from RethinkLog where isBlocked = 0 order by id desc LIMIT $MAX_LOGS"
     )
     fun getAllowedConnections(): PagingSource<Int, RethinkLog>
 

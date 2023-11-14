@@ -83,6 +83,7 @@ class GoVpnAdapter : KoinComponent {
         this.context = context
         this.externalScope = externalScope
 
+        val defaultDns = newDefaultTransport(appConfig.getDefaultDns())
         // no need to connect tunnel if already connected, just reset the tunnel with new
         // parameters
         Log.i(LOG_TAG_VPN, "connect tunnel with new params")
@@ -92,6 +93,7 @@ class GoVpnAdapter : KoinComponent {
                 opts.mtu.toLong(),
                 opts.preferredEngine.value(),
                 opts.fakeDns,
+                defaultDns,
                 opts.bridge
             ) // may throw exception
         setTunnelMode(opts)
@@ -104,7 +106,8 @@ class GoVpnAdapter : KoinComponent {
         }
 
         // setTcpProxyIfNeeded()
-        newDefaultTransport(appConfig.getDefaultDns())
+        // no need to add default in init as it is already added in connect
+        // addDefaultTransport(appConfig.getDefaultDns())
         setRoute(opts)
         setWireguardTunnelModeIfNeeded(opts.tunProxyMode)
         setSocks5TunnelModeIfNeeded(opts.tunProxyMode)
@@ -736,7 +739,25 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    fun newDefaultTransport(url: String?) {
+    private fun newDefaultTransport(url: String): intra.DefaultDNS {
+        try {
+            var ips: String = getIpString(context, url)
+            if (DEBUG) Log.d(LOG_TAG_VPN, "default transport url: $url ips: $ips")
+            if (url.contains("http")) {
+                return Intra.newDefaultDNS(Dnsx.DOH, url, ips)
+            }
+            // no need to set url for dns53
+            ips = url
+            return Intra.newDefaultDNS(Dnsx.DNS53, "" , ips)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
+            // most of the android devices have google dns, so add it as default transport
+            // TODO: notify the user that the default transport could not be set
+            return Intra.newDefaultDNS(Dnsx.DNS53, "", "8.8.4.4")
+        }
+    }
+
+    fun addDefaultTransport(url: String?) {
         try {
             if (!tunnel.isConnected) {
                 Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip new default transport")
@@ -745,14 +766,21 @@ class GoVpnAdapter : KoinComponent {
             // when the user has selected none as the dns mode, we use the grounded transport
             if (url.isNullOrEmpty()) {
                 Log.i(LOG_TAG_VPN, "set default transport to null, as dns mode is none")
-                return Intra.addDefaultTransport(tunnel, null, null)
+                return
             }
 
             val ips: String = getIpString(context, url)
-            if (DEBUG) Log.d(LOG_TAG_VPN, "default transport ips: $ips")
-            return Intra.addDefaultTransport(tunnel, url, ips)
+            if (DEBUG) Log.d(LOG_TAG_VPN, "default transport url: $url ips: $ips")
+            if (url.contains("http")) {
+                Intra.addDefaultTransport(tunnel, Dnsx.DOH, url, ips)
+            } else {
+                Intra.addDefaultTransport(tunnel, Dnsx.DNS53, url, ips)
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
+            // most of the android devices have google dns, so add it as default transport
+            // TODO: notify the user that the default transport could not be set
+            Intra.addDefaultTransport(tunnel, Dnsx.DNS53,"8.8.4.4", "")
         }
     }
 
