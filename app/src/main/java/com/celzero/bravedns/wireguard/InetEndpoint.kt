@@ -90,9 +90,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
         fun parse(endpoint: String): InetEndpoint {
             if (FORBIDDEN_CHARACTERS.matcher(endpoint).find())
                 throw ParseException(InetEndpoint::class.java, endpoint, "Forbidden characters")
-            val uri: URI
-            uri =
-                try {
+            val uri: URI = try {
                     URI("wg://$endpoint")
                 } catch (e: URISyntaxException) {
                     throw ParseException(InetEndpoint::class.java, endpoint, e)

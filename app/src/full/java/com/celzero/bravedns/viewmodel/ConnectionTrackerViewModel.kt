@@ -35,8 +35,13 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private var filterString: MutableLiveData<String> = MutableLiveData()
     private var filterRules: MutableSet<String> = mutableSetOf()
-    private var filterType: ConnectionTrackerFragment.TopLevelFilter =
-        ConnectionTrackerFragment.TopLevelFilter.ALL
+    private var filterType: TopLevelFilter = TopLevelFilter.ALL
+
+    enum class TopLevelFilter(val id: Int) {
+        ALL(0),
+        ALLOWED(1),
+        BLOCKED(2)
+    }
 
     init {
         filterString.value = ""
@@ -57,7 +62,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     fun setFilter(
         searchString: String,
         filter: Set<String>,
-        type: ConnectionTrackerFragment.TopLevelFilter
+        type: TopLevelFilter
     ) {
         filterRules.clear()
 
@@ -70,13 +75,13 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private fun fetchNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
         return when (filterType) {
-            ConnectionTrackerFragment.TopLevelFilter.ALL -> {
+            TopLevelFilter.ALL -> {
                 getAllNetworkLogs(input)
             }
-            ConnectionTrackerFragment.TopLevelFilter.ALLOWED -> {
+            TopLevelFilter.ALLOWED -> {
                 getAllowedNetworkLogs(input)
             }
-            ConnectionTrackerFragment.TopLevelFilter.BLOCKED -> {
+            TopLevelFilter.BLOCKED -> {
                 getBlockedNetworkLogs(input)
             }
         }

@@ -38,6 +38,7 @@ import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import dnsx.Dnsx
 import dnsx.RDNS
 import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
@@ -371,10 +372,9 @@ object RethinkBlocklistManager : KoinComponent {
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
-            Log.d("TEST","flags: $flags, type: $type, isRdnsNull(${getRDNS(type)}, getRDNS: ${getRDNS(type)?.flagsToStamp(flags)})}")
-            getRDNS(type)?.flagsToStamp(flags) ?: ""
+            getRDNS(type)?.flagsToStamp(flags, Dnsx.EB32) ?: ""
         } catch (e: java.lang.Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e ")
+            Log.e(LoggerConstants.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
             ""
         }
     }
@@ -383,7 +383,7 @@ object RethinkBlocklistManager : KoinComponent {
         return try {
             convertCsvToList(getRDNS(type)?.stampToFlags(stamp))
         } catch (e: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e ")
+            Log.e(LoggerConstants.LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e")
             setOf()
         }
     }

@@ -37,6 +37,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel
+import com.celzero.bravedns.viewmodel.ConnectionTrackerViewModel.TopLevelFilter
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -67,12 +68,6 @@ class ConnectionTrackerFragment :
             fragment.arguments = args
             return fragment
         }
-    }
-
-    enum class TopLevelFilter(val id: Int) {
-        ALL(0),
-        ALLOWED(1),
-        BLOCKED(2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

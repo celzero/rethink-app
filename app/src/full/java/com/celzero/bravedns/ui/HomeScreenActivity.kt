@@ -49,6 +49,8 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.BACKUP_FILE_EXTN
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
+import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
@@ -56,9 +58,10 @@ import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireGuardManager
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
@@ -91,6 +94,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
 
     private val persistentState by inject<PersistentState>()
+    private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
     private val refreshDatabase by inject<RefreshDatabase>()
 
@@ -248,7 +252,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 refreshDatabase.refreshAppInfoDatabase()
                 IpRulesManager.loadIpRules()
                 DomainRulesManager.load()
-                WireGuardManager.restoreProcessDeleteWireGuardEntries()
+                WireguardManager.restoreProcessDeleteWireGuardEntries()
             }
         }
     }
@@ -346,6 +350,54 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun removeThisMethod() {
         moveRemoteBlocklistFileFromAsset()
+        updateHttpProxy()
+    }
+
+    private fun updateHttpProxy() {
+        val defaultHost = "http://127.0.0.1:8118"
+        if (
+            persistentState.httpProxyHostAddress.isEmpty() ||
+                persistentState.httpProxyHostAddress == defaultHost
+        ) {
+            return
+        }
+
+        val host = persistentState.httpProxyHostAddress
+        io {
+            val endpoint = appConfig.getHttpProxyDetails()
+
+            val proxyEndpoint = constructProxy(endpoint.id, host)
+
+            if (proxyEndpoint != null) {
+                appConfig.updateCustomHttpProxy(proxyEndpoint)
+            }
+        }
+    }
+
+    private fun constructProxy(id: Int, ip: String?): ProxyEndpoint? {
+        val name = Constants.HTTP
+        val mode = ProxyManager.ProxyMode.HTTP
+        if (ip.isNullOrEmpty()) {
+            Log.w(LoggerConstants.LOG_TAG_PROXY, "cannot construct proxy with values ip: $ip")
+            return null
+        }
+
+        return ProxyEndpoint(
+            id,
+            name,
+            mode.value,
+            proxyType = "NONE",
+            proxyAppName = "",
+            ip,
+            proxyPort = 0,
+            userName = "",
+            password = "",
+            isSelected = true,
+            isCustom = true,
+            isUDP = false,
+            modifiedDataTime = 0L,
+            latency = 0
+        )
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
