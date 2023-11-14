@@ -159,12 +159,7 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         val allowed = makeChip(DnsLogFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val maybeBlocked =
             makeChip(DnsLogFilter.MAYBE_BLOCKED.id, getString(R.string.lbl_maybe_blocked), false)
-        val blocked =
-            makeChip(
-                ConnectionTrackerFragment.TopLevelFilter.BLOCKED.id,
-                getString(R.string.lbl_blocked),
-                false
-            )
+        val blocked = makeChip(DnsLogFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
 
         b.filterChipGroup.addView(all)
         b.filterChipGroup.addView(allowed)
