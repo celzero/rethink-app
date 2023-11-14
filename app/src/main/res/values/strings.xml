@@ -473,6 +473,9 @@
     <string name="settings_app_notification_a13_heading" translatable="true">App Notification</string>
     <string name="settings_app_notification_a13_desc" translatable="true">Enable notification permission for the app</string>
 
+    <string name="settings_app_notification_persistent_heading" translatable="true">Persistent Notification</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Make the notification persistent</string>
+
     <string name="settings_theme_heading" translatable="true">Appearance</string>
     <string name="settings_theme_desc" translatable="true">Dark/light theme</string>
 

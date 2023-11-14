@@ -213,7 +213,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
                 !b.settingsActivityAutoStartSwitch.isChecked
         }
 
-        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean
+        b.settingsActivityAutoStartSwitch.setOnCheckedChangeListener {
+            _: CompoundButton,
+            b: Boolean
             ->
             persistentState.prefAutoStartBootUp = b
         }
@@ -246,6 +248,17 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         b.settingsActivityNotificationRl.setOnClickListener {
             enableAfterDelay(TimeUnit.SECONDS.toMillis(1L), b.settingsActivityNotificationRl)
             showNotificationActionDialog()
+        }
+
+        b.settingsActivityAppNotificationPersistentRl.setOnClickListener {
+            b.settingsActivityAppNotificationPersistentSwitch.isChecked =
+                !b.settingsActivityAppNotificationPersistentSwitch.isChecked
+        }
+
+        b.settingsActivityAppNotificationPersistentSwitch.setOnCheckedChangeListener {
+            _: CompoundButton,
+            b: Boolean ->
+            persistentState.persistentNotification = b
         }
 
         b.settingsActivityPcapRl.setOnClickListener {
