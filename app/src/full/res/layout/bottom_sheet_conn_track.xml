@@ -31,8 +31,8 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
-            android:fontFamily="sans-serif-light"
             android:layout_toStartOf="@id/bs_conn_track_app_info"
+            android:fontFamily="sans-serif-light"
             android:padding="5dp"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/small_font_text_view"
@@ -133,8 +133,8 @@
         android:layout_margin="5dp"
         android:layout_marginBottom="10dp"
         android:ellipsize="end"
-        android:gravity="center"
         android:fontFamily="sans-serif-light"
+        android:gravity="center"
         android:padding="5dp"
         android:textColor="?attr/primaryLightColorText"
         android:textIsSelectable="true"
@@ -146,9 +146,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|bottom"
+        android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:maxLines="1"
-        android:fontFamily="sans-serif-light"
         android:singleLine="true"
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view" />
@@ -203,75 +203,63 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="10dp">
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/bs_conn_unknown_app_txt"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_gravity="center"
+            android:layout_weight="0.75"
+            android:padding="5dp"
+            android:text="@string/univ_firewall_rule_3"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
 
-            <TextView
-                android:id="@+id/bs_conn_unknown_app_txt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.75"
-                android:padding="5dp"
-                android:text="@string/univ_firewall_rule_3"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/bs_conn_unknown_app_check"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.25"
-                android:gravity="center" />
-        </LinearLayout>
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/bs_conn_unknown_app_check"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.25"
+            android:gravity="center" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/bs_conn_blocked_rule3_header_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:paddingBottom="5dp"
+        android:weightSum="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/bs_conn_block_conn_all_txt"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:weightSum="1">
+            android:layout_gravity="center"
+            android:layout_weight="0.6"
+            android:padding="5dp"
+            android:text="@string/bsct_block_ip"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
 
-            <TextView
-                android:id="@+id/bs_conn_block_conn_all_txt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.6"
-                android:padding="5dp"
-                android:text="@string/bsct_block_ip"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-
-            <Spinner
-                android:id="@+id/bs_conn_ip_rule_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.4"
-                android:background="@drawable/spinner_outline"
-                android:popupBackground="@drawable/spinner_outline_with_bg"
-                android:spinnerMode="dropdown"
-                tools:listitem="@layout/spinner_item_firewall_status" />
-        </LinearLayout>
+        <Spinner
+            android:id="@+id/bs_conn_ip_rule_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.4"
+            android:background="@drawable/spinner_outline"
+            android:popupBackground="@drawable/spinner_outline_with_bg"
+            android:spinnerMode="dropdown"
+            tools:listitem="@layout/spinner_item_firewall_status" />
 
     </LinearLayout>
 
@@ -281,39 +269,32 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/bs_conn_domain_txt"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:weightSum="1">
+            android:layout_gravity="center"
+            android:layout_weight="0.6"
+            android:padding="5dp"
+            android:text="@string/bsct_block_domain"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="@dimen/large_font_text_view" />
 
-            <TextView
-                android:id="@+id/bs_conn_domain_txt"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.6"
-                android:padding="5dp"
-                android:text="@string/bsct_block_domain"
-                android:textColor="?attr/primaryTextColor"
-                android:textSize="@dimen/large_font_text_view" />
-
-            <Spinner
-                android:id="@+id/bs_conn_domain_spinner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.4"
-                android:background="@drawable/spinner_outline"
-                android:popupBackground="@drawable/spinner_outline_with_bg"
-                android:spinnerMode="dropdown"
-                tools:listitem="@layout/spinner_item_firewall_status" />
-        </LinearLayout>
+        <Spinner
+            android:id="@+id/bs_conn_domain_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.4"
+            android:background="@drawable/spinner_outline"
+            android:popupBackground="@drawable/spinner_outline_with_bg"
+            android:spinnerMode="dropdown"
+            tools:listitem="@layout/spinner_item_firewall_status" />
 
     </LinearLayout>
 
