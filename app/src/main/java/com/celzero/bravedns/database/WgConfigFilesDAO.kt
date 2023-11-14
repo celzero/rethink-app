@@ -23,8 +23,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_ID
-import com.celzero.bravedns.service.WireGuardManager.WARP_ID
+import com.celzero.bravedns.service.WireguardManager.SEC_WARP_ID
+import com.celzero.bravedns.service.WireguardManager.WARP_ID
 
 @Dao
 interface WgConfigFilesDAO {
@@ -57,6 +57,9 @@ interface WgConfigFilesDAO {
 
     @Query("update WgConfigFiles set isCatchAll = :isCatchAll where id = :id")
     fun updateCatchAllConfig(id: Int, isCatchAll: Boolean)
+
+    @Query("update WgConfigFiles set oneWireGuard = :oneWireGuard where id = :id")
+    fun updateOneWireGuardConfig(id: Int, oneWireGuard: Boolean)
 
     @Query("update WgConfigFiles set isLockdown = :isLockdown where id = :id")
     fun updateLockdownConfig(id: Int, isLockdown: Boolean)

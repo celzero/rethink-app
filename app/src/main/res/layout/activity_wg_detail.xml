@@ -57,7 +57,7 @@
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tunnel_detail_card"
+                android:id="@+id/interface_detail_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
@@ -253,25 +253,65 @@
                         app:barrierDirection="bottom"
                         app:constraint_referenced_ids="listen_port_text,mtu_text" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/applications_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.75"
+                        android:text="Add / Remove apps"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/listen_port_mtu_barrier"
+                        app:layout_constraintWidth_max="@dimen/max_btn_size"
+                        app:rippleColor="?attr/secondaryTextColor" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/other_settings_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/interface_detail_card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="Other Settings"
+                        android:textColor="?attr/primaryLightColorText" />
+
                     <RelativeLayout
                         android:id="@+id/lockdown_ll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:padding="10dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/listen_port_mtu_barrier">
+                        app:layout_constraintTop_toBottomOf="parent">
 
                         <androidx.appcompat.widget.AppCompatCheckBox
                             android:id="@+id/lockdown_check"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/lockdown_info"
                             android:buttonTint="?attr/accentGood"
                             android:foregroundTint="?attr/accentGood"
-                            android:layout_alignParentStart="true"
                             android:paddingStart="5dp"
                             android:paddingEnd="5dp"
-                            android:layout_toStartOf="@id/lockdown_info"
-                            android:text="Enable lockdown"
+                            android:text="Lockdown"
                             android:textSize="@dimen/extra_large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatImageView
@@ -284,30 +324,79 @@
 
                     </RelativeLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/applications_btn"
-                        android:layout_width="wrap_content"
+                    <RelativeLayout
+                        android:id="@+id/catch_all_ll"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:alpha="0.75"
-                        android:text="Add / Remove apps"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        android:padding="10dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/lockdown_ll"
-                        app:layout_constraintWidth_max="@dimen/max_btn_size"
-                        app:rippleColor="?attr/secondaryTextColor" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintTop_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/catch_all_check"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/catch_all_info"
+                            android:buttonTint="?attr/accentGood"
+                            android:foregroundTint="?attr/accentGood"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:text="Catch-all"
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/catch_all_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_info_white" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/one_wg_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/one_wg_check"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/one_wg_info"
+                            android:buttonTint="?attr/accentGood"
+                            android:foregroundTint="?attr/accentGood"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:text="One-WireGuard"
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/one_wg_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_info_white" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/peers_list"
                 android:layout_width="match_parent"
-                android:layout_marginTop="10dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tunnel_detail_card" />
+                app:layout_constraintTop_toBottomOf="@+id/other_settings_card" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

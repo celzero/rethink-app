@@ -28,6 +28,7 @@ class WgConfigFiles {
     var isActive: Boolean = false
     var isCatchAll: Boolean = false
     var isLockdown: Boolean = false
+    var oneWireGuard: Boolean = false
     var isDeletable: Boolean = true
 
     override fun equals(other: Any?): Boolean {
@@ -48,7 +49,8 @@ class WgConfigFiles {
         serverResponse: String,
         isActive: Boolean,
         isCatchAll: Boolean,
-        isLockdown: Boolean
+        isLockdown: Boolean,
+        oneWireGuard: Boolean
     ) {
         this.id = id
         this.name = name
@@ -57,6 +59,7 @@ class WgConfigFiles {
         this.isActive = isActive
         this.isCatchAll = isCatchAll
         this.isLockdown = isLockdown
+        this.oneWireGuard = oneWireGuard
     }
 
     constructor(
@@ -65,7 +68,8 @@ class WgConfigFiles {
         serverResponse: String,
         isActive: Boolean,
         isCatchAll: Boolean,
-        isLockdown: Boolean
+        isLockdown: Boolean,
+        oneWireGuard: Boolean
     ) {
         this.name = name
         this.configPath = configPath
@@ -73,5 +77,6 @@ class WgConfigFiles {
         this.isActive = isActive
         this.isCatchAll = isCatchAll
         this.isLockdown = isLockdown
+        this.oneWireGuard = oneWireGuard
     }
 }
