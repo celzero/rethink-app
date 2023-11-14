@@ -42,6 +42,8 @@ object ViewModelModule {
         viewModel { WgConfigViewModel(get()) }
         viewModel { DoTEndpointViewModel(get()) }
         viewModel { ODoHEndpointViewModel(get()) }
+        viewModel { RethinkLogViewModel(get()) }
+        viewModel { AlertsViewModel(get(), get()) }
     }
 
     val modules = listOf(viewModelModule)

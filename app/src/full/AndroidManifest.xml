@@ -114,6 +114,9 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
+        <activity
+            android:name=".ui.activity.AlertsActivity"
+            android:finishOnTaskLaunch="true"  />
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"

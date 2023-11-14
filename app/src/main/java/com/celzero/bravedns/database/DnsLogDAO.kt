@@ -97,4 +97,10 @@ interface DnsLogDAO {
 
     @Query("select time from DNSLogs where id = (select min(id) from DNSLogs)")
     fun getLeastLoggedTime(): Long
+
+    @Query("select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time > :from and time < :to group by queryStr order by count desc LIMIT 5")
+    fun getBlockedDnsLogList(from: Long, to: Long): LiveData<List<AppConnection>>
+
+    @Query("select count(id) from DNSLogs where isBlocked = 1 and time > :from and time < :to")
+    fun getBlockedDomainsCount(from: Long, to: Long): LiveData<Int>
 }

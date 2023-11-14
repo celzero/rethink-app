@@ -209,7 +209,31 @@ interface ConnectionTrackerDAO {
     fun getLeastLoggedTime(): Long
 
     @Query(
-        "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :fromTime and timeStamp <= :toTime GROUP BY uid"
+        "SELECT uid, SUM(uploadBytes) AS uploadBytes, SUM(downloadBytes) AS downloadBytes FROM ConnectionTracker where timeStamp >= :from and timeStamp <= :to GROUP BY uid"
     )
-    fun getDataUsage(fromTime: Long, toTime: Long): List<DataUsage>
+    fun getDataUsage(from: Long, to: Long): List<DataUsage>
+
+    // blocked by rule #2, #2D (ip block, ip block universal)
+    @Query(
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #2', 'Rule #2D') group by ipAddress, appName order by count desc LIMIT 5"
+    )
+    fun getBlockedIpLogList(from: Long, to: Long): LiveData<List<AppConnection>>
+
+    // blocked by rule #1, #1B, #1D, #1E, #1G (app block, new app block, unmetered block, metered block, isolate)
+    @Query(
+        "select uid as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #1', 'Rule #1B', 'Rule #1D', 'Rule #1E', 'Rule #1G') group by appName order by count desc LIMIT 5"
+    )
+    fun getBlockedAppLogList(from: Long, to: Long): LiveData<List<AppConnection>>
+
+    // blocked by rule #1, #1B, #1D, #1E, #1G (app block, new app block, unmetered block, metered block, isolate)
+    @Query(
+        "select count(id) from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #1', 'Rule #1B', 'Rule #1D', 'Rule #1E', 'Rule #1G')"
+    )
+    fun getBlockedAppsCount(from: Long, to: Long): LiveData<Int>
+
+    // blocked by rule #2, #2D (ip block, ip block universal)
+    @Query(
+        "select count(id) from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #2', 'Rule #2D')"
+    )
+    fun getBlockedIpCount(from: Long, to: Long): LiveData<Int>
 }

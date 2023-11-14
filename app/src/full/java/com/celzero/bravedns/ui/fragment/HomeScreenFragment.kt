@@ -47,6 +47,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
+import com.celzero.bravedns.ui.activity.AlertsActivity
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
@@ -67,21 +68,24 @@ import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
+import com.celzero.bravedns.viewmodel.AlertsViewModel
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
+    private val alertsViewModel: AlertsViewModel by viewModel()
 
     private var isVpnActivated: Boolean = false
 
@@ -94,7 +98,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         FIREWALL,
         LOGS,
         RULES,
-        PROXY
+        PROXY,
+        ALERTS
     }
 
     override fun onAttach(context: Context) {
@@ -107,7 +112,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         initializeValues()
         initializeClickListeners()
         observeVpnState()
-        observeLogsCount()
     }
 
     private fun initializeValues() {
@@ -169,6 +173,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsSponsor.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
             startActivity(intent)
+        }
+
+        b.fhsCardAlertsLl.setOnClickListener {
+            startActivity(ScreenType.ALERTS)
         }
     }
 
@@ -252,6 +260,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         enableAppsCardIfNeeded()
         enableProxyCardIfNeeded()
         enableLogsCardIfNeeded()
+        enableAlertsCardIfNeeded()
     }
 
     private fun enableFirewallCardIfNeeded() {
@@ -312,6 +321,43 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         } else {
             disableLogsCard()
             unObserveLogsCount()
+        }
+    }
+
+    private fun enableAlertsCardIfNeeded() {
+        if (isVpnActivated) {
+            observeAlertsCount()
+        } else {
+            disableAlertsCard()
+            unObserveAlertsCount()
+        }
+    }
+
+    private fun disableAlertsCard() {
+        b.fhsCardAlertsIpCount.text = getString(R.string.firewall_card_text_inactive)
+        b.fhsCardAlertsIpCount.isSelected = true
+    }
+
+    private fun unObserveAlertsCount() {
+        alertsViewModel.getBlockedAppsCount().removeObservers(viewLifecycleOwner)
+        alertsViewModel.getBlockedDomainsCount().removeObservers(viewLifecycleOwner)
+        alertsViewModel.getBlockedIpCount().removeObservers(viewLifecycleOwner)
+    }
+
+    private fun observeAlertsCount() {
+        alertsViewModel.getBlockedAppsCount().observe(viewLifecycleOwner) {
+            b.fhsCardAlertsAppCount.text = "$it apps"
+            b.fhsCardAlertsAppCount.isSelected = true
+        }
+
+        alertsViewModel.getBlockedDomainsCount().observe(viewLifecycleOwner) {
+            b.fhsCardAlertsDomainCount.text = "$it domains"
+            b.fhsCardAlertsDomainCount.isSelected = true
+        }
+
+        alertsViewModel.getBlockedIpCount().observe(viewLifecycleOwner) {
+            b.fhsCardAlertsIpCount.text = "$it IPs"
+            b.fhsCardAlertsIpCount.isSelected = true
         }
     }
 
@@ -722,6 +768,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 ScreenType.LOGS -> Intent(requireContext(), NetworkLogsActivity::class.java)
                 ScreenType.RULES -> Intent(requireContext(), CustomRulesActivity::class.java)
                 ScreenType.PROXY -> Intent(requireContext(), ProxySettingsActivity::class.java)
+                ScreenType.ALERTS -> Intent(requireContext(), AlertsActivity::class.java)
             }
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
