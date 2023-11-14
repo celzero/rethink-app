@@ -176,6 +176,9 @@ class Constants {
         // constants to send type of proxy: for socks5
         const val SOCKS = "Socks5"
 
+        // constants to send type of proxy: for http
+        const val HTTP = "HTTP"
+
         // data-time format used as part of network log adapter
         const val DATE_FORMAT_PATTERN = "HH:mm:ss"
 

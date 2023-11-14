@@ -20,12 +20,12 @@ import androidx.lifecycle.LiveData
 
 class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 
-    suspend fun insert(proxyEndpoint: ProxyEndpoint) {
-        proxyEndpointDAO.insert(proxyEndpoint)
+    suspend fun update(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointDAO.update(proxyEndpoint)
     }
 
-    suspend fun deleteOlderData(date: Long) {
-        proxyEndpointDAO.deleteOlderData(date)
+    suspend fun insert(proxyEndpoint: ProxyEndpoint) {
+        proxyEndpointDAO.insert(proxyEndpoint)
     }
 
     suspend fun removeConnectionStatus() {
@@ -36,8 +36,28 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
         return proxyEndpointDAO.getCount()
     }
 
-    suspend fun getConnectedProxy(): ProxyEndpoint? {
-        return proxyEndpointDAO.getConnectedProxy()
+    suspend fun getConnectedSocks5Proxy(): ProxyEndpoint? {
+        return proxyEndpointDAO.getConnectedSocks5Proxy()
+    }
+
+    suspend fun getCustomSocks5Endpoint(): ProxyEndpoint {
+        return proxyEndpointDAO.getCustomSocks5Endpoint()
+    }
+
+    suspend fun getHttpProxyDetails(): ProxyEndpoint {
+        return proxyEndpointDAO.getHttpProxyDetails()
+    }
+
+    suspend fun getOrbotSocks5Endpoint(): ProxyEndpoint {
+        return proxyEndpointDAO.getOrbotSocks5Endpoint()
+    }
+
+    suspend fun getOrbotHttpEndpoint(): ProxyEndpoint {
+        return proxyEndpointDAO.getOrbotHttpEndpoint()
+    }
+
+    suspend fun getConnectedHttpProxy(): ProxyEndpoint {
+        return proxyEndpointDAO.getConnectedHttpProxy()
     }
 
     fun getConnectedProxyLiveData(): LiveData<ProxyEndpoint?> {
@@ -46,13 +66,5 @@ class ProxyEndpointRepository(private val proxyEndpointDAO: ProxyEndpointDAO) {
 
     suspend fun getConnectedOrbotProxy(): ProxyEndpoint {
         return proxyEndpointDAO.getConnectedOrbotProxy()
-    }
-
-    suspend fun clearAllData() {
-        proxyEndpointDAO.clearAllData()
-    }
-
-    suspend fun clearOrbotData() {
-        proxyEndpointDAO.clearOrbotData()
     }
 }
