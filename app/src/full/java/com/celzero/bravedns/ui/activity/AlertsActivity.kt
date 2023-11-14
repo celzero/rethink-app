@@ -66,7 +66,6 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
         // observe top 3 blocked ip addresses from the database (ConnectionTrackerRepository)
         // and display them in a recycler view
         alertsViewModel.getBlockedIpLogList().observe(this) {
-            Log.d("TEST", "alerts size: ${alerts.size}")
             process(it, AlertCategory.FIREWALL)
         }
     }
@@ -137,7 +136,6 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
                 isCustom = false /* isCustom */,
                 isNotified = false /* isNotified */
             )
-        Log.d("TEST", "alert: ${alert.alertMessage}")
         return alert
     }
 
@@ -145,14 +143,12 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
         // observe top 3 blocked ip addresses from the database (ConnectionTrackerRepository)
         // and display them in a recycler view
         alertsViewModel.getBlockedAppsLogList().observe(this) {
-            Log.d("TEST", "alerts(app) size: ${alerts.size}")
             process(it, AlertCategory.APP)
         }
     }
 
     private fun observeDnsBlock() {
         alertsViewModel.getBlockedDnsLogList().observe(this) {
-            Log.d("TEST", "alerts(app) size: ${alerts.size}")
             process(it, AlertCategory.DNS)
         }
     }
