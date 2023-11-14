@@ -30,5 +30,6 @@ data class ConnTrackerMetaData(
     var blocklists: String,
     val protocol: Int,
     var query: String,
-    var connId: String
+    var connId: String,
+    var connType: String
 ) : Serializable
