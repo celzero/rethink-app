@@ -58,7 +58,7 @@
     <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">डीएनएसक्रिप्ट रिज़ॉल्वर हटाएं\?</string>
     <string name="local_blocklist_download" translatable="true">ब्लॉकलिस्ट डाउनलोड करें</string>
     <string name="local_blocklist_download_desc" translatable="true">इस सुविधा का उपयोग करने के लिए ब्लॉकलिस्ट (लगभग 60 एमबी) डाउनलोड करें\?</string>
-    <string name="http_proxy_dialog_heading" translatable="true">एचटीटीपी(एस) प्रॉक्सी सेट करें</string>
+    <string name="http_proxy_dialog_heading" translatable="true">एचटीटीपी(एस) कनेक्ट प्रॉक्सी सेट करें</string>
     <string name="dns_proxy_remove_success" translatable="true">डीएनएस प्रॉक्सी हटा दिया गया।</string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">डीएनएस प्रॉक्सी</string>
     <string name="configure_dns_connected_dns_crypt_status" translatable="true">डीएनएसक्रिप्ट</string>
@@ -360,14 +360,14 @@
     <string name="settings_enable_logs" translatable="true">ऑन-डिवाइस लॉगिंग सक्षम करें</string>
     <string name="app_mode_choose" translatable="true">मोड चुनें</string>
     <string name="relative_time_yesterday" translatable="true">कल</string>
-    <string name="whats_dialog_title" translatable="true">संस्करण 054सी में क्या नया है</string>
+    <string name="whats_dialog_title" translatable="true">055ए में क्या नया है</string>
     <string name="relative_time_today" translatable="true">आज</string>
     <string name="settings_app_notification_a13_heading" translatable="true">ऐप अधिसूचना</string>
     <string name="settings_http_proxy_error_text1" translatable="true">पोर्ट रेंज 1024-65535 में होनी चाहिए</string>
     <string name="settings_http_proxy_error_text2" translatable="true">अमान्य पोर्ट</string>
     <string name="settings_http_proxy_error_text3" translatable="true">होस्टनाम खाली है</string>
     <string name="firewall_status_block_unmetered" translatable="true">बिना मीटर वाले (वाईफ़ाई) नेटवर्क पर ब्लॉक किया गया</string>
-    <string name="lbl_proceed" translatable="true">आगे बढ़ें</string>
+    <string name="lbl_proceed" translatable="true">जारी रखें</string>
     <string name="hsf_vpn_prepare_failure" translatable="true">या तो वीपीएन अनुमति गायब है, या कोई अन्य ऐप हमेशा-ऑन वीपीएन मोड में है।</string>
     <string name="hsf_start_dialog_header" translatable="true">%1$s प्रारंभ करें</string>
     <string name="dc_local_block_heading" translatable="true">ऑन-डिवाइस ब्लॉकलिस्ट</string>
@@ -829,9 +829,50 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">यूनीवर्सल डीएनएस और फायरवॉल नियमों को बायपास करेगा</string>
     <string name="brbs_backup_restore_desc" translatable="true">सभी ऐप वर्जन और डिवाइस पे एक साथ काम नहीं करता</string>
     <string name="lbl_maybe_blocked" translatable="true">शायद ब्लॉक किया</string>
-    <string name="trusted_domains_desc" translatable="true">भरोसेमंद डोमेन का नियम सिर्फ <u>रीथिंक के डीएनएस</u> के साथ काम करता है।</string>
+    <string name="trusted_domains_desc" translatable="true">ट्रस्ट डोमेन रूल <u>रीथिंक के डीएनएस</u> के साथ बेहतर काम करता है।</string>
     <string name="settings_allow_lan_heading" translatable="true">निजी आइपी रूट ना करे (प्रयोग)</string>
     <string name="settings_allow_lan_desc" translatable="true">रीथिंक के वीपीएन टनल से लैन, लूपबैक, और लिंक-लोकल रूट बाहर रखे।</string>
     <string name="lbl_network" translatable="true">नेटवर्क</string>
     <string name="bypass_dns_firewall_tooltip">%1$s सिर्फ रीथिंक के डीएनएस के साथ काम करता है</string>
+    <string name="lbl_import" translatable="true">इंपोर्ट करें</string>
+    <string name="lbl_allowed_ips" translatable="true">अलाउड आईपी</string>
+    <string name="lbl_socks5" translatable="true">सॉक्स5</string>
+    <string name="lbl_http" translatable="true">एचटीटीपी</string>
+    <string name="lbl_wireguard" translatable="true">वायरगार्ड</string>
+    <string name="lbl_mtu" translatable="true">एमटीयू</string>
+    <string name="lbl_sec" translatable="true">सेकंड</string>
+    <string name="lbl_hour" translatable="true">घंटे</string>
+    <string name="lbl_persistent_keepalive" translatable="true">परसिसटेंट कीपअलाइव</string>
+    <string name="lbl_save" translatable="true">सेव करें</string>
+    <string name="lbl_optional" translatable="true">(ज़रूरी नहीं)</string>
+    <string name="public_key_copy_toast_msg" translatable="true">पब्लिक चाबी कॉपी की गई।</string>
+    <string name="lbl_delete" translatable="true">हटाएं</string>
+    <string name="lbl_qr_code" translatable="true">क्यूआर कोड</string>
+    <string name="lbl_http_socks5" translatable="true">एचटीटीपीएस और सॉक्स5</string>
+    <string name="lbl_generated" translatable="true">(बनाया गया)</string>
+    <string name="lbl_auto" translatable="true">(अपनेआप)</string>
+    <string name="lbl_slow" translatable="true">स्लो</string>
+    <string name="lbl_day" translatable="true">दिन</string>
+    <string name="lbl_fast" translatable="true">तेज़</string>
+    <string name="search_proxy_add_apps" translatable="true">नाम से ऐप खोजें</string>
+    <string name="lbl_inactive" translatable="true">नहीं चल रहा</string>
+    <string name="lbl_addresses" translatable="true">पता</string>
+    <string name="lbl_active" translatable="true">चल रहा</string>
+    <string name="lbl_dns_servers" translatable="true">डीएनएस सर्वर</string>
+    <string name="lbl_app_wise" translatable="true">ऐप के हिसाब से</string>
+    <string name="status_protected_with_wg" translatable="true">वायरगार्ड से सेक्योर</string>
+    <string name="lbl_public_key" translatable="true">पब्लिक चाबी</string>
+    <string name="lbl_insecure" translatable="true">(महफूज़ नहीं)</string>
+    <string name="lbl_min" translatable="true">मिनट</string>
+    <string name="lbl_private_key" translatable="true">प्राइवेट चाबी</string>
+    <string name="lbl_preshared_key" translatable="true">प्रीशेयर चाबी</string>
+    <string name="lbl_applications" translatable="true">ऐप</string>
+    <string name="lbl_include" translatable="true">शामिल करें</string>
+    <string name="lbl_very" translatable="true">बहुत ज़्यादा</string>
+    <string name="lbl_select_all" translatable="true">सब चुनें</string>
+    <string name="lbl_create" translatable="true">बनाएं</string>
+    <string name="http_proxy_dialog_desc" translatable="true">इस तरह का यूआरएल सेट करें, &lt;प्रोटोकॉल&gt;://&lt;यूज़रनेम&gt;:&lt;पासवर्ड&gt;@&lt;डोमेन-या-आईपी&gt;:&lt;पोर्ट&gt;&lt;पाथ&gt;। नमूना: http://proxy.example.com:8080/</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">वायरगार्ड और प्राइवेट डीएनएस से सेक्योर</string>
+    <string name="lbl_listen_port" translatable="true">लिसन पोर्ट</string>
+    <string name="lbl_random" translatable="true">(बेतरतीब)</string>
 </resources>
