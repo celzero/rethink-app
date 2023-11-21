@@ -970,10 +970,14 @@
     <string name="key_length_error" translatable="true">密鑰長度錯誤</string>
     <string name="bad_config_explanation_positive_number" translatable="true">：必須係正數</string>
     <string name="wireguard_connection_error">連線去 WireGuard 配置嘅時候出錯</string>
-    <string name="wireguard_disclaimer">呢個係作為 TCP 同 UDP 代理嘅 WireGuard。當 DNS 流量被轉發咗去 %1$s 嘅時候，ICMP 流量（例如 ping）將會由底層網絡發送。</string>
+    <string name="wireguard_disclaimer">呢個係作為 TCP 同 UDP 實驗性代理嘅 WireGuard。當 DNS 流量被轉發咗去 %1$s 嘅時候，ICMP 流量（例如 ping）將會由底層網絡發送。</string>
     <string name="bad_config_explanation_udp_port" translatable="true">：必須係有效嘅 UDP 埠</string>
     <string name="cloudflare_dns_desc" translatable="true">唔攔截任何 DNS 請求。用 Cloudflare 嘅 1.1.1.1 DNS 端點。</string>
     <string name="cloudflare_family_dns_desc" translatable="true">攔截惡意軟體同成人內容。用 Cloudflare 嘅 1.1.1.3 DNS 端點。</string>
     <string name="cloudflare_security_dns_desc" translatable="true">攔截惡意內容。用 Cloudflare 嘅 1.1.1.2 DNS 端點。</string>
     <string name="google_dns_desc" translatable="true">唔攔截任何 DNS 請求。用 Google 嘅 DNS 端點。</string>
+    <string name="settings_go_log_desc" translatable="true">為咗調試</string>
+    <string name="settings_go_log_heading" translatable="true">日誌級別</string>
+    <string name="wireguard_refresh_toast">代理刷新完</string>
+    <string name="logs_card_duration" translatable="true">由 %1$s 以來</string>
 </resources>
