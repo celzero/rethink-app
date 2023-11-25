@@ -308,4 +308,37 @@
     <string name="status_protected_with_wg_private_dns" translatable="true">محافظت شده با وایرگارد و dns خصوصی</string>
     <string name="lbl_listen_port" translatable="true">پورت‌های مشغول</string>
     <string name="lbl_random" translatable="true">(تصادفی)</string>
+    <string name="settings_autostart_bootup_heading" translatable="true">Auto-start on power-up (experimental)</string>
+    <string name="settings_general_header" translatable="true">general</string>
+    <string name="settings_orbot_install_desc" translatable="true">برای نصب اوربات اینجا ضربه را لمس کنید</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot در حالت غیر vpn با HTTPS/SOCKS5.</string>
+    <string name="settings_https_disabled_error" translatable="true">Connected to %1$s. Turn it off to continue.</string>
+    <string name="settings_autostart_bootup_desc" translatable="true">On device power-up, start Rethink if it was running before shut down.</string>
+    <string name="settings_custom_downloader_desc" translatable="true">If disabled, Android\'s built-in <i>Download Manager</i> is used</string>
+    <string name="settings_check_update_desc" translatable="true">Automatically check for app updates once a week.</string>
+    <string name="about_settings_notification" translatable="true">تنظیمات اعلان</string>
+    <string name="settings_network_all_networks" translatable="true">Use all available networks (experimental)</string>
+    <string name="settings_network_all_networks_desc" translatable="true">When enabled, Rethink uses all available networks to connect to Internet. If not, it uses whichever network is deemed <i>active</i> by Android.</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Public key copied.</string>
+    <string name="settings_orbot_header" translatable="true">اوربات</string>
+    <string name="orbot_explanation" translatable="true">Orbot یک برنامه پراکسی رایگان است که به سایر برنامه‌ها اجازه می‌دهد تا &lt;u&gt;ایمن‌تر&lt;/u&gt; از اینترنت استفاده کنند.
+\n Orbot از &lt;u&gt;Tor&lt;/u&gt; برای رمزگذاری ترافیک اینترنت شما استفاده می کند که به شما کمک می کند &lt;u&gt;سانسور را دور بزنید&lt;/u&gt; و در برابر اشکال &lt;u&gt;نظارت شبکه&lt;/u&gt; که آزادی و حریم خصوصی شخصی را تهدید می کند، دفاع کنید.
+\n &lt;u&gt;پراکسی TCP&lt;/u&gt;: فقط اتصالات TCP برنامه‌های &lt;i&gt;شامل شده&lt;/i&gt; را مجدداً به Orbot فوروارد کنید.
+\n &lt;u&gt;پراکسی HTTP&lt;/u&gt;: دوباره فکر کنید &lt;i&gt;تونل HTTP CONNECT را به Orbot ایجاد می کند و فقط اتصالات TCP برنامه های &lt;i&gt;شامل&lt;/i&gt; را ارسال می کند.</string>
+    <string name="settings_general_customize" translatable="true">customize</string>
+    <string name="settings_orbot_notification_content" translatable="true">Failure starting Tor-as-a-Proxy. Open the Orbot app to start it manually.</string>
+    <string name="about_settings_app_info" translatable="true">اطلاعات برنامه</string>
+    <string name="search_proxy_add_apps" translatable="true">Search apps by name</string>
+    <string name="settings_orbot_heading" translatable="true">اوربات را راه اندازی کنید</string>
+    <string name="settings_socks5_vpn_disabled_error" translatable="true">Start Rethink to proceed.</string>
+    <string name="settings_check_update_heading" translatable="true">Check for app updates</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">وبسایت</string>
+    <string name="settings_import_export_heading" translatable="true">Backup &amp; Restore</string>
+    <string name="settings_orbot_notification_action" translatable="true">Open Orbot</string>
+    <string name="settings_orbot_disabled_error" translatable="true">Turn off HTTP(S) and/or SOCKS5 proxy to continue with Tor-as-a-proxy setup.</string>
+    <string name="about_settings" translatable="true">سیستم</string>
+    <string name="settings_import_export_desc" translatable="true">Manually back up or restore app data and settings.</string>
+    <string name="settings_socks5_disabled_error" translatable="true">Connected to %1$s. Turn it off to continue.</string>
+    <string name="settings_custom_downloader_heading" translatable="true">Use in-app downloader</string>
+    <string name="about_settings_vpn_profile" translatable="true">نمایهVPN</string>
 </resources>
