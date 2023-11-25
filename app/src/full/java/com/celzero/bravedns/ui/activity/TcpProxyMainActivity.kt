@@ -93,7 +93,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     }
 
     private fun displayWarpStatus() {
-        io {
+io {
             uiCtx {
                 val config = WireguardManager.getWarpConfig()
                 val isActive = WireguardManager.getConfigFilesById(WARP_ID)?.isActive
@@ -111,12 +111,13 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
                     b.warpSwitch.isChecked = false
                 }
             }
+        
         }
     }
 
     private fun setupClickListeners() {
         b.tcpProxySwitch.setOnCheckedChangeListener { _, checked ->
-            io {
+io {
                 val isActive = WireguardManager.isConfigActive(ProxyManager.ID_WG_BASE + WARP_ID)
                 uiCtx {
                     if (checked && isActive) {
@@ -167,8 +168,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
                     }
                     enableTcpProxy()
                 }
-            }
-        }
+            }        }
 
         b.enableUdpRelay.setOnCheckedChangeListener { _, b ->
             if (b) {

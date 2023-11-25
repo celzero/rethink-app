@@ -31,8 +31,8 @@ import com.celzero.bravedns.databinding.ListItemWgInterfaceBinding
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
-import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
+import com.celzero.bravedns.ui.WgConfigDetailActivity
+import com.celzero.bravedns.ui.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

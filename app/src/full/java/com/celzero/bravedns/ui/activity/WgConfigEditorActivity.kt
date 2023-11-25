@@ -61,6 +61,10 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireguardManager.INVALID_CONF_ID)
+    }
+
+    override fun onResume() {
+        super.onResume()
         init()
         setupClickListeners()
     }
@@ -74,29 +78,39 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         observeDnsName()
         io {
             wgConfig = WireguardManager.getConfigById(configId)
-            b.interfaceNameText.setText(wgConfig?.getName())
-        }
-        wgInterface = wgConfig?.getInterface()
+            wgInterface = wgConfig?.getInterface()
+            Log.d(
+                "TEST",
+                "wgInterface: $wgInterface, privateKey: ${wgInterface?.getKeyPair()?.getPrivateKey()?.base64()}, publicKey: ${wgInterface?.getKeyPair()?.getPublicKey()?.base64()}"
+            )
 
-        b.privateKeyText.setText(wgInterface?.getKeyPair()?.getPrivateKey()?.base64())
-        b.publicKeyText.setText(wgInterface?.getKeyPair()?.getPublicKey()?.base64())
-        if (wgInterface?.dnsServers?.isEmpty() != true) {
-            b.dnsServersText.setText(
-                wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
-            )
-        } else {
-            b.dnsServersText.setText(wgInterface?.dnsSearchDomains?.joinToString { it })
-        }
-        if (wgInterface?.getAddresses()?.isEmpty() != true) {
-            b.addressesLabelText.setText(
-                wgInterface?.getAddresses()?.joinToString { it.toString() }
-            )
-        }
-        if (wgInterface?.listenPort?.isPresent == true && wgInterface?.listenPort?.get() != 1) {
-            b.listenPortText.setText(wgInterface?.listenPort?.get().toString())
-        }
-        if (wgInterface?.mtu?.isPresent == true) {
-            b.mtuText.setText(wgInterface?.mtu?.get().toString())
+            uiCtx {
+                b.interfaceNameText.setText(wgConfig?.getName())
+
+                b.privateKeyText.setText(wgInterface?.getKeyPair()?.getPrivateKey()?.base64())
+                b.publicKeyText.setText(wgInterface?.getKeyPair()?.getPublicKey()?.base64())
+                if (wgInterface?.dnsServers?.isEmpty() != true) {
+                    b.dnsServersText.setText(
+                        wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
+                    )
+                } else {
+                    b.dnsServersText.setText(wgInterface?.dnsSearchDomains?.joinToString { it })
+                }
+                if (wgInterface?.getAddresses()?.isEmpty() != true) {
+                    b.addressesLabelText.setText(
+                        wgInterface?.getAddresses()?.joinToString { it.toString() }
+                    )
+                }
+                if (
+                    wgInterface?.listenPort?.isPresent == true &&
+                        wgInterface?.listenPort?.get() != 1
+                ) {
+                    b.listenPortText.setText(wgInterface?.listenPort?.get().toString())
+                }
+                if (wgInterface?.mtu?.isPresent == true) {
+                    b.mtuText.setText(wgInterface?.mtu?.get().toString())
+                }
+            }
         }
     }
 

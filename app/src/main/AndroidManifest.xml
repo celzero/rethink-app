@@ -5,11 +5,6 @@
     android:versionCode="32"
     android:versionName="v055a"> <!-- 32(v055a) -->
 
-    <uses-sdk
-        android:minSdkVersion="23"
-        android:targetSdkVersion="33"
-        tools:ignore="GradleOverrides" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

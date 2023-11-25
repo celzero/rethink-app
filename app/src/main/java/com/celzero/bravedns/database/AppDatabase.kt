@@ -23,10 +23,10 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_FILE_NAME
-import com.celzero.bravedns.service.WireGuardManager.SEC_WARP_NAME
-import com.celzero.bravedns.service.WireGuardManager.WARP_FILE_NAME
-import com.celzero.bravedns.service.WireGuardManager.WARP_NAME
+import com.celzero.bravedns.service.WireguardManager.SEC_WARP_FILE_NAME
+import com.celzero.bravedns.service.WireguardManager.SEC_WARP_NAME
+import com.celzero.bravedns.service.WireguardManager.WARP_FILE_NAME
+import com.celzero.bravedns.service.WireguardManager.WARP_NAME
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
 import java.io.File

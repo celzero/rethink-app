@@ -105,11 +105,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
+        Log.d("TEST", "init before io,config id: $configId")
         io {
+            Log.d("TEST", "init after io,config id: $configId")
             val config = WireguardManager.getConfigById(configId)
+            Log.d("TEST", "init after io,config id: $configId, config: $config")
             val mapping = WireguardManager.getConfigFilesById(configId)
+            Log.d("TEST", "init after io,config id: $configId, config: $config, mapping: $mapping")
             uiCtx {
                 //handleWarpConfigView()
+                Log.d("TEST", "init after uiCtx,config id: $configId, config: $config, mapping: $mapping")
                 if (mapping != null) {
                     b.lockdownCheck.isChecked = mapping.isLockdown
                     b.catchAllCheck.isChecked = mapping.isCatchAll
@@ -132,13 +137,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 prefillWarpConfig(config)
             }
         }
+
     }
 
     private fun prefillWarpConfig(config: Config) {
         wgInterface = config.getInterface()
+        Log.d("TEST", "prefillWarpConfig wgInterface: $wgInterface")
         peers.clear()
         peers.addAll(config.getPeers() ?: emptyList())
         if (wgInterface == null) {
+            Log.d("TEST", "prefillWarpConfig wgInterface is null")
             return
         }
         b.configNameText.text = config.getName()

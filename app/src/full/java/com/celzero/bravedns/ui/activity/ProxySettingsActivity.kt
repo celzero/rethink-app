@@ -434,7 +434,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
                     return@uiCtx
                 }
-
                 var wgStatus = ""
                 activeWgs.forEach {
                     val id = ProxyManager.ID_WG_BASE + it.getId()
