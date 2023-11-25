@@ -239,6 +239,10 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var shouldRequestNotificationPermission by
         booleanPref("notification_permission_request").withDefault<Boolean>(true)
 
+    // make notification persistent
+    var persistentNotification by
+            booleanPref("persistent_notification").withDefault<Boolean>(false)
+
     // biometric authentication
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
 

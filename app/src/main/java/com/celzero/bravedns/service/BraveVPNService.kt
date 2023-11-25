@@ -1095,6 +1095,11 @@ class BraveVPNService :
         builder.setSmallIcon(R.drawable.ic_notification_icon).setContentIntent(pendingIntent)
         builder.color = ContextCompat.getColor(this, getAccentColor(persistentState.theme))
 
+        if (persistentState.persistentNotification)
+        {
+            builder.setOngoing(true)
+        }
+
         // New action button options in the notification
         // 1. Pause / Resume, Stop action button.
         // 2. RethinkDNS modes (dns & dns+firewall mode)
