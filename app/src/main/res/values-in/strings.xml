@@ -981,4 +981,5 @@
     <string name="illegal_filename_error" translatable="true">Nama berkas ilegal \"%s\"</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (seluruh dunia) dnssec/tanpa-riwayat/tanpa–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Membuat notifikasi tetap</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Pemberitahuan Terus-menerus</string>
 </resources>
