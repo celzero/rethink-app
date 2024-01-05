@@ -982,4 +982,6 @@
     <string name="settings_go_log_heading" translatable="true">Уровень журнала активности</string>
     <string name="wireguard_refresh_toast">Обновление прокси завершено</string>
     <string name="logs_card_duration" translatable="true">с %1$s</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Сделать уведомление постоянным</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Постоянное уведомление</string>
 </resources>
