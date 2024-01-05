@@ -387,6 +387,7 @@
     <string name="about_mail_bugreport_text">Envíe este correo electrónico a : hello@celzero.com</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Cortafuegos:
+\n
 \nMuestra dos botones para cambiar rápidamente entre el modo DNS de ahorro de batería y el modo normal DNS + Firewall."</string>
     <string name="settings_selected_theme">Tema actual: %1$s</string>
     <string name="dns_crypt_relay_remove_dialog_title">¿Borrar el repetidor DNSCrypt\?</string>
@@ -443,9 +444,11 @@
     <string name="settings_notification_dialog_title">Elija la acción de notificación</string>
     <string name="settings_notification_dialog_option_1">"
 \nPausa / Parar (por defecto):
+\n
 \nMuestra dos botones, para pausar y detener rápidamente Rethink."</string>
     <string name="settings_notification_dialog_option_3">"
 \nNinguno:
+\n
 \nNo muestra ningún botón.
 \n"</string>
     <string name="firewall_card_status_active">%1$s aplicaciones</string>
