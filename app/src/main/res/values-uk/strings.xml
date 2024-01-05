@@ -435,4 +435,49 @@
     <string name="trusted_domains_desc" translatable="true">Правило дозволу домену краще працює з <u>Rethink\'s DNS</u>.</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Актуально!</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL-адреса скопійована</string>
+    <string name="orbot_install_dialog_positive" translatable="true">Встановлення</string>
+    <string name="orbot_socks5" translatable="true">Проксі-сервер лише для TCP</string>
+    <string name="orbot_status_arg_2" translatable="true">TCP</string>
+    <string name="orbot_install_dialog_message" translatable="true">Orbot приносить функції Tor на Android.</string>
+    <string name="settings_orbot_install_desc" translatable="true">Натисніть тут, щоб встановити Orbot</string>
+    <string name="settings_orbot_desc" translatable="true">Orbot в режимі без VPN з HTTPS/SOCKS5.</string>
+    <string name="orbot_stop_dialog_neutral" translatable="true">Змінити DNS</string>
+    <string name="relative_time_yesterday" translatable="true">Вчора</string>
+    <string name="orbot_bs_status_4" translatable="true">Налаштування Tor-as-a-Proxy (Orbot) одним кліком.</string>
+    <string name="orbot_stop_dialog_message" translatable="true">Rethink припинив переадресацію з\'єднань до Orbot, але Orbot, можливо, працює у фоновому режимі.</string>
+    <string name="orbot_title" translatable="true">Orbot і проксі</string>
+    <string name="settings_allow_lan_heading" translatable="true">Не перенаправляти приватні IP-адреси (експериментально)</string>
+    <string name="settings_ptrans_heading" translatable="true">Примусовий вихід IPv4</string>
+    <string name="orbot_status_arg_3" translatable="true">DNS і TCP</string>
+    <string name="orbot_bs_status_3" translatable="true">Пересилання %1$s до Orbot, HTTP-проксі також встановлено.</string>
+    <string name="settings_orbot_header" translatable="true">Orbot\t❯</string>
+    <string name="relative_time_today" translatable="true">Сьогодні</string>
+    <string name="settings_allow_bypass_heading" translatable="true">Увімкнути видимість мережі</string>
+    <string name="orbot_bs_status_trying_connect" translatable="true">Налаштування Orbot…</string>
+    <string name="orbot_none" translatable="true">Ні (за замовчуванням)</string>
+    <string name="orbot_none_desc" translatable="true">Нічого з перерахованого вище.</string>
+    <string name="settings_allow_lan_desc" translatable="true">Виключіть маршрути LAN, loopback, multicast, link-local з VPN-тунелю Rethink.</string>
+    <string name="settings_ip_network_desc" translatable="true">Виберіть одну з версій мережевого протоколу.</string>
+    <string name="orbot_http" translatable="true">HTTP-проксі</string>
+    <string name="orbot_stop_dialog_title" translatable="true">Потрібне ручне втручання</string>
+    <string name="settings_ptrans_desc" translatable="true">Перетворювати вихідний трафік з IPv6 на IPv4 на пристрої. Увімкніть, якщо ви підключені до мережі, яка підтримує лише IPv4.</string>
+    <string name="settings_orbot_heading" translatable="true">Налаштування Orbot</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
+\n
+\n%2$s</string>
+    <string name="orbot_both" translatable="true">TCP + HTTP Proxy</string>
+    <string name="settings_socks5_desc" translatable="true">Перенаправляти з\'єднання на кінцевий пункт SOCKS5.</string>
+    <string name="orbot_install_dialog_neutral" translatable="true">веб-сторінка</string>
+    <string name="settings_proxy_header" translatable="true">проксі</string>
+    <string name="orbot_install_dialog_title" translatable="true">Встановити Orbot?</string>
+    <string name="settings_lock_down_mode_desc" translatable="true">Деякі параметри вимкнено, коли VPN знаходиться в режимі блокування. <u>Дивіться налаштування VPN</u>.</string>
+    <string name="orbot_stop_dialog_negative" translatable="true">Зупинити Orbot</string>
+    <string name="settings_socks5_heading" translatable="true">Налаштування проксі-сервера SOCKS5</string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Не вдається налаштувати проксі-сервери, коли VPN працює в режимі \"Лише DNS\".</string>
+    <string name="settings_https_heading" translatable="true">Налаштування HTTP(s) CONNECT Proxy</string>
+    <string name="orbot_both_desc" translatable="true">Все вищеперелічене.</string>
+    <string name="orbot" translatable="true">Orbot</string>
+    <string name="orbot_socks5_desc" translatable="true">Перенаправляє всі TCP-з\'єднання на Orbot.</string>
+    <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink налаштовано для пересилання запитів DNS на Orbot. Змінюйте в міру необхідності.</string>
+    <string name="orbot_bs_status_1" translatable="true">Переадресація з\'єднаннь %1$s на Orbot.</string>
 </resources>
