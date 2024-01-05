@@ -611,4 +611,35 @@
     <string name="bsct_conn_desc_blocked" translatable="true">%1$s %2$s でブロック</string>
     <string name="firewall_act_universal_tab" translatable="true">ユニバーサル</string>
     <string name="local_blocklist_redownload" translatable="true">最新情報!</string>
+    <string name="show_logs_disabled_network_message" translatable="true">接続ログが無効になっています。 再度有効にするには、<i>設定</i> に移動し、<i>デバイス上のログを有効にする</i> をオンにします。</string>
+    <string name="lbl_import" translatable="true">インポート</string>
+    <string name="lbl_allowed_ips" translatable="true">許可されたIP</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_hour" translatable="true">時間</string>
+    <string name="lbl_save" translatable="true">保存</string>
+    <string name="lbl_optional" translatable="true">(任意)</string>
+    <string name="lbl_delete" translatable="true">削除</string>
+    <string name="lbl_qr_code" translatable="true">QRコード</string>
+    <string name="lbl_generated" translatable="true">(生成しました)</string>
+    <string name="lbl_auto" translatable="true">(自動)</string>
+    <string name="lbl_slow" translatable="true">遅い</string>
+    <string name="lbl_day" translatable="true">日</string>
+    <string name="lbl_fast" translatable="true">早い</string>
+    <string name="lbl_inactive" translatable="true">活動していません</string>
+    <string name="lbl_addresses" translatable="true">アドレス</string>
+    <string name="lbl_active" translatable="true">活動中</string>
+    <string name="lbl_dns_servers" translatable="true">DNSサーバー</string>
+    <string name="lbl_public_key" translatable="true">公開鍵</string>
+    <string name="lbl_insecure" translatable="true">(不安定)</string>
+    <string name="lbl_min" translatable="true">分</string>
+    <string name="lbl_private_key" translatable="true">秘密鍵</string>
+    <string name="lbl_preshared_key" translatable="true">鍵データ</string>
+    <string name="lbl_applications" translatable="true">アプリケーション</string>
+    <string name="lbl_very" translatable="true">とても</string>
+    <string name="lbl_select_all" translatable="true">すべて選択</string>
+    <string name="download_update_dialog_message_ok_title" translatable="true">アップデート！</string>
+    <string name="lbl_create" translatable="true">作成</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">WireGuardとプライベートDNSで保護します</string>
+    <string name="lbl_listen_port" translatable="true">待ち受けポート</string>
+    <string name="lbl_random" translatable="true">(ランダム)</string>
 </resources>
