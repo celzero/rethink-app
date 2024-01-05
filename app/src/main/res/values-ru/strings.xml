@@ -57,7 +57,7 @@
     <string name="status_protected_with_http">защищено http-прокси</string>
     <string name="about_app_contributors">Авторы</string>
     <string name="local_blocklist_redownload">Актуально!</string>
-    <string name="accessibility_service_description">RethinkDNS использует службу специальных возможностей для обнаружения и блокирования фоновых приложений. RethinkDNS не собирает и не продает какую-либо информацию.</string>
+    <string name="accessibility_service_description">Rethink использует службу специальных возможностей для обнаружения и блокирования фоновых приложений. Rethink не собирает и не продает какую-либо информацию.</string>
     <string name="slide_2_desc">RethinkDNS — это самый простой способ обходить интернет-цензуру, отслеживать и блокировать сетевую активность приложений на вашем Android устройстве.</string>
     <string name="title_about">О приложении</string>
     <string name="next">Следующий</string>
@@ -688,7 +688,7 @@
     <string name="orbot_install_dialog_message">Orbot переносит возможности и функциональность Tor на Android.</string>
     <string name="orbot_bs_status_trying_connect">Настройка Orbot…</string>
     <string name="settings_socks5_disabled_error">Подключен к %1$s. Выключите его, чтобы продолжить.</string>
-    <string name="settings_check_update_desc">Автоматически проверять наличие обновлений приложений раз в неделю.</string>
+    <string name="settings_check_update_desc">Автоматически проверять наличие обновлений приложения раз в неделю.</string>
     <string name="settings_orbot_heading">Настройка Orbot</string>
     <string name="settings_autostart_bootup_heading">Автозапуск приложения при включении устройства (экспериментально)</string>
     <string name="orbot_none_desc">Ничего из вышеперечисленного.</string>
@@ -715,7 +715,7 @@
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
 \n%2$s</string>
-    <string name="settings_check_update_heading">Проверять наличие обновлений приложения</string>
+    <string name="settings_check_update_heading">Проверять наличие обновлений</string>
     <string name="orbot_install_dialog_title">Установить Orbot\?</string>
     <string name="settings_socks5_vpn_disabled_error">Запустите Rethink, чтобы продолжить работу.</string>
     <string name="settings_orbot_notification_content">Сбой при запуске Tor-as-a-Proxy. Откройте приложение Orbot, чтобы запустить его вручную.</string>
