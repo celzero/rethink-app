@@ -856,4 +856,6 @@
     <string name="hs_biometeric_desc" translatable="true">Use autenticação biométrica para desbloquear o RethinkDNS</string>
     <string name="lbl_listen_port" translatable="true">Escutando Porta</string>
     <string name="lbl_random" translatable="true">(aleatório)</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Faça a notificação persistente</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Notificação persistente</string>
 </resources>
