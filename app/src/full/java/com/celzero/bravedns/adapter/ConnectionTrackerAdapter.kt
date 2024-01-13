@@ -69,7 +69,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 override fun areContentsTheSame(
                     oldConnection: ConnectionTracker,
                     newConnection: ConnectionTracker
-                ) = oldConnection == newConnection
+                ) = oldConnection.id == newConnection.id
             }
 
         private const val MAX_BYTES = 500000 // 500 KB
@@ -144,10 +144,12 @@ class ConnectionTrackerAdapter(private val context: Context) :
         }
 
         private fun displayAppDetails(ct: ConnectionTracker) {
-            b.connectionAppName.text = ct.appName
             io {
-                val apps = FirewallManager.getPackageNamesByUid(ct.uid)
                 uiCtx {
+                    b.connectionAppName.text = ct.appName
+
+                    val apps = FirewallManager.getPackageNamesByUid(ct.uid)
+
                     if (apps.isEmpty()) {
                         loadAppIcon(Utilities.getDefaultIcon(context))
                         return@uiCtx
@@ -227,9 +229,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     hasMinSummary = true
                 }
                 if (connType.isMetered()) {
-                    b.connectionDelay.text = "📶"
-                } else if (connType.isUnmetered()) {
-                    b.connectionDelay.text = "🌐"
+                    b.connectionDelay.text = "💴"
                 }
 
                 if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
@@ -261,12 +261,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
             b.connectionDelay.text = ""
             if (connType.isMetered()) {
-                b.connectionDelay.text = "📶"
-            } else if (connType.isUnmetered()) {
-                b.connectionDelay.text = "🌐"
+                b.connectionDelay.text = "💴"
             }
             if (isConnectionHeavier(ct)) {
-                b.connectionDelay.text = context.getString(R.string.symbol_elephant)
+                b.connectionDelay.text =
+                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_elephant)
             }
             if (isConnectionSlower(ct)) {
                 b.connectionDelay.text =
