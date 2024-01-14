@@ -1,5 +1,4 @@
 name: Static Analyser
-
 on:
   push:
     branches: [ "main" ]
@@ -13,5 +12,5 @@ on:
        - name: "checkout"
          uses: actions/checkout@v3
 
-       - name: "detekt"
+       - name: "run"
          uses: natiginfo/action-detekt-all@1.23.4
