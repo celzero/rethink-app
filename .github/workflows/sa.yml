@@ -1,11 +1,12 @@
-name: Kt Static Analyser
+name: Static Analyser
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
  jobs:
    detekt:
+     name: detekt
      runs-on: ubuntu-latest
 
      steps:
