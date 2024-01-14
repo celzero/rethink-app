@@ -1,0 +1,16 @@
+name: Static Analyser
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  detekt:
+    name: detekt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v3
+
+      - name: "run"
+        uses: natiginfo/action-detekt-all@1.23.4
