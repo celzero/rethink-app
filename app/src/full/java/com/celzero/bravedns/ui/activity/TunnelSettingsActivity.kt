@@ -80,7 +80,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         b.settingsActivityMtuSwitch.isChecked = persistentState.useMaxMtu
 
         displayInternetProtocolUi()
-        displayUseMultipleNetworksUi()
+        displayRethinkInRethinkUi()
     }
 
     private fun setupClickListeners() {
@@ -93,13 +93,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             _: CompoundButton,
             b: Boolean ->
             persistentState.useMultipleNetworks = b
-            // if the user disables the use multiple networks option, then disable the
-            // rethink in rethink option as well
-            if (!b) {
-                persistentState.routeRethinkInRethink = false
-                displayRethinkInRethinkUi()
-            }
-            displayUseMultipleNetworksUi()
         }
 
         b.settingsRInRRl.setOnClickListener {
@@ -237,15 +230,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
                     )
                 b.settingsActivityPtransRl.visibility = View.GONE
             }
-        }
-    }
-
-    private fun displayUseMultipleNetworksUi() {
-        if (persistentState.useMultipleNetworks) {
-            b.settingsRInRRl.visibility = View.VISIBLE
-            displayRethinkInRethinkUi()
-        } else {
-            b.settingsRInRRl.visibility = View.GONE
         }
     }
 
