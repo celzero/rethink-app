@@ -51,15 +51,20 @@ class AlertAdapter(
     inner class AlertRegistryViewHolder(private val b: ListItemAlertRegistryBinding) :
         RecyclerView.ViewHolder(b.root) {
         fun update(alert: AlertRegistry) {
+            // do not show the alert if the message is empty
+            if (alert.alertMessage.isEmpty()) {
+                b.root.visibility = View.GONE
+                return
+            }
             b.title.text = alert.alertTitle
             val message =
                 when (AlertCategory.valueOf(alert.alertCategory)) {
                     AlertCategory.DNS ->
-                        "List of domains blocked in past one hour. Click to see more..."
+                        "List of domains blocked in past one hour. Click to <<see more>>..."
                     AlertCategory.FIREWALL ->
-                        "List of IP addresses blocked in past one hour. Click to see more..."
+                        "List of IP addresses blocked in past one hour. Click to <<see more>>..."
                     AlertCategory.APP ->
-                        "List of apps blocked in past one hour. Click to see more..."
+                        "List of apps blocked in past one hour. Click to <<see more>>..."
                     else -> "Unknown category"
                 }
             b.description.text = message
