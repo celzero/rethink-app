@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 
 import android.text.TextUtils
 import com.celzero.bravedns.net.doh.Transaction
+import dnsx.Dnsx
 
 class QueryTracker(val persistentState: PersistentState) {
 
@@ -38,11 +39,14 @@ class QueryTracker(val persistentState: PersistentState) {
                 persistentState.median.value == null ||
                 persistentState.median.value == 0L
         ) {
-            refreshP50Latency()
+            refreshP50Latency(transaction.id)
         }
     }
 
-    private suspend fun refreshP50Latency() {
-        VpnController.syncP50Latency()
+    private suspend fun refreshP50Latency(id: String) {
+        // Dnsx.Local is multicast DNS, ignore its latency
+        if (id == Dnsx.Local) return
+
+        VpnController.syncP50Latency(id)
     }
 }
