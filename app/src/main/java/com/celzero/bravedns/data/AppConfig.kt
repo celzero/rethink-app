@@ -85,7 +85,7 @@ internal constructor(
 
     init {
         // now connectedDnsName has the dns name and url, extract the dns name and update
-        val dnsName = persistentState.connectedDnsName.split(",").first()
+        val dnsName = persistentState.connectedDnsName.split(",").firstOrNull() ?: ""
         connectedDns.postValue(dnsName)
         setDnsMode()
     }
@@ -745,10 +745,10 @@ internal constructor(
 
     suspend fun getBlockFreeRethinkEndpoint(): String {
         // decide which blockfree endpoint to use
-        if (getRemoteRethinkEndpoint()?.url?.contains(MAX_ENDPOINT) == true) {
-            return Constants.BLOCK_FREE_DNS_MAX
+        return if (getRemoteRethinkEndpoint()?.url?.contains(MAX_ENDPOINT) == true) {
+            Constants.BLOCK_FREE_DNS_MAX
         } else {
-            return Constants.BLOCK_FREE_DNS_SKY
+            Constants.BLOCK_FREE_DNS_SKY
         }
     }
 

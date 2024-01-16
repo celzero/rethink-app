@@ -114,7 +114,6 @@ object VpnController : KoinComponent {
         connectionStatus.postValue(state)
     }
 
-    // lock(VpnController.mutex) should not be held
     fun start(context: Context) {
         // if the tunnel has the go-adapter then there's nothing to do
         if (braveVpnService?.isOn() == true) {
@@ -153,7 +152,7 @@ object VpnController : KoinComponent {
     }
 
     suspend fun refresh() {
-        braveVpnService?.refresh()
+        braveVpnService?.refreshResolvers()
     }
 
     fun hasTunnel(): Boolean {
@@ -207,13 +206,14 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStatusById(id)
     }
 
-    suspend fun syncP50Latency() {
-        braveVpnService?.syncP50Latency()
+    suspend fun syncP50Latency(id: String) {
+        braveVpnService?.syncP50Latency(id)
     }
 
     fun protocols(): String {
         val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: -1
         val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: -1
+        Log.d(LOG_TAG_VPN, "protocols - ipv4Size: $ipv4Size, ipv6Size: $ipv6Size")
         return if (ipv4Size >= 1 && ipv6Size >= 1) {
             "IPv4, IPv6"
         } else if (ipv6Size >= 1) {
@@ -260,6 +260,10 @@ object VpnController : KoinComponent {
 
     fun refreshWireGuardConfig() {
         braveVpnService?.refreshWireGuardConfig()
+    }
+
+    fun updateWireGuardConfig() {
+        braveVpnService?.updateWireGuardConfig()
     }
 
     suspend fun getDnsStatus(id: String): Long? {

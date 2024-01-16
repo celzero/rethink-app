@@ -498,7 +498,7 @@ object Utilities {
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(
                 LOG_TAG_FIREWALL,
-                "ApplicationInfo is not available for package name: $packageName"
+                "no app info for package name: $packageName"
             )
             null
         }

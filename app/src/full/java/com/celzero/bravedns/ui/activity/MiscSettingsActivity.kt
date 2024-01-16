@@ -744,8 +744,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
 
     private fun showEnableNotificationSettingIfNeeded() {
         if (!isAtleastT()) {
-            // notification permission is only needed for version 13 or above
+            // notification permission and persistent is only needed for version 13 or above
             b.settingsActivityAppNotificationRl.visibility = View.GONE
+            b.settingsActivityAppNotificationPersistentRl.visibility = View.GONE
             return
         }
 
@@ -757,6 +758,9 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
             b.settingsActivityAppNotificationRl.visibility = View.VISIBLE
             b.settingsActivityAppNotificationSwitch.isChecked = false
         }
+        b.settingsActivityAppNotificationPersistentRl.visibility = View.VISIBLE
+        b.settingsActivityAppNotificationPersistentSwitch.isChecked =
+            persistentState.persistentNotification
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

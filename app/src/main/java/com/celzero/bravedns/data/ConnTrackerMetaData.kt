@@ -29,7 +29,7 @@ data class ConnTrackerMetaData(
     var proxyDetails: String,
     var blocklists: String,
     val protocol: Int,
-    var query: String,
+    var query: String?,
     var connId: String,
     var connType: String
 ) : Serializable

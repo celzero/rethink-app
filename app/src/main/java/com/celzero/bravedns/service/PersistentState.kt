@@ -47,7 +47,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val DNS_RELAYS = "dnscrypt_relay"
         const val INTERNET_PROTOCOL = "internet_protocol"
         const val PROTOCOL_TRANSLATION = "protocol_translation"
-        const val DEFAULT_DNS_SERVER = "default_dns_server"
+        const val DEFAULT_DNS_SERVER = "default_dns_query"
         const val PCAP_MODE = "pcap_mode"
         const val REMOTE_BLOCKLIST_UPDATE = "remote_block_list_downloaded_time"
         const val DNS_ALG = "dns_alg"
@@ -235,7 +235,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var shouldRequestNotificationPermission by
         booleanPref("notification_permission_request").withDefault<Boolean>(true)
 
-    // make notification persistent
+    // make notification persistent (Android 13 and above), default false
     var persistentNotification by
             booleanPref("persistent_notification").withDefault<Boolean>(false)
 

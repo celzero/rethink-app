@@ -75,9 +75,11 @@ object BugReportZipper {
     private fun getZipFile(context: Context): ZipFile? {
         return try {
             ZipFile(getZipFilePath(context))
-        } catch (ignored: FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
+            Log.e(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
             null
-        } catch (ignored: ZipException) {
+        } catch (e: ZipException) {
+            Log.e(LOG_TAG_SCHEDULER, "Zip exception while creating zip file", e)
             null
         }
     }
@@ -107,7 +109,7 @@ object BugReportZipper {
 
         val zipPath = getZipFilePath(context)
 
-        val zipFile = getZipFile(context)
+        val zipFile = getZipFile(context) ?: return
         zipFile.use { zf ->
             FileOutputStream(zipPath, true).use { fo ->
                 ZipOutputStream(fo).use { zo ->

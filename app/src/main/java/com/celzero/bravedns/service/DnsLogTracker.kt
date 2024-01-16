@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.os.SystemClock
+import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
@@ -51,8 +52,6 @@ internal constructor(
         private const val RDATA_MAX_LENGTH = 100
     }
 
-    private var numRequests: Long = 0
-    private var numBlockedRequests: Long = 0
     private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
 
     init {
@@ -61,6 +60,7 @@ internal constructor(
         vpnStateMap[Transaction.Status.NO_RESPONSE] = BraveVPNService.State.DNS_SERVER_DOWN
         vpnStateMap[Transaction.Status.TRANSPORT_ERROR] = BraveVPNService.State.DNS_SERVER_DOWN
         vpnStateMap[Transaction.Status.BAD_QUERY] = BraveVPNService.State.DNS_ERROR
+        vpnStateMap[Transaction.Status.CLIENT_ERROR] = BraveVPNService.State.DNS_ERROR
         vpnStateMap[Transaction.Status.BAD_RESPONSE] = BraveVPNService.State.DNS_ERROR
         vpnStateMap[Transaction.Status.INTERNAL_ERROR] = BraveVPNService.State.APP_ERROR
     }

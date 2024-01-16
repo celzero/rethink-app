@@ -239,8 +239,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
-                    android:paddingBottom="20dp"
-                    android:visibility="gone">
+                    android:paddingBottom="20dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_r_in_r_icon"
@@ -472,6 +471,7 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:paddingTop="15dp"
+                    android:visibility="gone"
                     android:paddingBottom="20dp">
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -500,7 +500,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Max MTU"
+                            android:text="Max MTU (experimental)"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView

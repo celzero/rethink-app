@@ -29,10 +29,10 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastO
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.File
 import java.io.InputStream
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class AppExitInfoCollector(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters), KoinComponent {
@@ -123,26 +123,27 @@ class AppExitInfoCollector(val context: Context, workerParameters: WorkerParamet
     }
 
     private fun dumpLogcat() {
-        try {} catch (e: Exception) {
+        try {
+            val s1 =
+                ProcessBuilder(
+                    LOGCAT_CMD,
+                    LOGCAT_OPTIONS_D,
+                    LOGCAT_OPTIONS_V,
+                    LOGCAT_OPTIONS_TIME,
+                    " ",
+                    LOGCAT_OPTIONS,
+                    LOGCAT_OPTIONS_B,
+                    EVENT_TYPES
+                )
+            val pd = s1.redirectErrorStream(true).start()
+            val ips: InputStream = pd.inputStream
+            BugReportZipper.writeTrace(file, ips)
+            val exit = pd.waitFor()
+            if (exit != 0) {
+                Log.e(LOG_TAG_SCHEDULER, "logcat process exited with $exit")
+            }
+        } catch (e: Exception) {
             Log.e(LOG_TAG_SCHEDULER, "Error while dumping logs", e)
-        }
-        val s1 =
-            ProcessBuilder(
-                LOGCAT_CMD,
-                LOGCAT_OPTIONS_D,
-                LOGCAT_OPTIONS_V,
-                LOGCAT_OPTIONS_TIME,
-                " ",
-                LOGCAT_OPTIONS,
-                LOGCAT_OPTIONS_B,
-                EVENT_TYPES
-            )
-        val pd = s1.redirectErrorStream(true).start()
-        val ips: InputStream = pd.inputStream
-        BugReportZipper.writeTrace(file, ips)
-        val exit = pd.waitFor()
-        if (exit != 0) {
-            Log.e(LOG_TAG_SCHEDULER, "logcat process exited with $exit")
         }
     }
 }
