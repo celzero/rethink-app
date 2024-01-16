@@ -175,26 +175,23 @@ class FirewallAppFilterBottomSheet : BottomSheetDialogFragment() {
             AppListActivity.TopLevelFilter.ALL.id -> {
                 sortValues.topLevelFilter = AppListActivity.TopLevelFilter.ALL
                 sortValues.categoryFilters.clear()
-                io {
-                    val categories = FirewallManager.getAllCategories()
-                    uiCtx { remakeChildFilterChipsUi(categories) }
-                }
+
+                val categories = FirewallManager.getAllCategories()
+                remakeChildFilterChipsUi(categories)
             }
             AppListActivity.TopLevelFilter.INSTALLED.id -> {
                 sortValues.topLevelFilter = AppListActivity.TopLevelFilter.INSTALLED
                 sortValues.categoryFilters.clear()
-                io {
-                    val categories = FirewallManager.getCategoriesForInstalledApps()
-                    uiCtx { remakeChildFilterChipsUi(categories) }
-                }
+
+                val categories = FirewallManager.getCategoriesForInstalledApps()
+                remakeChildFilterChipsUi(categories)
             }
             AppListActivity.TopLevelFilter.SYSTEM.id -> {
                 sortValues.topLevelFilter = AppListActivity.TopLevelFilter.SYSTEM
                 sortValues.categoryFilters.clear()
-                io {
-                    val categories = FirewallManager.getCategoriesForSystemApps()
-                    uiCtx { remakeChildFilterChipsUi(categories) }
-                }
+
+                val categories = FirewallManager.getCategoriesForSystemApps()
+                remakeChildFilterChipsUi(categories)
             }
         }
     }

@@ -94,6 +94,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.8"
+                android:layout_gravity="center"
                 android:gravity="center">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -134,7 +135,7 @@
                 android:id="@+id/dns_block_connection_flag"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:layout_gravity="end"
+                android:layout_gravity="center"
                 android:layout_weight="0.15"
                 android:ellipsize="none"
                 android:gravity="center"
@@ -148,7 +149,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
-                android:layout_marginTop="2dp"
                 android:layout_weight="0.65"
                 android:ellipsize="end"
                 android:paddingStart="10dp"
@@ -167,7 +167,6 @@
                 android:layout_marginEnd="5dp"
                 android:layout_weight="0.1"
                 android:background="@drawable/drawable_purple_gradient"
-                android:padding="7dp"
                 android:textAlignment="center"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
@@ -215,16 +214,16 @@
 
         <TextView
             android:id="@+id/dns_block_blocked_desc"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/dns_block_ip_header"
-            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
             android:padding="5dp"
             android:text="@string/bsdl_blocked_desc"
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible" />
-
 
     </RelativeLayout>
 

@@ -12,37 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/dns_proxy_dialog_header_dns"
-        android:textSize="@dimen/large_font_text_view"
-        android:padding="10dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:padding="10dp"
-        android:weightSum="1">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.3"
-            android:textSize="@dimen/large_font_text_view"
-            android:text="@string/dns_proxy_name" />
-
-        <EditText
-            android:id="@+id/dialog_dns_proxy_edit_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.7"
-            android:textSize="@dimen/large_font_text_view"
-            android:inputType="textNoSuggestions"
-            android:maxLines="1"
-            android:hint="@string/dns_proxy_name" />
-
-    </LinearLayout>
+        android:text="@string/dns_proxy_dialog_header_dns"
+        android:textSize="@dimen/large_font_text_view" />
 
     <LinearLayout
         android:id="@+id/dialog_dns_proxy_spinner_header"
@@ -50,23 +22,52 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:weightSum="1">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.3"
+            android:text="@string/settings_dns_proxy_dialog_app"
+            android:textSize="@dimen/large_font_text_view" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/dialog_proxy_spinner_appname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.7"
+            android:textSize="@dimen/large_font_text_view" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
         android:weightSum="1">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="@dimen/large_font_text_view"
             android:layout_weight="0.3"
-            android:text="@string/dns_proxy_app" />
+            android:text="@string/dns_proxy_name"
+            android:textSize="@dimen/large_font_text_view" />
 
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/dialog_dns_proxy_spinner_appname"
+        <EditText
+            android:id="@+id/dialog_dns_proxy_edit_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/large_font_text_view"
             android:layout_gravity="center"
-            android:layout_weight="0.7" />
+            android:layout_weight="0.7"
+            android:hint="@string/dns_proxy_name"
+            android:inputType="textNoSuggestions"
+            android:maxLines="1"
+            android:textSize="@dimen/large_font_text_view" />
 
     </LinearLayout>
 
@@ -81,20 +82,20 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/large_font_text_view"
             android:layout_gravity="center"
             android:layout_weight="0.3"
-            android:text="@string/dns_proxy_ip_address" />
+            android:text="@string/dns_proxy_ip_address"
+            android:textSize="@dimen/large_font_text_view" />
 
         <EditText
             android:id="@+id/dialog_dns_proxy_edit_ip"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="@dimen/large_font_text_view"
-            android:maxLines="1"
             android:layout_weight="0.7"
-            android:hint="@string/dns_proxy_ip_address" />
+            android:hint="@string/dns_proxy_ip_address"
+            android:maxLines="1"
+            android:textSize="@dimen/large_font_text_view" />
 
     </LinearLayout>
 
@@ -110,8 +111,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.3"
-            android:textSize="@dimen/large_font_text_view"
-            android:text="@string/dns_proxy_port" />
+            android:text="@string/dns_proxy_port"
+            android:textSize="@dimen/large_font_text_view" />
 
         <EditText
             android:id="@+id/dialog_dns_proxy_edit_port"
@@ -119,11 +120,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.7"
-            android:textSize="@dimen/large_font_text_view"
-            android:maxLines="1"
             android:autofillHints="@string/dns_proxy_port"
+            android:hint="@string/dns_proxy_port"
             android:inputType="number"
-            android:hint="@string/dns_proxy_port" />
+            android:maxLines="1"
+            android:textSize="@dimen/large_font_text_view" />
 
     </LinearLayout>
 
@@ -133,8 +134,8 @@
         android:layout_height="wrap_content"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:textSize="@dimen/default_font_text_view"
-        android:textColor="@color/colorRed_A400" />
+        android:textColor="@color/colorRed_A400"
+        android:textSize="@dimen/default_font_text_view" />
 
 
     <LinearLayout
@@ -150,9 +151,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:gravity="center"
-            android:textSize="@dimen/large_font_text_view"
             android:text="@string/lbl_cancel"
-            android:textColor="?attr/accentGood" />
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/dialog_dns_proxy_apply_btn"
@@ -162,7 +163,7 @@
             android:layout_margin="5dp"
             android:gravity="center"
             android:text="@string/lbl_add"
-            android:textSize="@dimen/large_font_text_view"
-            android:textColor="?attr/accentGood" />
+            android:textColor="?attr/accentGood"
+            android:textSize="@dimen/large_font_text_view" />
     </LinearLayout>
 </LinearLayout>

@@ -237,21 +237,15 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         private lateinit var customIp: CustomIp
 
         fun update(ci: CustomIp) {
-            io {
-                val appName = getAppName(ci.uid)
-                val appInfo = FirewallManager.getAppInfoByUid(ci.uid)
-                uiCtx {
-                    b.customIpAppName.text = appName
-                    displayIcon(
-                        Utilities.getIcon(
-                            context,
-                            appInfo?.packageName ?: "",
-                            appInfo?.appName ?: ""
-                        ),
-                        b.customIpAppIconIv
-                    )
-                }
-            }
+
+            val appName = getAppName(ci.uid)
+            val appInfo = FirewallManager.getAppInfoByUid(ci.uid)
+
+            b.customIpAppName.text = appName
+            displayIcon(
+                Utilities.getIcon(context, appInfo?.packageName ?: "", appInfo?.appName ?: ""),
+                b.customIpAppIconIv
+            )
 
             customIp = ci
             b.customIpLabelTv.text =
@@ -283,7 +277,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             b.customIpContainer.setOnClickListener { toggleActionsUi() }
         }
 
-        private suspend fun getAppName(uid: Int): String {
+        private fun getAppName(uid: Int): String {
             if (uid == UID_EVERYBODY) {
                 return context
                     .getString(R.string.firewall_act_universal_tab)

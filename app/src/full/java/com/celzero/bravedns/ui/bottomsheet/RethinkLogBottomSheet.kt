@@ -28,7 +28,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
@@ -48,9 +47,6 @@ import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 
@@ -66,6 +62,8 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     companion object {
         const val INSTANCE_STATE_IPDETAILS = "IPDETAILS"
+        const val DNS_IP_TEMPLATE_V4 = "10.111.222.3"
+        const val DNS_IP_TEMPLATE_V6 = "fd66:f83a:c650::3"
     }
 
     override fun onCreateView(
@@ -106,7 +104,17 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             return
         }
 
-        b.bsConnConnectionTypeHeading.text = info!!.ipAddress
+        if (info!!.ipAddress == DNS_IP_TEMPLATE_V4 || info!!.ipAddress == DNS_IP_TEMPLATE_V6) {
+            val dnsTxt =
+                getString(
+                    R.string.about_version_install_source,
+                    getString(R.string.dns_mode_info_title),
+                    info!!.ipAddress
+                )
+            b.bsConnConnectionTypeHeading.text = dnsTxt
+        } else {
+            b.bsConnConnectionTypeHeading.text = info!!.ipAddress
+        }
         b.bsConnConnectionFlag.text = info!!.flag
 
         b.bsConnBlockAppTxt.text = updateHtmlEncodedText(getString(R.string.bsct_block))
@@ -141,16 +149,13 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun handleRethinkApp() {
-        io {
-            val pkgName = FirewallManager.getPackageNameByUid(info!!.uid)
-            uiCtx {
-                if (pkgName == requireContext().packageName) {
-                    b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
-                    b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-                    b.bsConnBlockedRule3HeaderLl.visibility = View.GONE
-                    b.bsConnDomainRuleLl.visibility = View.GONE
-                }
-            }
+        val pkgName = FirewallManager.getPackageNameByUid(info!!.uid)
+
+        if (pkgName == requireContext().packageName) {
+            b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
+            b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
+            b.bsConnBlockedRule3HeaderLl.visibility = View.GONE
+            b.bsConnDomainRuleLl.visibility = View.GONE
         }
     }
 
@@ -208,33 +213,29 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun updateAppDetails() {
         if (info == null) return
-        io {
-            val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
-            val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
-            uiCtx {
-                val appCount = appNames.count()
-                if (appCount >= 1) {
-                    b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-                    b.bsConnTrackAppName.text =
-                        if (appCount >= 2) {
-                            getString(
-                                R.string.ctbs_app_other_apps,
-                                appNames[0],
-                                appCount.minus(1).toString()
-                            ) + "      ❯"
-                        } else {
-                            appNames[0] + "      ❯"
-                        }
-                    if (pkgName == null) return@uiCtx
-                    b.bsConnTrackAppIcon.setImageDrawable(
-                        getIcon(requireContext(), pkgName, info?.appName)
-                    )
+
+        val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
+        val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
+
+        val appCount = appNames.count()
+        if (appCount >= 1) {
+            b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
+            b.bsConnTrackAppName.text =
+                if (appCount >= 2) {
+                    getString(
+                        R.string.ctbs_app_other_apps,
+                        appNames[0],
+                        appCount.minus(1).toString()
+                    ) + "      ❯"
                 } else {
-                    // apps which are not available in cache are treated as non app.
-                    // TODO: check packageManager#getApplicationInfo() for appInfo
-                    handleNonApp()
+                    appNames[0] + "      ❯"
                 }
-            }
+            if (pkgName == null) return
+            b.bsConnTrackAppIcon.setImageDrawable(getIcon(requireContext(), pkgName, info?.appName))
+        } else {
+            // apps which are not available in cache are treated as non app.
+            // TODO: check packageManager#getApplicationInfo() for appInfo
+            handleNonApp()
         }
     }
 
@@ -306,21 +307,17 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     private fun setupClickListeners() {
 
         b.bsConnTrackAppNameHeader.setOnClickListener {
-            io {
-                uiCtx {
-                    val ai = FirewallManager.getAppInfoByUid(info!!.uid)
-                    // case: app is uninstalled but still available in RethinkDNS database
-                    if (ai == null || info?.uid == Constants.INVALID_UID) {
-                        showToastUiCentered(
-                            requireContext(),
-                            getString(R.string.ct_bs_app_info_error),
-                            Toast.LENGTH_SHORT
-                        )
-                        return@uiCtx
-                    }
-                }
-                openAppDetailActivity(info!!.uid)
+            val ai = FirewallManager.getAppInfoByUid(info!!.uid)
+            // case: app is uninstalled but still available in RethinkDNS database
+            if (ai == null || info?.uid == Constants.INVALID_UID) {
+                showToastUiCentered(
+                    requireContext(),
+                    getString(R.string.ct_bs_app_info_error),
+                    Toast.LENGTH_SHORT
+                )
+                return@setOnClickListener
             }
+            openAppDetailActivity(info!!.uid)
         }
     }
 
@@ -329,17 +326,5 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         val intent = Intent(requireContext(), AppInfoActivity::class.java)
         intent.putExtra(AppInfoActivity.UID_INTENT_NAME, uid)
         requireContext().startActivity(intent)
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
-    }
-
-    private suspend fun uiCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.Main) { f() }
-    }
-
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) { f() }
     }
 }

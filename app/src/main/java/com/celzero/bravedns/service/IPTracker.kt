@@ -22,6 +22,8 @@ import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
+import com.celzero.bravedns.database.RethinkLog
+import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.IPUtil
@@ -38,6 +40,7 @@ import java.net.InetAddress
 class IPTracker
 internal constructor(
     private val connectionTrackerRepository: ConnectionTrackerRepository,
+    private val rethinkLogRepository: RethinkLogRepository,
     private val context: Context
 ) : KoinComponent {
 
@@ -57,6 +60,7 @@ internal constructor(
         connTracker.blocklists = connTrackerMetaData.blocklists
         connTracker.proxyDetails = connTrackerMetaData.proxyDetails
         connTracker.connId = connTrackerMetaData.connId
+        connTracker.connType = connTrackerMetaData.connType
 
         val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
         connTracker.dnsQuery = connTrackerMetaData.query
@@ -69,12 +73,43 @@ internal constructor(
         return connTracker
     }
 
+    suspend fun makeRethinkLogs(connTrackerMetaData: ConnTrackerMetaData): RethinkLog {
+        val rlog = RethinkLog()
+        rlog.ipAddress = connTrackerMetaData.destIP
+        rlog.isBlocked = connTrackerMetaData.isBlocked
+        rlog.uid = connTrackerMetaData.uid
+        rlog.port = connTrackerMetaData.destPort
+        rlog.protocol = connTrackerMetaData.protocol
+        rlog.timeStamp = connTrackerMetaData.timestamp
+        rlog.proxyDetails = connTrackerMetaData.proxyDetails
+        rlog.connId = connTrackerMetaData.connId
+        rlog.connType = connTrackerMetaData.connType
+
+        val serverAddress = convertIpV6ToIpv4IfNeeded(connTrackerMetaData.destIP)
+        rlog.dnsQuery = connTrackerMetaData.query
+
+        val countryCode: String? = getCountryCode(serverAddress, context)
+        rlog.flag = getFlag(countryCode)
+
+        rlog.appName = fetchApplicationName(rlog.uid)
+
+        return rlog
+    }
+
     suspend fun insertBatch(conns: List<ConnectionTracker>) {
         connectionTrackerRepository.insertBatch(conns)
     }
 
+    suspend fun insertRethinkBatch(conns: List<RethinkLog>) {
+        rethinkLogRepository.insertBatch(conns)
+    }
+
     suspend fun updateBatch(summary: List<ConnectionSummary>) {
         connectionTrackerRepository.updateBatch(summary)
+    }
+
+    suspend fun updateRethinkBatch(summary: List<ConnectionSummary>) {
+        rethinkLogRepository.updateBatch(summary)
     }
 
     private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {
@@ -124,12 +159,9 @@ internal constructor(
         return appName
     }
 
-    private fun getValidAppName(uid: Int, packageName: String): String {
-        var appName: String? = null
+    private suspend fun getValidAppName(uid: Int, packageName: String): String {
+        var appName = FirewallManager.getAppNameByUid(uid)
 
-        if (appName.isNullOrEmpty()) {
-            appName = FirewallManager.getAppNameByUid(uid)
-        }
         if (appName.isNullOrEmpty()) {
             val appInfo = Utilities.getApplicationInfo(context, packageName) ?: return ""
 

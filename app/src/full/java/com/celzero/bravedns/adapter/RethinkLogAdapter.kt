@@ -54,18 +54,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class RethinkLogAdapter(private val context: Context) :
-    PagingDataAdapter<RethinkLog, RethinkLogAdapter.RethinkLogViewHolder>(
-        DIFF_CALLBACK
-    ) {
+    PagingDataAdapter<RethinkLog, RethinkLogAdapter.RethinkLogViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<RethinkLog>() {
 
-                override fun areItemsTheSame(
-                    oldConnection: RethinkLog,
-                    newConnection: RethinkLog
-                ) = oldConnection.id == newConnection.id
+                override fun areItemsTheSame(oldConnection: RethinkLog, newConnection: RethinkLog) =
+                    oldConnection.id == newConnection.id
 
                 override fun areContentsTheSame(
                     oldConnection: RethinkLog,
@@ -76,6 +72,9 @@ class RethinkLogAdapter(private val context: Context) :
         private const val MAX_BYTES = 500000 // 500 KB
         private const val MAX_TIME_TCP = 135 // seconds
         private const val MAX_TIME_UDP = 135 // seconds
+
+        const val DNS_IP_TEMPLATE_V4 = "10.111.222.3"
+        const val DNS_IP_TEMPLATE_V6 = "fd66:f83a:c650::3"
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RethinkLogViewHolder {
@@ -132,11 +131,18 @@ class RethinkLogAdapter(private val context: Context) :
             b.connectionResponseTime.text = time
             b.connectionFlag.text = log.flag
 
-            if (log.dnsQuery.isNullOrEmpty()) {
-                b.connectionIpAddress.text = log.ipAddress
-                b.connectionDomain.visibility = View.GONE
+            if (
+                log.ipAddress == DNS_IP_TEMPLATE_V4 ||
+                    log.ipAddress == DNS_IP_TEMPLATE_V6
+            ) {
+                b.connectionIpAddress.text = context.getString(R.string.dns_mode_info_title)
             } else {
                 b.connectionIpAddress.text = log.ipAddress
+            }
+
+            if (log.dnsQuery.isNullOrEmpty()) {
+                b.connectionDomain.visibility = View.GONE
+            } else {
                 b.connectionDomain.text = log.dnsQuery
                 b.connectionDomain.visibility = View.VISIBLE
                 // marquee is not working for the textview, hence the workaround.
@@ -146,30 +152,28 @@ class RethinkLogAdapter(private val context: Context) :
 
         private fun displayAppDetails(log: RethinkLog) {
             b.connectionAppName.text = log.appName
-            io {
-                val apps = FirewallManager.getPackageNamesByUid(log.uid)
-                uiCtx {
-                    if (apps.isEmpty()) {
-                        loadAppIcon(Utilities.getDefaultIcon(context))
-                        return@uiCtx
-                    }
 
-                    val count = apps.count()
-                    val appName =
-                        if (count > 1) {
-                            context.getString(
-                                R.string.ctbs_app_other_apps,
-                                log.appName,
-                                (count).minus(1).toString()
-                            )
-                        } else {
-                            log.appName
-                        }
+            val apps = FirewallManager.getPackageNamesByUid(log.uid)
 
-                    b.connectionAppName.text = appName
-                    loadAppIcon(getIcon(context, apps[0], /*No app name */ ""))
-                }
+            if (apps.isEmpty()) {
+                loadAppIcon(Utilities.getDefaultIcon(context))
+                return
             }
+
+            val count = apps.count()
+            val appName =
+                if (count > 1) {
+                    context.getString(
+                        R.string.ctbs_app_other_apps,
+                        log.appName,
+                        (count).minus(1).toString()
+                    )
+                } else {
+                    log.appName
+                }
+
+            b.connectionAppName.text = appName
+            loadAppIcon(getIcon(context, apps[0], /*No app name */ ""))
         }
 
         private fun displayProtocolDetails(port: Int, proto: Int) {

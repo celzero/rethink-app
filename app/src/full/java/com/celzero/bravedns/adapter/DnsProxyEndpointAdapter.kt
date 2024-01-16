@@ -106,23 +106,19 @@ class DnsProxyEndpointAdapter(
             b.dnsProxyListUrlName.text = endpoint.proxyName
             b.dnsProxyListCheckImage.isChecked = endpoint.isSelected
 
-            io {
-                val appName =
-                    if (
-                        endpoint.proxyName !=
-                            context.getString(R.string.cd_custom_dns_proxy_default_app)
-                    ) {
-                        FirewallManager.getAppInfoByPackage(endpoint.proxyAppName)?.appName
-                            ?: context.getString(R.string.cd_custom_dns_proxy_default_app)
-                    } else {
-                        endpoint.proxyAppName
-                            ?: context.getString(R.string.cd_custom_dns_proxy_default_app)
-                    }
-                uiCtx {
-                    b.dnsProxyListUrlExplanation.text =
-                        endpoint.getExplanationText(context, appName)
+            val appName =
+                if (
+                    endpoint.proxyName !=
+                        context.getString(R.string.cd_custom_dns_proxy_default_app)
+                ) {
+                    FirewallManager.getAppInfoByPackage(endpoint.proxyAppName)?.appName
+                        ?: context.getString(R.string.cd_custom_dns_proxy_default_app)
+                } else {
+                    endpoint.proxyAppName
+                        ?: context.getString(R.string.cd_custom_dns_proxy_default_app)
                 }
-            }
+
+            b.dnsProxyListUrlExplanation.text = endpoint.getExplanationText(context, appName)
 
             if (endpoint.isDeletable()) {
                 b.dnsProxyListActionImage.setImageDrawable(
@@ -139,17 +135,13 @@ class DnsProxyEndpointAdapter(
     private fun promptUser(endpoint: DnsProxyEndpoint) {
         if (endpoint.isDeletable()) showDeleteDialog(endpoint)
         else {
-            io {
-                val app = FirewallManager.getAppInfoByPackage(endpoint.getPackageName())?.appName
-                uiCtx {
-                    showDetailsDialog(
-                        endpoint.proxyName,
-                        endpoint.proxyIP,
-                        endpoint.proxyPort.toString(),
-                        app
-                    )
-                }
-            }
+            val app = FirewallManager.getAppInfoByPackage(endpoint.getPackageName())?.appName
+            showDetailsDialog(
+                endpoint.proxyName,
+                endpoint.proxyIP,
+                endpoint.proxyPort.toString(),
+                app
+            )
         }
     }
 

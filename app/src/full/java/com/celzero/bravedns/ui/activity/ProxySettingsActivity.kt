@@ -204,14 +204,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 val endpoint = appConfig.getHttpProxyDetails()
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
                 if (m?.isCustomHttp() == true) {
-                    io {
-                        val appNames: MutableList<String> = ArrayList()
-                        appNames.add(getString(R.string.settings_app_list_default_app))
-                        if (!VpnController.isVpnLockdown()) {
-                            appNames.addAll(FirewallManager.getAllAppNames())
-                        }
-                        uiCtx { showHttpProxyDialog(endpoint, appNames) }
+                    val appNames: MutableList<String> = ArrayList()
+                    appNames.add(getString(R.string.settings_app_list_default_app))
+                    if (!VpnController.isVpnLockdown()) {
+                        appNames.addAll(FirewallManager.getAllAppNames())
                     }
+                    uiCtx { showHttpProxyDialog(endpoint, appNames) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
@@ -331,36 +329,33 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun handleOrbotUiEvent() {
-        io {
-            val isOrbotInstalled = FirewallManager.isOrbotInstalled()
-            uiCtx {
-                if (!isOrbotInstalled) {
-                    showOrbotInstallDialog()
-                    return@uiCtx
-                }
 
-                if (!appConfig.canEnableOrbotProxy()) {
-                    val s =
-                        persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
-                    if (s.lowercase() == AppConfig.ProxyProvider.CUSTOM.name.lowercase()) {
-                        showToastUiCentered(
-                            this,
-                            getString(R.string.settings_orbot_disabled_error),
-                            Toast.LENGTH_SHORT
-                        )
-                    } else {
-                        showToastUiCentered(
-                            this,
-                            getString(R.string.settings_socks5_disabled_error, s),
-                            Toast.LENGTH_SHORT
-                        )
-                    }
-                    return@uiCtx
-                }
+        val isOrbotInstalled = FirewallManager.isOrbotInstalled()
 
-                openOrbotBottomSheet()
-            }
+        if (!isOrbotInstalled) {
+            showOrbotInstallDialog()
+            return
         }
+
+        if (!appConfig.canEnableOrbotProxy()) {
+            val s = persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
+            if (s.lowercase() == AppConfig.ProxyProvider.CUSTOM.name.lowercase()) {
+                showToastUiCentered(
+                    this,
+                    getString(R.string.settings_orbot_disabled_error),
+                    Toast.LENGTH_SHORT
+                )
+            } else {
+                showToastUiCentered(
+                    this,
+                    getString(R.string.settings_socks5_disabled_error, s),
+                    Toast.LENGTH_SHORT
+                )
+            }
+            return
+        }
+
+        openOrbotBottomSheet()
     }
 
     private fun openWireguardActivity() {
@@ -427,38 +422,36 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayWireguardUi() {
-        io {
-            val activeWgs = WireguardManager.getActiveConfigs()
-            uiCtx {
-                if (activeWgs.isEmpty()) {
-                    b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
-                    return@uiCtx
-                }
-                var wgStatus = ""
-                activeWgs.forEach {
-                    val id = ProxyManager.ID_WG_BASE + it.getId()
-                    val statusId = VpnController.getProxyStatusById(id)
-                    if (statusId != null) {
-                        val resId = UIUtils.getProxyStatusStringRes(statusId)
-                        val s = getString(resId).replaceFirstChar(Char::titlecase)
-                        wgStatus +=
-                            getString(R.string.ci_ip_label, it.getName(), s.padStart(1, ' ')) + "\n"
-                        if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status for $id: $s")
-                    } else {
-                        wgStatus +=
-                            getString(
-                                    R.string.ci_ip_label,
-                                    it.getName(),
-                                    getString(R.string.status_failing).padStart(1, ' ')
-                                )
-                                .replaceFirstChar(Char::titlecase) + "\n"
-                        if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status is null for $id")
-                    }
-                }
-                wgStatus = wgStatus.trimEnd()
-                b.settingsActivityWireguardDesc.text = wgStatus
+
+        val activeWgs = WireguardManager.getActiveConfigs()
+
+        if (activeWgs.isEmpty()) {
+            b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
+            return
+        }
+
+        var wgStatus = ""
+        activeWgs.forEach {
+            val id = ProxyManager.ID_WG_BASE + it.getId()
+            val statusId = VpnController.getProxyStatusById(id)
+            if (statusId != null) {
+                val resId = UIUtils.getProxyStatusStringRes(statusId)
+                val s = getString(resId).replaceFirstChar(Char::titlecase)
+                wgStatus += getString(R.string.ci_ip_label, it.getName(), s.padStart(1, ' ')) + "\n"
+                if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status for $id: $s")
+            } else {
+                wgStatus +=
+                    getString(
+                            R.string.ci_ip_label,
+                            it.getName(),
+                            getString(R.string.status_failing).padStart(1, ' ')
+                        )
+                        .replaceFirstChar(Char::titlecase) + "\n"
+                if (DEBUG) Log.d(LOG_TAG_PROXY, "current proxy status is null for $id")
             }
         }
+        wgStatus = wgStatus.trimEnd()
+        b.settingsActivityWireguardDesc.text = wgStatus
     }
 
     private fun displaySocks5Ui() {
@@ -478,13 +471,40 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             // only update below ui if its custom http proxy
             if (!m.isCustomSocks5()) return@io
 
-            uiCtx {
-                b.settingsActivitySocks5Desc.text =
-                    getString(
-                        R.string.settings_socks_forwarding_desc_no_app,
-                        endpoint.proxyIP,
-                        endpoint.proxyPort.toString()
-                    )
+            if (
+                endpoint.proxyAppName.isNullOrBlank() ||
+                    endpoint.proxyAppName.equals(getString(R.string.settings_app_list_default_app))
+            ) {
+                uiCtx {
+                    b.settingsActivitySocks5Desc.text =
+                        getString(
+                            R.string.settings_socks_forwarding_desc_no_app,
+                            endpoint.proxyIP,
+                            endpoint.proxyPort.toString()
+                        )
+                }
+            } else {
+                val app = FirewallManager.getAppInfoByPackage(endpoint.proxyAppName!!)
+                if (app == null) {
+                    uiCtx {
+                        b.settingsActivitySocks5Desc.text =
+                            getString(
+                                R.string.settings_socks_forwarding_desc_no_app,
+                                endpoint.proxyIP,
+                                endpoint.proxyPort.toString()
+                            )
+                    }
+                } else {
+                    uiCtx {
+                        b.settingsActivitySocks5Desc.text =
+                            getString(
+                                R.string.settings_socks_forwarding_desc,
+                                endpoint.proxyIP,
+                                endpoint.proxyPort.toString(),
+                                app.appName
+                            )
+                    }
+                }
             }
         }
     }
@@ -512,7 +532,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         io {
             val isOrbotInstalled = FirewallManager.isOrbotInstalled()
             val isOrbotDns = appConfig.isOrbotDns()
-
             uiCtx {
                 if (!isOrbotInstalled) {
                     b.settingsActivityHttpOrbotDesc.text =
@@ -610,17 +629,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 !endpoint.proxyAppName.isNullOrBlank() &&
                     endpoint.proxyAppName != getString(R.string.settings_app_list_default_app)
             ) {
-                io {
-                    val packageName = endpoint.proxyAppName
-                    val app = FirewallManager.getAppInfoByPackage(packageName)
-                    var position = 0
-                    for ((i, item) in appNames.withIndex()) {
-                        if (item == app?.appName) {
-                            position = i
-                        }
+
+                val packageName = endpoint.proxyAppName
+                val app = FirewallManager.getAppInfoByPackage(packageName)
+                var position = 0
+                for ((i, item) in appNames.withIndex()) {
+                    if (item == app?.appName) {
+                        position = i
                     }
-                    uiCtx { appNameSpinner.setSelection(position) }
                 }
+                appNameSpinner.setSelection(position)
             } else {
                 // no-op
             }
@@ -681,8 +699,22 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 persistentState.setUdpBlocked(udpBlockCheckBox.isChecked)
                 val appName = appNameSpinner.selectedItem.toString()
                 insertSocks5Endpoint(endpoint.id, ip, port, appName, userName, password, isUDPBlock)
-                b.settingsActivitySocks5Desc.text =
-                    getString(R.string.settings_socks_forwarding_desc, ip, port.toString(), "")
+                if (appName == getString(R.string.settings_app_list_default_app)) {
+                    b.settingsActivitySocks5Desc.text =
+                        getString(
+                            R.string.settings_socks_forwarding_desc_no_app,
+                            ip,
+                            port.toString()
+                        )
+                } else {
+                    b.settingsActivitySocks5Desc.text =
+                        getString(
+                            R.string.settings_socks_forwarding_desc,
+                            ip,
+                            port.toString(),
+                            appName
+                        )
+                }
                 dialog.dismiss()
             } else {
                 // no-op
@@ -796,17 +828,16 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 !endpoint.proxyAppName.isNullOrBlank() &&
                     endpoint.proxyAppName != getString(R.string.settings_app_list_default_app)
             ) {
-                io {
-                    val packageName = endpoint.proxyAppName
-                    val app = FirewallManager.getAppInfoByPackage(packageName)
-                    var position = 0
-                    for ((i, item) in appNames.withIndex()) {
-                        if (item == app?.appName) {
-                            position = i
-                        }
+
+                val packageName = endpoint.proxyAppName
+                val app = FirewallManager.getAppInfoByPackage(packageName)
+                var position = 0
+                for ((i, item) in appNames.withIndex()) {
+                    if (item == app?.appName) {
+                        position = i
                     }
-                    uiCtx { appNameSpinner.setSelection(position) }
                 }
+                appNameSpinner.setSelection(position)
             } else {
                 // no-op
             }

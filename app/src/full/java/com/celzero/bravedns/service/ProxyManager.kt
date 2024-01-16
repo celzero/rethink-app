@@ -23,11 +23,10 @@ import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import ipn.Ipn
+import java.util.concurrent.CopyOnWriteArraySet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -35,7 +34,6 @@ object ProxyManager : KoinComponent {
 
     private val proxyAppMappingRepository: ProxyAppMappingRepository by inject()
     private val appConfig: AppConfig by inject()
-    private val mutex: Mutex = Mutex()
 
     const val ID_ORBOT_BASE = "ORBOT"
     const val ID_WG_BASE = "wg"
@@ -84,43 +82,43 @@ object ProxyManager : KoinComponent {
         }
     }
 
-    private var appConfigMappings = mutableSetOf<ProxyApplicationMapping>()
-
-    suspend fun load() {
-        WireguardManager.load()
-        mutex.withLock { appConfigMappings = proxyAppMappingRepository.getApps().toMutableSet() }
+    init {
+        io { WireguardManager.load() }
     }
 
-    suspend fun getProxyIdForApp(uid: Int): String {
-        mutex.withLock {
-            val appConfigMapping = appConfigMappings.find { it.uid == uid }
-            return appConfigMapping?.proxyId ?: ID_SYSTEM
-        }
+    private var appConfigMappings = CopyOnWriteArraySet<ProxyApplicationMapping>()
+
+    suspend fun load() {
+        appConfigMappings = CopyOnWriteArraySet(proxyAppMappingRepository.getApps())
+    }
+
+    fun getProxyIdForApp(uid: Int): String {
+        val appConfigMapping = appConfigMappings.find { it.uid == uid }
+        return appConfigMapping?.proxyId ?: ID_SYSTEM
     }
 
     suspend fun updateProxyIdForApp(uid: Int, proxyId: String, proxyName: String) {
-        mutex.withLock {
-            val appConfigMapping = appConfigMappings.filter { it.uid == uid }
-            if (!isValidProxyId(proxyId)) {
-                Log.e(LOG_TAG_PROXY, "Invalid config id: $proxyId")
-                return
-            }
-
-            if (appConfigMapping.isNotEmpty()) {
-                appConfigMapping.forEach {
-                    if (DEBUG)
-                        Log.d(LOG_TAG_PROXY, "add $proxyId to app ${it.packageName} with uid $uid")
-                    it.proxyId = proxyId
-                    it.proxyName = proxyName
-                }
-            } else {
-                Log.e(LOG_TAG_PROXY, "updateProxyIdForApp - appConfigMapping is null for uid $uid")
-            }
+        val appConfigMapping = appConfigMappings.filter { it.uid == uid }
+        if (!isValidProxyId(proxyId)) {
+            Log.e(LOG_TAG_PROXY, "Invalid config id: $proxyId")
+            return
         }
+
+        if (appConfigMapping.isNotEmpty()) {
+            appConfigMapping.forEach {
+                if (DEBUG)
+                    Log.d(LOG_TAG_PROXY, "add $proxyId to app ${it.packageName} with uid $uid")
+                it.proxyId = proxyId
+                it.proxyName = proxyName
+            }
+        } else {
+            Log.e(LOG_TAG_PROXY, "updateProxyIdForApp - appConfigMapping is null for uid $uid")
+        }
+
         proxyAppMappingRepository.updateProxyIdForApp(uid, proxyId, proxyName)
     }
 
-    suspend fun isProxyActive(proxyId: String): Boolean {
+    fun isProxyActive(proxyId: String): Boolean {
         return if (proxyId.contains(ID_SYSTEM)) {
             false
         } else if (proxyId.contains(ID_ORBOT_BASE)) {
@@ -138,12 +136,10 @@ object ProxyManager : KoinComponent {
         }
     }
 
-    suspend fun getProxyMapping(): MutableSet<FirewallManager.AppInfoTuple> {
-        mutex.withLock {
-            return appConfigMappings
-                .map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }
-                .toMutableSet()
-        }
+    fun getProxyMapping(): MutableSet<FirewallManager.AppInfoTuple> {
+        return appConfigMappings
+            .map { FirewallManager.AppInfoTuple(it.uid, it.packageName) }
+            .toMutableSet()
     }
 
     suspend fun updateProxyIdForAllApps(proxyId: String, proxyName: String) {
@@ -152,32 +148,31 @@ object ProxyManager : KoinComponent {
             return
         }
         Log.i(LOG_TAG_PROXY, "Adding all apps to interface: $proxyId")
-        mutex.withLock { appConfigMappings.forEach { it.proxyId = proxyId } }
+        appConfigMappings.forEach { it.proxyId = proxyId }
         proxyAppMappingRepository.updateProxyForAllApps(proxyId, proxyName)
     }
 
     suspend fun removeProxyIdForApp(uid: Int) {
-        mutex.withLock {
-            val appConfigMapping = appConfigMappings.filter { it.uid == uid }
-            if (appConfigMapping.isNotEmpty()) {
-                appConfigMapping.forEach { it.proxyId = "" }
-            } else {
-                Log.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on removeProxyIdForApp")
-            }
+        val appConfigMapping = appConfigMappings.filter { it.uid == uid }
+        if (appConfigMapping.isNotEmpty()) {
+            appConfigMapping.forEach { it.proxyId = "" }
+        } else {
+            Log.e(LOG_TAG_PROXY, "app config mapping is null for uid $uid on removeProxyIdForApp")
         }
+
         // update the id as empty string to remove the proxy
         proxyAppMappingRepository.updateProxyIdForApp(uid, "", "")
     }
 
     suspend fun removeProxyForAllApps() {
         Log.i(LOG_TAG_PROXY, "Removing all apps from proxy")
-        mutex.withLock { appConfigMappings.forEach { it.proxyId = "" } }
+        appConfigMappings.forEach { it.proxyId = "" }
         proxyAppMappingRepository.updateProxyForAllApps("", "")
     }
 
     suspend fun removeProxyForAllApps(proxyId: String) {
         Log.i(LOG_TAG_PROXY, "Removing all apps from proxy with id: $proxyId")
-        mutex.withLock { appConfigMappings.filter { it.proxyId == proxyId }.forEach { it.proxyId = "" } }
+        appConfigMappings.filter { it.proxyId == proxyId }.forEach { it.proxyId = "" }
         proxyAppMappingRepository.removeAllAppsForProxy(proxyId)
     }
 
@@ -191,7 +186,7 @@ object ProxyManager : KoinComponent {
                 true,
                 proxyName
             )
-        mutex.withLock { appConfigMappings.add(pam) }
+        appConfigMappings.add(pam)
         proxyAppMappingRepository.insert(pam)
     }
 
@@ -205,7 +200,7 @@ object ProxyManager : KoinComponent {
                 false,
                 proxyId
             )
-        mutex.withLock { appConfigMappings.remove(pam) }
+        appConfigMappings.remove(pam)
         proxyAppMappingRepository.delete(pam)
         if (DEBUG) Log.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
     }
@@ -213,17 +208,13 @@ object ProxyManager : KoinComponent {
     suspend fun deleteApp(appInfoTuple: FirewallManager.AppInfoTuple) {
         val pam =
             ProxyApplicationMapping(appInfoTuple.uid, appInfoTuple.packageName, "", "", false, "")
-        mutex.withLock {
-            appConfigMappings.remove(pam)
-        }
+        appConfigMappings.remove(pam)
         proxyAppMappingRepository.delete(pam)
         if (DEBUG) Log.d(LOG_TAG_PROXY, "Deleting app for mapping: ${pam.appName}, ${pam.uid}")
     }
 
-    suspend fun isAnyAppSelected(proxyId: String): Boolean {
-        mutex.withLock {
-            return appConfigMappings.any { it.proxyId == proxyId }
-        }
+    fun isAnyAppSelected(proxyId: String): Boolean {
+        return appConfigMappings.any { it.proxyId == proxyId }
     }
 
     private fun isValidProxyId(proxyId: String): Boolean {
@@ -234,15 +225,13 @@ object ProxyManager : KoinComponent {
             proxyId.contains(ID_HTTP_BASE)
     }
 
-    suspend fun getAppCountForProxy(proxyId: String): Int {
-        mutex.withLock {
-            return appConfigMappings.count { it.proxyId == proxyId }
-        }
+    fun getAppCountForProxy(proxyId: String): Int {
+        return appConfigMappings.count { it.proxyId == proxyId }
     }
 
     suspend fun removeWgProxies() {
         // remove all the wg proxies from the app config mappings, during restore process
-        mutex.withLock { appConfigMappings.filter { it.proxyId.contains(ID_WG_BASE) }.forEach { it.proxyId = "" } }
+        appConfigMappings.filter { it.proxyId.contains(ID_WG_BASE) }.forEach { it.proxyId = "" }
         proxyAppMappingRepository.removeAllWgProxies()
     }
 
@@ -252,5 +241,9 @@ object ProxyManager : KoinComponent {
         // determine whether the connection is proxied or not
         // if the connection is not Ipn.Base, Ipn.Block, Ipn.Exit then it is proxied
         return proxyId != Ipn.Base && proxyId != Ipn.Block && proxyId != Ipn.Exit
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 }

@@ -386,21 +386,14 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
 
         fun update(cd: CustomDomain) {
 
-            io {
-                val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
-                val appName = getAppName(cd.uid)
-                uiCtx {
-                    b.customDomainAppName.text = appName
-                    displayIcon(
-                        Utilities.getIcon(
-                            context,
-                            appInfo?.packageName ?: "",
-                            appInfo?.appName ?: ""
-                        ),
-                        b.customDomainAppIconIv
-                    )
-                }
-            }
+            val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
+            val appName = getAppName(cd.uid)
+
+            b.customDomainAppName.text = appName
+            displayIcon(
+                Utilities.getIcon(context, appInfo?.packageName ?: "", appInfo?.appName ?: ""),
+                b.customDomainAppIconIv
+            )
 
             this.customDomain = cd
             b.customDomainLabelTv.text = customDomain.domain
@@ -425,7 +418,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             b.customDomainContainer.setOnClickListener { toggleActionsUi() }
         }
 
-        private suspend fun getAppName(uid: Int): String {
+        private fun getAppName(uid: Int): String {
             if (uid == Constants.UID_EVERYBODY) {
                 return context
                     .getString(R.string.firewall_act_universal_tab)

@@ -130,8 +130,16 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
 
         b.saveTunnel.setOnClickListener {
+            val name = b.interfaceNameText.text.toString()
+            val addresses = b.addressesLabelText.text.toString()
+            val mtu = b.mtuText.text.toString().ifEmpty { DEFAULT_MTU }
+            val listenPort = b.listenPortText.text.toString().ifEmpty { DEFAULT_LISTEN_PORT }
+            val dnsServers = b.dnsServersText.text.toString()
+            val privateKey = b.privateKeyText.text.toString()
             io {
-                if (addWgInterface() != null) {
+                val isInterfaceAdded =
+                    addWgInterface(name, addresses, mtu, listenPort, dnsServers, privateKey)
+                if (isInterfaceAdded != null) {
                     uiCtx {
                         Toast.makeText(
                                 this,
@@ -168,13 +176,14 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         }
     }
 
-    private suspend fun addWgInterface(): Config? {
-        val name = b.interfaceNameText.text.toString()
-        val addresses = b.addressesLabelText.text.toString()
-        val mtu = b.mtuText.text.toString().ifEmpty { DEFAULT_MTU }
-        val listenPort = b.listenPortText.text.toString().ifEmpty { DEFAULT_LISTEN_PORT }
-        val dnsServers = b.dnsServersText.text.toString()
-        val privateKey = b.privateKeyText.text.toString()
+    private suspend fun addWgInterface(
+        name: String,
+        addresses: String,
+        mtu: String,
+        listenPort: String,
+        dnsServers: String,
+        privateKey: String
+    ): Config? {
         try {
             // parse the wg interface to check for errors
             val wgInterface =
@@ -190,7 +199,9 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]
             Log.e(LOG_TAG_PROXY, "Exception while parsing wg interface: $error", e)
-            Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+            uiCtx {
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+            }
             return null
         }
     }
