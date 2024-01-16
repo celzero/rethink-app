@@ -33,6 +33,7 @@ import java.util.Locale
             Index(value = arrayOf("responseIps"), unique = false),
             Index(value = arrayOf("isBlocked"), unique = false),
             Index(value = arrayOf("blockLists"), unique = false),
+            Index(value = arrayOf("time"), unique = false),
         ]
 )
 class DnsLog {

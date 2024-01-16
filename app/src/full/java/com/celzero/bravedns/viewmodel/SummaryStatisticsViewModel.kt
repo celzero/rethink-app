@@ -28,9 +28,6 @@ import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SummaryStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
@@ -42,13 +39,12 @@ class SummaryStatisticsViewModel(
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var ips: MutableLiveData<String> = MutableLiveData()
 
-    private var fromTime: MutableLiveData<Long> = MutableLiveData()
-    private var toTime: MutableLiveData<Long> = MutableLiveData()
+    private var startTime: MutableLiveData<Long> = MutableLiveData()
 
     companion object {
-        private const val TIME_1_HOUR = 1 * 60 * 60 * 1000L
-        private const val TIME_24_HOUR = 24 * 60 * 60 * 1000L
-        private const val TIME_7_DAYS = 7 * 24 * 60 * 60 * 1000L
+        private const val ONE_HOUR_MILLIS = 1 * 60 * 60 * 1000L
+        private const val ONE_DAY_MILLIS = 24 * ONE_HOUR_MILLIS
+        private const val ONE_WEEK_MILLIS = 7 * ONE_DAY_MILLIS
         private const val IS_APP_BYPASSED = "true"
     }
 
@@ -63,40 +59,40 @@ class SummaryStatisticsViewModel(
     }
 
     init {
+        // set from and to time to current and 1 hr before
+        startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
         networkActivity.value = ""
+        /*val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
+        if (isAppBypassed) {
+            domains.postValue(IS_APP_BYPASSED)
+        } else {
+            domains.postValue("")
+        }*/
+        domains.postValue("")
         countryActivities.value = ""
-        domains.value = ""
         ips.value = ""
-        // set from and to time to current and 3 hrs before
-        fromTime.value = System.currentTimeMillis() - TIME_1_HOUR
-        toTime.value = System.currentTimeMillis()
     }
 
     fun timeCategoryChanged(timeCategory: TimeCategory) {
         when (timeCategory) {
             TimeCategory.ONE_HOUR -> {
-                fromTime.value = System.currentTimeMillis() - TIME_1_HOUR
-                toTime.value = System.currentTimeMillis()
+                startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
             }
             TimeCategory.TWENTY_FOUR_HOUR -> {
-                fromTime.value = System.currentTimeMillis() - TIME_24_HOUR
-                toTime.value = System.currentTimeMillis()
+                startTime.value = System.currentTimeMillis() - ONE_DAY_MILLIS
             }
             TimeCategory.SEVEN_DAYS -> {
-                fromTime.value = System.currentTimeMillis() - TIME_7_DAYS
-                toTime.value = System.currentTimeMillis()
+                startTime.value = System.currentTimeMillis() - ONE_WEEK_MILLIS
             }
         }
         networkActivity.value = ""
-        countryActivities.value = ""
-        io {
-            val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
-            if (isAppBypassed) {
-                domains.postValue(IS_APP_BYPASSED)
-            } else {
-                domains.postValue("")
-            }
+        val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
+        if (isAppBypassed) {
+            domains.postValue(IS_APP_BYPASSED)
+        } else {
+            domains.postValue("")
         }
+        countryActivities.value = ""
         ips.value = ""
     }
 
@@ -104,9 +100,8 @@ class SummaryStatisticsViewModel(
         networkActivity.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     // use dnsQuery as appName
-                    val from = fromTime.value ?: 0L
-                    val to = toTime.value ?: 0L
-                    connectionTrackerDAO.getAllowedAppNetworkActivity(from, to)
+                    val to = startTime.value ?: 0L
+                    connectionTrackerDAO.getAllowedAppNetworkActivity(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -116,9 +111,8 @@ class SummaryStatisticsViewModel(
         networkActivity.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     // use dnsQuery as appName
-                    val from = fromTime.value ?: 0L
-                    val to = toTime.value ?: 0L
-                    connectionTrackerDAO.getBlockedAppNetworkActivity(from, to)
+                    val to = startTime.value ?: 0L
+                    connectionTrackerDAO.getBlockedAppNetworkActivity(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -128,13 +122,11 @@ class SummaryStatisticsViewModel(
         domains.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     if (appConfig.getBraveMode().isDnsMode()) {
-                        val from = fromTime.value ?: 0L
-                        val to = toTime.value ?: 0L
-                        dnsLogDAO.getMostContactedDomains(from, to)
+                        val to = startTime.value ?: 0L
+                        dnsLogDAO.getMostContactedDomains(to)
                     } else {
-                        val from = fromTime.value ?: 0L
-                        val to = toTime.value ?: 0L
-                        connectionTrackerDAO.getMostContactedDomains(from, to)
+                        val to = startTime.value ?: 0L
+                        connectionTrackerDAO.getMostContactedDomains(to)
                     }
                 }
                 .liveData
@@ -145,17 +137,15 @@ class SummaryStatisticsViewModel(
         domains.switchMap { isAppBypassed ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
                     if (appConfig.getBraveMode().isDnsMode()) {
-                        val from = fromTime.value ?: 0L
-                        val to = toTime.value ?: 0L
-                        dnsLogDAO.getMostBlockedDomains(from, to)
+                        val to = startTime.value ?: 0L
+                        dnsLogDAO.getMostBlockedDomains(to)
                     } else {
                         // if any app bypasses the dns, then the decision made in flow() call
-                        val from = fromTime.value ?: 0L
-                        val to = toTime.value ?: 0L
+                        val to = startTime.value ?: 0L
                         if (isAppBypassed.isNotEmpty()) {
-                            connectionTrackerDAO.getMostBlockedDomains(from, to)
+                            connectionTrackerDAO.getMostBlockedDomains(to)
                         } else {
-                            dnsLogDAO.getMostBlockedDomains(from, to)
+                            dnsLogDAO.getMostBlockedDomains(to)
                         }
                     }
                 }
@@ -166,9 +156,8 @@ class SummaryStatisticsViewModel(
     val getMostContactedIps =
         ips.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val from = fromTime.value ?: 0L
-                    val to = toTime.value ?: 0L
-                    connectionTrackerDAO.getMostContactedIps(from, to)
+                    val to = startTime.value ?: 0L
+                    connectionTrackerDAO.getMostContactedIps(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -177,9 +166,8 @@ class SummaryStatisticsViewModel(
     val getMostBlockedIps =
         ips.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val from = fromTime.value ?: 0L
-                    val to = toTime.value ?: 0L
-                    connectionTrackerDAO.getMostBlockedIps(from, to)
+                    val to = startTime.value ?: 0L
+                    connectionTrackerDAO.getMostBlockedIps(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -188,9 +176,8 @@ class SummaryStatisticsViewModel(
     val getMostContactedCountries =
         countryActivities.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val from = fromTime.value ?: 0L
-                    val to = toTime.value ?: 0L
-                    connectionTrackerDAO.getMostContactedCountries(from, to)
+                    val to = startTime.value ?: 0L
+                    connectionTrackerDAO.getMostContactedCountries(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
@@ -199,15 +186,10 @@ class SummaryStatisticsViewModel(
     val getMostBlockedCountries =
         countryActivities.switchMap { _ ->
             Pager(PagingConfig(Constants.LIVEDATA_PAGE_SIZE)) {
-                    val from = fromTime.value ?: 0L
-                    val to = toTime.value ?: 0L
-                    connectionTrackerDAO.getMostBlockedCountries(from, to)
+                    val to = startTime.value ?: 0L
+                    connectionTrackerDAO.getMostBlockedCountries(to)
                 }
                 .liveData
                 .cachedIn(viewModelScope)
         }
-
-    private fun io(f: suspend () -> Unit) {
-        viewModelScope.launch { withContext(Dispatchers.IO) { f() } }
-    }
 }

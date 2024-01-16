@@ -74,24 +74,24 @@ interface DnsLogDAO {
     @Query("delete from DNSLogs where time < :date") fun purgeDnsLogsByDate(date: Long)
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and time > :from and time < :to group by queryStr order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and time < :to group by queryStr order by count desc LIMIT 7"
     )
-    fun getMostContactedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostContactedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and time > :from and time < :to  group by queryStr order by count desc"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and time < :to  group by queryStr order by count desc"
     )
-    fun getAllContactedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllContactedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time > :from and time < :to group by queryStr order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time < :to group by queryStr order by count desc LIMIT 7"
     )
-    fun getMostBlockedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostBlockedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time > :from and time < :to group by queryStr order by count desc"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time < :to group by queryStr order by count desc"
     )
-    fun getAllBlockedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllBlockedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query("select count(id) from DNSLogs") fun logsCount(): LiveData<Long>
 
@@ -100,7 +100,4 @@ interface DnsLogDAO {
 
     @Query("select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time > :from and time < :to group by queryStr order by count desc LIMIT 5")
     fun getBlockedDnsLogList(from: Long, to: Long): LiveData<List<AppConnection>>
-
-    @Query("select count(id) from DNSLogs where isBlocked = 1 and time > :from and time < :to")
-    fun getBlockedDomainsCount(from: Long, to: Long): LiveData<Int>
 }

@@ -122,84 +122,84 @@ interface ConnectionTrackerDAO {
     ): PagingSource<Int, ConnectionTracker>
 
     @Query(
-        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(uploadBytes+downloadBytes) as totalBytes from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by appName order by totalBytes desc LIMIT 7"
+        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(uploadBytes+downloadBytes) as totalBytes from ConnectionTracker where isBlocked = 0 and timeStamp > :to group by appName order by totalBytes desc LIMIT 7"
     )
-    fun getAllowedAppNetworkActivity(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllowedAppNetworkActivity(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(uploadBytes+downloadBytes) as totalBytes from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by appName order by totalBytes desc"
+        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 0 as blocked, appName as appOrDnsName, sum(downloadBytes) as downloadBytes, sum(uploadBytes) as uploadBytes, sum(uploadBytes+downloadBytes) as totalBytes from ConnectionTracker where isBlocked = 0 and timeStamp > :to group by appName order by totalBytes desc"
     )
-    fun getAllAllowedAppNetworkActivity(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllAllowedAppNetworkActivity(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to group by appName order by count desc LIMIT 7"
+        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to group by appName order by count desc LIMIT 7"
     )
-    fun getBlockedAppNetworkActivity(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getBlockedAppNetworkActivity(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to group by appName order by count desc"
+        "select uid as uid, '' as ipAddress, 0 as port, count(id) as count, 0 as flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to group by appName order by count desc"
     )
-    fun getAllBlockedAppNetworkActivity(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllBlockedAppNetworkActivity(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by ipAddress order by count desc LIMIT 7"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where  isBlocked = 0 and timeStamp > :to group by ipAddress order by count desc LIMIT 7"
     )
-    fun getMostContactedIps(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostContactedIps(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by flag order by count desc LIMIT 7"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :to group by flag order by count desc LIMIT 7"
     )
-    fun getMostContactedCountries(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostContactedCountries(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by flag order by count desc"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :to group by flag order by count desc"
     )
-    fun getAllContactedCountries(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllContactedCountries(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to group by flag order by count desc LIMIT 7"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to  group by flag order by count desc LIMIT 7"
     )
-    fun getMostBlockedCountries(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostBlockedCountries(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to group by flag order by count desc"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to  group by flag order by count desc"
     )
-    fun getAllBlockedCountries(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllBlockedCountries(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 0 and timeStamp > :from and timeStamp < :to group by ipAddress order by count desc"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 0 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to  group by ipAddress order by count desc"
     )
-    fun getAllContactedIps(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllContactedIps(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to group by ipAddress order by count desc LIMIT 7"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to  group by ipAddress order by count desc LIMIT 7"
     )
-    fun getMostBlockedIps(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostBlockedIps(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to group by ipAddress order by count desc"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, '' as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to  group by ipAddress order by count desc"
     )
-    fun getAllBlockedIps(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllBlockedIps(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 0 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where isBlocked = 0 and dnsQuery != '' and timeStamp > :from and timeStamp < :to group by dnsQuery order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 0 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where  isBlocked = 0 and timeStamp > :to group by dnsQuery order by count desc LIMIT 7"
     )
-    fun getMostContactedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostContactedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 0 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where isBlocked = 0 and dnsQuery != '' and timeStamp > :from and timeStamp < :to group by dnsQuery order by count desc"
+        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 0 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where  isBlocked = 0 and timeStamp > :to group by dnsQuery order by count desc"
     )
-    fun getAllContactedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllContactedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where isBlocked = 1 and blockedByRule like '%Rule #2G%' and timeStamp > :from and timeStamp < :to group by dnsQuery order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to and blockedByRule like 'Rule #2G%' group by dnsQuery order by count desc LIMIT 7"
     )
-    fun getMostBlockedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getMostBlockedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where isBlocked = 1 and blockedByRule like '%Rule #2G%' and timeStamp > :from and timeStamp < :to group by dnsQuery order by count desc"
+        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :to and blockedByRule like 'Rule #2G%' group by dnsQuery order by count desc"
     )
-    fun getAllBlockedDomains(from: Long, to: Long): PagingSource<Int, AppConnection>
+    fun getAllBlockedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query("select count(id) from ConnectionTracker") fun logsCount(): LiveData<Long>
 
@@ -215,25 +215,19 @@ interface ConnectionTrackerDAO {
 
     // blocked by rule #2, #2D (ip block, ip block universal)
     @Query(
-        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #2', 'Rule #2D') group by ipAddress, appName order by count desc LIMIT 5"
+        "select 0 as uid, ipAddress as ipAddress, port as port, count(id) as count, flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where blockedByRule in ('Rule #2', 'Rule #2D') and  timeStamp > :from and timeStamp < :to group by ipAddress, appName order by count desc LIMIT 5"
     )
     fun getBlockedIpLogList(from: Long, to: Long): LiveData<List<AppConnection>>
 
-    // blocked by rule #1, #1B, #1D, #1E, #1G (app block, new app block, unmetered block, metered block, isolate)
+    // blocked by rule #2E, #2G, #2H (domain block, dns blocked by upstream, domain block universal)
     @Query(
-        "select uid as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #1', 'Rule #1B', 'Rule #1D', 'Rule #1E', 'Rule #1G') group by appName order by count desc LIMIT 5"
+        "select 0 as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, dnsQuery as appOrDnsName from ConnectionTracker where blockedByRule in ('Rule #2E', 'Rule #2G', 'Rule #2H') and timeStamp > :from and timeStamp < :to group by dnsQuery order by count desc LIMIT 5"
+    )
+    fun getBlockedDomainsList(from: Long, to: Long): LiveData<List<AppConnection>>
+
+    // TODO: add blocked by rule #1, #1B, #1D, #1E, #1G (app block, new app block, unmetered block, metered block, isolate)
+    @Query(
+        "select uid as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where timeStamp > :from and timeStamp < :to group by appName order by count desc LIMIT 5"
     )
     fun getBlockedAppLogList(from: Long, to: Long): LiveData<List<AppConnection>>
-
-    // blocked by rule #1, #1B, #1D, #1E, #1G (app block, new app block, unmetered block, metered block, isolate)
-    @Query(
-        "select count(id) from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #1', 'Rule #1B', 'Rule #1D', 'Rule #1E', 'Rule #1G')"
-    )
-    fun getBlockedAppsCount(from: Long, to: Long): LiveData<Int>
-
-    // blocked by rule #2, #2D (ip block, ip block universal)
-    @Query(
-        "select count(id) from ConnectionTracker where isBlocked = 1 and timeStamp > :from and timeStamp < :to and blockedByRule in ('Rule #2', 'Rule #2D')"
-    )
-    fun getBlockedIpCount(from: Long, to: Long): LiveData<Int>
 }

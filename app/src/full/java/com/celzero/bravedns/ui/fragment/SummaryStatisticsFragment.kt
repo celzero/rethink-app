@@ -19,6 +19,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.adapter.SummaryStatisticsAdapter
@@ -31,6 +32,9 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -59,11 +63,11 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
                     MOST_CONNECTED_APPS.tid -> MOST_CONNECTED_APPS
                     MOST_BLOCKED_APPS.tid -> MOST_BLOCKED_APPS
                     MOST_CONTACTED_DOMAINS.tid -> MOST_CONTACTED_DOMAINS
-                    MOST_CONTACTED_COUNTRIES.tid -> MOST_CONTACTED_COUNTRIES
                     MOST_BLOCKED_DOMAINS.tid -> MOST_BLOCKED_DOMAINS
+                    MOST_CONTACTED_COUNTRIES.tid -> MOST_CONTACTED_COUNTRIES
+                    MOST_BLOCKED_COUNTRIES.tid -> MOST_BLOCKED_COUNTRIES
                     MOST_CONTACTED_IPS.tid -> MOST_CONTACTED_IPS
                     MOST_BLOCKED_IPS.tid -> MOST_BLOCKED_IPS
-                    MOST_BLOCKED_COUNTRIES.tid -> MOST_BLOCKED_COUNTRIES
                     // make most contacted apps as default
                     else -> MOST_CONNECTED_APPS
                 }
@@ -73,9 +77,13 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
-        observeAppStart()
-        initClickListeners()
+        io {
+            uiCtx {
+                initView()
+                observeAppStart()
+                initClickListeners()
+            }
+        }
     }
 
     private fun initView() {
@@ -84,10 +92,10 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         showAppNetworkActivity()
         showBlockedApps()
         showMostContactedDomain()
-        showMostContactedCountries()
-        showBlockedDomains()
+        showMostBlockedDomains()
         showMostContactedIps()
-        showBlockedIps()
+        showMostBlockedIps()
+        showMostContactedCountries()
         showMostBlockedCountries()
     }
 
@@ -98,7 +106,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun highlightToggleBtn() {
-        val timeCategory = "0" // default is 3 hours, "0" tag is 3 hours
+        val timeCategory = "0" // default is 1 hours, "0" tag is 1 hours
         val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
         btn.isChecked = true
         selectToggleBtnUi(btn)
@@ -235,7 +243,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
         val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssAppBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssAppBlockedRecyclerView.adapter = recyclerAdapter
     }
@@ -271,12 +279,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssContactedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedDomainRecyclerView.adapter = recyclerAdapter
     }
 
-    private fun showBlockedDomains() {
+    private fun showMostBlockedDomains() {
         // if dns is not active, hide the view
         if (!appConfig.getBraveMode().isDnsActive()) {
             b.fssDomainBlockedLl.visibility = View.GONE
@@ -306,7 +314,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssBlockedDomainRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedDomainRecyclerView.adapter = recyclerAdapter
     }
@@ -341,7 +349,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssContactedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedIpsRecyclerView.adapter = recyclerAdapter
     }
@@ -376,12 +384,12 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssContactedCountriesRecyclerView.minimumHeight = pixels.toInt()
         b.fssContactedCountriesRecyclerView.adapter = recyclerAdapter
     }
 
-    private fun showBlockedIps() {
+    private fun showMostBlockedIps() {
         // if firewall is not active, hide the view
         if (!appConfig.getBraveMode().isFirewallActive()) {
             b.fssIpBlockedLl.visibility = View.GONE
@@ -411,7 +419,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssBlockedIpsRecyclerView.minimumHeight = pixels.toInt()
         b.fssBlockedIpsRecyclerView.adapter = recyclerAdapter
     }
@@ -446,8 +454,16 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             }
         }
         val scale = resources.displayMetrics.density
-        val pixels = (RECYCLER_ITEM_VIEW_HEIGHT * scale + 0.5f)
+        val pixels = ((RECYCLER_ITEM_VIEW_HEIGHT - 60) * scale + 0.5f)
         b.fssCountriesBlockedRecyclerView.minimumHeight = pixels.toInt()
         b.fssCountriesBlockedRecyclerView.adapter = recyclerAdapter
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        this.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

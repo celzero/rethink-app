@@ -18,16 +18,10 @@ package com.celzero.bravedns.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.util.Constants
+import com.celzero.bravedns.service.FirewallManager
 
 class AlertsViewModel(
     private val connectionTrackerDao: ConnectionTrackerDAO,
@@ -47,24 +41,6 @@ class AlertsViewModel(
         toTime.value = System.currentTimeMillis()
     }
 
-    fun getBlockedAppsCount(): LiveData<Int> {
-        val fromTime = fromTime.value ?: 0L
-        val toTime = toTime.value ?: 0L
-        return connectionTrackerDao.getBlockedAppsCount(fromTime, toTime)
-    }
-
-    fun getBlockedDomainsCount(): LiveData<Int> {
-        val fromTime = fromTime.value ?: 0L
-        val toTime = toTime.value ?: 0L
-        return dnsLogDao.getBlockedDomainsCount(fromTime, toTime)
-    }
-
-    fun getBlockedIpCount(): LiveData<Int> {
-        val fromTime = fromTime.value ?: 0L
-        val toTime = toTime.value ?: 0L
-        return connectionTrackerDao.getBlockedIpCount(fromTime, toTime)
-    }
-
     fun getBlockedIpLogList(): LiveData<List<AppConnection>> {
         val fromTime = fromTime.value ?: 0L
         val toTime = toTime.value ?: 0L
@@ -77,9 +53,13 @@ class AlertsViewModel(
         return connectionTrackerDao.getBlockedAppLogList(fromTime, toTime)
     }
 
-    fun getBlockedDnsLogList(): LiveData<List<AppConnection>> {
+    fun getBlockedDnsLogList(isAppBypassed: Boolean): LiveData<List<AppConnection>> {
         val fromTime = fromTime.value ?: 0L
         val toTime = toTime.value ?: 0L
-        return dnsLogDao.getBlockedDnsLogList(fromTime, toTime)
+        return if (isAppBypassed) {
+            connectionTrackerDao.getBlockedDomainsList(fromTime, toTime)
+        } else {
+            dnsLogDao.getBlockedDnsLogList(fromTime, toTime)
+        }
     }
 }
