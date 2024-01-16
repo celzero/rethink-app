@@ -17,6 +17,7 @@ package com.celzero.bravedns.ui.activity
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -31,17 +32,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
+import com.celzero.bravedns.adapter.OneWgConfigAdapter
 import com.celzero.bravedns.adapter.WgConfigAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.QrCodeFromFileScanner
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.TunnelImporter
+import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.WgConfigViewModel
+import com.google.android.material.button.MaterialButton
 import com.google.zxing.qrcode.QRCodeReader
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -57,6 +62,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private val appConfig by inject<AppConfig>()
 
     private var wgConfigAdapter: WgConfigAdapter? = null
+    private var oneWgConfigAdapter: OneWgConfigAdapter? = null
     private val wgConfigViewModel: WgConfigViewModel by viewModel()
 
     private lateinit var animation: Animation
@@ -160,11 +166,11 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
 
     private fun init() {
         b.settingsNetwork.text = getString(R.string.lbl_wireguard).lowercase()
+        setAdapter()
         initAnimation()
         collapseFab()
         observeConfig()
         observeDnsName()
-        setupInterfaceList()
         setupClickListeners()
 
         onBackPressedDispatcher.addCallback(this /* lifecycle owner */) {
@@ -174,6 +180,55 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                 finish()
             }
         }
+    }
+
+    private fun setAdapter() {
+        val type = WireguardManager.oneWireGuardEnabled()
+
+        if (type) {
+            selectToggleBtnUi(b.oneWgToggleBtn)
+            unselectToggleBtnUi(b.wgGeneralToggleBtn)
+            b.wgGeneralInterfaceList.visibility = View.GONE
+            b.wgGeneralInterfaceList.adapter = null
+            b.oneWgInterfaceList.visibility = View.VISIBLE
+            setOneWgAdapter()
+        } else {
+            selectToggleBtnUi(b.wgGeneralToggleBtn)
+            unselectToggleBtnUi(b.oneWgToggleBtn)
+            b.wgGeneralInterfaceList.visibility = View.VISIBLE
+            b.wgGeneralInterfaceList.adapter = wgConfigAdapter
+            b.oneWgInterfaceList.visibility = View.GONE
+            b.oneWgInterfaceList.adapter = null
+            setGeneralAdapter()
+        }
+    }
+
+    private fun setGeneralAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.wgGeneralInterfaceList.layoutManager = layoutManager
+
+        wgConfigAdapter = WgConfigAdapter(this)
+        wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
+        b.wgGeneralInterfaceList.adapter = wgConfigAdapter
+    }
+
+    private fun setOneWgAdapter() {
+        val layoutManager = LinearLayoutManager(this)
+        b.oneWgInterfaceList.layoutManager = layoutManager
+
+        oneWgConfigAdapter = OneWgConfigAdapter(this)
+        wgConfigViewModel.interfaces.observe(this) { oneWgConfigAdapter?.submitData(lifecycle, it) }
+        b.oneWgInterfaceList.adapter = oneWgConfigAdapter
+    }
+
+    private fun selectToggleBtnUi(b: MaterialButton) {
+        b.backgroundTintList =
+            ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.accentGood))
+    }
+
+    private fun unselectToggleBtnUi(b: MaterialButton) {
+        b.backgroundTintList =
+            ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.defaultToggleBtnBg))
     }
 
     private fun initAnimation() {
@@ -205,11 +260,11 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
             if (it == 0) {
                 b.wgEmptyView.visibility = View.VISIBLE
                 b.wgWireguardDisclaimer.visibility = View.GONE
-                b.wgInterfaceList.visibility = View.GONE
+                b.wgGeneralInterfaceList.visibility = View.GONE
             } else {
                 b.wgEmptyView.visibility = View.GONE
                 b.wgWireguardDisclaimer.visibility = View.VISIBLE
-                b.wgInterfaceList.visibility = View.VISIBLE
+                b.wgGeneralInterfaceList.visibility = View.VISIBLE
             }
         }
     }
@@ -218,15 +273,6 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         appConfig.getConnectedDnsObservable().observe(this) {
             b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
         }
-    }
-
-    private fun setupInterfaceList() {
-        val layoutManager = LinearLayoutManager(this)
-        b.wgInterfaceList.layoutManager = layoutManager
-
-        wgConfigAdapter = WgConfigAdapter(this)
-        wgConfigViewModel.interfaces.observe(this) { wgConfigAdapter?.submitData(lifecycle, it) }
-        b.wgInterfaceList.adapter = wgConfigAdapter
     }
 
     private fun setupClickListeners() {
@@ -250,6 +296,32 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         }
         b.createFab.setOnClickListener { openTunnelEditorActivity() }
         b.wgRefresh.setOnClickListener { refresh() }
+        b.wgGeneralToggleBtn.setOnClickListener {
+            if (WireguardManager.oneWireGuardEnabled()) {
+                Toast.makeText(
+                    this,
+                    "Please disable the one wireguard interface to use general interface",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            selectToggleBtnUi(b.wgGeneralToggleBtn)
+            unselectToggleBtnUi(b.oneWgToggleBtn)
+            b.oneWgInterfaceList.visibility = View.GONE
+            b.oneWgInterfaceList.adapter = null
+            b.wgGeneralInterfaceList.visibility = View.VISIBLE
+            if (wgConfigAdapter == null) setGeneralAdapter()
+            else b.wgGeneralInterfaceList.adapter = wgConfigAdapter
+        }
+        b.oneWgToggleBtn.setOnClickListener {
+            selectToggleBtnUi(b.oneWgToggleBtn)
+            unselectToggleBtnUi(b.wgGeneralToggleBtn)
+            b.wgGeneralInterfaceList.visibility = View.GONE
+            b.wgGeneralInterfaceList.adapter = null
+            b.oneWgInterfaceList.visibility = View.VISIBLE
+            if (oneWgConfigAdapter == null) setOneWgAdapter()
+            else b.oneWgInterfaceList.adapter = oneWgConfigAdapter
+        }
     }
 
     private fun openTunnelEditorActivity() {

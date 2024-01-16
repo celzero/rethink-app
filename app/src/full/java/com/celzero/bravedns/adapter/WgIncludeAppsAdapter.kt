@@ -136,15 +136,13 @@ class WgIncludeAppsAdapter(
         }
 
         private fun updateInterfaceDetails(mapping: ProxyApplicationMapping, include: Boolean) {
-            io {
-                val appUidList = FirewallManager.getAppNamesByUid(mapping.uid)
-                uiCtx {
-                    if (appUidList.count() > 1) {
-                        showDialog(appUidList, mapping, include)
-                    } else {
-                        updateProxyIdForApp(mapping, include)
-                    }
-                }
+
+            val appUidList = FirewallManager.getAppNamesByUid(mapping.uid)
+
+            if (appUidList.count() > 1) {
+                showDialog(appUidList, mapping, include)
+            } else {
+                updateProxyIdForApp(mapping, include)
             }
         }
 
