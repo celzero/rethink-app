@@ -502,8 +502,7 @@ class SummaryStatisticsAdapter(
                 Glide.with(context.applicationContext)
                     .load(nextDnsUrl)
                     .onlyRetrieveFromCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .error(
                         // on error, check if the icon is stored in the name of duckduckgo url
                         displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
@@ -550,8 +549,7 @@ class SummaryStatisticsAdapter(
                 Glide.with(context.applicationContext)
                     .load(url)
                     .onlyRetrieveFromCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .error(
                         Glide.with(context.applicationContext)
                             .load(subDomainURL)

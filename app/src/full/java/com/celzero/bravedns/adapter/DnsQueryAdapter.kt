@@ -181,8 +181,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                 Glide.with(context.applicationContext)
                     .load(nextDnsUrl)
                     .onlyRetrieveFromCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .error(
                         // on error, check if the icon is stored in the name of duckduckgo url
                         displayDuckduckgoFavIcon(duckduckGoUrl, duckduckgoDomainURL)
@@ -228,8 +227,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
                 Glide.with(context.applicationContext)
                     .load(url)
                     .onlyRetrieveFromCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .error(
                         Glide.with(context.applicationContext)
                             .load(subDomainURL)
