@@ -150,7 +150,9 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             if (isChecked) {
                 selectToggleBtnUi(mb)
                 val tcValue = (mb.tag as String).toInt()
-                val timeCategory = SummaryStatisticsViewModel.TimeCategory.fromValue(tcValue)
+                val timeCategory =
+                    SummaryStatisticsViewModel.TimeCategory.fromValue(tcValue)
+                        ?: SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
                 viewModel.timeCategoryChanged(timeCategory)
                 return@OnButtonCheckedListener
             }

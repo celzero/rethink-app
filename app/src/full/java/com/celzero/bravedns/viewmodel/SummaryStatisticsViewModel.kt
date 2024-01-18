@@ -54,7 +54,7 @@ class SummaryStatisticsViewModel(
         SEVEN_DAYS(2);
 
         companion object {
-            fun fromValue(value: Int) = values().first { it.value == value }
+            fun fromValue(value: Int) = values().firstOrNull { it.value == value }
         }
     }
 

@@ -39,7 +39,6 @@ import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.ProxyEndpointRepository
 import com.celzero.bravedns.database.RethinkDnsEndpoint
 import com.celzero.bravedns.database.RethinkDnsEndpointRepository
-import com.celzero.bravedns.service.DnsConfig
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.Constants
@@ -731,11 +730,6 @@ internal constructor(
     }
 
     fun getDefaultDns(): String {
-        if (persistentState.defaultDnsUrl.isEmpty()) {
-            val dnsConfig = DnsConfig(context)
-            val dns = dnsConfig.getDnsConfigAsString()
-            persistentState.defaultDnsUrl = dns
-        }
         return persistentState.defaultDnsUrl
     }
 
@@ -791,10 +785,10 @@ internal constructor(
             dnsIp =
                 when (getInternetProtocol()) {
                     InternetProtocol.IPv4 -> {
-                        dnsServers.first { IPAddressString(it.hostAddress).isIPv4 }.hostAddress
+                        dnsServers.firstOrNull { IPAddressString(it.hostAddress).isIPv4 }?.hostAddress
                     }
                     InternetProtocol.IPv6 -> {
-                        dnsServers.first { IPAddressString(it.hostAddress).isIPv6 }.hostAddress
+                        dnsServers.firstOrNull { IPAddressString(it.hostAddress).isIPv6 }?.hostAddress
                     }
                     InternetProtocol.IPv46 -> {
                         dnsServers[0].hostAddress
@@ -812,7 +806,13 @@ internal constructor(
     }
 
     fun getSystemDns(): SystemDns {
+        val defaultDns = "8.8.4.4"
+        val defaultSysDns = SystemDns(defaultDns, DNS_PORT)
         if (DEBUG) Log.d(LOG_TAG_VPN, "SystemDns: ${systemDns.ipAddress}:${systemDns.port}")
+
+        if (systemDns.ipAddress.isEmpty()) {
+            systemDns = defaultSysDns
+        }
         return systemDns
     }
 

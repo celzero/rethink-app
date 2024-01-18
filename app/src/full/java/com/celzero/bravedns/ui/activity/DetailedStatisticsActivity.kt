@@ -50,7 +50,9 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
                 SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS.tid
             )
         val tc = intent.getIntExtra(INTENT_TIME_CATEGORY, 0)
-        val timeCategory = SummaryStatisticsViewModel.TimeCategory.fromValue(tc)
+        val timeCategory =
+            SummaryStatisticsViewModel.TimeCategory.fromValue(tc)
+                ?: SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
         val statType = SummaryStatisticsFragment.SummaryStatisticsType.getType(type)
         setSubTitle(timeCategory)
         setRecyclerView(statType, timeCategory)
