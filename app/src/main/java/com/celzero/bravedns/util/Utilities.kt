@@ -285,11 +285,11 @@ object Utilities {
         try {
             Toast.makeText(context, message, toastLength).show()
         } catch (e: IllegalStateException) {
-            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IllegalAccessException) {
-            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
         } catch (e: IOException) {
-            Log.w(LOG_TAG_VPN, "Show Toast issue : ${e.message}", e)
+            Log.w(LOG_TAG_VPN, "toast err: ${e.message}")
         }
     }
 
