@@ -23,6 +23,8 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository
+import com.celzero.bravedns.database.RethinkLog
+import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.NetLogBatcher
 import dnsx.Summary
 import kotlinx.coroutines.CoroutineScope
@@ -35,6 +37,7 @@ class NetLogTracker
 internal constructor(
     private val context: Context,
     private val connectionTrackerRepository: ConnectionTrackerRepository,
+    private val rethinkLogRepository: RethinkLogRepository,
     private val dnsLogRepository: DnsLogRepository,
     private val persistentState: PersistentState
 ) : KoinComponent {
@@ -50,10 +53,12 @@ internal constructor(
     private var dnsNetLogBatcher: NetLogBatcher<DnsLog>? = null
     private var ipNetLogBatcher: NetLogBatcher<ConnectionTracker>? = null
     private var summaryBatcher: NetLogBatcher<ConnectionSummary>? = null
+    private var rethinkLogBatcher: NetLogBatcher<RethinkLog>? = null
+    private var rethinkSummaryBatcher: NetLogBatcher<ConnectionSummary>? = null
 
     suspend fun startLogger(s: CoroutineScope) {
         if (ipTracker == null) {
-            ipTracker = IPTracker(connectionTrackerRepository, context)
+            ipTracker = IPTracker(connectionTrackerRepository, rethinkLogRepository, context)
         }
 
         if (dnsLogTracker == null) {
@@ -71,6 +76,12 @@ internal constructor(
 
         summaryBatcher = NetLogBatcher(ipTracker!!::updateBatch)
         summaryBatcher!!.begin(scope!!)
+
+        rethinkLogBatcher = NetLogBatcher(ipTracker!!::insertRethinkBatch)
+        rethinkLogBatcher!!.begin(scope!!)
+
+        rethinkSummaryBatcher = NetLogBatcher(ipTracker!!::updateRethinkBatch)
+        rethinkSummaryBatcher!!.begin(scope!!)
     }
 
     fun writeIpLog(info: ConnTrackerMetaData) {
@@ -82,10 +93,25 @@ internal constructor(
         }
     }
 
+    fun writeRethinkLog(info: ConnTrackerMetaData) {
+        if (!persistentState.logsEnabled) return
+
+        scope?.launch {
+            val rlog = ipTracker?.makeRethinkLogs(info) ?: return@launch
+            rethinkLogBatcher?.add(rlog)
+        }
+    }
+
     fun updateIpSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
         scope?.launch { summaryBatcher?.add(summary) }
+    }
+
+    fun updateRethinkSummary(summary: ConnectionSummary) {
+        if (!persistentState.logsEnabled) return
+
+        scope?.launch { rethinkSummaryBatcher?.add(summary) ?: return@launch }
     }
 
     // now, this method is doing multiple things which should be removed.
