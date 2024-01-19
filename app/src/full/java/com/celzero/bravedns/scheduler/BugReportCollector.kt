@@ -22,6 +22,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -38,7 +39,6 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
     CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val persistentState by inject<PersistentState>()
-    private lateinit var file: File
 
     companion object {
         private const val LOGCAT_CMD = "logcat"
@@ -59,44 +59,48 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
         }
 
         // prepare the bugreport directory and file
-        prepare()
-        storePrefs()
-        // app exit info is available only on Android R and above, normal process builder
-        // for logcat is used for all the other versions
-        if (Utilities.isAtleastR()) {
-            detectAppExitInfo()
-        } else {
-            Log.i(LOG_TAG_SCHEDULER, "app-exit-info job not supported on this device")
-            dumpLogcat()
-        }
-        build()
+        val fout = prepare()
+        storePrefs(fout)
+        val ts = dumpLogsAndAppExits(fout)
+        addToZip(fout)
+        // Store the last exit reason time stamp
+        persistentState.lastAppExitInfoTimestamp =
+            persistentState.lastAppExitInfoTimestamp.coerceAtLeast(ts)
         return Result.success()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun prepare() {
-        val path = BugReportZipper.prepare(this.applicationContext)
+    private fun prepare(): File {
+        val path = BugReportZipper.prepare(applicationContext.filesDir)
         Log.i(LOG_TAG_SCHEDULER, "app-exit-info job path: $path")
-        file = File(path)
+        val file = File(path)
         Log.i(LOG_TAG_SCHEDULER, "app-exit-info job file: ${file.name}, ${file.absolutePath}")
+        return file
     }
 
-    private fun storePrefs() {
+    private fun storePrefs(file: File) {
         // write all the shared preferences values into the file
-        BugReportZipper.writePrefs(applicationContext, file)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        BugReportZipper.dumpPrefs(prefs, file)
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun detectAppExitInfo() {
+    private fun dumpLogsAndAppExits(file: File): Long {
         // use the logcat dumper to get the default info
-        dumpLogcat()
+        dumpLogcat(file)
+
+        // app exit info is available only on Android R and above, normal process builder
+        // for logcat is used for all the other versions
+        if (!Utilities.isAtleastR()) {
+            Log.i(LOG_TAG_SCHEDULER, "app-exit-info job not supported on this device")
+            return -1L
+        }
 
         val am = context.getSystemService(AppCompatActivity.ACTIVITY_SERVICE) as ActivityManager
 
         // gets all the historical process exit reasons.
         val appExitInfo = am.getHistoricalProcessExitReasons(null, 0, 0)
 
-        if (appExitInfo.isEmpty()) return
+        if (appExitInfo.isEmpty()) return -1L
 
         var maxTimestamp = appExitInfo[0].timestamp
 
@@ -108,21 +112,21 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
                 if (persistentState.lastAppExitInfoTimestamp >= it.timestamp) return@returnTag
 
                 // appends the exit info to the file
-                BugReportZipper.write(it, file)
+                BugReportZipper.dumpAppExit(it, file)
             }
         }
 
-        // Store the last exit reason time stamp
-        persistentState.lastAppExitInfoTimestamp =
-            persistentState.lastAppExitInfoTimestamp.coerceAtLeast(maxTimestamp)
+        return maxTimestamp
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun build() {
-        BugReportZipper.build(applicationContext, file)
+    private fun addToZip(file: File) {
+        val dir = applicationContext.filesDir
+        BugReportZipper.rezipAll(dir, file)
+        BugReportZipper.deleteAll(dir)
     }
 
-    private fun dumpLogcat() {
+    private fun dumpLogcat(file: File) {
         try {
             val s1 =
                 ProcessBuilder(
@@ -137,10 +141,10 @@ class BugReportCollector(val context: Context, workerParameters: WorkerParameter
                 )
             val pd = s1.redirectErrorStream(true).start()
             val ips: InputStream = pd.inputStream
-            BugReportZipper.writeTrace(file, ips)
-            val exit = pd.waitFor()
-            if (exit != 0) {
-                Log.e(LOG_TAG_SCHEDULER, "logcat process exited with $exit")
+            BugReportZipper.fileWrite(ips, file)
+            val exitcode = pd.waitFor()
+            if (exitcode != 0) {
+                Log.e(LOG_TAG_SCHEDULER, "logcat process exited with $exitcode")
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG_SCHEDULER, "Error while dumping logs", e)

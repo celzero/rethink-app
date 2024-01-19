@@ -17,11 +17,10 @@
 package com.celzero.bravedns.scheduler
 
 import android.app.ApplicationExitInfo
-import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.preference.PreferenceManager
 import com.celzero.bravedns.BuildConfig
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
@@ -48,8 +47,8 @@ object BugReportZipper {
     const val FILE_PROVIDER_NAME = BuildConfig.APPLICATION_ID + ".provider"
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun prepare(context: Context): String {
-        val filePath = context.filesDir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
+    fun prepare(dir: File): String {
+        val filePath = dir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
         val file = File(filePath)
 
         if (file.exists()) {
@@ -59,12 +58,12 @@ object BugReportZipper {
             file.mkdir()
         }
 
-        val zipFile = getZipFile(context) ?: return constructFileName(filePath, null)
+        val zipFile = getZipFile(dir) ?: return constructFileName(filePath, null)
         zipFile.use { zf ->
             val nextFileNumber = zf.entries().toList().count()
 
             if (nextFileNumber >= BUG_REPORT_MAX_FILES_ALLOWED) {
-                val f = File(getOlderFile(zf))
+                val f = File(getOldestEntry(zf))
                 val fileName = Files.getNameWithoutExtension(f.name)
                 return constructFileName(filePath, fileName)
             }
@@ -72,9 +71,9 @@ object BugReportZipper {
         }
     }
 
-    private fun getZipFile(context: Context): ZipFile? {
+    private fun getZipFile(dir: File): ZipFile? {
         return try {
-            ZipFile(getZipFilePath(context))
+            ZipFile(getZipFileName(dir))
         } catch (e: FileNotFoundException) {
             Log.e(LOG_TAG_SCHEDULER, "File not found exception while creating zip file", e)
             null
@@ -92,51 +91,68 @@ object BugReportZipper {
 
     // Get the oldest file modified in the zip file to replace
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getOlderFile(directory: ZipFile?): String {
+    private fun getOldestEntry(directory: ZipFile?): String {
         if (directory?.entries() == null) return ""
 
         val entries = directory.entries().toList().sortedBy { it.lastModifiedTime.toMillis() }
         return entries[0].name ?: ""
     }
 
-    fun getZipFilePath(context: Context): String {
-        return context.filesDir.canonicalPath + File.separator + BUG_REPORT_ZIP_FILE_NAME
+    fun getZipFileName(dir: File): String {
+        return dir.canonicalPath + File.separator + BUG_REPORT_ZIP_FILE_NAME
+    }
+
+    private fun getTempZipFileName(dir: File): String {
+        return dir.canonicalPath + File.separator + "temp_" + BUG_REPORT_ZIP_FILE_NAME
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun build(context: Context, file: File) {
+    fun rezipAll(dir: File, file: File) {
         if (!file.exists() || file.length() <= 0) return
 
-        val zipPath = getZipFilePath(context)
-
-        val zipFile = getZipFile(context) ?: return
-        zipFile.use { zf ->
-            FileOutputStream(zipPath, true).use { fo ->
-                ZipOutputStream(fo).use { zo ->
-                    // Issue when a new file is appended to the existing zip file.
-                    // Using the approach similar to this ref=(https://stackoverflow.com/a/2265206)
-                    handleOlderFiles(zo, zf, file.name)
-
+        val curZip = getZipFile(dir)
+        if (curZip == null) {
+            val zip = getZipFileName(dir)
+            FileOutputStream(zip, true).use { zf ->
+                ZipOutputStream(zf).use { zo ->
                     // Add new file to zip
                     addNewZipEntry(zo, file)
                 }
             }
-        }
+        } else {
+            // cannot append to existing zip file, copy over and then append
+            // ref=(https://stackoverflow.com/a/2265206)
+            val tempZipFile = getTempZipFileName(dir)
+            curZip.use { czf ->
+                FileOutputStream(tempZipFile, true).use { tmp ->
+                    ZipOutputStream(tmp).use { tzo ->
+                        handleOlderFiles(tzo, czf, file.name)
+                        addNewZipEntry(tzo, file)
+                    }
+                }
+            }
 
-        deleteBugReportFile(context)
+            // delete the old zip file and rename the temp file to zip file
+            val zipFile = File(getZipFileName(dir))
+            zipFile.delete()
+            File(tempZipFile).renameTo(zipFile)
+        }
     }
 
     // delete the file created to store the bug report in zip
-    private fun deleteBugReportFile(context: Context) {
-        val filePath = context.filesDir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
+    fun deleteAll(dir: File) {
+        val filePath = dir.canonicalPath + File.separator + BUG_REPORT_DIR_NAME
         Utilities.deleteRecursive(File(filePath))
     }
 
     private fun addNewZipEntry(zo: ZipOutputStream, file: File) {
+        if (file.isDirectory) return
+
         Log.i(LOG_TAG_SCHEDULER, "Add new file: ${file.name} to bug_report.zip")
         val entry = ZipEntry(file.name)
         zo.putNextEntry(entry)
-        FileInputStream(file).use { inStream -> writeZipContents(zo, inStream) }
+        FileInputStream(file).use { inStream -> copy(inStream, zo) }
+        zo.closeEntry()
     }
 
     private fun handleOlderFiles(zo: ZipOutputStream, zipFile: ZipFile?, ignoreFileName: String) {
@@ -147,7 +163,7 @@ object BugReportZipper {
         while (entries.hasMoreElements()) {
             val e = entries.nextElement()
             if (ignoreFileName == e.name) {
-                Log.i(LOG_TAG_SCHEDULER, "Ignoring the old file: ${e.name} from bug_report.zip")
+                Log.i(LOG_TAG_SCHEDULER, "Ignoring file to be replaced: ${e.name}")
                 continue
             }
 
@@ -160,48 +176,43 @@ object BugReportZipper {
             zo.putNextEntry(zipEntry)
 
             if (!e.isDirectory) {
-                zipFile.getInputStream(e).use { inStream -> writeZipContents(zo, inStream) }
+                zipFile.getInputStream(e).use { inStream -> copy(inStream, zo) }
             }
             zo.closeEntry()
         }
     }
 
-    fun writeTrace(file: File, inputStream: InputStream?) {
+    fun fileWrite(inputStream: InputStream?, file: File) {
         if (inputStream == null) return
 
         FileOutputStream(file, true).use { outputStream -> copy(inputStream, outputStream) }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    fun write(it: ApplicationExitInfo, file: File) {
+    fun dumpAppExit(aei: ApplicationExitInfo, file: File) {
         val reportDetails =
-            "${it.packageUid},${it.reason},${it.description},${it.importance},${it.pss},${it.rss},${
-            Utilities.convertLongToTime(it.timestamp, Constants.TIME_FORMAT_3)
+            "${aei.packageUid},${aei.reason},${aei.description},${aei.importance},${aei.pss},${aei.rss},${
+            Utilities.convertLongToTime(aei.timestamp, Constants.TIME_FORMAT_3)
         }\n"
         file.appendText(reportDetails)
 
         if (Utilities.isAtleastS()) {
             // above API 31, we can get the traceInputStream for native crashes
-            if (it.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
-                it.traceInputStream.use { ins -> writeTrace(file, ins) }
+            if (aei.reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                aei.traceInputStream.use { ins -> fileWrite(ins, file) }
             }
         }
         // capture traces for ANR exit-infos
-        if (it.reason == ApplicationExitInfo.REASON_ANR) {
-            it.traceInputStream.use { ins -> writeTrace(file, ins) }
+        if (aei.reason == ApplicationExitInfo.REASON_ANR) {
+            aei.traceInputStream.use { ins -> fileWrite(ins, file) }
         }
     }
 
-    fun writePrefs(context: Context, file: File) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    fun dumpPrefs(prefs: SharedPreferences, file: File) {
         val prefsMap = prefs.all
         val prefsDetails = StringBuilder()
         prefsMap.forEach { (key, value) -> prefsDetails.append("$key=$value\n") }
         file.appendText(prefsDetails.toString())
-    }
-
-    private fun writeZipContents(outputStream: ZipOutputStream, inputStream: InputStream) {
-        copy(inputStream, outputStream)
     }
 
     private fun copy(input: InputStream, output: OutputStream) {
