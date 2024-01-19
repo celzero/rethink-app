@@ -34,7 +34,7 @@ import java.io.InputStream
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class AppExitInfoCollector(val context: Context, workerParameters: WorkerParameters) :
+class BugReportCollector(val context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters), KoinComponent {
 
     private val persistentState by inject<PersistentState>()

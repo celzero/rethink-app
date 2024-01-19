@@ -108,9 +108,9 @@ class WorkScheduler(val context: Context) {
         if (!Utilities.isAtleastR()) return
 
         if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "App exit info job scheduled")
-        val appExitInfoCollector =
+        val bugReportCollector =
             PeriodicWorkRequest.Builder(
-                    AppExitInfoCollector::class.java,
+                    BugReportCollector::class.java,
                     APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS,
                     TimeUnit.DAYS
                 )
@@ -120,7 +120,7 @@ class WorkScheduler(val context: Context) {
             .enqueueUniquePeriodicWork(
                 APP_EXIT_INFO_JOB_TAG,
                 ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-                appExitInfoCollector
+                bugReportCollector
             )
     }
 
@@ -149,8 +149,8 @@ class WorkScheduler(val context: Context) {
     fun scheduleOneTimeWorkForAppExitInfo() {
         ///if (isWorkScheduled(context.applicationContext, APP_EXIT_INFO_ONE_TIME_JOB_TAG)) return
 
-        val appExitInfoCollector =
-            OneTimeWorkRequestBuilder<AppExitInfoCollector>()
+        val bugReportCollector =
+            OneTimeWorkRequestBuilder<BugReportCollector>()
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
                     WorkRequest.MIN_BACKOFF_MILLIS,
@@ -162,7 +162,7 @@ class WorkScheduler(val context: Context) {
             .beginUniqueWork(
                 APP_EXIT_INFO_ONE_TIME_JOB_TAG,
                 ExistingWorkPolicy.REPLACE,
-                appExitInfoCollector
+                bugReportCollector
             )
             .enqueue()
     }

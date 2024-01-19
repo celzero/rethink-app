@@ -204,7 +204,7 @@ object BugReportZipper {
         copy(inputStream, outputStream)
     }
 
-    fun copy(input: InputStream, output: OutputStream) {
+    private fun copy(input: InputStream, output: OutputStream) {
         while (input.read() != -1) {
             output.write(input.readBytes())
         }
