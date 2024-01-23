@@ -385,47 +385,53 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         private lateinit var customDomain: CustomDomain
 
         fun update(cd: CustomDomain) {
+            io {
+                val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
+                val appNames = FirewallManager.getAppNamesByUid(cd.uid)
+                uiCtx {
+                    val appName = getAppName(cd.uid, appNames)
 
-            val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
-            val appName = getAppName(cd.uid)
+                    b.customDomainAppName.text = appName
+                    displayIcon(
+                        Utilities.getIcon(
+                            context,
+                            appInfo?.packageName ?: "",
+                            appInfo?.appName ?: ""
+                        ),
+                        b.customDomainAppIconIv
+                    )
 
-            b.customDomainAppName.text = appName
-            displayIcon(
-                Utilities.getIcon(context, appInfo?.packageName ?: "", appInfo?.appName ?: ""),
-                b.customDomainAppIconIv
-            )
+                    this.customDomain = cd
+                    b.customDomainLabelTv.text = customDomain.domain
+                    b.customDomainToggleGroup.tag = 1
 
-            this.customDomain = cd
-            b.customDomainLabelTv.text = customDomain.domain
-            b.customDomainToggleGroup.tag = 1
+                    // update toggle group button based on the status
+                    updateToggleGroup(customDomain.status)
+                    // whether to show the toggle group or not
+                    toggleActionsUi()
+                    // update status in desc and status flag (N/B/W)
+                    updateStatusUi(
+                        DomainRulesManager.Status.getStatus(customDomain.status),
+                        customDomain.modifiedTs
+                    )
 
-            // update toggle group button based on the status
-            updateToggleGroup(customDomain.status)
-            // whether to show the toggle group or not
-            toggleActionsUi()
-            // update status in desc and status flag (N/B/W)
-            updateStatusUi(
-                DomainRulesManager.Status.getStatus(customDomain.status),
-                customDomain.modifiedTs
-            )
+                    b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
 
-            b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
+                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
 
-            b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
+                    b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
 
-            b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
-
-            b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+                    b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+                }
+            }
         }
 
-        private fun getAppName(uid: Int): String {
+        private fun getAppName(uid: Int, appNames: List<String>): String {
             if (uid == Constants.UID_EVERYBODY) {
                 return context
                     .getString(R.string.firewall_act_universal_tab)
                     .replaceFirstChar(Char::titlecase)
             }
-
-            val appNames = FirewallManager.getAppNamesByUid(uid)
 
             if (appNames.isEmpty()) {
                 return context.getString(R.string.network_log_app_name_unnamed, "($uid)")

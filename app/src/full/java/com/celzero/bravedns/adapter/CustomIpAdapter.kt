@@ -237,15 +237,22 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         private lateinit var customIp: CustomIp
 
         fun update(ci: CustomIp) {
-
-            val appName = getAppName(ci.uid)
-            val appInfo = FirewallManager.getAppInfoByUid(ci.uid)
-
-            b.customIpAppName.text = appName
-            displayIcon(
-                Utilities.getIcon(context, appInfo?.packageName ?: "", appInfo?.appName ?: ""),
-                b.customIpAppIconIv
-            )
+            io {
+                val appNames = FirewallManager.getAppNamesByUid(ci.uid)
+                val appName = getAppName(ci.uid, appNames)
+                val appInfo = FirewallManager.getAppInfoByUid(ci.uid)
+                uiCtx {
+                    b.customIpAppName.text = appName
+                    displayIcon(
+                        Utilities.getIcon(
+                            context,
+                            appInfo?.packageName ?: "",
+                            appInfo?.appName ?: ""
+                        ),
+                        b.customIpAppIconIv
+                    )
+                }
+            }
 
             customIp = ci
             b.customIpLabelTv.text =
@@ -277,14 +284,12 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             b.customIpContainer.setOnClickListener { toggleActionsUi() }
         }
 
-        private fun getAppName(uid: Int): String {
+        private fun getAppName(uid: Int, appNames: List<String>): String {
             if (uid == UID_EVERYBODY) {
                 return context
                     .getString(R.string.firewall_act_universal_tab)
                     .replaceFirstChar(Char::titlecase)
             }
-
-            val appNames = FirewallManager.getAppNamesByUid(uid)
 
             if (appNames.isEmpty()) {
                 return context.getString(R.string.network_log_app_name_unnamed, "($uid)")

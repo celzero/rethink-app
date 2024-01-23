@@ -33,13 +33,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
-import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConnection
+import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.databinding.ListItemStatisticsSummaryBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.service.FirewallManager
@@ -175,13 +175,12 @@ class SummaryStatisticsAdapter(
         }
 
         private fun setIcon(appConnection: AppConnection) {
-            io {
-                uiCtx {
-                    when (type) {
-                        SummaryStatisticsType.MOST_CONNECTED_APPS -> {
 
-                            val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
-
+            when (type) {
+                SummaryStatisticsType.MOST_CONNECTED_APPS -> {
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
                             itemBinding.ssIcon.visibility = View.VISIBLE
                             itemBinding.ssFlag.visibility = View.GONE
                             loadAppIcon(
@@ -191,73 +190,75 @@ class SummaryStatisticsAdapter(
                                     appInfo?.appName ?: ""
                                 )
                             )
-                        }
-                        SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-
-                            val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
-
-                            itemBinding.ssIcon.visibility = View.VISIBLE
-                            itemBinding.ssFlag.visibility = View.GONE
-                            loadAppIcon(
-                                Utilities.getIcon(
-                                    context,
-                                    appInfo?.packageName ?: "",
-                                    appInfo?.appName ?: ""
-                                )
-                            )
-                        }
-                        SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
-                            itemBinding.ssFlag.text = appConnection.flag
-                            val query = appConnection.appOrDnsName?.dropLastWhile { it == ',' }
-                            if (query == null) {
-                                hideFavIcon()
-                                showFlag()
-                                return@uiCtx
-                            }
-
-                            // no need to check in glide cache if the value is available in failed
-                            // cache
-                            if (FavIconDownloader.isUrlAvailableInFailedCache(query) != null) {
-                                hideFavIcon()
-                                showFlag()
-                            } else {
-                                // Glide will cache the icons against the urls. To extract the fav
-                                // icon from
-                                // the
-                                // cache, first verify that the cache is available with the next dns
-                                // url.
-                                // If it is not available then glide will throw an error, do the
-                                // duckduckgo
-                                // url check in that case.
-                                displayNextDnsFavIcon(query)
-                            }
-                        }
-                        SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                            itemBinding.ssIcon.visibility = View.GONE
-                            itemBinding.ssFlag.visibility = View.VISIBLE
-                            itemBinding.ssFlag.text = appConnection.flag
-                        }
-                        SummaryStatisticsType.MOST_CONTACTED_IPS -> {
-                            itemBinding.ssIcon.visibility = View.GONE
-                            itemBinding.ssFlag.visibility = View.VISIBLE
-                            itemBinding.ssFlag.text = appConnection.flag
-                        }
-                        SummaryStatisticsType.MOST_BLOCKED_IPS -> {
-                            itemBinding.ssIcon.visibility = View.GONE
-                            itemBinding.ssFlag.visibility = View.VISIBLE
-                            itemBinding.ssFlag.text = appConnection.flag
-                        }
-                        SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
-                            itemBinding.ssIcon.visibility = View.GONE
-                            itemBinding.ssFlag.visibility = View.VISIBLE
-                            itemBinding.ssFlag.text = appConnection.flag
-                        }
-                        SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
-                            itemBinding.ssIcon.visibility = View.GONE
-                            itemBinding.ssFlag.visibility = View.VISIBLE
-                            itemBinding.ssFlag.text = appConnection.flag
                         }
                     }
+                }
+                SummaryStatisticsType.MOST_BLOCKED_APPS -> {
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            itemBinding.ssIcon.visibility = View.VISIBLE
+                            itemBinding.ssFlag.visibility = View.GONE
+                            loadAppIcon(
+                                Utilities.getIcon(
+                                    context,
+                                    appInfo?.packageName ?: "",
+                                    appInfo?.appName ?: ""
+                                )
+                            )
+                        }
+                    }
+                }
+                SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
+                    itemBinding.ssFlag.text = appConnection.flag
+                    val query = appConnection.appOrDnsName?.dropLastWhile { it == ',' }
+                    if (query == null) {
+                        hideFavIcon()
+                        showFlag()
+                        return
+                    }
+
+                    // no need to check in glide cache if the value is available in failed
+                    // cache
+                    if (FavIconDownloader.isUrlAvailableInFailedCache(query) != null) {
+                        hideFavIcon()
+                        showFlag()
+                    } else {
+                        // Glide will cache the icons against the urls. To extract the fav
+                        // icon from
+                        // the
+                        // cache, first verify that the cache is available with the next dns
+                        // url.
+                        // If it is not available then glide will throw an error, do the
+                        // duckduckgo
+                        // url check in that case.
+                        displayNextDnsFavIcon(query)
+                    }
+                }
+                SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = appConnection.flag
+                }
+                SummaryStatisticsType.MOST_CONTACTED_IPS -> {
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = appConnection.flag
+                }
+                SummaryStatisticsType.MOST_BLOCKED_IPS -> {
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = appConnection.flag
+                }
+                SummaryStatisticsType.MOST_CONTACTED_COUNTRIES -> {
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = appConnection.flag
+                }
+                SummaryStatisticsType.MOST_BLOCKED_COUNTRIES -> {
+                    itemBinding.ssIcon.visibility = View.GONE
+                    itemBinding.ssFlag.visibility = View.VISIBLE
+                    itemBinding.ssFlag.text = appConnection.flag
                 }
             }
         }
@@ -265,13 +266,24 @@ class SummaryStatisticsAdapter(
         private fun setName(appConnection: AppConnection) {
             when (type) {
                 SummaryStatisticsType.MOST_CONNECTED_APPS -> {
-                    val appName = getAppName(appConnection)
-                    itemBinding.ssName.visibility = View.VISIBLE
-                    itemBinding.ssName.text = appName
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            val appName = getAppName(appConnection, appInfo)
+                            itemBinding.ssName.visibility = View.VISIBLE
+                            itemBinding.ssName.text = appName
+                        }
+                    }
                 }
                 SummaryStatisticsType.MOST_BLOCKED_APPS -> {
-                    val appName = getAppName(appConnection)
-                    itemBinding.ssDataUsage.text = appName
+                    io {
+                        val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
+                        uiCtx {
+                            val appName = getAppName(appConnection, appInfo)
+                            itemBinding.ssName.visibility = View.VISIBLE
+                            itemBinding.ssName.text = appName
+                        }
+                    }
                 }
                 SummaryStatisticsType.MOST_CONTACTED_DOMAINS -> {
                     // remove the trailing dot
@@ -298,9 +310,8 @@ class SummaryStatisticsAdapter(
             }
         }
 
-        private fun getAppName(appConnection: AppConnection): String? {
+        private fun getAppName(appConnection: AppConnection, appInfo: AppInfo?): String? {
             return if (appConnection.appOrDnsName.isNullOrEmpty()) {
-                val appInfo = FirewallManager.getAppInfoByUid(appConnection.uid)
                 if (appInfo?.appName.isNullOrEmpty()) {
                     context.getString(R.string.network_log_app_name_unnamed, "($appConnection.uid)")
                 } else {
@@ -365,19 +376,22 @@ class SummaryStatisticsAdapter(
                         }
                     }
                     SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                        if (appConfig.getBraveMode().isDnsMode()) {
-                            showDnsLogs(appConnection)
-                        } else {
-                            // if any app bypasses the dns, then the decision made in flow() call
-                            // will be to show the network logs. Else, show the dns logs.
-
-                            if (FirewallManager.isAnyAppBypassesDns()) {
-                                showNetworkLogs(
-                                    appConnection,
-                                    SummaryStatisticsType.MOST_BLOCKED_DOMAINS
-                                )
-                            } else {
-                                showDnsLogs(appConnection)
+                        io {
+                            val isDnsBypassed = FirewallManager.isAnyAppBypassesDns()
+                            uiCtx {
+                                if (appConfig.getBraveMode().isDnsMode()) {
+                                    showDnsLogs(appConnection)
+                                }
+                                // if any app bypasses dns, then the decision made in flow() call
+                                // will be to show the network logs. Else, show the dns logs.
+                                if (isDnsBypassed) {
+                                    showNetworkLogs(
+                                        appConnection,
+                                        SummaryStatisticsType.MOST_BLOCKED_DOMAINS
+                                    )
+                                } else {
+                                    showDnsLogs(appConnection)
+                                }
                             }
                         }
                     }

@@ -29,6 +29,8 @@ import com.celzero.bravedns.database.DnsLogDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DetailedStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,
@@ -52,7 +54,7 @@ class DetailedStatisticsViewModel(
         private const val IS_APP_BYPASSED = "true"
     }
 
-    fun setData(type: SummaryStatisticsFragment.SummaryStatisticsType) {
+    fun setData(type: SummaryStatisticsFragment.SummaryStatisticsType, isAppBypassed: Boolean) {
         when (type) {
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_CONNECTED_APPS -> {
                 allowedNetworkActivity.value = ""
@@ -64,7 +66,6 @@ class DetailedStatisticsViewModel(
                 allowedDomains.value = ""
             }
             SummaryStatisticsFragment.SummaryStatisticsType.MOST_BLOCKED_DOMAINS -> {
-                val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
                 if (isAppBypassed) {
                     blockedDomains.postValue(IS_APP_BYPASSED)
                 } else {

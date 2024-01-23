@@ -94,20 +94,25 @@ class FirewallAppListAdapter(
         }
 
         private fun displayDetails(appInfo: AppInfo) {
-            val appStatus = FirewallManager.appStatus(appInfo.uid)
-            val connStatus = FirewallManager.connectionStatus(appInfo.uid)
-
-            b.firewallAppLabelTv.text = appInfo.appName
-            b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
-
-            displayIcon(getIcon(context, appInfo.packageName, appInfo.appName), b.firewallAppIconIv)
-            if (appInfo.packageName == context.packageName) {
-                b.firewallAppToggleWifi.visibility = View.GONE
-                b.firewallAppToggleMobileData.visibility = View.GONE
-                return
+            io {
+                val appStatus = FirewallManager.appStatus(appInfo.uid)
+                val connStatus = FirewallManager.connectionStatus(appInfo.uid)
+                uiCtx {
+                    b.firewallAppLabelTv.text = appInfo.appName
+                    b.firewallAppToggleOther.text = getFirewallText(appStatus, connStatus)
+                    displayIcon(
+                        getIcon(context, appInfo.packageName, appInfo.appName),
+                        b.firewallAppIconIv
+                    )
+                    if (appInfo.packageName == context.packageName) {
+                        b.firewallAppToggleWifi.visibility = View.GONE
+                        b.firewallAppToggleMobileData.visibility = View.GONE
+                        return@uiCtx
+                    }
+                    displayConnectionStatus(appStatus, connStatus)
+                    showAppHint(b.firewallAppStatusIndicator, appInfo)
+                }
             }
-            displayConnectionStatus(appStatus, connStatus)
-            showAppHint(b.firewallAppStatusIndicator, appInfo)
         }
 
         private fun getFirewallText(
@@ -224,55 +229,59 @@ class FirewallAppListAdapter(
         }
 
         private fun showAppHint(mIconIndicator: TextView, appInfo: AppInfo) {
-
-            val connStatus = FirewallManager.connectionStatus(appInfo.uid)
-            val appStatus = FirewallManager.appStatus(appInfo.uid)
-
-            when (appStatus) {
-                FirewallManager.FirewallStatus.NONE -> {
-                    when (connStatus) {
-                        FirewallManager.ConnectionStatus.ALLOW -> {
+            io {
+                val connStatus = FirewallManager.connectionStatus(appInfo.uid)
+                val appStatus = FirewallManager.appStatus(appInfo.uid)
+                uiCtx {
+                    when (appStatus) {
+                        FirewallManager.FirewallStatus.NONE -> {
+                            when (connStatus) {
+                                FirewallManager.ConnectionStatus.ALLOW -> {
+                                    mIconIndicator.setBackgroundColor(
+                                        context.getColor(R.color.colorGreen_900)
+                                    )
+                                }
+                                FirewallManager.ConnectionStatus.METERED -> {
+                                    mIconIndicator.setBackgroundColor(
+                                        context.getColor(R.color.colorAmber_900)
+                                    )
+                                }
+                                FirewallManager.ConnectionStatus.UNMETERED -> {
+                                    mIconIndicator.setBackgroundColor(
+                                        context.getColor(R.color.colorAmber_900)
+                                    )
+                                }
+                                FirewallManager.ConnectionStatus.BOTH -> {
+                                    mIconIndicator.setBackgroundColor(
+                                        context.getColor(R.color.colorAmber_900)
+                                    )
+                                }
+                            }
+                        }
+                        FirewallManager.FirewallStatus.EXCLUDE -> {
                             mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.colorGreen_900)
+                                context.getColor(R.color.primaryLightColorText)
                             )
                         }
-                        FirewallManager.ConnectionStatus.METERED -> {
+                        FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
+                            mIconIndicator.setBackgroundColor(
+                                context.getColor(R.color.primaryLightColorText)
+                            )
+                        }
+                        FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
+                            mIconIndicator.setBackgroundColor(
+                                context.getColor(R.color.primaryLightColorText)
+                            )
+                        }
+                        FirewallManager.FirewallStatus.ISOLATE -> {
                             mIconIndicator.setBackgroundColor(
                                 context.getColor(R.color.colorAmber_900)
                             )
                         }
-                        FirewallManager.ConnectionStatus.UNMETERED -> {
-                            mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.colorAmber_900)
-                            )
-                        }
-                        FirewallManager.ConnectionStatus.BOTH -> {
-                            mIconIndicator.setBackgroundColor(
-                                context.getColor(R.color.colorAmber_900)
-                            )
+                        FirewallManager.FirewallStatus.UNTRACKED -> {
+                            /* no-op */
                         }
                     }
-                }
-                FirewallManager.FirewallStatus.EXCLUDE -> {
-                    mIconIndicator.setBackgroundColor(
-                        context.getColor(R.color.primaryLightColorText)
-                    )
-                }
-                FirewallManager.FirewallStatus.BYPASS_UNIVERSAL -> {
-                    mIconIndicator.setBackgroundColor(
-                        context.getColor(R.color.primaryLightColorText)
-                    )
-                }
-                FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL -> {
-                    mIconIndicator.setBackgroundColor(
-                        context.getColor(R.color.primaryLightColorText)
-                    )
-                }
-                FirewallManager.FirewallStatus.ISOLATE -> {
-                    mIconIndicator.setBackgroundColor(context.getColor(R.color.colorAmber_900))
-                }
-                FirewallManager.FirewallStatus.UNTRACKED -> {
-                    /* no-op */
                 }
             }
         }

@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
@@ -47,6 +48,9 @@ import com.celzero.bravedns.util.Utilities.getIcon
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 
@@ -149,13 +153,16 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun handleRethinkApp() {
-        val pkgName = FirewallManager.getPackageNameByUid(info!!.uid)
-
-        if (pkgName == requireContext().packageName) {
-            b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
-            b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-            b.bsConnBlockedRule3HeaderLl.visibility = View.GONE
-            b.bsConnDomainRuleLl.visibility = View.GONE
+        io {
+            val pkgName = FirewallManager.getPackageNameByUid(info!!.uid)
+            uiCtx {
+                if (pkgName == requireContext().packageName) {
+                    b.bsConnBlockedRule1HeaderLl.visibility = View.GONE
+                    b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
+                    b.bsConnBlockedRule3HeaderLl.visibility = View.GONE
+                    b.bsConnDomainRuleLl.visibility = View.GONE
+                }
+            }
         }
     }
 
@@ -213,29 +220,33 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun updateAppDetails() {
         if (info == null) return
-
-        val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
-        val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
-
-        val appCount = appNames.count()
-        if (appCount >= 1) {
-            b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
-            b.bsConnTrackAppName.text =
-                if (appCount >= 2) {
-                    getString(
-                        R.string.ctbs_app_other_apps,
-                        appNames[0],
-                        appCount.minus(1).toString()
-                    ) + "      ❯"
+        io {
+            val appNames = FirewallManager.getAppNamesByUid(info!!.uid)
+            val pkgName = FirewallManager.getPackageNameByAppName(appNames[0])
+            uiCtx {
+                val appCount = appNames.count()
+                if (appCount >= 1) {
+                    b.bsConnBlockedRule2HeaderLl.visibility = View.GONE
+                    b.bsConnTrackAppName.text =
+                        if (appCount >= 2) {
+                            getString(
+                                R.string.ctbs_app_other_apps,
+                                appNames[0],
+                                appCount.minus(1).toString()
+                            ) + "      ❯"
+                        } else {
+                            appNames[0] + "      ❯"
+                        }
+                    if (pkgName == null) return@uiCtx
+                    b.bsConnTrackAppIcon.setImageDrawable(
+                        getIcon(requireContext(), pkgName, info?.appName)
+                    )
                 } else {
-                    appNames[0] + "      ❯"
+                    // apps which are not available in cache are treated as non app.
+                    // TODO: check packageManager#getApplicationInfo() for appInfo
+                    handleNonApp()
                 }
-            if (pkgName == null) return
-            b.bsConnTrackAppIcon.setImageDrawable(getIcon(requireContext(), pkgName, info?.appName))
-        } else {
-            // apps which are not available in cache are treated as non app.
-            // TODO: check packageManager#getApplicationInfo() for appInfo
-            handleNonApp()
+            }
         }
     }
 
@@ -307,17 +318,21 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     private fun setupClickListeners() {
 
         b.bsConnTrackAppNameHeader.setOnClickListener {
-            val ai = FirewallManager.getAppInfoByUid(info!!.uid)
-            // case: app is uninstalled but still available in RethinkDNS database
-            if (ai == null || info?.uid == Constants.INVALID_UID) {
-                showToastUiCentered(
-                    requireContext(),
-                    getString(R.string.ct_bs_app_info_error),
-                    Toast.LENGTH_SHORT
-                )
-                return@setOnClickListener
+            io {
+                val ai = FirewallManager.getAppInfoByUid(info!!.uid)
+                uiCtx {
+                    // case: app is uninstalled but still available in RethinkDNS database
+                    if (ai == null || info?.uid == Constants.INVALID_UID) {
+                        showToastUiCentered(
+                            requireContext(),
+                            getString(R.string.ct_bs_app_info_error),
+                            Toast.LENGTH_SHORT
+                        )
+                        return@uiCtx
+                    }
+                    openAppDetailActivity(info!!.uid)
+                }
             }
-            openAppDetailActivity(info!!.uid)
         }
     }
 
@@ -326,5 +341,13 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         val intent = Intent(requireContext(), AppInfoActivity::class.java)
         intent.putExtra(AppInfoActivity.UID_INTENT_NAME, uid)
         requireContext().startActivity(intent)
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

@@ -15,9 +15,6 @@ import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
 
@@ -135,30 +132,26 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     // apply the firewall rules to the filtered apps
-    fun updateUnmeteredStatus(blocked: Boolean) {
+    suspend fun updateUnmeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
-        io {
-            appList
-                .distinctBy { it.uid }
-                .forEach {
-                    val connStatus = FirewallManager.connectionStatus(it.uid)
-                    val appStatus = getAppStateForWifi(blocked, connStatus)
-                    FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
-                }
-        }
+        appList
+            .distinctBy { it.uid }
+            .forEach {
+                val connStatus = FirewallManager.connectionStatus(it.uid)
+                val appStatus = getAppStateForWifi(blocked, connStatus)
+                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
+            }
     }
 
-    fun updateMeteredStatus(blocked: Boolean) {
+    suspend fun updateMeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
-        io {
-            appList
-                .distinctBy { it.uid }
-                .forEach {
-                    val connStatus = FirewallManager.connectionStatus(it.uid)
-                    val appStatus = getAppStateForMobileData(blocked, connStatus)
-                    FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
-                }
-        }
+        appList
+            .distinctBy { it.uid }
+            .forEach {
+                val connStatus = FirewallManager.connectionStatus(it.uid)
+                val appStatus = getAppStateForMobileData(blocked, connStatus)
+                FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid)
+            }
     }
 
     suspend fun updateBypassStatus(bypass: Boolean) {
@@ -408,7 +401,4 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
         }
     }
 
-    private fun io(f: suspend () -> Unit) {
-        viewModelScope.launch { withContext(Dispatchers.IO) { f() } }
-    }
 }

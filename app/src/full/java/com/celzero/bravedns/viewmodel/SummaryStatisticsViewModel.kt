@@ -73,7 +73,7 @@ class SummaryStatisticsViewModel(
         ips.value = ""
     }
 
-    fun timeCategoryChanged(timeCategory: TimeCategory) {
+    fun timeCategoryChanged(timeCategory: TimeCategory, isAppBypassed: Boolean) {
         when (timeCategory) {
             TimeCategory.ONE_HOUR -> {
                 startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
@@ -86,7 +86,6 @@ class SummaryStatisticsViewModel(
             }
         }
         networkActivity.value = ""
-        val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
         if (isAppBypassed) {
             domains.postValue(IS_APP_BYPASSED)
         } else {

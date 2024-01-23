@@ -80,11 +80,11 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     }
 
     private fun initClickListeners() {
-        b.dohFabAddServerIcon.setOnClickListener {
+        io {
             val appNames: MutableList<String> = ArrayList()
             appNames.add(getString(R.string.settings_app_list_default_app))
             appNames.addAll(FirewallManager.getAllAppNames())
-            showAddDnsProxyDialog(appNames)
+            uiCtx { b.dohFabAddServerIcon.setOnClickListener { showAddDnsProxyDialog(appNames) } }
         }
     }
 
