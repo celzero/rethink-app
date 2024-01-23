@@ -118,8 +118,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     }
 
     // data class that holds the below information for handlers to process the network changes
+    // all values in OpPrefs should always remain immutable
     data class OpPrefs(
-        val networkSet: MutableSet<Network>,
+        val msgType: Int,
+        val networkSet: Set<Network>,
         val isForceUpdate: Boolean,
         val testReachability: Boolean,
         val dualStack: Boolean
@@ -137,7 +139,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     }
 
     interface NetworkListener {
-        fun onNetworkDisconnected()
+        fun onNetworkDisconnected(networks: UnderlyingNetworks)
+
         fun onNetworkConnected(networks: UnderlyingNetworks)
     }
 
@@ -179,19 +182,18 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
         if (DEBUG)
             Log.d(LOG_TAG_CONNECTION, "onCapabilitiesChanged, ${network.networkHandle}, $network")
-        handleNetworkChange()
+        handleNetworkChange(isForceUpdate = false, TimeUnit.SECONDS.toMillis(3))
     }
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
         if (DEBUG)
             Log.d(LOG_TAG_CONNECTION, "onLinkPropertiesChanged: ${network.networkHandle}, $network")
-        handleNetworkChange(isForceUpdate = true)
+        handleNetworkChange(isForceUpdate = true, TimeUnit.SECONDS.toMillis(3))
     }
 
     /**
      * Handles user preference changes, ie, when the user elects to see either multiple underlying
      * networks, or just one (the active network).
-     *
      */
     fun onUserPreferenceChangedLocked() {
         if (DEBUG) Log.d(LOG_TAG_CONNECTION, "onUserPreferenceChanged")
@@ -201,14 +203,13 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     /**
      * Force updates the VPN's underlying network based on the preference. Will be initiated when
      * the VPN start is completed.
-     *
      */
     fun onVpnStartLocked() {
         Log.i(LOG_TAG_CONNECTION, "new vpn is created force update the network")
         handleNetworkChange(isForceUpdate = true)
     }
 
-    private fun handleNetworkChange(isForceUpdate: Boolean = false) {
+    private fun handleNetworkChange(isForceUpdate: Boolean = false, delay: Long = 0L) {
         val isDualStack = InternetProtocol.isAuto(persistentState.internetProtocolType)
         val testReachability = isDualStack && !androidValidatedNetworks
         val msg =
@@ -222,7 +223,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         serviceHandler?.removeMessages(MSG_ADD_ACTIVE_NETWORK, null)
         serviceHandler?.removeMessages(MSG_ADD_ALL_NETWORKS, null)
         // process after a delay to avoid processing multiple network changes in short bursts
-        serviceHandler?.sendMessageDelayed(msg, TimeUnit.SECONDS.toMillis(3))
+        serviceHandler?.sendMessageDelayed(msg, delay)
     }
 
     /**
@@ -235,7 +236,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         testReachability: Boolean,
         dualStack: Boolean
     ): Message {
-        val opPrefs = OpPrefs(networkSet, isForceUpdate, testReachability, dualStack)
+        val opPrefs = OpPrefs(what, networkSet, isForceUpdate, testReachability, dualStack)
         val message = Message.obtain()
         message.what = what
         message.obj = opPrefs
@@ -249,7 +250,6 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     )
 
     data class UnderlyingNetworks(
-        val allNet: List<NetworkProperties>?,
         val ipv4Net: List<NetworkProperties>,
         val ipv6Net: List<NetworkProperties>,
         val useActive: Boolean,
@@ -263,6 +263,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         looper: Looper,
         val listener: NetworkListener
     ) : Handler(looper) {
+        // number of times the reachability check is performed due to failures
+        private var reachabilityCount = 0L
+        private val maxReachabilityCount = 10L
         private val ip4probes =
             listOf(
                 "216.239.32.27", // google org
@@ -355,42 +358,45 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             useActiveNetwork: Boolean = false,
             isActiveNetworkMetered: Boolean
         ) {
-            val sz = currentNetworks.size
-            Log.i(LOG_TAG_CONNECTION, "inform network change: ${sz}, all? $useActiveNetwork")
+            val sz = trackedIpv4Networks.size + trackedIpv6Networks.size
+            Log.i(
+                LOG_TAG_CONNECTION,
+                "inform network change: ${sz}, all? $useActiveNetwork, metered? $isActiveNetworkMetered"
+            )
             if (sz > 0) {
                 val underlyingNetworks =
                     UnderlyingNetworks(
-                        currentNetworks.map { it }, // map to produce shallow copy
-                        trackedIpv4Networks.map { it },
+                        trackedIpv4Networks.map { it }, // map to produce shallow copy
                         trackedIpv6Networks.map { it },
                         useActiveNetwork,
                         isActiveNetworkMetered,
                         SystemClock.elapsedRealtime()
                     )
-                currentNetworks.forEach {
-                    if (DEBUG)
-                        Log.d(
-                            LOG_TAG_CONNECTION,
-                            "inform listener all: ${it.network}, ${it.networkType}, $sz"
-                        )
-                }
                 trackedIpv4Networks.forEach {
                     if (DEBUG)
                         Log.d(
                             LOG_TAG_CONNECTION,
-                            "inform listener 4: ${it.network}, ${it.networkType}, $sz"
+                            "inform listener4: ${it.network}, ${it.networkType}, $sz"
                         )
                 }
                 trackedIpv6Networks.forEach {
                     if (DEBUG)
                         Log.d(
                             LOG_TAG_CONNECTION,
-                            "inform listener 6: ${it.network}, ${it.networkType}, $sz"
+                            "inform listener6: ${it.network}, ${it.networkType}, $sz"
                         )
                 }
                 listener.onNetworkConnected(underlyingNetworks)
             } else {
-                listener.onNetworkDisconnected()
+                val underlyingNetworks =
+                    UnderlyingNetworks(
+                        emptyList(),
+                        emptyList(),
+                        useActiveNetwork,
+                        isActiveNetworkMetered = false,
+                        SystemClock.elapsedRealtime()
+                    )
+                listener.onNetworkDisconnected(underlyingNetworks)
             }
         }
 
@@ -438,28 +444,32 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     if (address.isIPv6 && !ipv6.contains(prop)) {
                         var y = !testReachability
                         if (!testReachability) {
-                            ipv6.add(prop)
+                            // see #createNetworksSet for why we are using hasInternet
+                            if (hasInternet(network) == true) ipv6.add(prop)
                         } else if (isIPv6Reachable(network)) {
                             // in auto mode, do network validation ourselves
                             ipv6.add(prop)
                             y = true
                         }
-                        Log.i(LOG_TAG_CONNECTION, "adding ipv6: $network; works? $y for $address")
+                        Log.i(LOG_TAG_CONNECTION, "adding ipv6: $prop; works? $y for $address")
                     } else if (address.isIPv4 && !ipv4.contains(prop)) {
                         var y = !testReachability
                         if (!testReachability) {
-                            ipv4.add(prop)
+                            // see #createNetworksSet for why we are using hasInternet
+                            if (hasInternet(network) == true) ipv4.add(prop)
                         } else if (isIPv4Reachable(network)) {
                             // in auto mode, do network validation ourselves
                             ipv4.add(prop)
                             y = true
                         }
-                        Log.i(LOG_TAG_CONNECTION, "adding ipv4: $network; works? $y for $address")
+                        Log.i(LOG_TAG_CONNECTION, "adding ipv4: $prop; works? $y for $address")
                     } else {
                         Log.i(LOG_TAG_CONNECTION, "unknown: $network; $address")
                     }
                 }
             }
+
+            redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks, opPrefs)
 
             trackedIpv6Networks = ipv6
             trackedIpv4Networks = ipv4
@@ -467,9 +477,30 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 LOG_TAG_CONNECTION,
                 "repopulate v6: $trackedIpv6Networks,\nv4: $trackedIpv4Networks"
             )
-            currentNetworks = rearrangeNetworks(currentNetworks)
             trackedIpv4Networks = rearrangeNetworks(trackedIpv4Networks)
             trackedIpv6Networks = rearrangeNetworks(trackedIpv6Networks)
+        }
+
+        private fun redoReachabilityIfNeeded(
+            ipv4: LinkedHashSet<NetworkProperties>,
+            ipv6: LinkedHashSet<NetworkProperties>,
+            opPrefs: OpPrefs
+        ) {
+            if (ipv4.isEmpty() && ipv6.isEmpty()) {
+                reachabilityCount++
+                Log.i(LOG_TAG_CONNECTION, "redo reachability, try: $reachabilityCount")
+                if (reachabilityCount > maxReachabilityCount) return
+                val message = Message.obtain()
+                // assume opPrefs is immutable
+                message.what = opPrefs.msgType
+                message.obj = opPrefs
+                val delay = TimeUnit.SECONDS.toMillis(10 * reachabilityCount)
+                this.sendMessageDelayed(message, delay)
+            } else {
+                Log.d(LOG_TAG_CONNECTION, "reset reachability count, prev: $reachabilityCount")
+                // reset the reachability count
+                reachabilityCount = 0
+            }
         }
 
         private fun hasDifference(
@@ -518,7 +549,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
          */
         private fun createNetworksSet(
             activeNetwork: Network?,
-            networkSet: MutableSet<Network>
+            networkSet: Set<Network>
         ): LinkedHashSet<NetworkProperties> {
             val newNetworks: LinkedHashSet<NetworkProperties> = linkedSetOf()
             activeNetwork?.let {
@@ -531,7 +562,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     } else {
                         null
                     }
-                if (hasInternet(it) == true && isVPN(it) == false) {
+                // test for internet capability iff opPrefs.testReachability is false
+                if (/*hasInternet(it) == true &&*/ isVPN(it) == false) {
                     if (activeProp != null) {
                         newNetworks.add(activeProp)
                     }
@@ -565,7 +597,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     return@forEach
                 }
 
-                if (hasInternet(it) == true && isVPN(it) == false) {
+                // test for internet capability iff opPrefs.testReachability is false
+                if (/*hasInternet(it) == true &&*/ isVPN(it) == false) {
                     if (prop != null) {
                         newNetworks.add(prop)
                     }
@@ -718,8 +751,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             }
         }
 
-        private fun hasInternet(network: Network): Boolean? {
+        private fun hasInternet(network: Network?): Boolean? {
             // TODO: consider checking for NET_CAPABILITY_NOT_SUSPENDED, NET_CAPABILITY_VALIDATED?
+            if (network == null) return false
+
             return connectivityManager
                 .getNetworkCapabilities(network)
                 ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
