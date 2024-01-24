@@ -878,7 +878,7 @@
     <string name="bad_config_reason_invalid_value" translatable="true">Valeur invalide</string>
     <string name="lbl_day" translatable="true">jour</string>
     <string name="lbl_fast" translatable="true">rapide</string>
-    <string name="search_proxy_add_apps" translatable="true">Chercher les applications par nom</string>
+    <string name="search_proxy_add_apps" translatable="true">Rechercher des applications par nom</string>
     <string name="lbl_inactive" translatable="true">Inactif</string>
     <string name="lbl_addresses" translatable="true">Adresses</string>
     <string name="lbl_active" translatable="true">Actif</string>
@@ -898,10 +898,10 @@
     <string name="lbl_select_all" translatable="true">Tout sélectionner</string>
     <string name="lbl_create" translatable="true">Créer</string>
     <string name="http_proxy_dialog_desc" translatable="true">Configuration de l\'URL de forme, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exemple: http://proxy.example.com:8080/</string>
-    <string name="status_protected_with_wg_private_dns" translatable="true">protégé avec wireguard &amp; dns privé</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">Protégé avec Wireguard &amp; DNS privé</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Erreur de syntaxe</string>
     <string name="lbl_listen_port" translatable="true">Port d\'écoute</string>
-    <string name="lbl_random" translatable="true">(au hasard)</string>
+    <string name="lbl_random" translatable="true">(aléatoire)</string>
     <string name="config_delete_success_toast">Configuration supprimée</string>
     <string name="bad_config_explanation_pka" translatable="true">: Doit être positif et pas plus de 65535</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Ne pas validez les certificats TLS du serveur (uniquement si vous savez ce que vous faites)</string>
@@ -977,4 +977,7 @@
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="parse_error_inet_endpoint" translatable="true">Serveur distant</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notification persistante</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Rendre la notification persistante</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Keepalive persistant</string>
+    <string name="parse_error_reason" translatable="true">Impossible d\'analyser %1$s “%2$s”</string>
 </resources>
