@@ -55,13 +55,10 @@ import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
-import com.celzero.bravedns.service.DomainRulesManager
-import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
@@ -96,12 +93,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val appUpdateManager by inject<AppUpdater>()
-    private val refreshDatabase by inject<RefreshDatabase>()
+    private val rdb by inject<RefreshDatabase>()
 
     // support for biometric authentication
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
+
+    // biometric prompt retry only 1 time
+    private var biometricPromptRetry = 1
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
@@ -174,12 +174,18 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             LOG_TAG_UI,
                             "Biometric authentication error (code: $errorCode): $errString"
                         )
-                        showToastUiCentered(
-                            applicationContext,
-                            errString.toString(),
-                            Toast.LENGTH_SHORT
-                        )
-                        finish()
+                        if (biometricPromptRetry > 0) {
+                            Log.i(LOG_TAG_UI, "Biometric auth retry: $biometricPromptRetry")
+                            biometricPrompt.authenticate(promptInfo)
+                            biometricPromptRetry--
+                        } else {
+                            showToastUiCentered(
+                                applicationContext,
+                                errString.toString(),
+                                Toast.LENGTH_SHORT
+                            )
+                            finish()
+                        }
                     }
 
                     override fun onAuthenticationSucceeded(
@@ -248,12 +254,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             )
         } else if (intent.getBooleanExtra(INTENT_RESTART_APP, false)) {
             Log.i(LOG_TAG_UI, "Restart from restore, so refreshing app database...")
-            io {
-                refreshDatabase.refreshAppInfoDatabase()
-                IpRulesManager.loadIpRules()
-                DomainRulesManager.load()
-                WireguardManager.restoreProcessDeleteWireGuardEntries()
-            }
+            io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_RESTORE) }
         }
     }
 

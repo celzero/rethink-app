@@ -27,6 +27,10 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         customIpDao.insert(customIp)
     }
 
+    suspend fun updateUid(uid: Int, newUid: Int) {
+        customIpDao.updateUid(uid, newUid)
+    }
+
     suspend fun getIpRules(): List<CustomIp> {
         return customIpDao.getCustomIpRules()
     }

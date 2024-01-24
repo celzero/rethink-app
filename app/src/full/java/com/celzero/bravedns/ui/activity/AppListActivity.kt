@@ -781,7 +781,7 @@ class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchVie
     }
 
     private fun refreshDatabase() {
-        io { refreshDatabase.refreshAppInfoDatabase() }
+        io { refreshDatabase.refresh(RefreshDatabase.ACTION_REFRESH_INTERACTIVE) }
     }
 
     private fun io(f: suspend () -> Unit) {

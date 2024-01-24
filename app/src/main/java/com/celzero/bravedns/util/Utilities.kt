@@ -613,7 +613,7 @@ object Utilities {
     }
 
     fun isNonApp(p: String): Boolean {
-        return p.contains(NO_PACKAGE)
+        return p.startsWith(NO_PACKAGE)
     }
 
     fun removeLeadingAndTrailingDots(str: String?): String {

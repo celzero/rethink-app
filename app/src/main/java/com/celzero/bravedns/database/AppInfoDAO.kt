@@ -32,10 +32,16 @@ interface AppInfoDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(appInfo: AppInfo): Long
 
+    @Query("update AppInfo set uid = :newUid where uid = :oldUid and packageName = :pkg")
+    fun updateUid(oldUid: Int, pkg: String, newUid: Int): Int
+
     @Delete fun delete(appInfo: AppInfo)
 
     @Query("delete from AppInfo where packageName in (:packageNames)")
     fun deleteByPackageName(packageNames: List<String>)
+
+    @Query("delete from AppInfo where uid = :uid and packageName = :packageName")
+    fun deletePackage(uid: Int, packageName: String)
 
     @Query("select * from AppInfo order by appCategory, uid") fun getAllAppDetails(): List<AppInfo>
 

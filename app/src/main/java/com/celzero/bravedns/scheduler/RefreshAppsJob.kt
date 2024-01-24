@@ -32,7 +32,7 @@ class RefreshAppsJob(val context: Context, workerParameters: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         if (DEBUG) Log.d(LOG_TAG_SCHEDULER, "starting refresh-database job")
-        refreshDatabase.refreshAppInfoDatabase()
+        refreshDatabase.refresh(RefreshDatabase.ACTION_REFRESH_AUTO)
         return Result.success()
     }
 }

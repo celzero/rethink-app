@@ -298,11 +298,7 @@ object IpRulesManager : KoinComponent {
         resultsCache.invalidateAll()
     }
 
-    suspend fun loadIpRules() {
-        if (appIpRules.isNotEmpty() || wildCards.isNotEmpty()) {
-            return
-        }
-
+    suspend fun load() {
         val rules = customIpRepository.getIpRules()
         // sort the rules by the network prefix length
         val selector: (IPAddressString?) -> Int = { str -> str?.networkPrefixLength ?: 32 }
@@ -357,6 +353,18 @@ object IpRulesManager : KoinComponent {
         val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
         customIpRepository.insert(customIpObj)
         updateLocalCache(customIpObj)
+        resultsCache.invalidateAll()
+    }
+
+    suspend fun updateUid(uid: Int, newUid: Int) {
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "IP Rules, update uid for ($uid) with new uid: $newUid"
+        )
+        customIpRepository.updateUid(uid, newUid)
+        appIpRules =
+            appIpRules.filterKeys { it.uid != uid }.mapKeysTo(ConcurrentHashMap()) { it.key }
+        wildCards = wildCards.filterKeys { it.uid != uid }.mapKeysTo(ConcurrentHashMap()) { it.key }
         resultsCache.invalidateAll()
     }
 

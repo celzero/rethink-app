@@ -273,6 +273,36 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
+    suspend fun updateUid(uid: Int, newUid: Int) {
+        customDomainsRepository.updateUid(uid, newUid)
+        clearTrie(uid)
+        addNewUidToTrie(uid)
+    }
+
+    private suspend fun addNewUidToTrie(uid: Int) {
+        val customDomains = customDomainsRepository.getDomainsByUID(uid)
+        if (customDomains.isEmpty()) {
+            Log.w(LOG_TAG_DNS, "no custom domains found in db")
+            return
+        }
+
+        // sort the custom domains based on the length of the domain
+        val selector: (String) -> Int = { str -> str.length }
+        val sortedDomains = customDomains.sortedByDescending { selector(it.domain) }
+        sortedDomains.forEach { cd ->
+            val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+            trie.set(key, cd.status.toString())
+            if (cd.status == Status.TRUST.id) {
+                trustedTrie.set(key, cd.status.toString())
+            }
+        }
+    }
+
+    private fun clearTrie(uid: Int) {
+        trie.delAll(uid.toString())
+        trustedTrie.delAll(uid.toString())
+    }
+
     fun isWildCardEntry(url: String): Boolean {
         // regex to check if url is valid wildcard domain
         // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com

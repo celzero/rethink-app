@@ -93,5 +93,8 @@ interface CustomIpDao {
     )
     fun getAllCustomIpRules(query: String): PagingSource<Int, CustomIp>
 
+    @Query("update CustomIp set uid = :newUid where uid = :uid")
+    fun updateUid(uid: Int, newUid: Int)
+
     @Query("delete from CustomIp where uid != $UID_EVERYBODY") fun deleteAllAppsRules()
 }
