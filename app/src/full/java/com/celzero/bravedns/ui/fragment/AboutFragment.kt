@@ -48,10 +48,11 @@ import com.celzero.bravedns.databinding.DialogViewLogsBinding
 import com.celzero.bravedns.databinding.DialogWhatsnewBinding
 import com.celzero.bravedns.databinding.FragmentAboutBinding
 import com.celzero.bravedns.scheduler.BugReportZipper.FILE_PROVIDER_NAME
-import com.celzero.bravedns.scheduler.BugReportZipper.getZipFilePath
+import com.celzero.bravedns.scheduler.BugReportZipper.getZipFileName
 import com.celzero.bravedns.scheduler.WorkScheduler
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.ui.HomeScreenActivity
+import com.celzero.bravedns.ui.activity.PaymentActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
 import com.celzero.bravedns.util.LoggerConstants
@@ -117,12 +118,14 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         b.aboutAppTranslate.setOnClickListener(this)
 
         try {
-            // take first 7 characters of the version name
-            val version = getVersionName()
+            val version = getVersionName() ?: ""
+            // take first 7 characters of the version name, as the version has build number
+            // appended to it, which is not required for the user to see.
             val slicedVersion = version.slice(0..6) ?: ""
+            b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
+            // show the complete version name along with the source of installation
             b.aboutAppVersion.text =
                 getString(R.string.about_version_install_source, version, getDownloadSource())
-            b.aboutWhatsNew.text = getString(R.string.about_whats_new, slicedVersion)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.w(LOG_TAG_UI, "package name not found: ${e.message}", e)
         }
@@ -134,7 +137,6 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
                 requireContext().packageManager,
                 requireContext().packageName
             )
-        // take first 7 characters of the version name
         return pInfo?.versionName ?: ""
     }
 
@@ -317,7 +319,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.about_mail_bugreport_subject))
         emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.about_mail_bugreport_text))
         // Get the bug_report.zip file
-        val file = File(getZipFilePath(requireContext()))
+        val dir = requireContext().filesDir
+        val file = File(getZipFileName(dir))
         val uri = getFileUri(file)
         emailIntent.putExtra(Intent.EXTRA_STREAM, uri)
 
@@ -381,7 +384,8 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         val builder = AlertDialog.Builder(requireContext()).setView(binding.root)
         builder.setTitle(getString(R.string.about_bug_report))
 
-        val zipPath = getZipFilePath(requireContext())
+        val dir = requireContext().filesDir
+        val zipPath = getZipFileName(dir)
         val zipFile =
             try {
                 ZipFile(zipPath)

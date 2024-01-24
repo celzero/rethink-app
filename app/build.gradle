@@ -8,6 +8,14 @@ plugins {
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
+
+// https://github.com/celzero/rethink-app/issues/1032
+// https://docs.gradle.org/8.2/userguide/configuration_cache.html#config_cache:requirements:external_processes
+// get the git version from the command line
+def gitVersion = providers.exec {
+    commandLine("git", "describe", "--tags", "--always")
+}.standardOutput.asText.get().toString().trim()
+
 try {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } catch (Exception ex) {
@@ -26,7 +34,7 @@ android {
     defaultConfig {
         applicationId "com.celzero.bravedns"
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdkVersion 33
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -103,8 +111,8 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            versionCode = 32
-            versionName = "v055a"
+            versionCode = 33
+            versionName = gitVersion
             vectorDrawables.useSupportLibrary = true
         }
     }
@@ -131,16 +139,16 @@ configurations {
 
 dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
-    def room_version = "2.5.2"
+    def room_version = "2.6.1"
     def paging_version = "3.2.1"
 
     implementation 'com.google.guava:guava:32.1.1-android'
 
     // https://developer.android.com/studio/write/java8-support
     // included to fix issues with Android 6 support, issue#563
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0'
+    fullImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10'
     fullImplementation 'androidx.appcompat:appcompat:1.6.1'
     fullImplementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
@@ -167,8 +175,8 @@ dependencies {
 
     // For paging - connection tracker
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    fullImplementation 'androidx.fragment:fragment-ktx:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
+    fullImplementation 'androidx.fragment:fragment-ktx:1.6.2'
+    implementation 'com.google.android.material:material:1.11.0'
     fullImplementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     fullImplementation 'com.squareup.okhttp3:okhttp:4.11.0'
@@ -178,10 +186,10 @@ dependencies {
     fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     // Glide implementation
-    fullImplementation('com.github.bumptech.glide:glide:4.15.1') {
+    fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
     }
-    fullImplementation('com.github.bumptech.glide:okhttp3-integration:4.15.1') {
+    fullImplementation('com.github.bumptech.glide:okhttp3-integration:4.16.0') {
         exclude group: 'glide-parent'
     }
     // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
@@ -205,12 +213,12 @@ dependencies {
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
-    download 'com.github.celzero:firestack:b5d21c5664:arm64@aar'
-    implementation 'com.github.celzero:firestack:b5d21c5664:full@aar'
     // implementation project(":tun2socks")
+    download 'com.github.celzero:firestack:72eb7e4898@aar'
+    implementation 'com.github.celzero:firestack:72eb7e4898@aar'
 
     // Work manager
-    implementation('androidx.work:work-runtime-ktx:2.8.1') {
+    implementation('androidx.work:work-runtime-ktx:2.9.0') {
         modules {
             module("com.google.guava:listenablefuture") {
                 replacedBy("com.google.guava:guava", "listenablefuture is part of guava")
@@ -229,8 +237,8 @@ dependencies {
 
     leakCanaryImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 
-    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
-    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.7.4'
+    fullImplementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
+    fullImplementation 'androidx.navigation:navigation-ui-ktx:2.7.6'
 
     fullImplementation 'androidx.biometric:biometric:1.1.0'
 
@@ -238,8 +246,8 @@ dependencies {
 
     // for encrypted file management
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.security:security-app-authenticator:1.0.0-alpha02")
-    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha02")
+    implementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
 
     // barcode scanner for wireguard
     fullImplementation 'com.journeyapps:zxing-android-embedded:4.3.0'
