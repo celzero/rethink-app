@@ -35,6 +35,7 @@ class ConnectionTracker {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var appName: String = ""
     var uid: Int = 0
+    var usrId: Int = 0
     var ipAddress: String = ""
     var port: Int = 0
     var protocol: Int = 0
@@ -55,8 +56,7 @@ class ConnectionTracker {
 
     override fun equals(other: Any?): Boolean {
         if (other !is ConnectionTracker) return false
-        if (id != other.id) return false
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {

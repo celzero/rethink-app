@@ -53,6 +53,7 @@ internal constructor(
         connTracker.ipAddress = connTrackerMetaData.destIP
         connTracker.isBlocked = connTrackerMetaData.isBlocked
         connTracker.uid = connTrackerMetaData.uid
+        connTracker.usrId = connTrackerMetaData.usrId
         connTracker.port = connTrackerMetaData.destPort
         connTracker.protocol = connTrackerMetaData.protocol
         connTracker.timeStamp = connTrackerMetaData.timestamp

@@ -19,6 +19,7 @@ import java.io.Serializable
 
 data class ConnTrackerMetaData(
     val uid: Int,
+    val usrId: Int,
     val sourceIP: String,
     val sourcePort: Int,
     val destIP: String,

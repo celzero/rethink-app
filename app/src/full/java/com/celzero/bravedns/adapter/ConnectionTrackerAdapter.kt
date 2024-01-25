@@ -34,7 +34,6 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
@@ -147,7 +146,19 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private fun displayAppDetails(ct: ConnectionTracker) {
             io {
                 uiCtx {
-                    b.connectionAppName.text = ct.appName
+                    // append the usrId with app name if the usrId is not 0
+                    // fixme: move the 0 to a constant
+                    if (ct.usrId != 0) {
+                        b.connectionAppName.text =
+                            context.getString(
+                                R.string.about_version_install_source,
+                                ct.appName,
+                                ct.usrId.toString()
+                            )
+                    } else {
+                        b.connectionAppName.text = ct.appName
+                    }
+
                     val apps = FirewallManager.getPackageNamesByUid(ct.uid)
 
                     if (apps.isEmpty()) {
