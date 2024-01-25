@@ -114,7 +114,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private fun openBottomSheet(ct: ConnectionTracker) {
             if (context !is FragmentActivity) {
-                Log.wtf(LOG_TAG_UI, "Error opening the connection tracker bottomsheet")
+                Log.wtf(LOG_TAG_UI, "err opening the connection tracker bottomsheet")
                 return
             }
 
@@ -246,7 +246,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text =
-                        b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
+                        context.getString(
+                            R.string.ci_desc,
+                            b.connectionDelay.text,
+                            context.getString(R.string.symbol_key)
+                        )
                     hasMinSummary = true
                 }
                 if (!hasMinSummary) {
@@ -272,19 +276,20 @@ class ConnectionTrackerAdapter(private val context: Context) :
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
             b.connectionDelay.text = ""
             if (connType.isMetered()) {
-                b.connectionDelay.text = "💴"
+                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
+                                                             context.getString(R.string.symbol_currency))
             }
             if (isConnectionHeavier(ct)) {
-                b.connectionDelay.text =
-                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_elephant)
+                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
+                                                             context.getString(R.string.symbol_heavy))
             }
             if (isConnectionSlower(ct)) {
-                b.connectionDelay.text =
-                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
+                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
+                                                             context.getString(R.string.symbol_turtle))
             }
             if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
-                b.connectionDelay.text =
-                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
+                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
+                                                             context.getString(R.string.symbol_key))
             }
             if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
                 b.connectionSummaryLl.visibility = View.GONE

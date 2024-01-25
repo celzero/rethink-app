@@ -287,10 +287,12 @@ class FirewallAppListAdapter(
         }
 
         private fun displayIcon(drawable: Drawable?, mIconImageView: ImageView) {
-            Glide.with(context)
-                .load(drawable)
-                .error(Utilities.getDefaultIcon(context))
-                .into(mIconImageView)
+            ui {
+                Glide.with(context)
+                    .load(drawable)
+                    .error(Utilities.getDefaultIcon(context))
+                    .into(mIconImageView)
+            }
         }
 
         private fun setupClickListeners(appInfo: AppInfo) {
@@ -481,6 +483,10 @@ class FirewallAppListAdapter(
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
 
     private fun io(f: suspend () -> Unit) {

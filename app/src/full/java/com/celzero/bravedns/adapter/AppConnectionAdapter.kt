@@ -99,8 +99,7 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
 
         private fun setupClickListeners(appConn: AppConnection) {
             b.acdContainer.setOnClickListener {
-
-                // open bottom sheet for options
+                // open bottom sheet to apply domain/ip rules
                 openBottomSheet(appConn)
             }
         }

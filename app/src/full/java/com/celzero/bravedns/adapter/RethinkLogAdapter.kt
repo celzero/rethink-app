@@ -265,7 +265,7 @@ class RethinkLogAdapter(private val context: Context) :
                 b.connectionDelay.text = "🌐"
             }
             if (isConnectionHeavier(log)) {
-                b.connectionDelay.text = context.getString(R.string.symbol_elephant)
+                b.connectionDelay.text = context.getString(R.string.symbol_heavy)
             }
             if (isConnectionSlower(log)) {
                 b.connectionDelay.text =

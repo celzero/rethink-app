@@ -200,6 +200,7 @@ class DnsCryptEndpointAdapter(
             if (message.isNullOrEmpty()) return ""
 
             return try {
+                // fixme: find a better way to handle this
                 if (message.contains("R.string.")) {
                     val m = message.substringAfter("R.string.")
                     val resId: Int =
