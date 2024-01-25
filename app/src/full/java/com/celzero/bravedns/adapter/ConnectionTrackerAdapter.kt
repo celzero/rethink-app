@@ -34,6 +34,7 @@ import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
@@ -147,7 +148,6 @@ class ConnectionTrackerAdapter(private val context: Context) :
             io {
                 uiCtx {
                     b.connectionAppName.text = ct.appName
-
                     val apps = FirewallManager.getPackageNamesByUid(ct.uid)
 
                     if (apps.isEmpty()) {
@@ -221,7 +221,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     ct.message.isEmpty()
             ) {
                 var hasMinSummary = false
-                if (VpnController.hasCid(ct.connId)) {
+                if (VpnController.hasCid(ct.connId, ct.uid)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDataUsage.text = context.getString(R.string.lbl_active)
                     b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
@@ -283,7 +283,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
         private fun isConnectionProxied(ruleName: String?, proxyDetails: String): Boolean {
             if (ruleName == null) return false
             val rule = FirewallRuleset.getFirewallRule(ruleName) ?: return false
-            val proxy = ProxyManager.isProxied(proxyDetails)
+            val proxy = ProxyManager.isIpnProxy(proxyDetails)
             return FirewallRuleset.isProxied(rule) || proxy
         }
 

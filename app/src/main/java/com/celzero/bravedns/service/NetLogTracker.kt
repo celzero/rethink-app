@@ -27,7 +27,9 @@ import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.NetLogBatcher
 import dnsx.Summary
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -87,8 +89,8 @@ internal constructor(
     fun writeIpLog(info: ConnTrackerMetaData) {
         if (!persistentState.logsEnabled) return
 
-        scope?.launch {
-            val connTracker = ipTracker?.makeConnectionTracker(info) ?: return@launch
+        io("writeIpLog") {
+            val connTracker = ipTracker?.makeConnectionTracker(info) ?: return@io
             ipNetLogBatcher?.add(connTracker)
         }
     }
@@ -96,8 +98,8 @@ internal constructor(
     fun writeRethinkLog(info: ConnTrackerMetaData) {
         if (!persistentState.logsEnabled) return
 
-        scope?.launch {
-            val rlog = ipTracker?.makeRethinkLogs(info) ?: return@launch
+        io("writeRethinkLog") {
+            val rlog = ipTracker?.makeRethinkLogs(info) ?: return@io
             rethinkLogBatcher?.add(rlog)
         }
     }
@@ -105,13 +107,13 @@ internal constructor(
     fun updateIpSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        scope?.launch { summaryBatcher?.add(summary) }
+        io("writeIpSummary") { summaryBatcher?.add(summary) }
     }
 
     fun updateRethinkSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        scope?.launch { rethinkSummaryBatcher?.add(summary) ?: return@launch }
+        io("writeRethinkSummary") { rethinkSummaryBatcher?.add(summary) ?: return@io }
     }
 
     // now, this method is doing multiple things which should be removed.
@@ -121,7 +123,7 @@ internal constructor(
 
         transaction.responseCalendar = Calendar.getInstance()
         // refresh latency from GoVpnAdapter
-        scope?.launch { dnsLatencyTracker.refreshLatencyIfNeeded(transaction) }
+        io("refreshDnsLatency") { dnsLatencyTracker.refreshLatencyIfNeeded(transaction) }
 
         // TODO: This method should be part of BraveVPNService
         dnsLogTracker?.updateVpnConnectionState(transaction)
@@ -129,6 +131,10 @@ internal constructor(
         if (!persistentState.logsEnabled) return
 
         val dnsLog = dnsLogTracker?.makeDnsLogObj(transaction) ?: return
-        scope?.launch { dnsNetLogBatcher?.add(dnsLog) }
+        io("dnsLogger") { dnsNetLogBatcher?.add(dnsLog) }
     }
+
+    private fun io(s: String, f: suspend () -> Unit) =
+        scope?.launch(CoroutineName(s) + Dispatchers.IO) { f() }
 }
+

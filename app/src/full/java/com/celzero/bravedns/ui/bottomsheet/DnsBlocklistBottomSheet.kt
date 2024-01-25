@@ -305,9 +305,9 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
 
         val groupCount = group.keys().distinct().count()
         if (groupCount > 1) {
-            b.dnsBlockBlocklistChip.text = "${group.keys().first()} +${groupCount - 1}"
+            b.dnsBlockBlocklistChip.text = "${group.keys().firstOrNull()} +${groupCount - 1}"
         } else {
-            b.dnsBlockBlocklistChip.text = group.keys().first()
+            b.dnsBlockBlocklistChip.text = group.keys().firstOrNull()
         }
 
         b.dnsBlockBlocklistChip.setOnClickListener { showBlocklistDialog(group) }
@@ -427,13 +427,18 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         if (log!!.isBlocked) {
             showBlockedState(uptime)
         } else {
-            showResolvedState(uptime)
+            showResolvedState(uptime, log!!.latency, log!!.groundedQuery())
         }
     }
 
-    private fun showResolvedState(uptime: String) {
+    private fun showResolvedState(uptime: String, latency: Long, isGrounded: Boolean ) {
         if (log == null) {
             Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
+            return
+        }
+
+        if (latency == 0L && !isGrounded) {
+            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, uptime, getString(R.string.lbl_cache))
             return
         }
 
@@ -499,8 +504,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             Glide.with(requireContext().applicationContext)
                 .load(url)
                 .onlyRetrieveFromCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .error(lookupForImageDuckduckgo(duckduckgoUrl, duckduckgoDomainURL))
                 .transition(DrawableTransitionOptions.withCrossFade(factory))
                 .into(
@@ -551,8 +555,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
             Glide.with(requireContext().applicationContext)
                 .load(url)
                 .onlyRetrieveFromCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .error(
                     Glide.with(requireContext().applicationContext)
                         .load(domainUrl)

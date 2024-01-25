@@ -131,10 +131,7 @@ class RethinkLogAdapter(private val context: Context) :
             b.connectionResponseTime.text = time
             b.connectionFlag.text = log.flag
 
-            if (
-                log.ipAddress == DNS_IP_TEMPLATE_V4 ||
-                    log.ipAddress == DNS_IP_TEMPLATE_V6
-            ) {
+            if (log.ipAddress == DNS_IP_TEMPLATE_V4 || log.ipAddress == DNS_IP_TEMPLATE_V6) {
                 b.connectionIpAddress.text = context.getString(R.string.dns_mode_info_title)
             } else {
                 b.connectionIpAddress.text = log.ipAddress
@@ -153,27 +150,30 @@ class RethinkLogAdapter(private val context: Context) :
         private fun displayAppDetails(log: RethinkLog) {
             b.connectionAppName.text = log.appName
 
-            val apps = FirewallManager.getPackageNamesByUid(log.uid)
+            io {
+                val apps = FirewallManager.getPackageNamesByUid(log.uid)
+                uiCtx {
+                    if (apps.isEmpty()) {
+                        loadAppIcon(Utilities.getDefaultIcon(context))
+                        return@uiCtx
+                    }
 
-            if (apps.isEmpty()) {
-                loadAppIcon(Utilities.getDefaultIcon(context))
-                return
-            }
+                    val count = apps.count()
+                    val appName =
+                        if (count > 1) {
+                            context.getString(
+                                R.string.ctbs_app_other_apps,
+                                log.appName,
+                                (count).minus(1).toString()
+                            )
+                        } else {
+                            log.appName
+                        }
 
-            val count = apps.count()
-            val appName =
-                if (count > 1) {
-                    context.getString(
-                        R.string.ctbs_app_other_apps,
-                        log.appName,
-                        (count).minus(1).toString()
-                    )
-                } else {
-                    log.appName
+                    b.connectionAppName.text = appName
+                    loadAppIcon(getIcon(context, apps[0], /*No app name */ ""))
                 }
-
-            b.connectionAppName.text = appName
-            loadAppIcon(getIcon(context, apps[0], /*No app name */ ""))
+            }
         }
 
         private fun displayProtocolDetails(port: Int, proto: Int) {
@@ -217,7 +217,7 @@ class RethinkLogAdapter(private val context: Context) :
                     log.message.isEmpty()
             ) {
                 var hasMinSummary = false
-                if (VpnController.hasCid(log.connId)) {
+                if (VpnController.hasCid(log.connId, log.uid)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDataUsage.text = context.getString(R.string.lbl_active)
                     b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
@@ -281,7 +281,7 @@ class RethinkLogAdapter(private val context: Context) :
         }
 
         private fun isConnectionProxied(proxyDetails: String): Boolean {
-            return ProxyManager.isProxied(proxyDetails)
+            return ProxyManager.isIpnProxy(proxyDetails)
         }
 
         private fun isConnectionHeavier(ct: RethinkLog): Boolean {

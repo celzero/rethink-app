@@ -15,6 +15,7 @@
  */
 package com.celzero.bravedns.ui
 
+import android.app.ActivityManager
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context

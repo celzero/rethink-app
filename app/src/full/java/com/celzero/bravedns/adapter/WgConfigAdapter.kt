@@ -171,7 +171,6 @@ class WgConfigAdapter(private val context: Context) :
         private fun launchConfigDetail(id: Int) {
             val intent = Intent(context, WgConfigDetailActivity::class.java)
             intent.putExtra(INTENT_EXTRA_WG_ID, id)
-            Log.d("TEST", "ProxyLogs - WgConfigAdapter - launchConfigDetail - id: $id")
             context.startActivity(intent)
         }
     }

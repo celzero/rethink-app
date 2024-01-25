@@ -175,9 +175,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startActivity(intent)
         }
 
-        b.fhsCardAlertsLl.setOnClickListener {
-            startActivity(ScreenType.ALERTS)
-        }
+        // comment out the below code to disable the alerts card (v0.5.5b)
+        // b.fhsCardAlertsLl.setOnClickListener { startActivity(ScreenType.ALERTS) }
     }
 
     private fun handlePause() {
@@ -260,7 +259,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         enableAppsCardIfNeeded()
         enableProxyCardIfNeeded()
         enableLogsCardIfNeeded()
-        enableAlertsCardIfNeeded()
+        // comment out the below code to disable the alerts card (v0.5.5b)
+        // enableAlertsCardIfNeeded()
     }
 
     private fun enableFirewallCardIfNeeded() {
@@ -324,7 +324,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
-    private fun enableAlertsCardIfNeeded() {
+    // comment out the below code to disable the alerts card (v0.5.5b)
+    /* private fun enableAlertsCardIfNeeded() {
         if (isVpnActivated) {
             observeAlertsCount()
         } else {
@@ -334,32 +335,32 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disableAlertsCard() {
-        b.fhsCardAlertsIpCount.text = getString(R.string.firewall_card_text_inactive)
-        b.fhsCardAlertsIpCount.isSelected = true
+        b.fhsCardAlertsApps.text = getString(R.string.firewall_card_text_inactive)
+        b.fhsCardAlertsApps.isSelected = true
     }
 
     private fun unObserveAlertsCount() {
-        alertsViewModel.getBlockedAppsCount().removeObservers(viewLifecycleOwner)
-        alertsViewModel.getBlockedDomainsCount().removeObservers(viewLifecycleOwner)
-        alertsViewModel.getBlockedIpCount().removeObservers(viewLifecycleOwner)
+        alertsViewModel.getBlockedAppsLogList().removeObservers(viewLifecycleOwner)
     }
 
     private fun observeAlertsCount() {
-        alertsViewModel.getBlockedAppsCount().observe(viewLifecycleOwner) {
-            b.fhsCardAlertsAppCount.text = "$it apps"
-            b.fhsCardAlertsAppCount.isSelected = true
+        alertsViewModel.getBlockedAppsLogList().observe(viewLifecycleOwner) {
+            var message = ""
+            it.forEach { apps ->
+                if (it.indexOf(apps) > 2) return@forEach
+                message += apps.appOrDnsName + ", "
+            }
+            if (message.isEmpty()) {
+                b.fhsCardAlertsApps.text = "No alerts"
+                b.fhsCardAlertsApps.isSelected = true
+                return@observe
+            }
+            message = message.dropLastWhile { i -> i == ' ' }
+            message = message.dropLastWhile { i -> i == ',' }
+            b.fhsCardAlertsApps.text = "$message recently blocked"
+            b.fhsCardAlertsApps.isSelected = true
         }
-
-        alertsViewModel.getBlockedDomainsCount().observe(viewLifecycleOwner) {
-            b.fhsCardAlertsDomainCount.text = "$it domains"
-            b.fhsCardAlertsDomainCount.isSelected = true
-        }
-
-        alertsViewModel.getBlockedIpCount().observe(viewLifecycleOwner) {
-            b.fhsCardAlertsIpCount.text = "$it IPs"
-            b.fhsCardAlertsIpCount.isSelected = true
-        }
-    }
+    } */
 
     private fun observeProxyStates() {
         persistentState.proxyStatus.observe(viewLifecycleOwner) {

@@ -30,11 +30,11 @@ class NetLogBatcher<T>(val processor: suspend (List<T>) -> Unit) {
 
     // a single thread to run sig and batch co-routines in;
     // to avoid use of mutex/semaphores over shared-state
-    @OptIn(DelicateCoroutinesApi::class) val looper = newSingleThreadContext("netlogprovider")
+    @OptIn(DelicateCoroutinesApi::class) val looper = newSingleThreadContext("logLooper")
 
-    private val nprod = CoroutineName("producer") // batches writes
-    private val nsig = CoroutineName("signal")
-    private val ncons = CoroutineName("consumer") // writes batches to db
+    private val nprod = CoroutineName("logProducer") // batches writes
+    private val nsig = CoroutineName("logSignal")
+    private val ncons = CoroutineName("logConsumer") // writes batches to db
 
     // dispatch buffer to consumer if greater than batch size
     private val batchSize = 20
