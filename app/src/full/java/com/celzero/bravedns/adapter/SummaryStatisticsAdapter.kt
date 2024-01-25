@@ -134,7 +134,7 @@ class SummaryStatisticsAdapter(
 
         fun bind(appConnection: AppConnection) {
             setName(appConnection)
-            setIcon(appConnection)
+            ui { setIcon(appConnection) }
             showDataUsage(appConnection)
             setProgress(appConnection)
             setConnectionCount(appConnection)
@@ -225,13 +225,9 @@ class SummaryStatisticsAdapter(
                         showFlag()
                     } else {
                         // Glide will cache the icons against the urls. To extract the fav
-                        // icon from
-                        // the
-                        // cache, first verify that the cache is available with the next dns
-                        // url.
-                        // If it is not available then glide will throw an error, do the
-                        // duckduckgo
-                        // url check in that case.
+                        // icon from the cache, first verify that the cache is available with the
+                        // next dns url. If it is not available then glide will throw an error, do
+                        // the duckduckgo url check in that case.
                         displayNextDnsFavIcon(query)
                     }
                 }
@@ -350,10 +346,12 @@ class SummaryStatisticsAdapter(
         }
 
         private fun loadAppIcon(drawable: Drawable?) {
-            Glide.with(context)
-                .load(drawable)
-                .error(Utilities.getDefaultIcon(context))
-                .into(itemBinding.ssIcon)
+            ui {
+                Glide.with(context)
+                    .load(drawable)
+                    .error(Utilities.getDefaultIcon(context))
+                    .into(itemBinding.ssIcon)
+            }
         }
 
         private fun setupClickListeners(appConnection: AppConnection) {
@@ -620,6 +618,10 @@ class SummaryStatisticsAdapter(
 
     private fun io(f: suspend () -> Unit) {
         (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private fun ui(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

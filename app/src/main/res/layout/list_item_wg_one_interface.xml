@@ -18,52 +18,58 @@
         app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
-        <LinearLayout
-            android:id="@+id/interface_name_layout"
+        <RelativeLayout
+            android:id="@+id/config_title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:orientation="vertical"
-            android:padding="15dp">
+            android:padding="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/interface_name_text"
+            <LinearLayout
+                android:id="@+id/interface_name_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="1dp"
-                android:layout_marginEnd="1dp"
-                android:padding="10dp"
-                android:textSize="@dimen/heading_font_text_view" />
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/interface_switch"
+                android:layout_centerVertical="true"
+                android:orientation="vertical"
+                android:padding="15dp">
 
-            <TextView
-                android:id="@+id/interface_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:padding="5dp"
-                android:textColor="?attr/primaryLightColorText"
-                android:textSize="@dimen/default_font_text_view" />
+                <TextView
+                    android:id="@+id/interface_name_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:padding="10dp"
+                    android:textSize="@dimen/heading_font_text_view" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/interface_set_btn"
+                <TextView
+                    android:id="@+id/interface_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/interface_switch"
+                style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="1"
-                android:padding="10dp"
-                android:text="enable one wireguard"
-                android:textAllCaps="true"
-                android:textColor="?attr/accentGood" />
-
-        </LinearLayout>
-
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp" />
+        </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

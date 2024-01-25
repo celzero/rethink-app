@@ -43,6 +43,7 @@ class Transaction {
         NO_RESPONSE(Dnsx.NoResponse),
         BAD_RESPONSE(Dnsx.BadResponse),
         BAD_QUERY(Dnsx.BadQuery),
+        CLIENT_ERROR(Dnsx.ClientError),
         INTERNAL_ERROR(Dnsx.InternalError);
 
         companion object {

@@ -60,7 +60,7 @@ class ConfigureOtherDnsActivity : AppCompatActivity(R.layout.activity_configure_
 
         companion object {
             fun getCount(): Int {
-                return values().count()
+                return entries.size
             }
 
             fun getDnsType(index: Int): DnsScreen {
@@ -93,8 +93,7 @@ class ConfigureOtherDnsActivity : AppCompatActivity(R.layout.activity_configure_
         b.dnsDetailActViewpager.adapter =
             object : FragmentStateAdapter(this) {
                 override fun createFragment(position: Int): Fragment {
-                    val dt = DnsScreen.getDnsType(dnsType)
-                    return when (dt) {
+                    return when (DnsScreen.getDnsType(dnsType)) {
                         DnsScreen.DNS_CRYPT -> DnsCryptListFragment.newInstance()
                         DnsScreen.DNS_PROXY -> DnsProxyListFragment.newInstance()
                         DnsScreen.DOH -> DohListFragment.newInstance()

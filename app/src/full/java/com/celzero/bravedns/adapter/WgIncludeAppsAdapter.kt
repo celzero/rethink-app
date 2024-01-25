@@ -100,7 +100,9 @@ class WgIncludeAppsAdapter(
                 b.wgIncludeAppAppDescTv.visibility = View.GONE
                 b.wgIncludeAppListCheckbox.isChecked = false
             } else if (mapping.proxyId != proxyId) {
-                b.wgIncludeAppAppDescTv.text = "part of ${mapping.proxyName}"
+
+                b.wgIncludeAppAppDescTv.text =
+                    context.getString(R.string.wireguard_apps_proxy_map_desc, mapping.proxyName)
                 b.wgIncludeAppAppDescTv.visibility = View.VISIBLE
                 b.wgIncludeAppListCheckbox.isChecked = false
             } else {
@@ -110,7 +112,7 @@ class WgIncludeAppsAdapter(
             }
 
             val isIncluded = mapping.proxyId == proxyId && mapping.proxyId != ""
-            displayIcon(getIcon(context, mapping.packageName, mapping.appName))
+            ui { displayIcon(getIcon(context, mapping.packageName, mapping.appName)) }
             setupClickListeners(mapping, isIncluded)
         }
 
@@ -173,14 +175,16 @@ class WgIncludeAppsAdapter(
             builderSingle.setIcon(R.drawable.ic_firewall_exclude_on)
 
             val count = packageList.count()
-            positiveTxt =
+            val title =
                 if (included) {
-                    builderSingle.setTitle("Include apps - $count")
-                    "Include"
+                    positiveTxt = context.getString(R.string.lbl_include)
+                    context.getString(R.string.wg_apps_dialog_title_include, count.toString())
                 } else {
-                    builderSingle.setTitle("Remove apps - $count")
-                    "Remove"
+                    positiveTxt = context.getString(R.string.lbl_remove)
+                    context.getString(R.string.wg_apps_dialog_title_exclude, count.toString())
                 }
+
+            builderSingle.setTitle(title)
             val arrayAdapter =
                 ArrayAdapter<String>(context, android.R.layout.simple_list_item_activated_1)
             arrayAdapter.addAll(packageList)
@@ -205,6 +209,10 @@ class WgIncludeAppsAdapter(
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun ui(f: () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
     }
 
     private fun io(f: suspend () -> Unit) {

@@ -108,6 +108,7 @@ class RethinkEndpointAdapter(
 
         private fun displayDetails(endpoint: RethinkDnsEndpoint) {
             b.rethinkEndpointListUrlName.text = endpoint.name
+            // set empty for now, will be updated later, see updateBlocklistStatusText()
             b.rethinkEndpointListUrlExplanation.text = ""
             b.rethinkEndpointListCheckImage.isChecked = endpoint.isActive
             Log.i(

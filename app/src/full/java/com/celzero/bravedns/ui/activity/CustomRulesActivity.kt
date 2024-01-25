@@ -49,7 +49,7 @@ class CustomRulesActivity : AppCompatActivity(R.layout.activity_custom_rules) {
 
         companion object {
             fun getCount(): Int {
-                return values().count()
+                return entries.size
             }
         }
     }

@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -87,7 +86,13 @@ class WgConfigAdapter(private val context: Context) :
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
             b.interfaceSwitch.isChecked = config.isActive
-            b.interfaceLockdown.text = "Lockdown: ${config.isLockdown}"
+            val lockdown =
+                context.getString(
+                    R.string.ci_ip_label,
+                    context.getString(R.string.firewall_rule_global_lockdown),
+                    config.isLockdown.toString()
+                )
+            b.interfaceLockdown.text = lockdown
             updateStatus(config)
             setupClickListeners(config)
         }
@@ -107,7 +112,11 @@ class WgConfigAdapter(private val context: Context) :
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
                     b.interfaceProxyStatus.text =
-                        "Status: ${context.getString(resId).replaceFirstChar(Char::titlecase)}"
+                        context.getString(
+                            R.string.ci_ip_label,
+                            context.getString(R.string.lbl_status),
+                            context.getString(resId).replaceFirstChar(Char::titlecase)
+                        )
                     b.interfaceStatus.text =
                         context.getString(
                             R.string.about_version_install_source,
@@ -116,7 +125,13 @@ class WgConfigAdapter(private val context: Context) :
                         )
                 } else {
                     b.interfaceProxyStatus.text =
-                        "Status: ${context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)}"
+                        context.getString(
+                            R.string.ci_ip_label,
+                            context.getString(R.string.lbl_status),
+                            context
+                                .getString(R.string.status_failing)
+                                .replaceFirstChar(Char::titlecase)
+                        )
                     b.interfaceStatus.text =
                         context.getString(
                             R.string.about_version_install_source,
@@ -128,7 +143,11 @@ class WgConfigAdapter(private val context: Context) :
                 }
             } else {
                 b.interfaceProxyStatus.text =
-                    "Status: ${context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)}"
+                    context.getString(
+                        R.string.ci_ip_label,
+                        context.getString(R.string.lbl_status),
+                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                    )
                 b.interfaceStatus.text =
                     context.getString(
                         R.string.about_version_install_source,

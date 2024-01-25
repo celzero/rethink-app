@@ -43,7 +43,7 @@ public class GoProber extends Prober {
         new Thread(() -> {
             String dohIPs = GoVpnAdapter.Companion.getIpString(context, url);
             try {
-                Transport transport = Intra.newDoHTransport(PROBER_TAG, url, dohIPs);
+                Transport transport = null; //Intra.newDoHTransport(PROBER_TAG, url, dohIPs);
                 if (transport == null) {
                     callback.onCompleted(false);
                     return;

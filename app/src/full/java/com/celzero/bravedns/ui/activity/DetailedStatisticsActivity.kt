@@ -64,15 +64,15 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
     }
 
     private fun setSubTitle(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
-        when (timeCategory) {
+        b.dsaSubtitle.text = when (timeCategory) {
             SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
-                b.dsaSubtitle.text = "Last 1 " + getString(R.string.lbl_hour)
+                getString(R.string.three_argument, getString(R.string.lbl_last), getString(R.string.numeric_one), getString(R.string.lbl_hour))
             }
             SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
-                b.dsaSubtitle.text = "Last 24 " + getString(R.string.lbl_hour)
+                getString(R.string.three_argument, getString(R.string.lbl_last), getString(R.string.numeric_twenty_four), getString(R.string.lbl_hour))
             }
             SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
-                b.dsaSubtitle.text = "Last 7 " + getString(R.string.lbl_day)
+                 getString(R.string.three_argument, getString(R.string.lbl_last), getString(R.string.numeric_seven), getString(R.string.lbl_day))
             }
         }
     }

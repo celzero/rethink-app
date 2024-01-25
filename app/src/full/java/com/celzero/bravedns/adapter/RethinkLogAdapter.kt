@@ -36,6 +36,7 @@ import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.databinding.ConnectionTransactionRowBinding
 import com.celzero.bravedns.service.FirewallManager
+import com.celzero.bravedns.service.FirewallRuleset
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.bottomsheet.ConnTrackerBottomSheet
@@ -224,17 +225,18 @@ class RethinkLogAdapter(private val context: Context) :
                     b.connectionDelay.text = ""
                     hasMinSummary = true
                 }
-                b.connectionDelay.text = ""
                 if (connType.isMetered()) {
-                    b.connectionDelay.text = "📶"
-                } else if (connType.isUnmetered()) {
-                    b.connectionDelay.text = "🌐"
+                    b.connectionDelay.text = "💴"
                 }
 
                 if (isConnectionProxied(log.proxyDetails)) {
                     b.connectionSummaryLl.visibility = View.VISIBLE
                     b.connectionDelay.text =
-                        b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
+                        context.getString(
+                            R.string.ci_desc,
+                            b.connectionDelay.text,
+                            context.getString(R.string.symbol_key)
+                        )
                     hasMinSummary = true
                 }
                 if (!hasMinSummary) {
@@ -260,20 +262,36 @@ class RethinkLogAdapter(private val context: Context) :
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
             b.connectionDelay.text = ""
             if (connType.isMetered()) {
-                b.connectionDelay.text = "📶"
-            } else if (connType.isUnmetered()) {
-                b.connectionDelay.text = "🌐"
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_currency)
+                    )
             }
             if (isConnectionHeavier(log)) {
-                b.connectionDelay.text = context.getString(R.string.symbol_heavy)
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_heavy)
+                    )
             }
             if (isConnectionSlower(log)) {
                 b.connectionDelay.text =
-                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_turtle)
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_turtle)
+                    )
             }
             if (isConnectionProxied(log.proxyDetails)) {
                 b.connectionDelay.text =
-                    b.connectionDelay.text.toString() + context.getString(R.string.symbol_key)
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_key)
+                    )
             }
             if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
                 b.connectionSummaryLl.visibility = View.GONE

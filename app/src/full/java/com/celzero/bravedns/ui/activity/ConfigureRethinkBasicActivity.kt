@@ -50,7 +50,7 @@ class ConfigureRethinkBasicActivity : AppCompatActivity(R.layout.fragment_rethin
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         val type = intent.getIntExtra(INTENT, FragmentLoader.REMOTE.ordinal)
-        val fl = FragmentLoader.values()[type]
+        val fl = FragmentLoader.entries[type]
         val fragment = fragment(fl)
 
         if (savedInstanceState == null) {

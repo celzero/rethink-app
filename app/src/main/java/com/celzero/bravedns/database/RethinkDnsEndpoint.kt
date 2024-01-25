@@ -37,8 +37,7 @@ class RethinkDnsEndpoint(
         if (other !is RethinkDnsEndpoint) return false
         if (name != other.name) return false
         if (url != other.url) return false
-        if (uid != other.uid) return false
-        return true
+        return uid == other.uid
     }
 
     override fun hashCode(): Int {
@@ -54,8 +53,7 @@ class RethinkDnsEndpoint(
     }
 
     init {
-        if (modifiedDataTime != Constants.INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
-        else this.modifiedDataTime = System.currentTimeMillis()
+        this.modifiedDataTime = System.currentTimeMillis()
     }
 
     fun isEditable(context: Context): Boolean {

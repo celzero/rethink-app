@@ -109,6 +109,9 @@ class FirewallAppListAdapter(
                         b.firewallAppToggleMobileData.visibility = View.GONE
                         return@uiCtx
                     }
+
+                    b.firewallAppToggleWifi.visibility = View.VISIBLE
+                    b.firewallAppToggleMobileData.visibility = View.VISIBLE
                     displayConnectionStatus(appStatus, connStatus)
                     showAppHint(b.firewallAppStatusIndicator, appInfo)
                 }

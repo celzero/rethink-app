@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -84,7 +83,7 @@ class OneWgConfigAdapter(private val context: Context) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name + " (${config.oneWireGuard}, ${config.isActive})"
+            b.interfaceNameText.text = config.name
             updateStatus(config)
             setupClickListeners(config)
         }
@@ -125,26 +124,21 @@ class OneWgConfigAdapter(private val context: Context) :
                         appsCount
                     )
             }
-            val checked = config.oneWireGuard && config.isActive
-            if (checked) {
-                b.interfaceSetBtn.text = "disable one wireguard"
-            } else {
-                b.interfaceSetBtn.text = "set as one wireguard"
-            }
         }
 
         fun setupClickListeners(config: WgConfigFiles) {
             b.interfaceNameLayout.setOnClickListener { launchConfigDetail(config.id) }
 
-            b.interfaceSetBtn.setOnClickListener {
-                val checked = config.isActive
+            b.interfaceSwitch.setOnCheckedChangeListener(null)
+            b.interfaceSwitch.setOnClickListener {
+                val checked = b.interfaceSwitch.isChecked
                 io {
                     if (!checked) {
                         if (WireguardManager.canEnableConfig(config)) {
                             config.oneWireGuard = true
                             WireguardManager.updateOneWireGuardConfig(
                                 config.id,
-                                config.oneWireGuard
+                                owg = true
                             )
                             WireguardManager.enableConfig(config)
                             uiCtx { updateStatus(config) }
@@ -160,7 +154,7 @@ class OneWgConfigAdapter(private val context: Context) :
                         }
                     } else {
                         config.oneWireGuard = false
-                        WireguardManager.updateOneWireGuardConfig(config.id, config.oneWireGuard)
+                        WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
                         WireguardManager.disableConfig(config)
                         uiCtx { updateStatus(config) }
                     }
