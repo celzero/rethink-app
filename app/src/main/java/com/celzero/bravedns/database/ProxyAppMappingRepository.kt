@@ -35,8 +35,12 @@ class ProxyAppMappingRepository(
         proxyApplicationMappingDAO.deleteByPackageName(wgMapping.uid, wgMapping.packageName)
     }
 
+    suspend fun deleteAll() {
+        proxyApplicationMappingDAO.deleteAll()
+    }
+
     suspend fun getApps(): List<ProxyApplicationMapping> {
-        return proxyApplicationMappingDAO.getWgAppMapping()
+        return proxyApplicationMappingDAO.getWgAppMapping() ?: emptyList()
     }
 
     suspend fun updateProxyIdForApp(uid: Int, proxyId: String, proxyName: String) {
@@ -53,5 +57,9 @@ class ProxyAppMappingRepository(
 
     suspend fun updateProxyForAllApps(proxyId: String, proxyName: String) {
         proxyApplicationMappingDAO.updateProxyForAllApps(proxyId, proxyName)
+    }
+
+    suspend fun updateProxyForUnselectedApps(proxyId: String, proxyName: String) {
+        return proxyApplicationMappingDAO.updateProxyForUnselectedApps(proxyId, proxyName)
     }
 }

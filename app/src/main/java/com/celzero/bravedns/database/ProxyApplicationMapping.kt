@@ -22,10 +22,10 @@ class ProxyApplicationMapping {
 
     var uid: Int = 0
     var packageName: String = ""
+    var proxyId: String = ""
     var appName: String = ""
     var proxyName: String = ""
     var isActive: Boolean = false
-    var proxyId: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is ProxyApplicationMapping) return false
