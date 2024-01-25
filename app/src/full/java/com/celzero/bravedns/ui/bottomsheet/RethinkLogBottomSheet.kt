@@ -30,11 +30,13 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.R
+import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.databinding.BottomSheetConnTrackBinding
 import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
@@ -251,6 +253,25 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun displaySummaryDetails() {
+        b.connectionMessage.text = info?.message
+
+        if (VpnController.hasCid(info!!.connId, info!!.uid)) {
+            b.connectionSummaryLl.visibility = View.VISIBLE
+            b.bsConnConnDuration.text =
+                getString(R.string.symbol_green_circle) + " " + getString(R.string.lbl_active)
+        } else {
+            val duration =
+                UIUtils.getDurationInHumanReadableFormat(requireContext(), info!!.duration)
+            b.bsConnConnDuration.text = "⏱️" + " " + getString(R.string.single_argument, duration)
+        }
+
+        val connType = ConnectionTracker.ConnType.get(info?.connType)
+        if (connType.isMetered()) {
+            b.bsConnConnType.text = "💴 " + getString(R.string.ada_app_metered)
+        } else {
+            b.bsConnConnType.text = "🌐 " + getString(R.string.ada_app_unmetered)
+        }
+
         if (
             info?.message?.isEmpty() == true &&
                 info?.duration == 0 &&
@@ -258,13 +279,12 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 info?.uploadBytes == 0L
         ) {
             b.connectionSummaryLl.visibility = View.GONE
-            b.connectionUploadDownload.visibility = View.GONE
+            b.bsConnConnUpload.visibility = View.GONE
+            b.bsConnConnDownload.visibility = View.GONE
             return
         }
 
         b.connectionSummaryLl.visibility = View.VISIBLE
-        b.connectionUploadDownload.visibility = View.VISIBLE
-        b.connectionMessage.text = info?.message
         val downloadBytes =
             getString(
                 R.string.symbol_download,
@@ -275,8 +295,9 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 R.string.symbol_upload,
                 Utilities.humanReadableByteCount(info?.uploadBytes ?: 0L, true)
             )
-        b.connectionUploadDownload.text =
-            getString(R.string.two_argument, uploadBytes, downloadBytes)
+
+        b.bsConnConnUpload.text = uploadBytes
+        b.bsConnConnDownload.text = downloadBytes
     }
 
     private fun lightenUpChip() {
