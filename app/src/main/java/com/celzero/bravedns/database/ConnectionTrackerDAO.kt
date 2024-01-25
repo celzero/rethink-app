@@ -86,6 +86,14 @@ interface ConnectionTrackerDAO {
     )
     fun getBlockedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
+    @Query("select * from ConnectionTracker where protocol = :protocol order by id desc LIMIT $MAX_LOGS")
+    fun getProtocolFilteredConnections(protocol: String): PagingSource<Int, ConnectionTracker>
+
+    @Query(
+        "select * from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
+    )
+    fun getProtocolFilteredConnections(protocol: String, filter: Set<String>): PagingSource<Int, ConnectionTracker>
+
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
     )

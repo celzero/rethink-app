@@ -74,6 +74,24 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private fun fetchNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
+        // spl case, treat input with P:UDP, P:TCP, P:ICMP as protocol filter
+        if (input.startsWith(ConnectionTrackerFragment.PROTOCOL_FILTER_PREFIX)) {
+            val protocol = input.substringAfter(ConnectionTrackerFragment.PROTOCOL_FILTER_PREFIX)
+            return if (filterRules.isNotEmpty()) {
+                Pager(pagingConfig) {
+                        connectionTrackerDAO.getProtocolFilteredConnections(protocol, filterRules)
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(pagingConfig) {
+                        connectionTrackerDAO.getProtocolFilteredConnections(protocol)
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
+        }
+
         return when (filterType) {
             TopLevelFilter.ALL -> {
                 getAllNetworkLogs(input)

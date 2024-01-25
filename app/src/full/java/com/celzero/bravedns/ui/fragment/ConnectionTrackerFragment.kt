@@ -61,6 +61,7 @@ class ConnectionTrackerFragment :
     private val persistentState by inject<PersistentState>()
 
     companion object {
+        const val PROTOCOL_FILTER_PREFIX = "P:"
         fun newInstance(param: String): ConnectionTrackerFragment {
             val args = Bundle()
             args.putString(Constants.SEARCH_QUERY, param)
