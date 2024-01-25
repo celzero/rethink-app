@@ -444,7 +444,7 @@ object WireguardManager : KoinComponent {
                 .build()
         Log.i(LOG_TAG_PROXY, "updating interface for config: $configId, ${config.getName()}")
         val cfgId = ProxyManager.ID_WG_BASE + configId
-        ProxyManager.updateProxyIdForAllApps(cfgId, configName)
+        ProxyManager.setProxyIdForAllApps(cfgId, configName)
         writeConfigAndUpdateDb(cfg)
         return cfg
     }
@@ -530,10 +530,10 @@ object WireguardManager : KoinComponent {
         val config = configs.find { it.getId() == id }
         val map = mappings.find { it.id == id }
         if (config == null) {
-            Log.e(LOG_TAG_PROXY, "updateOneWireGuardConfig: wg not found, id: $id, ${configs.size}")
+            Log.e(LOG_TAG_PROXY, "update one wg: id($id) not found, size: ${configs.size}")
             return
         }
-        Log.i(LOG_TAG_PROXY, "updating one wireguard for config: $id, ${config.getName()}")
+        Log.i(LOG_TAG_PROXY, "update one wg, id: $id, ${config.getName()} to $owg")
         wgConfigFilesRepository.updateOneWireGuardConfig(id, owg)
         mappings.find { it.id == id }?.oneWireGuard = owg
         if (map?.isActive == true) {
@@ -687,7 +687,8 @@ object WireguardManager : KoinComponent {
     }
 
     fun restoreProcessDeleteWireGuardEntries() {
-        // delete the WireGuard entries from the database
+        // during a restore, we do not posses the keys to decrypt the wireguard configs
+        // so, delete the wireguard configs carried over from the backup
         io {
             val count = wgConfigFilesRepository.deleteOnAppRestore()
             ProxyManager.removeWgProxies()

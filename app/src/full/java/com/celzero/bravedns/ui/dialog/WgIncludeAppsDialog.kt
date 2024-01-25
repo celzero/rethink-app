@@ -211,6 +211,10 @@ class WgIncludeAppsDialog(
             showDialog(b.wgIncludeAppSelectAllCheckbox.isChecked)
         }
 
+        b.wgRemainingAppsBtn.setOnClickListener {
+            showConfirmationDialog()
+        }
+
         b.wgIncludeAppSelectAllCheckbox.setOnCheckedChangeListener(null)
 
         b.wgRefreshList.setOnClickListener {
@@ -234,7 +238,7 @@ class WgIncludeAppsDialog(
     }
 
     private fun refreshDatabase() {
-        io { refreshDatabase.refreshProxyMapping() }
+        io { refreshDatabase.refresh(RefreshDatabase.ACTION_REFRESH_INTERACTIVE) }
     }
 
     private fun clearSearch() {
@@ -259,7 +263,7 @@ class WgIncludeAppsDialog(
             io {
                 if (toAdd) {
                     Log.i(LOG_TAG_PROXY, "Adding all apps to proxy $proxyId, $proxyName")
-                    ProxyManager.updateProxyIdForAllApps(proxyId, proxyName)
+                    ProxyManager.setProxyIdForAllApps(proxyId, proxyName)
                 } else {
                     Log.i(LOG_TAG_PROXY, "Removing all apps from proxy $proxyId, $proxyName")
                     ProxyManager.removeProxyForAllApps()
@@ -274,15 +278,32 @@ class WgIncludeAppsDialog(
         builder.create().show()
     }
 
+    private fun showConfirmationDialog() {
+        val builder = MaterialAlertDialogBuilder(context)
+        builder.setTitle("Include remaining apps")
+        builder.setMessage("Include all apps that are not part of any proxy")
+        builder.setCancelable(true)
+        builder.setPositiveButton(context.getString(R.string.lbl_include)) { _, _ ->
+            io {
+                Log.i(LOG_TAG_PROXY, "Adding remaining apps to proxy $proxyId, $proxyName")
+                ProxyManager.setProxyIdForUnselectedApps(proxyId, proxyName)
+            }
+        }
+
+        builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
+            // no-op
+        }
+
+        builder.create().show()
+    }
+
     override fun onQueryTextSubmit(query: String): Boolean {
-        Log.d(LOG_TAG_PROXY, "Query text submit: $query")
         searchText = query
         viewModel.setFilter(query, filterType, proxyId)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        Log.d(LOG_TAG_PROXY, "Query text change: $query")
         searchText = query
         viewModel.setFilter(query, filterType, proxyId)
         return true

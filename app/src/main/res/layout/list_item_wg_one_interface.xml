@@ -32,6 +32,8 @@
                 android:id="@+id/interface_name_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:padding="10dp"
                 android:textSize="@dimen/heading_font_text_view" />
 
@@ -39,25 +41,26 @@
                 android:id="@+id/interface_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:padding="5dp"
                 android:textColor="?attr/primaryLightColorText"
                 android:textSize="@dimen/default_font_text_view" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="enable one wireguard"
                 android:id="@+id/interface_set_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
-                android:textColor="?attr/accentGood"
-                android:padding="10dp"
-                android:textAllCaps="true"
+                android:layout_marginBottom="10dp"
                 android:layout_weight="1"
-                />
+                android:padding="10dp"
+                android:text="enable one wireguard"
+                android:textAllCaps="true"
+                android:textColor="?attr/accentGood" />
 
         </LinearLayout>
 

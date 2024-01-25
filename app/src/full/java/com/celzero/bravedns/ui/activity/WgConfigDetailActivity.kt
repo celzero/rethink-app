@@ -142,7 +142,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun prefillWarpConfig(config: Config) {
         wgInterface = config.getInterface()
-        Log.d("TEST", "prefillWarpConfig wgInterface: $wgInterface")
         peers.clear()
         peers.addAll(config.getPeers() ?: emptyList())
         if (wgInterface == null) {
@@ -271,10 +270,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         b.addPeerFab.setOnClickListener { openAddPeerDialog() }
 
         b.applicationsBtn.setOnClickListener {
-            io {
-                val proxyName = WireguardManager.getConfigName(configId)
-                uiCtx { openAppsDialog(proxyName) }
-            }
+            val proxyName = WireguardManager.getConfigName(configId)
+            openAppsDialog(proxyName)
         }
 
         b.interfaceDelete.setOnClickListener { showDeleteInterfaceDialog() }
@@ -288,13 +285,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.interfaceRefresh.isEnabled = false
             b.interfaceRefresh.animation = animation
             b.interfaceRefresh.startAnimation(animation)
-            io {
-                //createConfigOrShowErrorLayout()
-                uiCtx {
-                    b.interfaceRefresh.isEnabled = true
-                    b.interfaceRefresh.clearAnimation()
-                }
-            }
+            b.interfaceRefresh.isEnabled = true
+            b.interfaceRefresh.clearAnimation()
         }
 
         b.publicKeyLabel.setOnClickListener {

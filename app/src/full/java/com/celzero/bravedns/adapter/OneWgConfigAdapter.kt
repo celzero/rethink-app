@@ -59,21 +59,24 @@ class OneWgConfigAdapter(private val context: Context) :
                     newConnection: WgConfigFiles
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
-                        oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive)
+                        oldConnection.isActive == newConnection.isActive &&
+                        oldConnection.oneWireGuard == newConnection.oneWireGuard)
                 }
             }
     }
 
     override fun onBindViewHolder(holder: WgInterfaceViewHolder, position: Int) {
-        val item = getItem(position)
-        val wgConfigFiles: WgConfigFiles = item ?: return
+        val wgConfigFiles: WgConfigFiles = getItem(position) ?: return
         holder.update(wgConfigFiles)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WgInterfaceViewHolder {
         val itemBinding =
-            ListItemWgOneInterfaceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ListItemWgOneInterfaceBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         return WgInterfaceViewHolder(itemBinding)
     }
 
@@ -81,26 +84,18 @@ class OneWgConfigAdapter(private val context: Context) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(config: WgConfigFiles) {
-            b.interfaceNameText.text = config.name + " (WireGuard)"
-            val checked = config.oneWireGuard && config.isActive
-            if (checked) {
-                b.interfaceSetBtn.text = "disable one wireguard"
-            } else {
-                b.interfaceSetBtn.text = "set as one wireguard"
-            }
+            b.interfaceNameText.text = config.name + " (${config.oneWireGuard}, ${config.isActive})"
             updateStatus(config)
             setupClickListeners(config)
         }
 
         private fun updateStatus(config: WgConfigFiles) {
-            io {
-                val id = ProxyManager.ID_WG_BASE + config.id
-                val apps = ProxyManager.getAppCountForProxy(id).toString()
-                uiCtx { updateStatusUI(config, id, apps) }
-            }
+            val id = ProxyManager.ID_WG_BASE + config.id
+            val apps = ProxyManager.getAppCountForProxy(id).toString()
+            updateStatusUi(config, id, apps)
         }
 
-        private fun updateStatusUI(config: WgConfigFiles, id: String, apps: String) {
+        private fun updateStatusUi(config: WgConfigFiles, id: String, apps: String) {
             val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
                 val statusId = VpnController.getProxyStatusById(id)
@@ -130,16 +125,27 @@ class OneWgConfigAdapter(private val context: Context) :
                         appsCount
                     )
             }
+            val checked = config.oneWireGuard && config.isActive
+            if (checked) {
+                b.interfaceSetBtn.text = "disable one wireguard"
+            } else {
+                b.interfaceSetBtn.text = "set as one wireguard"
+            }
         }
 
         fun setupClickListeners(config: WgConfigFiles) {
             b.interfaceNameLayout.setOnClickListener { launchConfigDetail(config.id) }
 
             b.interfaceSetBtn.setOnClickListener {
-                val checked = config.oneWireGuard
+                val checked = config.isActive
                 io {
                     if (!checked) {
                         if (WireguardManager.canEnableConfig(config)) {
+                            config.oneWireGuard = true
+                            WireguardManager.updateOneWireGuardConfig(
+                                config.id,
+                                config.oneWireGuard
+                            )
                             WireguardManager.enableConfig(config)
                             uiCtx { updateStatus(config) }
                         } else {
@@ -153,6 +159,8 @@ class OneWgConfigAdapter(private val context: Context) :
                             }
                         }
                     } else {
+                        config.oneWireGuard = false
+                        WireguardManager.updateOneWireGuardConfig(config.id, config.oneWireGuard)
                         WireguardManager.disableConfig(config)
                         uiCtx { updateStatus(config) }
                     }
@@ -163,7 +171,6 @@ class OneWgConfigAdapter(private val context: Context) :
         private fun launchConfigDetail(id: Int) {
             val intent = Intent(context, WgConfigDetailActivity::class.java)
             intent.putExtra(INTENT_EXTRA_WG_ID, id)
-            Log.d("TEST", "ProxyLogs - WgConfigAdapter - launchConfigDetail - id: $id")
             context.startActivity(intent)
         }
     }

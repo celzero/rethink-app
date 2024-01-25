@@ -258,15 +258,40 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private fun observeConfig() {
         wgConfigViewModel.configCount().observe(this) {
             if (it == 0) {
-                b.wgEmptyView.visibility = View.VISIBLE
-                b.wgWireguardDisclaimer.visibility = View.GONE
-                b.wgGeneralInterfaceList.visibility = View.GONE
+                showEmptyView()
+                hideWgViews()
             } else {
-                b.wgEmptyView.visibility = View.GONE
-                b.wgWireguardDisclaimer.visibility = View.VISIBLE
-                b.wgGeneralInterfaceList.visibility = View.VISIBLE
+                hideEmptyView()
+                showWgViews()
             }
         }
+    }
+
+    private fun showEmptyView() {
+        b.wgEmptyView.visibility = View.VISIBLE
+    }
+
+    private fun hideEmptyView() {
+        b.wgEmptyView.visibility = View.GONE
+    }
+
+    private fun showWgViews() {
+        b.wgGeneralToggleBtn.visibility = View.VISIBLE
+        b.oneWgToggleBtn.visibility = View.VISIBLE
+        b.wgRefresh.visibility = View.VISIBLE
+        b.wgGeneralInterfaceList.visibility = View.VISIBLE
+        b.oneWgInterfaceList.visibility = View.VISIBLE
+        b.wgWireguardDisclaimer.visibility = View.VISIBLE
+        b.wgGeneralInterfaceList.visibility = View.VISIBLE
+    }
+
+    private fun hideWgViews() {
+        b.wgGeneralToggleBtn.visibility = View.GONE
+        b.oneWgToggleBtn.visibility = View.GONE
+        b.wgRefresh.visibility = View.GONE
+        b.wgGeneralInterfaceList.visibility = View.GONE
+        b.oneWgInterfaceList.visibility = View.GONE
+        b.wgWireguardDisclaimer.visibility = View.GONE
     }
 
     private fun observeDnsName() {

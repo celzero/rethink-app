@@ -21,15 +21,15 @@
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/wg_refresh"
             android:fontFamily="sans-serif-smallcaps"
             android:lineSpacingExtra="5dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
             android:padding="5dp"
             android:text="@string/lbl_wireguard"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/wg_refresh"
             android:textColor="?attr/accentGood"
             android:textSize="@dimen/extra_large_font_text_view"
             android:textStyle="bold" />
@@ -90,8 +90,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/wg_header" />
 
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/wg_list_toggle_group"
+        style="@style/toggleButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        app:checkedButton="@id/lb_simple_toggle_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wg_wireguard_disclaimer"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/wg_general_toggle_btn"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="125dp"
+            android:tag="1"
+            android:text="Default"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/one_wg_toggle_btn"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="125dp"
+            android:tag="2"
+            android:text="One WG"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            app:cornerRadius="16dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/wg_interface_list"
+        android:id="@+id/wg_general_interface_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -99,7 +134,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wg_wireguard_disclaimer" />
+        app:layout_constraintTop_toBottomOf="@+id/wg_list_toggle_group" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/one_wg_interface_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:visibility="gone"
+        android:paddingBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wg_list_toggle_group" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/create_fab"

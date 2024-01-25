@@ -144,6 +144,8 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             }
             io {
                 val endpoint = appConfig.getSocks5ProxyDetails()
+                val packageName = endpoint.proxyAppName
+                val app = FirewallManager.getAppInfoByPackage(packageName)?.appName ?: ""
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
                 if (m?.isCustomSocks5() == true) {
                     val appNames: MutableList<String> = ArrayList()
@@ -151,14 +153,14 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     if (!VpnController.isVpnLockdown()) {
                         appNames.addAll(FirewallManager.getAllAppNames())
                     }
-                    uiCtx { showSocks5ProxyDialog(endpoint, appNames) }
+                    uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
                     if (!VpnController.isVpnLockdown()) {
                         appNames.addAll(FirewallManager.getAllAppNames())
                     }
-                    uiCtx { showSocks5ProxyDialog(endpoint, appNames) }
+                    uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 }
             }
         }
@@ -202,6 +204,8 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             }
             io {
                 val endpoint = appConfig.getHttpProxyDetails()
+                val packageName = endpoint.proxyAppName
+                val app = FirewallManager.getAppInfoByPackage(packageName)
                 val m = ProxyManager.ProxyMode.get(endpoint.proxyMode)
                 if (m?.isCustomHttp() == true) {
                     val appNames: MutableList<String> = ArrayList()
@@ -209,14 +213,14 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     if (!VpnController.isVpnLockdown()) {
                         appNames.addAll(FirewallManager.getAllAppNames())
                     }
-                    uiCtx { showHttpProxyDialog(endpoint, appNames) }
+                    uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
                     if (!VpnController.isVpnLockdown()) {
                         appNames.addAll(FirewallManager.getAllAppNames())
                     }
-                    uiCtx { showHttpProxyDialog(endpoint, appNames) }
+                    uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 }
             }
         }
@@ -329,33 +333,36 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun handleOrbotUiEvent() {
+        io {
+            val isOrbotInstalled = FirewallManager.isOrbotInstalled()
+            uiCtx {
+                if (!isOrbotInstalled) {
+                    showOrbotInstallDialog()
+                    return@uiCtx
+                }
 
-        val isOrbotInstalled = FirewallManager.isOrbotInstalled()
+                if (!appConfig.canEnableOrbotProxy()) {
+                    val s =
+                        persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
+                    if (s.lowercase() == AppConfig.ProxyProvider.CUSTOM.name.lowercase()) {
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.settings_orbot_disabled_error),
+                            Toast.LENGTH_SHORT
+                        )
+                    } else {
+                        showToastUiCentered(
+                            this,
+                            getString(R.string.settings_socks5_disabled_error, s),
+                            Toast.LENGTH_SHORT
+                        )
+                    }
+                    return@uiCtx
+                }
 
-        if (!isOrbotInstalled) {
-            showOrbotInstallDialog()
-            return
-        }
-
-        if (!appConfig.canEnableOrbotProxy()) {
-            val s = persistentState.proxyProvider.lowercase().replaceFirstChar(Char::titlecase)
-            if (s.lowercase() == AppConfig.ProxyProvider.CUSTOM.name.lowercase()) {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.settings_orbot_disabled_error),
-                    Toast.LENGTH_SHORT
-                )
-            } else {
-                showToastUiCentered(
-                    this,
-                    getString(R.string.settings_socks5_disabled_error, s),
-                    Toast.LENGTH_SHORT
-                )
+                openOrbotBottomSheet()
             }
-            return
         }
-
-        openOrbotBottomSheet()
     }
 
     private fun openWireguardActivity() {
@@ -586,7 +593,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
     }
 
-    private fun showSocks5ProxyDialog(endpoint: ProxyEndpoint, appNames: List<String>) {
+    private fun showSocks5ProxyDialog(endpoint: ProxyEndpoint, appNames: List<String>, appName: String) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val dialogBinding = DialogSetProxyBinding.inflate(layoutInflater)
@@ -630,11 +637,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     endpoint.proxyAppName != getString(R.string.settings_app_list_default_app)
             ) {
 
-                val packageName = endpoint.proxyAppName
-                val app = FirewallManager.getAppInfoByPackage(packageName)
+
                 var position = 0
                 for ((i, item) in appNames.withIndex()) {
-                    if (item == app?.appName) {
+                    if (item == appName) {
                         position = i
                     }
                 }
@@ -777,7 +783,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.settingsActivityHttpProxySwitch.isEnabled = canEnableProxy
     }
 
-    private fun showHttpProxyDialog(endpoint: ProxyEndpoint, appNames: List<String>) {
+    private fun showHttpProxyDialog(endpoint: ProxyEndpoint, appNames: List<String>, appName: String?) {
         val defaultHost = "http://127.0.0.1:8118"
         var host: String
         val dialog = Dialog(this)
@@ -828,12 +834,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 !endpoint.proxyAppName.isNullOrBlank() &&
                     endpoint.proxyAppName != getString(R.string.settings_app_list_default_app)
             ) {
-
-                val packageName = endpoint.proxyAppName
-                val app = FirewallManager.getAppInfoByPackage(packageName)
                 var position = 0
                 for ((i, item) in appNames.withIndex()) {
-                    if (item == app?.appName) {
+                    if (item == appName) {
                         position = i
                     }
                 }
