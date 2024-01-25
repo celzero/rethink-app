@@ -118,7 +118,7 @@
     <string name="settings_ptrans_desc">Traduit le trafic sortant IPv6 en IPv4 sur l’appareil. Activez cette option si vous êtes connecté à un réseau uniquement IPv4.</string>
     <string name="settings_allow_bypass_desc">Autorisez les applications requérantes à accéder à tous les réseaux disponibles. Ces applications peuvent contourner le tunnel VPN de Rethink à la demande. Certaines applications de conférence audio/vidéo comme Zoom et Meet peuvent en avoir besoin pour fonctionner correctement.</string>
     <string name="settings_lock_down_mode_desc">Certaines options sont désactivées lorsque le VPN est en mode de verrouillage. <u>Voir les paramètres VPN</u>.</string>
-    <string name="settings_https_desc">Ce paramètre n’est qu’une recommandation, certaines applications pourraient l’ignorer. Les applications utilisant le proxy HTTP(S) contourneront les règles du pare-feu et du DNS.</string>
+    <string name="settings_https_desc">Transférer les connexions vers le point de connexion HTTP(S).</string>
     <string name="orbot_http_desc">Recommande que les applications utilisent le proxy HTTP d’Orbot.</string>
     <string name="orbot_bs_status_2">Le proxy HTTP est défini (des applications pourraient l’ignorer).</string>
     <string name="orbot_stop_dialog_title">Intervention manuelle requise</string>
@@ -373,7 +373,7 @@
     <string name="download_update_dialog_message_ok">Vous êtes déjà sur la dernière version.</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiée</string>
     <string name="settings_ip_network_desc">Choisissez entre les versions du protocole Internet.</string>
-    <string name="settings_https_heading">Configuration du proxy HTTP(S)</string>
+    <string name="settings_https_heading">Configuration du proxy HTTP(S) de connexion</string>
     <string name="orbot_install_dialog_neutral">site Web</string>
     <string name="settings_orbot_header">Orbot ❯</string>
     <string name="orbot_bs_status_1">Transfert de %1$s connexions à Orbot.</string>
@@ -403,7 +403,7 @@
     <string name="about_settings">système</string>
     <string name="univ_firewall_dialog_title">Supprimer la règle IP \?</string>
     <string name="blocklist_update_check_failure">Un problème est survenu. Essayez à nouveau plus tard !</string>
-    <string name="http_proxy_dialog_heading">Définir le proxy HTTP(S)</string>
+    <string name="http_proxy_dialog_heading">Définir le proxy HTTP(S) de connection</string>
     <string name="app_mode_dns_low_battery">DNS (économise la batterie)</string>
     <string name="settings_ip_text_ipv46">Auto</string>
     <string name="apps_icon_content_desc">Icône de l’application</string>
@@ -709,7 +709,7 @@
     <string name="firewall_act_network_monitor_tab">Réseau</string>
     <string name="dns_crypt_url_remove_success">Résolveur DNSCrypt supprimé.</string>
     <string name="local_blocklist_download">Télécharger les listes de blocage</string>
-    <string name="whats_dialog_title">Quoi de neuf dans la v054c</string>
+    <string name="whats_dialog_title">Quoi de neuf dans la v055a</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_stop_dialog_neutral">Changer de DNS</string>
@@ -878,7 +878,7 @@
     <string name="bad_config_reason_invalid_value" translatable="true">Valeur invalide</string>
     <string name="lbl_day" translatable="true">jour</string>
     <string name="lbl_fast" translatable="true">rapide</string>
-    <string name="search_proxy_add_apps" translatable="true">Chercher les applications par nom</string>
+    <string name="search_proxy_add_apps" translatable="true">Rechercher des applications par nom</string>
     <string name="lbl_inactive" translatable="true">Inactif</string>
     <string name="lbl_addresses" translatable="true">Adresses</string>
     <string name="lbl_active" translatable="true">Actif</string>
@@ -898,10 +898,10 @@
     <string name="lbl_select_all" translatable="true">Tout sélectionner</string>
     <string name="lbl_create" translatable="true">Créer</string>
     <string name="http_proxy_dialog_desc" translatable="true">Configuration de l\'URL de forme, &lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exemple: http://proxy.example.com:8080/</string>
-    <string name="status_protected_with_wg_private_dns" translatable="true">protégé avec wireguard &amp; dns privé</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">Protégé avec Wireguard &amp; DNS privé</string>
     <string name="bad_config_reason_syntax_error" translatable="true">Erreur de syntaxe</string>
     <string name="lbl_listen_port" translatable="true">Port d\'écoute</string>
-    <string name="lbl_random" translatable="true">(au hasard)</string>
+    <string name="lbl_random" translatable="true">(aléatoire)</string>
     <string name="config_delete_success_toast">Configuration supprimée</string>
     <string name="bad_config_explanation_pka" translatable="true">: Doit être positif et pas plus de 65535</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Ne pas validez les certificats TLS du serveur (uniquement si vous savez ce que vous faites)</string>
@@ -976,4 +976,9 @@
     <string name="illegal_filename_error" translatable="true">Nom de fichier illégal “%s”</string>
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="parse_error_inet_endpoint" translatable="true">Serveur distant</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Notification persistante</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">Rendre la notification persistante</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Keepalive persistant</string>
+    <string name="parse_error_reason" translatable="true">Impossible d\'analyser %1$s “%2$s”</string>
+    <string name="lbl_insecure" translatable="true">(non sécurisé)</string>
 </resources>
