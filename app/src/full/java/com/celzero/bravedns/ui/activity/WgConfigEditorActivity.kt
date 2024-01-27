@@ -79,10 +79,6 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         io {
             wgConfig = WireguardManager.getConfigById(configId)
             wgInterface = wgConfig?.getInterface()
-            Log.d(
-                "TEST",
-                "wgInterface: $wgInterface, privateKey: ${wgInterface?.getKeyPair()?.getPrivateKey()?.base64()}, publicKey: ${wgInterface?.getKeyPair()?.getPublicKey()?.base64()}"
-            )
 
             uiCtx {
                 b.interfaceNameText.setText(wgConfig?.getName())

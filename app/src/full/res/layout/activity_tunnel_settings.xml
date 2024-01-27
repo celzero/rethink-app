@@ -267,7 +267,7 @@
                             style="@style/TextAppearance.AppCompat.Subhead"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Rethink within Rethink"
+                            android:text="@string/settings_rinr_heading"
                             android:textSize="@dimen/large_font_text_view" />
 
                         <TextView
@@ -275,7 +275,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="Rethink within Rethink"
+                            android:text="@string/settings_rinr_desc"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 
@@ -465,64 +465,6 @@
 
                 </RelativeLayout>
 
-                <RelativeLayout
-                    android:id="@+id/settings_activity_mtu_rl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:paddingTop="15dp"
-                    android:visibility="gone"
-                    android:paddingBottom="20dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_activity_mtu_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:alpha="0.5"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_ip_network" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/settings_activity_mtu_switch"
-                        android:layout_toEndOf="@id/settings_activity_mtu_icon"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/gen_settings_mtu_txt"
-                            style="@style/TextAppearance.AppCompat.Subhead"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Max MTU (experimental)"
-                            android:textSize="@dimen/large_font_text_view" />
-
-                        <TextView
-                            android:id="@+id/gen_settings_mtu_desc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingTop="5dp"
-                            android:text="Use Max MTU"
-                            android:textSize="@dimen/default_font_text_view" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settings_activity_mtu_switch"
-                        style="@style/CustomWidget.MaterialComponents.CompoundButton.Switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:padding="10dp"
-                        android:src="@drawable/ic_right_arrow_small" />
-
-                </RelativeLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

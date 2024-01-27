@@ -77,8 +77,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsActivityPtransSwitch.isChecked = false
         }
 
-        b.settingsActivityMtuSwitch.isChecked = persistentState.useMaxMtu
-
         displayInternetProtocolUi()
         displayRethinkInRethinkUi()
     }
@@ -167,14 +165,6 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         }
 
         b.settingsActivityDefaultDnsRl.setOnClickListener { showDefaultDnsDialog() }
-
-        b.settingsActivityMtuSwitch.setOnCheckedChangeListener { _, isSelected ->
-            persistentState.useMaxMtu = isSelected
-        }
-
-        b.settingsActivityMtuRl.setOnClickListener {
-            b.settingsActivityMtuSwitch.isChecked = !b.settingsActivityMtuSwitch.isChecked
-        }
     }
 
     private fun showDefaultDnsDialog() {
@@ -236,9 +226,9 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
     private fun displayRethinkInRethinkUi() {
         b.settingsRInRSwitch.isChecked = persistentState.routeRethinkInRethink
         if (persistentState.routeRethinkInRethink) {
-            b.genRInRDesc.text = "Rethink will route its own traffic through the VPN"
+            b.genRInRDesc.text = getString(R.string.settings_rinr_desc_enabled)
         } else {
-            b.genRInRDesc.text = "Rethink will not route its own traffic through the VPN"
+            b.genRInRDesc.text = getString(R.string.settings_rinr_desc_disabled)
         }
     }
 

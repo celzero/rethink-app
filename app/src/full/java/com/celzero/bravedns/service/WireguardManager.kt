@@ -121,7 +121,6 @@ object WireguardManager : KoinComponent {
         if (config == null) {
             Log.e(LOG_TAG_PROXY, "getConfigFilesById: wg not found: $id, ${configs.size}")
         }
-        Log.d("TEST", "getConfigFilesById exit: $id, ${config?.name}")
         return config
     }
 

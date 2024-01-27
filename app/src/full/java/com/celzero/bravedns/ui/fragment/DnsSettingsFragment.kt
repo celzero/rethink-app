@@ -379,7 +379,7 @@ class DnsSettingsFragment :
         b.wireguardRb.setOnClickListener {
             Utilities.showToastUiCentered(
                 requireContext(),
-                "Connected to One-WireGuard",
+                requireContext().getString(R.string.one_wg_success_toast),
                 Toast.LENGTH_LONG
             )
         }

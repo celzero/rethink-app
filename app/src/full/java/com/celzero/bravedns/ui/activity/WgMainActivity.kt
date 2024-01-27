@@ -325,7 +325,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
             if (WireguardManager.oneWireGuardEnabled()) {
                 Toast.makeText(
                     this,
-                    "Please disable the one wireguard interface to use general interface",
+                    getString(R.string.one_wg_error_toast),
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
