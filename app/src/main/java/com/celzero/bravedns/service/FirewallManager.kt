@@ -47,6 +47,21 @@ object FirewallManager : KoinComponent {
 
     const val NOTIF_CHANNEL_ID_FIREWALL_ALERTS = "Firewall_Alerts"
 
+    // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java
+    private const val PER_USER_RANGE = 100000
+
+    // lo part is the uid within the user and hi part is the userId
+    // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#224
+    fun appId(uid: Int): Int {
+        return uid % PER_USER_RANGE
+    }
+
+    // hi part is the userId and lo part is the uid within the user
+    // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#183
+    fun userId(uid: Int): Int {
+        return uid / PER_USER_RANGE
+    }
+
     // Below are the firewall rule set
     // app-status | connection-status |  Rule
     // none       |    ALLOW          |  allow
