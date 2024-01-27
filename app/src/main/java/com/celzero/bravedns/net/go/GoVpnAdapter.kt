@@ -38,6 +38,7 @@ import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_DOMAIN
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
+import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
@@ -47,10 +48,12 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
 import dnsx.Dnsx
 import dnsx.RDNS
+import dnsx.Resolver
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
+import ipn.Proxies
 import java.net.InetAddress
 import java.net.URI
 import kotlinx.coroutines.CoroutineScope
@@ -127,17 +130,21 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    fun setRoute(tunnelOptions: TunnelOptions) {
+    private fun setRoute(tunnelOptions: TunnelOptions) {
         try {
             // setRoute can throw exception iff preferredEngine is invalid, which is not possible
-            tunnel.setRoute(tunnelOptions.preferredEngine.value())
+            // Log.d(LOG_TAG_VPN, "set route: ${tunnelOptions.preferredEngine.value()}")
+            // tunnel.setRoute(tunnelOptions.preferredEngine.value())
+            // above code is commented as the route is now set as default instead of preferred
+            tunnel.setRoute(InternetProtocol.IPv46.value())
+
             // on route change, set the tun mode again for ptMode
             tunnel.setTunMode(
                 tunnelOptions.tunDnsMode.mode,
                 tunnelOptions.tunFirewallMode.mode,
                 tunnelOptions.ptMode.id
             )
-            Log.i(LOG_TAG_VPN, "set route: ${tunnelOptions.preferredEngine.value()}")
+            Log.i(LOG_TAG_VPN, "set route: ${InternetProtocol.IPv46.value()}")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "err setting route: ${e.message}", e)
         }
@@ -176,7 +183,8 @@ class GoVpnAdapter : KoinComponent {
                 addDnsProxyTransport(Dnsx.Preferred)
             }
             AppConfig.DnsType.SYSTEM_DNS -> {
-                setSystemDns()
+                addSystemDnsAsTransport(Dnsx.BlockFree)
+                addSystemDnsAsTransport(Dnsx.Preferred)
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 // only rethink has different stamp for block free transport
@@ -215,7 +223,6 @@ class GoVpnAdapter : KoinComponent {
             if (ips.isEmpty()) {
                 ips = resolveName(url)?.joinToString { it }.orEmpty()
             }
-            Log.d("TEST_dnsRequestParse", "ips: $ips")
             Intra.addDoHTransport(tunnel, id, url, ips)
             Log.i(LOG_TAG_VPN, "new doh: $id (${doh?.dohName}), url: $url")
         } catch (e: Exception) {
@@ -300,6 +307,16 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy failure", e)
             showDnsProxyConnectionFailureToast()
+        }
+    }
+
+    private suspend fun addSystemDnsAsTransport(id: String) {
+        try {
+            val dns = appConfig.getSystemDns()
+            Intra.addDNSProxy(tunnel, id, dns.ipAddress, dns.port.toString())
+            Log.i(LOG_TAG_VPN, "new system dns ip: ${dns.ipAddress}, port: ${dns.port}")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "connect-tunnel: system dns failure", e)
         }
     }
 
@@ -391,7 +408,7 @@ class GoVpnAdapter : KoinComponent {
                 setRDNSLocal()
             } else {
                 // remove local blocklist, if any
-                tunnel.resolver?.setRdnsLocal(null, null, null, null)
+                getResolver()?.setRdnsLocal(null, null, null, null)
             }
 
             // always set the remote blocklist
@@ -411,7 +428,7 @@ class GoVpnAdapter : KoinComponent {
             val remoteFile =
                 blocklistFile(remoteDir.absolutePath, ONDEVICE_BLOCKLIST_FILE_TAG) ?: return
             if (remoteFile.exists()) {
-                tunnel.resolver?.setRdnsRemote(remoteFile.absolutePath)
+                getResolver()?.setRdnsRemote(remoteFile.absolutePath)
                 Log.i(LOG_TAG_VPN, "remote-rdns enabled")
             } else {
                 Log.w(LOG_TAG_VPN, "filetag.json for remote-rdns missing")
@@ -455,7 +472,7 @@ class GoVpnAdapter : KoinComponent {
                 } else {
                     ProxyManager.ID_S5_BASE
                 }
-            val result = tunnel.proxies?.addProxy(id, url)
+            val result = getProxies()?.addProxy(id, url)
             Log.i(LOG_TAG_VPN, "Proxy mode set with tunnel url($id): $url, result: $result")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: err start proxy $userName@$ipAddress:$port", e)
@@ -523,10 +540,9 @@ class GoVpnAdapter : KoinComponent {
             val id = ID_WG_BASE + it.getId()
             val isDnsNeeded = WireguardManager.getOneWireGuardProxyId() == it.getId()
             try {
-                if (DEBUG)
-                    Log.d(LOG_TAG_VPN, "add wireguard proxy with id: $id, $wgUserSpaceString")
-                Log.d("ProxyLogs", "add wg proxy with id: $id, $wgUserSpaceString")
-                tunnel.proxies?.addProxy(id, wgUserSpaceString)
+                if (DEBUG) Log.d(LOG_TAG_VPN, "add wireguard proxy with id: $id")
+
+                getProxies()?.addProxy(id, wgUserSpaceString)
                 if (isDnsNeeded) {
                     setWireGuardDns(id)
                 }
@@ -542,7 +558,7 @@ class GoVpnAdapter : KoinComponent {
 
     private fun setWireGuardDns(id: String) {
         try {
-            val p = tunnel.proxies?.getProxy(id)
+            val p = getProxies()?.getProxy(id)
             if (p == null) {
                 Log.w(LOG_TAG_VPN, "wireguard proxy not found for id: $id")
                 return
@@ -588,7 +604,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun getProxyStatusById(id: String): Long? {
         return try {
-            val status = tunnel.proxies?.getProxy(id)?.status()
+            val status = getProxies()?.getProxy(id)?.status()
             if (DEBUG) Log.d(LOG_TAG_VPN, "getProxyStatusById: $id, $status")
             status
         } catch (ignored: Exception) {
@@ -610,7 +626,7 @@ class GoVpnAdapter : KoinComponent {
                 }
             val httpProxyUrl = endpoint?.proxyIP ?: return
 
-            tunnel.proxies?.addProxy(id, httpProxyUrl)
+            getProxies()?.addProxy(id, httpProxyUrl)
             Log.i(LOG_TAG_VPN, "Http mode set with url: $httpProxyUrl")
         } catch (e: Exception) {
             if (tunProxyMode.isTunProxyOrbot()) {
@@ -628,7 +644,7 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         try {
-            tunnel.proxies?.removeProxy(id)
+            getProxies()?.removeProxy(id)
             Log.i(LOG_TAG_VPN, "remove wireguard proxy with id: $id")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error removing wireguard proxy: ${e.message}", e)
@@ -644,7 +660,7 @@ class GoVpnAdapter : KoinComponent {
             val proxyId: Int = id.substring(ID_WG_BASE.length).toInt()
             val wgConfig = WireguardManager.getConfigById(proxyId)
             val wgUserSpaceString = wgConfig?.toWgUserspaceString()
-            tunnel.proxies?.addProxy(id, wgUserSpaceString)
+            getProxies()?.addProxy(id, wgUserSpaceString)
             Log.i(LOG_TAG_VPN, "add wireguard proxy with id: $id")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error adding wireguard proxy: ${e.message}", e)
@@ -655,13 +671,24 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
+    fun closeConnections(connIds: List<String>) {
+        if (!tunnel.isConnected) {
+            Log.i(LOG_TAG_VPN, "Tunnel not connected, skip disconnecting connection")
+            return
+        }
+
+        val connIdsStr = connIds.joinToString(",")
+        val res = tunnel.closeConns(connIdsStr)
+        Log.i(LOG_TAG_VPN, "close connection: $connIds, res: $res")
+    }
+
     fun refreshProxiesLocked() {
         if (!tunnel.isConnected) {
             Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip refreshing proxies")
             return
         }
         try {
-            val res = tunnel.proxies?.refreshProxies()
+            val res = getProxies()?.refreshProxies()
             Log.i(LOG_TAG_VPN, "refresh proxies: $res")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error refreshing proxies: ${e.message}", e)
@@ -670,8 +697,7 @@ class GoVpnAdapter : KoinComponent {
 
     fun getDnsStatus(id: String): Long? {
         try {
-            val status = tunnel.resolver?.get(id)?.status()
-            return status
+            return getResolver()?.get(id)?.status()
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "err getDnsStatus($id): ${e.message}", e)
         }
@@ -680,9 +706,9 @@ class GoVpnAdapter : KoinComponent {
 
     fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
         return if (type.isLocal()) {
-            tunnel.resolver?.rdnsLocal
+            getResolver()?.rdnsLocal
         } else {
-            tunnel.resolver?.rdnsRemote
+            getResolver()?.rdnsRemote
         }
     }
 
@@ -703,7 +729,7 @@ class GoVpnAdapter : KoinComponent {
         Log.d(LOG_TAG_VPN, "ips: $ips")
         // svc.rethinkdns.com / duplex.deno.dev
         val testpipwsurl = "pipws://proxy.nile.workers.dev/ws/nosig"
-        val ok = tunnel.proxies?.addProxy(ProxyManager.ID_TCP_BASE, testpipwsurl)
+        val ok = getProxies()?.addProxy(ProxyManager.ID_TCP_BASE, testpipwsurl)
         if (DEBUG) Log.d(LOG_TAG_VPN, "tcp-mode(${ProxyManager.ID_TCP_BASE}): ${u.url}, ok? $ok")
 
         val secWarp = WireguardManager.getSecWarpConfig()
@@ -712,7 +738,7 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         val wgUserSpaceString = secWarp.toWgUserspaceString()
-        val ok2 = tunnel.proxies?.addProxy(ID_WG_BASE + secWarp.getId(), wgUserSpaceString)
+        val ok2 = getProxies()?.addProxy(ID_WG_BASE + secWarp.getId(), wgUserSpaceString)
         if (DEBUG)
             Log.d(
                 LOG_TAG_VPN,
@@ -725,9 +751,7 @@ class GoVpnAdapter : KoinComponent {
     }
 
     fun refreshResolvers() {
-        if (tunnel.isConnected) {
-            tunnel.resolver?.refresh()
-        }
+        getResolver()?.refresh()
     }
 
     fun closeTun() {
@@ -740,32 +764,39 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private fun newDefaultTransport(url: String): intra.DefaultDNS {
+        val defaultDns = "8.8.4.4:53"
         try {
-            var ips: String = getIpString(context, url)
+            // when the url is empty, set the default transport to 8.8.4.4:53
+            if (url.isEmpty()) {
+                Log.i(LOG_TAG_VPN, "set default transport to 8.8.4.4, as url is empty")
+                return Intra.newDefaultDNS(Dnsx.DNS53, defaultDns, "")
+            }
+            val ips: String = getIpString(context, url)
             if (DEBUG) Log.d(LOG_TAG_VPN, "default transport url: $url ips: $ips")
             if (url.contains("http")) {
                 return Intra.newDefaultDNS(Dnsx.DOH, url, ips)
             }
-            // no need to set url for dns53
-            ips = url
-            return Intra.newDefaultDNS(Dnsx.DNS53, "" , ips)
+            // no need to set ips for dns53
+            return Intra.newDefaultDNS(Dnsx.DNS53, url, "")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
-            return Intra.newDefaultDNS(Dnsx.DNS53, "", "8.8.4.4")
+            return Intra.newDefaultDNS(Dnsx.DNS53, defaultDns, "")
         }
     }
 
     fun addDefaultTransport(url: String?) {
+        val defaultDns = "8.8.4.4:53"
         try {
             if (!tunnel.isConnected) {
-                Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip new default transport")
+                Log.i(LOG_TAG_VPN, "Tunnel not connected, skip new default transport")
                 return
             }
-            // when the user has selected none as the dns mode, we use the grounded transport
+            // when the url is empty, set the default transport to 8.8.4.4:53
             if (url.isNullOrEmpty()) {
-                Log.i(LOG_TAG_VPN, "set default transport to null, as dns mode is none")
+                Log.i(LOG_TAG_VPN, "set default transport to 8.8.4.4, as url is empty")
+                Intra.addDefaultTransport(tunnel, Dnsx.DNS53, defaultDns, "")
                 return
             }
 
@@ -774,17 +805,18 @@ class GoVpnAdapter : KoinComponent {
             if (url.contains("http")) {
                 Intra.addDefaultTransport(tunnel, Dnsx.DOH, url, ips)
             } else {
-                Intra.addDefaultTransport(tunnel, Dnsx.DNS53, url, ips)
+                Intra.addDefaultTransport(tunnel, Dnsx.DNS53, url, "")
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "err new default transport: ${e.message}", e)
             // most of the android devices have google dns, so add it as default transport
             // TODO: notify the user that the default transport could not be set
-            Intra.addDefaultTransport(tunnel, Dnsx.DNS53,"8.8.4.4", "")
+            Intra.addDefaultTransport(tunnel, Dnsx.DNS53, defaultDns, "")
         }
     }
 
     suspend fun setSystemDns() {
+        val defaultDns = "8.8.4.4:53"
         if (!tunnel.isConnected) {
             Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip setting system-dns")
         }
@@ -794,22 +826,23 @@ class GoVpnAdapter : KoinComponent {
             // TODO: system dns may be non existent; see: AppConfig#updateSystemDnsServers
             dnsProxy = HostName(IPAddressString(systemDns.ipAddress).address, systemDns.port)
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "setSystemDns: could not parse system dns", e)
+            Log.e(LOG_TAG_VPN, "set system dns: could not parse system dns", e)
         }
 
         if (dnsProxy == null || dnsProxy.host.isNullOrEmpty() || !isValidPort(dnsProxy.port)) {
-            Log.e(LOG_TAG_VPN, "setSystemDns: unset dnsProxy: $dnsProxy")
+            Log.e(LOG_TAG_VPN, "setSystemDns: unset dns proxy: $dnsProxy")
             // if system dns is empty, then remove the existing system dns from the tunnel
             // by setting it to empty string
-            Intra.setSystemDNS(tunnel, "")
+            Intra.setSystemDNS(tunnel, defaultDns)
             return
         }
 
         // below code is commented out, add the code to set the system dns via resolver
         // val transport = Intra.newDNSProxy("ID", dnsProxy.host, dnsProxy.port.toString())
         // tunnel?.resolver?.addSystemDNS(transport)
-        Log.d(LOG_TAG_VPN, "setSystemDns: ${dnsProxy.toNormalizedString()}")
-        Intra.setSystemDNS(tunnel, dnsProxy.toNormalizedString())
+        Log.d(LOG_TAG_VPN, "set system dns: ${dnsProxy.host}")
+        // no need to send the dnsProxy.port for the below method, as it is not expecting port
+        Intra.setSystemDNS(tunnel, dnsProxy.host)
 
         // add appropriate transports to the tunnel, if system dns is enabled
         if (appConfig.isSystemDns()) {
@@ -856,19 +889,19 @@ class GoVpnAdapter : KoinComponent {
         // since apps cannot understand alg ips
         if (appConfig.getBraveMode().isDnsMode()) {
             Log.i(LOG_TAG_VPN, "dns mode, set translate to false")
-            tunnel.resolver?.gateway()?.translate(false)
+            getResolver()?.gateway()?.translate(false)
             return
         }
 
         Log.i(LOG_TAG_VPN, "set dns alg: ${persistentState.enableDnsAlg}")
-        tunnel.resolver?.gateway()?.translate(persistentState.enableDnsAlg)
+        getResolver()?.gateway()?.translate(persistentState.enableDnsAlg)
     }
 
     fun setRDNSStamp() {
         try {
-            if (tunnel.resolver?.rdnsLocal != null) {
+            if (getResolver()?.rdnsLocal != null) {
                 Log.i(LOG_TAG_VPN, "set local stamp: ${persistentState.localBlocklistStamp}")
-                tunnel.resolver?.rdnsLocal?.stamp = persistentState.localBlocklistStamp
+                getResolver()?.rdnsLocal?.stamp = persistentState.localBlocklistStamp
             } else {
                 Log.w(LOG_TAG_VPN, "mode is not local, this should not happen")
             }
@@ -881,12 +914,12 @@ class GoVpnAdapter : KoinComponent {
 
     private fun resetLocalBlocklistStampFromTunnel() {
         try {
-            if (tunnel.resolver?.rdnsLocal == null) {
+            if (getResolver()?.rdnsLocal == null) {
                 Log.i(LOG_TAG_VPN, "mode is not local, no need to reset local stamp")
                 return
             }
 
-            persistentState.localBlocklistStamp = tunnel.resolver?.rdnsLocal?.stamp ?: ""
+            persistentState.localBlocklistStamp = getResolver()?.rdnsLocal?.stamp ?: ""
             if (DEBUG)
                 Log.d(LOG_TAG_VPN, "reset local stamp: ${persistentState.localBlocklistStamp}")
         } catch (e: Exception) {
@@ -906,13 +939,14 @@ class GoVpnAdapter : KoinComponent {
                     Constants.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     persistentState.localBlocklistTimestamp
                 )
-            tunnel.resolver?.setRdnsLocal(
-                path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
-                path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
-                path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                path + ONDEVICE_BLOCKLIST_FILE_TAG
-            )
-            tunnel.resolver?.rdnsLocal?.stamp = stamp
+            getResolver()
+                ?.setRdnsLocal(
+                    path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
+                    path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
+                    path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
+                    path + ONDEVICE_BLOCKLIST_FILE_TAG
+                )
+            getResolver()?.rdnsLocal?.stamp = stamp
             Log.i(LOG_TAG_VPN, "local brave dns object is set")
         } catch (ex: Exception) {
             // Set local blocklist enabled to false and reset the timestamp
@@ -949,12 +983,44 @@ class GoVpnAdapter : KoinComponent {
 
     fun syncP50Latency(id: String) {
         try {
-            val transport = tunnel.resolver?.get(id)
+            val tid =
+                if (persistentState.enableDnsCache && !id.startsWith(Dnsx.CT)) {
+                    Dnsx.CT + id
+                } else {
+                    id
+                }
+            val transport = getResolver()?.get(tid)
             val p50 = transport?.p50() ?: return
             persistentState.setMedianLatency(p50)
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "err getP50: ${e.message}", e)
         }
+    }
+
+    private fun getResolver(): Resolver? {
+        try {
+            if (!tunnel.isConnected) {
+                Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip get resolver")
+                return null
+            }
+            return tunnel.resolver
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "err get resolver: ${e.message}", e)
+        }
+        return null
+    }
+
+    private fun getProxies(): Proxies? {
+        try {
+            if (!tunnel.isConnected) {
+                Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip get proxies")
+                return null
+            }
+            return tunnel.proxies
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_VPN, "err get proxies: ${e.message}", e)
+        }
+        return null
     }
 
     private fun io(f: suspend () -> Unit) {

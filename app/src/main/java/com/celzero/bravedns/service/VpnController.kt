@@ -23,6 +23,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import dnsx.RDNS
@@ -246,8 +247,8 @@ object VpnController : KoinComponent {
         return t
     }
 
-    fun hasCid(cid: String): Boolean {
-        return braveVpnService?.hasCid(cid) ?: false
+    fun hasCid(cid: String, uid: Int): Boolean {
+        return braveVpnService?.hasCid(cid, uid) ?: false
     }
 
     fun removeWireGuardProxy(id: String) {
@@ -264,6 +265,10 @@ object VpnController : KoinComponent {
 
     fun updateWireGuardConfig() {
         braveVpnService?.updateWireGuardConfig()
+    }
+
+    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
+        braveVpnService?.closeConnectionsIfNeeded(uid)
     }
 
     suspend fun getDnsStatus(id: String): Long? {
