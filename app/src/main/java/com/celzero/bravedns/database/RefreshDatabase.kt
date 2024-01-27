@@ -37,7 +37,6 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.FirewallManager.deletePackage
-import com.celzero.bravedns.service.IPTracker
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
@@ -86,7 +85,6 @@ internal constructor(
         const val ACTION_INSERT_NEW_APP = ACTION_BASE + 5
         const val PENDING_INTENT_REQUEST_CODE_ALLOW = 0x10000000
         const val PENDING_INTENT_REQUEST_CODE_DENY = 0x20000000
-        private const val PER_USER_RANGE = 100000
     }
 
     private val randomNotifId: Random = Random
@@ -214,9 +212,10 @@ internal constructor(
     ): Set<FirewallManager.AppInfoTuple> {
         return if (ignoreUid) {
             val latestpkgs = latest.map { it.packageName }.toSet()
-            old.filter { !latestpkgs.contains(it.packageName) }.toSet()
+            old.filter { !latestpkgs.contains(it.packageName) || !isNonApp(it.packageName) }.toSet()
         } else {
-            Sets.difference(old, latest) // extract old apps that are not latest
+            // extract old apps that are not latest
+            Sets.difference(old, latest).filter { !isNonApp(it.packageName) }.toSet()
         }
     }
 
@@ -279,8 +278,8 @@ internal constructor(
         apps.forEach {
             // no need to avoid adding Rethink app to the database, so commenting the below line
             // if (it.packageName == context.applicationContext.packageName) return@forEach
-            val appInfo = Utilities.getApplicationInfo(context, it.packageName) ?: return@forEach
-            insertApp(appInfo)
+            val ai = Utilities.getApplicationInfo(context, it.packageName) ?: return@forEach
+            insertApp(ai)
         }
         maybeSendNewAppNotification(apps)
     }
@@ -315,17 +314,20 @@ internal constructor(
 
     private suspend fun maybeInsertApp(uid: Int) {
         val knownUid = FirewallManager.hasUid(uid)
+        if (knownUid) {
+            Log.i(LOG_TAG_APP_DB, "insertApp: $uid already tracked")
+            return
+            }
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
-        Log.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}, k? $knownUid")
+        Log.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}")
         if (ai != null) {
+            // uid may be different from the one in ai, if the app is installed in a different user
             insertApp(ai)
         } else {
             insertUnknownApp(uid)
         }
-        if (!knownUid) { // show notification only if this uid was not already tracked
             showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, pkg))
-        }
     }
 
     private fun maybeFetchAppInfo(uid: Int): ApplicationInfo? {
@@ -334,19 +336,12 @@ internal constructor(
         return fetchApplicationInfo(uid)
     }
 
-    private fun fetchApplicationInfo(_uid: Int): ApplicationInfo? {
-        // Returns the app id (base uid) for a given uid, stripping out the user id from it.
-        // http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#224
-        val uid = _uid % PER_USER_RANGE
-
-        // get packages for uid
-        val packageNameList = Utilities.getPackageInfoForUid(context, uid)
-        if (packageNameList.isNullOrEmpty()) return null
+    private fun fetchApplicationInfo(uid: Int): ApplicationInfo? {
+        val pkgs = Utilities.getPackageInfoForUid(context, uid)
         // return the first appinfo for a given uid (there could be multiple)
-        packageNameList.forEach {
+        pkgs?.forEach {
             return Utilities.getApplicationInfo(context, it) ?: return@forEach
         }
-
         return null
     }
 
@@ -423,15 +418,17 @@ internal constructor(
         FirewallManager.updateUid(oldUid, newUid, pkg)
     }
 
-    private suspend fun insertApp(appInfo: ApplicationInfo) {
-        val appName = context.packageManager.getApplicationLabel(appInfo).toString()
-        val isSystemApp = isSystemApp(appInfo)
+    private suspend fun insertApp(ai: ApplicationInfo) {
+        val appName = context.packageManager.getApplicationLabel(ai).toString()
+        val isSystemApp = isSystemApp(ai)
         val entry = AppInfo(null)
 
         entry.appName = appName
 
-        entry.packageName = appInfo.packageName
-        entry.uid = appInfo.uid
+        entry.packageName = ai.packageName
+        // uid may be different from the one in ai, if the app is installed in a different user
+        // see: fetchApplicationInfo()
+        entry.uid = ai.uid
         entry.isSystemApp = isSystemApp
 
         // do not firewall app by default, if blockNewlyInstalledApp is set to false
@@ -443,9 +440,9 @@ internal constructor(
             entry.connectionStatus = FirewallManager.ConnectionStatus.ALLOW.id
         }
 
-        entry.appCategory = determineAppCategory(appInfo)
+        entry.appCategory = determineAppCategory(ai)
 
-        Log.i(LOG_TAG_APP_DB, "insert app: $appInfo")
+        Log.i(LOG_TAG_APP_DB, "insert app: $ai")
         FirewallManager.persistAppInfo(entry)
         ProxyManager.addNewApp(entry)
     }
