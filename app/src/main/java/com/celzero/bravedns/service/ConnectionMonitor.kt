@@ -209,7 +209,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         handleNetworkChange(isForceUpdate = true)
     }
 
-    private fun handleNetworkChange(isForceUpdate: Boolean = false, delay: Long = 0L) {
+    private fun handleNetworkChange(
+        isForceUpdate: Boolean = false,
+        delay: Long = TimeUnit.SECONDS.toMillis(1)
+    ) {
         val isDualStack = InternetProtocol.isAuto(persistentState.internetProtocolType)
         val testReachability = isDualStack && !androidValidatedNetworks
         val msg =
@@ -518,17 +521,18 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val newNetworks: LinkedHashSet<NetworkProperties> = linkedSetOf()
             // add active network first, then add non metered networks, then metered networks
             val activeNetwork = connectivityManager.activeNetwork
-            val n = networks.filter { it.network == activeNetwork }
-            if (n.isNotEmpty()) {
-                newNetworks.add(n[0])
+            val n = networks.firstOrNull { it.network == activeNetwork }
+            if (n != null) {
+                newNetworks.add(n)
             }
             val nonMeteredNetworks =
-                networks.filter {
-                    it.network != activeNetwork && isConnectionNotMetered(it.capabilities)
+                networks.filter { isConnectionNotMetered(it.capabilities) }
+            nonMeteredNetworks.forEach {
+                if (!newNetworks.contains(it)) {
+                    newNetworks.add(it)
                 }
-            if (nonMeteredNetworks.isNotEmpty()) {
-                newNetworks.addAll(nonMeteredNetworks)
             }
+            // add remaining networks, ie, metered networks
             networks.forEach {
                 if (!newNetworks.contains(it)) {
                     newNetworks.add(it)
