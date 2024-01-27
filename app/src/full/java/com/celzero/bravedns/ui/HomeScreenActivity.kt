@@ -177,8 +177,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         )
                         if (biometricPromptRetry > 0) {
                             Log.i(LOG_TAG_UI, "Biometric auth retry: $biometricPromptRetry")
-                            biometricPrompt.authenticate(promptInfo)
                             biometricPromptRetry--
+                            biometricPrompt.authenticate(promptInfo)
                         } else {
                             showToastUiCentered(
                                 applicationContext,
@@ -194,6 +194,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     ) {
                         super.onAuthenticationSucceeded(result)
                         persistentState.biometricAuthTime = System.currentTimeMillis()
+                        biometricPromptRetry = 1
                         Log.i(LOG_TAG_UI, "Biometric authentication succeeded")
                     }
 
