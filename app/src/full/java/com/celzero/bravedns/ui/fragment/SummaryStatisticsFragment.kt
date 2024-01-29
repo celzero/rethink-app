@@ -16,6 +16,7 @@
 package com.celzero.bravedns.ui.fragment
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -106,6 +107,16 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         b.tbWeeklyToggleBtn.text = getString(R.string.ci_desc, "7", getString(R.string.lbl_day))
     }
 
+    override fun onResume() {
+        super.onResume()
+        // get the tabbed view from the view model and set the toggle button
+        // to the selected one. in case of fragment resume, the recycler view
+        // and the toggle button to be in sync
+        val timeCategory = viewModel.getTimeCategory().value.toString()
+        val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
+        btn.isChecked = true
+    }
+
     private fun highlightToggleBtn() {
         val timeCategory = "0" // default is 1 hours, "0" tag is 1 hours
         val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
@@ -165,11 +176,15 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
 
     private fun selectToggleBtnUi(mb: MaterialButton) {
-        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.secondaryTextColor))
+        mb.backgroundTintList =
+            ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(requireContext(), R.color.accentGood))
+        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
     }
 
     private fun unselectToggleBtnUi(mb: MaterialButton) {
         mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+        mb.backgroundTintList =
+            ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg))
     }
 
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {

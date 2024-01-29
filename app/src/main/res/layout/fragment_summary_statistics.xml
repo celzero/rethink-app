@@ -43,7 +43,7 @@
 
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggle_group"
-            style="@style/toggleButtonNoStyle"
+            style="@style/toggleButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:checkedButton="@id/tb_recent_toggle_btn"

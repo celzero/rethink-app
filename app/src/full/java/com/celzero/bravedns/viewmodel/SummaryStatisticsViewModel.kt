@@ -26,7 +26,6 @@ import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.util.Constants
 
 class SummaryStatisticsViewModel(
@@ -38,7 +37,7 @@ class SummaryStatisticsViewModel(
     private var countryActivities: MutableLiveData<String> = MutableLiveData()
     private var domains: MutableLiveData<String> = MutableLiveData()
     private var ips: MutableLiveData<String> = MutableLiveData()
-
+    private var timeCategory: TimeCategory = TimeCategory.ONE_HOUR
     private var startTime: MutableLiveData<Long> = MutableLiveData()
 
     companion object {
@@ -73,8 +72,13 @@ class SummaryStatisticsViewModel(
         ips.value = ""
     }
 
-    fun timeCategoryChanged(timeCategory: TimeCategory, isAppBypassed: Boolean) {
-        when (timeCategory) {
+    fun getTimeCategory(): TimeCategory {
+        return timeCategory
+    }
+
+    fun timeCategoryChanged(tc: TimeCategory, isAppBypassed: Boolean) {
+        timeCategory = tc
+        when (tc) {
             TimeCategory.ONE_HOUR -> {
                 startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
             }
