@@ -15,7 +15,6 @@
  */
 package com.celzero.bravedns.ui
 
-import android.app.ActivityManager
 import android.app.UiModeManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -101,8 +100,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
-    // biometric prompt retry only 1 time
-    private var biometricPromptRetry = 1
+    private var biometricPromptRetryCount = 1
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
@@ -175,9 +173,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             LOG_TAG_UI,
                             "Biometric authentication error (code: $errorCode): $errString"
                         )
-                        if (biometricPromptRetry > 0) {
-                            Log.i(LOG_TAG_UI, "Biometric auth retry: $biometricPromptRetry")
-                            biometricPromptRetry--
+                        // error code 5, this may happen when the device is locked or another
+                        // pending operation prevents or disables it
+                        // ref issuetracker.google.com/issues/145231213
+                        if (biometricPromptRetryCount > 0 && errorCode == 5) {
+                            biometricPromptRetryCount--
                             biometricPrompt.authenticate(promptInfo)
                         } else {
                             showToastUiCentered(
@@ -193,8 +193,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                         result: BiometricPrompt.AuthenticationResult
                     ) {
                         super.onAuthenticationSucceeded(result)
+                        biometricPromptRetryCount = 1
                         persistentState.biometricAuthTime = System.currentTimeMillis()
-                        biometricPromptRetry = 1
                         Log.i(LOG_TAG_UI, "Biometric authentication succeeded")
                     }
 
@@ -217,7 +217,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 .setSubtitle(getString(R.string.hs_biometeric_desc))
                 .setAllowedAuthenticators(
                     BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
+                        BiometricManager.Authenticators.BIOMETRIC_STRONG
                 )
                 .setConfirmationRequired(false)
                 .build()
@@ -228,7 +229,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             BiometricManager.from(this)
                 .canAuthenticate(
                     BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
+                        BiometricManager.Authenticators.BIOMETRIC_STRONG
                 ) == BiometricManager.BIOMETRIC_SUCCESS
         ) {
             biometricPrompt.authenticate(promptInfo)
