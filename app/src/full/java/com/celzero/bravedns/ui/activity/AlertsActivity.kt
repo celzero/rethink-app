@@ -42,7 +42,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
 
-    private val b by viewBinding(ActivityAlertsBinding::bind)
+    /*private val b by viewBinding(ActivityAlertsBinding::bind)
     private var alertAdapter: AlertAdapter? = null
     private val persistentState by inject<PersistentState>()
     private val alertsViewModel: AlertsViewModel by viewModel()
@@ -121,7 +121,7 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
         val severity = AlertSeverity.LOW.name
         val actions = "Check network logs to either allow or block the connection"
         return AlertRegistry(
-            id = 0 /* id */, // Room auto-increments id when its set to zero.
+            id = 0 *//* id *//*, // Room auto-increments id when its set to zero.
             title,
             type,
             1,
@@ -130,12 +130,12 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
             category.name,
             severity,
             actions,
-            alertStatus = "" /* alertStatus */,
-            alertSolution = "" /* alertSolution */,
-            isRead = false /* isRead */,
-            isDeleted = false /* isDeleted */,
-            isCustom = false /* isCustom */,
-            isNotified = false /* isNotified */
+            alertStatus = "" *//* alertStatus *//*,
+            alertSolution = "" *//* alertSolution *//*,
+            isRead = false *//* isRead *//*,
+            isDeleted = false *//* isDeleted *//*,
+            isCustom = false *//* isCustom *//*,
+            isNotified = false *//* isNotified *//*
         )
     }
 
@@ -173,5 +173,5 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
-    }
+    }*/
 }
