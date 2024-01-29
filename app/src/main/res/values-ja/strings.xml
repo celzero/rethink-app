@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="accessibility_service_description" translatable="true">Rethink はバックグラウンドのアプリを検知してファイアウォールをするためにアクセシビリティサービスを利用します。 Rethink が情報を収集または販売することはありません。</string>
+    <string name="accessibility_service_description" translatable="true">Rethink は、ユーザー補助サービスを利用してバックグラウンドアプリケーションを検出し、ファイアウォール機能を提供します。Rethink は、いかなる情報も収集・販売することはありません。</string>
     <string name="settings_title_desc" translatable="true">高度にカスタマイズ可能な DNS とファイアウォール</string>
-    <string name="about_title_desc" translatable="true">ネットワークセキュリティの脅威を検知してブロックする</string>
+    <string name="about_title_desc" translatable="true">ネットワークセキュリティの脅威を検知してブロック</string>
     <string name="txt_home" translatable="true">ホーム</string>
     <string name="next" translatable="true">次へ</string>
     <string name="skip" translatable="true">スキップ</string>
@@ -18,7 +18,7 @@
     <string name="lbl_logs" translatable="true">ログ</string>
     <string name="lbl_ip_rules" translatable="true">IP ルール</string>
     <string name="lbl_domain_rules" translatable="true">ドメインルール</string>
-    <string name="slide_1_desc" translatable="true">Rethink はオープンソースソフトウェアで、 Mozilla Builder MVP Program に支援されています。</string>
+    <string name="slide_1_desc" translatable="true">Rethink は、Mozilla Builders MVP プログラムによって支援されているオープンソースソフトウェアです。</string>
     <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
     <string name="allow" translatable="true">許可</string>
@@ -29,7 +29,7 @@
     <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">保護済み</string>
     <string name="status_app_error" translatable="true">アプリエラー</string>
     <string name="status_dns_error" translatable="true">DNS エラー</string>
-    <string name="status_dns_server_down" translatable="true">DNS サーバダウン</string>
+    <string name="status_dns_server_down" translatable="true">DNS サーバーダウン</string>
     <string name="status_protected_with_tor" translatable="true">Tor で保護されています</string>
     <string name="status_protected_with_private_dns" translatable="true">プライベート DNS で保護されています</string>
     <string name="status_protected_with_proxy_private_dns" translatable="true">プロキシとプライベート DNS で保護されています</string>
@@ -41,13 +41,13 @@
     <string name="dns_explanation_firewall_connected" translatable="true">ファイアウォールに接続済み</string>
     <string name="notification_action_dns_mode" translatable="true">DNS</string>
     <string name="firewall_mode_info_title" translatable="true">ファイアウォール</string>
-    <string name="firewall_mode_info_explanation_new" translatable="true">全てのアプリと IP アドレスに対してネットワークアクティビティを監視しファイアウォールします。</string>
+    <string name="firewall_mode_info_explanation_new" translatable="true">ネットワークのアクティビティを監視し、すべてのアプリや IP アドレスをファイアウォールを適用します。</string>
     <string name="apps_info_title" translatable="true">アプリ</string>
     <string name="hybrid_mode_info_title" translatable="true">DNS + ファイアウォール</string>
     <string name="dns_mode_info_explanation_new" translatable="true">DNS リクエストを監視、ブロック、暗号化します。</string>
-    <string name="alert_permission_accessibility" translatable="true">権限 - アクセシビリティ</string>
+    <string name="alert_permission_accessibility" translatable="true">権限 - ユーザー補助</string>
     <string name="brave_dns_connect_mode_change_dns" translatable="true">モードを選択してください。</string>
-    <string name="conn_track_clear_logs_title" translatable="true">全てのネットワークログを削除しますか？</string>
+    <string name="conn_track_clear_logs_title" translatable="true">すべてのネットワークログを削除しますか？</string>
     <string name="dns_query_clear_logs_title" translatable="true">すべての DNS ログを削除しますか？</string>
     <string name="dns_query_clear_logs_message" translatable="true">デバイス上の DNS ログを削除します。この操作は元に戻せません。続行してよろしいですか？</string>
     <string name="bsct_app_info" translatable="true">アプリ情報</string>
@@ -56,17 +56,16 @@
     <string name="title_settings" translatable="true">設定</string>
     <string name="title_statistics" translatable="true">統計</string>
     <string name="lbl_apply" translatable="true">適用</string>
-    <string name="lbl_dismiss" translatable="true">削除</string>
-    <string name="lbl_all" translatable="true">全て</string>
+    <string name="lbl_all" translatable="true">すべて</string>
     <string name="lbl_blocked" translatable="true">ブロック済み</string>
     <string name="slide_2_title" translatable="true">ようこそ</string>
     <string name="isolate" translatable="true">隔離</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">警告: Rethinkは無効化されています</string>
-    <string name="slide_2_desc" translatable="true">Rethink はあなたの Android デバイスでネットワークアクティビティを監視し、インターネットの検閲を回避し、アプリをファイアウォールするための最も簡単な方法です。</string>
-    <string name="slide_1_title" translatable="true">無料でオープンソース</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification." translatable="true">警告: Rethink は無効化されています</string>
+    <string name="slide_2_desc" translatable="true">Rethink は、Android デバイスでネットワークアクティビティを監視し、インターネットの検閲を回避し、アプリをファイアウォールするための最も簡単な方法です。</string>
+    <string name="slide_1_title" translatable="true">フリーでオープンソース</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification." translatable="true">タップして保護設定を変更</string>
     <string name="block" translatable="true">ブロック</string>
-    <string name="universal_firewall_explanation" translatable="true">デバイスのイベントに基づいて全てのアプリにファイアウォールを適用します。例えばデバイスがロックされている時や特定のアプリを使っていないときにファイアウォールします。</string>
+    <string name="universal_firewall_explanation" translatable="true">デバイスイベントに基づいてすべてのアプリにファイアウォールルールを適用します。例えば、デバイスがロックされているときや特定のアプリが使用されていないときにファイアウォールを適用します。</string>
     <string name="exclude" translatable="true">除外</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">待機中</string>
     <string name="bypass_dns_firewall" translatable="true">DNS とファイアウォールを回避</string>
@@ -80,15 +79,15 @@
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">RethinkDNS とファイアウォールに接続済み</string>
     <string name="notification_action_pause_vpn" translatable="true">一時停止</string>
     <string name="notification_action_stop_vpn" translatable="true">停止</string>
-    <string name="dns_firewall_mode_info_explanation_new" translatable="true">上記の全てに加えてインターネットの検閲を回避します。</string>
+    <string name="dns_firewall_mode_info_explanation_new" translatable="true">上記のすべてに加えて、インターネットの検閲を回避します。</string>
     <string name="notification_action_resume_vpn" translatable="true">再開</string>
     <string name="dns_mode_info_title" translatable="true">DNS</string>
     <string name="notification_action_dns_firewall_mode" translatable="true">DNS + ファイアウォール</string>
     <string name="firewall_rules" translatable="true">ネットワークルール</string>
-    <string name="alert_firewall_accessibility_exception" translatable="true">アクティビティの設定を開けませんでした。また後ほどお試しください！</string>
+    <string name="alert_firewall_accessibility_exception" translatable="true">ユーザー補助サービスの設定を開けませんでした。後でやり直してください！</string>
     <string name="conn_track_clear_logs_message" translatable="true">ネットワークログのみを削除し、ファイアウォールルールは削除しません。この操作は元に戻せません。続行してよろしいですか？</string>
     <string name="default_dns_name" translatable="true">RDNS デフォルト</string>
-    <string name="custom_url_error_invalid_url" translatable="true">不正な URL</string>
+    <string name="custom_url_error_invalid_url" translatable="true">無効な URL</string>
     <string name="brave_dns_connect_mode_change_firewall" translatable="true">モードを選択してください。</string>
     <string name="always_on_dialog_heading" translatable="true">常時接続 VPN を無効にする</string>
     <string name="always_on_dialog" translatable="true">このデバイスでは「常時接続VPN」が有効になっています。Rethinkを開始するには、設定にて「常時接続VPN」を無効にしてください。</string>
@@ -316,9 +315,9 @@
     <string name="brbs_backup_title" translatable="true">バックアップ</string>
     <string name="brbs_backup_dialog_positive" translatable="true">バックアップ</string>
     <string name="brbs_restore_dialog_failure_title" translatable="true">復元に失敗しました</string>
-    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethinkは、どのアプリが使用中（フォアグラウンド）か、使用中でないアプリ（バックグラウンド）かを追跡するためにアクセシビリティサービスを使用します。
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink は、ユーザー補助サービスを使用して、どのアプリが使用中 (フォアグラウンド) で、どのアプリが使用されていない (バックグラウンド) かを追跡します。
 \n
-\nRethinkは、いかなる情報収集やスパイ行為を行いません。</string>
+\nRethink は、いかなる方法でも、あなたの情報を収集したり、スパイ行為を行ったりすることはありません。</string>
     <string name="bsct_conn_rule_explanation" translatable="true"><u>#1</u>:アプリケーションのインターネットへの接続をブロックします。
 \n<u>#2</u>:アプリが特定のIPに接続できないようにします。
 \n<u>#3</u>:デバイスがロックされているときにすべての接続をブロックします(ユニバーサルファイアウォール)。
@@ -455,9 +454,9 @@
     <string name="contributors_list" translatable="true">現在の&lt;i&gt;Rethink Open Source Project&lt;/i&gt;があるのは、開発に数え切れないほどの時間を費やして下さったボランティアの皆々様のおかげです。&lt;br /&gt; &lt;br /&gt;🛡️ Androidアプリ &lt;br /&gt; &lt;a href=https://github.com/BayLee4&gt;BayLee4&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/HrBDev&gt;HrBDev&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/hussainmohd-a&gt;hussainmohd-a&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/markwmuller&gt;markwmuller&lt;/a&gt;&lt;br /&gt;&lt;a href=https://github.com/Uldiniad&gt;Uldiniad&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/Poussinou&gt;Poussinou&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/pjosingh&gt;pjosingh&lt;/a&gt;&lt;br /&gt; &lt;br /&gt;🚂 ネットワークエンジン &lt;br /&gt; &lt;a href=https://github.com/alalamav&gt;alalamav&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/bemasc&gt;bemasc&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/dmcardle&gt;dmcardle&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/fortuna&gt;fortuna&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/SeanBurford&gt;SeanBurford&lt;/a&gt;&lt;br /&gt; &lt;br /&gt;📚 リゾルバ &lt;br /&gt; &lt;a href=https://github.com/ahmed-tasaly&gt;ahmed-tasaly&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/amithm7&gt;amithm7&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/arfshl&gt;arfshl&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/badmojr&gt;badmojr&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/bongochong&gt;bongochong&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/elliotwutingfeng&gt;elliotwutingfeng&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/georgyo&gt;georgyo&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/GiddyGoatGaming&gt;GiddyGoatGaming&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/Harish-Narayan&gt;Harish-Narayan&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/ignoramous&gt;ignoramous&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/JakeChampion&gt;JakeChampion&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/MasterKia&gt;MasterKia&lt;/a&gt;&lt;br /&gt;&lt;a href=https://github.com/mtxadmin&gt;mtxadmin&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/neneeen&gt;neneeen&lt;/a&gt;&lt;br /&gt; &lt;ahref=https://github.com/PeterDaveHello&gt;PeterDaveHello&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/santhosh-ponnusamy&gt;santhosh-ponnusamy&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/shruuub&gt;shruuub&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/shuvashish76&gt;shuvashish76&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;⚜ コミュニティMods &lt;br /&gt; &lt;a href=https://t.me/amithm7&gt;amithm7&lt;/a&gt;&lt;br /&gt; &lt;a href=https://t.me/ppatra&gt;ppatra&lt;/a&gt;&lt;br /&gt; &lt;a href=https://t.me/InFamous23&gt;InFamous23&lt;/a&gt;&lt;br /&gt; &lt;a href=https://t.me/TheTr1ckst3r&gt;TheTr1ckst3r&lt;/a&gt;&lt;br /&gt; &lt;a href=https://t.me/Ch4t4r&gt;Ch4t4r&lt;/a&gt;&lt;br /&gt; &lt;a href=https://t.me/Billi_ance&gt;Billi_ance&lt;/a&gt;&lt;br /&gt; &lt;a href=https://t.me/kaliangel&gt;kaliangel&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com/PoneyClairDeLune&gt;PoneyClairDeLune&lt;/a&gt;&lt;br /&gt; &lt;br /&gt;📌 Geo-IP &lt;br /&gt; &lt;a href=https://db-ip.com&gt;db-ip.com&lt;/a&gt;&lt;br /&gt; &lt;br /&gt;❇ 翻訳 &lt;br /&gt; &lt;a href=https://weblate.org/en /&gt;Weblate&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;🦆 アイコン &lt;br /&gt; &lt;a href=https://github.com/celzero/rethink-app/issues/346&gt;Icons&lt;/a&gt;&lt;br /&gt; &lt;br /&gt;📦 サーバーの構築 &lt;br /&gt;&lt;a href=https://jitpack.io /&gt;JitPack&lt;/a&gt;&lt;br /&gt; &lt;a href=https://github.com /&gt;GitHub&lt;/a&gt;&lt;br /&gt;</string>
     <string name="dc_check_update_desc" translatable="true"><i>3</i>日ごとにブロックリストの更新を確認する</string>
     <string name="whats_new_version_update" translatable="true">&lt;b&gt;スーパーチャージ!&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;1.&lt;i&gt;新機能&lt;/i&gt;:高度なDNSフィルタリング。アプリケーションの接続時にのみドメインルールを適用します。&lt;br/&gt;2.&lt;i&gt;新機能&lt;/i&gt;:アプリケーションごとにドメインを許可または拒否します。&lt;br/&gt;3.&lt;i&gt;新機能&lt;/i&gt;:すべてのアプリケーションに対してドメインを許可または拒否します。&lt;br/&gt;4.&lt;i&gt;新機能&lt;/i&gt;:アプリケーションごとにDNSとファイアウォールの両方のルールをバイパスします。&lt;br/&gt;5.&lt;i&gt;新機能&lt;/i&gt;:パケットキャプチャ(PCAP)。&lt;br/&gt;6.&lt;i&gt;新機能&lt;/i&gt;:DNSブースター。要求を結合し、応答をキャッシュします。&lt;br/&gt;7.&lt;i&gt;新機能&lt;/i&gt;:ドメインおよびIPルールを編集します。&lt;br/&gt;8.その他のマイナーなUI変更とバグ修正。&lt;br/&gt;Modulated Modulatedこのアプリケーションの翻訳を支援します英語のみ)。&lt;br/&gt;&lt;a href=https://svc.rethinkdns.com/r/translate&gt;</string>
-    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethinkアクセシビリティサービスが停止またはクラッシュしました。
-\n<i><b>設定に移動し、Rethinkを強制的に停止</b></i>してから再度起動すると、<i>使用中でないアプリをブロックする機能</i>を使用できます。
-\nRethinkでは、アクセシビリティサービスを使用して、使用中のアプリ(フォアグラウンド)と使用中でないアプリ(バックグラウンド)を区別しています。</string>
+    <string name="alert_firewall_accessibility_regrant_explanation" translatable="true">Rethink のユーザー補助サービスが停止またはクラッシュしました。<i><b>設定に移動して Rethink を強制終了</b></i>し、再度起動してください。<i>使用していないアプリをブロックする</i> 機能を使用してください。
+\n
+\nRethink は、ユーザー補助サービスを使用して、使用中 (フォアグラウンド) のアプリと使用していない (バックグラウンド) のアプリを追跡しています。</string>
     <string name="firewall_rule_bypass_universal_ip_desc" translatable="true"><i>宛先IP</i>がすべてのユニバーサルファイアウォールルールをバイパスするように設定されているため、この接続は許可されました。<br/><br/>変更するには、<i>ユニバーサル</i>の<i>IPルール</i>に移動してください。</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true"><i>ドメイン</i>がユニバーサルドメインルールでブロックされているため、この接続はブロックされました。<br/><br/>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">この接続が許可されたのは、<i>ドメイン</i>がユニバーサルドメインルールで信頼できるものとして設定されているためです。<br/><br/>この動作を変更するには、<i>DNSの設定</i>タブに移動します。</string>
@@ -478,7 +477,7 @@
     <string name="ci_dialog_desc" translatable="true">IPアドレス、IPサブネット(範囲)、ポートを許可(バイパス)またはブロックします。例: 10.10.10.10, 10.1.1.*、 10.2.2/24、 ffff::/104、 [::]:80、 [10.1.0.0/16]:80、 *.*:80</string>
     <string name="show_logs_disabled_dns_message" translatable="true">DNS要求ログが無効になっています。再度有効にするには、<i>設定</i>に移動して<i>デバイス上のログを有効にする</i>をオンにしてください</string>
     <string name="dc_dns_leaks_desc" translatable="true">有効にすると、RethinkDNSはポート53上のすべてのパケットをキャプチャし、ユーザー設定のDNSエンドポイントに転送します</string>
-    <string name="pause_title_desc" translatable="true">昼寝をしている…</string>
+    <string name="pause_title_desc" translatable="true">昼寝中…</string>
     <string name="orbot_both_desc" translatable="true">上記すべてです。</string>
     <string name="orbot_bs_status_4" translatable="true">ワンクリックでTor-as-a-Proxy（Orbot）を設定できます。</string>
     <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s
@@ -599,7 +598,6 @@
     <string name="about_join_telegram" translatable="true">Telegram</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">バグ報告</string>
     <string name="about_website" translatable="true">rethinkdns.comをご覧ください</string>
-    <string name="bypass_universal" translatable="true">迷惑なリンク短縮サービスをバイパス</string>
     <string name="lbl_maybe_blocked" translatable="true">ブロックされている可能性があります</string>
     <string name="lbl_network" translatable="true">ネットワーク</string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s が %2$s によってブロックされました</string>
@@ -613,14 +611,14 @@
     <string name="local_blocklist_redownload" translatable="true">最新情報!</string>
     <string name="show_logs_disabled_network_message" translatable="true">接続ログが無効になっています。 再度有効にするには、<i>設定</i> に移動し、<i>デバイス上のログを有効にする</i> をオンにします。</string>
     <string name="lbl_import" translatable="true">インポート</string>
-    <string name="lbl_allowed_ips" translatable="true">許可されたIP</string>
+    <string name="lbl_allowed_ips" translatable="true">許可された IP</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
     <string name="lbl_hour" translatable="true">時間</string>
     <string name="lbl_save" translatable="true">保存</string>
     <string name="lbl_optional" translatable="true">(任意)</string>
     <string name="lbl_delete" translatable="true">削除</string>
-    <string name="lbl_qr_code" translatable="true">QRコード</string>
-    <string name="lbl_generated" translatable="true">(生成しました)</string>
+    <string name="lbl_qr_code" translatable="true">QR コード</string>
+    <string name="lbl_generated" translatable="true">(生成)</string>
     <string name="lbl_auto" translatable="true">(自動)</string>
     <string name="lbl_slow" translatable="true">遅い</string>
     <string name="lbl_day" translatable="true">日</string>
@@ -628,18 +626,23 @@
     <string name="lbl_inactive" translatable="true">活動していません</string>
     <string name="lbl_addresses" translatable="true">アドレス</string>
     <string name="lbl_active" translatable="true">活動中</string>
-    <string name="lbl_dns_servers" translatable="true">DNSサーバー</string>
+    <string name="lbl_dns_servers" translatable="true">DNS サーバー</string>
     <string name="lbl_public_key" translatable="true">公開鍵</string>
-    <string name="lbl_insecure" translatable="true">(不安定)</string>
+    <string name="lbl_insecure" translatable="true">(非セキュア)</string>
     <string name="lbl_min" translatable="true">分</string>
     <string name="lbl_private_key" translatable="true">秘密鍵</string>
     <string name="lbl_preshared_key" translatable="true">鍵データ</string>
-    <string name="lbl_applications" translatable="true">アプリケーション</string>
+    <string name="lbl_applications" translatable="true">アプリ</string>
     <string name="lbl_very" translatable="true">とても</string>
     <string name="lbl_select_all" translatable="true">すべて選択</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">アップデート！</string>
     <string name="lbl_create" translatable="true">作成</string>
-    <string name="status_protected_with_wg_private_dns" translatable="true">WireGuardとプライベートDNSで保護します</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">WireGuard とプライベート DNS で保護保護されています</string>
     <string name="lbl_listen_port" translatable="true">待ち受けポート</string>
     <string name="lbl_random" translatable="true">(ランダム)</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_sec" translatable="true">秒</string>
+    <string name="status_protected_with_wg" translatable="true">WireGuard で保護されています</string>
 </resources>
