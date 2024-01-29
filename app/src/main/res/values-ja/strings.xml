@@ -56,7 +56,6 @@
     <string name="title_settings" translatable="true">設定</string>
     <string name="title_statistics" translatable="true">統計</string>
     <string name="lbl_apply" translatable="true">適用</string>
-    <string name="lbl_dismiss" translatable="true"></string>
     <string name="lbl_all" translatable="true">すべて</string>
     <string name="lbl_blocked" translatable="true">ブロック済み</string>
     <string name="slide_2_title" translatable="true">ようこそ</string>
@@ -599,7 +598,6 @@
     <string name="about_join_telegram" translatable="true">Telegram</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">バグ報告</string>
     <string name="about_website" translatable="true">rethinkdns.comをご覧ください</string>
-    <string name="bypass_universal" translatable="true"></string>
     <string name="lbl_maybe_blocked" translatable="true">ブロックされている可能性があります</string>
     <string name="lbl_network" translatable="true">ネットワーク</string>
     <string name="bsct_conn_block_desc" translatable="true">%1$s が %2$s によってブロックされました</string>
