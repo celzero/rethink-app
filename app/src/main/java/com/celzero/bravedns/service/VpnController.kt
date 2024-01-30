@@ -251,7 +251,7 @@ object VpnController : KoinComponent {
         return braveVpnService?.hasCid(cid, uid) ?: false
     }
 
-    fun removeWireGuardProxy(id: String) {
+    fun removeWireGuardProxy(id: Int) {
         braveVpnService?.removeWireGuardProxy(id)
     }
 

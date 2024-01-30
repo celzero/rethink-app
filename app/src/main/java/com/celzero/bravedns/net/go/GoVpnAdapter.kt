@@ -612,7 +612,6 @@ class GoVpnAdapter : KoinComponent {
             null
         }
     }
-
     private suspend fun setHttpProxyIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
         if (!AppConfig.ProxyType.of(appConfig.getProxyType()).isProxyTypeHasHttp()) return
 
@@ -638,13 +637,19 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    fun removeWgProxy(id: String) {
+    fun removeWgProxy(id: Int) {
         if (!tunnel.isConnected) {
             Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip refreshing wg")
             return
         }
         try {
-            getProxies()?.removeProxy(id)
+            val id0 = ID_WG_BASE + id
+            getProxies()?.removeProxy(id0)
+            val isDnsNeeded = WireguardManager.getOneWireGuardProxyId() == id
+            // remove the dns if the wg proxy is removed
+            if (isDnsNeeded) {
+                getResolver()?.remove(id0)
+            }
             Log.i(LOG_TAG_VPN, "remove wireguard proxy with id: $id")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "error removing wireguard proxy: ${e.message}", e)

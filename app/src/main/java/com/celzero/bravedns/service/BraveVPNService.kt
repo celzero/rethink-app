@@ -156,7 +156,7 @@ class BraveVPNService :
     private var trackedCids = Collections.newSetFromMap(ConcurrentHashMap<CidKey, Boolean>())
 
     // data class to store the connection summary
-    data class CidKey(val cid: String, val uid: String)
+    data class CidKey(val cid: String, val uid: Int)
 
     private var excludedApps: MutableSet<String> = mutableSetOf()
 
@@ -1387,9 +1387,11 @@ class BraveVPNService :
     fun closeConnectionsIfNeeded(uid: Int) { // can be invalid uid, in which case, no-op
         if (uid == INVALID_UID) return
 
+        val uid0 = FirewallManager.userId(uid)
+
         val ids: MutableList<String> = mutableListOf()
         // when there is a change in firewall rule for uid, close all the existing connections
-        trackedCids.filter { it.uid == uid.toString() }.forEach { ids.add(it.cid) }
+        trackedCids.filter { it.uid == uid0 }.forEach { ids.add(it.cid) }
 
         if (ids.isEmpty()) return
 
@@ -1535,7 +1537,7 @@ class BraveVPNService :
             )
         Log.i(
             LOG_TAG_VPN,
-            "set tun mode with dns: ${tunnelOptions.tunDnsMode}, firewall: ${tunnelOptions.tunFirewallMode}, proxy: ${tunnelOptions.tunProxyMode}"
+            "set tun mode with dns: ${tunnelOptions.tunDnsMode}, firewall: ${tunnelOptions.tunFirewallMode}, proxy: ${tunnelOptions.tunProxyMode}, pt: ${tunnelOptions.ptMode}"
         )
         vpnAdapter?.setTunMode(tunnelOptions)
     }
@@ -2400,7 +2402,9 @@ class BraveVPNService :
             ConnectionSummary(s.uid, s.pid, s.id, s.rx, s.tx, s.duration, s.rtt, s.msg)
         logd("onSocketClosed: $s, $connectionSummary")
 
-        val key = CidKey(connectionSummary.connId, s.uid)
+        // convert the uid to appId
+        val uid = FirewallManager.appId(s.uid.toInt())
+        val key = CidKey(connectionSummary.connId, uid)
         trackedCids.remove(key)
 
         val rethinkUid = FirewallManager.getAppInfoByPackage(ctx.packageName)?.uid ?: 0
@@ -2532,7 +2536,7 @@ class BraveVPNService :
 
         // add to trackedCids, so that the connection can be removed from the list when the
         // connection is closed (onSocketClosed), use: ui to show the active connections
-        val key = CidKey(connTracker.connId, uid.toString())
+        val key = CidKey(connTracker.connId, uid)
         trackedCids.add(key)
 
         return@runBlocking determineProxyDetails(connTracker, connId, uid)
@@ -2738,11 +2742,13 @@ class BraveVPNService :
     }
 
     fun hasCid(connId: String, uid: Int): Boolean {
-        val key = CidKey(connId, uid.toString())
+        // get app id from uid
+        val uid0 = FirewallManager.appId(uid)
+        val key = CidKey(connId, uid0)
         return trackedCids.contains(key)
     }
 
-    fun removeWireGuardProxy(id: String) {
+    fun removeWireGuardProxy(id: Int) {
         logd("remove wg from tunnel: $id")
         io("removeWg") { vpnAdapter?.removeWgProxy(id) }
     }
