@@ -109,7 +109,7 @@
             android:layout_height="wrap_content"
             android:minWidth="125dp"
             android:tag="1"
-            android:text="Default"
+            android:text="@string/lbl_default"
             android:textColor="?attr/defaultToggleBtnTxt"
             app:cornerRadius="16dp" />
 
@@ -120,7 +120,7 @@
             android:layout_height="wrap_content"
             android:minWidth="125dp"
             android:tag="2"
-            android:text="One WG"
+            android:text="@string/lbl_one_wg"
             android:textColor="?attr/defaultToggleBtnTxt"
             app:cornerRadius="16dp" />
     </com.google.android.material.button.MaterialButtonToggleGroup>

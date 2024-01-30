@@ -28,6 +28,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
+import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
@@ -49,6 +50,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
     private var wgConfig: Config? = null
     private var wgInterface: WgInterface? = null
     private var configId: Int = -1
+    private var wgType: WgConfigDetailActivity.WgType = WgConfigDetailActivity.WgType.DEFAULT
 
     companion object {
         const val INTENT_EXTRA_WG_ID = "WIREGUARD_TUNNEL_ID"
@@ -61,6 +63,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireguardManager.INVALID_CONF_ID)
+        wgType = WgConfigDetailActivity.WgType.fromInt(intent.getIntExtra(INTENT_EXTRA_WG_TYPE, WgConfigDetailActivity.WgType.DEFAULT.value))
     }
 
     override fun onResume() {

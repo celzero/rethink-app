@@ -269,18 +269,35 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         if (VpnController.hasCid(info!!.connId, info!!.uid)) {
             b.connectionSummaryLl.visibility = View.VISIBLE
             b.bsConnConnDuration.text =
-                getString(R.string.symbol_green_circle) + " " + getString(R.string.lbl_active)
+                getString(
+                    R.string.two_argument_space,
+                    getString(R.string.symbol_green_circle),
+                    getString(R.string.lbl_active)
+                )
         } else {
-            val duration =
-                UIUtils.getDurationInHumanReadableFormat(requireContext(), info!!.duration)
-            b.bsConnConnDuration.text = "⏱️" + " " + getString(R.string.single_argument, duration)
+            b.bsConnConnDuration.text =
+                getString(
+                    R.string.two_argument_space,
+                    getString(R.string.symbol_clock),
+                    getString(R.string.symbol_hyphen)
+                )
         }
 
         val connType = ConnectionTracker.ConnType.get(info?.connType)
         if (connType.isMetered()) {
-            b.bsConnConnType.text = "💴 " + getString(R.string.ada_app_metered)
+            b.bsConnConnType.text =
+                getString(
+                    R.string.two_argument_space,
+                    getString(R.string.symbol_currency),
+                    getString(R.string.ada_app_metered)
+                )
         } else {
-            b.bsConnConnType.text = "🛜" + "🌐 " + getString(R.string.ada_app_unmetered)
+            b.bsConnConnType.text =
+                getString(
+                    R.string.two_argument_space,
+                    getString(R.string.symbol_global),
+                    getString(R.string.ada_app_unmetered)
+                )
         }
 
         if (
@@ -309,6 +326,9 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
         b.bsConnConnUpload.text = uploadBytes
         b.bsConnConnDownload.text = downloadBytes
+        val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info!!.duration)
+        b.bsConnConnDuration.text =
+            getString(R.string.two_argument_space, getString(R.string.symbol_clock), duration)
     }
 
     private fun lightenUpChip() {

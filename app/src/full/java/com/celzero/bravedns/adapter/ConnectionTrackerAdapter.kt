@@ -241,6 +241,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
                 }
                 if (connType.isMetered()) {
                     b.connectionDelay.text = "💴"
+                    hasMinSummary = true
                 }
 
                 if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {

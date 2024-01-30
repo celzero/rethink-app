@@ -98,7 +98,7 @@
     <color name="firewallExcludeToggleBtnTxt">#7b2549</color>
     <color name="firewallExcludeToggleBtnBg">#ffbcd7</color>
     <color name="defaultToggleBtnTxt">#FDFDFD</color>
-    <color name="defaultToggleBtnBg">#90444444</color>
+    <color name="defaultToggleBtnBg">#393939</color>
 
     <!-- theme light -->
     <color name="colorPrimaryLight">#ececec</color>
@@ -226,6 +226,6 @@
     <color name="firewallExcludeToggleBtnTxtBlack">#ffbcd7</color>
     <color name="firewallExcludeToggleBtnBgBlack">#CCffbcd7</color>
     <color name="defaultToggleBtnTxtBlack">#FDFDFD</color>
-    <color name="defaultToggleBtnBgBlack">#000000</color>
+    <color name="defaultToggleBtnBgBlack">#121212</color>
 
 </resources>

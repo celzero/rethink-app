@@ -19,7 +19,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -29,7 +28,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.adapter.WgIncludeAppsAdapter
 import com.celzero.bravedns.adapter.WgPeersAdapter
 import com.celzero.bravedns.databinding.ActivityWgDetailBinding
@@ -37,11 +35,8 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
-import com.celzero.bravedns.service.WireguardManager.WARP_ID
-import com.celzero.bravedns.service.WireguardManager.isWarpWorking
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -77,6 +72,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private var configId: Int = INVALID_CONF_ID
     private var wgInterface: WgInterface? = null
     private val peers: MutableList<Peer> = mutableListOf()
+    private var wgType: WgType = WgType.DEFAULT
 
     companion object {
         private const val ANIMATION_DURATION = 750L
@@ -85,12 +81,27 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         private const val ANIMATION_START_DEGREE = 0.0f
         private const val ANIMATION_END_DEGREE = 360.0f
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
+        const val INTENT_EXTRA_WG_TYPE = "WIREGUARD_TUNNEL_TYPE"
+    }
+
+    enum class WgType(val value: Int) {
+        DEFAULT(0),
+        ONE_WG(1);
+
+        fun isOneWg() = this == ONE_WG
+
+        fun isDefault() = this == DEFAULT
+
+        companion object {
+            fun fromInt(value: Int) = entries.first { it.value == value }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         configId = intent.getIntExtra(WgConfigEditorActivity.INTENT_EXTRA_WG_ID, INVALID_CONF_ID)
+        wgType = WgType.fromInt(intent.getIntExtra(INTENT_EXTRA_WG_TYPE, WgType.DEFAULT.value))
     }
 
     override fun onResume() {
@@ -109,17 +120,23 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             val config = WireguardManager.getConfigById(configId)
             val mapping = WireguardManager.getConfigFilesById(configId)
             uiCtx {
-                //handleWarpConfigView()
+                // handleWarpConfigView()
                 if (mapping != null) {
                     b.lockdownCheck.isChecked = mapping.isLockdown
                     b.oneWgCheck.isChecked = mapping.oneWireGuard
                 }
-                if (mapping?.oneWireGuard == true) {
-                    b.applicationsBtn.isEnabled = !mapping.oneWireGuard
+                if (wgType.isDefault()) {
+                    b.lockdownLl.visibility = View.GONE
+                    handleAppsCount()
+                } else if (wgType.isOneWg()) {
+                    b.lockdownLl.visibility = View.VISIBLE
+                    b.applicationsBtn.isEnabled = false
                     b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
                 } else {
-                    handleAppsCount()
+                    finish()
+                    return@uiCtx
                 }
+
                 /*if (config == null && configId == WARP_ID) {
                     showNewWarpConfigLayout()
                     return@uiCtx
@@ -128,13 +145,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     finish()
                     return@uiCtx
                 }
-                prefillWarpConfig(config)
+                prefillConfig(config)
             }
         }
-
     }
 
-    private fun prefillWarpConfig(config: Config) {
+    private fun prefillConfig(config: Config) {
         wgInterface = config.getInterface()
         peers.clear()
         peers.addAll(config.getPeers() ?: emptyList())
@@ -201,7 +217,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
     }*/
 
-   /* private suspend fun handleWarpConfigView() {
+    /* private suspend fun handleWarpConfigView() {
         if (configId == WARP_ID) {
             if (isWarpConfAvailable()) {
                 if (DEBUG) Log.d(LOG_TAG_PROXY, "warp config already available")
@@ -223,28 +239,28 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     /*private fun showNewWarpConfigLayout() {
-        b.interfaceDetailCard.visibility = View.GONE
-        b.peersList.visibility = View.GONE
-        b.addPeerFab.visibility = View.GONE
-        b.newConfLayout.visibility = View.VISIBLE
-    }
+            b.interfaceDetailCard.visibility = View.GONE
+            b.peersList.visibility = View.GONE
+            b.addPeerFab.visibility = View.GONE
+            b.newConfLayout.visibility = View.VISIBLE
+        }
 
-    private fun showWarpConfig() {
-        b.interfaceDetailCard.visibility = View.VISIBLE
-        b.peersList.visibility = View.VISIBLE
-        b.addPeerFab.visibility = View.GONE
-        b.interfaceEdit.visibility = View.GONE
-        b.interfaceDelete.visibility = View.GONE
-        b.interfaceRefresh.visibility = View.VISIBLE
-        hideNewWarpConfLayout()
-    }
+        private fun showWarpConfig() {
+            b.interfaceDetailCard.visibility = View.VISIBLE
+            b.peersList.visibility = View.VISIBLE
+            b.addPeerFab.visibility = View.GONE
+            b.interfaceEdit.visibility = View.GONE
+            b.interfaceDelete.visibility = View.GONE
+            b.interfaceRefresh.visibility = View.VISIBLE
+            hideNewWarpConfLayout()
+        }
 
-    private fun hideNewWarpConfLayout() {
-        b.newConfLayout.visibility = View.GONE
-        b.interfaceDetailCard.visibility = View.VISIBLE
-        b.peersList.visibility = View.VISIBLE
-    }
-*/
+        private fun hideNewWarpConfLayout() {
+            b.newConfLayout.visibility = View.GONE
+            b.interfaceDetailCard.visibility = View.VISIBLE
+            b.peersList.visibility = View.VISIBLE
+        }
+    */
     private fun handleAppsCount() {
         val id = ProxyManager.ID_WG_BASE + configId
         b.applicationsBtn.isEnabled = true
@@ -312,7 +328,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 updateLockdown(false)
             }
         }
-
 
         b.oneWgCheck.setOnClickListener {
             if (b.oneWgCheck.isChecked) {
@@ -390,7 +405,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         io {
             WireguardManager.updateLockdownConfig(configId, enabled)
             uiCtx {
-                Toast.makeText(this, getString(R.string.wg_lockdown_success_toast), Toast.LENGTH_SHORT)
+                Toast.makeText(
+                        this,
+                        getString(R.string.wg_lockdown_success_toast),
+                        Toast.LENGTH_SHORT
+                    )
                     .show()
             }
         }
@@ -403,11 +422,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 // disable add apps button
                 b.applicationsBtn.isEnabled = !enabled
                 b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
-                Toast.makeText(
-                        this,
-                        getString(R.string.one_wg_success_toast),
-                        Toast.LENGTH_SHORT
-                    )
+                Toast.makeText(this, getString(R.string.one_wg_success_toast), Toast.LENGTH_SHORT)
                     .show()
             }
         }

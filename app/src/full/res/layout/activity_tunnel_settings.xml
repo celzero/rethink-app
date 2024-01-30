@@ -275,7 +275,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingTop="5dp"
-                            android:text="@string/settings_rinr_desc"
+                            android:text="@string/settings_rinr_desc_enabled"
                             android:textSize="@dimen/default_font_text_view" />
                     </LinearLayout>
 

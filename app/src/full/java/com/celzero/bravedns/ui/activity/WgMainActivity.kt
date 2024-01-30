@@ -43,6 +43,7 @@ import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.QrCodeFromFileScanner
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.TunnelImporter
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.WgConfigViewModel
@@ -224,11 +225,13 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private fun selectToggleBtnUi(b: MaterialButton) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.accentGood))
+        b.setTextColor(UIUtils.fetchColor(this, R.attr.primaryTextColor))
     }
 
     private fun unselectToggleBtnUi(b: MaterialButton) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.defaultToggleBtnBg))
+        b.setTextColor(UIUtils.fetchColor(this, R.attr.primaryTextColor))
     }
 
     private fun initAnimation() {

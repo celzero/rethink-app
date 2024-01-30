@@ -251,7 +251,7 @@ object WireguardManager : KoinComponent {
             appConfig.removeProxy(proxyType, proxyProvider)
         }
         // directly remove the proxy from the tunnel, instead of calling updateTun
-        VpnController.removeWireGuardProxy(ProxyManager.ID_WG_BASE + map.id)
+        VpnController.removeWireGuardProxy(map.id)
         Log.i(LOG_TAG_PROXY, "disable wg config: ${map.id}, ${map.name}")
         return
     }

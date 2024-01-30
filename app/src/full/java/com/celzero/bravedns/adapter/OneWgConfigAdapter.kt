@@ -17,6 +17,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -32,6 +33,7 @@ import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
+import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import kotlinx.coroutines.Dispatchers
@@ -97,6 +99,7 @@ class OneWgConfigAdapter(private val context: Context) :
         private fun updateStatusUi(config: WgConfigFiles, id: String, apps: String) {
             val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
+                b.interfaceSwitch.isChecked = true
                 val statusId = VpnController.getProxyStatusById(id)
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
@@ -117,6 +120,7 @@ class OneWgConfigAdapter(private val context: Context) :
                         )
                 }
             } else {
+                b.interfaceSwitch.isChecked = false
                 b.interfaceStatus.text =
                     context.getString(
                         R.string.about_version_install_source,
@@ -131,7 +135,7 @@ class OneWgConfigAdapter(private val context: Context) :
 
             b.interfaceSwitch.setOnCheckedChangeListener(null)
             b.interfaceSwitch.setOnClickListener {
-                val checked = b.interfaceSwitch.isChecked
+                val checked = !b.interfaceSwitch.isChecked
                 io {
                     if (!checked) {
                         if (WireguardManager.canEnableConfig(config)) {
@@ -165,6 +169,7 @@ class OneWgConfigAdapter(private val context: Context) :
         private fun launchConfigDetail(id: Int) {
             val intent = Intent(context, WgConfigDetailActivity::class.java)
             intent.putExtra(INTENT_EXTRA_WG_ID, id)
+            intent.putExtra(INTENT_EXTRA_WG_TYPE, WgConfigDetailActivity.WgType.ONE_WG)
             context.startActivity(intent)
         }
     }
