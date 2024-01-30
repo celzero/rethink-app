@@ -143,6 +143,7 @@ class Config private constructor(builder: Builder) {
 
         // No default; must be provided before building.
         var wgInterface: WgInterface? = null
+
         fun addPeer(peer: Peer): Builder {
             peers.add(peer)
             return this

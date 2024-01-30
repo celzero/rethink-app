@@ -18,7 +18,6 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.os.SystemClock
-import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogRepository

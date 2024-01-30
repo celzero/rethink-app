@@ -63,7 +63,13 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         setTheme(Themes.getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
         configId = intent.getIntExtra(INTENT_EXTRA_WG_ID, WireguardManager.INVALID_CONF_ID)
-        wgType = WgConfigDetailActivity.WgType.fromInt(intent.getIntExtra(INTENT_EXTRA_WG_TYPE, WgConfigDetailActivity.WgType.DEFAULT.value))
+        wgType =
+            WgConfigDetailActivity.WgType.fromInt(
+                intent.getIntExtra(
+                    INTENT_EXTRA_WG_TYPE,
+                    WgConfigDetailActivity.WgType.DEFAULT.value
+                )
+            )
     }
 
     override fun onResume() {
@@ -198,9 +204,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]
             Log.e(LOG_TAG_PROXY, "Exception while parsing wg interface: $error", e)
-            uiCtx {
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
-            }
+            uiCtx { Toast.makeText(this, error, Toast.LENGTH_LONG).show() }
             return null
         }
     }

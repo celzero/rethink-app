@@ -57,13 +57,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
@@ -317,7 +317,7 @@ internal constructor(
         if (knownUid) {
             Log.i(LOG_TAG_APP_DB, "insertApp: $uid already tracked")
             return
-            }
+        }
         val ai = maybeFetchAppInfo(uid)
         val pkg = ai?.packageName ?: ""
         Log.i(LOG_TAG_APP_DB, "insert app; uid: $uid, pkg: ${pkg}")
@@ -327,7 +327,7 @@ internal constructor(
         } else {
             insertUnknownApp(uid)
         }
-            showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, pkg))
+        showNewAppNotificationIfNeeded(FirewallManager.AppInfoTuple(uid, pkg))
     }
 
     private fun maybeFetchAppInfo(uid: Int): ApplicationInfo? {

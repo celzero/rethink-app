@@ -400,5 +400,4 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             )
         }
     }
-
 }

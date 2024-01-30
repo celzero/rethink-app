@@ -326,11 +326,8 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         b.wgRefresh.setOnClickListener { refresh() }
         b.wgGeneralToggleBtn.setOnClickListener {
             if (WireguardManager.oneWireGuardEnabled()) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.one_wg_error_toast),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, getString(R.string.one_wg_error_toast), Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
             selectToggleBtnUi(b.wgGeneralToggleBtn)

@@ -25,6 +25,7 @@ class ConnectionTracer(ctx: Context) {
         private const val DNS_KEY = "17|10.111.222.1|10.111.222.3|53"
         private const val SEPARATOR = "|"
     }
+
     private val cm: ConnectivityManager
     private val uidCache: Cache<String, Int>
 

@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.service.FirewallManager
 
 class AlertsViewModel(
     private val connectionTrackerDao: ConnectionTrackerDAO,

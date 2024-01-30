@@ -17,7 +17,6 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -140,10 +139,7 @@ class OneWgConfigAdapter(private val context: Context) :
                     if (!checked) {
                         if (WireguardManager.canEnableConfig(config)) {
                             config.oneWireGuard = true
-                            WireguardManager.updateOneWireGuardConfig(
-                                config.id,
-                                owg = true
-                            )
+                            WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
                             WireguardManager.enableConfig(config)
                             uiCtx { updateStatus(config) }
                         } else {

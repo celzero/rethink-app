@@ -64,17 +64,33 @@ class DetailedStatisticsActivity : AppCompatActivity(R.layout.activity_detailed_
     }
 
     private fun setSubTitle(timeCategory: SummaryStatisticsViewModel.TimeCategory) {
-        b.dsaSubtitle.text = when (timeCategory) {
-            SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
-                getString(R.string.three_argument, getString(R.string.lbl_last), getString(R.string.numeric_one), getString(R.string.lbl_hour))
+        b.dsaSubtitle.text =
+            when (timeCategory) {
+                SummaryStatisticsViewModel.TimeCategory.ONE_HOUR -> {
+                    getString(
+                        R.string.three_argument,
+                        getString(R.string.lbl_last),
+                        getString(R.string.numeric_one),
+                        getString(R.string.lbl_hour)
+                    )
+                }
+                SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
+                    getString(
+                        R.string.three_argument,
+                        getString(R.string.lbl_last),
+                        getString(R.string.numeric_twenty_four),
+                        getString(R.string.lbl_hour)
+                    )
+                }
+                SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
+                    getString(
+                        R.string.three_argument,
+                        getString(R.string.lbl_last),
+                        getString(R.string.numeric_seven),
+                        getString(R.string.lbl_day)
+                    )
+                }
             }
-            SummaryStatisticsViewModel.TimeCategory.TWENTY_FOUR_HOUR -> {
-                getString(R.string.three_argument, getString(R.string.lbl_last), getString(R.string.numeric_twenty_four), getString(R.string.lbl_hour))
-            }
-            SummaryStatisticsViewModel.TimeCategory.SEVEN_DAYS -> {
-                 getString(R.string.three_argument, getString(R.string.lbl_last), getString(R.string.numeric_seven), getString(R.string.lbl_day))
-            }
-        }
     }
 
     private fun setRecyclerView(

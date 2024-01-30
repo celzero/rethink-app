@@ -102,7 +102,7 @@ class WorkScheduler(val context: Context) {
 
     // Schedule AppExitInfo every APP_EXIT_INFO_JOB_TIME_INTERVAL_DAYS
     fun scheduleAppExitInfoCollectionJob() {
-        //if (isWorkScheduled(context.applicationContext, APP_EXIT_INFO_JOB_TAG)) return
+        // if (isWorkScheduled(context.applicationContext, APP_EXIT_INFO_JOB_TAG)) return
 
         // app exit info is supported from R+
         if (!Utilities.isAtleastR()) return
@@ -125,7 +125,7 @@ class WorkScheduler(val context: Context) {
     }
 
     fun schedulePurgeConnectionsLog() {
-        //if (isWorkScheduled(context.applicationContext, PURGE_CONNECTION_LOGS_JOB_TAG)) return
+        // if (isWorkScheduled(context.applicationContext, PURGE_CONNECTION_LOGS_JOB_TAG)) return
 
         val purgeLogs =
             PeriodicWorkRequest.Builder(
@@ -147,7 +147,7 @@ class WorkScheduler(val context: Context) {
 
     // Schedule AppExitInfo on demand
     fun scheduleOneTimeWorkForAppExitInfo() {
-        ///if (isWorkScheduled(context.applicationContext, APP_EXIT_INFO_ONE_TIME_JOB_TAG)) return
+        /// if (isWorkScheduled(context.applicationContext, APP_EXIT_INFO_ONE_TIME_JOB_TAG)) return
 
         val bugReportCollector =
             OneTimeWorkRequestBuilder<BugReportCollector>()
@@ -169,7 +169,7 @@ class WorkScheduler(val context: Context) {
 
     // schedule blocklist update check (based on user settings)
     fun scheduleBlocklistUpdateCheckJob() {
-        //if (isWorkScheduled(context.applicationContext, BLOCKLIST_UPDATE_CHECK_JOB_TAG)) return
+        // if (isWorkScheduled(context.applicationContext, BLOCKLIST_UPDATE_CHECK_JOB_TAG)) return
 
         Log.i(LOG_TAG_SCHEDULER, "Scheduled blocklist update check")
         val blocklistUpdateCheck =
@@ -190,7 +190,7 @@ class WorkScheduler(val context: Context) {
 
     fun scheduleDataUsageJob() {
         Log.i(LOG_TAG_SCHEDULER, "Data usage job schedule started")
-        //if (isWorkScheduled(context.applicationContext, DATA_USAGE_JOB_TAG)) return
+        // if (isWorkScheduled(context.applicationContext, DATA_USAGE_JOB_TAG)) return
 
         Log.i(LOG_TAG_SCHEDULER, "Data usage job scheduled")
         val workRequest =

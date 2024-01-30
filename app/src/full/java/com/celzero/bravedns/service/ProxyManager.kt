@@ -23,12 +23,12 @@ import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
 import ipn.Ipn
-import java.util.concurrent.CopyOnWriteArraySet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.CopyOnWriteArraySet
 
 object ProxyManager : KoinComponent {
 
@@ -106,8 +106,7 @@ object ProxyManager : KoinComponent {
 
         if (m.isNotEmpty()) {
             m.forEach {
-                if (DEBUG)
-                    Log.d(LOG_TAG_PROXY, "add $proxyId for ${it.packageName} / uid $uid")
+                if (DEBUG) Log.d(LOG_TAG_PROXY, "add $proxyId for ${it.packageName} / uid $uid")
                 it.proxyId = proxyId
                 it.proxyName = proxyName
             }

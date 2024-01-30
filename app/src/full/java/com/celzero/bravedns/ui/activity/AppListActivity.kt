@@ -55,7 +55,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchView.OnQueryTextListener  {
+class AppListActivity :
+    AppCompatActivity(R.layout.activity_app_list), SearchView.OnQueryTextListener {
     private val persistentState by inject<PersistentState>()
     private val b by viewBinding(ActivityAppListBinding::bind)
 
@@ -455,11 +456,7 @@ class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchVie
         }
     }
 
-    private fun showBulkRulesUpdateDialog(
-        title: String,
-        message: String,
-        type: BlockType
-    ) {
+    private fun showBulkRulesUpdateDialog(title: String, message: String, type: BlockType) {
         val builder =
             AlertDialog.Builder(this)
                 .setTitle(title)
@@ -516,24 +513,11 @@ class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchVie
     private fun remakeFirewallChipsUi() {
         b.ffaFirewallChipGroup.removeAllViews()
 
-        val none =
-            makeFirewallChip(
-                FirewallFilter.ALL.id,
-                getString(R.string.lbl_all),
-                true
-            )
+        val none = makeFirewallChip(FirewallFilter.ALL.id, getString(R.string.lbl_all), true)
         val allowed =
-            makeFirewallChip(
-                FirewallFilter.ALLOWED.id,
-                getString(R.string.lbl_allowed),
-                false
-            )
+            makeFirewallChip(FirewallFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
         val blocked =
-            makeFirewallChip(
-                FirewallFilter.BLOCKED.id,
-                getString(R.string.lbl_blocked),
-                false
-            )
+            makeFirewallChip(FirewallFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
         val bypassUniversal =
             makeFirewallChip(
                 FirewallFilter.BYPASS.id,
@@ -755,9 +739,7 @@ class AppListActivity : AppCompatActivity(R.layout.activity_app_list), SearchVie
         layoutManager = CustomLinearLayoutManager(this)
         b.ffaAppList.layoutManager = layoutManager
         val recyclerAdapter = FirewallAppListAdapter(this, this)
-        appInfoViewModel.appInfo.observe(this) {
-            recyclerAdapter.submitData(this.lifecycle, it)
-        }
+        appInfoViewModel.appInfo.observe(this) { recyclerAdapter.submitData(this.lifecycle, it) }
         b.ffaAppList.adapter = recyclerAdapter
     }
 

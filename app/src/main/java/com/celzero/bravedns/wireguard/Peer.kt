@@ -22,8 +22,6 @@ import com.celzero.bravedns.wireguard.BadConfigException.*
 import inet.ipaddr.IPAddressString
 import ipn.Ipn
 import ipn.Key
-import java.net.URI
-import java.net.URISyntaxException
 import java.util.*
 import java.util.function.Consumer
 
@@ -153,9 +151,7 @@ class Peer private constructor(builder: Builder) {
                 sb.append("Endpoint = ").append(ep).append('\n')
             }
         )
-        unresolvedEndpoint.ifPresent {
-            sb.append("Endpoint = ").append(it).append('\n')
-        }
+        unresolvedEndpoint.ifPresent { sb.append("Endpoint = ").append(it).append('\n') }
         persistentKeepalive.ifPresent { pk: Int? ->
             sb.append("PersistentKeepalive = ").append(pk).append('\n')
         }
@@ -182,9 +178,7 @@ class Peer private constructor(builder: Builder) {
         endpoint.flatMap<Any>(InetEndpoint::getResolved).ifPresent { ep: Any? ->
             sb.append("endpoint=").append(ep)
         }
-        unresolvedEndpoint.ifPresent {
-            sb.append("endpoint=").append(it).append('\n')
-        }
+        unresolvedEndpoint.ifPresent { sb.append("endpoint=").append(it).append('\n') }
         persistentKeepalive.ifPresent { pk: Int? ->
             sb.append("persistent_keepalive_interval=").append(pk).append('\n')
         }

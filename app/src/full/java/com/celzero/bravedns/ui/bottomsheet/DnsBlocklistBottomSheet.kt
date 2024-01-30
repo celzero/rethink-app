@@ -37,7 +37,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomViewTarget
-import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.celzero.bravedns.R
@@ -63,11 +62,11 @@ import com.google.android.material.chip.Chip
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.Locale
 
 class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetDnsLogBinding? = null
@@ -431,14 +430,15 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun showResolvedState(uptime: String, latency: Long, isGrounded: Boolean ) {
+    private fun showResolvedState(uptime: String, latency: Long, isGrounded: Boolean) {
         if (log == null) {
             Log.w(LOG_TAG_DNS_LOG, "Transaction detail missing, no need to update ui")
             return
         }
 
         if (latency == 0L && !isGrounded) {
-            b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh, uptime, getString(R.string.lbl_cache))
+            b.dnsBlockBlockedDesc.text =
+                getString(R.string.dns_btm_resolved_doh, uptime, getString(R.string.lbl_cache))
             return
         }
 

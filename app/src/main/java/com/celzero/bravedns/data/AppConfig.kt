@@ -53,8 +53,8 @@ import com.celzero.bravedns.util.Utilities.getDnsPort
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import inet.ipaddr.IPAddressString
 import intra.Bridge
-import java.net.InetAddress
 import settings.Settings
+import java.net.InetAddress
 
 class AppConfig
 internal constructor(
@@ -785,10 +785,14 @@ internal constructor(
             dnsIp =
                 when (getInternetProtocol()) {
                     InternetProtocol.IPv4 -> {
-                        dnsServers.firstOrNull { IPAddressString(it.hostAddress).isIPv4 }?.hostAddress
+                        dnsServers
+                            .firstOrNull { IPAddressString(it.hostAddress).isIPv4 }
+                            ?.hostAddress
                     }
                     InternetProtocol.IPv6 -> {
-                        dnsServers.firstOrNull { IPAddressString(it.hostAddress).isIPv6 }?.hostAddress
+                        dnsServers
+                            .firstOrNull { IPAddressString(it.hostAddress).isIPv6 }
+                            ?.hostAddress
                     }
                     InternetProtocol.IPv46 -> {
                         dnsServers[0].hostAddress

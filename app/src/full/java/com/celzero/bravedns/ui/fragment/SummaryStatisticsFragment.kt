@@ -177,14 +177,18 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun selectToggleBtnUi(mb: MaterialButton) {
         mb.backgroundTintList =
-            ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(requireContext(), R.color.accentGood))
+            ColorStateList.valueOf(
+                UIUtils.fetchToggleBtnColors(requireContext(), R.color.accentGood)
+            )
         mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
     }
 
     private fun unselectToggleBtnUi(mb: MaterialButton) {
         mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
         mb.backgroundTintList =
-            ColorStateList.valueOf(UIUtils.fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg))
+            ColorStateList.valueOf(
+                UIUtils.fetchToggleBtnColors(requireContext(), R.color.defaultToggleBtnBg)
+            )
     }
 
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {

@@ -111,10 +111,7 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
             }
         }
 
-        customName.setText(
-            getString(R.string.lbl_dot),
-            TextView.BufferType.EDITABLE
-        )
+        customName.setText(getString(R.string.lbl_dot), TextView.BufferType.EDITABLE)
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
             val name = customName.text.toString()

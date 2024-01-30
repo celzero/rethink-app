@@ -30,9 +30,9 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.module.AppGlideModule
+import okhttp3.OkHttpClient
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
-import okhttp3.OkHttpClient
 
 /**
  * Defines the options to use when initializing Glide within an application. As of now, limit for

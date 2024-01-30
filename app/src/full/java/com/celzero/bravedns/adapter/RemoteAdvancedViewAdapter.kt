@@ -36,7 +36,8 @@ import kotlinx.coroutines.launch
 
 class RemoteAdvancedViewAdapter(val context: Context) :
     PagingDataAdapter<
-        RethinkRemoteFileTag, RemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder
+        RethinkRemoteFileTag,
+        RemoteAdvancedViewAdapter.RethinkRemoteFileTagViewHolder
     >(DIFF_CALLBACK) {
 
     companion object {

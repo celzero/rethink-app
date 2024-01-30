@@ -21,8 +21,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import com.celzero.bravedns.database.DoHEndpointDAO
-import com.celzero.bravedns.database.DoTEndpointDAO
 import com.celzero.bravedns.database.ODoHEndpointDAO
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 

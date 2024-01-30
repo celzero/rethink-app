@@ -41,6 +41,7 @@ class RethinkListBottomSheet : BottomSheetDialogFragment() {
     // This property is only valid between onCreateView and onDestroyView.
     private val b
         get() = _binding!!
+
     private val persistentState by inject<PersistentState>()
 
     private var layoutManager: RecyclerView.LayoutManager? = null

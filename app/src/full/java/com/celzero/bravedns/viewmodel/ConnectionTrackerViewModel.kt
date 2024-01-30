@@ -59,11 +59,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
             jumpThreshold = 5
         )
 
-    fun setFilter(
-        searchString: String,
-        filter: Set<String>,
-        type: TopLevelFilter
-    ) {
+    fun setFilter(searchString: String, filter: Set<String>, type: TopLevelFilter) {
         filterRules.clear()
 
         filterRules.addAll(filter)

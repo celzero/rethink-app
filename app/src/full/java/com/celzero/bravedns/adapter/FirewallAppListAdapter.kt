@@ -43,10 +43,10 @@ import com.celzero.bravedns.ui.activity.AppInfoActivity.Companion.UID_INTENT_NAM
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 class FirewallAppListAdapter(
     private val context: Context,

@@ -17,7 +17,13 @@
 package com.celzero.bravedns.database
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 
 @Dao
 interface ODoHEndpointDAO {
@@ -40,11 +46,13 @@ interface ODoHEndpointDAO {
     )
     fun getODoHEndpointLiveDataByName(query: String): PagingSource<Int, ODoHEndpoint>
 
-    @Query("delete from ODoHEndpoint where modifiedDataTime < :date") fun deleteOlderData(date: Long)
+    @Query("delete from ODoHEndpoint where modifiedDataTime < :date")
+    fun deleteOlderData(date: Long)
 
     @Query("delete from ODoHEndpoint") fun clearAllData()
 
-    @Query("delete from ODoHEndpoint where id = :id and isCustom = 1") fun deleteODoHEndpoint(id: Int)
+    @Query("delete from ODoHEndpoint where id = :id and isCustom = 1")
+    fun deleteODoHEndpoint(id: Int)
 
     @Query("update ODoHEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()

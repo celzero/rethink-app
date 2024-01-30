@@ -18,7 +18,12 @@ package com.celzero.bravedns.database
 
 import android.database.Cursor
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.celzero.bravedns.data.FileTag
 
 @Dao

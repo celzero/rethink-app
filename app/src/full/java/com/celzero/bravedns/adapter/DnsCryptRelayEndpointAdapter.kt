@@ -47,7 +47,8 @@ class DnsCryptRelayEndpointAdapter(
     private val appConfig: AppConfig
 ) :
     PagingDataAdapter<
-        DnsCryptRelayEndpoint, DnsCryptRelayEndpointAdapter.DnsCryptRelayEndpointViewHolder
+        DnsCryptRelayEndpoint,
+        DnsCryptRelayEndpointAdapter.DnsCryptRelayEndpointViewHolder
     >(DIFF_CALLBACK) {
 
     companion object {

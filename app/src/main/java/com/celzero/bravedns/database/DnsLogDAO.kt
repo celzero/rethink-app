@@ -18,7 +18,10 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
 
@@ -98,6 +101,8 @@ interface DnsLogDAO {
     @Query("select time from DNSLogs where id = (select min(id) from DNSLogs)")
     fun getLeastLoggedTime(): Long
 
-    @Query("select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time > :from and time < :to group by queryStr order by count desc LIMIT 5")
+    @Query(
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time > :from and time < :to group by queryStr order by count desc LIMIT 5"
+    )
     fun getBlockedDnsLogList(from: Long, to: Long): LiveData<List<AppConnection>>
 }

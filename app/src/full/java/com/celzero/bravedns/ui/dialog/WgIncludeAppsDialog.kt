@@ -211,9 +211,7 @@ class WgIncludeAppsDialog(
             showDialog(b.wgIncludeAppSelectAllCheckbox.isChecked)
         }
 
-        b.wgRemainingAppsBtn.setOnClickListener {
-            showConfirmationDialog()
-        }
+        b.wgRemainingAppsBtn.setOnClickListener { showConfirmationDialog() }
 
         b.wgIncludeAppSelectAllCheckbox.setOnCheckedChangeListener(null)
 

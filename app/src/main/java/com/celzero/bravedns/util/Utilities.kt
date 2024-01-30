@@ -66,6 +66,11 @@ import com.google.gson.JsonParser
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.launch
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -77,11 +82,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.launch
-import okio.HashingSink
-import okio.blackholeSink
-import okio.buffer
-import okio.source
 
 object Utilities {
 
@@ -148,8 +148,7 @@ object Utilities {
                 Settings.Secure.getString(
                     context.contentResolver,
                     Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-                )
-                    ?: return false
+                ) ?: return false
             val colonSplitter = SimpleStringSplitter(':')
             colonSplitter.setString(enabledServicesSetting)
             while (colonSplitter.hasNext()) {
@@ -496,10 +495,7 @@ object Utilities {
                 context.packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             }
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(
-                LOG_TAG_FIREWALL,
-                "no app info for package name: $packageName"
-            )
+            Log.w(LOG_TAG_FIREWALL, "no app info for package name: $packageName")
             null
         }
     }

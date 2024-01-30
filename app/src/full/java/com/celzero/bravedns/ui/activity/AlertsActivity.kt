@@ -15,30 +15,8 @@
  */
 package com.celzero.bravedns.ui.activity
 
-import android.content.Context
-import android.content.res.Configuration
-import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
-import com.celzero.bravedns.adapter.AlertAdapter
-import com.celzero.bravedns.data.AppConnection
-import com.celzero.bravedns.database.AlertRegistry
-import com.celzero.bravedns.databinding.ActivityAlertsBinding
-import com.celzero.bravedns.service.AlertCategory
-import com.celzero.bravedns.service.AlertSeverity
-import com.celzero.bravedns.service.AlertType
-import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.viewmodel.AlertsViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
 
@@ -121,21 +99,35 @@ class AlertsActivity : AppCompatActivity(R.layout.activity_alerts) {
         val severity = AlertSeverity.LOW.name
         val actions = "Check network logs to either allow or block the connection"
         return AlertRegistry(
-            id = 0 *//* id *//*, // Room auto-increments id when its set to zero.
-            title,
-            type,
-            1,
-            System.currentTimeMillis(),
-            message,
-            category.name,
-            severity,
-            actions,
-            alertStatus = "" *//* alertStatus *//*,
-            alertSolution = "" *//* alertSolution *//*,
-            isRead = false *//* isRead *//*,
-            isDeleted = false *//* isDeleted *//*,
-            isCustom = false *//* isCustom *//*,
-            isNotified = false *//* isNotified *//*
+            id = 0 */
+    /* id */
+    /*, // Room auto-increments id when its set to zero.
+    title,
+    type,
+    1,
+    System.currentTimeMillis(),
+    message,
+    category.name,
+    severity,
+    actions,
+    alertStatus = "" */
+    /* alertStatus */
+    /*,
+    alertSolution = "" */
+    /* alertSolution */
+    /*,
+    isRead = false */
+    /* isRead */
+    /*,
+    isDeleted = false */
+    /* isDeleted */
+    /*,
+    isCustom = false */
+    /* isCustom */
+    /*,
+    isNotified = false */
+    /* isNotified */
+    /*
         )
     }
 

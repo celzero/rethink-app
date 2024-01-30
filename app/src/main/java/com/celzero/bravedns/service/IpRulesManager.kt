@@ -29,9 +29,9 @@ import com.google.common.cache.CacheBuilder
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import java.util.concurrent.ConcurrentHashMap
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.ConcurrentHashMap
 
 object IpRulesManager : KoinComponent {
 
@@ -357,10 +357,7 @@ object IpRulesManager : KoinComponent {
     }
 
     suspend fun updateUid(uid: Int, newUid: Int) {
-        Log.i(
-            LOG_TAG_FIREWALL,
-            "IP Rules, update uid for ($uid) with new uid: $newUid"
-        )
+        Log.i(LOG_TAG_FIREWALL, "IP Rules, update uid for ($uid) with new uid: $newUid")
         customIpRepository.updateUid(uid, newUid)
         appIpRules =
             appIpRules.filterKeys { it.uid != uid }.mapKeysTo(ConcurrentHashMap()) { it.key }

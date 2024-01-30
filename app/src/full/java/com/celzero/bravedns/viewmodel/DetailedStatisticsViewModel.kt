@@ -26,11 +26,8 @@ import androidx.paging.liveData
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ConnectionTrackerDAO
 import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment
 import com.celzero.bravedns.util.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class DetailedStatisticsViewModel(
     private val connectionTrackerDAO: ConnectionTrackerDAO,

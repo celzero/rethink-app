@@ -17,7 +17,12 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
@@ -27,8 +32,7 @@ interface RethinkLogDao {
 
     @Update fun update(log: RethinkLog)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(log: RethinkLog)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(log: RethinkLog)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBatch(connTrackerList: List<RethinkLog>)
@@ -60,9 +64,7 @@ interface RethinkLogDao {
     )
     fun getRethinkLogByName(query: String): PagingSource<Int, RethinkLog>
 
-    @Query(
-        "select * from RethinkLog where isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
-    )
+    @Query("select * from RethinkLog where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedConnections(): PagingSource<Int, RethinkLog>
 
     @Query(
@@ -83,9 +85,7 @@ interface RethinkLogDao {
     @Query("select count(DISTINCT(ipAddress)) from RethinkLog where uid = :uid")
     fun getAppConnectionsCount(uid: Int): LiveData<Int>
 
-    @Query(
-        "select * from RethinkLog where isBlocked = 1 order by id desc LIMIT $MAX_LOGS"
-    )
+    @Query("select * from RethinkLog where isBlocked = 1 order by id desc LIMIT $MAX_LOGS")
     fun getBlockedConnectionsFiltered(): PagingSource<Int, RethinkLog>
 
     @Query(
@@ -97,24 +97,19 @@ interface RethinkLogDao {
 
     @Query("delete from RethinkLog where uid = :uid") fun clearLogsByUid(uid: Int)
 
-    @Query("DELETE FROM RethinkLog WHERE  timeStamp < :date")
-    fun purgeLogsByDate(date: Long)
+    @Query("DELETE FROM RethinkLog WHERE  timeStamp < :date") fun purgeLogsByDate(date: Long)
 
     @Query(
         "select * from RethinkLog where isBlocked = 0 and  (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
     )
     fun getAllowedConnections(query: String): PagingSource<Int, RethinkLog>
 
-    @Query(
-        "select * from RethinkLog where isBlocked = 0 order by id desc LIMIT $MAX_LOGS"
-    )
+    @Query("select * from RethinkLog where isBlocked = 0 order by id desc LIMIT $MAX_LOGS")
     fun getAllowedConnections(): PagingSource<Int, RethinkLog>
 
     @Query("select count(id) from RethinkLog") fun logsCount(): LiveData<Long>
 
-    @Query(
-        "select timeStamp from RethinkLog where id = (select min(id) from RethinkLog)"
-    )
+    @Query("select timeStamp from RethinkLog where id = (select min(id) from RethinkLog)")
     fun getLeastLoggedTime(): Long
 
     @Query(

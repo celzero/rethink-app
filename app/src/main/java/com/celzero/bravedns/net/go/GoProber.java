@@ -23,7 +23,6 @@ import com.celzero.bravedns.net.doh.Prober;
 
 import dnsx.Summary;
 import dnsx.Transport;
-import intra.Intra;
 
 /**
  * Implements a Probe using the Go-based DoH client.

@@ -17,7 +17,12 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.data.DataUsage
 import com.celzero.bravedns.util.Constants.Companion.MAX_LOGS
@@ -86,13 +91,18 @@ interface ConnectionTrackerDAO {
     )
     fun getBlockedConnectionsFiltered(filter: Set<String>): PagingSource<Int, ConnectionTracker>
 
-    @Query("select * from ConnectionTracker where protocol = :protocol order by id desc LIMIT $MAX_LOGS")
+    @Query(
+        "select * from ConnectionTracker where protocol = :protocol order by id desc LIMIT $MAX_LOGS"
+    )
     fun getProtocolFilteredConnections(protocol: String): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where protocol = :protocol and blockedByRule in (:filter) order by id desc LIMIT $MAX_LOGS"
     )
-    fun getProtocolFilteredConnections(protocol: String, filter: Set<String>): PagingSource<Int, ConnectionTracker>
+    fun getProtocolFilteredConnections(
+        protocol: String,
+        filter: Set<String>
+    ): PagingSource<Int, ConnectionTracker>
 
     @Query(
         "select * from ConnectionTracker where blockedByRule in (:filter) and isBlocked = 1 and (appName like :query or ipAddress like :query or dnsQuery like :query or flag like :query) order by id desc LIMIT $MAX_LOGS"
@@ -233,7 +243,8 @@ interface ConnectionTrackerDAO {
     )
     fun getBlockedDomainsList(from: Long, to: Long): LiveData<List<AppConnection>>
 
-    // TODO: add blocked by rule #1, #1B, #1D, #1E, #1G (app block, new app block, unmetered block, metered block, isolate)
+    // TODO: add blocked by rule #1, #1B, #1D, #1E, #1G (app block, new app block, unmetered block,
+    // metered block, isolate)
     @Query(
         "select uid as uid, '' as ipAddress, port as port, count(id) as count, flag, 1 as blocked, appName as appOrDnsName from ConnectionTracker where timeStamp > :from and timeStamp < :to group by appName order by count desc LIMIT 5"
     )

@@ -97,9 +97,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsRInRSwitch.isChecked = !b.settingsRInRSwitch.isChecked
         }
 
-        b.settingsRInRSwitch.setOnCheckedChangeListener {
-            _: CompoundButton,
-            b: Boolean ->
+        b.settingsRInRSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             persistentState.routeRethinkInRethink = b
             displayRethinkInRethinkUi()
         }
@@ -175,8 +173,7 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
         // if the default dns url is not in the list, then select the first item
         val checkedItem =
             Constants.DEFAULT_DNS_LIST.firstOrNull { it.url == persistentState.defaultDnsUrl }
-                ?.let { Constants.DEFAULT_DNS_LIST.indexOf(it) }
-                ?: 0
+                ?.let { Constants.DEFAULT_DNS_LIST.indexOf(it) } ?: 0
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, pos ->
             dialog.dismiss()
             // update the default dns url

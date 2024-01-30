@@ -114,7 +114,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // user set http proxy ip / hostname
     var httpProxyHostAddress by
-    stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
+        stringPref("http_proxy_ipaddress").withDefault<String>("http://127.0.0.1:8118")
 
     // whether apps subject to the RethinkDNS VPN tunnel can bypass the tunnel on-demand
     // default: false for fdroid flavour
@@ -236,8 +236,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         booleanPref("notification_permission_request").withDefault<Boolean>(true)
 
     // make notification persistent (Android 13 and above), default false
-    var persistentNotification by
-            booleanPref("persistent_notification").withDefault<Boolean>(false)
+    var persistentNotification by booleanPref("persistent_notification").withDefault<Boolean>(false)
 
     // biometric authentication
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)

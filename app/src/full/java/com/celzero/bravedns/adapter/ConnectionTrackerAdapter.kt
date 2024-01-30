@@ -47,10 +47,10 @@ import com.celzero.bravedns.util.UIUtils.getDurationInHumanReadableFormat
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getIcon
 import com.google.gson.Gson
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class ConnectionTrackerAdapter(private val context: Context) :
     PagingDataAdapter<ConnectionTracker, ConnectionTrackerAdapter.ConnectionTrackerViewHolder>(
@@ -277,20 +277,36 @@ class ConnectionTrackerAdapter(private val context: Context) :
             b.connectionDataUsage.text = context.getString(R.string.two_argument, upload, download)
             b.connectionDelay.text = ""
             if (connType.isMetered()) {
-                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
-                                                             context.getString(R.string.symbol_currency))
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_currency)
+                    )
             }
             if (isConnectionHeavier(ct)) {
-                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
-                                                             context.getString(R.string.symbol_heavy))
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_heavy)
+                    )
             }
             if (isConnectionSlower(ct)) {
-                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
-                                                             context.getString(R.string.symbol_turtle))
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_turtle)
+                    )
             }
             if (isConnectionProxied(ct.blockedByRule, ct.proxyDetails)) {
-                b.connectionDelay.text = context.getString(R.string.ci_desc, b.connectionDelay.text,
-                                                             context.getString(R.string.symbol_key))
+                b.connectionDelay.text =
+                    context.getString(
+                        R.string.ci_desc,
+                        b.connectionDelay.text,
+                        context.getString(R.string.symbol_key)
+                    )
             }
             if (b.connectionDelay.text.isEmpty() && b.connectionDataUsage.text.isEmpty()) {
                 b.connectionSummaryLl.visibility = View.GONE

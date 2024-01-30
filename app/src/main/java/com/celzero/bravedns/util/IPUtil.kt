@@ -216,6 +216,7 @@ class IPUtil {
 
         val start: InetAddress?
             get() = long2inet(inet2long(address) and prefix2mask(prefix))
+
         val end: InetAddress?
             get() =
                 long2inet((inet2long(address) and prefix2mask(prefix)) + (1L shl 32 - prefix) - 1)

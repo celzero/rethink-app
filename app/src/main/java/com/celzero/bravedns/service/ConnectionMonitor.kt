@@ -37,12 +37,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
-import java.io.IOException
-import java.lang.IllegalArgumentException
-import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
@@ -50,6 +44,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.IOException
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.util.concurrent.TimeUnit
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
@@ -525,8 +524,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             if (n != null) {
                 newNetworks.add(n)
             }
-            val nonMeteredNetworks =
-                networks.filter { isConnectionNotMetered(it.capabilities) }
+            val nonMeteredNetworks = networks.filter { isConnectionNotMetered(it.capabilities) }
             nonMeteredNetworks.forEach {
                 if (!newNetworks.contains(it)) {
                     newNetworks.add(it)

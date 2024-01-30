@@ -49,6 +49,7 @@ class Rotate3dAnimation
     private val mReverse: Boolean
 ) : Animation() {
     private lateinit var mCamera: Camera
+
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
         super.initialize(width, height, parentWidth, parentHeight)
         mCamera = Camera()
