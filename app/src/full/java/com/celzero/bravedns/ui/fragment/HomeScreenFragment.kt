@@ -49,12 +49,16 @@ import com.celzero.bravedns.databinding.FragmentHomeScreenBinding
 import com.celzero.bravedns.service.*
 import com.celzero.bravedns.ui.activity.AlertsActivity
 import com.celzero.bravedns.ui.activity.AppListActivity
+import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity
+import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_NAME
+import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.RETHINK_BLOCKLIST_URL
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
 import com.celzero.bravedns.ui.activity.FirewallActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
+import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
@@ -99,7 +103,9 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         LOGS,
         RULES,
         PROXY,
-        ALERTS
+        ALERTS,
+        RETHINK,
+        PROXY_WIREGUARD
     }
 
     override fun onAttach(context: Context) {
@@ -168,7 +174,13 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startActivity(ScreenType.LOGS, NetworkLogsActivity.Tabs.NETWORK_LOGS.screen)
         }
 
-        b.fhsCardProxyLl.setOnClickListener { startActivity(ScreenType.PROXY) }
+        b.fhsCardProxyLl.setOnClickListener {
+            if (appConfig.isWireGuardEnabled()) {
+                startActivity(ScreenType.PROXY_WIREGUARD)
+            } else {
+                startActivity(ScreenType.PROXY)
+            }
+        }
 
         b.fhsSponsor.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, RETHINKDNS_SPONSOR_LINK.toUri())
@@ -726,8 +738,19 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
+        if (isRethinkDnsActive()) {
+            // no need to pass value in intent, as default load to Rethink remote
+            startActivity(ScreenType.RETHINK, screenToLoad)
+            return
+        }
+
         startActivity(ScreenType.DNS, screenToLoad)
         return
+    }
+
+    private fun isRethinkDnsActive(): Boolean {
+        val dns = appConfig.getDnsType()
+        return dns.isRethinkRemote()
     }
 
     private fun showPrivateDnsDialog() {
@@ -770,10 +793,23 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 ScreenType.RULES -> Intent(requireContext(), CustomRulesActivity::class.java)
                 ScreenType.PROXY -> Intent(requireContext(), ProxySettingsActivity::class.java)
                 ScreenType.ALERTS -> Intent(requireContext(), AlertsActivity::class.java)
+                ScreenType.RETHINK ->
+                    Intent(requireContext(), ConfigureRethinkBasicActivity::class.java)
+                ScreenType.PROXY_WIREGUARD -> Intent(requireContext(), WgMainActivity::class.java)
             }
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
-        startActivity(intent)
+        if (type == ScreenType.RETHINK) {
+            io {
+                val url = appConfig.getRemoteRethinkEndpoint()?.url
+                val name = appConfig.getRemoteRethinkEndpoint()?.name
+                intent.putExtra(RETHINK_BLOCKLIST_NAME, name)
+                intent.putExtra(RETHINK_BLOCKLIST_URL, url)
+                uiCtx { startActivity(intent) }
+            }
+        } else {
+            intent.putExtra(Constants.VIEW_PAGER_SCREEN_TO_LOAD, screenToLoad)
+            startActivity(intent)
+        }
     }
 
     private fun prepareAndStartVpn() {
