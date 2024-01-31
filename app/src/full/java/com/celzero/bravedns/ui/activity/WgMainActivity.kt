@@ -22,8 +22,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,7 +35,6 @@ import com.celzero.bravedns.adapter.WgConfigAdapter
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.QrCodeFromFileScanner
@@ -48,6 +45,7 @@ import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.WgConfigViewModel
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.qrcode.QRCodeReader
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -66,18 +64,8 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private var oneWgConfigAdapter: OneWgConfigAdapter? = null
     private val wgConfigViewModel: WgConfigViewModel by viewModel()
 
-    private lateinit var animation: Animation
-
     companion object {
         private const val IMPORT_LAUNCH_INPUT = "*/*"
-
-        private const val REFRESH_TIMEOUT: Long = 4000
-
-        private const val ANIMATION_DURATION = 750L
-        private const val ANIMATION_REPEAT_COUNT = -1
-        private const val ANIMATION_PIVOT_VALUE = 0.5f
-        private const val ANIMATION_START_DEGREE = 0.0f
-        private const val ANIMATION_END_DEGREE = 360.0f
     }
 
     private val tunnelFileImportResultLauncher =
@@ -166,9 +154,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     }
 
     private fun init() {
-        b.settingsNetwork.text = getString(R.string.lbl_wireguard).lowercase()
         setAdapter()
-        initAnimation()
         collapseFab()
         observeConfig()
         observeDnsName()
@@ -184,24 +170,33 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     }
 
     private fun setAdapter() {
-        val type = WireguardManager.oneWireGuardEnabled()
+        setOneWgAdapter()
+        setGeneralAdapter()
 
+        val type = WireguardManager.oneWireGuardEnabled()
         if (type) {
-            selectToggleBtnUi(b.oneWgToggleBtn)
-            unselectToggleBtnUi(b.wgGeneralToggleBtn)
-            b.wgGeneralInterfaceList.visibility = View.GONE
-            b.wgGeneralInterfaceList.adapter = null
-            b.oneWgInterfaceList.visibility = View.VISIBLE
-            setOneWgAdapter()
+            showOneWgToggle()
         } else {
-            selectToggleBtnUi(b.wgGeneralToggleBtn)
-            unselectToggleBtnUi(b.oneWgToggleBtn)
-            b.wgGeneralInterfaceList.visibility = View.VISIBLE
-            b.wgGeneralInterfaceList.adapter = wgConfigAdapter
-            b.oneWgInterfaceList.visibility = View.GONE
-            b.oneWgInterfaceList.adapter = null
-            setGeneralAdapter()
+            showGeneralToggle()
         }
+    }
+
+    private fun showOneWgToggle() {
+        selectToggleBtnUi(b.oneWgToggleBtn)
+        unselectToggleBtnUi(b.wgGeneralToggleBtn)
+        b.wgGeneralInterfaceList.visibility = View.GONE
+        b.oneWgInterfaceList.visibility = View.VISIBLE
+        if (oneWgConfigAdapter == null) setOneWgAdapter()
+        else b.oneWgInterfaceList.adapter = oneWgConfigAdapter
+    }
+
+    private fun showGeneralToggle() {
+        selectToggleBtnUi(b.wgGeneralToggleBtn)
+        unselectToggleBtnUi(b.oneWgToggleBtn)
+        b.oneWgInterfaceList.visibility = View.GONE
+        b.wgGeneralInterfaceList.visibility = View.VISIBLE
+        if (wgConfigAdapter == null) setGeneralAdapter()
+        else b.wgGeneralInterfaceList.adapter = wgConfigAdapter
     }
 
     private fun setGeneralAdapter() {
@@ -232,20 +227,6 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.defaultToggleBtnBg))
         b.setTextColor(UIUtils.fetchColor(this, R.attr.primaryTextColor))
-    }
-
-    private fun initAnimation() {
-        animation =
-            RotateAnimation(
-                ANIMATION_START_DEGREE,
-                ANIMATION_END_DEGREE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE,
-                Animation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_VALUE
-            )
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
     }
 
     override fun onResume() {
@@ -281,19 +262,12 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private fun showWgViews() {
         b.wgGeneralToggleBtn.visibility = View.VISIBLE
         b.oneWgToggleBtn.visibility = View.VISIBLE
-        b.wgRefresh.visibility = View.VISIBLE
-        b.wgGeneralInterfaceList.visibility = View.VISIBLE
-        b.oneWgInterfaceList.visibility = View.VISIBLE
         b.wgWireguardDisclaimer.visibility = View.VISIBLE
-        b.wgGeneralInterfaceList.visibility = View.VISIBLE
     }
 
     private fun hideWgViews() {
         b.wgGeneralToggleBtn.visibility = View.GONE
         b.oneWgToggleBtn.visibility = View.GONE
-        b.wgRefresh.visibility = View.GONE
-        b.wgGeneralInterfaceList.visibility = View.GONE
-        b.oneWgInterfaceList.visibility = View.GONE
         b.wgWireguardDisclaimer.visibility = View.GONE
     }
 
@@ -323,29 +297,23 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
             )
         }
         b.createFab.setOnClickListener { openTunnelEditorActivity() }
-        b.wgRefresh.setOnClickListener { refresh() }
+
         b.wgGeneralToggleBtn.setOnClickListener {
             if (WireguardManager.oneWireGuardEnabled()) {
-                Toast.makeText(this, getString(R.string.one_wg_error_toast), Toast.LENGTH_SHORT)
-                    .show()
+                showDisableDialog(isOneWgToggle = false)
                 return@setOnClickListener
             }
-            selectToggleBtnUi(b.wgGeneralToggleBtn)
-            unselectToggleBtnUi(b.oneWgToggleBtn)
-            b.oneWgInterfaceList.visibility = View.GONE
-            b.oneWgInterfaceList.adapter = null
-            b.wgGeneralInterfaceList.visibility = View.VISIBLE
-            if (wgConfigAdapter == null) setGeneralAdapter()
-            else b.wgGeneralInterfaceList.adapter = wgConfigAdapter
+            showGeneralToggle()
         }
         b.oneWgToggleBtn.setOnClickListener {
-            selectToggleBtnUi(b.oneWgToggleBtn)
-            unselectToggleBtnUi(b.wgGeneralToggleBtn)
-            b.wgGeneralInterfaceList.visibility = View.GONE
-            b.wgGeneralInterfaceList.adapter = null
-            b.oneWgInterfaceList.visibility = View.VISIBLE
-            if (oneWgConfigAdapter == null) setOneWgAdapter()
-            else b.oneWgInterfaceList.adapter = oneWgConfigAdapter
+            val activeConfigs = WireguardManager.getActiveConfigs()
+            val isAnyConfigActive = activeConfigs.isNotEmpty()
+            val isOneWgEnabled = WireguardManager.oneWireGuardEnabled()
+            if (isAnyConfigActive && !isOneWgEnabled) {
+                showDisableDialog(isOneWgToggle = true)
+                return@setOnClickListener
+            }
+            showOneWgToggle()
         }
     }
 
@@ -354,20 +322,25 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         startActivity(intent)
     }
 
-    private fun refresh() {
-        b.wgRefresh.isEnabled = false
-        b.wgRefresh.animation = animation
-        b.wgRefresh.startAnimation(animation)
-        VpnController.refreshWireGuardConfig()
-        Utilities.delay(REFRESH_TIMEOUT, lifecycleScope) {
-            b.wgRefresh.isEnabled = true
-            b.wgRefresh.clearAnimation()
-            Utilities.showToastUiCentered(
-                this,
-                getString(R.string.wireguard_refresh_toast),
-                Toast.LENGTH_SHORT
-            )
-        }
+    private fun showDisableDialog(isOneWgToggle: Boolean) {
+        // show alert dialog with don't show again toggle in it
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.wireguard_disable_title))
+            .setMessage(getString(R.string.wireguard_disable_message))
+            .setPositiveButton(getString(R.string.wireguard_disable_positive)) { _, _ ->
+                // disable all configs
+                WireguardManager.disableAllActiveConfigs()
+                if (isOneWgToggle) {
+                    showOneWgToggle()
+                } else {
+                    showGeneralToggle()
+                }
+            }
+            .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+                // do nothing
+            }
+            .create()
+            .show()
     }
 
     private fun expendFab() {

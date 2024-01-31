@@ -26,6 +26,8 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.CompoundButton
@@ -64,11 +66,11 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)
@@ -76,6 +78,17 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
+
+    private lateinit var animation: Animation
+
+    companion object {
+        private const val REFRESH_TIMEOUT: Long = 4000
+        private const val ANIMATION_DURATION = 750L
+        private const val ANIMATION_REPEAT_COUNT = -1
+        private const val ANIMATION_PIVOT_VALUE = 0.5f
+        private const val ANIMATION_START_DEGREE = 0.0f
+        private const val ANIMATION_END_DEGREE = 360.0f
+    }
 
     private fun Context.isDarkThemeOn(): Boolean {
         return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
@@ -85,8 +98,23 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+        initAnimation()
         initView()
         initClickListeners()
+    }
+
+    private fun initAnimation() {
+        animation =
+            RotateAnimation(
+                ANIMATION_START_DEGREE,
+                ANIMATION_END_DEGREE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE,
+                Animation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_VALUE
+            )
+        animation.repeatCount = ANIMATION_REPEAT_COUNT
+        animation.duration = ANIMATION_DURATION
     }
 
     override fun onResume() {
@@ -109,6 +137,8 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun initClickListeners() {
+
+        b.wgRefresh.setOnClickListener { refresh() }
 
         b.settingsActivityTcpProxyContainer.setOnClickListener { handleTcpProxy() }
 
@@ -150,16 +180,12 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 if (m?.isCustomSocks5() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    if (!VpnController.isVpnLockdown()) {
-                        appNames.addAll(FirewallManager.getAllAppNames())
-                    }
+                    appNames.addAll(FirewallManager.getAllAppNames())
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    if (!VpnController.isVpnLockdown()) {
-                        appNames.addAll(FirewallManager.getAllAppNames())
-                    }
+                    appNames.addAll(FirewallManager.getAllAppNames())
                     uiCtx { showSocks5ProxyDialog(endpoint, appNames, app) }
                 }
             }
@@ -210,19 +236,31 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 if (m?.isCustomHttp() == true) {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    if (!VpnController.isVpnLockdown()) {
-                        appNames.addAll(FirewallManager.getAllAppNames())
-                    }
+                    appNames.addAll(FirewallManager.getAllAppNames())
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 } else {
                     val appNames: MutableList<String> = ArrayList()
                     appNames.add(getString(R.string.settings_app_list_default_app))
-                    if (!VpnController.isVpnLockdown()) {
-                        appNames.addAll(FirewallManager.getAllAppNames())
-                    }
+                    appNames.addAll(FirewallManager.getAllAppNames())
                     uiCtx { showHttpProxyDialog(endpoint, appNames, app?.appName) }
                 }
             }
+        }
+    }
+
+    private fun refresh() {
+        b.wgRefresh.isEnabled = false
+        b.wgRefresh.animation = animation
+        b.wgRefresh.startAnimation(animation)
+        VpnController.refreshProxies()
+        delay(REFRESH_TIMEOUT, lifecycleScope) {
+            b.wgRefresh.isEnabled = true
+            b.wgRefresh.clearAnimation()
+            showToastUiCentered(
+                this,
+                getString(R.string.wireguard_refresh_toast),
+                Toast.LENGTH_SHORT
+            )
         }
     }
 
@@ -633,10 +671,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
             portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
             userNameEditText.setText(endpoint.userName.toString(), TextView.BufferType.EDITABLE)
-            if (VpnController.isVpnLockdown()) {
-                appNameSpinner.setSelection(0)
-                appNameSpinner.isEnabled = false
-            } else if (
+            if (
                 !endpoint.proxyAppName.isNullOrBlank() &&
                     endpoint.proxyAppName != getString(R.string.settings_app_list_default_app)
             ) {
@@ -755,6 +790,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityTcpProxyContainer.alpha = 1f
             b.settingsActivitySocks5Rl.alpha = 1f
             b.settingsActivityHttpProxyContainer.alpha = 1f
+            b.wgRefresh.visibility = View.VISIBLE
         } else {
             b.settingsActivityOrbotContainer.alpha = 0.5f
             b.settingsActivityWireguardContainer.alpha = 0.5f
@@ -762,6 +798,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.settingsActivityTcpProxyContainer.alpha = 0.5f
             b.settingsActivitySocks5Rl.alpha = 0.5f
             b.settingsActivityHttpProxyContainer.alpha = 0.5f
+            b.wgRefresh.visibility = View.GONE
         }
 
         // Wireguard
@@ -771,15 +808,8 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         b.settingsActivityTcpProxyIcon.isEnabled = canEnableProxy
         b.settingsActivityTcpProxyContainer.isEnabled = canEnableProxy
         // Orbot
-        // case, when VPN is in lockdown mode, Orbot proxy should be disabled.
-        if (VpnController.isVpnLockdown()) {
-            b.settingsActivityOrbotContainer.alpha = 0.5f
-        } else {
-            b.settingsActivityOrbotContainer.alpha = 1f
-        }
-        b.settingsActivityOrbotImg.isEnabled = canEnableProxy && !VpnController.isVpnLockdown()
-        b.settingsActivityOrbotContainer.isEnabled =
-            canEnableProxy && !VpnController.isVpnLockdown()
+        b.settingsActivityOrbotImg.isEnabled = canEnableProxy
+        b.settingsActivityOrbotContainer.isEnabled = canEnableProxy
         // SOCKS5
         b.settingsActivitySocks5Switch.isEnabled = canEnableProxy
         // HTTP Proxy
@@ -834,10 +864,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         if (!endpoint.proxyIP.isNullOrBlank()) {
             ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
             portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
-            if (VpnController.isVpnLockdown()) {
-                appNameSpinner.setSelection(0)
-                appNameSpinner.isEnabled = false
-            } else if (
+            if (
                 !endpoint.proxyAppName.isNullOrBlank() &&
                     endpoint.proxyAppName != getString(R.string.settings_app_list_default_app)
             ) {

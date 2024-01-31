@@ -233,6 +233,13 @@ object WireguardManager : KoinComponent {
         }
     }
 
+    fun disableAllActiveConfigs() {
+        val activeConfigs = mappings.filter { it.isActive }
+        activeConfigs.forEach {
+            disableConfig(it)
+        }
+    }
+
     fun disableConfig(map: WgConfigFiles) {
         val config = configs.find { it.getId() == map.id }
         // no need to enable config if it is sec warp

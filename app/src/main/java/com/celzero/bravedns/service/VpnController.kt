@@ -259,8 +259,8 @@ object VpnController : KoinComponent {
         braveVpnService?.addWireGuardProxy(id)
     }
 
-    fun refreshWireGuardConfig() {
-        braveVpnService?.refreshWireGuardConfig()
+    fun refreshProxies() {
+        braveVpnService?.refreshProxies()
     }
 
     fun updateWireGuardConfig() {

@@ -20,8 +20,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -59,15 +57,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private var wgPeersAdapter: WgPeersAdapter? = null
     private var layoutManager: LinearLayoutManager? = null
-    private var animation: Animation =
-        RotateAnimation(
-            ANIMATION_START_DEGREE,
-            ANIMATION_END_DEGREE,
-            Animation.RELATIVE_TO_SELF,
-            ANIMATION_PIVOT_VALUE,
-            Animation.RELATIVE_TO_SELF,
-            ANIMATION_PIVOT_VALUE
-        )
 
     private var configId: Int = INVALID_CONF_ID
     private var wgInterface: WgInterface? = null
@@ -75,11 +64,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     private var wgType: WgType = WgType.DEFAULT
 
     companion object {
-        private const val ANIMATION_DURATION = 750L
-        private const val ANIMATION_REPEAT_COUNT = -1
-        private const val ANIMATION_PIVOT_VALUE = 0.5f
-        private const val ANIMATION_START_DEGREE = 0.0f
-        private const val ANIMATION_END_DEGREE = 360.0f
         private const val CLIPBOARD_PUBLIC_KEY_LBL = "Public Key"
         const val INTENT_EXTRA_WG_TYPE = "WIREGUARD_TUNNEL_TYPE"
     }
@@ -116,38 +100,35 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun init() {
-        io {
-            val config = WireguardManager.getConfigById(configId)
-            val mapping = WireguardManager.getConfigFilesById(configId)
-            uiCtx {
-                // handleWarpConfigView()
-                if (mapping != null) {
-                    b.lockdownCheck.isChecked = mapping.isLockdown
-                    b.oneWgCheck.isChecked = mapping.oneWireGuard
-                }
-                if (wgType.isDefault()) {
-                    b.lockdownLl.visibility = View.GONE
-                    handleAppsCount()
-                } else if (wgType.isOneWg()) {
-                    b.lockdownLl.visibility = View.VISIBLE
-                    b.applicationsBtn.isEnabled = false
-                    b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
-                } else {
-                    finish()
-                    return@uiCtx
-                }
-
-                /*if (config == null && configId == WARP_ID) {
-                    showNewWarpConfigLayout()
-                    return@uiCtx
-                }*/
-                if (config == null) {
-                    finish()
-                    return@uiCtx
-                }
-                prefillConfig(config)
-            }
+        if (wgType.isDefault()) {
+            b.lockdownLl.visibility = View.VISIBLE
+            handleAppsCount()
+        } else if (wgType.isOneWg()) {
+            b.lockdownLl.visibility = View.GONE
+            b.applicationsBtn.isEnabled = false
+            b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
+        } else {
+            // invalid wireguard type, finish the activity
+            finish()
+            return
         }
+        val config = WireguardManager.getConfigById(configId)
+        val mapping = WireguardManager.getConfigFilesById(configId)
+        // handleWarpConfigView()
+        if (mapping != null) {
+            b.lockdownCheck.isChecked = mapping.isLockdown
+            b.oneWgCheck.isChecked = mapping.oneWireGuard
+        }
+
+        /*if (config == null && configId == WARP_ID) {
+            showNewWarpConfigLayout()
+            return@uiCtx
+        }*/
+        if (config == null) {
+            finish()
+            return
+        }
+        prefillConfig(config)
     }
 
     private fun prefillConfig(config: Config) {
@@ -290,14 +271,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             io { createConfigOrShowErrorLayout() }
         }*/
 
-        b.interfaceRefresh.setOnClickListener {
-            b.interfaceRefresh.isEnabled = false
-            b.interfaceRefresh.animation = animation
-            b.interfaceRefresh.startAnimation(animation)
-            b.interfaceRefresh.isEnabled = true
-            b.interfaceRefresh.clearAnimation()
-        }
-
         b.publicKeyLabel.setOnClickListener {
             UIUtils.clipboardCopy(this, b.publicKeyText.text.toString(), CLIPBOARD_PUBLIC_KEY_LBL)
             Utilities.showToastUiCentered(
@@ -357,11 +330,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 getString(R.string.one_wg_dialog_desc)
             )
         }
-    }
-
-    init {
-        animation.repeatCount = ANIMATION_REPEAT_COUNT
-        animation.duration = ANIMATION_DURATION
     }
 
     private fun showConfirmationDialog(title: String, message: String, type: Int) {

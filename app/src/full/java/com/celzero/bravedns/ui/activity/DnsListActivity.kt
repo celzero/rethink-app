@@ -26,6 +26,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityOtherDnsListBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Themes
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import org.koin.android.ext.android.inject
 
@@ -126,24 +127,41 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     private fun updateUI() {
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
+                b.cardDoh.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDoh.strokeWidth = 2
                 b.initialDoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
                 b.abbrDoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.DNS_PROXY -> {
+                b.cardDnsproxy.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDnsproxy.strokeWidth = 2
                 b.initialDnsproxy.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
                 b.abbrDnsproxy.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.DNSCRYPT -> {
+                b.cardDnscrypt.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDnscrypt.strokeWidth = 2
                 b.initialDnscrypt.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
                 b.abbrDnscrypt.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.DOT -> {
+                b.cardDot.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDot.strokeWidth = 2
                 b.initialDot.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
                 b.abbrDot.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             AppConfig.DnsType.ODOH -> {
+                b.cardOdoh.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardOdoh.strokeWidth = 2
                 b.initialOdoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
                 b.abbrOdoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+            }
+            AppConfig.DnsType.RETHINK_REMOTE -> {
+                b.cardRethinkDns.strokeColor =
+                    UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardRethinkDns.strokeWidth = 2
+                b.initialRethinkDns.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.abbrRethinkDns.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
             }
             else -> {
                 // no-op

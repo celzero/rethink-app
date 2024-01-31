@@ -608,7 +608,7 @@ class GoVpnAdapter : KoinComponent {
             if (DEBUG) Log.d(LOG_TAG_VPN, "getProxyStatusById: $id, $status")
             status
         } catch (ignored: Exception) {
-            Log.e(LOG_TAG_VPN, "err getProxy($id) ignored: ${ignored.message}", ignored)
+            Log.e(LOG_TAG_VPN, "err getProxy($id) ignored: ${ignored.message}")
             null
         }
     }
@@ -688,7 +688,7 @@ class GoVpnAdapter : KoinComponent {
         Log.i(LOG_TAG_VPN, "close connection: $connIds, res: $res")
     }
 
-    fun refreshProxiesLocked() {
+    fun refreshProxies() {
         if (!tunnel.isConnected) {
             Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip refreshing proxies")
             return

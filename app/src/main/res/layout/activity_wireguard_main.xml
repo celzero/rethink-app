@@ -5,46 +5,6 @@
     android:layout_height="match_parent"
     android:background="?attr/background">
 
-
-    <RelativeLayout
-        android:id="@+id/wg_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="45dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/settings_network"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/wg_refresh"
-            android:fontFamily="sans-serif-smallcaps"
-            android:lineSpacingExtra="5dp"
-            android:padding="5dp"
-            android:text="@string/lbl_wireguard"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/wg_refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:padding="5dp"
-            android:src="@drawable/ic_refresh_white" />
-    </RelativeLayout>
-
     <RelativeLayout
         android:id="@+id/wg_empty_view"
         android:layout_width="match_parent"
@@ -76,29 +36,16 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/wg_wireguard_disclaimer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:alpha="0.7"
-        android:padding="10dp"
-        android:text="@string/wireguard_disclaimer"
-        android:textColor="?attr/primaryLightColorText"
-        android:textSize="@dimen/default_font_text_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wg_header" />
-
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/wg_list_toggle_group"
         style="@style/toggleButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
         app:checkedButton="@id/lb_simple_toggle_btn"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wg_wireguard_disclaimer"
+        app:layout_constraintTop_toTopOf="parent"
         app:selectionRequired="true"
         app:singleSelection="true">
 
@@ -125,28 +72,43 @@
             app:cornerRadius="16dp" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
+    <TextView
+        android:id="@+id/wg_wireguard_disclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:alpha="0.7"
+        android:padding="10dp"
+        android:text="@string/wireguard_disclaimer"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wg_list_toggle_group" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/wg_general_interface_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="100dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wg_list_toggle_group" />
+        app:layout_constraintTop_toBottomOf="@+id/wg_wireguard_disclaimer" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/one_wg_interface_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:visibility="gone"
         android:paddingBottom="100dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wg_list_toggle_group" />
+        app:layout_constraintTop_toBottomOf="@+id/wg_wireguard_disclaimer" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/create_fab"

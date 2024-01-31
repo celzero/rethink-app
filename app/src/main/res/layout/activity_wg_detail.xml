@@ -75,7 +75,6 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_toStartOf="@id/wg_refresh"
                     android:fontFamily="sans-serif-smallcaps"
                     android:lineSpacingExtra="5dp"
                     android:padding="5dp"
@@ -84,15 +83,6 @@
                     android:textSize="@dimen/extra_large_font_text_view"
                     android:textStyle="bold" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/wg_refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_gravity="center"
-                    android:padding="5dp"
-                    android:src="@drawable/ic_refresh_white" />
             </RelativeLayout>
 
 
@@ -252,15 +242,6 @@
                             android:layout_marginEnd="20dp"
                             android:layout_toStartOf="@id/interface_delete"
                             android:src="@drawable/ic_edit_icon_grey" />
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/interface_refresh"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/ic_refresh_white"
-                            android:visibility="gone" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/interface_delete"

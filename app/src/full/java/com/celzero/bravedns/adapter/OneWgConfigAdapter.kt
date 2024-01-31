@@ -17,6 +17,7 @@ package com.celzero.bravedns.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -35,6 +36,7 @@ import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.UIUtils.fetchColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,6 +87,7 @@ class OneWgConfigAdapter(private val context: Context) :
 
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
+            b.oneWgCheck.isChecked = config.isActive
             updateStatus(config)
             setupClickListeners(config)
         }
@@ -98,7 +101,9 @@ class OneWgConfigAdapter(private val context: Context) :
         private fun updateStatusUi(config: WgConfigFiles, id: String, apps: String) {
             val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
-                b.interfaceSwitch.isChecked = true
+                b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
+                b.interfaceDetailCard.strokeWidth = 2
+                b.oneWgCheck.isChecked = true
                 val statusId = VpnController.getProxyStatusById(id)
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
@@ -119,7 +124,8 @@ class OneWgConfigAdapter(private val context: Context) :
                         )
                 }
             } else {
-                b.interfaceSwitch.isChecked = false
+                b.interfaceDetailCard.strokeWidth = 0
+                b.oneWgCheck.isChecked = false
                 b.interfaceStatus.text =
                     context.getString(
                         R.string.about_version_install_source,
@@ -132,11 +138,15 @@ class OneWgConfigAdapter(private val context: Context) :
         fun setupClickListeners(config: WgConfigFiles) {
             b.interfaceNameLayout.setOnClickListener { launchConfigDetail(config.id) }
 
-            b.interfaceSwitch.setOnCheckedChangeListener(null)
-            b.interfaceSwitch.setOnClickListener {
-                val checked = !b.interfaceSwitch.isChecked
+            // b.oneWgCheck.setOnCheckedChangeListener(null)
+            b.oneWgCheck.setOnClickListener {
+                val isChecked = b.oneWgCheck.isChecked
+                Log.d(
+                    "OneWgConfigAdapter",
+                    "Switch checked: $isChecked, ${b.oneWgCheck.isChecked} W: ${WireguardManager.canEnableConfig(config)}"
+                )
                 io {
-                    if (!checked) {
+                    if (isChecked) {
                         if (WireguardManager.canEnableConfig(config)) {
                             config.oneWireGuard = true
                             WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
@@ -154,6 +164,7 @@ class OneWgConfigAdapter(private val context: Context) :
                         }
                     } else {
                         config.oneWireGuard = false
+                        b.oneWgCheck.isChecked = false
                         WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
                         WireguardManager.disableConfig(config)
                         uiCtx { updateStatus(config) }
