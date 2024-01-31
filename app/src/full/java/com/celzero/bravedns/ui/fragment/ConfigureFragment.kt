@@ -22,9 +22,12 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentConfigureBinding
+import com.celzero.bravedns.ui.activity.AppInfoActivity
+import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
 import com.celzero.bravedns.ui.activity.FirewallActivity
 import com.celzero.bravedns.ui.activity.MiscSettingsActivity
+import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.activity.ProxySettingsActivity
 import com.celzero.bravedns.ui.activity.TunnelSettingsActivity
 
@@ -33,11 +36,13 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
     private val b by viewBinding(FragmentConfigureBinding::bind)
 
     enum class ScreenType {
+        APPS,
         DNS,
         FIREWALL,
         PROXY,
         VPN,
-        OTHERS
+        OTHERS,
+        LOGS
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,6 +52,12 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
 
     private fun initView() {
         b.fsNetworkTv.text = getString(R.string.lbl_network).replaceFirstChar(Char::titlecase)
+        b.fsLogsTv.text = getString(R.string.lbl_logs).replaceFirstChar(Char::titlecase)
+
+        b.fsAppsCard.setOnClickListener {
+            // open apps configuration
+            startActivity(ScreenType.APPS)
+        }
 
         b.fsDnsCard.setOnClickListener {
             // open dns configuration
@@ -72,16 +83,23 @@ class ConfigureFragment : Fragment(R.layout.fragment_configure) {
             // open others configuration
             startActivity(ScreenType.OTHERS)
         }
+
+        b.fsLogsCard.setOnClickListener {
+            // open logs configuration
+            startActivity(ScreenType.LOGS)
+        }
     }
 
     private fun startActivity(type: ScreenType) {
         val intent =
             when (type) {
+                ScreenType.APPS -> Intent(requireContext(), AppListActivity::class.java)
                 ScreenType.DNS -> Intent(requireContext(), DnsDetailActivity::class.java)
                 ScreenType.FIREWALL -> Intent(requireContext(), FirewallActivity::class.java)
                 ScreenType.PROXY -> Intent(requireContext(), ProxySettingsActivity::class.java)
                 ScreenType.VPN -> Intent(requireContext(), TunnelSettingsActivity::class.java)
                 ScreenType.OTHERS -> Intent(requireContext(), MiscSettingsActivity::class.java)
+                ScreenType.LOGS -> Intent(requireContext(), NetworkLogsActivity::class.java)
             }
         intent.flags = Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         startActivity(intent)
