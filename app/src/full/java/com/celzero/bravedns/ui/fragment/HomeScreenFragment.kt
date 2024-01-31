@@ -482,6 +482,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                     DateUtils.FORMAT_ABBREV_RELATIVE
                 )
             uiCtx {
+                if (!isAdded) return@uiCtx
+
                 b.fhsCardLogsDuration.visibility = View.VISIBLE
                 b.fhsCardLogsDuration.text = getString(R.string.logs_card_duration, t)
             }
