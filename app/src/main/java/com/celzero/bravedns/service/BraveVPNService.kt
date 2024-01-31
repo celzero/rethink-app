@@ -172,6 +172,8 @@ class BraveVPNService :
     private lateinit var appInfoObserver: Observer<Collection<AppInfo>>
     private lateinit var orbotStartStatusObserver: Observer<Boolean>
 
+    private lateinit var rethinkUid: String
+
     // used to store the conn-ids that are allowed and active, to show in network logs
     // as active connections. removed when the connection is closed (onSummary)
     private var trackedCids = Collections.newSetFromMap(ConcurrentHashMap<CidKey, Boolean>())
@@ -1130,7 +1132,14 @@ class BraveVPNService :
         )
     }
 
+    private fun getRethinkUid(): String {
+        val r = Utilities.getApplicationInfo(this, this.packageName)?.uid ?: INVALID_UID
+        return r.toString()
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        rethinkUid = getRethinkUid()
+
         VpnController.onConnectionStateChanged(State.NEW)
 
         ui {
@@ -1408,7 +1417,8 @@ class BraveVPNService :
     fun closeConnectionsIfNeeded(uid: Int) { // can be invalid uid, in which case, no-op
         if (uid == INVALID_UID) return
 
-        val uid0 = FirewallManager.userId(uid)
+        // get app id from uid
+        val uid0 = FirewallManager.appId(uid)
 
         val ids: MutableList<String> = mutableListOf()
         // when there is a change in firewall rule for uid, close all the existing connections
@@ -2414,22 +2424,26 @@ class BraveVPNService :
         return Tab()
     }
 
-    override fun onSocketClosed(s: SocketSummary?) = runBlocking {
+    override fun onSocketClosed(s: SocketSummary?) {
         if (s == null) {
             Log.i(LOG_TAG_VPN, "received null summary for socket")
-            return@runBlocking
+            return
         }
         val connectionSummary =
             ConnectionSummary(s.uid, s.pid, s.id, s.rx, s.tx, s.duration, s.rtt, s.msg)
         logd("onSocketClosed: $s, $connectionSummary")
 
+        if (s.uid.isNullOrEmpty()) {
+            Log.e(LOG_TAG_VPN, "onSocketClosed: missing uid, summary: $s")
+            return
+        }
+
         try {
-            // convert the uid to appId
+            // convert the uid to app id
             val uid = FirewallManager.appId(s.uid.toInt())
             val key = CidKey(connectionSummary.connId, uid)
             trackedCids.remove(key)
-            val rethinkUid = FirewallManager.getAppInfoByPackage(ctx.packageName)?.uid ?: 0
-            if (s.uid == rethinkUid.toString()) {
+            if (s.uid == rethinkUid) {
                 // update rethink summary
                 netLogTracker.updateRethinkSummary(connectionSummary)
             } else {
