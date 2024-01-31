@@ -53,7 +53,7 @@ class SummaryStatisticsViewModel(
         SEVEN_DAYS(2);
 
         companion object {
-            fun fromValue(value: Int) = values().firstOrNull { it.value == value }
+            fun fromValue(value: Int) = entries.firstOrNull { it.value == value }
         }
     }
 
@@ -61,12 +61,6 @@ class SummaryStatisticsViewModel(
         // set from and to time to current and 1 hr before
         startTime.value = System.currentTimeMillis() - ONE_HOUR_MILLIS
         networkActivity.value = ""
-        /*val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
-        if (isAppBypassed) {
-            domains.postValue(IS_APP_BYPASSED)
-        } else {
-            domains.postValue("")
-        }*/
         domains.postValue("")
         countryActivities.value = ""
         ips.value = ""

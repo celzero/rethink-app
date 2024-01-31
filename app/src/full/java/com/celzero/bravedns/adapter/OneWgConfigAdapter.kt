@@ -154,6 +154,7 @@ class OneWgConfigAdapter(private val context: Context) :
                             uiCtx { updateStatus(config) }
                         } else {
                             uiCtx {
+                                b.oneWgCheck.isChecked = false
                                 Toast.makeText(
                                         context,
                                         context.getString(R.string.wireguard_enabled_failure),

@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -151,7 +152,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         // fixme - #324 - move the 15 minutes to a configurable value
         if (
             persistentState.biometricAuthTime + TimeUnit.MINUTES.toMillis(15) >
-                System.currentTimeMillis()
+                SystemClock.elapsedRealtime()
         ) {
             Log.i(
                 LOG_TAG_UI,
