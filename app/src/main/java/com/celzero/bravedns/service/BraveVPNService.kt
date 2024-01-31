@@ -87,17 +87,6 @@ import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
 import ipn.Ipn
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Protect
-import rnet.ServerSummary
-import rnet.Tab
 import java.io.IOException
 import java.net.InetAddress
 import java.net.SocketException
@@ -109,6 +98,17 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Protect
+import rnet.ServerSummary
+import rnet.Tab
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -1706,7 +1706,7 @@ class BraveVPNService :
         // refresh will do a configuration refresh in tunnel to ensure a successful
         // reconnection after detecting a network change event
         if (appConfig.isWireGuardEnabled()) {
-            refreshWireGuardConfig()
+            refreshProxies()
         }
     }
 
@@ -2423,18 +2423,21 @@ class BraveVPNService :
             ConnectionSummary(s.uid, s.pid, s.id, s.rx, s.tx, s.duration, s.rtt, s.msg)
         logd("onSocketClosed: $s, $connectionSummary")
 
-        // convert the uid to appId
-        val uid = FirewallManager.appId(s.uid.toInt())
-        val key = CidKey(connectionSummary.connId, uid)
-        trackedCids.remove(key)
-
-        val rethinkUid = FirewallManager.getAppInfoByPackage(ctx.packageName)?.uid ?: 0
-        if (s.uid == rethinkUid.toString()) {
-            // update rethink summary
-            netLogTracker.updateRethinkSummary(connectionSummary)
-        } else {
-            // other apps summary
-            netLogTracker.updateIpSummary(connectionSummary)
+        try {
+            // convert the uid to appId
+            val uid = FirewallManager.appId(s.uid.toInt())
+            val key = CidKey(connectionSummary.connId, uid)
+            trackedCids.remove(key)
+            val rethinkUid = FirewallManager.getAppInfoByPackage(ctx.packageName)?.uid ?: 0
+            if (s.uid == rethinkUid.toString()) {
+                // update rethink summary
+                netLogTracker.updateRethinkSummary(connectionSummary)
+            } else {
+                // other apps summary
+                netLogTracker.updateIpSummary(connectionSummary)
+            }
+        } catch (e: NumberFormatException) {
+            Log.e(LOG_TAG_VPN, "onSocketClosed: ${e.message}", e)
         }
     }
 
@@ -2779,9 +2782,9 @@ class BraveVPNService :
         io("addWg") { vpnAdapter?.addWgProxy(id) }
     }
 
-    fun refreshWireGuardConfig() {
+    fun refreshProxies() {
         logd("refresh wg config")
-        io("refreshWg") { vpnAdapter?.refreshProxiesLocked() }
+        io("refreshWg") { vpnAdapter?.refreshProxies() }
     }
 
     fun updateWireGuardConfig() {
