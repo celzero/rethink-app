@@ -78,14 +78,14 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -160,6 +160,17 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             return
         }
 
+        promptInfo =
+            BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.hs_biometeric_title))
+                .setSubtitle(getString(R.string.hs_biometeric_desc))
+                .setAllowedAuthenticators(
+                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                )
+                .setConfirmationRequired(false)
+                .build()
+
         // ref: https://developer.android.com/training/sign-in/biometric-auth
         executor = ContextCompat.getMainExecutor(this)
         biometricPrompt =
@@ -211,26 +222,13 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 }
             )
 
-        promptInfo =
-            BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.hs_biometeric_title))
-                .setSubtitle(getString(R.string.hs_biometeric_desc))
-                .setAllowedAuthenticators(
-                    BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
-                        BiometricManager.Authenticators.BIOMETRIC_STRONG
-                )
-                .setConfirmationRequired(false)
-                .build()
-
         // BIOMETRIC_WEAK :Any biometric (e.g. fingerprint, iris, or face) on the device that meets
         // or exceeds the requirements for Class 2(formerly Weak), as defined by the Android CDD.
         if (
             BiometricManager.from(this)
                 .canAuthenticate(
                     BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
-                        BiometricManager.Authenticators.BIOMETRIC_STRONG
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
                 ) == BiometricManager.BIOMETRIC_SUCCESS
         ) {
             biometricPrompt.authenticate(promptInfo)
