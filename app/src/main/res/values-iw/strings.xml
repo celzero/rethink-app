@@ -211,4 +211,74 @@
     <string name="univ_delete_firewall_dialog_message" translatable="true">מחיקת כללים אלה תאפשר לכל אפליקציה להתחבר לכתובות ה-IP החסומות כעת.</string>
     <string name="dns_connected_no_count" translatable="true">מחובר</string>
     <string name="title_statistics" translatable="true">סטטיסטיקות</string>
+    <string name="lbl_maybe_blocked" translatable="true">אולי חסום</string>
+    <string name="lbl_ip_rules" translatable="true">כללי IP</string>
+    <string name="lbl_logs" translatable="true">יומן</string>
+    <string name="lbl_network" translatable="true">רשת</string>
+    <string name="lbl_domain_rules" translatable="true">כללי דומיין</string>
+    <string name="slide_1_title" translatable="true">תוכנה חופשית וקוד פתוח</string>
+    <string name="conn_track_clear_logs_title" translatable="true">למחוק את כל יומני הרשת?</string>
+    <string name="lbl_create" translatable="true">ליצור</string>
+    <string name="lbl_qr_code" translatable="true">ברקוד</string>
+    <string name="lbl_import" translatable="true">ייבוא</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_public_key" translatable="true">מפתח ציבורי</string>
+    <string name="lbl_addresses" translatable="true">כתובות</string>
+    <string name="lbl_dns_servers" translatable="true">שרתי DNS</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(אוטומטי)</string>
+    <string name="lbl_include" translatable="true">לכלול</string>
+    <string name="lbl_select_all" translatable="true">בחר הכל</string>
+    <string name="lbl_active" translatable="true">פעיל</string>
+    <string name="lbl_inactive" translatable="true">לא פעיל</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_fast" translatable="true">מהיר</string>
+    <string name="lbl_allowed_ips" translatable="true">כתובות רשת מותרות</string>
+    <string name="lbl_save" translatable="true">שמירה</string>
+    <string name="exclude" translatable="true">תכלול</string>
+    <string name="status_protected_with_socks5_private_dns" translatable="true">מוגן באמצעות SOCKS5 ו- DNS פרטי</string>
+    <string name="status_protected_with_http_private_dns" translatable="true">מוגן באמצעות פרוקסי HTTP ו- DNS פרטי</string>
+    <string name="status_protected_with_socks5" translatable="true">מוגן באמצעות socks proxy</string>
+    <string name="status_protected_with_http" translatable="true">מוגן באמצעות proxy http</string>
+    <string name="status_protected_with_wg" translatable="true">מוגן באמצעות Wireguard</string>
+    <string name="dns_mode_info_explanation_new" translatable="true">עקוב, לחסום ולהצפין בקשות DNS.</string>
+    <string name="default_dns_name" translatable="true">ברירת המחדל של RDNS</string>
+    <string name="dns_query_clear_logs_title" translatable="true">למחוק את כל יומני ה- DNS?</string>
+    <string name="lbl_disabled" translatable="true">מושבת</string>
+    <string name="lbl_domain" translatable="true">דומיין</string>
+    <string name="lbl_wildcard" translatable="true">תו כללי</string>
+    <string name="lbl_action_required" translatable="true">פעולה נדרשת</string>
+    <string name="lbl_rules" translatable="true">כללים</string>
+    <string name="lbl_configure" translatable="true">הגדר</string>
+    <string name="slide_1_desc" translatable="true">Rethink היא תוכנת קוד פתוח המגובה על ידי תוכנית MVP של Mozilla Builders.</string>
+    <string name="rethink_plus" translatable="true">RETHINKDNS Plus</string>
+    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="bypass_universal" translatable="true">עוקף אוניברסלי</string>
+    <string name="lbl_applications" translatable="true">יישומים</string>
+    <string name="lbl_delete" translatable="true">מחק</string>
+    <string name="lbl_proceed" translatable="true">להמשיך</string>
+    <string name="lbl_private_key" translatable="true">מפתח פרטי</string>
+    <string name="lbl_generated" translatable="true">(נוצר)</string>
+    <string name="lbl_random" translatable="true">(אקראי)</string>
+    <string name="lbl_slow" translatable="true">איטי</string>
+    <string name="lbl_very" translatable="true">מאוד</string>
+    <string name="lbl_min" translatable="true">דקות</string>
+    <string name="lbl_day" translatable="true">יום</string>
+    <string name="lbl_add" translatable="true">הוסף</string>
+    <string name="lbl_app_wise" translatable="true">לאפליקציה</string>
+    <string name="lbl_sec" translatable="true">שניות</string>
+    <string name="lbl_hour" translatable="true">שעות</string>
+    <string name="lbl_insecure" translatable="true">(לא בטוח)</string>
+    <string name="lbl_optional" translatable="true">(אופציונאלי)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">שומר מתמשך</string>
+    <string name="slide_2_desc" translatable="true">Rethink הוא הדרך הקלה ביותר לפקח על פעילות הרשת, לעקוף צנזורה באינטרנט ואפליקציות חומת אש במכשיר אנדרואיד שלך.</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">מוגן באמצעות Wireguard ו- DNS פרטי</string>
+    <string name="alert_permission_accessibility" translatable="true">הרשאה - נגישות</string>
+    <string name="alert_firewall_accessibility_explanation" translatable="true">Rethink משתמש בשירות נגישות כדי לעקוב אחר האפליקציות הן בשימוש (חזית) לעומת אלה שאינם בשימוש (רקע).
+\n
+\nRETHINK אינו אוסף עליך מידע או ריגול בשום דרך.</string>
+    <string name="conn_track_clear_logs_message" translatable="true">זה מוחק רק יומני רשת אך לא כללי חומת אש. פעולה זו אינה הפיכה. אתה רוצה להמשיך?</string>
+    <string name="dns_query_clear_logs_message" translatable="true">זה מוחק את יומני ה- DNS במכשיר. פעולה זו אינה הפיכה. אתה רוצה להמשיך?</string>
 </resources>
