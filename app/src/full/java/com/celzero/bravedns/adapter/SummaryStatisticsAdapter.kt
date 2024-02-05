@@ -53,10 +53,10 @@ import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.isAtleastN
-import kotlin.math.log2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.log2
 
 class SummaryStatisticsAdapter(
     private val context: Context,

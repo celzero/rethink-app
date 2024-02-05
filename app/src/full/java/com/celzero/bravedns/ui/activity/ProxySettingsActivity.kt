@@ -66,11 +66,11 @@ import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configure) {
     private val b by viewBinding(FragmentProxyConfigureBinding::bind)

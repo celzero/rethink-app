@@ -19,7 +19,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -44,7 +43,6 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import ipn.Ipn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -372,8 +370,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                     updateLockdown(true)
                 }
                 2 -> {
-                    //b.oneWgCheck.isChecked = true
-                    //updateOneWireGuard(true)
+                    // b.oneWgCheck.isChecked = true
+                    // updateOneWireGuard(true)
                 }
                 3 -> {
                     b.catchAllCheck.isChecked = true
@@ -414,7 +412,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
     }
 
-   /* private fun updateOneWireGuard(enabled: Boolean) {
+    /* private fun updateOneWireGuard(enabled: Boolean) {
         io {
             WireguardManager.updateOneWireGuardConfig(configId, enabled)
             uiCtx {

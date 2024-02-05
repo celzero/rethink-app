@@ -22,7 +22,6 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.FragmentConfigureBinding
-import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.ui.activity.DnsDetailActivity
 import com.celzero.bravedns.ui.activity.FirewallActivity

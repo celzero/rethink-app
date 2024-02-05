@@ -194,7 +194,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
 
     private fun showGeneralToggle() {
         if (this.isDestroyed) return
-        
+
         selectToggleBtnUi(b.wgGeneralToggleBtn)
         unselectToggleBtnUi(b.oneWgToggleBtn)
         b.oneWgInterfaceList.visibility = View.GONE
