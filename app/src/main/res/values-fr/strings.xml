@@ -129,7 +129,7 @@
     <string name="orbot_install_dialog_message">Orbot apporte les caractéristiques et les fonctionnalités de Tor à Android.</string>
     <string name="settings_theme_desc">Thème sombre/clair</string>
     <string name="settings_notification_dialog_option_2">"
-\nDNS / DNS + Pare-feu :
+\nDNS / DNS + Pare-feu :
 \nAffiche deux boutons permettant de passer rapidement du mode DNS qui économise la batterie, au mode normal DNS + Pare-feu."</string>
     <string name="settings_selected_theme">Thème actuel : %1$s</string>
     <string name="settings_import_export_heading">Sauvegarder &amp; Restaurer</string>
@@ -181,10 +181,10 @@
     <string name="dc_local_block_heading">Listes de blocage embarquées sur l’appareil</string>
     <string name="settings_notification_desc3">Aucun</string>
     <string name="settings_notification_dialog_option_1">"
-\nPause / Arrêt (par défaut) :
+\nPause / Arrêt (par défaut) :
 \nAffiche deux boutons, pour mettre rapidement en pause et arrêter Rethink."</string>
     <string name="settings_notification_dialog_option_3">"
-\nAucun :
+\nAucun :
 \nN’affiche aucun bouton.
 \n"</string>
     <string name="firewall_status_excluded">exclue du DNS et du pare-feu</string>
@@ -871,7 +871,7 @@
     <string name="lbl_delete" translatable="true">Supprimer</string>
     <string name="lbl_qr_code" translatable="true">QR Code</string>
     <string name="bad_config_reason_missing_attribute" translatable="true">Attribut manquant</string>
-    <string name="key_length_explanation_base64" translatable="true">: les clés WireGuard base64 doivent être de 44 caractères (32 octets)</string>
+    <string name="key_length_explanation_base64" translatable="true">: Les clés WireGuard base64 doivent être de 44 caractères (32 octets)</string>
     <string name="lbl_generated" translatable="true">(généré)</string>
     <string name="bad_config_reason_missing_section" translatable="true">Section manquante</string>
     <string name="lbl_slow" translatable="true">lent</string>
