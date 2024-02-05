@@ -107,11 +107,17 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
 
     override fun onResume() {
         super.onResume()
-        resetUI()
-        updateUI()
+        resetUi()
+        highlightSelectedUi()
     }
 
-    private fun resetUI() {
+    private fun resetUi() {
+        b.cardDoh.strokeWidth = 0
+        b.cardDnsproxy.strokeWidth = 0
+        b.cardDnscrypt.strokeWidth = 0
+        b.cardDot.strokeWidth = 0
+        b.cardOdoh.strokeWidth = 0
+        b.cardRethinkDns.strokeWidth = 0
         b.initialDoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
         b.abbrDoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
         b.initialDnsproxy.setTextColor(fetchColor(this, R.attr.primaryTextColor))
@@ -122,9 +128,11 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
         b.abbrDot.setTextColor(fetchColor(this, R.attr.primaryTextColor))
         b.initialOdoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
         b.abbrOdoh.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.initialRethinkDns.setTextColor(fetchColor(this, R.attr.primaryTextColor))
+        b.abbrRethinkDns.setTextColor(fetchColor(this, R.attr.primaryTextColor))
     }
 
-    private fun updateUI() {
+    private fun highlightSelectedUi() {
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
                 b.cardDoh.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
