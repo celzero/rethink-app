@@ -188,6 +188,7 @@
 
         <!-- draw a vertical line -->
         <View
+            android:id="@+id/bs_conn_vertical_line"
             android:layout_width="0.5dp"
             android:layout_height="match_parent"
             android:background="?attr/primaryLightColorText" />

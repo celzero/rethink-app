@@ -51,8 +51,6 @@ class RethinkLogFragment :
     private var layoutManager: RecyclerView.LayoutManager? = null
     private val viewModel: RethinkLogViewModel by viewModel()
 
-    private var filterQuery: String = ""
-    private var filterType: TopLevelFilter = TopLevelFilter.ALL
     private val rethinkLogRepository by inject<RethinkLogRepository>()
     private val persistentState by inject<PersistentState>()
 
@@ -76,6 +74,9 @@ class RethinkLogFragment :
     }
 
     private fun initView() {
+
+        // no need to show filter options for rethink logs
+        b.connectionFilterIcon.visibility = View.GONE
 
         if (!persistentState.logsEnabled) {
             b.connectionListLogsDisabledTv.visibility = View.VISIBLE
@@ -102,18 +103,8 @@ class RethinkLogFragment :
         setupRecyclerScrollListener()
 
         b.connectionSearch.setOnQueryTextListener(this)
-        b.connectionSearch.setOnClickListener {
-            showParentChipsUi()
-            showChildChipsIfNeeded()
-            b.connectionSearch.requestFocus()
-            b.connectionSearch.onActionViewExpanded()
-        }
-
-        b.connectionFilterIcon.setOnClickListener { toggleParentChipsUi() }
 
         b.connectionDeleteIcon.setOnClickListener { showDeleteDialog() }
-
-        remakeParentFilterChipsUi()
     }
 
     private fun setupRecyclerScrollListener() {
@@ -141,90 +132,13 @@ class RethinkLogFragment :
         b.recyclerConnection.addOnScrollListener(scrollListener)
     }
 
-    private fun toggleParentChipsUi() {
-        if (b.filterChipParentGroup.isVisible) {
-            hideParentChipsUi()
-            hideChildChipsUi()
-        } else {
-            showParentChipsUi()
-            showChildChipsIfNeeded()
-        }
-    }
-
-    private fun showChildChipsIfNeeded() {
-        when (filterType) {
-            TopLevelFilter.ALL -> {
-                hideChildChipsUi()
-            }
-            TopLevelFilter.ALLOWED -> {
-                showChildChipsUi()
-            }
-            TopLevelFilter.BLOCKED -> {
-                showChildChipsUi()
-            }
-        }
-    }
-
-    private fun remakeParentFilterChipsUi() {
-        b.filterChipParentGroup.removeAllViews()
-
-        val all = makeParentChip(TopLevelFilter.ALL.id, getString(R.string.lbl_all), true)
-        val allowed =
-            makeParentChip(TopLevelFilter.ALLOWED.id, getString(R.string.lbl_allowed), false)
-        val blocked =
-            makeParentChip(TopLevelFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
-
-        b.filterChipParentGroup.addView(all)
-        b.filterChipParentGroup.addView(allowed)
-        b.filterChipParentGroup.addView(blocked)
-    }
-
-    private fun makeParentChip(id: Int, label: String, checked: Boolean): Chip {
-        val chip = this.layoutInflater.inflate(R.layout.item_chip_filter, b.root, false) as Chip
-        chip.tag = id
-        chip.text = label
-        chip.isChecked = checked
-
-        chip.setOnCheckedChangeListener { button: CompoundButton, isSelected: Boolean ->
-            if (isSelected) { // apply filter only when the CompoundButton is selected
-                applyParentFilter(button.tag)
-            } else { // actions need to be taken when the button is unselected
-                unselectParentsChipsUi(button.tag)
-            }
-        }
-
-        return chip
-    }
-
-    private fun applyParentFilter(tag: Any) {
-        when (tag) {
-            TopLevelFilter.ALL.id -> {
-                filterType = TopLevelFilter.ALL
-                viewModel.setFilter(filterQuery, filterType)
-                hideChildChipsUi()
-            }
-            TopLevelFilter.ALLOWED.id -> {
-                filterType = TopLevelFilter.ALLOWED
-                viewModel.setFilter(filterQuery, filterType)
-                showChildChipsUi()
-            }
-            TopLevelFilter.BLOCKED.id -> {
-                filterType = TopLevelFilter.BLOCKED
-                viewModel.setFilter(filterQuery, filterType)
-                showChildChipsUi()
-            }
-        }
-    }
-
     override fun onQueryTextSubmit(query: String): Boolean {
-        this.filterQuery = query
-        viewModel.setFilter(query, filterType)
+        viewModel.setFilter(query)
         return true
     }
 
     override fun onQueryTextChange(query: String): Boolean {
-        this.filterQuery = query
-        viewModel.setFilter(query, filterType)
+        viewModel.setFilter(query)
         return true
     }
 
@@ -241,34 +155,6 @@ class RethinkLogFragment :
         builder.create().show()
     }
 
-    // chips: all, allowed, blocked
-    // when any chip other than "all" is selected, show the child chips.
-    // ignore unselect events from allowed and blocked chip
-    private fun unselectParentsChipsUi(tag: Any) {
-        when (tag) {
-            TopLevelFilter.ALL.id -> {
-                showChildChipsUi()
-            }
-        }
-    }
-
-    private fun showChildChipsUi() {
-        b.filterChipGroup.visibility = View.VISIBLE
-    }
-
-    private fun hideChildChipsUi() {
-        b.filterChipGroup.visibility = View.GONE
-    }
-
-    private fun showParentChipsUi() {
-        b.filterChipParentGroup.visibility = View.VISIBLE
-    }
-
-    private fun hideParentChipsUi() {
-        b.filterChipParentGroup.visibility = View.GONE
-    }
-
-    // fixme: move this to viewmodel scope
     private fun io(f: suspend () -> Unit) {
         lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }

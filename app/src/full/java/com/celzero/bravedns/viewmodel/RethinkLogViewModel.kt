@@ -32,7 +32,6 @@ import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 class RethinkLogViewModel(private val rlogDao: RethinkLogDao) : ViewModel() {
 
     private var filterString: MutableLiveData<String> = MutableLiveData()
-    private var filterType: TopLevelFilter = TopLevelFilter.ALL
 
     enum class TopLevelFilter(val id: Int) {
         ALL(0),
@@ -56,43 +55,13 @@ class RethinkLogViewModel(private val rlogDao: RethinkLogDao) : ViewModel() {
             jumpThreshold = 5
         )
 
-    fun setFilter(searchString: String, type: TopLevelFilter) {
-        filterType = type
-
+    fun setFilter(searchString: String) {
         if (searchString.isNotBlank()) filterString.value = searchString
         else filterString.value = ""
     }
 
     private fun fetchNetworkLogs(input: String): LiveData<PagingData<RethinkLog>> {
-        return when (filterType) {
-            TopLevelFilter.ALL -> {
-                getAllNetworkLogs(input)
-            }
-            TopLevelFilter.ALLOWED -> {
-                getAllowedNetworkLogs(input)
-            }
-            TopLevelFilter.BLOCKED -> {
-                getBlockedNetworkLogs(input)
-            }
-        }
-    }
-
-    private fun getBlockedNetworkLogs(input: String): LiveData<PagingData<RethinkLog>> {
-        return Pager(pagingConfig) {
-                if (input.isBlank()) rlogDao.getBlockedConnections()
-                else rlogDao.getBlockedConnections("%$input%")
-            }
-            .liveData
-            .cachedIn(viewModelScope)
-    }
-
-    private fun getAllowedNetworkLogs(input: String): LiveData<PagingData<RethinkLog>> {
-        return Pager(pagingConfig) {
-                if (input.isBlank()) rlogDao.getAllowedConnections()
-                else rlogDao.getAllowedConnections("%$input%")
-            }
-            .liveData
-            .cachedIn(viewModelScope)
+        return getAllNetworkLogs(input)
     }
 
     private fun getAllNetworkLogs(input: String): LiveData<PagingData<RethinkLog>> {

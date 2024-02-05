@@ -298,6 +298,8 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.connectionSummaryLl.visibility = View.GONE
             b.bsConnConnUpload.visibility = View.GONE
             b.bsConnConnDownload.visibility = View.GONE
+            b.bsConnVerticalLine.visibility = View.GONE
+            b.bsConnConnDuration.visibility = View.GONE
             return
         }
 
