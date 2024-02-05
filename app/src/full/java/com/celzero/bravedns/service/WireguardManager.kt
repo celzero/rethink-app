@@ -32,6 +32,12 @@ import com.celzero.bravedns.wireguard.WgInterface
 import inet.ipaddr.IPAddressString
 import ipn.Ipn
 import ipn.Key
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArraySet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,12 +45,6 @@ import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
-import java.util.Locale
-import java.util.concurrent.CopyOnWriteArraySet
 
 object WireguardManager : KoinComponent {
 
@@ -124,7 +124,7 @@ object WireguardManager : KoinComponent {
         return config
     }
 
-    fun getActiveConfigs(): List<Config> {
+    fun getEnabledConfigs(): List<Config> {
         val m = mappings.filter { it.isActive }
         val l = mutableListOf<Config>()
         m.forEach {
@@ -233,10 +233,11 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    fun disableAllActiveConfigs() {
+    suspend fun disableAllActiveConfigs() {
         val activeConfigs = mappings.filter { it.isActive }
         activeConfigs.forEach {
             disableConfig(it)
+            updateOneWireGuardConfig(it.id, false)
         }
     }
 
@@ -345,7 +346,14 @@ object WireguardManager : KoinComponent {
         val configId = ProxyManager.getProxyIdForApp(uid)
         if (configId == "" || !configId.contains(ProxyManager.ID_WG_BASE)) {
             Log.i(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
-            return null
+            // there maybe catch-all config enabled, so return the active catch-all config
+            val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
+            if (catchAllConfig == null) {
+                Log.i(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+                return null
+            } else {
+                return catchAllConfig
+            }
         }
 
         val id = convertStringIdToId(configId)
@@ -726,8 +734,8 @@ object WireguardManager : KoinComponent {
     }
 
     fun canRouteIp(configId: Int?, ip: String?): Boolean {
-        val defaultIpv4 = IPAddressString("0.0.0.0")
-        val defaultIpv6 = IPAddressString("::")
+        val destAddr = IPAddressString(ip)
+
         if (configId == null || ip == null) {
             Log.e(LOG_TAG_PROXY, "canRouteIp: configId or ip is null")
             return false
@@ -740,32 +748,11 @@ object WireguardManager : KoinComponent {
         }
         // if no allowed ips are present, then allow all (case: no peers added)
         val allowedIps = config.getPeers()?.map { it.getAllowedIps() }?.flatten() ?: return true
-        if (DEBUG) Log.d(LOG_TAG_PROXY, "canRouteIp: $allowedIps")
+        if (DEBUG) Log.d(LOG_TAG_PROXY, "canRouteIp: $allowedIps, dest: $destAddr")
+
         allowedIps.forEach {
-            val addr = IPAddressString(it.address.hostAddress)
-            val destAddr = IPAddressString(ip)
-            // if the allowed ip is default ipv4 and the destination ip is ipv4, then allow
-            if (addr == defaultIpv4 && destAddr.isIPv4) {
-                return true
-            }
-            // if the allowed ip is default ipv6 and the destination ip is ipv6, then allow
-            if (addr == defaultIpv6 && destAddr.isIPv6) {
-                return true
-            }
-            // replace addr to *.* if its default ipv4
-            if (addr == defaultIpv4) {
-                val newAddr = IPAddressString("*.*/${addr.networkPrefixLength}")
-                if (newAddr.contains(destAddr)) {
-                    return true
-                }
-            }
-            // replace addr to *:* if its default ipv6
-            if (addr == defaultIpv6) {
-                val newAddr = IPAddressString("*:*/${addr.networkPrefixLength}")
-                if (newAddr.contains(destAddr)) {
-                    return true
-                }
-            }
+            val addr = IPAddressString(it.toString())
+            if (DEBUG) Log.d(LOG_TAG_PROXY, "canRouteIp: a: $addr, d: $destAddr, c:${addr.contains(destAddr)}")
             // if the destination ip is present in the allowed ip, then allow
             if (addr.contains(destAddr)) {
                 return true
