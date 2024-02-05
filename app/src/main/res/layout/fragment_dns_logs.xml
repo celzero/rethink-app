@@ -26,7 +26,7 @@
                 android:gravity="start"
                 android:orientation="vertical">
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/query_list_url_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -36,36 +36,38 @@
 
                     <androidx.appcompat.widget.SearchView
                         android:id="@+id/query_list_search"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="start"
-                        android:layout_weight="0.80"
+                        android:layout_toStartOf="@id/query_list_filter_icon"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
-                        app:queryHint="@string/search_dns_logs" />
+                        app:queryHint="@string/search_firewall_network_log" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/query_list_filter_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/query_list_delete_icon"
                         android:padding="7dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/query_list_delete_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:padding="7dp"
                         android:src="@drawable/ic_delete"
                         android:visibility="visible" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/filter_chip_group"
@@ -105,9 +107,9 @@
             android:id="@+id/query_list_recycler_scroll_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/recycler_view_header_bg"
             android:layout_below="@id/query_list_card_view_top"
             android:layout_centerHorizontal="true"
+            android:background="@drawable/recycler_view_header_bg"
             android:paddingStart="10dp"
             android:paddingTop="5dp"
             android:paddingEnd="10dp"

@@ -38,9 +38,9 @@ import com.celzero.bravedns.util.UIUtils.formatToRelativeTime
 import com.celzero.bravedns.viewmodel.DnsLogViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -70,7 +70,8 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         ALL(0),
         ALLOWED(1),
         BLOCKED(2),
-        MAYBE_BLOCKED(3)
+        MAYBE_BLOCKED(3),
+        UNKNOWN_RECORDS(4)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -160,11 +161,18 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
         val maybeBlocked =
             makeChip(DnsLogFilter.MAYBE_BLOCKED.id, getString(R.string.lbl_maybe_blocked), false)
         val blocked = makeChip(DnsLogFilter.BLOCKED.id, getString(R.string.lbl_blocked), false)
+        val unknown =
+            makeChip(
+                DnsLogFilter.UNKNOWN_RECORDS.id,
+                getString(R.string.network_log_app_name_unknown),
+                false
+            )
 
         b.filterChipGroup.addView(all)
         b.filterChipGroup.addView(allowed)
         b.filterChipGroup.addView(maybeBlocked)
         b.filterChipGroup.addView(blocked)
+        b.filterChipGroup.addView(unknown)
     }
 
     private fun makeChip(id: Int, label: String, checked: Boolean): Chip {
@@ -208,6 +216,10 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
                 filterType = DnsLogFilter.MAYBE_BLOCKED
                 viewModel.setFilter(filterValue, filterType)
             }
+            DnsLogFilter.UNKNOWN_RECORDS.id -> {
+                filterType = DnsLogFilter.UNKNOWN_RECORDS
+                viewModel.setFilter(filterValue, filterType)
+            }
         }
     }
 
@@ -247,6 +259,6 @@ class DnsLogFragment : Fragment(R.layout.fragment_dns_logs), SearchView.OnQueryT
     }
 
     private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch { f() }
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
     }
 }

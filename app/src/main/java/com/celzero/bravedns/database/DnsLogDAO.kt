@@ -68,6 +68,16 @@ interface DnsLogDAO {
     fun getMaybeBlockedDnsLogs(): PagingSource<Int, DnsLog>
 
     @Query(
+        "select * from DNSLogs where typeName not in (:types) order by id desc LIMIT $MAX_LOGS"
+    )
+    fun getUnknownRecordDnsLogs(types: Set<String>): PagingSource<Int, DnsLog>
+
+    @Query(
+        "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and typeName not in (:types) order by id desc LIMIT $MAX_LOGS"
+    )
+    fun getUnknownRecordDnsLogsByName(searchString: String, types: Set<String>): PagingSource<Int, DnsLog>
+
+    @Query(
         "select * from DNSLogs where (queryStr like :searchString or responseIps like :searchString) and isBlocked = 0 and blockLists != '' order by id desc LIMIT $MAX_LOGS"
     )
     fun getMaybeBlockedDnsLogsByName(searchString: String): PagingSource<Int, DnsLog>
