@@ -376,7 +376,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun observeProxyStates() {
         persistentState.proxyStatus.observe(viewLifecycleOwner) {
-            Log.d(LOG_TAG_VPN, "Proxy status: $it")
             if (it != -1) {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_active)
                 b.fhsCardOtherProxyCount.visibility = View.VISIBLE

@@ -25,7 +25,7 @@
                 android:orientation="vertical">
 
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/connection_url_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -35,10 +35,12 @@
 
                     <androidx.appcompat.widget.SearchView
                         android:id="@+id/connection_search"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
-                        android:layout_weight="0.80"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@id/connection_filter_icon"
                         android:fontFamily="sans-serif"
                         android:isScrollContainer="true"
                         app:iconifiedByDefault="false"
@@ -46,25 +48,25 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/connection_filter_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/connection_delete_icon"
                         android:padding="7dp"
                         android:src="@drawable/ic_filter"
                         android:visibility="visible" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/connection_delete_icon"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:padding="7dp"
                         android:src="@drawable/ic_delete"
                         android:visibility="visible" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/filter_chip_parent_group"

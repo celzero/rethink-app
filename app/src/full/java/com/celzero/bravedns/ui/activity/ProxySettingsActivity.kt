@@ -468,7 +468,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
     private fun displayWireguardUi() {
 
-        val activeWgs = WireguardManager.getActiveConfigs()
+        val activeWgs = WireguardManager.getEnabledConfigs()
 
         if (activeWgs.isEmpty()) {
             b.settingsActivityWireguardDesc.text = getString(R.string.wireguard_description)
