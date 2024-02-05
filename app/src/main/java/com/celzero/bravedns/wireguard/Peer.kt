@@ -176,7 +176,7 @@ class Peer private constructor(builder: Builder) {
         sb.append("public_key=").append(publicKey.hex()).append('\n')
         for (allowedIp in allowedIps) sb.append("allowed_ip=").append(allowedIp).append('\n')
         endpoint.flatMap<Any>(InetEndpoint::getResolved).ifPresent { ep: Any? ->
-            sb.append("endpoint=").append(ep)
+            sb.append("endpoint=").append(ep).append('\n')
         }
         unresolvedEndpoint.ifPresent { sb.append("endpoint=").append(it).append('\n') }
         persistentKeepalive.ifPresent { pk: Int? ->
