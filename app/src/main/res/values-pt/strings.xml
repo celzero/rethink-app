@@ -847,4 +847,27 @@
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Ignorar DNS universal e regras de firewall para aplicações <i>listadas</i>\?</string>
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está definido como bloqueado nas regras de domínio Universal.<br/><br/> Para alterar este comportamento, vá ao separador <i>Configurar DNS</i>.</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Reforço de DNS (experimental)</string>
+    <string name="lbl_qr_code" translatable="true">Código QR</string>
+    <string name="lbl_import" translatable="true">Importar</string>
+    <string name="lbl_public_key" translatable="true">Chave pública</string>
+    <string name="lbl_private_key" translatable="true">Chave privada</string>
+    <string name="lbl_random" translatable="true">(aleatório)</string>
+    <string name="lbl_very" translatable="true">muito</string>
+    <string name="lbl_maybe_blocked" translatable="true">Talvez esteja bloqueado</string>
+    <string name="lbl_network" translatable="true">rede</string>
+    <string name="lbl_create" translatable="true">Criar</string>
+    <string name="lbl_wireguard" translatable="true">WireGuard</string>
+    <string name="lbl_addresses" translatable="true">Endereços</string>
+    <string name="lbl_dns_servers" translatable="true">Servidores DNS</string>
+    <string name="lbl_applications" translatable="true">Aplicações</string>
+    <string name="lbl_delete" translatable="true">Eliminar</string>
+    <string name="lbl_include" translatable="true">Incluir</string>
+    <string name="lbl_select_all" translatable="true">Selecionar tudo</string>
+    <string name="lbl_active" translatable="true">Ativo</string>
+    <string name="lbl_inactive" translatable="true">Inativo</string>
+    <string name="lbl_fast" translatable="true">rápido</string>
+    <string name="lbl_slow" translatable="true">lento</string>
+    <string name="lbl_app_wise" translatable="true">por aplicação</string>
+    <string name="lbl_sec" translatable="true">seg</string>
+    <string name="lbl_min" translatable="true">min</string>
 </resources>
