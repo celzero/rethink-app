@@ -61,7 +61,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
-import java.net.InetAddress
 import java.net.URI
 
 /**
@@ -219,37 +218,11 @@ class GoVpnAdapter : KoinComponent {
                 if (DEBUG) Log.d(LOG_TAG_VPN, "changing url from https to http for $url")
                 url = url?.replace("https", "http")
             }
-            var ips: String = getIpString(context, url)
-            if (ips.isEmpty()) {
-                ips = resolveName(url)?.joinToString { it }.orEmpty()
-            }
+            val ips: String = getIpString(context, url)
             Intra.addDoHTransport(tunnel, id, url, ips)
-            Log.i(LOG_TAG_VPN, "new doh: $id (${doh?.dohName}), url: $url")
+            Log.i(LOG_TAG_VPN, "new doh: $id (${doh?.dohName}), url: $url, ips: $ips")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: doh failure", e)
-        }
-    }
-
-    private suspend fun resolveName(hostname: String?): List<String>? {
-        if (hostname.isNullOrEmpty()) return null
-
-        return try {
-            val hn =
-                if (hostname.contains("https")) {
-                    hostname.substringAfter("https://").substringBefore("/")
-                } else {
-                    hostname.substringAfter("http://").substringBefore("/")
-                }
-            val addresses = InetAddress.getAllByName(hn)
-            val resolvedAddresses = ArrayList<String>()
-
-            for (address in addresses) {
-                address.hostAddress?.let { resolvedAddresses.add(it) }
-            }
-            resolvedAddresses
-        } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "err: resolve name($hostname): ${e.message}", e)
-            null
         }
     }
 
@@ -289,11 +262,12 @@ class GoVpnAdapter : KoinComponent {
             val url = dc.dnsCryptURL
             Intra.addDNSCryptTransport(tunnel, id, url)
             Log.i(LOG_TAG_VPN, "new dnscrypt: $id (${dc.dnsCryptName}), url: $url")
-            setDnscryptResolversIfAny()
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt failure", e)
             showDnscryptConnectionFailureToast()
         }
+        // setDnscryptRelaysIfAny() is expected to catch exceptions
+        setDnscryptRelaysIfAny()
     }
 
     private suspend fun addDnsProxyTransport(id: String) {
@@ -322,13 +296,9 @@ class GoVpnAdapter : KoinComponent {
 
     private suspend fun addRdnsTransport(id: String, url: String) {
         try {
-            var ips: String = getIpString(context, url)
-
+            val ips: String = getIpString(context, url)
             val convertedUrl = getRdnsUrl(url) ?: return
             if (url.contains(RETHINK_BASE_URL_SKY)) {
-                if (ips.isEmpty()) {
-                    ips = resolveName(url)?.joinToString { it }.orEmpty()
-                }
                 Intra.addDoHTransport(tunnel, id, convertedUrl, ips)
                 Log.i(LOG_TAG_VPN, "new doh (rdns): $id, url: $convertedUrl, ips: $ips")
             } else {
@@ -438,7 +408,7 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private suspend fun setDnscryptResolversIfAny() {
+    private suspend fun setDnscryptRelaysIfAny() {
         val routes: String = appConfig.getDnscryptRelayServers()
         routes.split(",").forEach {
             if (it.isBlank()) return@forEach
@@ -527,13 +497,13 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode) {
-        if (!tunProxyMode.isTunProxyWireguard()) return
+    suspend fun setWireguardTunnelModeIfNeeded(tunProxyMode: AppConfig.TunProxyMode): Boolean {
+        if (!tunProxyMode.isTunProxyWireguard()) return false
 
-        val wgConfigs: List<Config> = WireguardManager.getActiveConfigs()
+        val wgConfigs: List<Config> = WireguardManager.getEnabledConfigs()
         if (wgConfigs.isEmpty()) {
             Log.i(LOG_TAG_VPN, "no active wireguard configs found")
-            return
+            return false
         }
         wgConfigs.forEach {
             val wgUserSpaceString = it.toWgUserspaceString()
@@ -552,8 +522,10 @@ class GoVpnAdapter : KoinComponent {
                     e.message ?: context.getString(R.string.wireguard_connection_error)
                 )
                 Log.e(LOG_TAG_VPN, "connect-tunnel: could not start wireguard", e)
+                return false
             }
         }
+        return true
     }
 
     private fun setWireGuardDns(id: String) {
@@ -604,11 +576,20 @@ class GoVpnAdapter : KoinComponent {
 
     fun getProxyStatusById(id: String): Long? {
         return try {
-            val status = getProxies()?.getProxy(id)?.status()
-            if (DEBUG) Log.d(LOG_TAG_VPN, "getProxyStatusById: $id, $status")
+            val status = getProxyById(id)?.status()
+            if (DEBUG) Log.d(LOG_TAG_VPN, "proxy status($id): $status")
             status
         } catch (ignored: Exception) {
-            Log.e(LOG_TAG_VPN, "err getProxy($id) ignored: ${ignored.message}")
+            Log.i(LOG_TAG_VPN, "err getProxy($id) ignored: ${ignored.message}")
+            null
+        }
+    }
+
+    fun getProxyById(id: String): ipn.Proxy? {
+        return try {
+            getProxies()?.getProxy(id)
+        } catch (ignored: Exception) {
+            Log.i(LOG_TAG_VPN, "err getProxy($id) ignored: ${ignored.message}")
             null
         }
     }

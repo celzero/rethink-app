@@ -172,7 +172,7 @@ class BraveVPNService :
     private lateinit var appInfoObserver: Observer<Collection<AppInfo>>
     private lateinit var orbotStartStatusObserver: Observer<Boolean>
 
-    private lateinit var rethinkUid: String
+    private var rethinkUid: Int = INVALID_UID
 
     // used to store the conn-ids that are allowed and active, to show in network logs
     // as active connections. removed when the connection is closed (onSummary)
@@ -431,8 +431,9 @@ class BraveVPNService :
                 // no-op; pass-through
             }
 
+            val isMetered = isConnectionMetered(connInfo.destIP)
             // block all metered connections (Universal firewall setting)
-            if (persistentState.getBlockMeteredConnections() && isConnectionMetered(connInfo)) {
+            if (persistentState.getBlockMeteredConnections() && isMetered) {
                 return FirewallRuleset.RULE1F
             }
 
@@ -466,10 +467,6 @@ class BraveVPNService :
             if (dnsBypassed(connInfo.query)) {
                 return FirewallRuleset.RULE7
             }
-
-            if (isProxyEnabled(uid)) {
-                return FirewallRuleset.RULE12
-            }
         } catch (iex: Exception) {
             // TODO: show alerts to user on such exceptions, in a separate ui?
             Log.e(LOG_TAG_VPN, "err blocking conn, block anyway", iex)
@@ -478,26 +475,6 @@ class BraveVPNService :
 
         logd("no firewall rule, uid=${connInfo.uid}")
         return FirewallRuleset.RULE0
-    }
-
-    private fun isProxyEnabled(uid: Int): Boolean {
-        val isProxyEnabled = appConfig.isProxyEnabled()
-        if (!isProxyEnabled) {
-            return false
-        }
-
-        // no need to check for uid if http or socks5 proxy is enabled
-        if (appConfig.isCustomHttpProxyEnabled() || appConfig.isCustomSocks5Enabled()) {
-            return true
-        }
-
-        val id = ProxyManager.getProxyIdForApp(uid)
-        if (id == ProxyManager.ID_NONE) {
-            Log.i(LOG_TAG_VPN, "No proxy enabled for uid=$uid")
-            return false
-        }
-
-        return ProxyManager.isProxyActive(id)
     }
 
     private fun getDomainRule(domain: String?, uid: Int): DomainRulesManager.Status {
@@ -598,7 +575,7 @@ class BraveVPNService :
         val isUdp = protocol == Protocol.UDP.protocolType
         if (!isUdp) return false
 
-        // fall through dns requests, other rules might catch appropriate
+        // fall through dns requests, other rules might catch as appropriate
         // https://github.com/celzero/rethink-app/issues/492#issuecomment-1299090538
         if (isDns(port)) return false
 
@@ -658,51 +635,52 @@ class BraveVPNService :
             return null
         }
 
-        if (isWifiBlockedForUid(connectionStatus) && !isConnectionMetered(connInfo)) {
+        val isMetered = isConnectionMetered(connInfo.destIP)
+        if (isWifiBlockedForUid(connectionStatus) && !isMetered) {
             return FirewallRuleset.RULE1D
         }
 
-        if (isMobileDataBlockedForUid(connectionStatus) && isConnectionMetered(connInfo)) {
+        if (isMobileDataBlockedForUid(connectionStatus) && isMetered) {
             return FirewallRuleset.RULE1E
         }
 
         return null
     }
 
-    private fun isConnectionMetered(connInfo: ConnTrackerMetaData): Boolean {
+    private fun isConnectionMetered(dst: String): Boolean {
         if (persistentState.useMultipleNetworks || VpnController.isVpnLockdown()) {
-            return boundNetworkMeteredCheck(connInfo)
+            return isIfaceMetered(dst)
         }
-        return activeNetworkMeteredCheck()
+        return isActiveIfaceMetered()
     }
 
-    private fun boundNetworkMeteredCheck(connInfo: ConnTrackerMetaData): Boolean {
-        val dest = IPAddressString(connInfo.destIP)
+    private fun isIfaceMetered(dst: String): Boolean {
+        val dest = IPAddressString(dst)
         // TODO: check for all networks instead of just the first one
         val cap =
             if (dest.isIPv6) {
                 // if there are no network to be bound, fallback to active network
                 if (underlyingNetworks?.ipv6Net?.isEmpty() == true) {
-                    return activeNetworkMeteredCheck()
+                    return isActiveIfaceMetered()
                 }
                 underlyingNetworks?.ipv6Net?.firstOrNull()?.capabilities
             } else {
                 // if there are no network to be bound, fallback to active network
                 if (underlyingNetworks?.ipv4Net?.isEmpty() == true) {
-                    return activeNetworkMeteredCheck()
+                    return isActiveIfaceMetered()
                 }
                 underlyingNetworks?.ipv4Net?.firstOrNull()?.capabilities
             }
 
         // if there are no network to be bound given a destination IP, fallback to active network
         if (cap == null) {
-            Log.e(LOG_TAG_VPN, "no network to be bound for $connInfo, use active network")
-            return activeNetworkMeteredCheck()
+            Log.e(LOG_TAG_VPN, "no network to be bound for $dst, use active network")
+            return isActiveIfaceMetered()
         }
         return !cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
     }
 
-    private fun activeNetworkMeteredCheck(): Boolean {
+    private fun isActiveIfaceMetered(): Boolean {
         val now = elapsedRealtime()
         val ts = underlyingNetworks?.lastUpdated
         // Added the INIT_TIME_MS check, encountered a bug during phone restart
@@ -1132,9 +1110,8 @@ class BraveVPNService :
         )
     }
 
-    private fun getRethinkUid(): String {
-        val r = Utilities.getApplicationInfo(this, this.packageName)?.uid ?: INVALID_UID
-        return r.toString()
+    private fun getRethinkUid(): Int {
+        return Utilities.getApplicationInfo(this, this.packageName)?.uid ?: INVALID_UID
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -1706,8 +1683,8 @@ class BraveVPNService :
                 newNetworks.ipv4Net.map { it.network } + newNetworks.ipv6Net.map { it.network }
             setUnderlyingNetworks(allNetworks.toTypedArray())
         }
-        // restart vpn to add new routes if in ipv46 (Auto) mode
-        if (appConfig.getInternetProtocol().isIPv46() && isRoutesChanged) {
+        // restart vpn if in ipv46 (Auto) mode
+        if (appConfig.getInternetProtocol().isIPv46()) {
             io("restartVpnRouteChanges") { restartVpnWithExistingAppConfig() }
         }
 
@@ -1734,11 +1711,6 @@ class BraveVPNService :
     ): Boolean {
         // no old routes to compare with, return true
         if (old == null) return true
-
-        // in case of active networks, restart and set the builder with active network routes
-        // there maybe case, when underlying networks have both IPv4 and Ipv6 and active network
-        // does not have both, in that case, restart the vpn
-        if (!persistentState.useMultipleNetworks) return true
 
         val old6 = old.ipv6Net.isNotEmpty()
         val new6 = new.ipv6Net.isNotEmpty()
@@ -2322,7 +2294,13 @@ class BraveVPNService :
     private fun transportIdForOnQuery(userPreferredId: String): String {
         val tid =
             if (WireguardManager.oneWireGuardEnabled()) {
-                getDnsProxyId(userPreferredId)
+                val wg = WireguardManager.getOneWireGuardProxyId() ?: return userPreferredId
+                val fullId = ProxyManager.ID_WG_BASE + wg
+                if (hasProxy(fullId)) {
+                    fullId
+                } else {
+                    userPreferredId
+                }
             } else if (appConfig.isSystemDns()) {
                 // system dns is treated as special in GoTun2Socks, so return as Dnsx.System if
                 // enabled
@@ -2360,15 +2338,10 @@ class BraveVPNService :
         }
     }
 
-    private fun getDnsProxyId(userPreferredId: String): String {
+    private fun hasProxy(id: String): Boolean {
         // only add proxy id for one wireguard, no need for catchall wireguard
         // catchall wireguard need not have all the apps added to it
-        val wg = WireguardManager.getOneWireGuardProxyId()
-        return if (wg == null) {
-            userPreferredId
-        } else {
-            ProxyManager.ID_WG_BASE + wg
-        }
+        return vpnAdapter?.getProxyById(id) != null
     }
 
     private fun canUseDnsCacheOnTransportId(userPreferredId: String): Boolean {
@@ -2378,19 +2351,39 @@ class BraveVPNService :
 
     private fun proxyIdForOnQuery(): String {
         return if (appConfig.isCustomSocks5Enabled()) {
-            ProxyManager.ID_S5_BASE
+            val id = ProxyManager.ID_S5_BASE
+            if (hasProxy(id)) {
+                id
+            } else {
+                Ipn.Base
+            }
         } else if (appConfig.isCustomHttpProxyEnabled()) {
-            ProxyManager.ID_HTTP_BASE
+            val id = ProxyManager.ID_HTTP_BASE
+            if (hasProxy(id)) {
+                id
+            } else {
+                Ipn.Base
+            }
         } else if (appConfig.isWireGuardEnabled()) {
             // need to check if the enabled wireguard is one-wireguard
             // only for one-wireguard, the dns queries are proxied
             if (WireguardManager.oneWireGuardEnabled()) {
-                val wg = WireguardManager.getOneWireGuardProxyId() ?: return Ipn.Base
-                ProxyManager.ID_WG_BASE + wg
+                val id = WireguardManager.getOneWireGuardProxyId() ?: return Ipn.Base
+                val fullId = ProxyManager.ID_WG_BASE + id
+                if (hasProxy(fullId)) {
+                    fullId
+                } else {
+                    Ipn.Base
+                }
             } else if (WireguardManager.catchAllEnabled()) {
                 // if the enabled wireguard is catchall-wireguard, then return wireguard id
-                val wg = WireguardManager.getCatchAllWireGuardProxyId() ?: return Ipn.Base
-                ProxyManager.ID_WG_BASE + wg
+                val id = WireguardManager.getCatchAllWireGuardProxyId() ?: return Ipn.Base
+                val fullId = ProxyManager.ID_WG_BASE + id
+                if (hasProxy(fullId)) {
+                    fullId
+                } else {
+                    Ipn.Base
+                }
             } else {
                 // if the enabled wireguard is not one-wireguard, then return base
                 Ipn.Base
@@ -2439,15 +2432,17 @@ class BraveVPNService :
         }
 
         try {
-            // convert the uid to app id
-            val uid = FirewallManager.appId(s.uid.toInt())
-            val key = CidKey(connectionSummary.connId, uid)
-            trackedCids.remove(key)
-            if (s.uid == rethinkUid) {
+            if (s.uid == Protect.UidSelf) {
                 // update rethink summary
+                val key = CidKey(connectionSummary.connId, rethinkUid)
+                trackedCids.remove(key)
                 netLogTracker.updateRethinkSummary(connectionSummary)
             } else {
                 // other apps summary
+                // convert the uid to app id
+                val uid = FirewallManager.appId(s.uid.toInt())
+                val key = CidKey(connectionSummary.connId, uid)
+                trackedCids.remove(key)
                 netLogTracker.updateIpSummary(connectionSummary)
             }
         } catch (e: NumberFormatException) {
@@ -2479,7 +2474,7 @@ class BraveVPNService :
         val dstIp = if (second.asAddress() == null) "" else second.asAddress().toString()
         val dstPort = second.port ?: 0
 
-        val ips = realIps?.split(",")?.toList() ?: emptyList()
+        val ips = realIps?.split(",") ?: emptyList()
         // use realIps; as of now, netstack uses the first ip
         // TODO: apply firewall rules on all real ips
         val realDestIp =
@@ -2497,12 +2492,18 @@ class BraveVPNService :
         val connId = Utilities.getRandomString(8)
 
         // TODO: handle multiple domains, for now, use the first domain
-        val domains: Set<String> = d?.split(",")?.toSet() ?: emptySet()
+        val domains = d?.split(",") ?: emptyList()
 
         // if `d` is blocked, then at least one of the real ips is unspecified
         val anyRealIpBlocked = !ips.none { isUnspecifiedIp(it.trim()) }
+        val connTyp =
+            if (isConnectionMetered(realDestIp)) {
+                ConnectionTracker.ConnType.METERED
+            } else {
+                ConnectionTracker.ConnType.UNMETERED
+            }
 
-        val connInfo =
+        val cm =
             createConnTrackerMetaData(
                 uid,
                 userId,
@@ -2515,75 +2516,65 @@ class BraveVPNService :
                 blocklists,
                 domains.firstOrNull(),
                 connId,
-                ConnectionTracker.ConnType.NONE // set later
+                connTyp
             )
 
-        val packageName = FirewallManager.getPackageNameByUid(uid) ?: ""
-        if (packageName == ctx.packageName) {
+        val trapVpnDns = isDns(dstPort) && isVpnDns(dstIp)
+
+        val isRethink = uid == rethinkUid
+        if (isRethink) {
             // case when uid is rethink, return Ipn.Base
             logd(
-                "flow: uid is rethink, returning Ipn.Exit, $uid, $packageName, $srcIp, $srcPort, $realDestIp, $dstPort, $possibleDomains"
+                "flow: Ipn.Exit for rethink, $uid, $packageName, $srcIp, $srcPort, $realDestIp, $dstPort, $possibleDomains"
             )
             if (domains.isEmpty()) {
                 // possible domains only used for logging purposes, it may be available if
                 // the domains are empty. So, use the possibleDomains only if domains is empty
                 // no need to show the possible domains other than rethink
-                connInfo.query = possibleDomains?.split(",")?.toSet()?.firstOrNull() ?: ""
+                cm.query = possibleDomains?.split(",")?.firstOrNull() ?: ""
             }
-            return@runBlocking persistAndConstructFlowResponse(
-                connInfo,
-                Ipn.Exit,
-                connId,
-                uid,
-                isRethink = true
-            )
+
+            // if trapVpnDns is true, then Ipn.Exit won't be able to route the request via the
+            // underlying network as the IP only exists within the VPN tunnel. So, use Ipn.Base
+            // and expect the network engine to re-route as appropriate.
+            val proxy =
+                if (trapVpnDns) {
+                    Ipn.Base
+                } else {
+                    Ipn.Exit
+                }
+            // add to trackedCids, so that the connection can be removed from the list when the
+            // connection is closed (onSocketClosed), use: ui to show the active connections
+            val key = CidKey(cm.connId, uid)
+            trackedCids.add(key)
+            return@runBlocking persistAndConstructFlowResponse(cm, proxy, connId, uid, isRethink)
         }
 
-        if (persistentState.preventDnsLeaks) {
-            if (isDns(dstPort) && isVpnDns(dstIp)) {
-                logd("flow: dns-request, returning Ipn.Base, $uid")
-                return@runBlocking persistAndConstructFlowResponse(null, Ipn.Base, connId, uid)
-            }
-        } else {
-            if (isDns(dstPort)) {
-                logd("flow: dns-request, returning Ipn.Base, $uid")
-                return@runBlocking persistAndConstructFlowResponse(null, Ipn.Base, connId, uid)
-            }
-        }
-
-        // connection tracker is null in case of dns-request
-        val connTracker = processFirewallRequest(connInfo, anyRealIpBlocked, blocklists)
-
-        if (connTracker == null) {
-            // when connTracker is null, return Ipn.Base, no need to check for other proxies
-            logd("flow: dns-request, returning Ipn.Base, $connId, $uid")
+        if (trapVpnDns) {
+            logd("flow: dns-request, returning Ipn.Base, $uid")
             return@runBlocking persistAndConstructFlowResponse(null, Ipn.Base, connId, uid)
         }
 
-        if (connTracker.isBlocked) {
+        processFirewallRequest(cm, anyRealIpBlocked, blocklists)
+
+        if (cm.isBlocked) {
             // return Ipn.Block, no need to check for other rules
             logd("flow: received rule: block, returning Ipn.Block, $connId, $uid")
-            return@runBlocking persistAndConstructFlowResponse(connTracker, Ipn.Block, connId, uid)
-        }
-
-        if (isConnectionMetered(connTracker)) {
-            connTracker.connType = ConnectionTracker.ConnType.METERED.value
-        } else {
-            connTracker.connType = ConnectionTracker.ConnType.UNMETERED.value
+            return@runBlocking persistAndConstructFlowResponse(cm, Ipn.Block, connId, uid)
         }
 
         // add to trackedCids, so that the connection can be removed from the list when the
         // connection is closed (onSocketClosed), use: ui to show the active connections
-        val key = CidKey(connTracker.connId, uid)
+        val key = CidKey(cm.connId, uid)
         trackedCids.add(key)
 
-        return@runBlocking determineProxyDetails(connTracker, connId, uid)
+        return@runBlocking determineProxyDetails(cm)
     }
 
     private suspend fun determineProxyDetails(
-        connTracker: ConnTrackerMetaData?,
-        connId: String,
-        uid: Int
+        connTracker: ConnTrackerMetaData,
+        connId: String = connTracker.connId,
+        uid: Int = connTracker.uid
     ): intra.Mark {
         // check for one-wireguard, if enabled, return wireguard proxy for all connections
         if (WireguardManager.oneWireGuardEnabled()) {
@@ -2592,8 +2583,10 @@ class BraveVPNService :
                 WireguardManager.getOneWireGuardProxyId()
                     ?: return persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
             val proxyId = "${ProxyManager.ID_WG_BASE}${id}"
-
-            if (WireguardManager.canRouteIp(id, connTracker?.destIP)) {
+            logd(
+                "flow: one-wireguard is enabled, returning $proxyId, ${WireguardManager.canRouteIp(id, connTracker.destIP)}, ${hasProxy(proxyId)}"
+            )
+            if (WireguardManager.canRouteIp(id, connTracker.destIP) && hasProxy(proxyId)) {
                 logd("flow: one-wireguard is enabled, returning $proxyId, $connId, $uid")
                 return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
             } else {
@@ -2612,14 +2605,14 @@ class BraveVPNService :
 
                 return if (cf.isLockdown) {
                     logd(
-                        "flow: one-wireguard is enabled, but no route available, returning Ipn.Block, $connId, $uid"
+                        "flow: one-wireguard is enabled, but no route/proxy available, returning Ipn.Block, $connId, $uid"
                     )
-                    connTracker?.blockedByRule = FirewallRuleset.RULE13.id
-                    connTracker?.isBlocked = true
+                    connTracker.blockedByRule = FirewallRuleset.RULE13.id
+                    connTracker.isBlocked = true
                     persistAndConstructFlowResponse(connTracker, Ipn.Block, connId, uid)
                 } else {
                     logd(
-                        "flow: one-wireguard is enabled, but no route available, returning Ipn.Base, $connId, $uid"
+                        "flow: one-wireguard is enabled, but no route/proxy available, returning Ipn.Base, $connId, $uid"
                     )
                     persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
                 }
@@ -2652,13 +2645,18 @@ class BraveVPNService :
             logd(
                 "flow: wireguard is enabled and app is included, returning $proxyId, $connId, $uid"
             )
-            return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
+            return if (hasProxy(proxyId)) {
+                persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
+            } else {
+                // in some configurations the allowed ips will not be
+                persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
+            }
         }
 
         // no need to check for other proxies if the protocol is not TCP or UDP
         if (
-            connTracker?.protocol != Protocol.TCP.protocolType &&
-                connTracker?.protocol != Protocol.UDP.protocolType
+            connTracker.protocol != Protocol.TCP.protocolType &&
+                connTracker.protocol != Protocol.UDP.protocolType
         ) {
             logd("flow: protocol is not TCP or UDP, returning Ipn.Base, $connId, $uid")
             return persistAndConstructFlowResponse(connTracker, Ipn.Base, connId, uid)
@@ -2702,7 +2700,7 @@ class BraveVPNService :
             }
         }*/
 
-        if (appConfig.isOrbotProxyEnabled()) {
+        if (appConfig.isOrbotProxyEnabled() && hasProxy(ProxyManager.ID_ORBOT_BASE)) {
             val endpoint = appConfig.getConnectedOrbotProxy()
             val packageName = FirewallManager.getPackageNameByUid(uid)
             if (endpoint?.proxyAppName == packageName) {
@@ -2732,7 +2730,7 @@ class BraveVPNService :
         }
 
         // chose socks5 proxy over http proxy
-        if (appConfig.isCustomSocks5Enabled()) {
+        if (appConfig.isCustomSocks5Enabled() && hasProxy(ProxyManager.ID_S5_BASE)) {
             val endpoint = runBlocking { appConfig.getSocks5ProxyDetails() }
             val packageName = FirewallManager.getPackageNameByUid(uid)
             logd("flow: socks5 proxy is enabled, $packageName, ${endpoint.proxyAppName}")
@@ -2740,8 +2738,8 @@ class BraveVPNService :
                 logd(
                     "flow: socks5 proxy is enabled and app is $packageName, returning ${Ipn.Exit}, $connId, $uid"
                 )
-                connTracker?.isBlocked = false
-                connTracker?.blockedByRule = FirewallRuleset.RULE0.id
+                connTracker.isBlocked = false
+                connTracker.blockedByRule = FirewallRuleset.RULE0.id
                 return persistAndConstructFlowResponse(connTracker, Ipn.Exit, connId, uid)
             }
 
@@ -2754,7 +2752,7 @@ class BraveVPNService :
             )
         }
 
-        if (appConfig.isCustomHttpProxyEnabled()) {
+        if (appConfig.isCustomHttpProxyEnabled() && hasProxy(ProxyManager.ID_HTTP_BASE)) {
             val endpoint = runBlocking { appConfig.getHttpProxyDetails() }
             val packageName = FirewallManager.getPackageNameByUid(uid)
             if (endpoint.proxyAppName == packageName) {
@@ -2825,6 +2823,10 @@ class BraveVPNService :
         // persist the connTracker
         if (connTracker != null) {
             connTracker.proxyDetails = proxyId
+            // assign the proxy details to the connTracker after the decision is made
+            if (ProxyManager.isIpnProxy(proxyId) && !connTracker.isBlocked) {
+                connTracker.blockedByRule = FirewallRuleset.RULE12.id
+            }
             if (isRethink) {
                 netLogTracker.writeRethinkLog(connTracker)
             } else {
@@ -2849,16 +2851,7 @@ class BraveVPNService :
         metadata: ConnTrackerMetaData,
         anyRealIpBlocked: Boolean = false,
         blocklists: String = ""
-    ): ConnTrackerMetaData? {
-        // skip the block-ceremony for dns conns
-        logd(
-            "process-firewall-request: $metadata, ${isDns(metadata.destPort)}, ${isVpnDns(metadata.destIP)}"
-        )
-        if (isDns(metadata.destPort) && isVpnDns(metadata.destIP)) {
-            logd("firewall-rule dns-request no-op on conn $metadata")
-            return null
-        }
-
+    ) {
         val rule = firewall(metadata, anyRealIpBlocked)
 
         metadata.blockedByRule = rule.id
@@ -2868,7 +2861,7 @@ class BraveVPNService :
         metadata.isBlocked = blocked
 
         logd("firewall-rule $rule on conn $metadata")
-        return metadata
+        return
     }
 
     private fun createConnTrackerMetaData(
