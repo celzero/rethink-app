@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:clickable="true"
+        android:focusable="true"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         app:cardPreventCornerOverlap="false"
@@ -22,6 +24,7 @@
             android:id="@+id/config_title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -67,6 +70,16 @@
 
                 <TextView
                     android:id="@+id/interface_lockdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:padding="5dp"
+                    android:textColor="?attr/primaryLightColorText"
+                    android:textSize="@dimen/default_font_text_view" />
+
+                <TextView
+                    android:id="@+id/interface_catch_all"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"

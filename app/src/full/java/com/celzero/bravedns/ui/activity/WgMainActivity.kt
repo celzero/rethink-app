@@ -182,6 +182,8 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     }
 
     private fun showOneWgToggle() {
+        if (this.isDestroyed) return
+
         selectToggleBtnUi(b.oneWgToggleBtn)
         unselectToggleBtnUi(b.wgGeneralToggleBtn)
         b.wgGeneralInterfaceList.visibility = View.GONE
@@ -191,6 +193,8 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     }
 
     private fun showGeneralToggle() {
+        if (this.isDestroyed) return
+        
         selectToggleBtnUi(b.wgGeneralToggleBtn)
         unselectToggleBtnUi(b.oneWgToggleBtn)
         b.oneWgInterfaceList.visibility = View.GONE
@@ -306,7 +310,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
             showGeneralToggle()
         }
         b.oneWgToggleBtn.setOnClickListener {
-            val activeConfigs = WireguardManager.getActiveConfigs()
+            val activeConfigs = WireguardManager.getEnabledConfigs()
             val isAnyConfigActive = activeConfigs.isNotEmpty()
             val isOneWgEnabled = WireguardManager.oneWireGuardEnabled()
             if (isAnyConfigActive && !isOneWgEnabled) {
@@ -329,11 +333,15 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
             .setMessage(getString(R.string.wireguard_disable_message))
             .setPositiveButton(getString(R.string.wireguard_disable_positive)) { _, _ ->
                 // disable all configs
-                WireguardManager.disableAllActiveConfigs()
-                if (isOneWgToggle) {
-                    showOneWgToggle()
-                } else {
-                    showGeneralToggle()
+                io {
+                    WireguardManager.disableAllActiveConfigs()
+                    uiCtx {
+                        if (isOneWgToggle) {
+                            showOneWgToggle()
+                        } else {
+                            showGeneralToggle()
+                        }
+                    }
                 }
             }
             .setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
@@ -359,5 +367,13 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         b.createFab.visibility = View.GONE
         b.importFab.visibility = View.GONE
         b.qrCodeFab.visibility = View.GONE
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

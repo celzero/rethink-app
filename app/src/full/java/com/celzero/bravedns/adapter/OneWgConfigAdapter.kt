@@ -95,16 +95,27 @@ class OneWgConfigAdapter(private val context: Context) :
         private fun updateStatus(config: WgConfigFiles) {
             val id = ProxyManager.ID_WG_BASE + config.id
             val apps = ProxyManager.getAppCountForProxy(id).toString()
-            updateStatusUi(config, id, apps)
+            val statusId = VpnController.getProxyStatusById(id)
+            if (statusId == null) {
+                WireguardManager.disableConfig(config)
+            }
+            updateStatusUi(config, statusId, apps)
         }
 
-        private fun updateStatusUi(config: WgConfigFiles, id: String, apps: String) {
+        private fun handleSwitchClick(config: WgConfigFiles) {
+            val id = ProxyManager.ID_WG_BASE + config.id
+            val apps = ProxyManager.getAppCountForProxy(id).toString()
+            val statusId = VpnController.getProxyStatusById(id)
+            updateStatusUi(config, statusId, apps)
+        }
+
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?, apps: String) {
             val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
-                val statusId = VpnController.getProxyStatusById(id)
+
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
                     b.interfaceStatus.text =
@@ -136,7 +147,7 @@ class OneWgConfigAdapter(private val context: Context) :
         }
 
         fun setupClickListeners(config: WgConfigFiles) {
-            b.interfaceNameLayout.setOnClickListener { launchConfigDetail(config.id) }
+            b.interfaceDetailCard.setOnClickListener { launchConfigDetail(config.id) }
 
             // b.oneWgCheck.setOnCheckedChangeListener(null)
             b.oneWgCheck.setOnClickListener {
@@ -151,7 +162,7 @@ class OneWgConfigAdapter(private val context: Context) :
                             config.oneWireGuard = true
                             WireguardManager.updateOneWireGuardConfig(config.id, owg = true)
                             WireguardManager.enableConfig(config)
-                            uiCtx { updateStatus(config) }
+                            uiCtx { handleSwitchClick(config) }
                         } else {
                             uiCtx {
                                 b.oneWgCheck.isChecked = false
@@ -168,7 +179,7 @@ class OneWgConfigAdapter(private val context: Context) :
                         b.oneWgCheck.isChecked = false
                         WireguardManager.updateOneWireGuardConfig(config.id, owg = false)
                         WireguardManager.disableConfig(config)
-                        uiCtx { updateStatus(config) }
+                        uiCtx { handleSwitchClick(config) }
                     }
                 }
             }
@@ -177,7 +188,7 @@ class OneWgConfigAdapter(private val context: Context) :
         private fun launchConfigDetail(id: Int) {
             val intent = Intent(context, WgConfigDetailActivity::class.java)
             intent.putExtra(INTENT_EXTRA_WG_ID, id)
-            intent.putExtra(INTENT_EXTRA_WG_TYPE, WgConfigDetailActivity.WgType.ONE_WG)
+            intent.putExtra(INTENT_EXTRA_WG_TYPE, WgConfigDetailActivity.WgType.ONE_WG.value)
             context.startActivity(intent)
         }
     }
