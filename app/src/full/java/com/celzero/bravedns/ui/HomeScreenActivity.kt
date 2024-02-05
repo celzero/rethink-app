@@ -167,7 +167,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 .setSubtitle(getString(R.string.hs_biometeric_desc))
                 .setAllowedAuthenticators(
                     BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
+                        BiometricManager.Authenticators.BIOMETRIC_STRONG
                 )
                 .setConfirmationRequired(false)
                 .build()
@@ -206,8 +207,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                     ) {
                         super.onAuthenticationSucceeded(result)
                         biometricPromptRetryCount = 1
-                        persistentState.biometricAuthTime = System.currentTimeMillis()
-                        Log.i(LOG_TAG_UI, "Biometric authentication succeeded")
+                        persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
+                        Log.i(LOG_TAG_UI, "Biometric success @ ${System.currentTimeMillis()}")
                     }
 
                     override fun onAuthenticationFailed() {
@@ -229,7 +230,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             BiometricManager.from(this)
                 .canAuthenticate(
                     BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
+                        BiometricManager.Authenticators.BIOMETRIC_STRONG
                 ) == BiometricManager.BIOMETRIC_SUCCESS
         ) {
             biometricPrompt.authenticate(promptInfo)
