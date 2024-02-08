@@ -51,13 +51,11 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_RESTART_APP
 import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_SCHEME
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.data.AppConfig
-import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.ActivityHomeScreenBinding
 import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.activity.PauseActivity
@@ -79,14 +77,14 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.Calendar
+import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.util.Calendar
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private val b by viewBinding(ActivityHomeScreenBinding::bind)
@@ -148,16 +146,12 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun biometricPrompt() {
-        // return if the biometric authentication is already done within the last 15 minutes
+        // if the biometric authentication is already done in the last 15 minutes, then skip
         // fixme - #324 - move the 15 minutes to a configurable value
         if (
-            persistentState.biometricAuthTime + TimeUnit.MINUTES.toMillis(15) >
-                SystemClock.elapsedRealtime()
+            SystemClock.elapsedRealtime() - persistentState.biometricAuthTime <
+                TimeUnit.MINUTES.toMillis(15)
         ) {
-            Log.i(
-                LOG_TAG_UI,
-                "Biometric authentication already done at ${persistentState.biometricAuthTime} , skipping"
-            )
             return
         }
 
@@ -356,54 +350,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
 
     private fun removeThisMethod() {
         moveRemoteBlocklistFileFromAsset()
-        updateHttpProxy()
-    }
-
-    private fun updateHttpProxy() {
-        val defaultHost = "http://127.0.0.1:8118"
-        if (
-            persistentState.httpProxyHostAddress.isEmpty() ||
-                persistentState.httpProxyHostAddress == defaultHost
-        ) {
-            return
-        }
-
-        val host = persistentState.httpProxyHostAddress
-        io {
-            val endpoint = appConfig.getHttpProxyDetails()
-
-            val proxyEndpoint = constructProxy(endpoint.id, host)
-
-            if (proxyEndpoint != null) {
-                appConfig.updateCustomHttpProxy(proxyEndpoint)
-            }
-        }
-    }
-
-    private fun constructProxy(id: Int, ip: String?): ProxyEndpoint? {
-        val name = Constants.HTTP
-        val mode = ProxyManager.ProxyMode.HTTP
-        if (ip.isNullOrEmpty()) {
-            Log.w(LoggerConstants.LOG_TAG_PROXY, "cannot construct proxy with values ip: $ip")
-            return null
-        }
-
-        return ProxyEndpoint(
-            id,
-            name,
-            mode.value,
-            proxyType = "NONE",
-            proxyAppName = "",
-            ip,
-            proxyPort = 0,
-            userName = "",
-            password = "",
-            isSelected = true,
-            isCustom = true,
-            isUDP = false,
-            modifiedDataTime = 0L,
-            latency = 0
-        )
+        // reset the bio metric auth time, as now the value is changed from System.currentTimeMillis
+        // to SystemClock.elapsedRealtime
+        persistentState.biometricAuthTime = SystemClock.elapsedRealtime()
     }
 
     // fixme: find a cleaner way to implement this, move this to some other place
