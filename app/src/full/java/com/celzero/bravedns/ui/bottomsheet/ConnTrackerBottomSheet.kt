@@ -264,10 +264,11 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun displaySummaryDetails() {
+        b.bsConnConnTypeSecondary.visibility = View.GONE
         b.connectionMessage.text = info?.message
 
         if (VpnController.hasCid(info!!.connId, info!!.uid)) {
-            b.connectionSummaryLl.visibility = View.VISIBLE
+            b.connectionMessageLl.visibility = View.VISIBLE
             b.bsConnConnDuration.text =
                 getString(
                     R.string.two_argument_space,
@@ -306,13 +307,14 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
                 info?.downloadBytes == 0L &&
                 info?.uploadBytes == 0L
         ) {
-            b.connectionSummaryLl.visibility = View.GONE
-            b.bsConnConnUpload.visibility = View.GONE
-            b.bsConnConnDownload.visibility = View.GONE
+            b.connectionMessageLl.visibility = View.GONE
+            b.bsConnSummaryDetailLl.visibility = View.GONE
+            b.bsConnConnTypeSecondary.visibility = View.VISIBLE
+            b.bsConnConnTypeSecondary.text = b.bsConnConnType.text
             return
         }
 
-        b.connectionSummaryLl.visibility = View.VISIBLE
+        b.connectionMessageLl.visibility = View.VISIBLE
         val downloadBytes =
             getString(
                 R.string.symbol_download,

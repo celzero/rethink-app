@@ -142,6 +142,7 @@
         android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/bs_conn_summary_detail_ll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="50dp"
@@ -153,9 +154,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
             android:layout_weight="0.45"
             android:gravity="center"
-            android:layout_marginEnd="10dp"
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -197,8 +198,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="0.45"
             android:layout_marginStart="10dp"
+            android:layout_weight="0.45"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -230,6 +231,20 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/bs_conn_conn_type_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:maxLines="1"
+        android:visibility="gone"
+        android:singleLine="true"
+        android:textColor="?attr/primaryLightColorText"
+        android:textSize="@dimen/default_font_text_view" />
 
     <LinearLayout
         android:id="@+id/bs_conn_blocked_rule1_header_ll"
@@ -377,7 +392,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/connection_summary_ll"
+        android:id="@+id/connection_message_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
@@ -393,15 +408,15 @@
             android:layout_gravity="center"
             android:ellipsize="start"
             android:fontFamily="sans-serif-light"
+            android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
             android:maxLines="2"
             android:paddingStart="8dp"
             android:paddingEnd="10dp"
             android:scrollHorizontally="true"
             android:singleLine="false"
-            android:textAppearance="@android:style/TextAppearance.Material.Body1"
             android:textColor="?attr/primaryLightColorText"
-            android:textSize="@dimen/default_font_text_view" />
+            android:textSize="@dimen/small_font_text_view" />
 
     </LinearLayout>
 

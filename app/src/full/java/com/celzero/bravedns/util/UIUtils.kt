@@ -568,7 +568,7 @@ object UIUtils {
                 "🇿🇲" to "Zambia",
                 "🇿🇼" to "Zimbabwe"
             )
-        return flagCodePoints[flag] ?: "Unknown"
+        return flagCodePoints[flag] ?: "--"
     }
 
     fun getAccentColor(appTheme: Int): Int {
