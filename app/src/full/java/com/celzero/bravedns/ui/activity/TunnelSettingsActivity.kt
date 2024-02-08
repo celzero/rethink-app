@@ -35,8 +35,8 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
+import org.koin.android.ext.android.inject
 
 class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settings) {
     private val b by viewBinding(ActivityTunnelSettingsBinding::bind)
@@ -97,9 +97,30 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             b.settingsRInRSwitch.isChecked = !b.settingsRInRSwitch.isChecked
         }
 
-        b.settingsRInRSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-            persistentState.routeRethinkInRethink = b
-            displayRethinkInRethinkUi()
+        b.settingsRInRSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
+            // show a dialog to enable use multiple networks if the user selects yes
+            // rinr will not work without multiple networks
+            // reason: ConnectivityManager.activeNetwork returns VPN network when rinr is enabled
+            if (isChecked && !persistentState.useMultipleNetworks) {
+                val alertBuilder = MaterialAlertDialogBuilder(this)
+                alertBuilder.setTitle(getString(R.string.settings_rinr_dialog_title))
+                alertBuilder.setMessage(getString(R.string.settings_rinr_dialog_desc))
+                alertBuilder.setPositiveButton(getString(R.string.lbl_proceed)) { dialog, _ ->
+                    dialog.dismiss()
+                    b.settingsActivityAllNetworkSwitch.isChecked = true
+                    persistentState.useMultipleNetworks = true
+                    persistentState.routeRethinkInRethink = true
+                    displayRethinkInRethinkUi()
+                }
+                alertBuilder.setNegativeButton(getString(R.string.lbl_cancel)) { dialog, _ ->
+                    dialog.dismiss()
+                    b.settingsRInRSwitch.isChecked = false
+                }
+                alertBuilder.create().show()
+            } else {
+                persistentState.routeRethinkInRethink = isChecked
+                displayRethinkInRethinkUi()
+            }
         }
 
         b.settingsActivityAllowBypassRl.setOnClickListener {
