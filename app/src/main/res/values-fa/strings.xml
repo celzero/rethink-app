@@ -30,7 +30,7 @@
     <string name="accessibility_service_description">RethinkDNS از سرویس دسترس پذیری برای شناسایی و فایروال برنامه های پس زمینه استفاده می کند. RethinkDNS هیچ اطلاعاتی را جمع آوری یا نمی فروشد.</string>
     <string name="status_protected_with_http_private_dns">محافظت شده با پروکسی http و dns خصوصی</string>
     <string name="slide_2_desc">RethinkDNS ساده ترین راه برای نظارت بر فعالیت شبکه، دور زدن سانسور اینترنت و برنامه های فایروال در دستگاه اندرویدی شما است.</string>
-    <string name="slide_1_desc">Rethink یک نرم افزار متن باز است که توسط برنامه Mozilla Builders MVP حمایت می شود.</string>
+    <string name="slide_1_desc">"Rethink یک نرم‌افزار  متن باز است که توسط برنامه Mozilla Builders MVP حمایت می‌شود."</string>
     <string name="status_protected_with_proxy_private_dns">محافظت شده با پروکسی و dns خصوصی</string>
     <string name="slide_1_title">رایگان و متن‌باز</string>
     <string name="hybrid_mode_info_title">DNS + دیوار آتش</string>
@@ -149,7 +149,7 @@
     <string name="show_logs_disabled_dns_message" translatable="true">ثبت درخواست DNS غیرفعال شده است. برای فعال سازی مجدد، به <i>تنظیمات</i> رفته و <i> گزینه فعال سازی گزارش روی دستگاه را روشن کنید.</i></string>
     <string name="configure_dns_connected_dns_proxy_status" translatable="true">پروکسی DNS</string>
     <string name="configure_dns_crypt" translatable="true">برطرف کننده‌های DNSCrypt: %1$s</string>
-    <string name="http_proxy_dialog_heading" translatable="true">پروکسی HTTP(S) را تنظیم کنید</string>
+    <string name="http_proxy_dialog_heading" translatable="true">پروکسی HTTP(S) را تنظیم کنید.</string>
     <string name="show_logs_disabled_network_message" translatable="true">ثبت اتصال غیرفعال شده است. برای فعال سازی مجدد، به <i>تنظیمات</i> بروید و <i>گزینه فعال کردن گزارش روی دستگاه را روشن کنید.</i></string>
     <string name="configure_dns_connection_name" translatable="true">متصل به %1$s</string>
     <string name="univ_firewall_dialog_message" translatable="true">حذف این قانون به هر برنامه ای اجازه می دهد تا به این IP متصل شود. آیا می خواهید ادامه دهید؟</string>
@@ -175,7 +175,7 @@
     <string name="search_universal_ips" translatable="true"><font size="12">جستجوی آی‌پی‌ها</font></string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL کپی شد</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">آدرس IP کپی شد.</string>
-    <string name="whats_dialog_title" translatable="true">چه چیزی در v054c جدید است</string>
+    <string name="whats_dialog_title" translatable="true">چه چیزی در v055a جدید است</string>
     <string name="info_dialog_rethink_toast_msg" translatable="true">به عنوان URL RDNS+ DNS-over-HTTPS کپی شد</string>
     <string name="settings_enable_logs_desc" translatable="true">گزارش های DNS و دیوار آتش را به صورت محلی روی دستگاه ذخیره کنید.</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">به‌روز است!</string>
@@ -341,4 +341,6 @@
     <string name="settings_socks5_disabled_error" translatable="true">Connected to %1$s. Turn it off to continue.</string>
     <string name="settings_custom_downloader_heading" translatable="true">Use in-app downloader</string>
     <string name="about_settings_vpn_profile" translatable="true">نمایهVPN</string>
+    <string name="settings_app_notification_a13_heading" translatable="true">اعلان برنامه</string>
+    <string name="settings_app_notification_a13_desc" translatable="true">فعال کردن دسترسی برای اعلان برنامه</string>
 </resources>
