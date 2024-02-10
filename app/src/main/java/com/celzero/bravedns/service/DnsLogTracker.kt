@@ -30,6 +30,7 @@ import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.makeAddressPair
 import com.celzero.bravedns.util.Utilities.normalizeIp
+import dnsx.Dnsx
 import dnsx.Summary
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -107,6 +108,12 @@ internal constructor(
 
         dnsLog.resolver = transaction.serverName
 
+        // mark the query as blocked if the transaction id is Dnsx.BlockAll, no need to check
+        // for blocklist as it is already marked as blocked
+        if (transaction.id == Dnsx.BlockAll) {
+            dnsLog.isBlocked = true
+        }
+
         if (transaction.status === Transaction.Status.COMPLETE) {
 
             if (ResourceRecordTypes.mayContainIP(transaction.type.toInt())) {
@@ -138,7 +145,8 @@ internal constructor(
                         dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
                     }
                     // if the response is empty and blocklist is not empty, then mark it as blocked
-                    if (transaction.blocklist.isNotEmpty()) {
+                    // most likely happens with HTTP SVCB records which are blocked
+                    if (transaction.response.isEmpty() && transaction.blocklist.isNotEmpty()) {
                         dnsLog.isBlocked = true
                     }
                 }
