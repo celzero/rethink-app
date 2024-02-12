@@ -239,7 +239,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     private fun showEditDomainDialog(customDomain: CustomDomain) {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(context.getString(R.string.cd_dialog_title))
+        dialog.setTitle(context.getString(R.string.cd_dialog_edit_title))
         val dBind =
             DialogAddCustomDomainBinding.inflate((context as CustomRulesActivity).layoutInflater)
         dialog.setContentView(dBind.root)
@@ -372,11 +372,13 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         status: DomainRulesManager.Status
     ) {
         DomainRulesManager.updateDomainRule(domain, status, type, prevDomain)
-        Utilities.showToastUiCentered(
-            context,
-            context.getString(R.string.cd_toast_added),
-            Toast.LENGTH_SHORT
-        )
+        uiCtx {
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.cd_toast_edit),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     inner class CustomDomainViewHolderWithHeader(private val b: ListItemCustomAllDomainBinding) :
