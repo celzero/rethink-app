@@ -148,12 +148,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 val isSelected = isAnyAppSelected()
                 uiCtx {
                     if (!isSelected) {
-                        Toast.makeText(
-                                context,
+                        Utilities.showToastUiCentered(
+                                requireContext(),
                                 getString(R.string.orbot_no_app_toast),
                                 Toast.LENGTH_SHORT
                             )
-                            .show()
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioSocks5.isChecked = false
                         return@uiCtx
@@ -171,12 +170,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 val isSelected = isAnyAppSelected()
                 uiCtx {
                     if (!isSelected) {
-                        Toast.makeText(
-                                context,
+                        Utilities.showToastUiCentered(
+                                requireContext(),
                                 getString(R.string.orbot_no_app_toast),
                                 Toast.LENGTH_SHORT
                             )
-                            .show()
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioSocks5.isChecked = false
                         return@uiCtx
@@ -196,12 +194,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 val isSelected = isAnyAppSelected()
                 uiCtx {
                     if (!isSelected) {
-                        Toast.makeText(
-                                context,
+                        Utilities.showToastUiCentered(
+                                requireContext(),
                                 getString(R.string.orbot_no_app_toast),
                                 Toast.LENGTH_SHORT
                             )
-                            .show()
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioHttp.isChecked = false
                         return@uiCtx
@@ -219,12 +216,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 val isSelected = isAnyAppSelected()
                 uiCtx {
                     if (!isSelected) {
-                        Toast.makeText(
-                                context,
+                        Utilities.showToastUiCentered(
+                                requireContext(),
                                 getString(R.string.orbot_no_app_toast),
                                 Toast.LENGTH_SHORT
                             )
-                            .show()
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioHttp.isChecked = false
                         return@uiCtx
@@ -244,12 +240,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 val isSelected = isAnyAppSelected()
                 uiCtx {
                     if (!isSelected) {
-                        Toast.makeText(
-                                context,
+                        Utilities.showToastUiCentered(
+                                requireContext(),
                                 getString(R.string.orbot_no_app_toast),
                                 Toast.LENGTH_SHORT
                             )
-                            .show()
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioBoth.isChecked = false
                         return@uiCtx
@@ -267,12 +262,11 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 val isSelected = isAnyAppSelected()
                 uiCtx {
                     if (!isSelected) {
-                        Toast.makeText(
-                                context,
+                        Utilities.showToastUiCentered(
+                                requireContext(),
                                 getString(R.string.orbot_no_app_toast),
                                 Toast.LENGTH_SHORT
                             )
-                            .show()
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioBoth.isChecked = false
                         return@uiCtx
@@ -588,6 +582,6 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

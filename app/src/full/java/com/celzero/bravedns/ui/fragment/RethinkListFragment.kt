@@ -392,7 +392,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
@@ -404,6 +404,6 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

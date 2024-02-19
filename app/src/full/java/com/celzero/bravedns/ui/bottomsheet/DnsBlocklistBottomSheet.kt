@@ -131,6 +131,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         b.dnsBlockIpAddress.text = getResponseIp()
         b.dnsBlockConnectionFlag.text = log!!.flag
         b.dnsBlockIpLatency.text = getString(R.string.dns_btm_latency_ms, log!!.latency.toString())
+        b.dnsMessage.text = log!!.msg
 
         displayFavIcon()
         displayDnsTransactionDetails()
@@ -602,6 +603,6 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

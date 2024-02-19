@@ -226,7 +226,7 @@ class RethinkEndpointAdapter(
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO){ f() }
         }
     }
 }

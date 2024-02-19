@@ -271,7 +271,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
     private suspend fun showConfigCreationError() {
         uiCtx {
-            Toast.makeText(this, getString(R.string.new_warp_error_toast), Toast.LENGTH_LONG).show()
+            Utilities.showToastUiCentered(this, getString(R.string.new_warp_error_toast), Toast.LENGTH_LONG)
             b.enableUdpRelay.isChecked = false
         }
     }
@@ -285,6 +285,6 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

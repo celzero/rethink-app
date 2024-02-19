@@ -150,12 +150,6 @@ class SummaryStatisticsAdapter(
                 return
             }
 
-            if (appConnection.downloadBytes == 0L && appConnection.uploadBytes == 0L) {
-                itemBinding.ssName.visibility = View.GONE
-                itemBinding.ssCount.text = appConnection.count.toString()
-                return
-            }
-
             itemBinding.ssName.visibility = View.VISIBLE
             val download =
                 context.getString(
@@ -635,11 +629,11 @@ class SummaryStatisticsAdapter(
     }
 
     private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        (context as LifecycleOwner).lifecycleScope.launch (Dispatchers.Main) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

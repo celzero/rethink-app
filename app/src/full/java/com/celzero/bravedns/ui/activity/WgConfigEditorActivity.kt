@@ -146,12 +146,11 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                     addWgInterface(name, addresses, mtu, listenPort, dnsServers, privateKey)
                 if (isInterfaceAdded != null) {
                     uiCtx {
-                        Toast.makeText(
+                        Utilities.showToastUiCentered(
                                 this,
                                 getString(R.string.config_add_success_toast),
                                 Toast.LENGTH_LONG
                             )
-                            .show()
                         finish()
                     }
                 } else {
@@ -204,13 +203,13 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
         } catch (e: Throwable) {
             val error = ErrorMessages[this, e]
             Log.e(LOG_TAG_PROXY, "Exception while parsing wg interface: $error", e)
-            uiCtx { Toast.makeText(this, error, Toast.LENGTH_LONG).show() }
+            uiCtx { Utilities.showToastUiCentered(this, error, Toast.LENGTH_LONG) }
             return null
         }
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

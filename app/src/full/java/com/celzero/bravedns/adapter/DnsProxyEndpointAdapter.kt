@@ -215,8 +215,7 @@ class DnsProxyEndpointAdapter(
         io {
             appConfig.deleteDnsProxyEndpoint(id)
             uiCtx {
-                Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT)
-                    .show()
+                Utilities.showToastUiCentered(context, context.getString(R.string.dns_proxy_remove_success), Toast.LENGTH_SHORT)
             }
         }
     }

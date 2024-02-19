@@ -219,12 +219,11 @@ class DnsCryptRelayEndpointAdapter(
             io {
                 if (isSelected && !appConfig.isDnscryptRelaySelectable()) {
                     uiCtx {
-                        Toast.makeText(
+                        Utilities.showToastUiCentered(
                                 context,
                                 context.getString(R.string.dns_crypt_relay_error_toast),
                                 Toast.LENGTH_LONG
                             )
-                            .show()
                         b.dnsCryptEndpointListActionImage.isChecked = false
                     }
                     return@io
@@ -239,18 +238,17 @@ class DnsCryptRelayEndpointAdapter(
             io {
                 appConfig.deleteDnscryptRelayEndpoint(id)
                 uiCtx {
-                    Toast.makeText(
+                    Utilities.showToastUiCentered(
                             context,
-                            R.string.dns_crypt_relay_remove_success,
+                            context.getString(R.string.dns_crypt_relay_remove_success),
                             Toast.LENGTH_SHORT
                         )
-                        .show()
                 }
             }
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
         }
 
         private suspend fun uiCtx(f: suspend () -> Unit) {

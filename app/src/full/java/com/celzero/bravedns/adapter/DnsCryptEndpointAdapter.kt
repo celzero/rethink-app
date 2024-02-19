@@ -225,12 +225,11 @@ class DnsCryptEndpointAdapter(
             io {
                 appConfig.deleteDnscryptEndpoint(id)
                 uiCtx {
-                    Toast.makeText(
+                    Utilities.showToastUiCentered(
                             context,
-                            R.string.dns_crypt_url_remove_success,
+                            context.getString(R.string.dns_crypt_url_remove_success),
                             Toast.LENGTH_SHORT
                         )
-                        .show()
                 }
             }
         }
@@ -240,7 +239,7 @@ class DnsCryptEndpointAdapter(
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
         }
     }
 }

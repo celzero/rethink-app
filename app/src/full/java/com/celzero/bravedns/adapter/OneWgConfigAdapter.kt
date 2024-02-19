@@ -37,6 +37,7 @@ import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import com.celzero.bravedns.util.Utilities
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -166,12 +167,11 @@ class OneWgConfigAdapter(private val context: Context) :
                         } else {
                             uiCtx {
                                 b.oneWgCheck.isChecked = false
-                                Toast.makeText(
+                                Utilities.showToastUiCentered(
                                         context,
                                         context.getString(R.string.wireguard_enabled_failure),
                                         Toast.LENGTH_LONG
                                     )
-                                    .show()
                             }
                         }
                     } else {
@@ -198,6 +198,6 @@ class OneWgConfigAdapter(private val context: Context) :
     }
 
     private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

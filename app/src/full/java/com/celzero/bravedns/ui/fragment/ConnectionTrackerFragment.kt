@@ -311,6 +311,6 @@ class ConnectionTrackerFragment :
 
     // fixme: move this to viewmodel scope
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

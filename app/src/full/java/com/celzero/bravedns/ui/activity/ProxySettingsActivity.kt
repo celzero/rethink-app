@@ -704,7 +704,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
 
         applyURLBtn.setOnClickListener {
-            var port = 0
+            var port:Int? = 0
             var isValid: Boolean
             var isIPValid = true
             var isUDPBlock = false
@@ -717,7 +717,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             }
 
             try {
-                port = portEditText.text.toString().toInt()
+                port = portEditText.text.toString().toInt() // can cause NumberFormatException
                 isValid =
                     if (Utilities.isLanIpv4(ip)) {
                         Utilities.isValidLocalPort(port)
@@ -911,12 +911,11 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 val appName = appNameSpinner.selectedItem.toString()
                 insertHttpProxyEndpointDB(endpoint.id, host, appName)
                 dialog.dismiss()
-                Toast.makeText(
+                showToastUiCentered(
                         this,
                         getString(R.string.settings_http_proxy_toast_success),
                         Toast.LENGTH_SHORT
                     )
-                    .show()
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
                     b.settingsActivityHttpProxyDesc.text =
                         getString(R.string.settings_http_proxy_desc, host)
@@ -934,7 +933,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     private fun insertSocks5Endpoint(
         id: Int,
         ip: String,
-        port: Int,
+        port: Int?,
         appName: String,
         userName: String,
         password: String,
@@ -964,7 +963,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     mode,
                     appPackage,
                     ip,
-                    port,
+                    port ?: 0,
                     userName,
                     password,
                     isUDPBlock
@@ -1053,7 +1052,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

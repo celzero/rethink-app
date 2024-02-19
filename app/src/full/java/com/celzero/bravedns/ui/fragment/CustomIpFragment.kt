@@ -305,10 +305,10 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

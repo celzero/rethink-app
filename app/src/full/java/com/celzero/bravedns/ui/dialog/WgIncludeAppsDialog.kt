@@ -308,6 +308,6 @@ class WgIncludeAppsDialog(
     }
 
     private fun io(f: suspend () -> Unit) {
-        (activity as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        (activity as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

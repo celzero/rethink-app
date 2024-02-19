@@ -225,6 +225,8 @@ class ConnectionTrackerAdapter(private val context: Context) :
 
         private fun displaySummaryDetails(ct: ConnectionTracker) {
             val connType = ConnectionTracker.ConnType.get(ct.connType)
+            b.connectionDataUsage.text = ""
+            b.connectionDelay.text = ""
             if (
                 ct.duration == 0 &&
                     ct.downloadBytes == 0L &&
@@ -238,9 +240,11 @@ class ConnectionTrackerAdapter(private val context: Context) :
                     b.connectionDuration.text = context.getString(R.string.symbol_green_circle)
                     b.connectionDelay.text = ""
                     hasMinSummary = true
+                } else {
+                    b.connectionDataUsage.text = ""
                 }
                 if (connType.isMetered()) {
-                    b.connectionDelay.text = "💴"
+                    b.connectionDelay.text = context.getString(R.string.symbol_currency)
                     hasMinSummary = true
                 }
 
@@ -338,7 +342,7 @@ class ConnectionTrackerAdapter(private val context: Context) :
     }
 
     private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

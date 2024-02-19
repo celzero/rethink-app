@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
 import kotlinx.coroutines.Dispatchers
@@ -108,14 +109,14 @@ class WgAddPeerDialog(
                 }
             } catch (e: Throwable) {
                 Log.e(LoggerConstants.LOG_TAG_PROXY, "Error while adding peer", e)
-                Toast.makeText(context, ErrorMessages[context, e], Toast.LENGTH_SHORT).show()
+                Utilities.showToastUiCentered(context, ErrorMessages[context, e], Toast.LENGTH_SHORT)
                 return@setOnClickListener
             }
         }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        (activity as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        (activity as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 
     private suspend fun io(f: suspend () -> Unit) {

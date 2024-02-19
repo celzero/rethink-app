@@ -443,7 +443,7 @@ class MiscSettingsActivity : AppCompatActivity(R.layout.activity_misc_settings) 
         val checkedItem = persistentState.goLoggerLevel.toInt()
         alertBuilder.setSingleChoiceItems(items, checkedItem) { dialog, which ->
             dialog.dismiss()
-            if (persistentState.goLoggerLevel.toInt() == which) {
+            if (checkedItem == which) {
                 return@setSingleChoiceItems
             }
 
