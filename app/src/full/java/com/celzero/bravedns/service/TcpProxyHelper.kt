@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 
 object TcpProxyHelper : KoinComponent {
 
-    private val tcpProxyRespository: TcpProxyRepository by inject()
+    private val db: TcpProxyRepository by inject()
     private val appConfig: AppConfig by inject()
     private val persistentState: PersistentState by inject()
 
@@ -96,12 +96,11 @@ object TcpProxyHelper : KoinComponent {
         io { load() }
     }
 
-    suspend fun load() {
-        if (tcpProxies.isNotEmpty()) return
-
+    suspend fun load() : Int {
         tcpProxies.clear()
-        tcpProxies.addAll(tcpProxyRespository.getTcpProxies())
+        tcpProxies.addAll(db.getTcpProxies())
         loadTrie()
+        return tcpProxies.size
     }
 
     private fun loadTrie() {
@@ -210,7 +209,7 @@ object TcpProxyHelper : KoinComponent {
             return
         }
         tcpProxy.paymentStatus = paymentStatus.value
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
     }
 
     suspend fun updateToken(token: String) {
@@ -220,7 +219,7 @@ object TcpProxyHelper : KoinComponent {
             return
         }
         tcpProxy.token = token
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
     }
 
     suspend fun updateUrl(url: String) {
@@ -230,7 +229,7 @@ object TcpProxyHelper : KoinComponent {
             return
         }
         tcpProxy.url = url
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
     }
 
     fun initiatePaymentVerification(context: Context) {
@@ -272,7 +271,7 @@ object TcpProxyHelper : KoinComponent {
         }
 
         tcpProxy.isActive = true
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
         appConfig.addProxy(AppConfig.ProxyType.TCP, AppConfig.ProxyProvider.TCP)
     }
 
@@ -284,7 +283,7 @@ object TcpProxyHelper : KoinComponent {
         }
 
         tcpProxy.isActive = false
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
         appConfig.removeProxy(AppConfig.ProxyType.TCP, AppConfig.ProxyProvider.TCP)
     }
 
