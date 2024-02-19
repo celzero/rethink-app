@@ -36,7 +36,7 @@ interface LocalBlocklistPacksMapDao {
     fun insertAll(maps: List<LocalBlocklistPacksMap>): LongArray
 
     @Query(
-        "select * from LocalBlocklistPacksMap l INNER JOIN (SELECT pack, MIN(level) level FROM LocalBlocklistPacksMap GROUP BY pack) l1 ON l1.pack = l.pack Where l1.level = l.level ORDER BY l.`group` ASC"
+        "select * from LocalBlocklistPacksMap l INNER JOIN (SELECT pack, MIN(level) level FROM LocalBlocklistPacksMap where pack not in ('dead','ignore') GROUP BY pack) l1 ON l1.pack = l.pack Where l1.level = l.level ORDER BY l.`group` DESC"
     )
     fun getTags(): PagingSource<Int, LocalBlocklistPacksMap>
 }

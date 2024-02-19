@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/crp_blocktype_heading_tv"
@@ -19,8 +19,21 @@
             android:gravity="center"
             android:padding="10dp"
             android:textColor="?attr/accentBad"
-            android:textSize="@dimen/heading_font_text_view"
+            android:textSize="@dimen/home_screen_stat_text"
             android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/crp_blocktype_desc_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/crp_blocktype_heading_tv"
+            android:alpha="0.75"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/default_font_text_view" />
 
     </RelativeLayout>
 
@@ -55,10 +68,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/crp_check_box"
                 android:layout_alignParentStart="true"
+                android:layout_marginStart="13dp"
                 android:layout_toStartOf="@+id/crp_check_box"
                 android:ellipsize="end"
                 android:padding="3dp"
-                android:layout_marginStart="13dp"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
 

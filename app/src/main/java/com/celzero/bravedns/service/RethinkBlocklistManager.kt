@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.FileTag
 import com.celzero.bravedns.data.FileTagDeserializer
 import com.celzero.bravedns.database.LocalBlocklistPacksMap
@@ -40,12 +41,12 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dnsx.Dnsx
 import dnsx.RDNS
+import java.io.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.IOException
 
 object RethinkBlocklistManager : KoinComponent {
 
@@ -372,6 +373,11 @@ object RethinkBlocklistManager : KoinComponent {
     suspend fun getStamp(fileValues: Set<Int>, type: RethinkBlocklistType): String {
         return try {
             val flags = convertListToCsv(fileValues)
+            if (DEBUG)
+                Log.d(
+                    LoggerConstants.LOG_TAG_VPN,
+                    "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Dnsx.EB32)}"
+                )
             getRDNS(type)?.flagsToStamp(flags, Dnsx.EB32) ?: ""
         } catch (e: java.lang.Exception) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
@@ -391,7 +397,7 @@ object RethinkBlocklistManager : KoinComponent {
     private fun convertCsvToList(csv: String?): Set<Int> {
         if (csv == null) return setOf()
 
-        return csv.split(",").map { it.toInt() }.toSet()
+        return csv.split(",").map { it.toIntOrNull() ?: 0 }.toSet()
     }
 
     private fun convertListToCsv(s: Set<Int>): String {

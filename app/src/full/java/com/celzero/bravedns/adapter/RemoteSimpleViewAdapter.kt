@@ -80,6 +80,7 @@ class RemoteSimpleViewAdapter(val context: Context) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(map: RemoteBlocklistPacksMap, position: Int) {
+            b.root.tag = getGroupName(map.group)
             displayMetaData(map, position)
             setupClickListener(map)
         }

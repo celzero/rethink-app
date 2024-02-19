@@ -29,6 +29,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.filter
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Recycler
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -53,11 +55,13 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.
 import com.celzero.bravedns.ui.bottomsheet.RethinkPlusFilterBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.DEAD_PACK
+import com.celzero.bravedns.util.Constants.Companion.DEFAULT_RDNS_REMOTE_DNS_NAMES
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
@@ -72,12 +76,12 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.regex.Pattern
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.regex.Pattern
 
 class RethinkBlocklistFragment :
     Fragment(R.layout.fragment_rethink_blocklist), SearchView.OnQueryTextListener {
@@ -120,6 +124,8 @@ class RethinkBlocklistFragment :
     enum class BlocklistView(val tag: String) {
         PACKS("1"),
         ADVANCED("2");
+
+        fun isSimple() = this == PACKS
 
         companion object {
             fun getTag(tag: String): BlocklistView {
@@ -287,6 +293,12 @@ class RethinkBlocklistFragment :
     }
 
     private fun isStampChanged(): Boolean {
+        // no need to check on the stamp when the remote name is in the default list
+        // eg., rec, sec, pec etc
+        if (DEFAULT_RDNS_REMOTE_DNS_NAMES.contains(remoteName)) {
+            return false
+        }
+
         // user modified the blocklists
         return getStamp() != modifiedStamp
     }
@@ -411,7 +423,7 @@ class RethinkBlocklistFragment :
         builder.setNeutralButton(getString(R.string.rt_dialog_neutral)) { _, _ ->
             // no-op
         }
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
+        builder.setNegativeButton(getString(R.string.notif_dialog_pause_dialog_negative)) { _, _ ->
             requireActivity().finish()
         }
         builder.create().show()
@@ -501,6 +513,39 @@ class RethinkBlocklistFragment :
                 showList(b.lbSimpleToggleBtn.tag.toString())
             }
         }
+    }
+
+    private fun setupRecyclerScrollListener(recycler: RecyclerView, viewType: BlocklistView) {
+        val scrollListener =
+            object : RecyclerView.OnScrollListener() {
+
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    if (recyclerView.getChildAt(0)?.tag == null) return
+
+                    val tag: String = recyclerView.getChildAt(0).tag as String
+
+                    if (viewType.isSimple()) {
+                        b.recyclerScrollHeaderSimple.visibility = View.VISIBLE
+                        b.recyclerScrollHeaderSimple.text = tag
+                        b.recyclerScrollHeaderAdv.visibility = View.GONE
+                    } else {
+                        b.recyclerScrollHeaderAdv.visibility = View.VISIBLE
+                        b.recyclerScrollHeaderAdv.text = tag
+                        b.recyclerScrollHeaderSimple.visibility = View.GONE
+                    }
+                }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        b.recyclerScrollHeaderSimple.visibility = View.GONE
+                        b.recyclerScrollHeaderAdv.visibility = View.GONE
+                    }
+                }
+            }
+        recycler.addOnScrollListener(scrollListener)
     }
 
     private fun setSimpleAdapter() {
@@ -628,6 +673,7 @@ class RethinkBlocklistFragment :
             localSimpleViewAdapter?.submitData(viewLifecycleOwner.lifecycle, l)
         }
         b.lbSimpleRecyclerPacks.adapter = localSimpleViewAdapter
+        setupRecyclerScrollListener(b.lbSimpleRecyclerPacks, BlocklistView.PACKS)
     }
 
     private fun setRemoteSimpleViewAdapter() {
@@ -640,6 +686,7 @@ class RethinkBlocklistFragment :
             remoteSimpleViewAdapter?.submitData(viewLifecycleOwner.lifecycle, r)
         }
         b.lbSimpleRecyclerPacks.adapter = remoteSimpleViewAdapter
+        setupRecyclerScrollListener(b.lbSimpleRecyclerPacks, BlocklistView.PACKS)
     }
 
     private fun remakeFilterChipsUi() {
@@ -712,6 +759,7 @@ class RethinkBlocklistFragment :
             advanceRemoteViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.lbAdvancedRecycler.adapter = advanceRemoteViewAdapter
+        setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)
 
         // implement sticky headers
         // ref:
@@ -732,6 +780,7 @@ class RethinkBlocklistFragment :
             advanceLocalViewAdapter!!.submitData(viewLifecycleOwner.lifecycle, it)
         }
         b.lbAdvancedRecycler.adapter = advanceLocalViewAdapter
+        setupRecyclerScrollListener(b.lbAdvancedRecycler, BlocklistView.ADVANCED)
     }
 
     private fun observeWorkManager() {
