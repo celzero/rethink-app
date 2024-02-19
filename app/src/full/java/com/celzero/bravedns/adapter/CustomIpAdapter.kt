@@ -216,19 +216,19 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private suspend fun byPassUniversal(customIp: CustomIp) {
-        IpRulesManager.byPassUniversal(customIp)
+        IpRulesManager.updateBypass(customIp)
     }
 
     private suspend fun byPassAppRule(customIp: CustomIp) {
-        IpRulesManager.trustIpRules(customIp)
+        IpRulesManager.updateTrust(customIp)
     }
 
     private suspend fun blockIp(customIp: CustomIp) {
-        IpRulesManager.blockIp(customIp)
+        IpRulesManager.updateBlock(customIp)
     }
 
     private suspend fun noRuleIp(customIp: CustomIp) {
-        IpRulesManager.noRuleIp(customIp)
+        IpRulesManager.updateNoRule(customIp)
     }
 
     inner class CustomIpsViewHolderWithHeader(private val b: ListItemCustomAllIpBinding) :
@@ -395,7 +395,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 io { IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port) }
-                Toast.makeText(
+                Utilities.showToastUiCentered(
                         context,
                         context.getString(
                             R.string.univ_ip_delete_individual_toast,
@@ -403,7 +403,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                         ),
                         Toast.LENGTH_SHORT
                     )
-                    .show()
             }
 
             builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
@@ -618,7 +617,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 io { IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port) }
-                Toast.makeText(
+                Utilities.showToastUiCentered(
                         context,
                         context.getString(
                             R.string.univ_ip_delete_individual_toast,
@@ -626,7 +625,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                         ),
                         Toast.LENGTH_SHORT
                     )
-                    .show()
             }
 
             builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
@@ -819,13 +817,13 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         if (hostName == null) return
 
         val new =
-            IpRulesManager.constructCustomIpObject(
+            IpRulesManager.makeCustomIp(
                 prev.uid,
                 hostName.asAddress().toNormalizedString(),
                 hostName.port,
                 status
             )
-        io { IpRulesManager.updateIpRule(prev, new) }
+        io { IpRulesManager.replaceIpRule(prev, new) }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
@@ -837,10 +835,10 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private fun io(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

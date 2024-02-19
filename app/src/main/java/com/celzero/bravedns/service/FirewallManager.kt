@@ -441,19 +441,22 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateUid(olduid: Int, uid: Int, pkg: String) {
+    var cacheok = false
         // FIXME: review once again
         mutex.withLock {
             appInfos.get(olduid).forEach { ai ->
                 if (ai.packageName == pkg) {
-                    // remove the old uid entry
-                    appInfos.remove(olduid, ai)
-                    appInfos.put(uid, ai)
+                    appInfos.remove(olduid, ai) // remove the old uid entry
+                    ai.uid = uid // update the uid in-place
+                    appInfos.put(uid, ai) // add the updated ai entry
+                    cacheok = true
                     return@withLock
                 }
             }
         }
         // Delete the uninstalled apps from database
-        db.updateUid(olduid, uid, pkg)
+        val dbok = db.updateUid(olduid, uid, pkg)
+        Log.d("FirewallManager", "update: $pkg; $olduid -> $uid; c? $cacheok; db? $dbok")
         informObservers()
     }
 
@@ -464,11 +467,11 @@ object FirewallManager : KoinComponent {
         informObservers()
     }
 
-    suspend fun load() {
+    suspend fun load(): Int {
         val apps = db.getAppInfo()
         if (apps.isEmpty()) {
             Log.w(LOG_TAG_FIREWALL, "no apps found in db, no app-based rules to load")
-            return
+            return 0
         }
 
         mutex.withLock {
@@ -476,6 +479,7 @@ object FirewallManager : KoinComponent {
             apps.forEach { appInfos.put(it.uid, it) }
         }
         informObservers()
+        return apps.size
     }
 
     fun untrackForegroundApps() {

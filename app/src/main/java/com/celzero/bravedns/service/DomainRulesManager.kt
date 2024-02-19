@@ -25,19 +25,18 @@ import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
 import dnsx.Dnsx
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.net.MalformedURLException
 import java.util.Calendar
 import java.util.Locale
 import java.util.regex.Pattern
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 object DomainRulesManager : KoinComponent {
 
-    private val customDomainsRepository by inject<CustomDomainRepository>()
+    private val db by inject<CustomDomainRepository>()
 
     private var trie: dnsx.RadixTree = Dnsx.newRadixTree()
-    private val trustedTrie: dnsx.RadixTree = Dnsx.newRadixTree()
 
     enum class Status(val id: Int) {
         NONE(0),
@@ -54,7 +53,11 @@ object DomainRulesManager : KoinComponent {
                 )
             }
 
-            fun getStatus(statusId: Int): Status {
+            fun getStatus(statusId: Int?): Status {
+                if (statusId == null) {
+                    return NONE
+                }
+
                 return when (statusId) {
                     NONE.id -> NONE
                     TRUST.id -> TRUST
@@ -82,35 +85,24 @@ object DomainRulesManager : KoinComponent {
 
     // update the cache with the domain and its status based on the domain type
     private fun updateTrie(cd: CustomDomain) {
-        val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+        val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
         trie.set(key, cd.status.toString())
-        if (cd.status == Status.TRUST.id) {
-            trustedTrie.set(key, cd.status.toString())
-        }
     }
 
-    private fun getTrieKey(_domain: String, uid: Int): String {
-        val domain = _domain.removePrefix("*").removeSuffix("*")
+    private fun mkTrieKey(_domain: String, uid: Int): String {
+        // *.google.co.uk -> .google.co.uk,<uid>
+        // not supported by IpTrie: google.* -> google.,<uid>
+        val domain = _domain.removePrefix("*")
         return domain.lowercase(Locale.ROOT) + "," + uid
     }
 
-    suspend fun load() {
-        val customDomains = customDomainsRepository.getAllCustomDomains()
-        if (customDomains.isEmpty()) {
-            Log.w(LOG_TAG_DNS, "no custom domains found in db")
-            return
-        }
-
-        // sort the custom domains based on the length of the domain
-        val selector: (String) -> Int = { str -> str.length }
-        val sortedDomains = customDomains.sortedByDescending { selector(it.domain) }
-        sortedDomains.forEach { cd ->
-            val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+    suspend fun load(): Long {
+        trie.clear()
+        db.getAllCustomDomains().forEach { cd ->
+            val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
             trie.set(key, cd.status.toString())
-            if (cd.status == Status.TRUST.id) {
-                trustedTrie.set(key, cd.status.toString())
-            }
         }
+        return trie.len()
     }
 
     fun status(d: String, uid: Int): Status {
@@ -134,23 +126,23 @@ object DomainRulesManager : KoinComponent {
     }
 
     private fun matchesWildcard(domain: String, uid: Int): Status {
-        val key = getTrieKey(domain.lowercase(Locale.ROOT), uid)
-        val match = trie.getAny(key)
+        val key = mkTrieKey(domain.lowercase(Locale.ROOT), uid)
+        val match = trie.getAny(key) // matches the longest prefix
 
         if (match.isNullOrEmpty()) {
             return Status.NONE
         }
 
-        return Status.getStatus(match.toInt())
+        return Status.getStatus(match.toIntOrNull())
     }
 
     fun getDomainRule(domain: String, uid: Int): Status {
-        val key = getTrieKey(domain.lowercase(Locale.ROOT), uid)
+        val key = mkTrieKey(domain.lowercase(Locale.ROOT), uid)
         val match = trie.get(key)
         if (match.isNullOrEmpty()) {
             return Status.NONE
         }
-        return Status.getStatus(match.toInt())
+        return Status.getStatus(match.toIntOrNull())
     }
 
     fun isDomainTrusted(_domain: String?): Boolean {
@@ -159,8 +151,12 @@ object DomainRulesManager : KoinComponent {
         }
 
         val domain = _domain.lowercase(Locale.ROOT)
-        val key = getTrieKey(domain, Constants.UID_EVERYBODY)
-        return trustedTrie.hasAny(key)
+        val key = mkTrieKey(domain, Constants.UID_EVERYBODY)
+        val match = trie.get(key)
+        if (match.isNullOrEmpty()) {
+            return false
+        }
+        return Status.TRUST.id == match.toIntOrNull()
     }
 
     suspend fun whitelist(cd: CustomDomain) {
@@ -221,15 +217,15 @@ object DomainRulesManager : KoinComponent {
     }
 
     private suspend fun dbInsertOrUpdate(cd: CustomDomain) {
-        customDomainsRepository.insert(cd)
+        db.insert(cd)
     }
 
     private suspend fun dbUpdate(prevDomain: CustomDomain, cd: CustomDomain) {
-        customDomainsRepository.update(prevDomain, cd)
+        db.update(prevDomain, cd)
     }
 
     private suspend fun dbDelete(cd: CustomDomain) {
-        customDomainsRepository.delete(cd)
+        db.delete(cd)
     }
 
     suspend fun deleteDomain(cd: CustomDomain) {
@@ -238,31 +234,23 @@ object DomainRulesManager : KoinComponent {
     }
 
     suspend fun deleteRulesByUid(uid: Int) {
-        customDomainsRepository.deleteRulesByUid(uid)
+        db.deleteRulesByUid(uid)
         val rulesDeleted = trie.delAll(uid.toString())
-        val trustedRulesDeleted = trustedTrie.delAll(uid.toString())
-        Log.i(
-            LOG_TAG_DNS,
-            "Deleted $rulesDeleted rules from trie and $trustedRulesDeleted rules from trustedTrie"
-        )
+        Log.i(LOG_TAG_DNS, "rules deleted from trie for $uid: $rulesDeleted")
     }
 
     suspend fun deleteAllRules() {
-        customDomainsRepository.deleteAllRules()
+        db.deleteAllRules()
         trie.clear()
-        trustedTrie.clear()
     }
 
     private fun removeFromTrie(cd: CustomDomain) {
-        val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+        val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
         trie.del(key)
-        if (cd.status == Status.TRUST.id) {
-            trustedTrie.del(key)
-        }
     }
 
     fun getUniversalCustomDomainCount(): LiveData<Int> {
-        return customDomainsRepository.getUniversalCustomDomainCount()
+        return db.getUniversalCustomDomainCount()
     }
 
     fun isValidDomain(url: String): Boolean {
@@ -273,34 +261,39 @@ object DomainRulesManager : KoinComponent {
         }
     }
 
-    suspend fun updateUid(uid: Int, newUid: Int) {
-        customDomainsRepository.updateUid(uid, newUid)
-        clearTrie(uid)
-        addNewUidToTrie(uid)
+    suspend fun updateUids(uids: List<Int>, newUids: List<Int>) {
+        for (i in uids.indices) {
+            val uid = uids[i]
+            val newUid = newUids[i]
+            updateUid(uid, newUid)
+        }
     }
 
-    private suspend fun addNewUidToTrie(uid: Int) {
-        val customDomains = customDomainsRepository.getDomainsByUID(uid)
-        if (customDomains.isEmpty()) {
-            Log.w(LOG_TAG_DNS, "no custom domains found in db")
+    suspend fun updateUid(uid: Int, newUid: Int) {
+        clearTrie(uid)
+        db.updateUid(uid, newUid)
+        rehydrateFromDB(newUid)
+    }
+
+    private suspend fun rehydrateFromDB(uid: Int) {
+        val doms = db.getDomainsByUID(uid)
+        if (doms.isEmpty()) {
+            Log.w(LOG_TAG_DNS, "rehydrate: zero domains for uid: $uid in db")
             return
         }
 
-        // sort the custom domains based on the length of the domain
+        Log.i(LOG_TAG_DNS, "rehydrate: rehydrating ${doms.size} domains for uid: $uid")
+        // process longer domains first
         val selector: (String) -> Int = { str -> str.length }
-        val sortedDomains = customDomains.sortedByDescending { selector(it.domain) }
-        sortedDomains.forEach { cd ->
-            val key = getTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+        val desc = doms.sortedByDescending { selector(it.domain) }
+        desc.forEach { cd ->
+            val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
             trie.set(key, cd.status.toString())
-            if (cd.status == Status.TRUST.id) {
-                trustedTrie.set(key, cd.status.toString())
-            }
         }
     }
 
     private fun clearTrie(uid: Int) {
         trie.delAll(uid.toString())
-        trustedTrie.delAll(uid.toString())
     }
 
     fun isWildCardEntry(url: String): Boolean {

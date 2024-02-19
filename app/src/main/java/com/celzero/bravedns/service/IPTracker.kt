@@ -34,8 +34,8 @@ import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.getPackageInfoForUid
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
-import org.koin.core.component.KoinComponent
 import java.net.InetAddress
+import org.koin.core.component.KoinComponent
 
 class IPTracker
 internal constructor(
@@ -97,6 +97,16 @@ internal constructor(
         return rlog
     }
 
+    suspend fun makeSummaryWithTarget(s: ConnectionSummary): ConnectionSummary {
+        if (s.targetIp.isNullOrEmpty()) {
+            return s
+        }
+        val serverAddress = convertIpV6ToIpv4IfNeeded(s.targetIp)
+        val countryCode: String? = getCountryCode(serverAddress, context)
+        s.flag = getFlag(countryCode)
+        return s
+    }
+
     suspend fun insertBatch(conns: List<ConnectionTracker>) {
         connectionTrackerRepository.insertBatch(conns)
     }
@@ -120,7 +130,7 @@ internal constructor(
         // no need to check if IP is not of type IPv6
         if (!IPUtil.isIpV6(ipAddress)) return inetAddress
 
-        val ipv4 = IPUtil.toIpV4(ipAddress)
+        val ipv4 = IPUtil.ip4in6(ipAddress)
 
         return if (ipv4 != null) {
             ipv4.toInetAddress()

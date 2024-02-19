@@ -64,12 +64,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
-import java.util.Locale
 
 class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
@@ -272,15 +272,15 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.bsConnConnDuration.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_green_circle),
-                    getString(R.string.lbl_active)
+                    getString(R.string.lbl_active),
+                    getString(R.string.symbol_green_circle)
                 )
         } else {
             b.bsConnConnDuration.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_clock),
-                    getString(R.string.symbol_hyphen)
+                    getString(R.string.symbol_hyphen),
+                    getString(R.string.symbol_clock)
                 )
         }
 
@@ -289,15 +289,15 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.bsConnConnType.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_currency),
-                    getString(R.string.ada_app_metered)
+                    getString(R.string.ada_app_metered),
+                    getString(R.string.symbol_currency)
                 )
         } else {
             b.bsConnConnType.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_global),
-                    getString(R.string.ada_app_unmetered)
+                    getString(R.string.ada_app_unmetered),
+                    getString(R.string.symbol_global)
                 )
         }
 
@@ -330,7 +330,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         b.bsConnConnDownload.text = downloadBytes
         val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info!!.duration)
         b.bsConnConnDuration.text =
-            getString(R.string.two_argument_space, getString(R.string.symbol_clock), duration)
+            getString(R.string.two_argument_space, duration, getString(R.string.symbol_clock))
     }
 
     private fun lightenUpChip() {
@@ -550,7 +550,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
     private fun updateIpRulesUi(uid: Int, ipAddress: String, port: Int) {
         io {
-            val rule = IpRulesManager.isIpRuleAvailable(uid, ipAddress, port)
+            val rule = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
             uiCtx { b.bsConnIpRuleSpinner.setSelection(rule.id) }
         }
     }
@@ -654,21 +654,21 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun applyIpRule(ipRuleStatus: IpRulesManager.IpRuleStatus) {
-        val protocol = Protocol.getProtocolName(info!!.protocol).name
-        val connRules = ConnectionRules(info!!.ipAddress, info!!.port, protocol)
+        val proto = Protocol.getProtocolName(info!!.protocol).name
+        val cr = ConnectionRules(info!!.ipAddress, info!!.port, proto)
 
         Log.i(
             LOG_TAG_FIREWALL,
-            "Apply ip rule for ${connRules.ipAddress}, ${FirewallRuleset.RULE2.name}"
+            "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}"
         )
         io {
             // no need to apply rule, prev selection and current selection are same
             if (
-                IpRulesManager.isIpRuleAvailable(info!!.uid, info!!.ipAddress, info!!.port) ==
+                IpRulesManager.getMostSpecificRuleMatch(info!!.uid, info!!.ipAddress) ==
                     ipRuleStatus
             )
                 return@io
-            IpRulesManager.updateRule(info!!.uid, connRules.ipAddress, connRules.port, ipRuleStatus)
+            IpRulesManager.addIpRule(info!!.uid, cr.ipAddress, /*wildcard-port*/ 0, ipRuleStatus)
         }
     }
 
@@ -688,7 +688,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun io(f: suspend () -> Unit) =
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
 
     private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { f() }
 }

@@ -144,7 +144,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     private fun setRulesUi() {
         io {
             // no need to send port number for the app info screen
-            ipRule = IpRulesManager.isIpRuleAvailable(uid, ipAddress, null)
+            ipRule = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
             Log.d("FirewallManager", "Set selection of ip: $ipAddress, ${ipRule.id}")
             uiCtx {
                 when (ipRule) {
@@ -239,7 +239,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

@@ -57,13 +57,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
@@ -77,6 +77,7 @@ internal constructor(
         private const val NOTIF_BATCH_NEW_APPS_THRESHOLD = 5
         private val FULL_REFRESH_INTERVAL = TimeUnit.MINUTES.toMillis(1L)
         private const val NOTIF_ID_LOAD_RULES_FAIL = 103
+        private const val NOBODY = Constants.INVALID_UID
         private const val ACTION_BASE = 0
         const val ACTION_REFRESH_RESTORE = ACTION_BASE + 1
         const val ACTION_REFRESH_AUTO = ACTION_BASE + 2
@@ -90,7 +91,7 @@ internal constructor(
     private val randomNotifId: Random = Random
     private val actions: Channel<Action> = Channel(Channel.RENDEZVOUS)
 
-    data class Action(val action: Int, val uid: Int = -1)
+    data class Action(val action: Int, val uid: Int = NOBODY, val cb: suspend () -> Unit = {})
 
     private var latestRefreshTime: Long = 0L
 
@@ -106,8 +107,8 @@ internal constructor(
      * Need to rewrite the logic for adding the apps in the database and removing it during
      * uninstall.
      */
-    suspend fun refresh(action: Int) {
-        actions.send(Action(action))
+    suspend fun refresh(action: Int, cb: suspend () -> Unit = {}) {
+        actions.send(Action(action, NOBODY, cb))
     }
 
     suspend fun addNewApp(uid: Int) {
@@ -115,35 +116,39 @@ internal constructor(
     }
 
     suspend fun process(a: Action) {
-        val action = a.action
-        val uid = a.uid // may be -1
-        if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info $a")
-        if (action == ACTION_INSERT_NEW_APP) {
-            // ignore invalid uid (app source could not be determined)
-            // ignore missing uid (protocol unknown or connectivity mgr missing)
-            if (Utilities.isMissingOrInvalidUid(uid)) return
-            maybeInsertApp(uid)
-            return
-        }
-        val current = SystemClock.elapsedRealtime()
-        // do not auto-refresh and the last refresh was within AUTO_REFRESH_INTERVAL
-        if (
-            latestRefreshTime > 0 &&
-                current - latestRefreshTime < FULL_REFRESH_INTERVAL &&
-                (action == ACTION_REFRESH_AUTO || action == ACTION_REFRESH_INTERACTIVE)
-        ) {
-            Log.i(LOG_TAG_APP_DB, "no-op auto refresh")
-            return
-        }
-        latestRefreshTime = current
-        val pm = context.packageManager ?: return
-
         try {
-            FirewallManager.load()
-            IpRulesManager.load()
-            DomainRulesManager.load()
-            TcpProxyHelper.load()
-            ProxyManager.load()
+            val action = a.action
+            val uid = a.uid // may be -1
+            if (DEBUG) Log.d(LOG_TAG_APP_DB, "Initiated refresh application info $a")
+            if (action == ACTION_INSERT_NEW_APP) {
+                // ignore invalid uid (app source could not be determined)
+                // ignore missing uid (protocol unknown or connectivity mgr missing)
+                if (Utilities.isMissingOrInvalidUid(uid)) return
+                maybeInsertApp(uid)
+                return
+            }
+            val current = SystemClock.elapsedRealtime()
+            // do not auto-refresh and the last refresh was within AUTO_REFRESH_INTERVAL
+            if (
+                latestRefreshTime > 0 &&
+                    current - latestRefreshTime < FULL_REFRESH_INTERVAL &&
+                    (action == ACTION_REFRESH_AUTO || action == ACTION_REFRESH_INTERACTIVE)
+            ) {
+                Log.i(LOG_TAG_APP_DB, "no-op auto refresh")
+                return
+            }
+            latestRefreshTime = current
+            val pm = context.packageManager ?: return
+
+            val fm = FirewallManager.load()
+            val ipm = IpRulesManager.load()
+            val dm = DomainRulesManager.load()
+            val pxm = ProxyManager.load()
+            val wgm = WireguardManager.load()
+            val tcpm = TcpProxyHelper.load()
+
+            Log.i(LOG_TAG_APP_DB, "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: ${tcpm}")
+
             val trackedApps = FirewallManager.getAllApps()
             if (trackedApps.isEmpty()) {
                 notifyEmptyFirewallRules()
@@ -170,9 +175,13 @@ internal constructor(
             val packagesToUpdate =
                 findPackagesToUpdate(trackedApps, installedApps, action == ACTION_REFRESH_RESTORE)
 
+            printAll(packagesToAdd, "packagesToAdd")
+            printAll(packagesToDelete, "packagesToDelete")
+            printAll(packagesToUpdate, "packagesToUpdate")
+
             Log.i(
                 LOG_TAG_APP_DB,
-                "rmv: $packagesToDelete; add: $packagesToAdd; update: $packagesToUpdate"
+                "sizes: rmv: ${packagesToDelete.size}; add: ${packagesToAdd.size}; update: ${packagesToUpdate.size}"
             )
             deletePackages(packagesToDelete)
             addMissingPackages(packagesToAdd)
@@ -180,13 +189,18 @@ internal constructor(
             removeWireGuardProfilesIfNeeded(action == ACTION_REFRESH_RESTORE)
             refreshNonApps(trackedApps, installedApps)
             // for proxy mapping, restore is a special case, where we clear all proxy->app mappings
-            // and so, packagesToUpdate, even if not empty, is ignored
+            // and so, packagesToUpdate, even if not empty, is ignored. proxy mappings cannot be
+            // updated during restore.
             refreshProxyMapping(trackedApps, action == ACTION_REFRESH_RESTORE)
+            // must be called after updateExistingPackagesIfNeeded
             refreshIPRules(packagesToUpdate)
+            // must be called after updateExistingPackagesIfNeeded
             refreshDomainRules(packagesToUpdate)
         } catch (e: RuntimeException) {
             Log.e(LOG_TAG_APP_DB, e.message, e)
             throw e
+        } finally {
+            a.cb()
         }
     }
 
@@ -212,7 +226,7 @@ internal constructor(
     ): Set<FirewallManager.AppInfoTuple> {
         return if (ignoreUid) {
             val latestpkgs = latest.map { it.packageName }.toSet()
-            old.filter { !latestpkgs.contains(it.packageName) || !isNonApp(it.packageName) }.toSet()
+            old.filter { !latestpkgs.contains(it.packageName) && !isNonApp(it.packageName) }.toSet()
         } else {
             // extract old apps that are not latest
             Sets.difference(old, latest).filter { !isNonApp(it.packageName) }.toSet()
@@ -296,20 +310,30 @@ internal constructor(
 
     private suspend fun refreshIPRules(apps: Set<FirewallManager.AppInfoTuple>) {
         if (apps.isEmpty()) return
-
+        val oldUids = mutableListOf<Int>()
+        val newUids = mutableListOf<Int>()
         apps.forEach { old ->
-            val newinfo = FirewallManager.getAppInfoByUid(old.uid) ?: return@forEach
-            IpRulesManager.updateUid(old.uid, newinfo.uid)
+            // FirewallManager must have been udpated by now, so we can get the latest app info
+            // using the package-name (as uid have changed)
+            val newinfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
+            oldUids.add(old.uid)
+            newUids.add(newinfo.uid)
         }
+        IpRulesManager.updateUids(oldUids, newUids)
     }
 
     private suspend fun refreshDomainRules(apps: Set<FirewallManager.AppInfoTuple>) {
         if (apps.isEmpty()) return
-
+        val oldUids = mutableListOf<Int>()
+        val newUids = mutableListOf<Int>()
         apps.forEach { old ->
-            val newinfo = FirewallManager.getAppInfoByUid(old.uid) ?: return@forEach
-            DomainRulesManager.updateUid(old.uid, newinfo.uid)
+            // FirewallManager must have been udpated by now, so we can get the latest app info
+            // using the package-name (as uid have changed)
+            val newinfo = FirewallManager.getAppInfoByPackage(old.packageName) ?: return@forEach
+            oldUids.add(old.uid)
+            newUids.add(newinfo.uid)
         }
+        DomainRulesManager.updateUids(oldUids, newUids)
     }
 
     private suspend fun maybeInsertApp(uid: Int) {
@@ -354,10 +378,10 @@ internal constructor(
 
     private suspend fun refreshProxyMapping(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
-        redo: Boolean
+        emptyAll: Boolean
     ) {
         // remove all apps from proxy mapping and add the apps from tracked apps
-        if (redo) {
+        if (emptyAll) {
             ProxyManager.clear()
             trackedApps
                 .map { FirewallManager.getAppInfoByUid(it.uid) }
@@ -760,6 +784,12 @@ internal constructor(
         // purge logs older than specified date
         dnsLogRepository.purgeDnsLogsByDate(date)
         connTrackerRepository.purgeLogsByDate(date)
+    }
+
+    private fun printAll(c: Collection<FirewallManager.AppInfoTuple>, tag: String) {
+        c.forEach {
+            Log.i(LOG_TAG_APP_DB, "$tag: ${it.uid}, ${it.packageName}")
+        }
     }
 
     /** Below code to fetch the google play service-application category Not in use as of now. */

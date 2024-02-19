@@ -47,6 +47,10 @@ class CustomIpRepository(private val customIpDao: CustomIpDao) {
         customIpDao.deleteRulesByUid(uid)
     }
 
+    suspend fun getRulesByUid(uid: Int): List<CustomIp> {
+        return customIpDao.getRulesByUid(uid)
+    }
+
     fun getCustomIpsLiveData(): LiveData<Int> {
         return customIpDao.getCustomIpsLiveData()
     }

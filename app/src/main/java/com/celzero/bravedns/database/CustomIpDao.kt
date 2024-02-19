@@ -72,6 +72,8 @@ interface CustomIpDao {
 
     @Query("delete from CustomIp where uid = $UID_EVERYBODY") fun deleteAllIPRulesUniversal()
 
+    @Query("select * from CustomIp where uid = :uid") fun getRulesByUid(uid: Int): List<CustomIp>
+
     @Query("select count(*) from CustomIp where uid = $UID_EVERYBODY and isActive = 1")
     fun getBlockedConnectionsCount(): Int
 

@@ -32,24 +32,11 @@ class IPUtil {
             return ip.isIPv6
         }
 
-        fun canMakeIpv4(ip: IPAddress): Boolean {
-
-            if (isIpV4Compatible(ip)) {
-                return true
+        fun ip4in6(ip: IPAddress): IPAddress? {
+            if (ip.isIPv4) {
+                // already v4; no need to convert
+                return null
             }
-
-            if (isIpv6Prefix64(ip)) {
-                return true
-            }
-
-            if (isIpTeredo(ip)) {
-                return true
-            }
-
-            return false
-        }
-
-        fun toIpV4(ip: IPAddress): IPAddress? {
             if (isIpV4Compatible(ip)) {
                 return ip.toIPv4()
             }
@@ -77,9 +64,7 @@ class IPUtil {
 
         // for IPv4-Mapped IPv6 Address and IPv4 embedded IPv6 (prefix: 2001:db8::/32)
         private fun isIpV4Compatible(ip: IPAddress): Boolean {
-            if (ip.isIPv6 && ip.isIPv4Convertible && ip.toIPv4() != null) return true
-
-            return false
+            return ip.isIPv6 && ip.isIPv4Convertible && ip.toIPv4() != null
         }
 
         // for teredo tunneling
