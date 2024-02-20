@@ -18,6 +18,7 @@ package com.celzero.bravedns.ui.fragment
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +32,7 @@ import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.ui.activity.DetailedStatisticsActivity
 import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.SummaryStatisticsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -48,6 +50,13 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     private val persistentState by inject<PersistentState>()
 
     private var isVpnActive: Boolean = false
+
+    data class TotalUsage(
+        val totalDownload: Long,
+        val totalUpload: Long,
+        val connectionsCount: Int,
+        val meteredDataUsage: Long
+    )
 
     enum class SummaryStatisticsType(val tid: Int) {
         MOST_CONNECTED_APPS(0),
@@ -115,6 +124,63 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         val timeCategory = viewModel.getTimeCategory().value.toString()
         val btn = b.toggleGroup.findViewWithTag<MaterialButton>(timeCategory)
         btn.isChecked = true
+        handleTotalUsagesUi()
+    }
+
+    private fun handleTotalUsagesUi() {
+        io {
+            val totalUsage = viewModel.totalUsage()
+            uiCtx { setTotalUsagesUi(totalUsage) }
+        }
+    }
+
+    private fun setTotalUsagesUi(totalUsage: TotalUsage) {
+        val progress = (totalUsage.totalDownload + totalUsage.totalUpload)
+        val secondaryProgress =
+            (totalUsage.totalDownload + totalUsage.totalUpload) + totalUsage.meteredDataUsage
+        b.fssTotalDataUsage.text = "Unmetered: " + Utilities.humanReadableByteCount(progress, true)
+        b.fssTotalUpload.text =
+            "Metered: " + Utilities.humanReadableByteCount(totalUsage.meteredDataUsage, true)
+
+        b.fssTotalUpload.setCompoundDrawablesWithIntrinsicBounds(R.drawable.dot_accent,  0,  0,  0)
+
+        // Set the alpha for the drawable
+        val alphaValue =  128 // Half-transparent
+        val drawable = b.fssTotalUpload.compoundDrawables[0] // Assuming the drawable is on the left side
+        drawable?.mutate()?.alpha = alphaValue
+
+
+        val cur = calculatePercentage(progress, secondaryProgress)
+        val sec = calculatePercentage(totalUsage.meteredDataUsage, secondaryProgress)
+        val secondaryVal = cur + sec
+        b.fssProgressBar.max = secondaryVal
+
+        b.fssProgressBar.progress = cur
+        b.fssProgressBar.secondaryProgress = secondaryVal
+
+        //b.fssProgressBar.updateProgress(cur, secondaryVal)
+        b.fssTotalConnections.text =
+            "Overall: " + Utilities.humanReadableByteCount(secondaryProgress, true)
+        // totalUsage.connectionsCount.toString()
+        /*getString(
+            R.string.two_argument,
+            getString(
+                R.string.symbol_download,
+                Utilities.humanReadableByteCount(progress, true)
+            ),
+            getString(
+                R.string.symbol_upload,
+                Utilities.humanReadableByteCount(totalUsage.totalUpload, true)
+            )
+        )*/
+    }
+
+    private fun calculatePercentage(currentValue: Long, maxValue: Long): Int {
+        // Calculate the percentage as a float
+        val percentageFloat = currentValue.toFloat() / maxValue * 100
+
+        // Convert the float to an int, rounding down if necessary
+        return percentageFloat.toInt()
     }
 
     private fun highlightToggleBtn() {
@@ -161,13 +227,14 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             val mb: MaterialButton = b.toggleGroup.findViewById(checkedId)
             if (isChecked) {
                 selectToggleBtnUi(mb)
-                val tcValue = (mb.tag as String).toInt()
+                val tcValue = (mb.tag as String).toIntOrNull() ?: 0
                 val timeCategory =
                     SummaryStatisticsViewModel.TimeCategory.fromValue(tcValue)
                         ?: SummaryStatisticsViewModel.TimeCategory.ONE_HOUR
                 io {
                     val isAppBypassed = FirewallManager.isAnyAppBypassesDns()
                     uiCtx { viewModel.timeCategoryChanged(timeCategory, isAppBypassed) }
+                    handleTotalUsagesUi()
                 }
                 return@OnButtonCheckedListener
             }
@@ -193,7 +260,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {
         val mb = b.toggleGroup.checkedButtonId
-        val timeCategory = (b.toggleGroup.findViewById<MaterialButton>(mb).tag as String).toInt()
+        val timeCategory = (b.toggleGroup.findViewById<MaterialButton>(mb).tag as String).toIntOrNull()
+            ?: 0
         val intent = Intent(requireContext(), DetailedStatisticsActivity::class.java)
         intent.putExtra(DetailedStatisticsActivity.INTENT_TYPE, type.tid)
         intent.putExtra(DetailedStatisticsActivity.INTENT_TIME_CATEGORY, timeCategory)
@@ -485,7 +553,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
     }
 
     private fun io(f: suspend () -> Unit) {
-        this.lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        this.lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

@@ -82,6 +82,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.math.ln
 
 object Utilities {
 
@@ -227,7 +228,7 @@ object Utilities {
         // no need to check if IP is not of type IPv6
         if (!IPUtil.isIpV6(ipAddress)) return ip
 
-        val ipv4 = IPUtil.toIpV4(ipAddress)
+        val ipv4 = IPUtil.ip4in6(ipAddress)
 
         return if (ipv4 != null) {
             ipv4.toInetAddress()
@@ -257,11 +258,15 @@ object Utilities {
         return ip.isLoopback || ip.isLocal || ip.isAnyLocal || UNSPECIFIED_IP_IPV4.equals(ip)
     }
 
-    fun isValidLocalPort(port: Int): Boolean {
+    fun isValidLocalPort(port: Int?): Boolean {
+        if (port == null) return false
+
         return isValidPort(port)
     }
 
-    fun isValidPort(port: Int): Boolean {
+    fun isValidPort(port: Int?): Boolean {
+        if (port == null) return false
+
         return port in 65535 downTo 0
     }
 
@@ -724,9 +729,14 @@ object Utilities {
     fun humanReadableByteCount(bytes: Long, si: Boolean): String {
         val unit = if (si) 1000 else 1024
         if (bytes < unit) return "$bytes B"
-        val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
-        val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
-        return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+        try {
+            val exp = (ln(bytes.toDouble()) / ln(unit.toDouble())).toInt()
+            val pre = ("KMGTPE")[exp - 1] + if (si) "" else "i"
+            return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+        } catch (e: NumberFormatException) {
+            Log.e(LOG_TAG_DOWNLOAD, "Number format exception: ${e.message}", e)
+        }
+        return ""
     }
 
     fun calculateMd5(filePath: String): String {

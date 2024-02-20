@@ -155,7 +155,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
             }
 
             try {
-                port = portEditText.text.toString().toInt()
+                port = portEditText.text.toString().toInt() // can cause NumberFormatException
                 isPortValid =
                     if (Utilities.isLanIpv4(ip)) {
                         Utilities.isValidLocalPort(port)
@@ -225,7 +225,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
