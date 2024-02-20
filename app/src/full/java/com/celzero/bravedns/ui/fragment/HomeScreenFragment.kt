@@ -76,13 +76,13 @@ import com.celzero.bravedns.viewmodel.AlertsViewModel
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -196,15 +196,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             showToastUiCentered(
                 requireContext(),
                 requireContext().getString(R.string.hsf_pause_vpn_failure),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        if (VpnController.isVpnLockdown()) {
-            showToastUiCentered(
-                requireContext(),
-                getString(R.string.hsf_pause_lockdown_failure),
                 Toast.LENGTH_SHORT
             )
             return
@@ -1059,8 +1050,31 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             }
         }
 
-        b.fhsProtectionLevelTxt.setTextColor(colorId)
-        b.fhsProtectionLevelTxt.setText(statusId)
+        if (statusId == R.string.status_no_internet || statusId == R.string.status_failing) {
+            val message = getString(statusId)
+            colorId = fetchTextColor(R.color.accentBad)
+            if (appConfig.isCustomSocks5Enabled() && appConfig.isCustomHttpProxyEnabled()) {
+                statusId = R.string.status_protected_with_proxy
+            } else if (appConfig.isCustomSocks5Enabled()) {
+                statusId = R.string.status_protected_with_socks5
+            } else if (appConfig.isCustomHttpProxyEnabled()) {
+                statusId = R.string.status_protected_with_http
+            } else if (appConfig.isWireGuardEnabled()) {
+                statusId = R.string.status_protected_with_wg
+            } else if (isPrivateDnsActive(requireContext())) {
+                statusId = R.string.status_protected_with_private_dns
+            }
+            // replace the string "protected" with appropriate string
+            // FIXME: spilt the string literals to separate strings
+            val string =
+                getString(statusId)
+                    .replaceFirst(getString(R.string.status_protected), message, true)
+            b.fhsProtectionLevelTxt.setTextColor(colorId)
+            b.fhsProtectionLevelTxt.text = string
+        } else {
+            b.fhsProtectionLevelTxt.setTextColor(colorId)
+            b.fhsProtectionLevelTxt.setText(statusId)
+        }
     }
 
     private fun isAnotherVpnActive(): Boolean {
@@ -1101,7 +1115,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

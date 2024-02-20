@@ -192,18 +192,7 @@ class AppListActivity :
 
     override fun onResume() {
         super.onResume()
-        checkVpnLockdownAndAllNetworks()
         setFirewallFilter(filters.value?.firewallFilter)
-    }
-
-    private fun checkVpnLockdownAndAllNetworks() {
-        if (VpnController.isVpnLockdown()) {
-            b.firewallAppLockdownHint.text = getString(R.string.fapps_lockdown_hint)
-            b.firewallAppLockdownHint.visibility = View.VISIBLE
-            return
-        }
-
-        b.firewallAppLockdownHint.visibility = View.GONE
     }
 
     private fun initObserver() {
@@ -767,7 +756,7 @@ class AppListActivity :
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private fun ui(f: () -> Unit) {
