@@ -334,12 +334,22 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
             .setPositiveButton(getString(R.string.wireguard_disable_positive)) { _, _ ->
                 // disable all configs
                 io {
-                    WireguardManager.disableAllActiveConfigs()
-                    uiCtx {
-                        if (isOneWgToggle) {
-                            showOneWgToggle()
-                        } else {
-                            showGeneralToggle()
+                    if (WireguardManager.canDisableAllActiveConfigs()) {
+                        WireguardManager.disableAllActiveConfigs()
+                        uiCtx {
+                            if (isOneWgToggle) {
+                                showOneWgToggle()
+                            } else {
+                                showGeneralToggle()
+                            }
+                        }
+                    } else {
+                        uiCtx {
+                            Utilities.showToastUiCentered(
+                                    this,
+                                    getString(R.string.wireguard_disable_failure),
+                                    Toast.LENGTH_LONG
+                                )
                         }
                     }
                 }
@@ -370,7 +380,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

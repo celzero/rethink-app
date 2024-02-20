@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -43,6 +44,8 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import ipn.Ipn
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -118,8 +121,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val mapping = WireguardManager.getConfigFilesById(configId)
         // handleWarpConfigView()
         if (mapping != null) {
-            b.lockdownCheck.isChecked = mapping.isLockdown
+            // if catch all is enabled, disable the add apps button and lockdown
             b.catchAllCheck.isChecked = mapping.isCatchAll
+            if (mapping.isCatchAll) {
+                b.lockdownCheck.isEnabled = false
+                b.applicationsBtn.isEnabled = false
+            }
+            b.lockdownCheck.isChecked = mapping.isLockdown
             b.oneWgCheck.isChecked = mapping.oneWireGuard
         }
 
@@ -402,12 +410,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         io {
             WireguardManager.updateLockdownConfig(configId, enabled)
             uiCtx {
-                Toast.makeText(
-                        this,
-                        getString(R.string.wg_lockdown_success_toast),
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
+                Utilities.showToastUiCentered(
+                    this,
+                    getString(R.string.wg_lockdown_success_toast),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
     }
@@ -429,8 +436,15 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         io {
             WireguardManager.updateCatchAllConfig(configId, enabled)
             uiCtx {
-                Toast.makeText(this, "Catch all config updated successfully", Toast.LENGTH_SHORT)
-                    .show()
+                b.lockdownCheck.isEnabled = !enabled
+                b.applicationsBtn.isEnabled = !enabled
+                if (enabled) {
+                    Utilities.showToastUiCentered(
+                        this,
+                        getString(R.string.catch_all_wg_success_toast),
+                        Toast.LENGTH_SHORT
+                    )
+                }
             }
         }
     }
@@ -455,12 +469,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             io {
                 WireguardManager.deleteConfig(configId)
                 uiCtx {
-                    Toast.makeText(
-                            this,
-                            getString(R.string.config_delete_success_toast),
-                            Toast.LENGTH_SHORT
-                        )
-                        .show()
+                    Utilities.showToastUiCentered(
+                        this,
+                        getString(R.string.config_delete_success_toast),
+                        Toast.LENGTH_SHORT
+                    )
                     finish()
                 }
             }
@@ -493,6 +506,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

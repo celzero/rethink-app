@@ -20,6 +20,9 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -32,12 +35,18 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity
 import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_EXTRA_WG_ID
 import com.celzero.bravedns.util.UIUtils
+import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.delay
+import ipn.Ipn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-
+        private const val DELAY = 1000L
         private val DIFF_CALLBACK =
             object : DiffUtil.ItemCallback<WgConfigFiles>() {
 
@@ -54,7 +63,8 @@ class WgConfigAdapter(private val context: Context) :
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
                         oldConnection.name == newConnection.name &&
-                        oldConnection.isActive == newConnection.isActive)
+                        oldConnection.isActive == newConnection.isActive &&
+                        oldConnection.isCatchAll == newConnection.isCatchAll)
                 }
             }
     }
@@ -102,27 +112,24 @@ class WgConfigAdapter(private val context: Context) :
             val id = ProxyManager.ID_WG_BASE + config.id
             val apps = ProxyManager.getAppCountForProxy(id).toString()
             val statusId = VpnController.getProxyStatusById(id)
-            if (statusId == null) {
-                WireguardManager.disableConfig(config)
-            }
-            updateStatusUI(config, statusId, apps)
-        }
-
-        private fun handleSwitchClick(config: WgConfigFiles) {
-            val id = ProxyManager.ID_WG_BASE + config.id
-            val apps = ProxyManager.getAppCountForProxy(id).toString()
-            val statusId = VpnController.getProxyStatusById(id)
             updateStatusUI(config, statusId, apps)
         }
 
         private fun updateStatusUI(config: WgConfigFiles, statusId: Long?, apps: String) {
+            if (context !is LifecycleOwner) return
+
             val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
-                b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.accentGood)
                 b.interfaceDetailCard.strokeWidth = 2
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    // show active status only if the status is TOK(connected), TUP (starting)
+                    if (statusId == Ipn.TOK || statusId == Ipn.TUP) {
+                        b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.accentGood)
+                    } else {
+                        b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.accentBad)
+                    }
                     b.interfaceProxyStatus.text =
                         context.getString(
                             R.string.ci_ip_label,
@@ -136,6 +143,7 @@ class WgConfigAdapter(private val context: Context) :
                             appsCount
                         )
                 } else {
+                    b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.accentBad)
                     b.interfaceProxyStatus.text =
                         context.getString(
                             R.string.ci_ip_label,
@@ -177,21 +185,33 @@ class WgConfigAdapter(private val context: Context) :
 
             b.interfaceSwitch.setOnCheckedChangeListener(null)
             b.interfaceSwitch.setOnClickListener {
+                val scope = (context as LifecycleOwner).lifecycleScope
                 if (b.interfaceSwitch.isChecked) {
                     if (WireguardManager.canEnableConfig(config)) {
                         WireguardManager.enableConfig(config)
-                        handleSwitchClick(config)
+                        // update the status after 1 second
+                        delay(DELAY, scope) { updateStatus(config) }
                     } else {
-                        Toast.makeText(
+                        Utilities.showToastUiCentered(
                                 context,
                                 context.getString(R.string.wireguard_enabled_failure),
                                 Toast.LENGTH_LONG
                             )
-                            .show()
+                        b.interfaceSwitch.isChecked = false
                     }
                 } else {
-                    WireguardManager.disableConfig(config)
-                    handleSwitchClick(config)
+                    if (WireguardManager.canDisableConfig(config)) {
+                        WireguardManager.disableConfig(config)
+                        // update the status after 1 second
+                        delay(DELAY, scope) { updateStatus(config) }
+                    } else {
+                        Utilities.showToastUiCentered(
+                                context,
+                                context.getString(R.string.wireguard_disable_failure),
+                                Toast.LENGTH_LONG
+                            )
+                        b.interfaceSwitch.isChecked = true
+                    }
                 }
             }
         }

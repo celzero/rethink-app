@@ -740,6 +740,11 @@ object WireguardManager : KoinComponent {
     fun canRouteIp(configId: Int?, ip: String?): Boolean {
         val destAddr = IPAddressString(ip)
 
+        if (destAddr.isZero()) {
+            Log.w(LOG_TAG_PROXY, "canRouteIp: unsupported wildcard ip: $ip")
+            return false
+        }
+
         if (configId == null || ip == null) {
             Log.e(LOG_TAG_PROXY, "canRouteIp: configId or ip is null")
             return false

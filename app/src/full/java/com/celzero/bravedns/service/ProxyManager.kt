@@ -82,14 +82,12 @@ object ProxyManager : KoinComponent {
         }
     }
 
-    init {
-        io { WireguardManager.load() }
-    }
-
     private var proxyMapCache = CopyOnWriteArraySet<ProxyApplicationMapping>()
 
-    suspend fun load() {
-        proxyMapCache = CopyOnWriteArraySet(db.getApps())
+    suspend fun load(): Int {
+        val a = db.getApps()
+        proxyMapCache = CopyOnWriteArraySet(a)
+        return a.size
     }
 
     fun getProxyIdForApp(uid: Int): String {

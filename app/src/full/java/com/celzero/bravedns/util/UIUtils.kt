@@ -84,6 +84,9 @@ object UIUtils {
 
     fun getProxyStatusStringRes(statusId: Long): Int {
         return when (statusId) {
+            Ipn.TUP -> {
+                R.string.lbl_starting
+            }
             Ipn.TOK -> {
                 R.string.dns_connected
             }
