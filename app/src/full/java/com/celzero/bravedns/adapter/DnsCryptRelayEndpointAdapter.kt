@@ -220,10 +220,10 @@ class DnsCryptRelayEndpointAdapter(
                 if (isSelected && !appConfig.isDnscryptRelaySelectable()) {
                     uiCtx {
                         Utilities.showToastUiCentered(
-                                context,
-                                context.getString(R.string.dns_crypt_relay_error_toast),
-                                Toast.LENGTH_LONG
-                            )
+                            context,
+                            context.getString(R.string.dns_crypt_relay_error_toast),
+                            Toast.LENGTH_LONG
+                        )
                         b.dnsCryptEndpointListActionImage.isChecked = false
                     }
                     return@io
@@ -239,10 +239,10 @@ class DnsCryptRelayEndpointAdapter(
                 appConfig.deleteDnscryptRelayEndpoint(id)
                 uiCtx {
                     Utilities.showToastUiCentered(
-                            context,
-                            context.getString(R.string.dns_crypt_relay_remove_success),
-                            Toast.LENGTH_SHORT
-                        )
+                        context,
+                        context.getString(R.string.dns_crypt_relay_remove_success),
+                        Toast.LENGTH_SHORT
+                    )
                 }
             }
         }

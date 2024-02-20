@@ -168,10 +168,10 @@ class OneWgConfigAdapter(private val context: Context) :
                             uiCtx {
                                 b.oneWgCheck.isChecked = false
                                 Utilities.showToastUiCentered(
-                                        context,
-                                        context.getString(R.string.wireguard_enabled_failure),
-                                        Toast.LENGTH_LONG
-                                    )
+                                    context,
+                                    context.getString(R.string.wireguard_enabled_failure),
+                                    Toast.LENGTH_LONG
+                                )
                             }
                         }
                     } else {

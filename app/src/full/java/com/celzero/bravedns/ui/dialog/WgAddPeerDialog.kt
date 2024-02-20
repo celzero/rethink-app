@@ -109,7 +109,11 @@ class WgAddPeerDialog(
                 }
             } catch (e: Throwable) {
                 Log.e(LoggerConstants.LOG_TAG_PROXY, "Error while adding peer", e)
-                Utilities.showToastUiCentered(context, ErrorMessages[context, e], Toast.LENGTH_SHORT)
+                Utilities.showToastUiCentered(
+                    context,
+                    ErrorMessages[context, e],
+                    Toast.LENGTH_SHORT
+                )
                 return@setOnClickListener
             }
         }

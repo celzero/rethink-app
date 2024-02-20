@@ -271,7 +271,11 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
     private suspend fun showConfigCreationError() {
         uiCtx {
-            Utilities.showToastUiCentered(this, getString(R.string.new_warp_error_toast), Toast.LENGTH_LONG)
+            Utilities.showToastUiCentered(
+                this,
+                getString(R.string.new_warp_error_toast),
+                Toast.LENGTH_LONG
+            )
             b.enableUdpRelay.isChecked = false
         }
     }

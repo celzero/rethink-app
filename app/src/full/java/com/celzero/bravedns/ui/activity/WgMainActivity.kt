@@ -346,10 +346,10 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                     } else {
                         uiCtx {
                             Utilities.showToastUiCentered(
-                                    this,
-                                    getString(R.string.wireguard_disable_failure),
-                                    Toast.LENGTH_LONG
-                                )
+                                this,
+                                getString(R.string.wireguard_disable_failure),
+                                Toast.LENGTH_LONG
+                            )
                         }
                     }
                 }

@@ -133,7 +133,7 @@ object UIUtils {
         val c2 = Calendar.getInstance()
         c2.time = day
         return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
-                c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)
+            c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)
     }
 
     fun openVpnProfile(context: Context) {

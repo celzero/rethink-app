@@ -96,7 +96,7 @@ object TcpProxyHelper : KoinComponent {
         io { load() }
     }
 
-    suspend fun load() : Int {
+    suspend fun load(): Int {
         tcpProxies.clear()
         tcpProxies.addAll(db.getTcpProxies())
         loadTrie()

@@ -633,7 +633,7 @@ class SummaryStatisticsAdapter(
     }
 
     private fun ui(f: suspend () -> Unit) {
-        (context as LifecycleOwner).lifecycleScope.launch (Dispatchers.Main) { f() }
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

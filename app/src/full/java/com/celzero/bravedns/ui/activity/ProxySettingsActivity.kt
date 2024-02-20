@@ -704,7 +704,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         }
 
         applyURLBtn.setOnClickListener {
-            var port:Int? = 0
+            var port: Int? = 0
             var isValid: Boolean
             var isIPValid = true
             var isUDPBlock = false
@@ -912,10 +912,10 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                 insertHttpProxyEndpointDB(endpoint.id, host, appName)
                 dialog.dismiss()
                 showToastUiCentered(
-                        this,
-                        getString(R.string.settings_http_proxy_toast_success),
-                        Toast.LENGTH_SHORT
-                    )
+                    this,
+                    getString(R.string.settings_http_proxy_toast_success),
+                    Toast.LENGTH_SHORT
+                )
                 if (b.settingsActivityHttpProxySwitch.isChecked) {
                     b.settingsActivityHttpProxyDesc.text =
                         getString(R.string.settings_http_proxy_desc, host)

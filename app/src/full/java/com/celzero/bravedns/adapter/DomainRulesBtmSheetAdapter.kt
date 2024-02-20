@@ -29,7 +29,6 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.util.LoggerConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class DomainRulesBtmSheetAdapter(
     val context: Context,

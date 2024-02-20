@@ -162,10 +162,10 @@ class DoTEndpointAdapter(
                 appConfig.deleteDoTEndpoint(id)
                 uiCtx {
                     Utilities.showToastUiCentered(
-                            context,
-                            context.getString(R.string.doh_custom_url_remove_success),
-                            Toast.LENGTH_SHORT
-                        )
+                        context,
+                        context.getString(R.string.doh_custom_url_remove_success),
+                        Toast.LENGTH_SHORT
+                    )
                 }
             }
         }

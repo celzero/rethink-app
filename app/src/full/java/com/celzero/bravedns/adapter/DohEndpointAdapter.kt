@@ -162,10 +162,10 @@ class DohEndpointAdapter(
                 appConfig.deleteDohEndpoint(id)
                 uiCtx {
                     Utilities.showToastUiCentered(
-                            context,
-                            context.getString(R.string.doh_custom_url_remove_success),
-                            Toast.LENGTH_SHORT
-                        )
+                        context,
+                        context.getString(R.string.doh_custom_url_remove_success),
+                        Toast.LENGTH_SHORT
+                    )
                 }
             }
         }
@@ -235,7 +235,7 @@ class DohEndpointAdapter(
         }
 
         private fun io(f: suspend () -> Unit) {
-            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO){ f() }
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
         }
     }
 }

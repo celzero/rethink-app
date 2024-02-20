@@ -149,10 +149,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 uiCtx {
                     if (!isSelected) {
                         Utilities.showToastUiCentered(
-                                requireContext(),
-                                getString(R.string.orbot_no_app_toast),
-                                Toast.LENGTH_SHORT
-                            )
+                            requireContext(),
+                            getString(R.string.orbot_no_app_toast),
+                            Toast.LENGTH_SHORT
+                        )
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioSocks5.isChecked = false
                         return@uiCtx
@@ -171,10 +171,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 uiCtx {
                     if (!isSelected) {
                         Utilities.showToastUiCentered(
-                                requireContext(),
-                                getString(R.string.orbot_no_app_toast),
-                                Toast.LENGTH_SHORT
-                            )
+                            requireContext(),
+                            getString(R.string.orbot_no_app_toast),
+                            Toast.LENGTH_SHORT
+                        )
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioSocks5.isChecked = false
                         return@uiCtx
@@ -195,10 +195,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 uiCtx {
                     if (!isSelected) {
                         Utilities.showToastUiCentered(
-                                requireContext(),
-                                getString(R.string.orbot_no_app_toast),
-                                Toast.LENGTH_SHORT
-                            )
+                            requireContext(),
+                            getString(R.string.orbot_no_app_toast),
+                            Toast.LENGTH_SHORT
+                        )
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioHttp.isChecked = false
                         return@uiCtx
@@ -217,10 +217,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 uiCtx {
                     if (!isSelected) {
                         Utilities.showToastUiCentered(
-                                requireContext(),
-                                getString(R.string.orbot_no_app_toast),
-                                Toast.LENGTH_SHORT
-                            )
+                            requireContext(),
+                            getString(R.string.orbot_no_app_toast),
+                            Toast.LENGTH_SHORT
+                        )
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioHttp.isChecked = false
                         return@uiCtx
@@ -241,10 +241,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 uiCtx {
                     if (!isSelected) {
                         Utilities.showToastUiCentered(
-                                requireContext(),
-                                getString(R.string.orbot_no_app_toast),
-                                Toast.LENGTH_SHORT
-                            )
+                            requireContext(),
+                            getString(R.string.orbot_no_app_toast),
+                            Toast.LENGTH_SHORT
+                        )
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioBoth.isChecked = false
                         return@uiCtx
@@ -263,10 +263,10 @@ class OrbotBottomSheet : BottomSheetDialogFragment() {
                 uiCtx {
                     if (!isSelected) {
                         Utilities.showToastUiCentered(
-                                requireContext(),
-                                getString(R.string.orbot_no_app_toast),
-                                Toast.LENGTH_SHORT
-                            )
+                            requireContext(),
+                            getString(R.string.orbot_no_app_toast),
+                            Toast.LENGTH_SHORT
+                        )
                         b.bsOrbotRadioNone.isChecked = true
                         b.bsOrbotRadioBoth.isChecked = false
                         return@uiCtx

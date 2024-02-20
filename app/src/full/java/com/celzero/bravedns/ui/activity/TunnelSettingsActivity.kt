@@ -35,8 +35,8 @@ import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.util.concurrent.TimeUnit
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settings) {
     private val b by viewBinding(ActivityTunnelSettingsBinding::bind)

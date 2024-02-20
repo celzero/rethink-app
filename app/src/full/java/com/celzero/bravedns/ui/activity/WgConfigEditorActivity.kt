@@ -147,10 +147,10 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
                 if (isInterfaceAdded != null) {
                     uiCtx {
                         Utilities.showToastUiCentered(
-                                this,
-                                getString(R.string.config_add_success_toast),
-                                Toast.LENGTH_LONG
-                            )
+                            this,
+                            getString(R.string.config_add_success_toast),
+                            Toast.LENGTH_LONG
+                        )
                         finish()
                     }
                 } else {

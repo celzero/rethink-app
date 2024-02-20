@@ -396,13 +396,10 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 io { IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port) }
                 Utilities.showToastUiCentered(
-                        context,
-                        context.getString(
-                            R.string.univ_ip_delete_individual_toast,
-                            customIp.ipAddress
-                        ),
-                        Toast.LENGTH_SHORT
-                    )
+                    context,
+                    context.getString(R.string.univ_ip_delete_individual_toast, customIp.ipAddress),
+                    Toast.LENGTH_SHORT
+                )
             }
 
             builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
@@ -618,13 +615,10 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
                 io { IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port) }
                 Utilities.showToastUiCentered(
-                        context,
-                        context.getString(
-                            R.string.univ_ip_delete_individual_toast,
-                            customIp.ipAddress
-                        ),
-                        Toast.LENGTH_SHORT
-                    )
+                    context,
+                    context.getString(R.string.univ_ip_delete_individual_toast, customIp.ipAddress),
+                    Toast.LENGTH_SHORT
+                )
             }
 
             builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->

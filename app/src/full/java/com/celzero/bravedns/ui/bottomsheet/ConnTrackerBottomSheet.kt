@@ -64,12 +64,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
+import java.util.Locale
 
 class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
 
@@ -657,10 +657,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         val proto = Protocol.getProtocolName(info!!.protocol).name
         val cr = ConnectionRules(info!!.ipAddress, info!!.port, proto)
 
-        Log.i(
-            LOG_TAG_FIREWALL,
-            "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}"
-        )
+        Log.i(LOG_TAG_FIREWALL, "Apply ip rule for ${cr.ipAddress}, ${FirewallRuleset.RULE2.name}")
         io {
             // no need to apply rule, prev selection and current selection are same
             if (
@@ -687,8 +684,7 @@ class ConnTrackerBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         }
     }
 
-    private fun io(f: suspend () -> Unit) =
-        lifecycleScope.launch(Dispatchers.IO) { f() }
+    private fun io(f: suspend () -> Unit) = lifecycleScope.launch(Dispatchers.IO) { f() }
 
     private suspend fun uiCtx(f: suspend () -> Unit) = withContext(Dispatchers.Main) { f() }
 }

@@ -37,7 +37,6 @@ import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
