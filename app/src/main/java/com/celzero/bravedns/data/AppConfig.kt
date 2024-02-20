@@ -45,16 +45,12 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
-import com.celzero.bravedns.util.KnownPorts.Companion.DNS_PORT
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.PcapMode
-import com.celzero.bravedns.util.Utilities.getDnsPort
 import com.celzero.bravedns.util.Utilities.isAtleastQ
-import inet.ipaddr.IPAddressString
 import intra.Bridge
 import settings.Settings
-import java.net.InetAddress
 
 class AppConfig
 internal constructor(

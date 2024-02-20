@@ -20,7 +20,6 @@ import com.google.gson.reflect.TypeToken
 import java.io.Serializable
 import java.lang.reflect.Type
 
-
 // there are two different formats for the FileTag json
 // below is the sample legacy format
 /*"value":0,

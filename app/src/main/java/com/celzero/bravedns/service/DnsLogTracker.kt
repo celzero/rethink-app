@@ -148,7 +148,9 @@ internal constructor(
                         dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
                     }
                     // now, there is no empty response, instead -- is added as response from go
-                    if (transaction.response == EMPTY_RESPONSE && transaction.blocklist.isNotEmpty()) {
+                    if (
+                        transaction.response == EMPTY_RESPONSE && transaction.blocklist.isNotEmpty()
+                    ) {
                         dnsLog.isBlocked = true
                     }
                 }

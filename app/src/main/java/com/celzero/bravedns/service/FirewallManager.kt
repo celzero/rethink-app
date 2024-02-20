@@ -441,7 +441,7 @@ object FirewallManager : KoinComponent {
     }
 
     suspend fun updateUid(olduid: Int, uid: Int, pkg: String) {
-    var cacheok = false
+        var cacheok = false
         // FIXME: review once again
         mutex.withLock {
             appInfos.get(olduid).forEach { ai ->

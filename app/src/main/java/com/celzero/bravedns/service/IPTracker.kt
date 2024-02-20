@@ -35,8 +35,8 @@ import com.celzero.bravedns.util.Utilities.getPackageInfoForUid
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
-import java.net.InetAddress
 import org.koin.core.component.KoinComponent
+import java.net.InetAddress
 
 class IPTracker
 internal constructor(

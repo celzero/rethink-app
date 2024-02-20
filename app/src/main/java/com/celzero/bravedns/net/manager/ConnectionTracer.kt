@@ -112,7 +112,8 @@ class ConnectionTracer(ctx: Context) {
     private fun makeCacheKey(
         protocol: Int,
         local: InetSocketAddress,
-        remote: InetSocketAddress): String {
+        remote: InetSocketAddress
+    ): String {
         return protocol.toString() +
             SEPARATOR +
             local.address.hostAddress +

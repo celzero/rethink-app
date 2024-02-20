@@ -57,13 +57,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
 import com.google.common.collect.Sets
-import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class RefreshDatabase
 internal constructor(
@@ -147,7 +147,10 @@ internal constructor(
             val wgm = WireguardManager.load()
             val tcpm = TcpProxyHelper.load()
 
-            Log.i(LOG_TAG_APP_DB, "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: ${tcpm}")
+            Log.i(
+                LOG_TAG_APP_DB,
+                "reload: fm: ${fm}; ip: ${ipm}; dom: ${dm}; px: ${pxm}; wg: ${wgm}; t: ${tcpm}"
+            )
 
             val trackedApps = FirewallManager.getAllApps()
             if (trackedApps.isEmpty()) {
@@ -787,9 +790,7 @@ internal constructor(
     }
 
     private fun printAll(c: Collection<FirewallManager.AppInfoTuple>, tag: String) {
-        c.forEach {
-            Log.i(LOG_TAG_APP_DB, "$tag: ${it.uid}, ${it.packageName}")
-        }
+        c.forEach { Log.i(LOG_TAG_APP_DB, "$tag: ${it.uid}, ${it.packageName}") }
     }
 
     /** Below code to fetch the google play service-application category Not in use as of now. */
