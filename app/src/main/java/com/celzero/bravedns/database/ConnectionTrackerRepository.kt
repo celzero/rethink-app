@@ -31,14 +31,28 @@ class ConnectionTrackerRepository(private val connectionTrackerDAO: ConnectionTr
 
     suspend fun updateBatch(summary: List<ConnectionSummary>) {
         summary.forEach {
-            connectionTrackerDAO.updateSummary(
-                it.connId,
-                it.downloadBytes,
-                it.uploadBytes,
-                it.duration,
-                it.synack,
-                it.message
-            )
+            if (it.targetIp.isNullOrEmpty()) {
+                connectionTrackerDAO.updateSummary(
+                    it.connId,
+                    it.downloadBytes,
+                    it.uploadBytes,
+                    it.duration,
+                    it.synack,
+                    it.message
+                )
+            } else {
+                val flag = it.flag ?: ""
+                connectionTrackerDAO.updateSummary(
+                    it.connId,
+                    it.downloadBytes,
+                    it.uploadBytes,
+                    it.duration,
+                    it.synack,
+                    it.message,
+                    it.targetIp,
+                    flag
+                )
+            }
         }
     }
 

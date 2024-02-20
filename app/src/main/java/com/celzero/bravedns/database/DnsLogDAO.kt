@@ -88,22 +88,22 @@ interface DnsLogDAO {
     @Query("delete from DNSLogs where time < :date") fun purgeDnsLogsByDate(date: Long)
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and time < :to group by queryStr order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and queryStr != '' and time < :to group by queryStr order by count desc LIMIT 7"
     )
     fun getMostContactedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and time < :to  group by queryStr order by count desc"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 0 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 0 and status = 'COMPLETE' and response != 'NXDOMAIN' and queryStr != '' and time < :to  group by queryStr order by count desc"
     )
     fun getAllContactedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time < :to group by queryStr order by count desc LIMIT 7"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time < :to and queryStr != '' group by queryStr order by count desc LIMIT 7"
     )
     fun getMostBlockedDomains(to: Long): PagingSource<Int, AppConnection>
 
     @Query(
-        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time < :to group by queryStr order by count desc"
+        "select 0 as uid, '' as ipAddress, 0 as port, count(id) as count, flag, 1 as blocked, queryStr as appOrDnsName from DNSLogs where isBlocked = 1 and time < :to and queryStr != '' group by queryStr order by count desc"
     )
     fun getAllBlockedDomains(to: Long): PagingSource<Int, AppConnection>
 

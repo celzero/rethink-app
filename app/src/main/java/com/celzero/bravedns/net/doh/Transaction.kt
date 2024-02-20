@@ -34,6 +34,7 @@ class Transaction {
     var id: String = ""
     var ttl: Long = 0L
     var transportType: TransportType = TransportType.DOH
+    var msg: String = ""
 
     enum class Status(val id: Long) {
         START(Dnsx.Start),

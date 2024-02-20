@@ -17,6 +17,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
 import com.celzero.bravedns.database.ConnectionTracker
@@ -27,13 +28,13 @@ import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.NetLogBatcher
 import dnsx.Summary
+import java.util.Calendar
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.Calendar
 
 class NetLogTracker
 internal constructor(
@@ -107,13 +108,33 @@ internal constructor(
     fun updateIpSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        io("writeIpSummary") { summaryBatcher?.add(summary) }
+        if (ipTracker == null) return
+
+        io("writeIpSummary") {
+            val s =
+                if (DEBUG && summary.targetIp?.isNotEmpty() == true) {
+                    ipTracker!!.makeSummaryWithTarget(summary)
+                } else {
+                    summary
+                }
+
+            summaryBatcher?.add(s)
+        }
     }
 
     fun updateRethinkSummary(summary: ConnectionSummary) {
         if (!persistentState.logsEnabled) return
 
-        io("writeRethinkSummary") { rethinkSummaryBatcher?.add(summary) ?: return@io }
+        io("writeRethinkSummary") {
+            val s =
+                if (DEBUG && summary.targetIp?.isNotEmpty() == true) {
+                    ipTracker!!.makeSummaryWithTarget(summary)
+                } else {
+                    summary
+                }
+
+            rethinkSummaryBatcher?.add(s)
+        }
     }
 
     // now, this method is doing multiple things which should be removed.
