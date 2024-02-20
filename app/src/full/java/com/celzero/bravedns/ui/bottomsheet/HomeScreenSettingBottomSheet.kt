@@ -202,6 +202,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
         val protocols = VpnController.protocols()
         val netType = VpnController.netType()
         val now = System.currentTimeMillis()
+        val mtu = VpnController.mtu().toString()
         // returns a string describing 'time' as a time relative to 'now'
         val t =
             DateUtils.getRelativeTimeSpanString(
@@ -217,7 +218,7 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
                 getString(R.string.hsf_downtime, t)
             } else {
                 b.bsHomeScreenAppUptime.visibility = View.VISIBLE
-                getString(R.string.hsf_uptime, t, protocols, netType)
+                getString(R.string.hsf_uptime, t, protocols, netType, mtu)
             }
     }
 
@@ -240,6 +241,6 @@ class HomeScreenSettingBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

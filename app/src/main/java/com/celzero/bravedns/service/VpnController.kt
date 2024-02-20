@@ -228,6 +228,10 @@ object VpnController : KoinComponent {
         }
     }
 
+    fun mtu(): Int {
+        return braveVpnService?.underlyingNetworks?.minMtu ?: BraveVPNService.VPN_INTERFACE_MTU
+    }
+
     fun netType(): String {
         // using firewall_status_unknown from strings.xml as a place holder to show network
         // type as Unknown.
