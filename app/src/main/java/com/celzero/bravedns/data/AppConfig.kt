@@ -72,7 +72,6 @@ internal constructor(
     private val dnsLogs: DnsLogRepository
 ) {
     private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
-    private var systemDns: SystemDns = SystemDns("", DNS_PORT)
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
     private var pcapFilePath: String = ""
 
@@ -84,6 +83,7 @@ internal constructor(
 
     init {
         // now connectedDnsName has the dns name and url, extract the dns name and update
+        // csv is <dns-name,url>, url maybe empty
         val dnsName = persistentState.connectedDnsName.split(",").firstOrNull() ?: ""
         connectedDns.postValue(dnsName)
         setDnsMode()
@@ -356,8 +356,6 @@ internal constructor(
         return ProtoTranslationMode.PTMODEAUTO
     }
 
-    data class SystemDns(var ipAddress: String, var port: Int)
-
     fun getFirewallMode(): TunFirewallMode {
         return determineFirewallMode()
     }
@@ -499,42 +497,41 @@ internal constructor(
             DnsType.DOH -> {
                 val endpoint = getDOHDetails() ?: return
 
-                updateConnectedDnsName(endpoint.dohName, endpoint.dohURL)
+                postConnectedDnsName(endpoint.dohName, endpoint.dohURL)
             }
             DnsType.DOT -> {
                 val endpoint = getDOTDetails() ?: return
 
-                updateConnectedDnsName(endpoint.name, endpoint.url)
+                postConnectedDnsName(endpoint.name, endpoint.url)
             }
             DnsType.ODOH -> {
                 val endpoint = getODoHDetails() ?: return
 
-                updateConnectedDnsName(endpoint.name, endpoint.resolver)
+                postConnectedDnsName(endpoint.name, endpoint.resolver)
             }
             DnsType.DNSCRYPT -> {
                 val endpoint = getConnectedDnscryptServer()
-                updateConnectedDnsName(endpoint.dnsCryptName, endpoint.dnsCryptURL)
+                postConnectedDnsName(endpoint.dnsCryptName, endpoint.dnsCryptURL)
             }
             DnsType.DNS_PROXY -> {
                 val endpoint = getDNSProxyServerDetails() ?: return
 
                 val url = endpoint.proxyIP + ":" + endpoint.proxyPort
-                updateConnectedDnsName(endpoint.proxyName, url)
+                postConnectedDnsName(endpoint.proxyName, url)
             }
             DnsType.RETHINK_REMOTE -> {
                 val endpoint = getRemoteRethinkEndpoint() ?: return
 
                 persistentState.setRemoteBlocklistCount(endpoint.blocklistCount)
-                updateConnectedDnsName(endpoint.name, endpoint.url)
+                postConnectedDnsName(endpoint.name, endpoint.url)
             }
             DnsType.SYSTEM_DNS -> {
-                val url = systemDns.ipAddress + ":" + systemDns.port
-                updateConnectedDnsName(context.getString(R.string.network_dns), url)
+                postConnectedDnsName(context.getString(R.string.network_dns))
             }
         }
     }
 
-    private fun updateConnectedDnsName(name: String, url: String) {
+    private fun postConnectedDnsName(name: String, url: String = "") {
         connectedDns.postValue(name)
         persistentState.connectedDnsName = "$name,$url"
     }
@@ -769,55 +766,6 @@ internal constructor(
         }
 
         onDnsChange(DnsType.SYSTEM_DNS)
-    }
-
-    fun updateSystemDnsServers(dnsServers: List<InetAddress>?) {
-        var dnsIp: String? = null
-        val dnsPort = -1 // unknown
-
-        if (dnsServers.isNullOrEmpty()) {
-            Log.w(LOG_TAG_VPN, "No System DNS servers; unsetting existing $systemDns")
-            systemDns.port = getDnsPort(dnsPort)
-            systemDns.ipAddress = ""
-            return
-        }
-        try {
-            dnsIp =
-                when (getInternetProtocol()) {
-                    InternetProtocol.IPv4 -> {
-                        dnsServers
-                            .firstOrNull { IPAddressString(it.hostAddress).isIPv4 }
-                            ?.hostAddress
-                    }
-                    InternetProtocol.IPv6 -> {
-                        dnsServers
-                            .firstOrNull { IPAddressString(it.hostAddress).isIPv6 }
-                            ?.hostAddress
-                    }
-                    InternetProtocol.IPv46 -> {
-                        dnsServers[0].hostAddress
-                    }
-                }
-        } catch (e: NoSuchElementException) {
-            Log.w(LOG_TAG_VPN, "No ip4 / ip6 matching with dns servers")
-        }
-
-        if (dnsIp.isNullOrEmpty()) {
-            dnsIp = dnsServers[0].hostAddress
-        }
-        systemDns.ipAddress = dnsIp ?: ""
-        systemDns.port = getDnsPort(dnsPort)
-    }
-
-    fun getSystemDns(): SystemDns {
-        val defaultDns = "8.8.4.4"
-        val defaultSysDns = SystemDns(defaultDns, DNS_PORT)
-        if (DEBUG) Log.d(LOG_TAG_VPN, "SystemDns: ${systemDns.ipAddress}:${systemDns.port}")
-
-        if (systemDns.ipAddress.isEmpty()) {
-            systemDns = defaultSysDns
-        }
-        return systemDns
     }
 
     fun isSystemDns(): Boolean {

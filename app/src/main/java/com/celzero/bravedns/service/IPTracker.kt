@@ -32,6 +32,7 @@ import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.getCountryCode
 import com.celzero.bravedns.util.Utilities.getFlag
 import com.celzero.bravedns.util.Utilities.getPackageInfoForUid
+import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import java.net.InetAddress
@@ -124,6 +125,9 @@ internal constructor(
     }
 
     private fun convertIpV6ToIpv4IfNeeded(ip: String): InetAddress? {
+        // ip maybe a wildcard, so we need to check if it is a valid IP
+        if (ip.isEmpty() || isUnspecifiedIp(ip)) return null
+
         val inetAddress = HostName(ip).toInetAddress()
         val ipAddress = IPAddressString(ip).address ?: return inetAddress
 

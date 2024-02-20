@@ -34,9 +34,18 @@ import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
+import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
+import java.io.Closeable
+import java.io.IOException
+import java.net.DatagramSocket
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.util.concurrent.TimeUnit
+import kotlin.math.min
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
@@ -44,11 +53,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.IOException
-import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.util.concurrent.TimeUnit
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {
@@ -76,12 +80,10 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 // api26: .addTransportType(NetworkCapabilities.TRANSPORT_LOWPAN)
                 .build()
 
-    // An Android handler thread internally operates on a looper.
-    // Defined as @Volatile so that the looper in the Handler thread so that
-    // the value loaded from memory instead of Thread's local cache.
-    // ref -
-    // https://alvinalexander.com/java/jwarehouse/android/core/java/android/app/IntentService.java.shtml
-    @Volatile private var handlerThread: HandlerThread
+    // An Android handler thread internally operates on a looper
+    // ref:
+    // alvinalexander.com/java/jwarehouse/android/core/java/android/app/IntentService.java.shtml
+    private var handlerThread: HandlerThread
     private var serviceHandler: NetworkRequestHandler? = null
     private val persistentState by inject<PersistentState>()
 
@@ -248,6 +250,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     data class NetworkProperties(
         val network: Network,
         val capabilities: NetworkCapabilities,
+        val linkProperties: LinkProperties?,
         val networkType: String
     )
 
@@ -255,6 +258,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         val ipv4Net: List<NetworkProperties>,
         val ipv6Net: List<NetworkProperties>,
         val useActive: Boolean,
+        val minMtu: Int,
         var isActiveNetworkMetered: Boolean,
         var lastUpdated: Long
     )
@@ -268,6 +272,12 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         // number of times the reachability check is performed due to failures
         private var reachabilityCount = 0L
         private val maxReachabilityCount = 10L
+
+        companion object {
+            private const val MAX_INTERFACE_MTU = 1500 // same as BraveVpnService#VPN_INTERFACE_MTU
+            private const val MIN_INTERFACE_MTU = 1280
+        }
+
         private val ip4probes =
             listOf(
                 "216.239.32.27", // google org
@@ -371,22 +381,17 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         trackedIpv4Networks.map { it }, // map to produce shallow copy
                         trackedIpv6Networks.map { it },
                         useActiveNetwork,
+                        determineMtu(useActiveNetwork),
                         isActiveNetworkMetered,
                         SystemClock.elapsedRealtime()
                     )
-                trackedIpv4Networks.forEach {
-                    if (DEBUG)
-                        Log.d(
-                            LOG_TAG_CONNECTION,
-                            "inform listener4: ${it.network}, ${it.networkType}, $sz"
-                        )
-                }
-                trackedIpv6Networks.forEach {
-                    if (DEBUG)
-                        Log.d(
-                            LOG_TAG_CONNECTION,
-                            "inform listener6: ${it.network}, ${it.networkType}, $sz"
-                        )
+                if (DEBUG) {
+                    trackedIpv4Networks.forEach {
+                        Log.d(LOG_TAG_CONNECTION, "inform4: ${it.network}, ${it.networkType}, $sz")
+                    }
+                    trackedIpv6Networks.forEach {
+                        Log.d(LOG_TAG_CONNECTION, "inform6: ${it.network}, ${it.networkType}, $sz")
+                    }
                 }
                 listener.onNetworkConnected(underlyingNetworks)
             } else {
@@ -395,10 +400,84 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         emptyList(),
                         emptyList(),
                         useActiveNetwork,
+                        MAX_INTERFACE_MTU,
                         isActiveNetworkMetered = false,
                         SystemClock.elapsedRealtime()
                     )
                 listener.onNetworkDisconnected(underlyingNetworks)
+            }
+        }
+
+        private fun determineMtu(useActiveNetwork: Boolean): Int {
+            if (!isAtleastQ()) {
+                return MAX_INTERFACE_MTU
+            }
+
+            var mtu =
+                if (useActiveNetwork) {
+                    val activeNetwork = connectivityManager.activeNetwork
+                    // consider first network in underlying network as active network, in case
+                    // if active network is null
+                    val lp4 =
+                        trackedIpv4Networks.firstOrNull()?.linkProperties
+                            ?: connectivityManager.getLinkProperties(activeNetwork)
+                    val lp6 =
+                        trackedIpv6Networks.firstOrNull()?.linkProperties
+                            ?: connectivityManager.getLinkProperties(activeNetwork)
+                    minNonZeroMtu(lp4?.mtu, lp6?.mtu)
+                } else {
+                    var prev4Lp: LinkProperties? = null
+                    var prev6Lp: LinkProperties? = null
+                    var minMtu4: Int = MAX_INTERFACE_MTU
+                    var minMtu6: Int = MAX_INTERFACE_MTU
+                    // parse through all the networks and get the minimum mtu
+                    trackedIpv4Networks.forEach {
+                        if (DEBUG)
+                            Log.d(LOG_TAG_CONNECTION, "mtu for ipv4: ${it.linkProperties?.mtu}")
+                        val c = it.linkProperties
+                        minMtu4 = minNonZeroMtu(c?.mtu, prev4Lp?.mtu) ?: minMtu4
+                        prev4Lp = c
+                    }
+                    trackedIpv6Networks.forEach {
+                        if (DEBUG)
+                            Log.d(LOG_TAG_CONNECTION, "mtu for ipv6: ${it.linkProperties?.mtu}")
+                        val c = it.linkProperties
+                        minMtu6 = minNonZeroMtu(c?.mtu, prev6Lp?.mtu) ?: minMtu6
+                        prev6Lp = c
+                    }
+                    if (DEBUG) Log.d(LOG_TAG_CONNECTION, "min mtu for v4 nws: $minMtu4, v6 nws: $minMtu6")
+                    min(minMtu4, minMtu6)
+                }
+
+            // mtu can be 0 or null, set it to default value
+            // LinkProperties#getMtu() returns 0 if the value is not set
+            // minNonZeroMtu can returns null
+            if (mtu == null || mtu == 0) {
+                mtu = MAX_INTERFACE_MTU
+                Log.i(LOG_TAG_CONNECTION, "mtu is 0, setting to default $MAX_INTERFACE_MTU")
+            }
+
+            // min value is 1280, set it to 1280 if it is less than 1280
+            if (mtu < MIN_INTERFACE_MTU) {
+                mtu = MIN_INTERFACE_MTU
+                Log.i(LOG_TAG_CONNECTION, "mtu is less than 1280, setting to 1280")
+            }
+
+            Log.i(LOG_TAG_CONNECTION, "current mtu: $mtu")
+            return mtu
+        }
+
+        private fun minNonZeroMtu(m1: Int?, m2: Int?): Int? {
+            return if (m1 != null && m1 > 0 && m2 != null && m2 > 0) {
+                // mtu can be null when lp is null
+                // mtu can be 0 when the value is not set, see:LinkProperties#getMtu()
+                min(m1, m2)
+            } else if (m1 != null && m1 > 0) {
+                m1
+            } else if (m2 != null && m2 > 0) {
+                m2
+            } else {
+                null
             }
         }
 
@@ -417,18 +496,25 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
             val activeNetwork = connectivityManager.activeNetwork // null in vpn lockdown mode
 
-            networks.forEach { prop ->
+            networks.forEach outer@{ prop ->
                 var network: Network? = prop.network
 
-                val lp = connectivityManager.getLinkProperties(network) ?: return@forEach
+                val lp = connectivityManager.getLinkProperties(network)
+                if (lp == null) {
+                    Log.i(LOG_TAG_CONNECTION, "skipping: $network; no link properties")
+                    return@outer
+                }
 
                 if (network == activeNetwork) {
                     if (DEBUG) Log.d(LOG_TAG_CONNECTION, "processing active network: $network")
                     // reachability check automatically bind to active, when network is null
                     network = null
                 }
+                var checked4 = false
+                var checked6 = false
 
                 lp.linkAddresses.forEach inner@{ addr ->
+                    if (checked4 && checked6) return@outer
                     // skip if the address scope is not RT_SCOPE_UNIVERSE, as there are some
                     // addresses which are not reachable outside the network but we will end up
                     // adding those address for ipv4/ipv6 mode, reachability check will fail in
@@ -444,6 +530,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     val address = IPAddressString(addr.address.hostAddress?.toString())
 
                     if (address.isIPv6 && !ipv6.contains(prop)) {
+                        checked6 = true
                         var y = !testReachability
                         if (!testReachability) {
                             // see #createNetworksSet for why we are using hasInternet
@@ -455,6 +542,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         }
                         Log.i(LOG_TAG_CONNECTION, "adding ipv6: $prop; works? $y for $address")
                     } else if (address.isIPv4 && !ipv4.contains(prop)) {
+                        checked4 = true
                         var y = !testReachability
                         if (!testReachability) {
                             // see #createNetworksSet for why we are using hasInternet
@@ -470,11 +558,11 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     }
                 }
             }
+            trackedIpv6Networks = ipv6
+            trackedIpv4Networks = ipv4
 
             redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks, opPrefs)
 
-            trackedIpv6Networks = ipv6
-            trackedIpv4Networks = ipv4
             Log.d(
                 LOG_TAG_CONNECTION,
                 "repopulate v6: $trackedIpv6Networks,\nv4: $trackedIpv4Networks"
@@ -555,12 +643,13 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         ): LinkedHashSet<NetworkProperties> {
             val newNetworks: LinkedHashSet<NetworkProperties> = linkedSetOf()
             activeNetwork?.let {
-                val activeLp = connectivityManager.getNetworkCapabilities(activeNetwork)
+                val activeCap = connectivityManager.getNetworkCapabilities(activeNetwork)
+                val activeLp = connectivityManager.getLinkProperties(activeNetwork)
                 val nwType =
-                    networkType(activeLp) + ", NotMetered?" + isConnectionNotMetered(activeLp)
+                    networkType(activeCap) + ", NotMetered?" + isConnectionNotMetered(activeCap)
                 val activeProp =
-                    if (activeLp != null) {
-                        NetworkProperties(it, activeLp, nwType)
+                    if (activeCap != null) {
+                        NetworkProperties(it, activeCap, activeLp, nwType)
                     } else {
                         null
                     }
@@ -587,11 +676,13 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 }
 
             networks.forEach {
-                val lp = connectivityManager.getNetworkCapabilities(it)
+                val cap = connectivityManager.getNetworkCapabilities(it)
+                val lp = connectivityManager.getLinkProperties(it)
                 val prop =
-                    if (lp != null) {
-                        val nwType = networkType(lp) + ", NotMetered?" + isConnectionNotMetered(lp)
-                        NetworkProperties(it, lp, nwType)
+                    if (cap != null) {
+                        val nwType =
+                            networkType(cap) + ", NotMetered?" + isConnectionNotMetered(cap)
+                        NetworkProperties(it, cap, lp, nwType)
                     } else {
                         null
                     }
@@ -612,14 +703,14 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             return newNetworks
         }
 
-        private fun isIPv4Reachable(nw: Network?): Boolean = runBlocking {
+        private fun isIPv4Reachable(nw: Network?, ping: Boolean = false): Boolean = runBlocking {
             coroutineScope {
                 // select the first reachable IP / domain and return true if any of them is
                 // reachable
                 select<Boolean> {
                         ip4probes.forEach { ip ->
                             async {
-                                    if (nw == null) {
+                                    if (ping) {
                                         isReachable(ip)
                                     } else {
                                         isReachableTcp(nw, ip)
@@ -632,12 +723,12 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             }
         }
 
-        private fun isIPv6Reachable(nw: Network?): Boolean = runBlocking {
+        private fun isIPv6Reachable(nw: Network?, ping: Boolean = false): Boolean = runBlocking {
             coroutineScope {
                 select<Boolean> {
                         ip6probes.forEach { ip ->
                             async {
-                                    if (nw == null) {
+                                    if (ping) {
                                         isReachable(ip)
                                     } else {
                                         isReachableTcp(nw, ip)
@@ -655,9 +746,9 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
                 TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
 
-                val yes = tcp80(nw, host) || tcp53(nw, host)
+                val yes = tcp80(nw, host) || udp53(nw, host) || tcp53(nw, host)
 
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "$host isReachable on network: $yes")
+                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "$host isReachable on network($nw): $yes")
                 return yes
             } catch (e: Exception) {
                 Log.w(LOG_TAG_CONNECTION, "err isReachable: ${e.message}")
@@ -698,13 +789,12 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             try {
                 // port 7 is echo port, blocked by most firewalls. use port 80 instead
                 val s = InetSocketAddress(host, port80)
-                // create a new socket and bind it to the network
                 socket = Socket()
-                nw?.bindSocket(socket) ?: return false
+                nw?.bindSocket(socket)
                 socket.connect(s, onesec)
                 val c = socket.isConnected
                 val b = socket.isBound
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "tcpEcho: $host, ${nw.networkHandle}: $c, $b")
+                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "tcpEcho: $host, ${nw?.networkHandle}: $c, $b")
 
                 return true
             } catch (e: IOException) {
@@ -719,11 +809,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 Log.w(LOG_TAG_CONNECTION, "err tcpEcho: ${e.message}, ${e.cause}")
                 return false
             } finally {
-                try {
-                    socket?.close()
-                } catch (ignored: IOException) {
-                    if (DEBUG) Log.d(LOG_TAG_CONNECTION, "err tcpEcho: ${ignored.message}")
-                }
+                clos(socket)
             }
         }
 
@@ -734,23 +820,45 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             try {
                 socket = Socket()
                 val s = InetSocketAddress(host, port53)
-                // create a new socket and bind it to the network
-                nw?.bindSocket(socket) ?: return false
+                nw?.bindSocket(socket)
                 socket.connect(s)
                 val c = socket.isConnected
                 val b = socket.isBound
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw.networkHandle}: $c, $b")
+                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw?.networkHandle}: $c, $b")
                 return true
             } catch (e: Exception) {
                 Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}")
-                return false
             } finally {
-                try {
-                    socket?.close()
-                } catch (ignored: IOException) {
-                    if (DEBUG) Log.d(LOG_TAG_CONNECTION, "err udpEcho: ${ignored.message}")
-                }
+                clos(socket)
             }
+            return false
+        }
+
+        private fun udp53(nw: Network?, host: String): Boolean {
+            val port53 = 53 // port
+            var socket: DatagramSocket? = null
+
+            try {
+                socket = DatagramSocket()
+                val s = InetSocketAddress(host, port53)
+                nw?.bindSocket(socket)
+                socket.connect(s)
+                val c = socket.isConnected
+                val b = socket.isBound
+                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw?.networkHandle}: $c, $b")
+                return true
+            } catch (e: Exception) {
+                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}")
+            } finally {
+                clos(socket)
+            }
+            return false
+        }
+
+        private fun clos(socket: Closeable?) {
+            try {
+                socket?.close()
+            } catch (ignored: IOException) {}
         }
 
         private fun hasInternet(network: Network?): Boolean? {

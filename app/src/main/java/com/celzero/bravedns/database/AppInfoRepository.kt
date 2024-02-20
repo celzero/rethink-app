@@ -33,8 +33,8 @@ class AppInfoRepository(private val appInfoDAO: AppInfoDAO) {
         return appInfoDAO.insert(appInfo)
     }
 
-    suspend fun updateUid(oldUid: Int, uid: Int, pkg: String) {
-        appInfoDAO.updateUid(oldUid, pkg, uid)
+    suspend fun updateUid(oldUid: Int, uid: Int, pkg: String): Int {
+        return appInfoDAO.updateUid(oldUid, pkg, uid)
     }
 
     suspend fun deleteByPackageName(packageNames: List<String>) {

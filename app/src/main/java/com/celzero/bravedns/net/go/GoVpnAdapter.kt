@@ -26,6 +26,7 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
+import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
@@ -43,7 +44,6 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
 import com.celzero.bravedns.util.Utilities.blocklistFile
-import com.celzero.bravedns.util.Utilities.isValidPort
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
 import dnsx.Dnsx
@@ -54,6 +54,7 @@ import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
 import ipn.Proxies
+import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,7 +62,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
-import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -182,8 +182,7 @@ class GoVpnAdapter : KoinComponent {
                 addDnsProxyTransport(Dnsx.Preferred)
             }
             AppConfig.DnsType.SYSTEM_DNS -> {
-                addSystemDnsAsTransport(Dnsx.BlockFree)
-                addSystemDnsAsTransport(Dnsx.Preferred)
+                // no-op; system dns propagated by ConnectionMonitor
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 // only rethink has different stamp for block free transport
@@ -284,10 +283,9 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private suspend fun addSystemDnsAsTransport(id: String) {
+    private suspend fun addSystemDnsAsBlockfreeTransport(dns: BraveVPNService.SystemDns) {
         try {
-            val dns = appConfig.getSystemDns()
-            Intra.addDNSProxy(tunnel, id, dns.ipAddress, dns.port.toString())
+            Intra.addDNSProxy(tunnel, Dnsx.BlockFree, dns.ipAddress, dns.port.toString())
             Log.i(LOG_TAG_VPN, "new system dns ip: ${dns.ipAddress}, port: ${dns.port}")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: system dns failure", e)
@@ -644,7 +642,11 @@ class GoVpnAdapter : KoinComponent {
             return
         }
         try {
-            val proxyId: Int = id.substring(ID_WG_BASE.length).toInt()
+            val proxyId: Int? = id.substring(ID_WG_BASE.length).toIntOrNull()
+            if (proxyId == null) {
+                Log.e(LOG_TAG_VPN, "invalid wireguard proxy id: $id")
+                return
+            }
             val wgConfig = WireguardManager.getConfigById(proxyId)
             val wgUserSpaceString = wgConfig?.toWgUserspaceString()
             getProxies()?.addProxy(id, wgUserSpaceString)
@@ -802,38 +804,28 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun setSystemDns() {
-        val defaultDns = "8.8.4.4:53"
+    suspend fun setSystemDns(systemDns: BraveVPNService.SystemDns) {
         if (!tunnel.isConnected) {
             Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip setting system-dns")
         }
-        val systemDns = appConfig.getSystemDns()
+
         var dnsProxy: HostName? = null
         try {
             // TODO: system dns may be non existent; see: AppConfig#updateSystemDnsServers
             dnsProxy = HostName(IPAddressString(systemDns.ipAddress).address, systemDns.port)
-        } catch (e: Exception) {
+            // below code is commented out, add the code to set the system dns via resolver
+            // val transport = Intra.newDNSProxy("ID", dnsProxy.host, dnsProxy.port.toString())
+            // tunnel?.resolver?.addSystemDNS(transport)
+            Log.d(LOG_TAG_VPN, "set system dns: ${dnsProxy?.host}")
+            // no need to send the dnsProxy.port for the below method, as it is not expecting port
+            Intra.setSystemDNS(tunnel, dnsProxy.host)
+        } catch (e: Exception) { // this is not expected to happen
             Log.e(LOG_TAG_VPN, "set system dns: could not parse system dns", e)
         }
 
-        if (dnsProxy == null || dnsProxy.host.isNullOrEmpty() || !isValidPort(dnsProxy.port)) {
-            Log.e(LOG_TAG_VPN, "setSystemDns: unset dns proxy: $dnsProxy")
-            // if system dns is empty, then remove the existing system dns from the tunnel
-            // by setting it to empty string
-            Intra.setSystemDNS(tunnel, defaultDns)
-            return
-        }
-
-        // below code is commented out, add the code to set the system dns via resolver
-        // val transport = Intra.newDNSProxy("ID", dnsProxy.host, dnsProxy.port.toString())
-        // tunnel?.resolver?.addSystemDNS(transport)
-        Log.d(LOG_TAG_VPN, "set system dns: ${dnsProxy.host}")
-        // no need to send the dnsProxy.port for the below method, as it is not expecting port
-        Intra.setSystemDNS(tunnel, dnsProxy.host)
-
         // add appropriate transports to the tunnel, if system dns is enabled
         if (appConfig.isSystemDns()) {
-            addTransport()
+            addSystemDnsAsBlockfreeTransport(systemDns)
         }
     }
 
@@ -842,7 +834,7 @@ class GoVpnAdapter : KoinComponent {
             Log.e(LOG_TAG_VPN, "updateLink: tunFd is null, returning")
             return false
         }
-        Log.i(LOG_TAG_VPN, "updateLink with fd(${tunFd.fd}) opts: $opts")
+        Log.i(LOG_TAG_VPN, "updateLink with fd(${tunFd.fd}) mtu: ${opts.mtu}")
         return try {
             tunnel.setLink(tunFd.fd.toLong(), opts.mtu.toLong())
             true
@@ -934,7 +926,7 @@ class GoVpnAdapter : KoinComponent {
                     path + ONDEVICE_BLOCKLIST_FILE_TAG
                 )
             getResolver()?.rdnsLocal?.stamp = stamp
-            Log.i(LOG_TAG_VPN, "local brave dns object is set")
+            Log.i(LOG_TAG_VPN, "local brave dns object is set with stamp: $stamp")
         } catch (ex: Exception) {
             // Set local blocklist enabled to false and reset the timestamp
             // if there is a failure creating bravedns
@@ -1011,10 +1003,10 @@ class GoVpnAdapter : KoinComponent {
     }
 
     private fun io(f: suspend () -> Unit) {
-        externalScope.launch { withContext(Dispatchers.IO) { f() } }
+        externalScope.launch(Dispatchers.IO) { f() }
     }
 
     private fun ui(f: suspend () -> Unit) {
-        externalScope.launch { withContext(Dispatchers.Main) { f() } }
+        externalScope.launch(Dispatchers.Main) { f() }
     }
 }
