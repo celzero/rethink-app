@@ -268,5 +268,5 @@ interface ConnectionTrackerDAO {
     @Query(
         "select sum(downloadBytes) as totalDownload, sum(uploadBytes) as totalUpload, count(id) as connectionsCount, ict.meteredDataUsage as meteredDataUsage from ConnectionTracker as ct join (select sum(downloadBytes + uploadBytes) as meteredDataUsage from ConnectionTracker where connType like :meteredTxt and timeStamp > :to) as ict where timeStamp > :to"
     )
-    fun getTotalUsages(to: Long, meteredTxt: String): SummaryStatisticsFragment.TotalUsage
+    fun getTotalUsages(to: Long, meteredTxt: String): SummaryStatisticsFragment.DataUsage
 }

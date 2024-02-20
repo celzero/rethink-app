@@ -18,7 +18,6 @@ package com.celzero.bravedns.ui.fragment
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -51,7 +50,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private var isVpnActive: Boolean = false
 
-    data class TotalUsage(
+    data class DataUsage(
         val totalDownload: Long,
         val totalUpload: Long,
         val connectionsCount: Int,
@@ -134,52 +133,55 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
         }
     }
 
-    private fun setTotalUsagesUi(totalUsage: TotalUsage) {
-        val progress = (totalUsage.totalDownload + totalUsage.totalUpload)
-        val secondaryProgress =
-            (totalUsage.totalDownload + totalUsage.totalUpload) + totalUsage.meteredDataUsage
-        b.fssTotalDataUsage.text = "Unmetered: " + Utilities.humanReadableByteCount(progress, true)
-        b.fssTotalUpload.text =
-            "Metered: " + Utilities.humanReadableByteCount(totalUsage.meteredDataUsage, true)
+    private fun setTotalUsagesUi(dataUsage: DataUsage) {
+        val unmeteredUsage = (dataUsage.totalDownload + dataUsage.totalUpload)
+        val totalUsage = unmeteredUsage + dataUsage.meteredDataUsage
 
-        b.fssTotalUpload.setCompoundDrawablesWithIntrinsicBounds(R.drawable.dot_accent,  0,  0,  0)
+        b.fssUnmeteredDataUsage.text =
+            getString(
+                R.string.two_argument_colon,
+                getString(R.string.ada_app_unmetered),
+                Utilities.humanReadableByteCount(unmeteredUsage, true)
+            )
+        b.fssMeteredDataUsage.text =
+            getString(
+                R.string.two_argument_colon,
+                getString(R.string.ada_app_metered),
+                Utilities.humanReadableByteCount(dataUsage.meteredDataUsage, true)
+            )
+        b.fssTotalDataUsage.text =
+            getString(
+                R.string.two_argument_colon,
+                getString(R.string.lbl_overall),
+                Utilities.humanReadableByteCount(totalUsage, true)
+            )
+        b.fssMeteredDataUsage.setCompoundDrawablesWithIntrinsicBounds(
+            R.drawable.dot_accent,
+            0,
+            0,
+            0
+        )
 
-        // Set the alpha for the drawable
-        val alphaValue =  128 // Half-transparent
-        val drawable = b.fssTotalUpload.compoundDrawables[0] // Assuming the drawable is on the left side
+        // set the alpha for the drawable
+        val alphaValue = 128 // half-transparent
+        val drawable = b.fssMeteredDataUsage.compoundDrawables[0] // drawableLeft
         drawable?.mutate()?.alpha = alphaValue
 
+        // set the progress bar
+        val ump = calculatePercentage(unmeteredUsage, totalUsage) // unmetered percentage
+        val mp = calculatePercentage(dataUsage.meteredDataUsage, totalUsage) // metered percentage
+        val secondaryVal = ump + mp
 
-        val cur = calculatePercentage(progress, secondaryProgress)
-        val sec = calculatePercentage(totalUsage.meteredDataUsage, secondaryProgress)
-        val secondaryVal = cur + sec
         b.fssProgressBar.max = secondaryVal
-
-        b.fssProgressBar.progress = cur
+        b.fssProgressBar.progress = ump
         b.fssProgressBar.secondaryProgress = secondaryVal
-
-        //b.fssProgressBar.updateProgress(cur, secondaryVal)
-        b.fssTotalConnections.text =
-            "Overall: " + Utilities.humanReadableByteCount(secondaryProgress, true)
-        // totalUsage.connectionsCount.toString()
-        /*getString(
-            R.string.two_argument,
-            getString(
-                R.string.symbol_download,
-                Utilities.humanReadableByteCount(progress, true)
-            ),
-            getString(
-                R.string.symbol_upload,
-                Utilities.humanReadableByteCount(totalUsage.totalUpload, true)
-            )
-        )*/
     }
 
     private fun calculatePercentage(currentValue: Long, maxValue: Long): Int {
-        // Calculate the percentage as a float
+        // calculate the percentage as a float
         val percentageFloat = currentValue.toFloat() / maxValue * 100
 
-        // Convert the float to an int, rounding down if necessary
+        // convert the float to an int, rounding down if necessary
         return percentageFloat.toInt()
     }
 
@@ -260,8 +262,8 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
 
     private fun openDetailedStatsUi(type: SummaryStatisticsType) {
         val mb = b.toggleGroup.checkedButtonId
-        val timeCategory = (b.toggleGroup.findViewById<MaterialButton>(mb).tag as String).toIntOrNull()
-            ?: 0
+        val timeCategory =
+            (b.toggleGroup.findViewById<MaterialButton>(mb).tag as String).toIntOrNull() ?: 0
         val intent = Intent(requireContext(), DetailedStatisticsActivity::class.java)
         intent.putExtra(DetailedStatisticsActivity.INTENT_TYPE, type.tid)
         intent.putExtra(DetailedStatisticsActivity.INTENT_TIME_CATEGORY, timeCategory)
