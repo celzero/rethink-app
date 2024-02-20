@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
@@ -100,6 +101,8 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     private var biometricPromptRetryCount = 1
+    private var onResumeCalledAlready = false
+    private val ON_RESUME_CALLED_PREFERENCE_KEY = "onResumeCalled"
 
     // TODO - #324 - Usage of isDarkTheme() in all activities.
     private fun Context.isDarkThemeOn(): Boolean {
@@ -110,6 +113,11 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(getCurrentTheme(isDarkThemeOn(), persistentState.theme))
         super.onCreate(savedInstanceState)
+
+        // stackoverflow.com/questions/44221195/multiple-onstop-onresume-calls-in-android-activity
+        // Restore value of members from saved state
+        onResumeCalledAlready =
+            savedInstanceState?.getBoolean(ON_RESUME_CALLED_PREFERENCE_KEY) ?: false
 
         // do not launch on board activity when app is running on TV
         if (persistentState.firstTimeLaunch && !isAppRunningOnTv()) {
@@ -128,9 +136,14 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
         observeAppState()
     }
 
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        outState.putBoolean(ON_RESUME_CALLED_PREFERENCE_KEY, onResumeCalledAlready)
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
     override fun onResume() {
         super.onResume()
-        if (persistentState.biometricAuth && !isAppRunningOnTv()) {
+        if (persistentState.biometricAuth && !isAppRunningOnTv() && !onResumeCalledAlready) {
             biometricPrompt()
         }
     }
@@ -161,8 +174,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 .setSubtitle(getString(R.string.hs_biometeric_desc))
                 .setAllowedAuthenticators(
                     BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
-                        BiometricManager.Authenticators.BIOMETRIC_STRONG
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
                 )
                 .setConfirmationRequired(false)
                 .build()
@@ -180,10 +192,15 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             LOG_TAG_UI,
                             "Biometric authentication error (code: $errorCode): $errString"
                         )
-                        // error code 5, this may happen when the device is locked or another
-                        // pending operation prevents or disables it
-                        // ref issuetracker.google.com/issues/145231213
-                        if (biometricPromptRetryCount > 0 && errorCode == 5) {
+                        // error code 5 (ERROR_CANCELED), this may happen when the device is locked
+                        // or another pending operation prevents or disables it
+                        // error code 10 (ERROR_USER_CANCELED), retry once after user cancelled
+                        // the biometric prompt. ref issuetracker.google.com/issues/145231213
+                        if (
+                            biometricPromptRetryCount > 0 &&
+                                (errorCode == BiometricPrompt.ERROR_CANCELED ||
+                                    errorCode == BiometricPrompt.ERROR_USER_CANCELED)
+                        ) {
                             biometricPromptRetryCount--
                             biometricPrompt.authenticate(promptInfo)
                         } else {
@@ -213,7 +230,9 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                             Toast.LENGTH_SHORT
                         )
                         Log.i(LOG_TAG_UI, "Biometric authentication failed")
-                        biometricPrompt.authenticate(promptInfo)
+
+                        // show the biometric prompt again only if the ui is in foreground
+                        if (isInForeground()) biometricPrompt.authenticate(promptInfo)
                     }
                 }
             )
@@ -224,8 +243,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             BiometricManager.from(this)
                 .canAuthenticate(
                     BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL or
-                        BiometricManager.Authenticators.BIOMETRIC_STRONG
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
                 ) == BiometricManager.BIOMETRIC_SUCCESS
         ) {
             biometricPrompt.authenticate(promptInfo)
@@ -236,6 +254,10 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
                 Toast.LENGTH_SHORT
             )
         }
+    }
+
+    private fun isInForeground(): Boolean {
+        return !this.isFinishing && !this.isDestroyed
     }
 
     private fun handleIntent() {
@@ -630,6 +652,6 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

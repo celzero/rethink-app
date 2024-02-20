@@ -129,14 +129,8 @@ object UIUtils {
         c1.add(Calendar.DAY_OF_YEAR, -1)
         val c2 = Calendar.getInstance()
         c2.time = day
-        if (
-            c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
+        return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) &&
                 c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)
-        ) {
-            return true
-        }
-
-        return false
     }
 
     fun openVpnProfile(context: Context) {

@@ -69,7 +69,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:checkedButton="@+id/rethink_plus_dns_rb"
                         android:paddingTop="5dp">
 
                         <RadioButton

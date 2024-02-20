@@ -50,6 +50,7 @@ internal constructor(
         // for eg: https://support.mozilla.org/en-US/questions/1213045
         val DNS_TTL_GRACE_SEC = TimeUnit.MINUTES.toSeconds(5L)
         private const val RDATA_MAX_LENGTH = 100
+        private const val EMPTY_RESPONSE = "--"
     }
 
     private val vpnStateMap = HashMap<Transaction.Status, BraveVPNService.State>()
@@ -83,6 +84,7 @@ internal constructor(
         transaction.responseCalendar = Calendar.getInstance()
         transaction.blocklist = summary.blocklists ?: ""
         transaction.relayName = summary.relayServer ?: ""
+        transaction.msg = summary.msg ?: ""
         return transaction
     }
 
@@ -99,6 +101,7 @@ internal constructor(
         dnsLog.serverIP = transaction.serverName
         dnsLog.status = transaction.status.name
         dnsLog.time = transaction.responseCalendar.timeInMillis
+        dnsLog.msg = transaction.msg
         val typeName = ResourceRecordTypes.getTypeName(transaction.type.toInt())
         if (typeName == ResourceRecordTypes.UNKNOWN) {
             dnsLog.typeName = transaction.type.toString()
@@ -144,9 +147,8 @@ internal constructor(
                     if (transaction.response.isNotEmpty()) {
                         dnsLog.response = transaction.response.take(RDATA_MAX_LENGTH)
                     }
-                    // if the response is empty and blocklist is not empty, then mark it as blocked
-                    // most likely happens with HTTP SVCB records which are blocked
-                    if (transaction.response.isEmpty() && transaction.blocklist.isNotEmpty()) {
+                    // now, there is no empty response, instead -- is added as response from go
+                    if (transaction.response == EMPTY_RESPONSE && transaction.blocklist.isNotEmpty()) {
                         dnsLog.isBlocked = true
                     }
                 }

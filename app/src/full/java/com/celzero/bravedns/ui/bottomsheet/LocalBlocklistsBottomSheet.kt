@@ -431,11 +431,15 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                         persistentState.localBlocklistTimestamp
                     )
                 }
-            if (blocklistsExist && isLocalBlocklistStampAvailable()) {
+            if (blocklistsExist) {
                 setBraveDnsLocal()
-                updateLocalBlocklistUi()
+                if (isLocalBlocklistStampAvailable()) {
+                    updateLocalBlocklistUi()
+                } else {
+                    invokeRethinkActivity()
+                }
             } else {
-                invokeRethinkActivity()
+                removeBraveDnsLocal()
             }
         }
     }
@@ -451,11 +455,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun isLocalBlocklistStampAvailable(): Boolean {
-        if (persistentState.localBlocklistStamp.isEmpty()) {
-            return false
-        }
-
-        return true
+        return persistentState.localBlocklistStamp.isNotEmpty()
     }
 
     // FIXME: Verification of BraveDns object should be added in future.
@@ -566,7 +566,7 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun ui(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+        lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
@@ -574,6 +574,6 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

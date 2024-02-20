@@ -261,15 +261,15 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.bsConnConnDuration.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_green_circle),
-                    getString(R.string.lbl_active)
+                    getString(R.string.lbl_active),
+                    getString(R.string.symbol_green_circle)
                 )
         } else {
             b.bsConnConnDuration.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_clock),
-                    getString(R.string.symbol_hyphen)
+                    getString(R.string.symbol_hyphen),
+                    getString(R.string.symbol_clock)
                 )
         }
 
@@ -278,15 +278,15 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
             b.bsConnConnType.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_currency),
-                    getString(R.string.ada_app_metered)
+                    getString(R.string.ada_app_metered),
+                    getString(R.string.symbol_currency)
                 )
         } else {
             b.bsConnConnType.text =
                 getString(
                     R.string.two_argument_space,
-                    getString(R.string.symbol_global),
-                    getString(R.string.ada_app_unmetered)
+                    getString(R.string.ada_app_unmetered),
+                    getString(R.string.symbol_global)
                 )
         }
 
@@ -319,7 +319,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
         b.bsConnConnDownload.text = downloadBytes
         val duration = UIUtils.getDurationInHumanReadableFormat(requireContext(), info!!.duration)
         b.bsConnConnDuration.text =
-            getString(R.string.two_argument_space, getString(R.string.symbol_clock), duration)
+            getString(R.string.two_argument_space, duration, getString(R.string.symbol_clock))
     }
 
     private fun lightenUpChip() {
@@ -387,7 +387,7 @@ class RethinkLogBottomSheet : BottomSheetDialogFragment(), KoinComponent {
     }
 
     private fun io(f: suspend () -> Unit) {
-        lifecycleScope.launch { withContext(Dispatchers.IO) { f() } }
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 
     private suspend fun uiCtx(f: suspend () -> Unit) {

@@ -78,7 +78,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="100dp">
+        android:paddingBottom="40dp">
 
         <LinearLayout
             android:id="@+id/dns_block_header_container"
@@ -93,8 +93,8 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.8"
                 android:layout_gravity="center"
+                android:layout_weight="0.8"
                 android:gravity="center">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -226,5 +226,35 @@
             android:visibility="visible" />
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/dns_message_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/dns_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="start"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="3"
+            android:paddingStart="8dp"
+            android:paddingEnd="10dp"
+            android:scrollHorizontally="true"
+            android:singleLine="false"
+            android:textColor="?attr/primaryLightColorText"
+            android:textSize="@dimen/small_font_text_view" />
+
+    </LinearLayout>
 
 </LinearLayout>

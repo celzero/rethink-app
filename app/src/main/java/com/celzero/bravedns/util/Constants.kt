@@ -303,5 +303,15 @@ class Constants {
 
         // wireguard folder name
         const val WIREGUARD_FOLDER_NAME = "wireguard"
+
+        val DEFAULT_RDNS_REMOTE_DNS_NAMES =
+            listOf(
+                "RDNS Default",
+                "RDNS Adult",
+                "RDNS Piracy",
+                "RDNS Social Media",
+                "RDNS Security",
+                "RDNS Privacy"
+            )
     }
 }

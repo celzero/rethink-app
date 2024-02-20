@@ -37,12 +37,12 @@ interface WgConfigFilesDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(wgConfigFiles: WgConfigFiles): Long
 
     @Query(
-        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc"
+        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by isActive desc"
     )
     fun getWgConfigsLiveData(): PagingSource<Int, WgConfigFiles>
 
     @Query(
-        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by id desc"
+        "select * from WgConfigFiles where id != $SEC_WARP_ID and id != $WARP_ID order by isActive desc"
     )
     fun getWgConfigs(): List<WgConfigFiles>
 

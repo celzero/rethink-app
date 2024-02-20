@@ -54,7 +54,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
         const val APP_VERSION = "app_version"
         const val PRIVATE_IPS = "private_ips"
         const val RETHINK_IN_RETHINK = "route_rethink_in_rethink"
-        const val USE_MAX_MTU = "use_max_mtu"
     }
 
     // when vpn is started by the user, this is set to true; set to false when user stops
@@ -270,9 +269,6 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
 
     // route rethink in rethink
     var routeRethinkInRethink by booleanPref("route_rethink_in_rethink").withDefault<Boolean>(false)
-
-    // use max mtu
-    var useMaxMtu by booleanPref("use_max_mtu").withDefault<Boolean>(false)
 
     var orbotConnectionStatus: MutableLiveData<Boolean> = MutableLiveData()
     var median: MutableLiveData<Long> = MutableLiveData()

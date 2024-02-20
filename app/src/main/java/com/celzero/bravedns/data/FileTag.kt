@@ -20,6 +20,38 @@ import com.google.gson.reflect.TypeToken
 import java.io.Serializable
 import java.lang.reflect.Type
 
+
+// there are two different formats for the FileTag json
+// below is the sample legacy format
+/*"value":0,
+"uname":"0",
+"vname":"Prevent bypass",
+"group":"ParentalControl",
+"subg":"BypassMethods",
+"url":"https://raw.githubusercontent.com/nextdns/metadata/master/parentalcontrol/bypass-methods",
+"pack":[
+"vpn & proxies"
+],
+"show":0,
+"entries":635*/
+
+// below is the sample new format
+/*"value":171,
+"uname":"171",
+"vname":"1Hosts (Xtra)",
+"group":"privacy",
+"subg":"",
+"url":"https://raw.githubusercontent.com/badmojr/1Hosts/master/Xtra/domains.wildcards",
+"format":"domains",
+"pack":[
+"extremeprivacy"
+],
+"level":[
+2
+],
+"entries":296372,
+"discards":0*/
+
 // data class to handle filetags for both local and remote blocklist (filetag.json)
 data class FileTag(
     val value: Int,

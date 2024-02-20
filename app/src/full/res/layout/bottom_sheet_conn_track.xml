@@ -329,7 +329,6 @@
         android:layout_marginBottom="5dp"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:paddingBottom="5dp"
         android:weightSum="1">
 
         <TextView
@@ -410,7 +409,7 @@
             android:fontFamily="sans-serif-light"
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
-            android:maxLines="2"
+            android:maxLines="3"
             android:paddingStart="8dp"
             android:paddingEnd="10dp"
             android:scrollHorizontally="true"

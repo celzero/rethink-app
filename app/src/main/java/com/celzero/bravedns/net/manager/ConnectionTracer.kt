@@ -75,7 +75,7 @@ class ConnectionTracer(ctx: Context) {
         } catch (ignored: SecurityException) {
             return uid
         }
-        val key = makeCacheKey(protocol, local, remote, destPort)
+        val key = makeCacheKey(protocol, local, remote)
         try {
             // executing inside a coroutine to avoid the NetworkOnMainThreadException issue#853
             runBlocking(Dispatchers.IO) { uid = cm.getConnectionOwnerUid(protocol, local, remote) }
@@ -112,15 +112,13 @@ class ConnectionTracer(ctx: Context) {
     private fun makeCacheKey(
         protocol: Int,
         local: InetSocketAddress,
-        remote: InetSocketAddress,
-        destPort: Int
-    ): String {
+        remote: InetSocketAddress): String {
         return protocol.toString() +
             SEPARATOR +
             local.address.hostAddress +
             SEPARATOR +
             remote.address.hostAddress +
             SEPARATOR +
-            destPort
+            remote.port
     }
 }
