@@ -102,12 +102,6 @@ object UIUtils {
         }
     }
 
-    fun humanReadableTime(timestamp: Long): String {
-        val offSet = TimeZone.getDefault().rawOffset + TimeZone.getDefault().dstSavings
-        val now = timestamp - offSet
-        return Utilities.convertLongToTime(now, Constants.TIME_FORMAT_1)
-    }
-
     fun formatToRelativeTime(context: Context, timestamp: Long): String {
         val now = System.currentTimeMillis()
         return if (DateUtils.isToday(timestamp)) {

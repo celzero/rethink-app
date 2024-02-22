@@ -35,7 +35,6 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Themes
-import com.celzero.bravedns.util.UIUtils.humanReadableTime
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import java.util.concurrent.TimeUnit
@@ -88,7 +87,11 @@ class PauseActivity : AppCompatActivity(R.layout.activity_pause) {
 
     private fun observeTimer() {
         VpnController.getPauseCountDownObserver()?.observe(this) {
-            b.pacTimer.text = humanReadableTime(it)
+            // 'it' is expected to be in milliseconds
+            val ss = (TimeUnit.MILLISECONDS.toSeconds(it) % 60).toString().padStart(2, '0')
+            val mm = (TimeUnit.MILLISECONDS.toMinutes(it) % 60).toString().padStart(2, '0')
+            val hh = TimeUnit.MILLISECONDS.toHours(it).toString().padStart(2, '0')
+            b.pacTimer.text = getString(R.string.three_argument_colon, hh, mm, ss)
         }
     }
 
