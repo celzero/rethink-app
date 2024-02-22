@@ -1,6 +1,4 @@
 complexity:
-  MaxLineLength:
-    active: false
   TooManyFunctions:
     active: false
     
