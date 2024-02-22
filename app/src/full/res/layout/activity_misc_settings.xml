@@ -686,7 +686,7 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_notification" />
+                        android:src="@drawable/show_notification" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -740,7 +740,7 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_notification" />
+                        android:src="@drawable/persistent_notification" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"

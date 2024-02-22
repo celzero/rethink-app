@@ -58,7 +58,7 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_pcap" />
+                        android:src="@drawable/universal_firewall" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -117,7 +117,7 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_ip_address" />
+                        android:src="@drawable/universal_ip_rule" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
