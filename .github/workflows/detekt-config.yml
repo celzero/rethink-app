@@ -1,0 +1,3 @@
+complexity:
+  MaxLineLength:
+    active: false
