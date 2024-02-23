@@ -112,7 +112,6 @@
     <string name="fapps_metered_block_dialog_message" translatable="true">Блокувати з\'єднання в мережі з обмеженням(мобільній мережі) для <i>перелічених</i> застосунків\?</string>
     <string name="fapps_metered_block_dialog_title" translatable="true">Блокувати на обмежених</string>
     <string name="fapps_metered_unblock_dialog_message" translatable="true">Дозволити з’єднання в обмеженій (мобільній) мережі для <i>перелічених</i> застосунків\?</string>
-    <string name="fapps_lockdown_hint" translatable="true">Vpn знаходиться в режимі блокування. Брандмауер не буде виконувати правила Обмежений /Необмежений.</string>
     <string name="network_log_app_name_unknown" translatable="true">Невідомо</string>
     <string name="network_log_app_name_unnamed" translatable="true">Без назви (%1$s)</string>
     <string name="accessibility_notification_content" translatable="true">Служба доступності RethinkDNS зупинилася або вийшла з ладу. Більше не блокує фонові застосунки. Натисніть, щоб увімкнути знову.</string>
@@ -389,7 +388,6 @@
     <string name="hs_download_positive_website" translatable="true">Відвідайте вебсайт</string>
     <string name="about_bug_no_log_dialog_title" translatable="true">Звіт про помилку</string>
     <string name="about_connect" translatable="true">зв\'язок</string>
-    <string name="whats_dialog_title" translatable="true">Що нового у v055a</string>
     <string name="about_join_telegram" translatable="true">Telegram</string>
     <string name="about_faq" translatable="true">Переглянути ЧаПи</string>
     <string name="about_github" translatable="true">Зробити внесок на GitHub</string>

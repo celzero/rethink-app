@@ -217,7 +217,6 @@
     <string name="bsct_app_info">অ্যাপের তথ্য</string>
     <string name="bsct_conn_block_desc_device">ডিভাইসে %1$s ব্লক করা হয়েছে</string>
     <string name="dns_proxy_remove_dialog_message">সংরক্ষিত কনফিগারেশন থেকে DNS প্রক্সি মুছুন।</string>
-    <string name="whats_dialog_title">v053k এ নতুন কি আছে</string>
     <string name="orbot_bs_status_3">অরবোটে %1$s ফরোয়ার্ড করা, HTTP প্রক্সিও সেট করা হয়েছে।</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
 \n
@@ -476,7 +475,6 @@
     <string name="hsf_vpn_prepare_failure">হয় VPN অনুমতি অনুপস্থিত, অথবা অন্য একটি অ্যাপ সবসময়-চালু VPN মোডে আছে।</string>
     <string name="about_settings_vpn_profile">ভিপিএন প্রোফাইল</string>
     <string name="hsf_blocklist_updating_text">সক্ষম করা হচ্ছে…</string>
-    <string name="hsf_pause_lockdown_failure">বিরাম দেওয়া যাবে না: লকডাউন মোডে পুনর্বিবেচনা করুন</string>
     <string name="hsf_proxy_chip_removed_toast">প্রক্সি সরানো হয়েছে</string>
     <string name="about_mail_bugreport_text">এই ইমেলটি পাঠান: hello@celzero.com</string>
     <string name="about_github_link">https://github.com/celzero/rethink-app</string>
@@ -718,7 +716,6 @@
     <string name="fapps_firewall_filter_bypass_universal">বাইপাস</string>
     <string name="fapps_unmetered_block_dialog_message"><i>তালিকাভুক্ত</i> অ্যাপের জন্য মিটারবিহীন (ওয়াইফাই) নেটওয়ার্কে সংযোগ ব্লক করবেন\?</string>
     <string name="fapps_metered_block_dialog_title">মিটারে ব্লক</string>
-    <string name="fapps_lockdown_hint">Vpn লকডাউন মোডে আছে। ফায়ারওয়াল মিটারড / আনমিটারড নিয়ম মেনে চলবে না।</string>
     <string name="fapps_firewall_filter_desc_category">বিভাগে দেখানো হচ্ছে <u>%1$s</u> %2$s অ্যাপগুলি: %3$s</string>
     <string name="fav_icon">fav_icon</string>
     <string name="fapps_unmetered_block_dialog_title">আনমিটারে ব্লক করুন</string>

@@ -63,7 +63,6 @@
     <string name="app_mode_wireguard">VPN</string>
     <string name="info_dialog_url_copy_toast_msg">Nettadresse kopiert</string>
     <string name="app_mode_choose">Velg modus</string>
-    <string name="whats_dialog_title">Nyheter i v053k</string>
     <string name="connection_http3">HTTP/3</string>
     <string name="settings_ip_network_heading">Velg IP-versjon</string>
     <string name="settings_socks5_heading">Sett opp SOCKS5-mellomtjener</string>

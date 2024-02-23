@@ -360,7 +360,6 @@
     <string name="settings_enable_logs" translatable="true">ऑन-डिवाइस लॉगिंग सक्षम करें</string>
     <string name="app_mode_choose" translatable="true">मोड चुनें</string>
     <string name="relative_time_yesterday" translatable="true">कल</string>
-    <string name="whats_dialog_title" translatable="true">055ए में क्या नया है</string>
     <string name="relative_time_today" translatable="true">आज</string>
     <string name="settings_app_notification_a13_heading" translatable="true">ऐप अधिसूचना</string>
     <string name="settings_http_proxy_error_text1" translatable="true">पोर्ट रेंज 1024-65535 में होनी चाहिए</string>
@@ -609,7 +608,6 @@
     <string name="hsf_proxy_chip_text" translatable="true">प्रॉक्सी सक्रिय</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">बंद किया जा रहा है…</string>
     <string name="settings_http_proxy_desc" translatable="true">%1$s को फोरवर्ड करना</string>
-    <string name="hsf_pause_lockdown_failure" translatable="true">रुक नहीं सकता: रीथिंक लॉकडाउन मोड में है</string>
     <string name="dc_block_heading" translatable="true">नियम</string>
     <string name="dc_other_dns_heading" translatable="true">प्रकार</string>
     <string name="dc_local_block_desc_1" translatable="true">195+ ब्लॉकलिस्ट में से चुनें। ब्लॉकलिस्ट को डाउनलोड या कॉन्फ़िगर करने के लिए यहां क्लिक करें।</string>
@@ -739,7 +737,6 @@
     <string name="fapps_info_unmetered_msg" translatable="true">अनमीटर्ड (वाईफाई) नेटवर्क पर अनुमति दें / ब्लॉक करें।</string>
     <string name="fapps_info_metered_msg" translatable="true">मीटर्ड (मोबाइल) नेटवर्क पर अनुमति दें / ब्लॉक करें।</string>
     <string name="fapps_bypass_block_dialog_message" translatable="true"><i>सूचीबद्ध</i> ऐप्स के लिए यूनीवर्सल फ़ायरवॉल नियमों को बायपास करें\?</string>
-    <string name="fapps_lockdown_hint" translatable="true">वीपीएन लॉकडाउन मोड में है। फ़ायरवॉल मीटर्ड/अनमीटर्ड नियमों का सम्मान नहीं करेगा।</string>
     <string name="settings_local_blocklist_version" translatable="true">संस्करण: %1$s</string>
     <string name="accessibility_notification_content" translatable="true">रीथिंक सुलभता सेवा बंद या क्रैश हो गई है। अब बैकग्राउंड वाले ऐप्स को ब्लॉक नहीं किया जा रहा है। पुन: सक्षम करने के लिए टैप करें।</string>
     <string name="hs_btm_sheet_lock_down" translatable="true">वीपीएन के <i>लॉकडाउन</i> होने पर मोड नहीं बदल सकते। <u>वीपीएन सेटिंग संपादित करने</u> के लिए टैप करें।</string>

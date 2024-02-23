@@ -175,7 +175,6 @@
     <string name="search_universal_ips" translatable="true"><font size="12">جستجوی آی‌پی‌ها</font></string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL کپی شد</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">آدرس IP کپی شد.</string>
-    <string name="whats_dialog_title" translatable="true">چه چیزی در v055a جدید است</string>
     <string name="info_dialog_rethink_toast_msg" translatable="true">به عنوان URL RDNS+ DNS-over-HTTPS کپی شد</string>
     <string name="settings_enable_logs_desc" translatable="true">گزارش های DNS و دیوار آتش را به صورت محلی روی دستگاه ذخیره کنید.</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">به‌روز است!</string>

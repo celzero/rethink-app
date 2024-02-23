@@ -112,7 +112,6 @@
     <string name="info_dialog_url_copy_toast_msg">已複製 URL</string>
     <string name="info_dialog_rethink_toast_msg">已作爲 RDNS+ DNS-over-HTTPS URL 複製</string>
     <string name="settings_enable_logs_desc">於本地儲存 DNS 與防火牆日誌。</string>
-    <string name="whats_dialog_title">v055b 的新內容</string>
     <string name="settings_ip_network_desc">在不同互聯網協定版本中選擇。</string>
     <string name="settings_ptrans_heading">強制 IPv4 出站</string>
     <string name="settings_ptrans_desc">於本地將出站的 IPv6 流量轉換爲 IPv4 流量。在您連線至僅有 IPv4 的網路時使用。</string>
@@ -486,7 +485,6 @@
     <string name="hsf_blocklist_updating_text">啓動中……</string>
     <string name="hsf_chip_appearance">主題：%1$s</string>
     <string name="hsf_pause_vpn_failure">無法暫停： Rethink 未啓用</string>
-    <string name="hsf_pause_lockdown_failure">無法暫停： Rethink 正處於閉關模式</string>
     <string name="dc_block_heading">規則</string>
     <string name="dc_other_dns_heading">類型</string>
     <string name="dc_custom_dns_radio">其他 DNS</string>
@@ -658,7 +656,6 @@
     <string name="fapps_metered_block_dialog_message">是否於計費網路（行動數據）攔截<i>所列出的</i>應用程式？</string>
     <string name="fapps_metered_unblock_dialog_title">於計費網路放行</string>
     <string name="fapps_metered_unblock_dialog_message">是否於計費網路放行<i>已列出</i>應用程式？</string>
-    <string name="fapps_lockdown_hint">VPN 正處於閉關模式。防火牆將不會遵守計費 / 非計費規則。</string>
     <string name="fapps_firewall_filter_hint">正顯示所有應用程式</string>
     <string name="fapps_firewall_filter_desc">顯示 <u>%1$s</u> %2$s 個應用程式</string>
     <string name="fapps_firewall_filter_desc_category">正顯示 <u>%1$s</u> %2$s 個應用程式於分類：%3$s</string>

@@ -302,9 +302,7 @@
     <string name="hsf_vpn_dialog_message">Rethink a besoin de l’autorisation de mettre en place un VPN local pour chiffrer les requêtes DNS de l’appareil, mettre en œuvre un moniteur réseau et appliquer des règles de pare-feu.
 \n
 \nRethink ne collecte aucune information et ne vous espionne en aucune façon.</string>
-    <string name="hsf_pause_lockdown_failure">Impossible de mettre en pause : Rethink est en mode confinement</string>
     <string name="dns_btm_resolved_doh">résolu %1$s par %2$s</string>
-    <string name="fapps_lockdown_hint">Le VPN est en mode confinement. Le pare-feu n’honorera pas les règles Avec / Sans abonnement.</string>
     <string name="firewall_rule_block_app_new_install">Nouvelle appli</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqué</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS redirigé</string>
@@ -709,7 +707,6 @@
     <string name="firewall_act_network_monitor_tab">Réseau</string>
     <string name="dns_crypt_url_remove_success">Résolveur DNSCrypt supprimé.</string>
     <string name="local_blocklist_download">Télécharger les listes de blocage</string>
-    <string name="whats_dialog_title">Quoi de neuf dans la v055a</string>
     <string name="orbot_both">TCP + Proxy HTTP</string>
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_stop_dialog_neutral">Changer de DNS</string>

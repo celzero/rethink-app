@@ -293,7 +293,6 @@
     <string name="title_about" translatable="true">About</string>
     <string name="download_update_dialog_trylater_message" translatable="true">Không thể thực hiện cập nhật ngay bây giờ, vui lòng thử lại sau.</string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Tìm kiếm danh sách chặn</font></string>
-    <string name="whats_dialog_title" translatable="true">Có gì mới trong phiên bản 053n</string>
     <string name="whats_new_version_update" translatable="true">&lt;b&gt;RA Fisher!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Tính năng mới&lt;/i&gt;: Màn hình Thống kê hoàn toàn mới.&lt;br/&gt; 2. &lt;i&gt;Tính năng mới&lt;/i&gt; : Bảo mật ứng dụng này bằng khóa màn hình.&lt;br/&gt; 3. &lt;i&gt;Tính năng mới&lt;/i&gt;: Chọn ngôn ngữ ưa thích của bạn từ cài đặt ứng dụng.&lt;br/&gt; 4. &lt;i&gt;Tính năng mới&lt;/i&gt;: RDNS+ &lt; Chế độ xem i&gt;Đơn giản&lt;/i&gt; chỉ hiển thị các danh sách được sắp xếp hợp lý.&lt;br/&gt; 5. Đổi tên: Chế độ &lt;i&gt;Khóa ứng dụng&lt;/i&gt; hiện là chế độ &lt;i&gt;Cô lập&lt;/i&gt;.&lt;br/&gt; 6 . Đổi tên: &lt;i&gt;Bỏ qua các quy tắc của ứng dụng&lt;/i&gt; hiện được gọi là IP &lt;i&gt;Trust&lt;/i&gt;.&lt;br/&gt; 7. Khắc phục sự cố khi Rethink được cài đặt trong Hồ sơ công việc.&lt;br/&gt; 8. Bây giờ xóa các quy tắc dành riêng cho ứng dụng khi gỡ cài đặt ứng dụng.&lt;br/&gt; 9. Và các bản sửa lỗi và thay đổi nhỏ khác về giao diện người dùng.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/ translate&gt;Hỗ trợ dịch ứng dụng&lt;/a&gt;</string>
     <string name="settings_allow_bypass_desc" translatable="true">Cho phép các ứng dụng yêu cầu truy cập vào tất cả các mạng có sẵn. Các ứng dụng này có thể bỏ qua đường hầm VPN của Rethink theo yêu cầu. Một số ứng dụng hội nghị âm thanh/video như Zoom và Meet có thể yêu cầu tính năng này hoạt động bình thường.</string>
     <string name="settings_import_export_heading" translatable="true">Sao lưu và khôi phục</string>
@@ -358,7 +357,6 @@
     <string name="hsf_blocklist_chip_text_no_data" translatable="true">Kích hoạt RDNS+</string>
     <string name="hsf_whats_new_remove_text" translatable="true">Đang đóng…</string>
     <string name="hsf_blocklist_updating_text" translatable="true">Đang cho phép…</string>
-    <string name="hsf_pause_lockdown_failure" translatable="true">Không thể dừng: Rethink đang ở chế độ khoá</string>
     <string name="dc_other_dns_heading" translatable="true">loại</string>
     <string name="dc_custom_block_heading" translatable="true">Quy tắc tên miền</string>
     <string name="about_github" translatable="true">Đóng góp trên GitHub</string>

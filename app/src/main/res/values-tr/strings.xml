@@ -229,7 +229,6 @@
     <string name="univ_ip_delete_toast_success">Tüm IP kuralları silindi.</string>
     <string name="dns_proxy_app">Uygulama</string>
     <string name="fapps_filter_filter_heading">Tür</string>
-    <string name="fapps_lockdown_hint">Vpn kilitleme modunda. Güvenlik Duvarı Ölçülü / Ölçüsüz kurallarına uymayacaktır.</string>
     <string name="network_log_app_name_unnamed">İsimsiz (%1$s)</string>
     <string name="firewall_rule_isolate">Lockdown (Uygulama)</string>
     <string name="notif_channel_vpn_failure">Etkin Olmayan VPN</string>
@@ -252,7 +251,6 @@
     <string name="settings_socks_forwarding_desc_no_app">%1$s adresine yönlendirme:%2$s</string>
     <string name="settings_selected_theme">Şu anki tema: %1$s</string>
     <string name="hsf_whats_new_chip_text">Yenilikler</string>
-    <string name="hsf_pause_lockdown_failure">Duraklatılamıyor: RethinkDNS kilitleme modunda</string>
     <string name="about_bug_no_log_dialog_positive_btn">E-posta gönder</string>
     <string name="about_app">app, uygulama</string>
     <string name="vpn_profile_error">VPN profili başlatılamadı.</string>
@@ -451,7 +449,6 @@
     <string name="radio_sky_btn">⛅ Gökyüzü</string>
     <string name="configure_dns_connected_doh_status">HTTPS üzerinden DNS</string>
     <string name="settings_enable_logs">Aygıt üzerinde günlük kaydını etkinleştirme</string>
-    <string name="whats_dialog_title">v053l\'deki yenilikler</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_lock_down_mode_desc">VPN kilitleme modunda çalışırken bypass\'a izin verilemez veya proxy\'ler kurulamaz. <u>VPN ayarlarına gidin</u>.</string>
     <string name="orbot_stop_dialog_message">RethinkDNS, bağlantıları Orbot\'a yönlendirmeyi durdurdu, ancak Orbot arka planda çalışıyor olabilir.</string>

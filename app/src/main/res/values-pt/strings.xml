@@ -181,7 +181,6 @@
     <string name="settings_vpn_heading">vpn</string>
     <string name="settings_enable_logs">Ativar o registro no dispositivo</string>
     <string name="app_mode_choose">Escolha o modo</string>
-    <string name="whats_dialog_title">O que há de novo na v054</string>
     <string name="connection_http3">HTTP3</string>
     <string name="relative_time_today">Hoje</string>
     <string name="settings_app_notification_a13_heading">Notificação da aplicação</string>
@@ -242,7 +241,6 @@
     <string name="hsf_whats_new_remove_text">A encerrar…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausar: o RethinkDNS não está ativo</string>
-    <string name="hsf_pause_lockdown_failure">Não é possível pausar: o RethinkDNS está no modo confinado</string>
     <string name="hybrid_mode_info_title">DNS + Firewall</string>
     <string name="conn_track_clear_logs_message">Isto só elimina os registos da rede, mas não as regras de firewall. Esta operação não é reversível. Quer prosseguir\?</string>
     <string name="info_dialog_url_copy_toast_msg">URL copiado</string>
@@ -475,7 +473,6 @@
 \n
 \nNúmero da porta: %3$s</string>
     <string name="fapps_info_dialog_message">Bloqueie a conexão de aplicações à Internet. Limitar o acesso à Internet ajuda a evitar o uso indevido de dados, além de economizar bateria.</string>
-    <string name="fapps_lockdown_hint">A VPN está no modo bloqueado. A firewall não respeitará as regras em redes limitadas / ilimitadas.</string>
     <string name="fapps_firewall_filter_desc_category">A mostrar aplicações (<u>%1$s</u>, %2$s) nas categorias: %3$s</string>
     <string name="rules_load_failure_heading">Nota</string>
     <string name="settings_local_blocklist_version">Versão: v%1$s</string>
