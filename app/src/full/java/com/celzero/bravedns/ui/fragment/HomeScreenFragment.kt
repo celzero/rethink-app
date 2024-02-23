@@ -89,7 +89,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private val persistentState by inject<PersistentState>()
     private val appConfig by inject<AppConfig>()
-    private val alertsViewModel: AlertsViewModel by viewModel()
 
     private var isVpnActivated: Boolean = false
 

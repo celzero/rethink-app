@@ -133,6 +133,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             connectivityManager.registerNetworkCallback(networkRequest, this)
         } catch (e: Exception) {
             Log.w(LOG_TAG_CONNECTION, "Exception while registering network callback", e)
+            networkListener.onNetworkRegistrationFailed()
         }
         this.handlerThread = HandlerThread(NetworkRequestHandler::class.simpleName)
         this.handlerThread.start()
@@ -143,6 +144,8 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         fun onNetworkDisconnected(networks: UnderlyingNetworks)
 
         fun onNetworkConnected(networks: UnderlyingNetworks)
+
+        fun onNetworkRegistrationFailed()
     }
 
     fun onVpnStop() {
@@ -508,8 +511,6 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
                 if (network == activeNetwork) {
                     if (DEBUG) Log.d(LOG_TAG_CONNECTION, "processing active network: $network")
-                    // reachability check automatically bind to active, when network is null
-                    network = null
                 }
                 var checked4 = false
                 var checked6 = false
@@ -548,19 +549,20 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                         if (!testReachability) {
                             // see #createNetworksSet for why we are using hasInternet
                             if (hasInternet(network) == true) ipv4.add(prop)
+
                         } else if (isIPv4Reachable(network)) {
                             // in auto mode, do network validation ourselves
                             ipv4.add(prop)
                             y = true
                         }
-                        Log.i(LOG_TAG_CONNECTION, "adding ipv4: $prop; works? $y for $address")
+                        Log.i(LOG_TAG_CONNECTION, "adding ipv4(${ipv4.size}): $prop; works? $y for $address")
                     } else {
                         Log.i(LOG_TAG_CONNECTION, "unknown: $network; $address")
                     }
                 }
             }
-            trackedIpv6Networks = ipv6
             trackedIpv4Networks = ipv4
+            trackedIpv6Networks = ipv6
 
             redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks, opPrefs)
 

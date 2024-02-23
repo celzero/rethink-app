@@ -351,14 +351,14 @@ object WireguardManager : KoinComponent {
     fun getConfigIdForApp(uid: Int): WgConfigFiles? {
         val configId = ProxyManager.getProxyIdForApp(uid)
         if (configId == "" || !configId.contains(ProxyManager.ID_WG_BASE)) {
-            Log.i(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
+            if (DEBUG) Log.d(LOG_TAG_PROXY, "app config mapping not found for uid: $uid")
             // there maybe catch-all config enabled, so return the active catch-all config
             val catchAllConfig = mappings.find { it.isActive && it.isCatchAll }
-            if (catchAllConfig == null) {
-                Log.i(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
-                return null
+            return if (catchAllConfig == null) {
+                if (DEBUG) Log.d(LOG_TAG_PROXY, "catch all config not found for uid: $uid")
+                null
             } else {
-                return catchAllConfig
+                catchAllConfig
             }
         }
 

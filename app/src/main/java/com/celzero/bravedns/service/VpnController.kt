@@ -143,7 +143,7 @@ object VpnController : KoinComponent {
     }
 
     fun state(): VpnState {
-        val requested: Boolean = persistentState.getVpnEnabledLocked()
+        val requested: Boolean = persistentState.getVpnEnabled()
         val on = isOn()
         return VpnState(requested, on, connectionState)
     }

@@ -94,7 +94,7 @@ object UIUtils {
                 R.string.status_failing
             }
             Ipn.END -> {
-                R.string.rt_filter_parent_selected
+                R.string.lbl_stopped
             }
             else -> {
                 R.string.rt_filter_parent_selected

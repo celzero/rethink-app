@@ -258,6 +258,7 @@ object ProxyManager : KoinComponent {
     }
 
     fun isIpnProxy(ipnProxyId: String): Boolean {
+        if (ipnProxyId.isEmpty()) return false
         // if id is not Ipn.Base, Ipn.Block, Ipn.Exit then it is proxied
         return ipnProxyId != Ipn.Base && ipnProxyId != Ipn.Block && ipnProxyId != Ipn.Exit
     }
