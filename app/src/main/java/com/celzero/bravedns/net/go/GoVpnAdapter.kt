@@ -26,7 +26,6 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.data.AppConfig.TunnelOptions
 import com.celzero.bravedns.database.ProxyEndpoint
-import com.celzero.bravedns.service.BraveVPNService
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.service.ProxyManager.ID_WG_BASE
@@ -40,6 +39,7 @@ import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_F
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_DOMAIN
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_BASE_URL_SKY
 import com.celzero.bravedns.util.InternetProtocol
+import com.celzero.bravedns.util.KnownPorts
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDir
@@ -49,18 +49,16 @@ import com.celzero.bravedns.wireguard.Config
 import dnsx.Dnsx
 import dnsx.RDNS
 import dnsx.Resolver
-import inet.ipaddr.HostName
-import inet.ipaddr.IPAddressString
 import intra.Intra
 import intra.Tunnel
 import ipn.Proxies
+import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import tun2socks.Tun2socks
-import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -282,10 +280,13 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    private suspend fun addSystemDnsAsBlockfreeTransport(dns: BraveVPNService.SystemDns) {
+    private suspend fun addSystemDnsAsBlockfreeTransport(dns: String?) {
+        if (dns == null) {
+            Log.w(LOG_TAG_VPN, "null sys-dns for blockfree transport")
+        }
         try {
-            Intra.addDNSProxy(tunnel, Dnsx.BlockFree, dns.ipAddress, dns.port.toString())
-            Log.i(LOG_TAG_VPN, "new system dns ip: ${dns.ipAddress}, port: ${dns.port}")
+            Intra.addDNSProxy(tunnel, Dnsx.BlockFree, dns, KnownPorts.DNS_PORT.toString())
+            Log.i(LOG_TAG_VPN, "new system dns ip: ${dns}, port: ${KnownPorts.DNS_PORT}")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: system dns failure", e)
         }
@@ -803,28 +804,28 @@ class GoVpnAdapter : KoinComponent {
         }
     }
 
-    suspend fun setSystemDns(systemDns: BraveVPNService.SystemDns) {
+    suspend fun setSystemDns(systemDns: List<String>) {
         if (!tunnel.isConnected) {
             Log.i(LOG_TAG_VPN, "Tunnel NOT connected, skip setting system-dns")
         }
 
-        var dnsProxy: HostName? = null
         try {
             // TODO: system dns may be non existent; see: AppConfig#updateSystemDnsServers
-            dnsProxy = HostName(IPAddressString(systemDns.ipAddress).address, systemDns.port)
+            // convert list to comma separated string, as Intra expects as csv
+            val sysDnsStr = systemDns.joinToString(",")
             // below code is commented out, add the code to set the system dns via resolver
             // val transport = Intra.newDNSProxy("ID", dnsProxy.host, dnsProxy.port.toString())
             // tunnel?.resolver?.addSystemDNS(transport)
-            Log.d(LOG_TAG_VPN, "set system dns: ${dnsProxy?.host}")
+            Log.i(LOG_TAG_VPN, "set system dns: $sysDnsStr")
             // no need to send the dnsProxy.port for the below method, as it is not expecting port
-            Intra.setSystemDNS(tunnel, dnsProxy.host)
+            Intra.setSystemDNS(tunnel, sysDnsStr)
         } catch (e: Exception) { // this is not expected to happen
             Log.e(LOG_TAG_VPN, "set system dns: could not parse system dns", e)
         }
 
         // add appropriate transports to the tunnel, if system dns is enabled
         if (appConfig.isSystemDns()) {
-            addSystemDnsAsBlockfreeTransport(systemDns)
+            addSystemDnsAsBlockfreeTransport(systemDns.firstOrNull())
         }
     }
 

@@ -67,7 +67,6 @@ internal constructor(
     private val networkLogs: ConnectionTrackerRepository,
     private val dnsLogs: DnsLogRepository
 ) {
-    private var appTunDnsMode: TunDnsMode = TunDnsMode.NONE
     private var braveModeObserver: MutableLiveData<Int> = MutableLiveData()
     private var pcapFilePath: String = ""
 
@@ -82,7 +81,6 @@ internal constructor(
         // csv is <dns-name,url>, url maybe empty
         val dnsName = persistentState.connectedDnsName.split(",").firstOrNull() ?: ""
         connectedDns.postValue(dnsName)
-        setDnsMode()
     }
 
     data class TunnelOptions(
@@ -352,14 +350,6 @@ internal constructor(
         return ProtoTranslationMode.PTMODEAUTO
     }
 
-    fun getFirewallMode(): TunFirewallMode {
-        return determineFirewallMode()
-    }
-
-    private fun setFirewallMode() {
-        determineFirewallMode()
-    }
-
     fun setPcap(mode: Int, path: String = PcapMode.DISABLE_PCAP) {
         pcapFilePath =
             when (PcapMode.getPcapType(mode)) {
@@ -397,16 +387,15 @@ internal constructor(
     }
 
     private fun getDnsMode(): TunDnsMode {
-        return appTunDnsMode
-    }
-
-    private fun setDnsMode() {
-        // Case: app mode - firewall, DNS mode should be none.
-        when (persistentState.braveMode) {
-            BraveMode.FIREWALL.mode -> appTunDnsMode = TunDnsMode.NONE
-            BraveMode.DNS.mode -> appTunDnsMode = determineTunDnsMode()
-            BraveMode.DNS_FIREWALL.mode -> appTunDnsMode = determineTunDnsMode()
-            else -> Log.wtf(LOG_TAG_VPN, "Invalid brave mode: ${persistentState.braveMode}")
+        return when (persistentState.braveMode) {
+            // Case: app mode - firewall, DNS mode should be none.
+            BraveMode.FIREWALL.mode -> TunDnsMode.NONE
+            BraveMode.DNS.mode -> determineTunDnsMode()
+            BraveMode.DNS_FIREWALL.mode -> determineTunDnsMode()
+            else -> {
+                Log.wtf(LOG_TAG_VPN, "Invalid brave mode: ${persistentState.braveMode}")
+                TunDnsMode.NONE
+            }
         }
     }
 
@@ -488,7 +477,6 @@ internal constructor(
         if (!isValidDnsType(dt)) return
 
         persistentState.dnsType = dt.type
-        setDnsMode()
         when (dt) {
             DnsType.DOH -> {
                 val endpoint = getDOHDetails() ?: return
@@ -559,8 +547,6 @@ internal constructor(
     fun changeBraveMode(braveMode: Int) {
         persistentState.braveMode = braveMode
         braveModeObserver.postValue(braveMode)
-        setDnsMode()
-        setFirewallMode()
     }
 
     fun getBraveMode(): BraveMode {
@@ -572,7 +558,7 @@ internal constructor(
         }
     }
 
-    private fun determineFirewallMode(): TunFirewallMode {
+    fun determineFirewallMode(): TunFirewallMode {
         // app mode - DNS, set the firewall mode as NONE.
         if (persistentState.braveMode == BraveMode.DNS.mode) {
             return TunFirewallMode.NONE
@@ -595,7 +581,7 @@ internal constructor(
     ): TunnelOptions {
         return TunnelOptions(
             getDnsMode(),
-            getFirewallMode(),
+            determineFirewallMode(),
             getTunProxyMode(),
             ptMode,
             bridge,

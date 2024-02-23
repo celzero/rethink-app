@@ -87,17 +87,6 @@ import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
 import ipn.Ipn
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import protect.Protect
-import rnet.ServerSummary
-import rnet.Tab
 import java.io.IOException
 import java.net.InetAddress
 import java.net.SocketException
@@ -109,6 +98,17 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import protect.Protect
+import rnet.ServerSummary
+import rnet.Tab
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -216,8 +216,6 @@ class BraveVPNService :
             return
         }
 
-        // fixme: vpn lockdown scenario should behave similar to the behaviour of use all
-        // network.
 
         var pfd: ParcelFileDescriptor? = null
         // allNet, ipv4Net, ipv6Net is always sorted, first network is always the active network
@@ -254,8 +252,6 @@ class BraveVPNService :
             return
         }
 
-        // fixme: vpn lockdown scenario should behave similar to the behaviour of use all
-        // network enabled?
 
         var pfd: ParcelFileDescriptor? = null
         underlyingNetworks?.ipv6Net?.forEach {
@@ -908,7 +904,7 @@ class BraveVPNService :
                 return builder
             }
 
-            if (appConfig.getFirewallMode().isFirewallSinkMode()) {
+            if (appConfig.determineFirewallMode().isFirewallSinkMode()) {
                 for (packageName in excludedApps) {
                     builder = builder.addAllowedApplication(packageName)
                 }
@@ -1276,8 +1272,7 @@ class BraveVPNService :
                 return
             }
         }
-        // FIXME: protect getVpnEnabledLocked with mutex everywhere?
-        if (!persistentState.getVpnEnabledLocked()) {
+        if (!persistentState.getVpnEnabled()) {
             // when persistent-state "thinks" vpn is disabled, stop the service, especially when
             // we could be here via onStartCommand -> updateTun -> handleVpnAdapterChange while
             // conn-monitor and go-vpn-adapter exist, but persistent-state tracking vpn goes out
@@ -1313,7 +1308,6 @@ class BraveVPNService :
                 io("localBlocklistEnable") { setRDNS() }
             }
             PersistentState.LOCAL_BLOCK_LIST_UPDATE -> {
-                // FIXME: update just that local bravedns obj, not the entire tunnel
                 io("localBlocklistDownload") { setRDNS() }
             }
             PersistentState.BACKGROUND_MODE -> {
@@ -1365,6 +1359,9 @@ class BraveVPNService :
                         }
                     }
                 }
+            }
+            PersistentState.PREVENT_DNS_LEAKS -> {
+                io("preventDnsLeaks") { restartVpn(createNewTunnelOptsObj()) }
             }
             PersistentState.DNS_RELAYS -> {
                 // FIXME: add relay using vpnAdapter; no update needed
@@ -1571,8 +1568,7 @@ class BraveVPNService :
                 return
             }
         }
-        // FIXME: protect getVpnEnabledLocked with mutex everywhere?
-        if (!persistentState.getVpnEnabledLocked()) {
+        if (!persistentState.getVpnEnabled()) {
             // when persistent-state "thinks" vpn is disabled, stop the service, especially when
             // we could be here via onStartCommand -> isNewVpn -> restartVpn while both,
             // vpn-service & conn-monitor exists & vpn-enabled state goes out of sync
@@ -1612,12 +1608,10 @@ class BraveVPNService :
 
     // protected by vpncontroller.mutex
     fun hasTunnel(): Boolean {
-        // FIXME: protect vpnAdapter with mutex
         return vpnAdapter?.hasTunnel() == true
     }
 
     fun isOn(): Boolean {
-        // FIXME: protect vpnAdapter with mutex
         return vpnAdapter != null
     }
 
@@ -1671,6 +1665,11 @@ class BraveVPNService :
         )
         setUnderlyingNetworks(null)
         VpnController.onConnectionStateChanged(null)
+    }
+
+    override fun onNetworkRegistrationFailed() {
+        Log.i(LOG_TAG_VPN, "recd nw registration failed, stop vpn service with notification")
+        signalStopService(userInitiated = false)
     }
 
     override fun onNetworkConnected(newNetworks: ConnectionMonitor.UnderlyingNetworks) {
@@ -1804,54 +1803,44 @@ class BraveVPNService :
             vpnAdapter?.setSystemDns(dns)
             // set default dns server for the tunnel if none is set
             if (isDefaultDnsNone()) {
-                val d = HostName(IPAddressString(dns.ipAddress).address, dns.port).toString()
+                val firstDns = dns.firstOrNull()
+                val d = HostName(IPAddressString(firstDns).address, KnownPorts.DNS_PORT).toString()
                 vpnAdapter?.addDefaultTransport(d)
             }
         }
     }
 
-    data class SystemDns(var ipAddress: String, var port: Int)
-
-    private fun determineSystemDns(dnsServers: List<InetAddress>?): SystemDns {
-        var dnsIp: String? = null
-        val dnsPort = Utilities.getDnsPort(-1) // unknown
+    private fun determineSystemDns(dnsServers: List<InetAddress>?): List<String> {
         val fallbackIp = "8.8.4.4"
-        val systemDns = SystemDns(fallbackIp, dnsPort)
+        val dnsList: MutableList<String> = mutableListOf()
 
         if (dnsServers.isNullOrEmpty()) {
-            Log.w(LOG_TAG_VPN, "No System DNS servers; unsetting existing $systemDns")
-            return systemDns
+            Log.w(LOG_TAG_VPN, "No System DNS servers; unsetting existing $fallbackIp")
+            dnsList.add(fallbackIp)
+            return dnsList
         }
-        val firstDns = dnsServers[0].hostAddress
         try {
-            dnsIp =
-                when (appConfig.getInternetProtocol()) {
-                    InternetProtocol.IPv4 -> {
-                        dnsServers
-                            .firstOrNull { IPAddressString(it.hostAddress).isIPv4 }
-                            ?.hostAddress ?: firstDns
-                    }
-                    InternetProtocol.IPv6 -> {
-                        dnsServers
-                            .firstOrNull { IPAddressString(it.hostAddress).isIPv6 }
-                            ?.hostAddress ?: firstDns
-                    }
-                    InternetProtocol.IPv46 -> {
-                        firstDns
-                    }
+            when (appConfig.getInternetProtocol()) {
+                InternetProtocol.IPv4 -> {
+                    val list = dnsServers.filter { IPAddressString(it.hostAddress).isIPv4 }
+                    val sys = list.map { it.hostAddress ?: "" }.filter { it != "" }
+                    dnsList.addAll(sys)
                 }
+                InternetProtocol.IPv6 -> {
+                    val list = dnsServers.filter { IPAddressString(it.hostAddress).isIPv6 }
+                    val sys = list.map { it.hostAddress ?: "" }.filter { it != "" }
+                    dnsList.addAll(sys)
+                }
+                InternetProtocol.IPv46 -> {
+                    val list = dnsServers.map { it.hostAddress ?: "" }.filter { it != "" }
+                    dnsList.addAll(list)
+                }
+            }
         } catch (e: NoSuchElementException) {
             Log.w(LOG_TAG_VPN, "No ip4 / ip6 matching with dns servers")
         }
-
-        systemDns.ipAddress =
-            if (!dnsIp.isNullOrEmpty()) {
-                dnsIp
-            } else {
-                Log.w(LOG_TAG_VPN, "could not determine sys-dns; using fallback $fallbackIp")
-                fallbackIp
-            }
-        return systemDns
+        if (DEBUG) Log.d(LOG_TAG_VPN, "System dns: $dnsList")
+        return dnsList
     }
 
     private fun isDefaultDnsNone(): Boolean {
@@ -1906,6 +1895,7 @@ class BraveVPNService :
             builder
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setContentTitle(resources.getText(R.string.warning_title))
+                // fixme: should the string need to be changed based on failure type?
                 .setContentText(resources.getText(R.string.notification_content))
                 .setContentIntent(pendingIntent)
                 // Open the main UI if possible.
