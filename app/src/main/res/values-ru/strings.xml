@@ -274,7 +274,6 @@
     <string name="info_dialog_rethink_toast_msg">Скопировано как URL RDNS+ DNS-over-HTTPS</string>
     <string name="settings_enable_logs_desc">Сохранять журналы DNS и брандмауэра локально на устройстве.</string>
     <string name="settings_enable_logs">Включить ведение журнала на устройстве</string>
-    <string name="whats_dialog_title">Что нового в v055a</string>
     <string name="relative_time_today">Сегодня</string>
     <string name="relative_time_yesterday">Вчера</string>
     <string name="app_mode_choose">Выбор режима</string>
@@ -425,7 +424,6 @@
 \n"</string>
     <string name="firewall_status_whitelisted">обходит универсальные правила брандмауэра</string>
     <string name="firewall_card_text_inactive">Включить режим брандмауэра.</string>
-    <string name="hsf_pause_lockdown_failure">Невозможно сделать паузу: Rethink в режиме блокировки</string>
     <string name="about_docs">Читать документацию</string>
     <string name="about_twitter">Посетите нашу страницу в Twitter</string>
     <string name="firewall_status_block_unmetered">блокируется в сетях без тарификации (wifi)</string>
@@ -482,7 +480,6 @@
     <string name="fapps_unmetered_unblock_dialog_message">Разрешить подключения в сети без учета тарифов (WiFi) для приложений <i>перечисленных в списке</i>\?</string>
     <string name="fapps_metered_block_dialog_title">Блок на дозированном</string>
     <string name="fapps_metered_block_dialog_message">Блокировать соединения в (мобильной) тарифицируемой сети для приложений <i>перечисленных в списке</i>\?</string>
-    <string name="fapps_lockdown_hint">Vpn находится в режиме блокировки. Брандмауэр не соблюдает правила Metered / Unmetered.</string>
     <string name="fapps_firewall_filter_hint">Показаны все приложения</string>
     <string name="rules_load_failure_desc">Правила брандмауэра не найдены</string>
     <string name="network_log_app_name_unnamed">Неназванный (%1$s)</string>

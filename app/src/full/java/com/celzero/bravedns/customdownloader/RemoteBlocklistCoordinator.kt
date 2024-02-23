@@ -93,7 +93,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
         Log.i(LoggerConstants.LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
 
         val retrofit =
-            RetrofitManager.getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
+            RetrofitManager.getBlocklistBaseBuilder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
@@ -150,8 +150,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                     context,
                     Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     timestamp
-                )
-                    ?: return null
+                ) ?: return null
 
             if (!dir.exists()) {
                 dir.mkdirs()

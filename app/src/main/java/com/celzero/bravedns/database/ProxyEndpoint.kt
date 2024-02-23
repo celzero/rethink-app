@@ -25,8 +25,10 @@ class ProxyEndpoint {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var proxyName: String = ""
 
-    // Set as 1 for Socks5
+    // 0 - SOCKS5, 1 - HTTP, 2 - Orbot (SOCKS5), 3 - Orbot (HTTP)
     var proxyMode: Int = 0
+    // NONE for now, later we can add other types
+    // ideally this should be an enum (ProxyType)
     var proxyType: String = ""
     var proxyAppName: String? = null
     var proxyIP: String? = null
@@ -65,8 +67,6 @@ class ProxyEndpoint {
         modifiedDataTime: Long,
         latency: Int
     ) {
-        // Room auto-increments id when its set to zero.
-        // A non-zero id overrides and sets caller-specified id instead.
         this.id = id
         this.proxyMode = proxyMode
         this.proxyName = proxyName

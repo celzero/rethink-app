@@ -89,7 +89,6 @@
     <string name="info_dialog_copy_toast_msg" translatable="true">כתובת ה-IP הועתקה.</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">כתובת האתר הועתקה</string>
     <string name="app_mode_choose" translatable="true">בחר מצב</string>
-    <string name="whats_dialog_title" translatable="true">מה חדש ב-v054</string>
     <string name="relative_time_today" translatable="true">היום</string>
     <string name="relative_time_yesterday" translatable="true">אתמול</string>
     <string name="settings_ip_network_desc" translatable="true">בחר בין גרסאות פרוטוקול אינטרנט.</string>

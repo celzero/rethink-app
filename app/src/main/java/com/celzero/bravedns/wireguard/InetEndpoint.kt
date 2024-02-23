@@ -35,6 +35,7 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
     private val lock = Any()
     private var lastResolution = Instant.EPOCH
     private var resolved: InetEndpoint? = null
+
     override fun equals(obj: Any?): Boolean {
         if (obj !is InetEndpoint) return false
         val other = obj
@@ -86,12 +87,12 @@ private constructor(val host: String, private val isResolved: Boolean, val port:
     companion object {
         private val BARE_IPV6 = Pattern.compile("^[^\\[\\]]*:[^\\[\\]]*")
         private val FORBIDDEN_CHARACTERS = Pattern.compile("[/?#]")
+
         @Throws(ParseException::class)
         fun parse(endpoint: String): InetEndpoint {
             if (FORBIDDEN_CHARACTERS.matcher(endpoint).find())
                 throw ParseException(InetEndpoint::class.java, endpoint, "Forbidden characters")
-            val uri: URI
-            uri =
+            val uri: URI =
                 try {
                     URI("wg://$endpoint")
                 } catch (e: URISyntaxException) {

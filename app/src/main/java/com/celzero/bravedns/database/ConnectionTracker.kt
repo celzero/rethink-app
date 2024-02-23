@@ -28,18 +28,21 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
             Index(value = arrayOf("appName"), unique = false),
             Index(value = arrayOf("dnsQuery"), unique = false),
             Index(value = arrayOf("blockedByRule"), unique = false),
+            Index(value = arrayOf("isBlocked", "timeStamp"), unique = false),
         ]
 )
 class ConnectionTracker {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     var appName: String = ""
     var uid: Int = 0
+    var usrId: Int = 0
     var ipAddress: String = ""
     var port: Int = 0
     var protocol: Int = 0
     var isBlocked: Boolean = false
     var blockedByRule: String = ""
     var blocklists: String = ""
+    var proxyDetails: String = ""
     var flag: String = ""
     var dnsQuery: String? = null
     var timeStamp: Long = INIT_TIME_MS
@@ -49,14 +52,54 @@ class ConnectionTracker {
     var duration: Int = 0
     var synack: Int = 0
     var message: String = ""
+    var connType: String = ""
 
     override fun equals(other: Any?): Boolean {
         if (other !is ConnectionTracker) return false
-        if (id != other.id) return false
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {
         return this.id.hashCode()
+    }
+
+    enum class ConnType(val id: Int, val value: String) {
+        NONE(0, "None"),
+        METERED(1, "Metered"),
+        UNMETERED(2, "Unmetered");
+
+        fun isMetered(): Boolean {
+            return this == METERED
+        }
+
+        fun isUnmetered(): Boolean {
+            return this == UNMETERED
+        }
+
+        fun isNone(): Boolean {
+            return this == NONE
+        }
+
+        companion object {
+            fun get(v: Int?): ConnType {
+                if (v == null) return NONE
+                return when (v) {
+                    NONE.id -> NONE
+                    METERED.id -> METERED
+                    UNMETERED.id -> UNMETERED
+                    else -> NONE
+                }
+            }
+
+            fun get(v: String?): ConnType {
+                if (v == null) return NONE
+                return when (v) {
+                    NONE.value -> NONE
+                    METERED.value -> METERED
+                    UNMETERED.value -> UNMETERED
+                    else -> NONE
+                }
+            }
+        }
     }
 }

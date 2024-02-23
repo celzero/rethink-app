@@ -20,6 +20,7 @@
             android:id="@+id/ss_icon_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:alpha="0.7"
             android:layout_centerVertical="true">
 
             <ImageView
@@ -62,7 +63,7 @@
             android:padding="5dp">
 
             <TextView
-                android:id="@+id/ss_name"
+                android:id="@+id/ss_data_usage"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -75,11 +76,25 @@
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/extra_large_font_text_view" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ss_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:ellipsize="start"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:padding="2dp"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/small_font_text_view" />
+
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/ss_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
+                android:alpha="0.7"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:padding="3dp"

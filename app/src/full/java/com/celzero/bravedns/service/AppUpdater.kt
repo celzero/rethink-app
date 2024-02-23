@@ -25,17 +25,23 @@ interface AppUpdater {
     )
 
     fun completeUpdate()
+
     fun unregisterListener(listener: InstallStateListener)
 
     interface InstallStateListener {
         fun onStateUpdate(state: InstallState)
+
         fun onUpdateAvailable(installSource: InstallSource)
+
         fun onUpToDate(installSource: InstallSource, isInteractive: UserPresent)
+
         fun onUpdateCheckFailed(installSource: InstallSource, isInteractive: UserPresent)
+
         fun onUpdateQuotaExceeded(installSource: InstallSource)
     }
 
     data class InstallState(val status: InstallStatus)
+
     enum class InstallStatus {
         DOWNLOADED,
         FAILED,

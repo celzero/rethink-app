@@ -28,7 +28,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RemoteBlocklistPacksMap
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistSimpleBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.RethinkBlocklistFragment
+import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import kotlinx.coroutines.CoroutineScope
@@ -80,6 +80,7 @@ class RemoteSimpleViewAdapter(val context: Context) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(map: RemoteBlocklistPacksMap, position: Int) {
+            b.root.tag = getGroupName(map.group)
             displayMetaData(map, position)
             setupClickListener(map)
         }

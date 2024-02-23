@@ -349,7 +349,6 @@
     <string name="settings_enable_logs_desc">Armazene os registros do DNS e Firewall localmente no dispositivo.</string>
     <string name="settings_enable_logs">Ativar registros no dispositivo</string>
     <string name="app_mode_choose">Escolha o modo</string>
-    <string name="whats_dialog_title">O que há de novo na v055a</string>
     <string name="connection_http3">HTTP3</string>
     <string name="settings_ip_network_desc">Escolha entre as versões do Protocolos de internet.</string>
     <string name="settings_ptrans_heading">Forçar IPv4 egress</string>
@@ -468,7 +467,6 @@
     <string name="hsf_blocklist_chip_text_no_data">Ativar RDNS+</string>
     <string name="hsf_exclude_error">Não é possível excluir em modo restrito da VPN</string>
     <string name="hsf_pause_vpn_failure">Não é possível pausar: Rethink não está ativo</string>
-    <string name="hsf_pause_lockdown_failure">Não é possível pausar: Rethink no modo restrito</string>
     <string name="dc_dns_website_desc">Obter ícones através de <i>nextdns.io</i> e <i>duckduckgo.com</i>. Consome mais de 350mb de espaço em disco</string>
     <string name="dc_dns_leaks_desc">Quando ativado, Rethink captura todos pacotes na porta 53 e os encaminha para um endpoint de DNS definido pelo usuário</string>
     <string name="dc_check_update_heading">Avisar sobre atualizações das listas de bloqueio</string>
@@ -580,7 +578,6 @@
     <string name="dns_crypt_connection_failure">Erro ao conectar a servidor de DNSCrypt.</string>
     <string name="dns_proxy_connection_failure">Erro ao conectar a servidor proxy de DNS.</string>
     <string name="fapps_info_dialog_message">Impedir que aplicativos se conectem à Internet. Limitar o acesso à Internet ajuda a evitar o uso indesejado de dados, além de economizar bateria.</string>
-    <string name="fapps_lockdown_hint">VPN está em modo restrito. O firewall não respeitará as regras de redes com franquia de dados / banda larga.</string>
     <string name="dns_proxy_toast_parameter">Proxy de DNS</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio em uso</string>
     <string name="settings_local_blocklist_dialog_positive">Baixar</string>

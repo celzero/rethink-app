@@ -5,11 +5,15 @@
         <item>@string/url1</item>
         <item>@string/url2</item>
         <item>@string/url3</item>
+        <item>@string/url4</item>
+        <item>@string/url5</item>
     </string-array>
     <string-array name="ips">
         <item>@string/ips0</item>
         <item>@string/ips1</item>
         <item>@string/ips2</item>
         <item>@string/ips3</item>
+        <item>@string/ips4</item>
+        <item>@string/ips5</item>
     </string-array>
 </resources>

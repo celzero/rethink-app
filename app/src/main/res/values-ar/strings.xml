@@ -260,7 +260,6 @@
     <string name="search_rethinkplus_file_tag"><font size="12"> البحث في قوائم الحظر </font></string>
     <string name="app_mode_firewall">جدار الحماية</string>
     <string name="app_mode_dns_firewall">DNS وجدار الحماية (افتراضي)</string>
-    <string name="whats_dialog_title">ما الجديد في v054</string>
     <string name="orbot_stop_dialog_negative">توقف عن Orbot</string>
     <string name="settings_http_proxy_error_text3">اسم المضيف فارغ</string>
     <string name="settings_socks_forwarding_default_desc">قم بإعادة توجيه الاتصالات إلى نقطة نهاية SOCKS5.</string>
@@ -466,7 +465,6 @@
     <string name="apps_icon_content_desc">أيقونة التطبيق</string>
     <string name="hsf_stop_btn_state">توقف</string>
     <string name="hsf_start_dialog_header">ابدأ %1$s</string>
-    <string name="hsf_pause_lockdown_failure">لا يمكن التوقف مؤقتاً: RethinkDNS في وضع القفل</string>
     <string name="about_github">المساهمة على جيثب</string>
     <string name="dns_btm_sheet_chip_no_answer">لا اجابة</string>
     <string name="univ_view_blocked_ip">قواعد الملكية الفكرية والميناء</string>
@@ -506,7 +504,6 @@
     <string name="univ_firewall_rule_2">حظر أي تطبيق ليس قيد الاستخدام</string>
     <string name="univ_view_blocked_ip_desc">تعديل قواعد IP / المنفذ المحظورة أو المتجاوزة.</string>
     <string name="dns_proxy_desc_no_app">%1$s: %2$s</string>
-    <string name="fapps_lockdown_hint">Vpn في وضع القفل. لن يلتزم جدار الحماية بالقواعد المقننة / غير المقاسة.</string>
     <string name="fapps_firewall_filter_desc">إظهار تطبيقات <u> %1$s </u> %2$s</string>
     <string name="rules_load_failure_desc">لم يتم العثور على قواعد جدار الحماية</string>
     <string name="other_dns_list_tab3">وكيل DNS</string>

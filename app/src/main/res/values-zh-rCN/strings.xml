@@ -67,7 +67,6 @@
     <string name="download_update_dialog_trylater_title">现在无法更新</string>
     <string name="app_mode_dns">DNS</string>
     <string name="settings_enable_logs">启用本地日志</string>
-    <string name="whats_dialog_title">v055b 的新内容</string>
     <string name="settings_allow_bypass_heading">于网络可见</string>
     <string name="settings_socks5_heading">设置 SOCKS5 代理</string>
     <string name="orbot">Orbot</string>
@@ -633,7 +632,6 @@
     <string name="cd_custom_doh_dialog_title">自定义服务器 URL</string>
     <string name="dns_crypt_relay_remove_dialog_title">是否删除此 DNSCrypt 中继？</string>
     <string name="show_logs_disabled_network_message">连接日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
-    <string name="hsf_pause_lockdown_failure">无法暂停： Rethink 正使用闭关模式</string>
     <string name="refresh_complete">应用列表已重新同步完毕。</string>
     <string name="show_logs_disabled_dns_message">DNS 请求日志已被禁用。若您想要重新启用，请至<i>设置</i>并打开<i>启用本地日志</i>。</string>
     <string name="search_firewall_all_apps"><font size="12">以 UID / 应用名搜索应用</font></string>
@@ -684,7 +682,6 @@
     <string name="hs_btm_sheet_lock_down">无法在 VPN 处于<i>闭关模式</i>时更换模式。轻触以<u>更改 VPN 设置</u>。</string>
     <string name="radio_max_btn">🪂 Max</string>
     <string name="fapps_filter_parent_installed">已安装</string>
-    <string name="fapps_lockdown_hint">VPN 正处于闭关模式。防火墙将不会遵守收费 / 非收费规则。</string>
     <string name="dns_proxy_toast_parameter">DNS 代理</string>
     <string name="update_complete_action_snack">重启</string>
     <string name="firewall_rule_block_unmetered">非收费网络（ WiFi ）</string>

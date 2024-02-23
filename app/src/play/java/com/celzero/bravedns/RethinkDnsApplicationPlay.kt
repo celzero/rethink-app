@@ -41,6 +41,7 @@ class RethinkDnsApplicationPlay : Application() {
 
         get<WorkScheduler>().scheduleAppExitInfoCollectionJob()
         get<ScheduleManager>().scheduleDatabaseRefreshJob()
+        get<WorkScheduler>().scheduleDataUsageJob()
         get<WorkScheduler>().schedulePurgeConnectionsLog()
     }
 }

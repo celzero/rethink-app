@@ -93,21 +93,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/cda_trust_desc_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/cda_search_container"
-                app:drawableStartCompat="@drawable/ic_info_white"
-                android:drawablePadding="10dp"
-                android:layout_marginBottom="10dp"
-                android:gravity="center_vertical"
-                android:paddingStart="10dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="10dp"
-                android:text="@string/trusted_domains_desc"
-                android:textSize="@dimen/default_font_text_view" />
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView

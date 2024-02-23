@@ -8,13 +8,16 @@ import android.text.TextUtils
 import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Protocol
+import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import inet.ipaddr.IPAddressString
 import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 class ConnectionTracer(ctx: Context) {
 
@@ -25,6 +28,7 @@ class ConnectionTracer(ctx: Context) {
         private const val DNS_KEY = "17|10.111.222.1|10.111.222.3|53"
         private const val SEPARATOR = "|"
     }
+
     private val cm: ConnectivityManager
     private val uidCache: Cache<String, Int>
 
@@ -50,7 +54,7 @@ class ConnectionTracer(ctx: Context) {
     ): Int {
         var uid = Constants.INVALID_UID
         // android.googlesource.com/platform/development/+/da84168fb/ndk/platforms/android-21/include/linux/in.h
-        if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) {
+        if (protocol != Protocol.TCP.protocolType && protocol != Protocol.UDP.protocolType) {
             return uid
         }
         val local: InetSocketAddress
@@ -74,14 +78,14 @@ class ConnectionTracer(ctx: Context) {
         } catch (ignored: SecurityException) {
             return uid
         }
-        val key = makeCacheKey(protocol, local, remote, destPort)
+        val key = makeCacheKey(protocol, local, remote)
         try {
             // executing inside a coroutine to avoid the NetworkOnMainThreadException issue#853
             runBlocking(Dispatchers.IO) { uid = cm.getConnectionOwnerUid(protocol, local, remote) }
 
             if (DEBUG)
                 Log.d(
-                    LoggerConstants.LOG_TAG_VPN,
+                    LOG_TAG_VPN,
                     "getConnectionOwnerUid(): $uid, $key, ${uidCache.getIfPresent(key)}, ${local.address.hostAddress}, ${remote.address.hostAddress}"
                 )
             if (uid != Constants.INVALID_UID) {
@@ -89,30 +93,62 @@ class ConnectionTracer(ctx: Context) {
                 return uid
             }
         } catch (secEx: SecurityException) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "err getUidQ: " + secEx.message, secEx)
+            Log.e(LOG_TAG_VPN, "err getUidQ: " + secEx.message, secEx)
         } catch (ex: InterruptedException) { // InterruptedException is thrown by runBlocking
-            Log.e(LoggerConstants.LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
+            Log.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         } catch (ex: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
+            Log.e(LOG_TAG_VPN, "err getUidQ: " + ex.message, ex)
         }
+
+        if (retryRequired(uid, protocol, destIp)) {
+            // change the destination IP to unspecified IP and try again for unconnected UDP
+            val dip =
+                if (IPAddressString(destIp).isIPv6) {
+                    Constants.UNSPECIFIED_IP_IPV6
+                } else {
+                    Constants.UNSPECIFIED_IP_IPV4
+                }
+            val dport = 0
+            val res = getUidQ(protocol, sourceIp, sourcePort, dip, dport)
+            if (DEBUG)
+                Log.d(
+                    LOG_TAG_VPN,
+                    "retrying with: $protocol, $sourceIp, $sourcePort, $dip, $dport old($destIp, $destPort), res: $res"
+                )
+            return res
+        }
+
         // If the uid is not in connectivity manager, then return the uid from cache.
         uid = uidCache.getIfPresent(key) ?: Constants.INVALID_UID
         return uid
+    }
+
+    // handle unconnected UDP requests
+    private fun retryRequired(uid: Int, protocol: Int, destIp: String): Boolean {
+        if (uid != Constants.INVALID_UID) { // already got the uid, no need to retry
+            return false
+        }
+        // no need to retry for protocols other than UDP
+        if (protocol != Protocol.UDP.protocolType) {
+            return false
+        }
+
+        // no need to retry for unspecified IP, as it is already tried
+        return !isUnspecifiedIp(destIp)
     }
 
     private fun addUidToCache(key: String, uid: Int) {
         // do not cache the DNS request (key: 17|10.111.222.1|10.111.222.3|53)
         if (key == DNS_KEY) return
 
-        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
+        if (DEBUG) Log.d(LOG_TAG_VPN, "getConnectionOwnerUid(): $uid, $key")
         uidCache.put(key, uid)
     }
 
     private fun makeCacheKey(
         protocol: Int,
         local: InetSocketAddress,
-        remote: InetSocketAddress,
-        destPort: Int
+        remote: InetSocketAddress
     ): String {
         return protocol.toString() +
             SEPARATOR +
@@ -120,6 +156,6 @@ class ConnectionTracer(ctx: Context) {
             SEPARATOR +
             remote.address.hostAddress +
             SEPARATOR +
-            destPort
+            remote.port
     }
 }

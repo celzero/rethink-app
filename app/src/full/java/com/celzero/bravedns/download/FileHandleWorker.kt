@@ -29,9 +29,10 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.calculateMd5
+import com.celzero.bravedns.util.Utilities.getTagValueFromJson
 import com.celzero.bravedns.util.Utilities.hasLocalBlocklists
 import com.celzero.bravedns.util.Utilities.localBlocklistFileDownloadPath
-import dnsx.Dnsx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -177,24 +178,24 @@ class FileHandleWorker(val context: Context, workerParameters: WorkerParameters)
                     LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     timestamp
                 )
-            val braveDNS =
-                Dnsx.newBraveDNSLocal(
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG
-                )
+            val tdmd5 = calculateMd5(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD)
+            val rdmd5 = calculateMd5(path + Constants.ONDEVICE_BLOCKLIST_FILE_RD)
+            val remoteTdmd5 =
+                getTagValueFromJson(path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG, "tdmd5")
+            val remoteRdmd5 =
+                getTagValueFromJson(path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG, "rdmd5")
             if (DEBUG)
-                Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid? ${braveDNS != null}")
-            return braveDNS != null
+                Log.d(
+                    LOG_TAG_DOWNLOAD,
+                    "tdmd5: $tdmd5, rdmd5: $rdmd5, remotetd: $remoteTdmd5, remoterd: $remoteRdmd5"
+                )
+            val isDownloadValid = tdmd5 == remoteTdmd5 && rdmd5 == remoteRdmd5
+            Log.i(LOG_TAG_DOWNLOAD, "AppDownloadManager, isDownloadValid? $isDownloadValid")
+            return isDownloadValid
         } catch (e: Exception) {
-            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception: ${e.message}", e)
+            Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager, isDownloadValid err: ${e.message}", e)
         }
         return false
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch { f() }
     }
 
     private fun ui(f: suspend () -> Unit) {

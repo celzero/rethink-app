@@ -19,6 +19,7 @@
 package com.celzero.bravedns.wireguard
 
 import com.celzero.bravedns.wireguard.BadConfigException.*
+import inet.ipaddr.IPAddressString
 import ipn.Ipn
 import ipn.Key
 import java.util.*
@@ -35,6 +36,7 @@ class Peer private constructor(builder: Builder) {
     val id: Int = 0
     private val allowedIps: Set<InetNetwork>
     private val endpoint: Optional<InetEndpoint>
+    private val unresolvedEndpoint: Optional<String>
 
     /**
      * Returns the peer's persistent keepalive.
@@ -50,6 +52,7 @@ class Peer private constructor(builder: Builder) {
         allowedIps =
             Collections.unmodifiableSet(LinkedHashSet<Any?>(builder.allowedIps)) as Set<InetNetwork>
         endpoint = builder.endpoint
+        unresolvedEndpoint = builder.unresolvedEndpoint
         persistentKeepalive = builder.persistentKeepalive
         preSharedKey = builder.preSharedKey
         publicKey = Objects.requireNonNull(builder.publicKey, "Peers must have a public key")!!
@@ -60,6 +63,7 @@ class Peer private constructor(builder: Builder) {
         val other = obj
         return allowedIps == other.allowedIps &&
             endpoint == other.endpoint &&
+            unresolvedEndpoint == other.unresolvedEndpoint &&
             persistentKeepalive == other.persistentKeepalive &&
             preSharedKey == other.preSharedKey &&
             publicKey == other.publicKey
@@ -84,6 +88,10 @@ class Peer private constructor(builder: Builder) {
         return endpoint
     }
 
+    fun getEndpointText(): Optional<String> {
+        return unresolvedEndpoint
+    }
+
     /**
      * Returns the peer's pre-shared key.
      *
@@ -106,6 +114,7 @@ class Peer private constructor(builder: Builder) {
         var hash = 1
         hash = 31 * hash + allowedIps.hashCode()
         hash = 31 * hash + endpoint.hashCode()
+        hash = 31 * hash + unresolvedEndpoint.hashCode()
         hash = 31 * hash + persistentKeepalive.hashCode()
         hash = 31 * hash + preSharedKey.hashCode()
         hash = 31 * hash + publicKey.hashCode()
@@ -142,6 +151,7 @@ class Peer private constructor(builder: Builder) {
                 sb.append("Endpoint = ").append(ep).append('\n')
             }
         )
+        unresolvedEndpoint.ifPresent { sb.append("Endpoint = ").append(it).append('\n') }
         persistentKeepalive.ifPresent { pk: Int? ->
             sb.append("PersistentKeepalive = ").append(pk).append('\n')
         }
@@ -168,6 +178,7 @@ class Peer private constructor(builder: Builder) {
         endpoint.flatMap<Any>(InetEndpoint::getResolved).ifPresent { ep: Any? ->
             sb.append("endpoint=").append(ep).append('\n')
         }
+        unresolvedEndpoint.ifPresent { sb.append("endpoint=").append(it).append('\n') }
         persistentKeepalive.ifPresent { pk: Int? ->
             sb.append("persistent_keepalive_interval=").append(pk).append('\n')
         }
@@ -185,6 +196,9 @@ class Peer private constructor(builder: Builder) {
         var endpoint: Optional<InetEndpoint> = Optional.empty<InetEndpoint>()
 
         // Defaults to not present.
+        var unresolvedEndpoint: Optional<String> = Optional.empty<String>()
+
+        // Defaults to not present.
         var persistentKeepalive = Optional.empty<Int>()
 
         // Defaults to not present.
@@ -192,6 +206,7 @@ class Peer private constructor(builder: Builder) {
 
         // No default; must be provided before building.
         var publicKey: Key? = null
+
         fun addAllowedIp(allowedIp: InetNetwork): Builder {
             allowedIps.add(allowedIp)
             return this
@@ -230,8 +245,26 @@ class Peer private constructor(builder: Builder) {
         fun parseEndpoint(endpoint: String): Builder {
             return try {
                 setEndpoint(InetEndpoint.parse(endpoint))
+                // add the domain name to the unresolved endpoint
+                parseUnresolvedEndpoint(endpoint)
             } catch (e: ParseException) {
                 throw BadConfigException(Section.PEER, Location.ENDPOINT, e)
+            }
+        }
+
+        @Throws(BadConfigException::class)
+        fun parseUnresolvedEndpoint(d: String): Builder {
+            return try {
+                if (d.isEmpty()) return this
+
+                val ip = IPAddressString(d)
+                if (ip.isIPv4 || ip.isIPv6) return this
+
+                setUnresolvedEndpoint(d)
+                this
+            } catch (e: Exception) {
+                setUnresolvedEndpoint(d)
+                this
             }
         }
 
@@ -271,6 +304,11 @@ class Peer private constructor(builder: Builder) {
 
         fun setEndpoint(endpoint: InetEndpoint): Builder {
             this.endpoint = Optional.of<InetEndpoint>(endpoint)
+            return this
+        }
+
+        fun setUnresolvedEndpoint(endpointText: String): Builder {
+            this.unresolvedEndpoint = Optional.of<String>(endpointText)
             return this
         }
 
@@ -325,7 +363,7 @@ class Peer private constructor(builder: Builder) {
                             line
                         )
                     }
-                when (attribute.key.toLowerCase(Locale.ENGLISH)) {
+                when (attribute.key.lowercase(Locale.ENGLISH)) {
                     "allowedips" -> builder.parseAllowedIPs(attribute.value)
                     "endpoint" -> builder.parseEndpoint(attribute.value)
                     "persistentkeepalive" -> builder.parsePersistentKeepalive(attribute.value)

@@ -3,15 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage" />
 
-    <application android:name=".RethinkDnsApplication"
+    <application
+        android:name=".RethinkDnsApplication"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/AppThemeInitial">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
 
         <activity
-            android:name=".ui.FirewallActivity"
+            android:name=".ui.activity.FirewallActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.HomeScreenActivity"
@@ -38,62 +44,65 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.DnsDetailActivity"
+            android:name=".ui.activity.DnsDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WelcomeActivity"
+            android:name=".ui.activity.WelcomeActivity"
             android:finishOnTaskLaunch="true"
             android:noHistory="true" />
         <activity
-            android:name=".ui.AppInfoActivity"
+            android:name=".ui.activity.AppInfoActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.PauseActivity"
+            android:name=".ui.activity.PauseActivity"
             android:launchMode="singleInstance" />
         <activity
-            android:name=".ui.DnsListActivity"
+            android:name=".ui.activity.DnsListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.CustomRulesActivity"
+            android:name=".ui.activity.CustomRulesActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.ConfigureRethinkBasicActivity"
+            android:name=".ui.activity.ConfigureRethinkBasicActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.ProxySettingsActivity"
+            android:name=".ui.activity.ProxySettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.MiscSettingsActivity"
+            android:name=".ui.activity.MiscSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.TunnelSettingsActivity"
+            android:name=".ui.activity.TunnelSettingsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.AppListActivity"
+            android:name=".ui.activity.AppListActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.DetailedStatisticsActivity"
+            android:name=".ui.activity.DetailedStatisticsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.NetworkLogsActivity"
+            android:name=".ui.activity.NetworkLogsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WgMainActivity"
+            android:name=".ui.activity.WgMainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WgConfigEditorActivity"
+            android:name=".ui.activity.WgConfigEditorActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.WgConfigDetailActivity"
+            android:name=".ui.activity.WgConfigDetailActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.CheckoutActivity"
+            android:name=".ui.activity.CheckoutActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.TcpProxyMainActivity"
+            android:name=".ui.activity.TcpProxyMainActivity"
             android:finishOnTaskLaunch="true" />
         <activity
-            android:name=".ui.UniversalFirewallSettingsActivity"
+            android:name=".ui.activity.UniversalFirewallSettingsActivity"
+            android:finishOnTaskLaunch="true" />
+        <activity
+            android:name=".ui.activity.ConfigureOtherDnsActivity"
             android:finishOnTaskLaunch="true" />
         <activity
             android:name=".ui.NotificationHandlerDialog"
@@ -105,13 +114,19 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
+        <activity
+            android:name=".ui.activity.AlertsActivity"
+            android:finishOnTaskLaunch="true"  />
 
         <receiver
             android:name=".receiver.BraveAutoStartReceiver"
             android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
+            android:directBootAware="false"
             android:label="@string/app_name">
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>

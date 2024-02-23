@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/background"
     android:orientation="vertical"
-    tools:context=".ui.DnsDetailActivity">
+    tools:context=".ui.activity.DnsDetailActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/dns_detail_act_tabLayout"

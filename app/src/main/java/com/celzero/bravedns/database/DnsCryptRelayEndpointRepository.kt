@@ -15,10 +15,6 @@ limitations under the License.
 */
 package com.celzero.bravedns.database
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 class DnsCryptRelayEndpointRepository(
     private val dnsCryptRelayEndpointDAO: DnsCryptRelayEndpointDAO
 ) {
@@ -27,11 +23,8 @@ class DnsCryptRelayEndpointRepository(
         dnsCryptRelayEndpointDAO.update(dnsCryptRelayEndpoint)
     }
 
-    suspend fun insertAsync(
-        dnsCryptRelayEndpoint: DnsCryptRelayEndpoint,
-        coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-    ) {
-        coroutineScope.launch { dnsCryptRelayEndpointDAO.insert(dnsCryptRelayEndpoint) }
+    suspend fun insertAsync(dnsCryptRelayEndpoint: DnsCryptRelayEndpoint) {
+        dnsCryptRelayEndpointDAO.insert(dnsCryptRelayEndpoint)
     }
 
     suspend fun deleteOlderData(date: Long) {

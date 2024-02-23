@@ -193,7 +193,14 @@ enum class FirewallRuleset(val id: String, val title: Int, val desc: Int, val ac
         R.string.firewall_rule_proxied,
         R.string.firewall_rule_proxied_desc,
         R.integer.allow
-    );
+    ),
+    RULE13(
+        "No route available",
+        R.string.firewall_rule_block_app,
+        R.string.firewall_rule_block_app_desc,
+        R.integer.stall
+    ),
+    ;
 
     companion object {
         fun getFirewallRule(ruleId: String): FirewallRuleset? {

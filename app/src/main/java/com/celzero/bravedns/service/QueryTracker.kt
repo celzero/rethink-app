@@ -18,55 +18,35 @@ package com.celzero.bravedns.service
 
 import android.text.TextUtils
 import com.celzero.bravedns.net.doh.Transaction
-import com.celzero.bravedns.util.P2QuantileEstimation
-import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
+import dnsx.Dnsx
 
-/**
- * A class for tracking DNS transactions. This class counts the number of successful transactions,
- * records the last minute of query timestamps, and optionally maintains a history of recent
- * transactions. Thread-safe.
- */
-class QueryTracker(private var persistentState: PersistentState) {
+class QueryTracker(val persistentState: PersistentState) {
 
     private var numRequests: Long = 0
-    private var quantileEstimator: P2QuantileEstimation? = null
-
-    init {
-        reinitializeQuantileEstimator()
-    }
 
     companion object {
-        private const val HISTORY_SIZE = 1000
+        private const val HISTORY_SIZE = 20
     }
 
-    private fun reinitializeQuantileEstimator() {
-        quantileEstimator = P2QuantileEstimation(0.5)
-        numRequests = 1
-    }
-
-    fun recordTransaction(transaction: Transaction) {
+    suspend fun refreshLatencyIfNeeded(transaction: Transaction) {
         // if server-ip is nil and blocklists are not empty, skip because this tx was resolved
         // locally
         if (TextUtils.isEmpty(transaction.serverName) && !TextUtils.isEmpty(transaction.blocklist))
             return
         ++numRequests
-        if (numRequests % HISTORY_SIZE == 0L) {
-            reinitializeQuantileEstimator()
+        if (
+            numRequests % HISTORY_SIZE == 0L ||
+                persistentState.median.value == null ||
+                persistentState.median.value == 0L
+        ) {
+            refreshP50Latency(transaction.id)
         }
-        sync(transaction)
     }
 
-    fun sync(transaction: Transaction?) {
-        if (
-            transaction == null ||
-                transaction.serverName.isEmpty() ||
-                isUnspecifiedIp(transaction.serverName) ||
-                transaction.status != Transaction.Status.COMPLETE
-        ) {
-            return
-        }
-        // Restore number of requests from storage, or 0 if it isn't defined yet.
-        quantileEstimator!!.addValue(transaction.responseTime.toDouble())
-        persistentState.setMedianLatency(quantileEstimator!!.getQuantile())
+    private suspend fun refreshP50Latency(id: String) {
+        // Dnsx.Local is multicast DNS, ignore its latency
+        if (id == Dnsx.Local) return
+
+        VpnController.syncP50Latency(id)
     }
 }

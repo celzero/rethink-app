@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.celzero.bravedns.R
-import com.celzero.bravedns.service.FirewallManager
 
 @Entity(tableName = "DNSProxyEndpoint")
 class DnsProxyEndpoint {
@@ -76,18 +75,17 @@ class DnsProxyEndpoint {
         return isCustom && !isSelected
     }
 
-    fun getExplanationText(context: Context): String {
+    fun getExplanationText(context: Context, appName: String): String {
         // if selected, add forwarding to the text..
         return if (this.isSelected) {
             // don't show the app name if there is no app selected, earlier "Nobody" was labelled
             // for no app.
             if (this.proxyAppName != context.getString(R.string.cd_custom_dns_proxy_default_app)) {
-                val app = FirewallManager.getAppInfoByPackage(this.proxyAppName)?.appName
                 context.getString(
                     R.string.settings_socks_forwarding_desc,
                     this.proxyIP,
                     this.proxyPort.toString(),
-                    app
+                    appName
                 )
             } else {
                 context.getString(
@@ -98,12 +96,11 @@ class DnsProxyEndpoint {
             }
         } else {
             if (this.proxyAppName != context.getString(R.string.cd_custom_dns_proxy_default_app)) {
-                val app = FirewallManager.getAppInfoByPackage(this.proxyAppName)?.appName
                 context.getString(
                     R.string.dns_proxy_desc,
                     this.proxyIP,
                     this.proxyPort.toString(),
-                    app
+                    appName
                 )
             } else {
                 context.getString(

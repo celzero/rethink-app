@@ -61,8 +61,7 @@ class RemoteFileTagUtil : KoinComponent {
                     context,
                     Constants.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME,
                     timestamp
-                )
-                    ?: return null
+                ) ?: return null
             if (!dir.exists()) {
                 dir.mkdirs()
             }

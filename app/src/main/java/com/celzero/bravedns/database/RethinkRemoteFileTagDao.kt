@@ -17,7 +17,13 @@
 package com.celzero.bravedns.database
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.celzero.bravedns.data.FileTag
 
 @Dao
@@ -33,12 +39,12 @@ interface RethinkRemoteFileTagDao {
     fun insertAll(fileTag: List<RethinkRemoteFileTag>): LongArray
 
     @Query(
-        "select * from RethinkRemoteFileTag where case when isSelected = 1 then pack like '%%' else pack not like '%\"dead\"%' end order by `group`"
+        "select * from RethinkRemoteFileTag where case when isSelected = 1 then pack like '%%' else (pack not like '%dead%' and pack not like '%ignore%') end order by `group` desc"
     )
     fun getRemoteFileTags(): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) and (pack not like '%dead%' and pack not like '%ignore%') order by `group` desc"
     )
     fun getRemoteFileTags(
         query: String,
@@ -47,7 +53,7 @@ interface RethinkRemoteFileTagDao {
     ): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and (vname like :query or `group` like :query or subg like :query) order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and (vname like :query or `group` like :query or subg like :query) and (pack not like '%dead%' and pack not like '%ignore%') order by `group` desc"
     )
     fun getRemoteFileTagsGroup(
         query: String,
@@ -55,7 +61,7 @@ interface RethinkRemoteFileTagDao {
     ): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) and case when isSelected = 1 then pack like '%%' else pack not like '%\"dead\"%' end order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and subg in (:subg) and (vname like :query or `group` like :query or subg like :query) and case when isSelected = 1 then pack like '%%' else (pack not like '%dead%' and pack not like '%ignore%') end order by `group` desc"
     )
     fun getRemoteFileTagsSubg(
         query: String,
@@ -64,13 +70,13 @@ interface RethinkRemoteFileTagDao {
     ): PagingSource<Int, RethinkRemoteFileTag>
 
     @Query(
-        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, level, simpleTagId, isSelected from RethinkRemoteFileTag order by `group`"
+        "select value, uname, vname, `group`, subg, url as urls, show, entries, pack, level, simpleTagId, isSelected from RethinkRemoteFileTag order by `group` desc"
     )
     fun getAllTags(): List<FileTag>
 
     @Transaction
     @Query(
-        "select * from RethinkRemoteFileTag where isSelected in (:selected) and (vname like :input or `group` like :input or subg like :input) and case when isSelected = 1 then pack like '%%' else pack not like '%\"dead\"%' end order by `group`"
+        "select * from RethinkRemoteFileTag where isSelected in (:selected) and (vname like :input or `group` like :input or subg like :input) and case when isSelected = 1 then pack like '%%' else (pack not like '%dead%' and pack not like '%ignore%') end order by `group` desc"
     )
     fun getRemoteFileTagsWithFilter(
         input: String,

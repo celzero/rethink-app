@@ -39,7 +39,9 @@ class BraveAutoStartReceiver : BroadcastReceiver(), KoinComponent {
         }
 
         if (
-            Intent.ACTION_REBOOT != intent.action && Intent.ACTION_BOOT_COMPLETED != intent.action
+            Intent.ACTION_REBOOT != intent.action &&
+                Intent.ACTION_BOOT_COMPLETED != intent.action &&
+                Intent.ACTION_LOCKED_BOOT_COMPLETED != intent.action
         ) {
             Log.w(LOG_TAG_VPN, "unhandled broadcast ${intent.action}")
             return

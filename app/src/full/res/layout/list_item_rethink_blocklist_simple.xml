@@ -21,7 +21,7 @@
             android:paddingTop="5dp"
             android:paddingEnd="5dp"
             android:textColor="?attr/accentBad"
-            android:textSize="@dimen/heading_font_text_view"
+            android:textSize="@dimen/home_screen_stat_text"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatTextView

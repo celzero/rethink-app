@@ -168,7 +168,6 @@
     <string name="download_update_dialog_failure_message" translatable="true">Albo nasze serwery są wyłączone, albo nie można nawiązać połączenia. Spróbuj ponownie za jakiś czas.</string>
     <string name="app_mode_wireguard" translatable="true">VPN</string>
     <string name="info_dialog_copy_toast_msg" translatable="true">Zkopiowano adres IP.</string>
-    <string name="whats_dialog_title" translatable="true">Co nowego w wersji v055a</string>
     <string name="settings_vpn_heading" translatable="true">vpn</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">Z kopiowano URL</string>
     <string name="blocklist_update_check_failure" translatable="true">Coś poszło nie tak. Spróbuj ponownie później!</string>
@@ -296,7 +295,6 @@
     <string name="hsf_exclude_error" translatable="true">Wykluczenie nie jest możliwe w trybie blokady VPN</string>
     <string name="hsf_proxy_chip_remove_text" translatable="true">Zatrzymywanie…</string>
     <string name="hsf_chip_appearance" translatable="true">Temat: %1$s</string>
-    <string name="hsf_pause_lockdown_failure" translatable="true">Nie można wstrzymać: Rethink jest w trybie blokady</string>
     <string name="about_docs" translatable="true">Przeczytaj dokumenty</string>
     <string name="about_privacy_policy" translatable="true">Polityka prywatności</string>
     <string name="about_connect" translatable="true">kontakt</string>
@@ -397,7 +395,6 @@
     <string name="fapps_firewall_filter_excluded" translatable="true">Wykluczony</string>
     <string name="fapps_unmetered_block_dialog_message" translatable="true">Zablokować połączenia w sieci WiFi dla <i>wymienionych</i> aplikacji\?</string>
     <string name="fapps_metered_block_dialog_message" translatable="true">Zablokować połączenia w sieci taryfowej (komórkowej) dla <i>wymienionych</i> aplikacji\?</string>
-    <string name="fapps_lockdown_hint" translatable="true">VPN jest w trybie blokady. Firewall nie będzie honorować reguł mierzonych/niezmierzonych.</string>
     <string name="fapps_firewall_filter_hint" translatable="true">Wyświetlam wszystkie aplikacje</string>
     <string name="fapps_firewall_filter_desc" translatable="true">Wyświetlanie <u>%1$s</u> %2$s aplikacji</string>
     <string name="rules_load_failure_desc" translatable="true">Nie znaleziono żadnych reguł firewalla</string>

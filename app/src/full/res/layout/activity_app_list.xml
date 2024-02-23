@@ -214,26 +214,11 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/firewall_app_lockdown_hint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/ffa_toggle_all_container"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:fontFamily="sans-serif"
-        android:padding="5dp"
-        android:text="@string/fapps_lockdown_hint"
-        android:textColor="?attr/accentBad"
-        android:textSize="@dimen/default_font_text_view"
-        android:textStyle="italic"
-        android:visibility="visible" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ffa_app_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/firewall_app_lockdown_hint"
+        android:layout_below="@id/ffa_search_view_top"
         android:layout_marginStart="2dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="2dp"

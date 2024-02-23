@@ -74,9 +74,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
         var paymentStatus = TcpProxyHelper.PaymentStatus.INITIATED
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder(
-                        RetrofitManager.Companion.OkHttpDnsType.DEFAULT
-                    )
+                RetrofitManager.getTcpProxyBaseBuilder()
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)

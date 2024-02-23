@@ -20,8 +20,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.SpinnerItemFirewallStatusBinding
 
@@ -71,7 +71,7 @@ class FirewallStatusSpinnerAdapter(val context: Context, private val spinnerLabe
     private fun setItem(view: View, status: String?) {
         if (status == null) return
 
-        val tv = view.findViewById<TextView>(R.id.spinner_text)
+        val tv = view.findViewById<AppCompatTextView>(R.id.spinner_text)
         val iv = view.findViewById<AppCompatImageView>(R.id.spinner_icon)
         tv.text = status
         // do not show down arrow on drop down

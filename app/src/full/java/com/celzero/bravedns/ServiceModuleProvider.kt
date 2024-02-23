@@ -30,7 +30,7 @@ import org.koin.dsl.module
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-private val RootModule = module { single<ContentResolver> { androidContext().contentResolver } }
+private val rootModule = module { single<ContentResolver> { androidContext().contentResolver } }
 private val updaterModule = module {
     single { NonStoreAppUpdater(Constants.RETHINK_APP_UPDATE_CHECK, get()) }
     single<AppUpdater> { get<NonStoreAppUpdater>() }
@@ -50,7 +50,7 @@ private val schedulerModule = module { single { ScheduleManager(androidContext()
 
 val AppModules: List<Module> by lazy {
     mutableListOf<Module>().apply {
-        add(RootModule)
+        add(rootModule)
         addAll(DatabaseModule.modules)
         addAll(ViewModelModule.modules)
         addAll(DataModule.modules)

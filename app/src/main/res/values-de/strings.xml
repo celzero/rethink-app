@@ -159,7 +159,6 @@
     <string name="search_custom_domains"><font size="12">Domänennamen suchen</font></string>
     <string name="search_rethinkplus_file_tag"><font size="12">Suche in Blocklisten</font></string>
     <string name="app_mode_choose">Modus wählen</string>
-    <string name="whats_dialog_title">Was ist neu in v055a</string>
     <string name="whats_new_version_update">&lt;b&gt;LAN-Party!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Neue Funktion&lt;/i&gt;: Private IPs (LAN / link-local) ausschließen.&lt;br/&gt; 2. Die Einstellung zum Umgehen der DNS &amp; Firewall zum Funktionieren bringen.&lt;br/&gt; 3. Vielleicht Blockiert in den DNS Logs anzeigen für Domänen, die eventuell von der Firewall blockiert werden.&lt;br/&gt; 4. Adaptives Icon wo unterstützt anzeigen.&lt;br/&gt; 5. Biometrische Authentifizierung fragt alle 15 Minuten.&lt;br/&gt; 6. Und andere kleinere Benutzeroberflächen-Änderungen und Performance Verbesserungen.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Helfen Sie uns dies App zu übersetzen&lt;/a&gt;</string>
     <string name="connection_http3">HTTP3</string>
     <string name="relative_time_today">Heute</string>
@@ -546,7 +545,6 @@
     <string name="hsf_blocklist_updating_text">Aktivieren…</string>
     <string name="hsf_chip_appearance">Thema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Kann nicht pausieren: Rethink nicht aktiv</string>
-    <string name="hsf_pause_lockdown_failure">Kann nicht pausieren: Rethink im Lockdown-Modus</string>
     <string name="dc_block_heading">Regeln</string>
     <string name="dc_other_dns_heading">Typ</string>
     <string name="about_bravedns_whoarewe">Rethink ist ein freies und quelloffenes Projekt, das von ehemaligen Ingenieuren von Amazon, IBM und Scientific Games geleitet wird.</string>
@@ -787,7 +785,6 @@
     <string name="copy_clipboard_label">URL</string>
     <string name="fapps_unmetered_block_dialog_title" translatable="true">Blockieren auf nicht getakteten Verbindung</string>
     <string name="fapps_info_metered_msg" translatable="true">Zulassen / Blockieren im getakteten (mobilen) Netzwerk.</string>
-    <string name="fapps_lockdown_hint" translatable="true">VPN befindet sich im Sperrmodus. Die Firewall berücksichtigt keine Metered/Unmetered-Regeln.</string>
     <string name="ssv_toast_start_rethink" description="This label will appear on the stats screen as toast to start Rethink app" translatable="true">Starten Sie Rethink, um fortzufahren</string>
     <string name="lbl_wildcard" translatable="true">Wildcard</string>
     <string name="lbl_allowed" translatable="true">Erlaubt</string>

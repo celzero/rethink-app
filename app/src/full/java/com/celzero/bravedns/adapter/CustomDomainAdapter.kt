@@ -29,6 +29,8 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -42,7 +44,7 @@ import com.celzero.bravedns.service.DomainRulesManager
 import com.celzero.bravedns.service.DomainRulesManager.isValidDomain
 import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.CustomRulesActivity
+import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -51,6 +53,9 @@ import com.celzero.bravedns.util.Utilities
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RULES) :
     PagingDataAdapter<CustomDomain, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
@@ -133,28 +138,30 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     }
 
     private fun changeDomainStatus(id: DomainRulesManager.Status, cd: CustomDomain) {
-        when (id) {
-            DomainRulesManager.Status.NONE -> {
-                noRule(cd)
-            }
-            DomainRulesManager.Status.BLOCK -> {
-                block(cd)
-            }
-            DomainRulesManager.Status.TRUST -> {
-                whitelist(cd)
+        io {
+            when (id) {
+                DomainRulesManager.Status.NONE -> {
+                    noRule(cd)
+                }
+                DomainRulesManager.Status.BLOCK -> {
+                    block(cd)
+                }
+                DomainRulesManager.Status.TRUST -> {
+                    whitelist(cd)
+                }
             }
         }
     }
 
-    private fun whitelist(cd: CustomDomain) {
+    private suspend fun whitelist(cd: CustomDomain) {
         DomainRulesManager.whitelist(cd)
     }
 
-    private fun block(cd: CustomDomain) {
+    private suspend fun block(cd: CustomDomain) {
         DomainRulesManager.block(cd)
     }
 
-    private fun noRule(cd: CustomDomain) {
+    private suspend fun noRule(cd: CustomDomain) {
         DomainRulesManager.noRule(cd)
     }
 
@@ -215,7 +222,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         builder.setMessage(R.string.cd_remove_dialog_message)
         builder.setCancelable(true)
         builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
-            DomainRulesManager.deleteDomain(customDomain)
+            io { DomainRulesManager.deleteDomain(customDomain) }
             Utilities.showToastUiCentered(
                 context,
                 context.getString(R.string.cd_toast_deleted),
@@ -232,7 +239,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     private fun showEditDomainDialog(customDomain: CustomDomain) {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setTitle(context.getString(R.string.cd_dialog_title))
+        dialog.setTitle(context.getString(R.string.cd_dialog_edit_title))
         val dBind =
             DialogAddCustomDomainBinding.inflate((context as CustomRulesActivity).layoutInflater)
         dialog.setContentView(dBind.root)
@@ -295,7 +302,6 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
         dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
         dialog.window?.attributes = lp
 
         dBind.dacdUrlTitle.text = context.getString(R.string.cd_dialog_title)
@@ -349,66 +355,85 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             }
         }
 
-        insertDomain(Utilities.removeLeadingAndTrailingDots(url), selectedType, prevDomain, status)
+        io {
+            insertDomain(
+                Utilities.removeLeadingAndTrailingDots(url),
+                selectedType,
+                prevDomain,
+                status
+            )
+        }
     }
 
-    private fun insertDomain(
+    private suspend fun insertDomain(
         domain: String,
         type: DomainRulesManager.DomainType,
         prevDomain: CustomDomain,
         status: DomainRulesManager.Status
     ) {
         DomainRulesManager.updateDomainRule(domain, status, type, prevDomain)
-        Utilities.showToastUiCentered(
-            context,
-            context.getString(R.string.cd_toast_added),
-            Toast.LENGTH_SHORT
-        )
+        uiCtx {
+            Utilities.showToastUiCentered(
+                context,
+                context.getString(R.string.cd_toast_edit),
+                Toast.LENGTH_SHORT
+            )
+        }
     }
 
     inner class CustomDomainViewHolderWithHeader(private val b: ListItemCustomAllDomainBinding) :
         RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customDomain: CustomDomain
+
         fun update(cd: CustomDomain) {
-            b.customDomainAppName.text = getAppName(cd.uid)
-            val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
-            displayIcon(
-                Utilities.getIcon(context, appInfo?.packageName ?: "", appInfo?.appName ?: ""),
-                b.customDomainAppIconIv
-            )
+            io {
+                val appInfo = FirewallManager.getAppInfoByUid(cd.uid)
+                val appNames = FirewallManager.getAppNamesByUid(cd.uid)
+                uiCtx {
+                    val appName = getAppName(cd.uid, appNames)
 
-            this.customDomain = cd
-            b.customDomainLabelTv.text = customDomain.domain
-            b.customDomainToggleGroup.tag = 1
+                    b.customDomainAppName.text = appName
+                    displayIcon(
+                        Utilities.getIcon(
+                            context,
+                            appInfo?.packageName ?: "",
+                            appInfo?.appName ?: ""
+                        ),
+                        b.customDomainAppIconIv
+                    )
 
-            // update toggle group button based on the status
-            updateToggleGroup(customDomain.status)
-            // whether to show the toggle group or not
-            toggleActionsUi()
-            // update status in desc and status flag (N/B/W)
-            updateStatusUi(
-                DomainRulesManager.Status.getStatus(customDomain.status),
-                customDomain.modifiedTs
-            )
+                    this.customDomain = cd
+                    b.customDomainLabelTv.text = customDomain.domain
+                    b.customDomainToggleGroup.tag = 1
 
-            b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
+                    // update toggle group button based on the status
+                    updateToggleGroup(customDomain.status)
+                    // whether to show the toggle group or not
+                    toggleActionsUi()
+                    // update status in desc and status flag (N/B/W)
+                    updateStatusUi(
+                        DomainRulesManager.Status.getStatus(customDomain.status),
+                        customDomain.modifiedTs
+                    )
 
-            b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
+                    b.customDomainToggleGroup.addOnButtonCheckedListener(domainRulesGroupListener)
 
-            b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
+                    b.customDomainEditIcon.setOnClickListener { showEditDomainDialog(customDomain) }
 
-            b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+                    b.customDomainExpandIcon.setOnClickListener { toggleActionsUi() }
+
+                    b.customDomainContainer.setOnClickListener { toggleActionsUi() }
+                }
+            }
         }
 
-        private fun getAppName(uid: Int): String {
+        private fun getAppName(uid: Int, appNames: List<String>): String {
             if (uid == Constants.UID_EVERYBODY) {
                 return context
                     .getString(R.string.firewall_act_universal_tab)
                     .replaceFirstChar(Char::titlecase)
             }
-
-            val appNames = FirewallManager.getAppNamesByUid(uid)
 
             if (appNames.isEmpty()) {
                 return context.getString(R.string.network_log_app_name_unnamed, "($uid)")
@@ -552,6 +577,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customDomain: CustomDomain
+
         fun update(cd: CustomDomain) {
             this.customDomain = cd
             b.customDomainLabelTv.text = customDomain.domain
@@ -696,5 +722,13 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
             b.customDomainStatusIcon.setTextColor(t.txtColor)
             b.customDomainStatusIcon.backgroundTintList = ColorStateList.valueOf(t.bgColor)
         }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 }

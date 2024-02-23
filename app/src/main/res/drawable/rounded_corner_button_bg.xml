@@ -4,6 +4,6 @@
     <solid android:color="?attr/homeScreenBtnBackground" />
     <corners android:radius="16dp" />
     <size
-        android:width="60dp"
-        android:height="60dp" />
+        android:width="48dp"
+        android:height="48dp" />
 </shape>

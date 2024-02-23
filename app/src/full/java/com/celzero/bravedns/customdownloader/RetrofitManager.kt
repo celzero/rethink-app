@@ -37,94 +37,90 @@ class RetrofitManager {
             FALLBACK_DNS
         }
 
-        fun getBlocklistBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
-            return Retrofit.Builder()
-                .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient(dnsType))
+        fun getBlocklistBaseBuilder(): Retrofit.Builder {
+            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient())
         }
 
-        fun getWarpBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
-            return Retrofit.Builder()
-                .baseUrl(Constants.DOWNLOAD_BASE_URL)
-                .client(okHttpClient(dnsType))
+        fun getWarpBaseBuilder(): Retrofit.Builder {
+            return Retrofit.Builder().baseUrl(Constants.DOWNLOAD_BASE_URL).client(okHttpClient())
         }
 
-        fun getTcpProxyBaseBuilder(dnsType: OkHttpDnsType): Retrofit.Builder {
-            return Retrofit.Builder()
-                .baseUrl(Constants.TCP_PROXY_BASE_URL)
-                .client(okHttpClient(dnsType))
+        fun getTcpProxyBaseBuilder(): Retrofit.Builder {
+            return Retrofit.Builder().baseUrl(Constants.TCP_PROXY_BASE_URL).client(okHttpClient())
         }
 
-        fun okHttpClient(dnsType: OkHttpDnsType): OkHttpClient {
+        fun okHttpClient(): OkHttpClient {
             val b = OkHttpClient.Builder()
             b.connectTimeout(1, TimeUnit.MINUTES)
             b.readTimeout(20, TimeUnit.MINUTES)
             b.writeTimeout(5, TimeUnit.MINUTES)
             b.retryOnConnectionFailure(true)
             // If unset, the system-wide default DNS will be used.
-            customDns(dnsType, b.build())?.let { b.dns(it) }
+            customDns(b.build())?.let { b.dns(it) }
             return b.build()
         }
 
         // As of now, quad9 is used as default dns in okhttp client.
-        private fun customDns(dnsType: OkHttpDnsType, bootstrapClient: OkHttpClient): Dns? {
-            try {
-                when (dnsType) {
-                    OkHttpDnsType.DEFAULT -> {
-                        return DnsOverHttps.Builder()
-                            .client(bootstrapClient)
-                            .url("https://dns.quad9.net/dns-query".toHttpUrl())
-                            .bootstrapDnsHosts(
-                                getByIp("9.9.9.9"),
-                                getByIp("149.112.112.112"),
-                                getByIp("2620:fe::9"),
-                                getByIp("2620:fe::fe")
-                            )
-                            .includeIPv6(true)
-                            .build()
+        private fun customDns(bootstrapClient: OkHttpClient): Dns? {
+            enumValues<OkHttpDnsType>().forEach {
+                try {
+                    when (it) {
+                        OkHttpDnsType.DEFAULT -> {
+                            return DnsOverHttps.Builder()
+                                .client(bootstrapClient)
+                                .url("https://dns.quad9.net/dns-query".toHttpUrl())
+                                .bootstrapDnsHosts(
+                                    getByIp("9.9.9.9"),
+                                    getByIp("149.112.112.112"),
+                                    getByIp("2620:fe::9"),
+                                    getByIp("2620:fe::fe")
+                                )
+                                .includeIPv6(true)
+                                .build()
+                        }
+                        OkHttpDnsType.CLOUDFLARE -> {
+                            return DnsOverHttps.Builder()
+                                .client(bootstrapClient)
+                                .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
+                                .bootstrapDnsHosts(
+                                    getByIp("1.1.1.1"),
+                                    getByIp("1.0.0.1"),
+                                    getByIp("2606:4700:4700::1111"),
+                                    getByIp("2606:4700:4700::1001")
+                                )
+                                .includeIPv6(true)
+                                .build()
+                        }
+                        OkHttpDnsType.GOOGLE -> {
+                            return DnsOverHttps.Builder()
+                                .client(bootstrapClient)
+                                .url("https://dns.google/dns-query".toHttpUrl())
+                                .bootstrapDnsHosts(
+                                    getByIp("8.8.8.8"),
+                                    getByIp("8.8.4.4"),
+                                    getByIp("2001:4860:4860:0:0:0:0:8888"),
+                                    getByIp("2001:4860:4860:0:0:0:0:8844")
+                                )
+                                .includeIPv6(true)
+                                .build()
+                        }
+                        OkHttpDnsType.SYSTEM_DNS -> {
+                            return Dns.SYSTEM
+                        }
+                        OkHttpDnsType.FALLBACK_DNS -> {
+                            // todo: return retrieved system dns
+                            return null
+                        }
                     }
-                    OkHttpDnsType.CLOUDFLARE -> {
-                        return DnsOverHttps.Builder()
-                            .client(bootstrapClient)
-                            .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
-                            .bootstrapDnsHosts(
-                                getByIp("1.1.1.1"),
-                                getByIp("1.0.0.1"),
-                                getByIp("2606:4700:4700::1111"),
-                                getByIp("2606:4700:4700::1001")
-                            )
-                            .includeIPv6(true)
-                            .build()
-                    }
-                    OkHttpDnsType.GOOGLE -> {
-                        return DnsOverHttps.Builder()
-                            .client(bootstrapClient)
-                            .url("https://dns.google/dns-query".toHttpUrl())
-                            .bootstrapDnsHosts(
-                                getByIp("8.8.8.8"),
-                                getByIp("8.8.4.4"),
-                                getByIp("2001:4860:4860:0:0:0:0:8888"),
-                                getByIp("2001:4860:4860:0:0:0:0:8844")
-                            )
-                            .includeIPv6(true)
-                            .build()
-                    }
-                    OkHttpDnsType.SYSTEM_DNS -> {
-                        return Dns.SYSTEM
-                    }
-                    OkHttpDnsType.FALLBACK_DNS -> {
-                        // todo: return retrieved system dns
-                        return null
-                    }
+                } catch (e: Exception) {
+                    Log.e(
+                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        "Exception while getting custom dns: ${e.message}",
+                        e
+                    )
                 }
-            } catch (e: Exception) {
-                Log.e(
-                    LoggerConstants.LOG_TAG_DOWNLOAD,
-                    "Exception while getting custom dns: ${e.message}",
-                    e
-                )
-                return null
             }
+            return null
         }
 
         private fun getByIp(ip: String): InetAddress {

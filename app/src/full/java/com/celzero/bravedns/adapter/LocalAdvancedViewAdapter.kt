@@ -27,7 +27,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RethinkLocalFileTag
 import com.celzero.bravedns.databinding.ListItemRethinkBlocklistAdvBinding
 import com.celzero.bravedns.service.RethinkBlocklistManager
-import com.celzero.bravedns.ui.RethinkBlocklistFragment
+import com.celzero.bravedns.ui.fragment.RethinkBlocklistFragment
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.openUrl
 import kotlinx.coroutines.CoroutineScope
@@ -83,6 +83,7 @@ class LocalAdvancedViewAdapter(val context: Context) :
         RecyclerView.ViewHolder(b.root) {
 
         fun update(filetag: RethinkLocalFileTag, position: Int) {
+            b.root.tag = getGroupName(filetag.group)
             displayHeaderIfNeeded(filetag, position)
             displayMetaData(filetag)
 
@@ -178,10 +179,23 @@ class LocalAdvancedViewAdapter(val context: Context) :
             if (position == 0 || getItem(position - 1)?.group != filetag.group) {
                 b.crpTitleLl.visibility = View.VISIBLE
                 b.crpBlocktypeHeadingTv.text = getGroupName(filetag.group)
+                b.crpBlocktypeDescTv.text = getTitleDesc(filetag.group)
                 return
             }
 
             b.crpTitleLl.visibility = View.GONE
+        }
+
+        private fun getTitleDesc(title: String): String {
+            return if (title.equals(RethinkBlocklistManager.PARENTAL_CONTROL.name, true)) {
+                context.getString(RethinkBlocklistManager.PARENTAL_CONTROL.desc)
+            } else if (title.equals(RethinkBlocklistManager.SECURITY.name, true)) {
+                context.getString(RethinkBlocklistManager.SECURITY.desc)
+            } else if (title.equals(RethinkBlocklistManager.PRIVACY.name, true)) {
+                context.getString(RethinkBlocklistManager.PRIVACY.desc)
+            } else {
+                ""
+            }
         }
 
         private fun io(f: suspend () -> Unit) {

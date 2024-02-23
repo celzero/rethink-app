@@ -38,6 +38,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ProxyEndpoint
 import com.celzero.bravedns.receiver.NotificationActionReceiver
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.ProxyManager
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
@@ -46,6 +47,7 @@ import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isFdroidFlavour
 import com.celzero.bravedns.util.Utilities.isPlayStoreFlavour
+import com.celzero.bravedns.util.Utilities.isValidPort
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -358,9 +360,11 @@ class OrbotHelper(
     }
 
     private suspend fun handleOrbotSocks5Update(): Boolean {
-        val proxyEndpoint = constructProxy()
+        val pMode = ProxyManager.ProxyMode.ORBOT_SOCKS5
+        val id = appConfig.getOrbotSocks5Endpoint().id
+        val proxyEndpoint = constructProxy(id, pMode, socks5Ip, socks5Port)
         return if (proxyEndpoint != null) {
-            appConfig.insertOrbotProxy(proxyEndpoint)
+            appConfig.updateOrbotProxy(proxyEndpoint)
             true
         } else {
             Log.w(LOG_TAG_VPN, "Error inserting value in proxy database")
@@ -368,9 +372,14 @@ class OrbotHelper(
         }
     }
 
-    private fun handleOrbotHttpUpdate(): Boolean {
-        return if (httpsIp != null && httpsPort != null) {
-            persistentState.httpProxyHostAddress = constructHttpAddress(httpsIp!!, httpsPort!!)
+    private suspend fun handleOrbotHttpUpdate(): Boolean {
+        val pMode = ProxyManager.ProxyMode.ORBOT_HTTP
+        // store the http address in proxyIp column of ProxyEndpoint table
+        val httpAddress = constructHttpAddress(httpsIp!!, httpsPort!!)
+        val id = appConfig.getOrbotHttpEndpoint().id
+        val proxyEndpoint = constructProxy(id, pMode, httpAddress, 0)
+        return if (proxyEndpoint != null) {
+            appConfig.updateOrbotHttpProxy(proxyEndpoint)
             true
         } else {
             Log.w(LOG_TAG_VPN, "could not setup Orbot http proxy with ${httpsIp}:${httpsPort}")
@@ -388,23 +397,25 @@ class OrbotHelper(
         return URI.create(proxyUrl.toString()).toASCIIString()
     }
 
-    private fun constructProxy(): ProxyEndpoint? {
-        if (socks5Ip == null || socks5Port == null) {
-            Log.w(
-                LOG_TAG_VPN,
-                "Cannot construct proxy with values ip: $socks5Ip, port: $socks5Port"
-            )
+    private fun constructProxy(
+        id: Int,
+        proxyMode: ProxyManager.ProxyMode,
+        ip: String?,
+        port: Int?
+    ): ProxyEndpoint? {
+        if (ip.isNullOrEmpty() || port == null || !isValidPort(port)) {
+            Log.w(LOG_TAG_VPN, "cannot construct proxy with values ip: $ip, port: $port")
             return null
         }
 
         return ProxyEndpoint(
-            id = 0,
+            id,
             orbot,
-            proxyMode = 1,
+            proxyMode.value,
             proxyType = "NONE",
             ORBOT_PACKAGE_NAME,
-            socks5Ip!!,
-            socks5Port!!,
+            ip,
+            port,
             userName = "",
             password = "",
             isSelected = true,

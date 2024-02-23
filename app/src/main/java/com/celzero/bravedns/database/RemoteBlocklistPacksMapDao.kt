@@ -16,7 +16,11 @@
 package com.celzero.bravedns.database
 
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface RemoteBlocklistPacksMapDao {
@@ -32,7 +36,7 @@ interface RemoteBlocklistPacksMapDao {
     fun insertAll(maps: List<RemoteBlocklistPacksMap>): LongArray
 
     @Query(
-        "select * from RemoteBlocklistPacksMap l INNER JOIN (SELECT pack, MIN(level) level FROM RemoteBlocklistPacksMap GROUP BY pack) l1 ON l1.pack = l.pack Where l1.level = l.level ORDER BY l.`group` ASC"
+        "select * from RemoteBlocklistPacksMap l INNER JOIN (SELECT pack, MIN(level) level FROM RemoteBlocklistPacksMap where pack not in ('dead','ignore') GROUP BY pack) l1 ON l1.pack = l.pack Where l1.level = l.level ORDER BY l.`group` DESC"
     )
     fun getTags(): PagingSource<Int, RemoteBlocklistPacksMap>
 }

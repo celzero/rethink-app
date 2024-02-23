@@ -74,15 +74,45 @@
     <string name="lbl_persistent_keepalive" translatable="true">Persistent keepalive</string>
     <string name="lbl_allowed_ips" translatable="true">Allowed IPs</string>
     <string name="lbl_save" translatable="true">save</string>
+    <string name="lbl_dot" translatable="false">DoT</string>
+    <string name="lbl_odoh" translatable="false">ODoH</string>
+    <string name="lbl_cache" translatable="false">Cache</string>
+    <string name="lbl_status" translatable="false">Status</string>
+    <string name="lbl_remove" translatable="false">Remove</string>
+    <string name="lbl_last" translatable="false">Last</string>
+    <string name="lbl_dot_abbr" translatable="false">Dns-over-TLS</string>
+    <string name="lbl_dc" translatable="false">DC</string>
+    <string name="lbl_dc_abbr" translatable="false">DNSCrypt</string>
+    <string name="lbl_dp" translatable="false">DP</string>
+    <string name="lbl_dp_abbr" translatable="false">DNS Proxy</string>
+    <string name="lbl_odoh_abbr" translatable="false">Oblivious DNS-over-HTTPS</string>
+    <string name="lbl_rdns" translatable="false">RDNS</string>
+    <string name="lbl_default" translatable="false">Default</string>
+    <string name="lbl_one_wg" translatable="false">One WG</string>
+    <string name="lbl_starting" translatable="false">Starting</string>
+    <string name="lbl_overall" translatable="false">Overall</string>
+    <string name="lbl_stopped" translatable="false">Stopped</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
     <string name="single_argument" translatable="false">%1$s</string>
+    <string name="two_argument_space" translatable="false">%1$s %2$s</string>
+    <string name="two_argument_colon" translatable="false">%1$s :%2$s</string>
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
-    <string name="symbol_elephant" translatable="false">🐘</string>
+    <string name="three_argument" translatable="false">%1$s %2$s %3$s</string>
+    <string name="three_argument_colon" translatable="false">%1$s:%2$s:%3$s</string>
+    <string name="symbol_heavy" translatable="false">🐘</string>
     <string name="symbol_turtle" translatable="false">🐢</string>
+    <string name="symbol_currency" translatable="false">💸</string>
     <string name="symbol_green_circle" translatable="false">🟢</string>
     <string name="symbol_key" translatable="false">🗝️</string>
+    <string name="symbol_global" translatable="false">🌐</string>
+    <string name="symbol_clock" translatable="false">🕒</string>
+    <string name="symbol_hyphen" translatable="false">-</string>
+
+    <string name="numeric_one" translatable="false">1</string>
+    <string name="numeric_twenty_four" translatable="false">24</string>
+    <string name="numeric_seven" translatable="false">7</string>
 
     <string name="slide_2_title" translatable="true">Welcome</string>
     <string name="slide_2_desc" translatable="true">Rethink is the easiest way to monitor network activity, bypass Internet censorship, and firewall apps on your Android device.</string>
@@ -277,6 +307,9 @@
     <string name="doh_custom_url_remove_dialog_message" translatable="true">Delete the DNS over Https endpoint from saved configuration.</string>
     <string name="doh_custom_url_remove_success" translatable="true">Endpoint deleted.</string>
 
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Delete DoT endpoint?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Delete the DNS over TLS endpoint from saved configuration.</string>
+
     <string name="dns_crypt_custom_url_remove_dialog_title" translatable="true">Delete DNSCrypt resolver?</string>
     <string name="dns_crypt_url_remove_dialog_message" translatable="true">Delete the DNSCrypt resolver from saved configuration.</string>
     <string name="dns_crypt_url_remove_success" translatable="true">DNSCrypt resolver deleted.</string>
@@ -350,7 +383,6 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_dialog_title" translatable="true">What\'s new in v055a</string>
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Jason A. Donenfeld</b><br/><br/>
         1. <i>New feature</i>: Multi-VPN support with any number of WireGuard upstreams.<br/>
         2. <i>New feature</i>: Active (open) connection indicator in Network Logs.</br>
@@ -437,6 +469,8 @@
     <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
     <string name="orbot_install_activity_error" translatable="false">Something went wrong, try after sometime</string>
 
+    <string name="orbot_no_app_toast" translatable="false">Select atleast one app to enable Orbot</string>
+
     <string name="settings_orbot_heading" translatable="true">Setup Orbot</string>
     <string name="settings_orbot_header" translatable="true">Orbot\t\u276F</string>
     <string name="settings_orbot_desc" translatable="true">Orbot in non-vpn mode with HTTPS/SOCKS5.</string>
@@ -481,6 +515,13 @@
 
     <string name="settings_go_log_heading" translatable="true">Log level</string>
     <string name="settings_go_log_desc" translatable="true">For debugging purposes</string>
+
+    <string name="settings_rinr_heading" translatable="false">Rethink within Rethink</string>
+    <string name="settings_rinr_desc_enabled" translatable="false">Rethink will route its own traffic through the VPN</string>
+    <string name="settings_rinr_desc_disabled" translatable="false">Rethink will not route its own traffic through the VPN</string>
+
+    <string name="settings_rinr_dialog_title" translatable="false">Rethink within Rethink</string>
+    <string name="settings_rinr_dialog_desc" translatable="false">To route Rethink\'s own traffic through the VPN, use all available networks setting should be enabled. Do you want to proceed?</string>
 
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
     <string name="settings_gologger_dialog_option_2" translatable="false">Debug</string>
@@ -608,7 +649,7 @@
     <string name="hsf_start_btn_state" translatable="true">start</string>
     <string name="hsf_stop_btn_state" translatable="true">stop</string>
 
-    <string name="hsf_uptime" translatable="true">(active %1$s; protos: %2$s; type: %3$s)</string>
+    <string name="hsf_uptime" translatable="false">(active %1$s; protos: %2$s; type: %3$s; mtu: %4$s)</string>
     <string name="hsf_downtime" translatable="true">(inactive since %1$s)</string>
 
     <string name="logs_card_duration" translatable="true">since %1$s</string>
@@ -642,7 +683,6 @@
 
     <string name="hsf_chip_appearance" translatable="true">Theme: %1$s</string>
     <string name="hsf_pause_vpn_failure" translatable="true">Cannot pause: Rethink not active</string>
-    <string name="hsf_pause_lockdown_failure" translatable="true">Cannot pause: Rethink in lockdown mode</string>
 
     <!-- DNS configure screen -->
 
@@ -695,7 +735,7 @@
     <string name="about_settings_notification" translatable="true">Notification Settings</string>
     <string name="about_whats_new" translatable="true">What\'s new in %1$s</string>
     <string name="about_twitter" translatable="true">Follow us on Twitter</string>
-    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, OSOM Products Inc, FOSS United Foundation.</string>
+    <string name="about_mozilla" translatable="true">Rethink is supported by Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
     <string name="about_app_update_check" translatable="true">Check for app updates</string>
     <string name="about_app_contributors" translatable="true">Authors</string>
     <string name="about_app_translate" translatable="true">Translate</string>
@@ -974,8 +1014,6 @@
     <string name="fapps_isolate_block_dialog_title" translatable="true">Isolate apps</string>
     <string name="fapps_isolate_block_dialog_message" translatable="true">Isolate <i>listed</i> apps?</string>
 
-    <string name="fapps_lockdown_hint" translatable="true">Vpn is in lockdown mode. Firewall will not honour Metered / Unmetered rules.</string>
-
     <string name="fapps_firewall_filter_hint" translatable="true">Showing all apps</string>
 
     <string name="fapps_firewall_filter_desc" translatable="true"><![CDATA[Showing <u>%1$s</u> %2$s apps]]></string>
@@ -1143,6 +1181,8 @@
 
     <string name="cd_no_rules_text" translatable="true">No domain rules.</string>
 
+    <string name="cd_dialog_edit_title" translatable="false">Edit domain</string>
+    <string name="cd_toast_edit" translatable="false">Domain edited successfully</string>
     <string name="cd_dialog_title" translatable="true">Add domain</string>
     <string name="cd_dialog_desc" translatable="true">Custom URL(domain) or wild card to either allow or block. eg, *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Enter %1$s</string>
@@ -1287,10 +1327,10 @@
     <!-- dns configure fragment -->
     <string name="dc_local_block_enabled" translatable="true">Enabled</string>
 
-    <string name="dc_rethink_dns" translatable="true">Rethink DNS</string>
-    <string name="dc_doh" translatable="true">Dns over HTTPS</string>
-    <string name="dc_dns_crypt" translatable="true">DNSCrypt</string>
-    <string name="dc_dns_proxy" translatable="true">DNS Proxy</string>
+    <string name="dc_rethink_dns" translatable="false">Rethink DNS</string>
+    <string name="dc_doh" translatable="false">DNS-over-HTTPS</string>
+    <string name="dc_dns_crypt" translatable="false">DNSCrypt</string>
+    <string name="dc_dns_proxy" translatable="false">DNS Proxy</string>
 
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS booster</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Coalesce requests, cache responses, resilient error handling</string>
@@ -1398,27 +1438,56 @@
     <string name="new_warp_error_toast" translatable="true">Unable to fetch WARP configuration</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Invalid WARP configuration</string>
 
-    <string name="add_remove_apps" translatable="true">Add / Remove Applications (%1$s apps)</string>
+    <string name="one_wg_apps_added" translatable="false">All apps included</string>
+
+    <string name="wg_lockdown_dialog_title" translatable="false">Lockdown</string>
+    <string name="wg_lockdown_dialog_desc" translatable="false">If enabled, all requests from the selected apps will be forwarded to this WireGuard connection. If this configuration fails, it will result in a connection failure for the selected apps. Do you want to proceed?</string>
+    <string name="wg_lockdown_success_toast" translatable="false">Lockdown enabled</string>
+
+    <string name="one_wg_dialog_title" translatable="false">One WireGuard</string>
+    <string name="one_wg_dialog_desc" translatable="false">This will disable all other WireGuard configurations. All connections, including DNS, will be forwarded to this WireGuard configuration. Do you want to proceed?</string>
+    <string name="one_wg_success_toast" translatable="false">One WireGuard enabled</string>
+
+    <string name="catch_all_wg_dialog_title" translatable="false">Catch All</string>
+    <string name="catch_all_wg_dialog_desc" translatable="false">This will capture all the apps that are not part of other WireGuard configurations and forward those requests to this WireGuard connection. Do you want to proceed?</string>
+    <string name="catch_all_wg_success_toast" translatable="false">Catch All enabled</string>
+
+    <string name="catch_all_info_dialog_msg" translatable="false">This will capture all the apps that are not part of other WireGuard configurations and forward those requests to this WireGuard connection.</string>
+    <string name="one_wg_info_dialog_msg" translatable="false">This will disable all other WireGuard configurations. All connections, including DNS, will be forwarded to this WireGuard configuration.</string>
+    <string name="wg_lockdown_info_dialog_msg" translatable="false">If enabled, all requests from the selected apps will be forwarded to this WireGuard connection. If this configuration fails, it will result in a connection failure for the selected apps.</string>
+
+    <string name="one_wg_error_toast" translatable="false">Please disable the one wireguard interface to use general interface</string>
+
+    <string name="add_remove_apps" translatable="false">Add / Remove Apps (%1$s apps)</string>
     <string name="add_peer" translatable="true">Add Peer</string>
 
-    <string name="config_delete_dialog_desc">Are you sure you want to delete this Config?</string>
-    <string name="config_delete_dialog_title">Delete Config</string>
-    <string name="config_delete_success_toast">Config deleted</string>
-    <string name="config_add_success_toast">Config added</string>
+    <string name="config_delete_dialog_desc" translatable="false">Are you sure you want to delete this Config?</string>
+    <string name="config_delete_dialog_title" translatable="false">Delete Config</string>
+    <string name="config_delete_success_toast" translatable="false">Config deleted</string>
+    <string name="config_add_success_toast" translatable="false">Config added</string>
 
-    <string name="include_all_app_wg_dialog_title">Include all apps</string>
-    <string name="include_all_app_wg_dialog_desc">Tunnel all apps through this tunnel?</string>
+    <string name="include_all_app_wg_dialog_title" translatable="false">Include all apps</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="false">Tunnel all apps through this tunnel?</string>
 
-    <string name="exclude_all_app_wg_dialog_title">Exclude all apps</string>
-    <string name="exclude_all_app_wg_dialog_desc">Exclude all apps from this tunnel?</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="false">Exclude all apps</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="false">Exclude all apps from this tunnel?</string>
 
-    <string name="wireguard_enabled_failure">Turn off other proxies to enable WireGuard</string>
+    <string name="wireguard_enabled_failure" translatable="false">Turn off other proxies to enable WireGuard</string>
+    <string name="wireguard_disable_failure" translatable="false">Cannot disable WireGuard, catch-all is enabled</string>
 
-    <string name="wireguard_refresh_toast">Proxies refresh complete</string>
+    <string name="wireguard_refresh_toast" translatable="false">Proxies refresh complete</string>
 
-    <string name="wireguard_no_config_msg">No WireGuard configs</string>
-    <string name="wireguard_connection_error">Issue connecting to WireGuard configuration</string>
-    <string name="wireguard_disclaimer">This is an experimental WireGuard as TCP and UDP proxy. While DNS traffic is forwarded to %1$s, ICMP traffic (ex: ping) is sent to the underlying network.</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="false">part of %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="false">Include apps: %1$s</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="false">Remove apps: %1$s</string>
+
+    <string name="wireguard_no_config_msg" translatable="false">No WireGuard configs</string>
+    <string name="wireguard_connection_error" translatable="false">Issue connecting to WireGuard configuration</string>
+    <string name="wireguard_disclaimer" translatable="false">This is an experimental WireGuard as TCP and UDP proxy. While DNS traffic is forwarded to %1$s, ICMP traffic (ex: ping) is sent to the underlying network.</string>
+
+    <string name="wireguard_disable_title" translatable="false">Disable WireGuard</string>
+    <string name="wireguard_disable_message" translatable="false">Disable all active WireGuard connections?</string>
+    <string name="wireguard_disable_positive" translatable="false">Disable</string>
 
     <!-- dns description -->
     <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
@@ -1443,4 +1512,82 @@
     <string name="crypt_relay_us" translatable="true">Anonymized DNS relay hosted in the US - Los Angeles, CA provided by https://cryptostrom.is/.</string>
     <string name="crypt_relay_singapore" translatable="true">Anonymized DNS relay hosted in Singapore.</string>
 
+    <!-- alert, commenting out for now in v055b -->
+
+   <!-- <string name="alert_severity_high" translatable="true">High</string>
+    <string name="alert_severity_medium" translatable="true">Medium</string>
+    <string name="alert_severity_low" translatable="true">Low</string>
+    <string name="alert_severity_critical" translatable="true">Critical</string>
+
+    <string name="alert_type_info" translatable="true">Info</string>
+    <string name="alert_type_warning" translatable="true">Warning</string>
+    <string name="alert_type_error" translatable="true">Error</string>
+    <string name="alert_type_success" translatable="true">Success</string>
+
+    <string name="alert_category_dns" translatable="true">DNS</string>
+    <string name="alert_category_firewall" translatable="true">Firewall</string>
+    <string name="alert_category_proxy" translatable="true">Proxy</string>
+    <string name="alert_category_vpn" translatable="true">VPN</string>
+    <string name="alert_category_app" translatable="true">App</string>
+    <string name="alert_category_other" translatable="true">Other</string>
+
+    <string name="alert_title_protected" translatable="true">Protected</string>
+    <string name="alert_message_protected" translatable="true">Rethink is protecting your device</string>
+    <string name="alert_actions_protected" translatable="true">View</string>
+    <string name="alert_solution_protected" translatable="true">Rethink is protecting your device</string>
+
+    <string name="alert_title_no_internet" translatable="true">No Internet</string>
+    <string name="alert_message_no_internet" translatable="true">Rethink is not connected to the Internet</string>
+    <string name="alert_actions_no_internet" translatable="true">View</string>
+    <string name="alert_solution_no_internet" translatable="true">Rethink is not connected to the Internet</string>
+
+    <string name="alert_title_dns_error" translatable="true">DNS Error</string>
+    <string name="alert_message_dns_error" translatable="true">Rethink is unable to resolve DNS queries</string>
+    <string name="alert_actions_dns_error" translatable="true">View</string>
+    <string name="alert_solution_dns_error" translatable="true">Rethink is unable to resolve DNS queries</string>
+
+    <string name="alert_title_blocked_connections" translatable="true">Blocked Connection</string>
+    <string name="alert_message_blocked_connections" translatable="true">Rethink is blocking a connection</string>
+    <string name="alert_actions_blocked_connections" translatable="true">View</string>
+    <string name="alert_solution_blocked_connections" translatable="true">Rethink is blocking a connection</string>
+
+    <string name="alert_title_allowed_connections" translatable="true">Allowed Connection</string>
+    <string name="alert_message_allowed_connections" translatable="true">Rethink is allowing a connection</string>
+    <string name="alert_actions_allowed_connections" translatable="true">View</string>
+    <string name="alert_solution_allowed_connections" translatable="true">Rethink is allowing a connection</string>
+
+    <string name="alert_title_send_failed" translatable="true">Send Failed</string>
+    <string name="alert_message_send_failed" translatable="true">Rethink is unable to send logs</string>
+    <string name="alert_actions_send_failed" translatable="true">View</string>
+    <string name="alert_solution_send_failed" translatable="true">Rethink is unable to send logs</string>
+
+    <string name="alert_title_dns_not_active" translatable="true">DNS Not Active</string>
+    <string name="alert_message_dns_not_active" translatable="true">Rethink is not active as DNS</string>
+    <string name="alert_actions_dns_not_active" translatable="true">View</string>
+    <string name="alert_solution_dns_not_active" translatable="true">Rethink is not active as DNS</string>
+
+    <string name="alert_title_firewall_not_active" translatable="true">Firewall Not Active</string>
+    <string name="alert_message_firewall_not_active" translatable="true">Rethink is not active as Firewall</string>
+    <string name="alert_actions_firewall_not_active" translatable="true">View</string>
+    <string name="alert_solution_firewall_not_active" translatable="true">Rethink is not active as Firewall</string>
+
+    <string name="alert_title_proxy_failed" translatable="true">Proxy Failed</string>
+    <string name="alert_message_proxy_failed" translatable="true">Rethink is unable to start proxy</string>
+    <string name="alert_actions_proxy_failed" translatable="true">View</string>
+    <string name="alert_solution_proxy_failed" translatable="true">Rethink is unable to start proxy</string>
+
+    <string name="alert_title_vpn_failed" translatable="true">VPN Failed</string>
+    <string name="alert_message_vpn_failed" translatable="true">Rethink is unable to start VPN</string>
+    <string name="alert_actions_vpn_failed" translatable="true">View</string>
+    <string name="alert_solution_vpn_failed" translatable="true">Rethink is unable to start VPN</string>
+
+    <string name="alert_title_firewall_blocked" translatable="true">Firewall Blocked</string>
+    <string name="alert_message_firewall_blocked" translatable="true">Rethink is blocking a connection</string>
+    <string name="alert_actions_firewall_blocked" translatable="true">View</string>
+    <string name="alert_solution_firewall_blocked" translatable="true">Rethink is blocking a connection</string>
+
+    <string name="alert_title_ip_domain_blocked" translatable="true">IP/Domain Blocked</string>
+    <string name="alert_message_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>
+    <string name="alert_actions_ip_domain_blocked" translatable="true">View</string>
+    <string name="alert_solution_ip_domain_blocked" translatable="true">Rethink is blocking a connection</string>-->
 </resources>

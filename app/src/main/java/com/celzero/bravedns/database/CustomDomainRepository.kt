@@ -43,7 +43,11 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
         return customDomainDAO.getAllDomains()
     }
 
-    fun deleteRulesByUid(uid: Int) {
+    fun getDomainsByUID(uid: Int): List<CustomDomain> {
+        return customDomainDAO.getDomainsByUID(uid)
+    }
+
+    suspend fun deleteRulesByUid(uid: Int) {
         customDomainDAO.deleteRulesByUid(uid)
     }
 
@@ -54,6 +58,10 @@ class CustomDomainRepository(private val customDomainDAO: CustomDomainDAO) {
     fun getUniversalCustomDomainCount(): LiveData<Int> {
         // get the count of the universal rules
         return customDomainDAO.getAppWiseDomainRulesCount(Constants.UID_EVERYBODY)
+    }
+
+    fun updateUid(uid: Int, newUid: Int) {
+        customDomainDAO.updateUid(uid, newUid)
     }
 
     fun cpInsert(customDomain: CustomDomain): Long {

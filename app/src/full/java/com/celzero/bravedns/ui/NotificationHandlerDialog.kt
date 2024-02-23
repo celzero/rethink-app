@@ -25,6 +25,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.celzero.bravedns.R
 import com.celzero.bravedns.service.VpnController
+import com.celzero.bravedns.ui.activity.AppListActivity
+import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

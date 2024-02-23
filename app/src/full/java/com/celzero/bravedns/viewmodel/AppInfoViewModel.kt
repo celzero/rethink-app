@@ -13,7 +13,7 @@ import androidx.paging.liveData
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.AppInfoDAO
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.ui.AppListActivity
+import com.celzero.bravedns.ui.activity.AppListActivity
 import com.celzero.bravedns.util.Constants
 
 class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
@@ -132,9 +132,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
     }
 
     // apply the firewall rules to the filtered apps
-    fun updateUnmeteredStatus(blocked: Boolean) {
+    suspend fun updateUnmeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
-
         appList
             .distinctBy { it.uid }
             .forEach {
@@ -144,9 +143,8 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             }
     }
 
-    fun updateMeteredStatus(blocked: Boolean) {
+    suspend fun updateMeteredStatus(blocked: Boolean) {
         val appList = getFilteredApps()
-
         appList
             .distinctBy { it.uid }
             .forEach {
@@ -156,7 +154,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             }
     }
 
-    fun updateBypassStatus(bypass: Boolean) {
+    suspend fun updateBypassStatus(bypass: Boolean) {
         val appList = getFilteredApps()
         // update the bypass status for the filtered apps
         // if the app is already in the bypass list, remove it
@@ -178,7 +176,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
-    fun updateBypassDnsFirewall(bypass: Boolean) {
+    suspend fun updateBypassDnsFirewall(bypass: Boolean) {
         val appList = getFilteredApps()
         // update the bypass status for the filtered apps
         // if the app is already in the bypass list, remove it
@@ -200,7 +198,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
-    fun updateExcludeStatus(exclude: Boolean) {
+    suspend fun updateExcludeStatus(exclude: Boolean) {
         val appList = getFilteredApps()
         // update the exclude status for the filtered apps
         // if the app is already in the exclude list, remove it
@@ -222,7 +220,7 @@ class AppInfoViewModel(private val appInfoDAO: AppInfoDAO) : ViewModel() {
             .forEach { FirewallManager.updateFirewallStatus(it.uid, appStatus.fid, appStatus.cid) }
     }
 
-    fun updateLockdownStatus(lockdown: Boolean) {
+    suspend fun updateLockdownStatus(lockdown: Boolean) {
         val appList = getFilteredApps()
         // update the lockdown status for the filtered apps
         // if the app is already in the lockdown list, remove it

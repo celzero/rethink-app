@@ -5,18 +5,18 @@
     app:startDestination="@id/homeScreenFragment">
     <fragment
         android:id="@+id/homeScreenFragment"
-        android:name="com.celzero.bravedns.ui.HomeScreenFragment"
+        android:name="com.celzero.bravedns.ui.fragment.HomeScreenFragment"
         android:label="HomeScreenFragment" />
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.celzero.bravedns.ui.AboutFragment"
+        android:name="com.celzero.bravedns.ui.fragment.AboutFragment"
         android:label="AboutFragment" />
     <fragment
         android:id="@+id/summaryStatisticsFragment"
-        android:name="com.celzero.bravedns.ui.SummaryStatisticsFragment"
+        android:name="com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment"
         android:label="SummaryStatisticsFragment" />
     <fragment
         android:id="@+id/configureFragment"
-        android:name="com.celzero.bravedns.ui.ConfigureFragment"
+        android:name="com.celzero.bravedns.ui.fragment.ConfigureFragment"
         android:label="ConfigureFragment" />
 </navigation>

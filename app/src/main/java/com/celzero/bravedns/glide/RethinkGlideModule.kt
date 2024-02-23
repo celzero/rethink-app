@@ -24,6 +24,7 @@ import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.bumptech.glide.load.engine.cache.LruResourceCache
+import com.bumptech.glide.load.engine.executor.GlideExecutor
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
@@ -42,14 +43,27 @@ import java.util.concurrent.TimeUnit
 class RethinkGlideModule : AppGlideModule() {
 
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        val memoryCacheSizeBytes = 1024 * 1024 * 30 // 30 MB
-        builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
+        val memoryCacheSizeBytes = 1024 * 1024 * 30L // 30 MB
+        builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes))
 
         // 350M disk cache is enough to store 35K favicons of 10KB size on average.
         // 35K is a good guesstimate of unique domains a device may hit over 30 days
         // Lowering disk-cache means an increase in data use (some reported, 600MB+)
-        val diskCacheSizeBytes = 1024 * 1024 * 350 // 350 MB
-        builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
+        val diskCacheSizeBytes = 1024 * 1024 * 350L // 350 MB
+        builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes))
+        // default disk cache executors thread count is 1, which is not enough for disk cache
+        // operations. Increasing the thread count to available processors.
+        val diskCacheBuilder = GlideExecutor.newDiskCacheBuilder()
+        val threadCount = Math.min(Runtime.getRuntime().availableProcessors(), 1)
+        diskCacheBuilder.setThreadCount(threadCount)
+        diskCacheBuilder.setName("g-disk-cache")
+        builder.setDiskCacheExecutor(diskCacheBuilder.build())
+
+        val srcCacheBuilder = GlideExecutor.newSourceBuilder()
+        srcCacheBuilder.setThreadCount(threadCount * 2)
+        srcCacheBuilder.setName("g-source-cache")
+        builder.setSourceExecutor(srcCacheBuilder.build())
+
         builder.setLogLevel(Log.ERROR)
     }
 
@@ -57,8 +71,8 @@ class RethinkGlideModule : AppGlideModule() {
         super.registerComponents(context, glide, registry)
         val client: OkHttpClient =
             OkHttpClient.Builder()
-                .readTimeout(20, TimeUnit.SECONDS)
-                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .connectTimeout(3, TimeUnit.SECONDS)
                 .build()
 
         val factory: OkHttpUrlLoader.Factory = OkHttpUrlLoader.Factory(client)

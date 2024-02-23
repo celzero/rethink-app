@@ -23,8 +23,10 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.celzero.bravedns.R
+import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
+import dnsx.RDNS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -113,7 +115,6 @@ object VpnController : KoinComponent {
         connectionStatus.postValue(state)
     }
 
-    // lock(VpnController.mutex) should not be held
     fun start(context: Context) {
         // if the tunnel has the go-adapter then there's nothing to do
         if (braveVpnService?.isOn() == true) {
@@ -142,7 +143,7 @@ object VpnController : KoinComponent {
     }
 
     fun state(): VpnState {
-        val requested: Boolean = persistentState.getVpnEnabledLocked()
+        val requested: Boolean = persistentState.getVpnEnabled()
         val on = isOn()
         return VpnState(requested, on, connectionState)
     }
@@ -152,7 +153,7 @@ object VpnController : KoinComponent {
     }
 
     suspend fun refresh() {
-        braveVpnService?.refresh()
+        braveVpnService?.refreshResolvers()
     }
 
     fun hasTunnel(): Boolean {
@@ -206,9 +207,14 @@ object VpnController : KoinComponent {
         return braveVpnService?.getProxyStatusById(id)
     }
 
+    suspend fun syncP50Latency(id: String) {
+        braveVpnService?.syncP50Latency(id)
+    }
+
     fun protocols(): String {
         val ipv4Size = braveVpnService?.underlyingNetworks?.ipv4Net?.size ?: -1
         val ipv6Size = braveVpnService?.underlyingNetworks?.ipv6Net?.size ?: -1
+        Log.d(LOG_TAG_VPN, "protocols - ipv4Size: $ipv4Size, ipv6Size: $ipv6Size")
         return if (ipv4Size >= 1 && ipv6Size >= 1) {
             "IPv4, IPv6"
         } else if (ipv6Size >= 1) {
@@ -220,6 +226,10 @@ object VpnController : KoinComponent {
             // see: BraveVpnService#establishVpn
             "IPv4, IPv6"
         }
+    }
+
+    fun mtu(): Int {
+        return braveVpnService?.underlyingNetworks?.minMtu ?: BraveVPNService.VPN_INTERFACE_MTU
     }
 
     fun netType(): String {
@@ -241,11 +251,11 @@ object VpnController : KoinComponent {
         return t
     }
 
-    fun hasCid(cid: String): Boolean {
-        return braveVpnService?.hasCid(cid) ?: false
+    fun hasCid(cid: String, uid: Int): Boolean {
+        return braveVpnService?.hasCid(cid, uid) ?: false
     }
 
-    fun removeWireGuardProxy(id: String) {
+    fun removeWireGuardProxy(id: Int) {
         braveVpnService?.removeWireGuardProxy(id)
     }
 
@@ -253,7 +263,23 @@ object VpnController : KoinComponent {
         braveVpnService?.addWireGuardProxy(id)
     }
 
-    fun refreshWireGuardConfig() {
-        braveVpnService?.refreshWireGuardConfig()
+    fun refreshProxies() {
+        braveVpnService?.refreshProxies()
+    }
+
+    fun updateWireGuardConfig() {
+        braveVpnService?.updateWireGuardConfig()
+    }
+
+    fun closeConnectionsIfNeeded(uid: Int = INVALID_UID) {
+        braveVpnService?.closeConnectionsIfNeeded(uid)
+    }
+
+    suspend fun getDnsStatus(id: String): Long? {
+        return braveVpnService?.getDnsStatus(id)
+    }
+
+    suspend fun getRDNS(type: RethinkBlocklistManager.RethinkBlocklistType): RDNS? {
+        return braveVpnService?.getRDNS(type)
     }
 }

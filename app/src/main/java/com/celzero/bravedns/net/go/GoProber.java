@@ -23,7 +23,6 @@ import com.celzero.bravedns.net.doh.Prober;
 
 import dnsx.Summary;
 import dnsx.Transport;
-import intra.Intra;
 
 /**
  * Implements a Probe using the Go-based DoH client.
@@ -43,7 +42,7 @@ public class GoProber extends Prober {
         new Thread(() -> {
             String dohIPs = GoVpnAdapter.Companion.getIpString(context, url);
             try {
-                Transport transport = Intra.newDoHTransport(PROBER_TAG, url, dohIPs);
+                Transport transport = null; //Intra.newDoHTransport(PROBER_TAG, url, dohIPs);
                 if (transport == null) {
                     callback.onCompleted(false);
                     return;

@@ -65,7 +65,6 @@
     <string name="app_mode_dns">DNS</string>
     <string name="app_mode_firewall">防火牆</string>
     <string name="settings_enable_logs">啓用本地日誌</string>
-    <string name="whats_dialog_title">v055a 嘅新內容</string>
     <string name="info_dialog_rethink_toast_msg">當做 RDNS+ DNS-over-HTTPS URL 複製咗</string>
     <string name="orbot_http">HTTP 代理</string>
     <string name="whats_new_version_update">&lt;b&gt;Jason A. Donenfeld&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意數量 WireGuard 上游嘅多 VPN 支援。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：網絡日誌入面嘅活躍連線指示器。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor 代理（Orbot）指定應用程式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區而家可以跟據 IP 地理位址嚟顯示分組。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：在網絡日誌度顯示資料使用情況：每個請求嘅上載同下載位元組數。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分應用統計上載同下載。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支援本地 DNS over HTTPS（非公開）解析服務。&lt;br/&gt; 8. 非常精細嘅按需漏洞報告，以更好咁診斷問題。&lt;br/&gt; 9. DNS 加速器而家會默認啓用。&lt;br/&gt; 10. 爲分應用 IP 同網域改進嘅 UI 。&lt;br/&gt; 11. 首頁上更大粒嘅 UI 塊。&lt;br/&gt; 12. 煥然一新嘅防火牆 UI。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：令 HTTP 代理喺 CONNECT 隧道度工作。&lt;br/&gt; 14. &lt;i&gt;漏洞修復&lt;/i&gt;：信任網域而家可以喺第三方 DNS 解析服務度工作。&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;幫手翻譯呢個 app&lt;/a&gt;</string>
@@ -321,7 +320,6 @@
     <string name="hsf_blocklist_updating_text">啓動緊……</string>
     <string name="hsf_chip_appearance">主題：%1$s</string>
     <string name="hsf_pause_vpn_failure">暫停唔到：Rethink 未啓用</string>
-    <string name="hsf_pause_lockdown_failure">暫停唔到：Rethink 正處於閉關模式</string>
     <string name="dc_block_heading">規則</string>
     <string name="dc_other_dns_heading">類型</string>
     <string name="dc_custom_dns_radio">其他 DNS</string>
@@ -474,7 +472,6 @@
     <string name="fapps_metered_block_dialog_title">喺收費嘅網絡攔截</string>
     <string name="fapps_metered_block_dialog_message">係咪喺收費嘅網絡（流動數據）攔截<i>呢度列出嘅</i>應用程式？</string>
     <string name="fapps_metered_unblock_dialog_message">係咪喺收費嘅網絡（流動數據）放行<i>呢度列出嘅</i>應用程式？</string>
-    <string name="fapps_lockdown_hint">VPN 正處於閉關模式。防火牆將唔會遵守收費／唔收費規則。</string>
     <string name="fapps_firewall_filter_hint">顯示緊所有應用程式</string>
     <string name="fapps_firewall_filter_desc">顯示 <u>%1$s</u> %2$s 個 app</string>
     <string name="fapps_firewall_filter_desc_category">顯示分類 %3$s 嘅 <u>%1$s</u> %2$s 個應用</string>

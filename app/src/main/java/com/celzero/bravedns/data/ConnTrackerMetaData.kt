@@ -19,6 +19,7 @@ import java.io.Serializable
 
 data class ConnTrackerMetaData(
     val uid: Int,
+    val usrId: Int,
     val sourceIP: String,
     val sourcePort: Int,
     val destIP: String,
@@ -26,8 +27,10 @@ data class ConnTrackerMetaData(
     val timestamp: Long,
     var isBlocked: Boolean,
     var blockedByRule: String,
+    var proxyDetails: String,
     var blocklists: String,
     val protocol: Int,
-    var query: String,
-    var connId: String
+    var query: String?,
+    var connId: String,
+    var connType: String
 ) : Serializable

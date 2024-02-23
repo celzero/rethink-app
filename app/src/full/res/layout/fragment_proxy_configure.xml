@@ -117,27 +117,14 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
-            android:id="@+id/settings_wireguard_title"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="55dp"
-            android:layout_marginTop="15dp"
-            android:fontFamily="sans-serif-smallcaps"
-            android:lineSpacingExtra="5dp"
-            android:padding="5dp"
-            android:text="@string/lbl_wireguard"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/settings_activity_vpn_lockdown_desc"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="10dp"
             android:paddingStart="10dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="15dp"
             android:paddingTop="10dp"
             android:paddingEnd="10dp"
             android:paddingBottom="10dp"
@@ -145,6 +132,43 @@
             android:textSize="@dimen/default_font_text_view"
             android:visibility="visible"
             app:drawableStartCompat="@drawable/dis_allowed" />
+
+        <RelativeLayout
+            android:id="@+id/wg_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/settings_wireguard_title"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="55dp"
+                android:layout_marginTop="15dp"
+                android:fontFamily="sans-serif-smallcaps"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:text="@string/lbl_wireguard"
+                android:textColor="?attr/accentGood"
+                android:textSize="@dimen/extra_large_font_text_view"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/wg_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_marginEnd="20dp"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:src="@drawable/ic_refresh_white" />
+
+        </RelativeLayout>
+
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

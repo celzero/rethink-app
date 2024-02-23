@@ -27,6 +27,7 @@ class Attribute private constructor(val key: String, val value: String) {
     companion object {
         private val LINE_PATTERN = Pattern.compile("(\\w+)\\s*=\\s*([^\\s#][^#]*)")
         private val LIST_SEPARATOR = Pattern.compile("\\s*,\\s*")
+
         fun join(values: Iterable<*>): String {
             val it = values.iterator()
             if (!it.hasNext()) {

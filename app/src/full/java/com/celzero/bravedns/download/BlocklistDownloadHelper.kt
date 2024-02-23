@@ -145,7 +145,7 @@ class BlocklistDownloadHelper {
         ): BlocklistUpdateServerResponse? {
             try {
                 val retrofit =
-                    RetrofitManager.getBlocklistBaseBuilder(getDnsTypeOnRetryCount(retryCount))
+                    RetrofitManager.getBlocklistBaseBuilder()
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
                 val retrofitInterface = retrofit.create(IBlocklistDownload::class.java)
@@ -183,18 +183,6 @@ class BlocklistDownloadHelper {
             }
 
             checkBlocklistUpdate(timestamp, vcode, retryCount + 1)
-        }
-
-        private fun getDnsTypeOnRetryCount(
-            retryCount: Int
-        ): RetrofitManager.Companion.OkHttpDnsType {
-            return when (retryCount) {
-                0 -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
-                1 -> RetrofitManager.Companion.OkHttpDnsType.CLOUDFLARE
-                2 -> RetrofitManager.Companion.OkHttpDnsType.GOOGLE
-                3 -> RetrofitManager.Companion.OkHttpDnsType.SYSTEM_DNS
-                else -> RetrofitManager.Companion.OkHttpDnsType.FALLBACK_DNS
-            }
         }
 
         private fun processCheckDownloadResponse(

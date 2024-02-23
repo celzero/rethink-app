@@ -106,7 +106,25 @@ class DnsProxyEndpointAdapter(
             b.dnsProxyListUrlName.text = endpoint.proxyName
             b.dnsProxyListCheckImage.isChecked = endpoint.isSelected
 
-            b.dnsProxyListUrlExplanation.text = endpoint.getExplanationText(context)
+            io {
+                val appInfo = FirewallManager.getAppInfoByPackage(endpoint.proxyAppName)
+                uiCtx {
+                    val appName =
+                        if (
+                            endpoint.proxyName !=
+                                context.getString(R.string.cd_custom_dns_proxy_default_app)
+                        ) {
+                            appInfo?.appName
+                                ?: context.getString(R.string.cd_custom_dns_proxy_default_app)
+                        } else {
+                            endpoint.proxyAppName
+                                ?: context.getString(R.string.cd_custom_dns_proxy_default_app)
+                        }
+
+                    b.dnsProxyListUrlExplanation.text =
+                        endpoint.getExplanationText(context, appName)
+                }
+            }
 
             if (endpoint.isDeletable()) {
                 b.dnsProxyListActionImage.setImageDrawable(
@@ -123,20 +141,23 @@ class DnsProxyEndpointAdapter(
     private fun promptUser(endpoint: DnsProxyEndpoint) {
         if (endpoint.isDeletable()) showDeleteDialog(endpoint)
         else {
-            showDetailsDialog(
-                endpoint.proxyName,
-                endpoint.getPackageName(),
-                endpoint.proxyIP,
-                endpoint.proxyPort.toString()
-            )
+            io {
+                val app = FirewallManager.getAppInfoByPackage(endpoint.getPackageName())?.appName
+                uiCtx {
+                    showDetailsDialog(
+                        endpoint.proxyName,
+                        endpoint.proxyIP,
+                        endpoint.proxyPort.toString(),
+                        app
+                    )
+                }
+            }
         }
     }
 
-    private fun showDetailsDialog(title: String, packageName: String?, ip: String?, port: String) {
+    private fun showDetailsDialog(title: String, ip: String?, port: String, app: String?) {
         val builder = MaterialAlertDialogBuilder(context)
         builder.setTitle(title)
-
-        val app = FirewallManager.getAppInfoByPackage(packageName)?.appName
 
         if (!app.isNullOrEmpty()) {
             builder.setMessage(context.getString(R.string.dns_proxy_dialog_message, app, ip, port))
@@ -194,8 +215,11 @@ class DnsProxyEndpointAdapter(
         io {
             appConfig.deleteDnsProxyEndpoint(id)
             uiCtx {
-                Toast.makeText(context, R.string.dns_proxy_remove_success, Toast.LENGTH_SHORT)
-                    .show()
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.dns_proxy_remove_success),
+                    Toast.LENGTH_SHORT
+                )
             }
         }
     }

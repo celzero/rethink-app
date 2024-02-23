@@ -128,7 +128,6 @@
     <string name="settings_enable_logs_desc">Conserva il registro delle connessioni DNS e del Firewall sul dispositivo.</string>
     <string name="settings_enable_logs">Salva connessioni sul registro</string>
     <string name="app_mode_choose">Scegli modalità</string>
-    <string name="whats_dialog_title">Novità della versione v055a</string>
     <string name="connection_http3">HTTP/3</string>
     <string name="settings_ip_network_heading">Scegli la versione IP</string>
     <string name="settings_ip_network_desc">Scegli tra le versioni dell\'Internet Protocol.</string>
@@ -391,7 +390,6 @@
     <string name="hsf_blocklist_updating_text">Avvio…</string>
     <string name="hsf_chip_appearance">Tema: %1$s</string>
     <string name="hsf_pause_vpn_failure">Impossibile mettere in pausa: Rethink non è attivo</string>
-    <string name="hsf_pause_lockdown_failure">Impossibile mettere in pausa: Rethink è impostata come VPN obbligatoria</string>
     <string name="dc_block_heading">regole</string>
     <string name="dc_other_dns_heading">tipo</string>
     <string name="dc_custom_dns_radio">Altro DNS</string>
@@ -542,7 +540,6 @@
     <string name="fapps_metered_block_dialog_title">Blocca su rete a consumo</string>
     <string name="fapps_metered_block_dialog_message">Bloccare le connessioni sulla rete a consumo (dati mobili) delle le applicazioni <i>elencate</i>\?</string>
     <string name="fapps_firewall_filter_hint">Mostra tutte le app</string>
-    <string name="fapps_lockdown_hint">La VPN è in modalità obbligatoria. Il Firewall non rispetterà le regole A Consumo / Non a Consumo.</string>
     <string name="fapps_firewall_filter_desc"><u>%1$s</u>%2$s app elencate</string>
     <string name="fapps_firewall_filter_desc_category"><u>%1$s</u> %2$s app elencate delle categorie: %3$s</string>
     <string name="rules_load_failure_heading">Nota</string>

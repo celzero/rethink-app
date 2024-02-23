@@ -27,7 +27,7 @@ import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.ConnectionTracker
 import com.celzero.bravedns.database.ConnectionTrackerDAO
-import com.celzero.bravedns.ui.ConnectionTrackerFragment
+import com.celzero.bravedns.ui.fragment.ConnectionTrackerFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
 
 class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTrackerDAO) :
@@ -35,8 +35,13 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
 
     private var filterString: MutableLiveData<String> = MutableLiveData()
     private var filterRules: MutableSet<String> = mutableSetOf()
-    private var filterType: ConnectionTrackerFragment.TopLevelFilter =
-        ConnectionTrackerFragment.TopLevelFilter.ALL
+    private var filterType: TopLevelFilter = TopLevelFilter.ALL
+
+    enum class TopLevelFilter(val id: Int) {
+        ALL(0),
+        ALLOWED(1),
+        BLOCKED(2)
+    }
 
     init {
         filterString.value = ""
@@ -54,11 +59,7 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
             jumpThreshold = 5
         )
 
-    fun setFilter(
-        searchString: String,
-        filter: Set<String>,
-        type: ConnectionTrackerFragment.TopLevelFilter
-    ) {
+    fun setFilter(searchString: String, filter: Set<String>, type: TopLevelFilter) {
         filterRules.clear()
 
         filterRules.addAll(filter)
@@ -69,14 +70,34 @@ class ConnectionTrackerViewModel(private val connectionTrackerDAO: ConnectionTra
     }
 
     private fun fetchNetworkLogs(input: String): LiveData<PagingData<ConnectionTracker>> {
+        // spl case: treat input with P:UDP, P:TCP, P:ICMP as protocol filter
+        val protocolPrefix = ConnectionTrackerFragment.PROTOCOL_FILTER_PREFIX.lowercase()
+        val s = input.trim().lowercase()
+        if (s.startsWith(protocolPrefix)) {
+            val protocol = s.substringAfter(protocolPrefix)
+            return if (filterRules.isNotEmpty()) {
+                Pager(pagingConfig) {
+                        connectionTrackerDAO.getProtocolFilteredConnections(protocol, filterRules)
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            } else {
+                Pager(pagingConfig) {
+                        connectionTrackerDAO.getProtocolFilteredConnections(protocol)
+                    }
+                    .liveData
+                    .cachedIn(viewModelScope)
+            }
+        }
+
         return when (filterType) {
-            ConnectionTrackerFragment.TopLevelFilter.ALL -> {
+            TopLevelFilter.ALL -> {
                 getAllNetworkLogs(input)
             }
-            ConnectionTrackerFragment.TopLevelFilter.ALLOWED -> {
+            TopLevelFilter.ALLOWED -> {
                 getAllowedNetworkLogs(input)
             }
-            ConnectionTrackerFragment.TopLevelFilter.BLOCKED -> {
+            TopLevelFilter.BLOCKED -> {
                 getBlockedNetworkLogs(input)
             }
         }

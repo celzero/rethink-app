@@ -23,6 +23,7 @@ import android.util.Log
 import android.widget.Toast
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
+import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.FirewallManager.NOTIF_CHANNEL_ID_FIREWALL_ALERTS
 import com.celzero.bravedns.service.VpnController
@@ -40,6 +41,7 @@ import org.koin.core.component.inject
 class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     private val appConfig by inject<AppConfig>()
     private val orbotHelper by inject<OrbotHelper>()
+    private val rdb by inject<RefreshDatabase>()
 
     override fun onReceive(context: Context, intent: Intent) {
         // TODO - Move the NOTIFICATION_ACTIONs value to enum
@@ -89,7 +91,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun reloadRules() {
-        io { FirewallManager.loadAppFirewallRules() }
+        io { rdb.refresh(RefreshDatabase.ACTION_REFRESH_FORCE) }
     }
 
     private fun stopVpn(context: Context) {
@@ -101,15 +103,6 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             Utilities.showToastUiCentered(
                 context,
                 context.getString(R.string.hsf_pause_vpn_failure),
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-
-        if (VpnController.isVpnLockdown()) {
-            Utilities.showToastUiCentered(
-                context,
-                context.getString(R.string.hsf_pause_lockdown_failure),
                 Toast.LENGTH_SHORT
             )
             return
@@ -143,7 +136,7 @@ class NotificationActionReceiver : BroadcastReceiver(), KoinComponent {
             }
 
         Utilities.showToastUiCentered(context, text, Toast.LENGTH_SHORT)
-        FirewallManager.updateFirewalledApps(uid, connectionStatus)
+        io { FirewallManager.updateFirewalledApps(uid, connectionStatus) }
     }
 
     private fun io(f: suspend () -> Unit) {

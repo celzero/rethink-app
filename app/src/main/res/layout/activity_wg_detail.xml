@@ -56,15 +56,193 @@
 
             </LinearLayout>
 
+            <RelativeLayout
+                android:id="@+id/wg_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/settings_network"
+                    style="@style/TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="5dp"
+                    android:text="@string/lbl_wireguard"
+                    android:textColor="?attr/accentGood"
+                    android:textSize="@dimen/extra_large_font_text_view"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/wg_wireguard_disclaimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:alpha="0.7"
+                android:padding="10dp"
+                android:text="@string/wireguard_disclaimer"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/default_font_text_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/wg_header" />
+
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tunnel_detail_card"
+                android:id="@+id/other_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/wg_wireguard_disclaimer">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/applications_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:alpha="0.75"
+                        android:text="@string/add_remove_apps"
+                        android:textColor="?attr/secondaryTextColor"
+                        android:textSize="@dimen/large_font_text_view"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/other_settings_card"
+                        app:layout_constraintWidth_max="@dimen/max_btn_size"
+                        app:rippleColor="?attr/secondaryTextColor" />
+
+                    <RelativeLayout
+                        android:id="@+id/lockdown_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="10dp"
+                        android:padding="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/lockdown_check"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/lockdown_info"
+                            android:buttonTint="?attr/accentGood"
+                            android:foregroundTint="?attr/accentGood"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:text="@string/firewall_rule_global_lockdown"
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/lockdown_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_info_white" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/catch_all_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="10dp"
+                        android:padding="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/catch_all_check"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/catch_all_info"
+                            android:buttonTint="?attr/accentGood"
+                            android:foregroundTint="?attr/accentGood"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:text="@string/catch_all_wg_dialog_title"
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/catch_all_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_info_white" />
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:id="@+id/one_wg_ll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/one_wg_check"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/one_wg_info"
+                            android:buttonTint="?attr/accentGood"
+                            android:foregroundTint="?attr/accentGood"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/one_wg_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_info_white" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/interface_detail_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/other_settings_card">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -97,15 +275,6 @@
                             android:layout_marginEnd="20dp"
                             android:layout_toStartOf="@id/interface_delete"
                             android:src="@drawable/ic_edit_icon_grey" />
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/interface_refresh"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/ic_refresh_white"
-                            android:visibility="gone" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/interface_delete"
@@ -246,36 +415,18 @@
                         app:layout_constraintTop_toBottomOf="@+id/mtu_label"
                         tools:text="1500" />
 
-                    <androidx.constraintlayout.widget.Barrier
-                        android:id="@+id/listen_port_mtu_barrier"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:barrierDirection="bottom"
-                        app:constraint_referenced_ids="listen_port_text,mtu_text" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/applications_btn"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/add_remove_apps"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:textSize="@dimen/large_font_text_view"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/listen_port_mtu_barrier"
-                        app:layout_constraintWidth_max="@dimen/max_btn_size"
-                        app:rippleColor="?attr/secondaryTextColor" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/peers_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tunnel_detail_card" />
+                app:layout_constraintTop_toBottomOf="@+id/interface_detail_card" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

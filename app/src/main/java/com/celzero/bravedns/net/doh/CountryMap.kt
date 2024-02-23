@@ -62,6 +62,7 @@ class CountryMap(assetManager: AssetManager) {
     companion object {
         // Number of bytes used to store each country string.
         private const val COUNTRY_SIZE = 2
+
         @Throws(IOException::class)
         private fun read(input: InputStream): ByteArray {
             val buffer = ByteArrayOutputStream()

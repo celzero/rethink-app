@@ -120,7 +120,6 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/tcp_proxy_add_apps"
-
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/enable_udp_relay"

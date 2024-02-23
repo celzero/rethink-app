@@ -10,4 +10,8 @@
     <string name="ips2" translatable="false">137.66.7.89,2a09:8280:1::1:7432</string>
     <string name="url3" translatable="false">https://zero.rethinkdns.com/</string>
     <string name="ips3" translatable="false">104.21.10.13,172.67.162.27</string>
+    <string name="url4" translatable="false">https://dns.google/dns-query</string>
+    <string name="ips4" translatable="false">8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844</string>
+    <string name="url5" translatable="false">https://cloudflare-dns.com/dns-query</string>
+    <string name="ips5" translatable="false">1.1.1.1,104.16.249.249,2606:4700:4700::1111,2606:4700::6810:f8f9</string>
 </resources>

@@ -40,6 +40,7 @@ class PurgeConnectionLogs(val context: Context, workerParameters: WorkerParamete
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, NUMBER_OF_DAYS_TO_PURGE)
         val date = calendar.time.time
+        Log.i(LoggerConstants.LOG_TAG_SCHEDULER, "purging logs older than 7 days, date: $date")
 
         /**
          * purge logs older than 7 days (on version v053l, subject to change in later versions based

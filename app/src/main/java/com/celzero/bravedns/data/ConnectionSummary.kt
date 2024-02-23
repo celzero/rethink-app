@@ -25,5 +25,7 @@ data class ConnectionSummary(
     val uploadBytes: Long,
     val duration: Int,
     val synack: Int,
-    val message: String
+    val message: String,
+    val targetIp: String?,
+    var flag: String?
 ) : Serializable

@@ -27,7 +27,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.databinding.ListItemWgPeersBinding
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.WARP_ID
-import com.celzero.bravedns.ui.WgAddPeerDialog
+import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.wireguard.Peer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
@@ -110,14 +110,17 @@ class WgPeersAdapter(
 
     fun dataChanged() {
         peers.clear()
-        peers.addAll(WireguardManager.getPeers(configId))
-        this?.notifyDataSetChanged()
+        io {
+            val p = WireguardManager.getPeers(configId)
+            peers.addAll(p)
+            uiCtx { this?.notifyDataSetChanged() }
+        }
     }
 
     private fun showDeleteInterfaceDialog(wgPeer: Peer) {
         val builder = MaterialAlertDialogBuilder(context)
-        builder.setTitle("Delete?")
-        builder.setMessage("Are you sure you want to delete this Config?")
+        builder.setTitle(context.getString(R.string.config_delete_dialog_title))
+        builder.setMessage(context.getString(R.string.config_delete_dialog_desc))
         builder.setCancelable(true)
         builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
             deletePeer(wgPeer)
@@ -130,20 +133,18 @@ class WgPeersAdapter(
     }
 
     private fun deletePeer(wgPeer: Peer) {
-        ui {
-            ioCtx {
-                WireguardManager.deletePeer(configId, wgPeer)
-                peers = WireguardManager.getPeers(configId)
-            }
-            this.notifyDataSetChanged()
+        io {
+            WireguardManager.deletePeer(configId, wgPeer)
+            peers = WireguardManager.getPeers(configId)
+            uiCtx { this.notifyDataSetChanged() }
         }
     }
 
-    private suspend fun ioCtx(f: suspend () -> Unit) {
-        withContext(Dispatchers.IO) { f() }
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
     }
 
-    private fun ui(f: suspend () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch { withContext(Dispatchers.Main) { f() } }
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

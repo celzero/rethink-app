@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 
 object TcpProxyHelper : KoinComponent {
 
-    private val tcpProxyRespository: TcpProxyRepository by inject()
+    private val db: TcpProxyRepository by inject()
     private val appConfig: AppConfig by inject()
     private val persistentState: PersistentState by inject()
 
@@ -86,7 +86,9 @@ object TcpProxyHelper : KoinComponent {
         INVALID(5);
 
         fun isPaid() = this == PAID
+
         fun isFailed() = this == FAILED
+
         fun isNotPaid() = this == NOT_PAID
     }
 
@@ -94,12 +96,11 @@ object TcpProxyHelper : KoinComponent {
         io { load() }
     }
 
-    suspend fun load() {
-        if (tcpProxies.isNotEmpty()) return
-
+    suspend fun load(): Int {
         tcpProxies.clear()
-        tcpProxies.addAll(tcpProxyRespository.getTcpProxies())
+        tcpProxies.addAll(db.getTcpProxies())
         loadTrie()
+        return tcpProxies.size
     }
 
     private fun loadTrie() {
@@ -109,6 +110,8 @@ object TcpProxyHelper : KoinComponent {
     }
 
     fun isCloudflareIp(ip: String): Boolean {
+        // do not check for cloudflare ips for now
+        // return false
         return try {
             cfIpTrie.hasAny(ip)
         } catch (e: Exception) {
@@ -128,9 +131,7 @@ object TcpProxyHelper : KoinComponent {
         var works = false
         try {
             val retrofit =
-                RetrofitManager.getTcpProxyBaseBuilder(
-                        RetrofitManager.Companion.OkHttpDnsType.DEFAULT
-                    )
+                RetrofitManager.getTcpProxyBaseBuilder()
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             val retrofitInterface = retrofit.create(ITcpProxy::class.java)
@@ -155,7 +156,11 @@ object TcpProxyHelper : KoinComponent {
                 Log.w(LOG_TAG_PROXY, "unsuccessful response for ${response?.raw()?.request?.url}")
             }
         } catch (e: Exception) {
-            Log.w(LOG_TAG_PROXY, "publicKeyUsable: exception while checking public key", e)
+            Log.e(
+                LOG_TAG_PROXY,
+                "publicKeyUsable: exception while checking public key: ${e.message}",
+                e
+            )
         }
         return works
     }
@@ -204,7 +209,7 @@ object TcpProxyHelper : KoinComponent {
             return
         }
         tcpProxy.paymentStatus = paymentStatus.value
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
     }
 
     suspend fun updateToken(token: String) {
@@ -214,7 +219,7 @@ object TcpProxyHelper : KoinComponent {
             return
         }
         tcpProxy.token = token
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
     }
 
     suspend fun updateUrl(url: String) {
@@ -224,7 +229,7 @@ object TcpProxyHelper : KoinComponent {
             return
         }
         tcpProxy.url = url
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
     }
 
     fun initiatePaymentVerification(context: Context) {
@@ -266,7 +271,7 @@ object TcpProxyHelper : KoinComponent {
         }
 
         tcpProxy.isActive = true
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
         appConfig.addProxy(AppConfig.ProxyType.TCP, AppConfig.ProxyProvider.TCP)
     }
 
@@ -278,7 +283,7 @@ object TcpProxyHelper : KoinComponent {
         }
 
         tcpProxy.isActive = false
-        tcpProxyRespository.update(tcpProxy)
+        db.update(tcpProxy)
         appConfig.removeProxy(AppConfig.ProxyType.TCP, AppConfig.ProxyProvider.TCP)
     }
 

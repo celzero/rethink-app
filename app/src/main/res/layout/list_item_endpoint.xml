@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/endpoint_list_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="0.5dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <RelativeLayout
+        android:id="@+id/endpoint_list_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:padding="5dp"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_toStartOf="@id/endpoint_info_img"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/endpoint_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="@dimen/large_font_text_view" />
+
+            <TextView
+                android:id="@+id/endpoint_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:textColor="?attr/primaryLightColorText"
+                android:textSize="@dimen/default_font_text_view" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/endpoint_info_img"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/endpoint_check"
+            android:padding="10dp"
+            android:src="@drawable/ic_info" />
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/endpoint_check"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:buttonTint="?attr/accentGood"
+            android:checked="false"
+            android:foregroundTint="?attr/accentGood"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@null" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/endpoint_list_container" />
+
+</RelativeLayout>

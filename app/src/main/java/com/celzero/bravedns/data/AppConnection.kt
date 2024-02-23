@@ -22,5 +22,8 @@ data class AppConnection(
     val count: Int,
     val flag: String,
     val blocked: Boolean,
-    val appOrDnsName: String?
+    val appOrDnsName: String?,
+    val downloadBytes: Long? = 0L,
+    val uploadBytes: Long? = 0L,
+    val totalBytes: Long? = 0L
 )

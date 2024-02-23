@@ -83,20 +83,6 @@
             android:textColor="?attr/primaryLightColorText"
             android:textSize="@dimen/extra_large_font_text_view" />
 
-        <TextView
-            android:id="@+id/bsac_trust_tip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="10dp"
-            android:fontFamily="monospace"
-            android:alpha="0.7"
-            android:textColor="?attr/primaryLightColorText"
-            android:padding="5dp"
-            android:text="@string/trusted_domains_desc"
-            android:textSize="@dimen/small_font_text_view" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bsac_domain_list"
             android:layout_width="match_parent"

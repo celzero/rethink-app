@@ -445,6 +445,13 @@
         <item name="strokeWidth">@dimen/default_stroke_width</item>
     </style>
 
+    <style name="toggleButtonNoStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:paddingLeft">@dimen/default_padding</item>
+        <item name="android:paddingRight">@dimen/default_padding</item>
+        <item name="strokeColor">?attr/primaryTextColor</item>
+        <item name="strokeWidth">@dimen/default_stroke_width</item>
+    </style>
+
     <style name="TabTextDefault" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
         <item name="android:textStyle">normal</item>

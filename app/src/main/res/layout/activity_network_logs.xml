@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/background"
     android:orientation="vertical"
-    tools:context=".ui.FirewallActivity">
+    tools:context=".ui.activity.FirewallActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/logs_act_tabLayout"

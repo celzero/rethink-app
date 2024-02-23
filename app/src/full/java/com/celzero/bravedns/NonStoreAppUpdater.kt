@@ -46,7 +46,7 @@ class NonStoreAppUpdater(
         Log.i(LOG_TAG_APP_UPDATE, "Beginning update check")
         val url = baseUrl + BuildConfig.VERSION_CODE
 
-        val client = RetrofitManager.okHttpClient(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
+        val client = RetrofitManager.okHttpClient()
         val request = Request.Builder().url(url).build()
 
         client

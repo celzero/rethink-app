@@ -34,6 +34,7 @@ class Transaction {
     var id: String = ""
     var ttl: Long = 0L
     var transportType: TransportType = TransportType.DOH
+    var msg: String = ""
 
     enum class Status(val id: Long) {
         START(Dnsx.Start),
@@ -43,6 +44,7 @@ class Transaction {
         NO_RESPONSE(Dnsx.NoResponse),
         BAD_RESPONSE(Dnsx.BadResponse),
         BAD_QUERY(Dnsx.BadQuery),
+        CLIENT_ERROR(Dnsx.ClientError),
         INTERNAL_ERROR(Dnsx.InternalError);
 
         companion object {
@@ -61,10 +63,6 @@ class Transaction {
         DOH(Dnsx.DOH),
         DNS_CRYPT(Dnsx.DNSCrypt),
         DNS_PROXY(Dnsx.DNS53);
-
-        fun isDnsCrypt(): Boolean {
-            return this == DNS_CRYPT
-        }
 
         companion object {
             fun getType(type: String): TransportType {

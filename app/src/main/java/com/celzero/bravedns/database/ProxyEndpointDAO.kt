@@ -18,7 +18,12 @@ package com.celzero.bravedns.database
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface ProxyEndpointDAO {
@@ -35,24 +40,32 @@ interface ProxyEndpointDAO {
     @Query("select * from ProxyEndpoint where proxyName like :query order by isSelected desc")
     fun getDNSProxyEndpointLiveDataByType(query: String): PagingSource<Int, ProxyEndpoint>
 
-    @Query("delete from ProxyEndpoint where modifiedDataTime < :date")
-    fun deleteOlderData(date: Long)
-
-    @Query("delete from ProxyEndpoint") fun clearAllData()
-
-    @Query("delete from ProxyEndpoint where proxyName = 'ORBOT'") fun clearOrbotData()
-
     @Query("update ProxyEndpoint set isSelected = 0 where isSelected = 1")
     fun removeConnectionStatus()
 
     @Query("select count(*) from ProxyEndpoint") fun getCount(): Int
 
     @Query("select * from ProxyEndpoint where isSelected = 1")
-    fun getConnectedProxy(): ProxyEndpoint?
-
-    @Query("select * from ProxyEndpoint where isSelected = 1")
     fun getConnectedProxyLiveData(): LiveData<ProxyEndpoint?>
 
-    @Query("select * from ProxyEndpoint where isSelected = 1 and proxyName = 'ORBOT'")
+    @Query("select * from ProxyEndpoint where proxyMode = 0") // 0 for Custom SOCKS5
+    fun getCustomSocks5Endpoint(): ProxyEndpoint
+
+    @Query("select * from ProxyEndpoint where isSelected = 1 and proxyMode = 0")
+    fun getConnectedSocks5Proxy(): ProxyEndpoint?
+
+    @Query("select * from ProxyEndpoint where proxyMode = 1") // 1 for Custom HTTP
+    fun getHttpProxyDetails(): ProxyEndpoint
+
+    @Query("select * from ProxyEndpoint where proxyMode = 1 and isSelected = 1")
+    fun getConnectedHttpProxy(): ProxyEndpoint
+
+    @Query("select * from ProxyEndpoint where isSelected = 1 and (proxyMode = 2 or proxyMode = 3)")
     fun getConnectedOrbotProxy(): ProxyEndpoint
+
+    @Query("select * from ProxyEndpoint where proxyMode = 2") // 2 for Orbot SOCKS5
+    fun getOrbotSocks5Endpoint(): ProxyEndpoint
+
+    @Query("select * from ProxyEndpoint where proxyMode = 3") // 3 for Orbot HTTP
+    fun getOrbotHttpEndpoint(): ProxyEndpoint
 }

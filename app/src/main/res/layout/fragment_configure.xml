@@ -36,7 +36,7 @@
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/fs_network_card"
+        android:id="@+id/fs_apps_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="true"
@@ -47,25 +47,23 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:padding="20dp">
 
-
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/fs_network_icon"
+                android:id="@+id/fs_apps_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerInParent="true"
-                android:src="@drawable/ic_network_tunnel" />
+                android:src="@drawable/ic_app_info_accent" />
 
             <TextView
-                android:id="@+id/fs_network_tv"
-                android:layout_width="match_parent"
+                android:id="@+id/fs_apps_tv"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
-                android:layout_toEndOf="@id/fs_network_icon"
-                android:text="@string/lbl_network"
+                android:layout_toEndOf="@id/fs_apps_icon"
+                android:text="@string/apps_info_title"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="16sp" />
 
@@ -73,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
                 android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -207,6 +205,49 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fs_network_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/fs_network_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_network_tunnel" />
+
+            <TextView
+                android:id="@+id/fs_network_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/fs_network_icon"
+                android:text="@string/lbl_network"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_right_arrow_white" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/fs_others_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -246,6 +287,47 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:src="@drawable/ic_right_arrow_white" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fs_logs_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="true"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/fs_logs_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_logs_accent" />
+
+            <TextView
+                android:id="@+id/fs_logs_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/fs_logs_icon"
+                android:text="@string/lbl_logs"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
                 android:src="@drawable/ic_right_arrow_white" />
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -62,7 +62,6 @@
     <string name="univ_firewall_dialog_message">Menghapus aturan ini akan memungkinkan aplikasi apa pun terhubung ke alamat IP ini. Apakah Anda ingin melanjutkan\?</string>
     <string name="download_update_dialog_message">Versi baru tersedia untuk diunduh dari situs web. Apakah Anda ingin melanjutkan\?</string>
     <string name="search_universal_ips"><font size="12">Cari IP</font></string>
-    <string name="whats_dialog_title">Apa yang baru di v055a</string>
     <string name="settings_ip_network_desc">Pilih versi Protokol Jaringan.</string>
     <string name="orbot_stop_dialog_dns_message">Rethink disiapkan untuk meneruskan permintaan DNS ke Orbot. Silahkan ubah sesuai kebutuhan.</string>
     <string name="orbot_bs_status_1">Meneruskan koneksi %1$s ke Orbot.</string>
@@ -504,7 +503,6 @@
     <string name="notif_dialog_pause_dialog_negative">Singkirkan</string>
     <string name="ada_app_status_block_wifi">Diblokir pada jaringan yang tidak terukur (WiFi)</string>
     <string name="notif_dialog_pause_dialog_title">Aplikasi Dijeda!</string>
-    <string name="hsf_pause_lockdown_failure">Tidak dapat menjeda: Memikirkan kembali dalam mode kuncian</string>
     <string name="about_dialog_positive_button">Ayo Jalankan</string>
     <string name="fapps_metered_unblock_dialog_title">Izinkan koneksi pada jaringan yang terukur</string>
     <string name="settings_notification_desc1">Jeda/Berhenti (bawaan)</string>
@@ -541,7 +539,6 @@
     <string name="firewall_rule_global_lockdown">Penguncian penuh</string>
     <string name="cd_dns_crypt_dialog_title">Tambahkan Penyelesai (Resolver) atau Jembatan-Penghubung (Relay) DNSCrypt</string>
     <string name="ada_firewall_status">Aplikasi ini <b><i>%1$s</i></b>.</string>
-    <string name="fapps_lockdown_hint">Vpn dalam mode terkunci penuh. Firewall akan mematuhi aturan Terukur / tidak Terukur.</string>
     <string name="dns_crypt_connection_failure">Gagal terhubung ke server DNSCrypt.</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s penyelesai</string>
     <string name="ada_app_metered">Terukur</string>

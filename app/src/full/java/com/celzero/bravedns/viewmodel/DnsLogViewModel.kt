@@ -27,8 +27,9 @@ import androidx.paging.cachedIn
 import androidx.paging.liveData
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.database.DnsLogDAO
-import com.celzero.bravedns.ui.DnsLogFragment
+import com.celzero.bravedns.ui.fragment.DnsLogFragment
 import com.celzero.bravedns.util.Constants.Companion.LIVEDATA_PAGE_SIZE
+import com.celzero.bravedns.util.ResourceRecordTypes.Companion.getHandledTypes
 
 class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
 
@@ -63,6 +64,9 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
             }
             DnsLogFragment.DnsLogFilter.MAYBE_BLOCKED -> {
                 getMaybeBlockedDnsLogs(filter)
+            }
+            DnsLogFragment.DnsLogFilter.UNKNOWN_RECORDS -> {
+                getUnknownRecordDnsLogs(filter)
             }
         }
     }
@@ -109,6 +113,19 @@ class DnsLogViewModel(private val dnsLogDAO: DnsLogDAO) : ViewModel() {
                     dnsLogDAO.getMaybeBlockedDnsLogs()
                 } else {
                     dnsLogDAO.getMaybeBlockedDnsLogsByName("%$filter%")
+                }
+            }
+            .liveData
+            .cachedIn(viewModelScope)
+    }
+
+    private fun getUnknownRecordDnsLogs(filter: String): LiveData<PagingData<DnsLog>> {
+        val handledTypes = getHandledTypes()
+        return Pager(pagingConfig) {
+                if (filter.isEmpty()) {
+                    dnsLogDAO.getUnknownRecordDnsLogs(handledTypes)
+                } else {
+                    dnsLogDAO.getUnknownRecordDnsLogsByName("%$filter%", handledTypes)
                 }
             }
             .liveData

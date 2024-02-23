@@ -5,54 +5,13 @@
     android:layout_height="match_parent"
     android:background="?attr/background">
 
-
-    <RelativeLayout
-        android:id="@+id/wg_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="45dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/settings_network"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:fontFamily="sans-serif-smallcaps"
-            android:lineSpacingExtra="5dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
-            android:padding="5dp"
-            android:text="@string/lbl_wireguard"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/wg_refresh"
-            android:textColor="?attr/accentGood"
-            android:textSize="@dimen/extra_large_font_text_view"
-            android:textStyle="bold" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/wg_refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:padding="5dp"
-            android:src="@drawable/ic_refresh_white" />
-    </RelativeLayout>
-
     <RelativeLayout
         android:id="@+id/wg_empty_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wg_header">
+        app:layout_constraintStart_toStartOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/wg_no_config_text"
@@ -76,6 +35,42 @@
 
     </RelativeLayout>
 
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/wg_list_toggle_group"
+        style="@style/toggleButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        app:checkedButton="@id/lb_simple_toggle_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/wg_general_toggle_btn"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="125dp"
+            android:tag="1"
+            android:text="@string/lbl_default"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/one_wg_toggle_btn"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="125dp"
+            android:tag="2"
+            android:text="@string/lbl_one_wg"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            app:cornerRadius="16dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
     <TextView
         android:id="@+id/wg_wireguard_disclaimer"
         android:layout_width="match_parent"
@@ -88,14 +83,27 @@
         android:textColor="?attr/primaryLightColorText"
         android:textSize="@dimen/default_font_text_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wg_header" />
+        app:layout_constraintTop_toBottomOf="@+id/wg_list_toggle_group" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/wg_interface_list"
+        android:id="@+id/wg_general_interface_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="100dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wg_wireguard_disclaimer" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/one_wg_interface_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

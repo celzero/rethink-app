@@ -19,40 +19,33 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import dnsx.Dnsx
 import inet.ipaddr.HostName
-import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.write
 
 object IpRulesManager : KoinComponent {
 
-    private val customIpRepository by inject<CustomIpRepository>()
-    private val persistentState by inject<PersistentState>()
-    private val lock = ReentrantReadWriteLock()
+    private val db by inject<CustomIpRepository>()
 
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
-    private var appIpRules: MutableMap<CacheKey, CustomIp> = hashMapOf()
-    private var wildCards: MutableMap<CacheKey, CustomIp> = hashMapOf()
+    private var iptree = Dnsx.newIpTree()
 
     // key-value object for ip look-up
     data class CacheKey(val hostName: HostName, val uid: Int)
 
     // stores the response for the look-up request from the BraveVpnService
+    // especially useful for storing results of subnetMatch() function as it is expensive
     private val resultsCache: Cache<CacheKey, IpRuleStatus> =
         CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE).build()
 
@@ -82,7 +75,11 @@ object IpRulesManager : KoinComponent {
                 )
             }
 
-            fun getStatus(id: Int): IpRuleStatus {
+            fun getStatus(id: Int?): IpRuleStatus {
+                if (id == null) {
+                    return NONE
+                }
+
                 return when (id) {
                     NONE.id -> NONE
                     BLOCK.id -> BLOCK
@@ -94,262 +91,226 @@ object IpRulesManager : KoinComponent {
         }
     }
 
-    init {
-        io { loadIpRules() }
+    private fun logd(msg: String) {
+        if (DEBUG) Log.d(LOG_TAG_FIREWALL, msg)
     }
 
-    // returns CustomIp object based on uid and IP address
-    private suspend fun getObj(uid: Int, ipAddress: String, port: Int): CustomIp? {
-        return customIpRepository.getCustomIpDetail(uid, ipAddress, port)
-    }
-
-    fun getCustomIpsLiveData(): LiveData<Int> {
-        return customIpRepository.getCustomIpsLiveData()
-    }
-
-    fun removeIpRule(uid: Int, ipAddress: String, port: Int) {
-        Log.i(LOG_TAG_FIREWALL, "IP Rules, remove/delete rule for ip: $ipAddress for uid: $uid")
-        if (ipAddress.isEmpty()) {
-            return
-        }
-
-        io {
-            val customIp = getObj(uid, ipAddress, port)
-            customIpRepository.deleteRule(uid, ipAddress, port)
-
-            if (customIp == null) return@io
-
-            // remove the ip address from local list
-            removeLocalCache(customIp)
-            resultsCache.invalidateAll()
-        }
-    }
-
-    fun updateRule(uid: Int, ipAddress: String, port: Int, status: IpRuleStatus) {
-        Log.i(
-            LOG_TAG_FIREWALL,
-            "IP Rules, update rule for ip: $ipAddress for uid: $uid with status: ${status.name}"
-        )
-        io {
-            val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
-            customIpRepository.insert(customIpObj)
-            updateLocalCache(customIpObj)
-            resultsCache.invalidateAll()
-        }
-    }
-
-    fun byPassUniversal(customIp: CustomIp) {
-        Log.i(
-            LOG_TAG_FIREWALL,
-            "IP Rules, by-pass univ rules, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
-        )
-        io {
-            customIp.status = IpRuleStatus.BYPASS_UNIVERSAL.id
-            customIp.modifiedDateTime = System.currentTimeMillis()
-            customIpRepository.update(customIp)
-            updateLocalCache(customIp)
-            resultsCache.invalidateAll()
-        }
-    }
-
-    fun trustIpRules(customIp: CustomIp) {
-        Log.i(
-            LOG_TAG_FIREWALL,
-            "IP Rules, trust ip, ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
-        )
-        io {
-            customIp.status = IpRuleStatus.TRUST.id
-            customIp.modifiedDateTime = System.currentTimeMillis()
-            customIpRepository.update(customIp)
-            updateLocalCache(customIp)
-            resultsCache.invalidateAll()
-        }
-    }
-
-    fun noRuleIp(customIp: CustomIp) {
-        Log.i(
-            LOG_TAG_FIREWALL,
-            "IP Rules, remove(soft delete) rule for ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
-        )
-        io {
-            customIp.status = IpRuleStatus.NONE.id
-            customIp.modifiedDateTime = System.currentTimeMillis()
-            customIpRepository.update(customIp)
-            updateLocalCache(customIp)
-            resultsCache.invalidateAll()
-        }
-    }
-
-    private fun updateLocalCache(ip: CustomIp) {
-        lock.write {
-            if (
-                ip.getCustomIpAddress().asAddress().isMultiple ||
-                    ip.getCustomIpAddress().asAddress().isAnyLocal
-            ) {
-                wildCards[CacheKey(ip.getCustomIpAddress(), ip.uid)] = ip
-                return
-            }
-            appIpRules[CacheKey(ip.getCustomIpAddress(), ip.uid)] = ip
-        }
-    }
-
-    private fun removeLocalCache(ip: CustomIp) {
-        lock.write {
-            if (
-                ip.getCustomIpAddress().asAddress().isMultiple ||
-                    ip.getCustomIpAddress().asAddress().isAnyLocal
-            ) {
-                wildCards.remove(CacheKey(ip.getCustomIpAddress(), ip.uid))
-                return
-            }
-            appIpRules.remove(CacheKey(ip.getCustomIpAddress(), ip.uid))
-        }
-    }
-
-    fun blockIp(customIp: CustomIp) {
-        Log.i(
-            LOG_TAG_FIREWALL,
-            "IP Rules, block rule for ip: ${customIp.ipAddress} for uid: ${customIp.uid} with previous status id: ${customIp.status}"
-        )
-        io {
-            customIp.status = IpRuleStatus.BLOCK.id
-            customIp.modifiedDateTime = System.currentTimeMillis()
-            customIpRepository.update(customIp)
-            updateLocalCache(customIp)
-            resultsCache.invalidateAll()
-        }
-    }
-
-    fun hasRule(uid: Int, ipString: String, port: Int?): IpRuleStatus {
-        val ip =
-            if (port == null) {
-                HostName(ipString)
-            } else {
-                HostName(IPAddressString(ipString).address, port)
-            }
-
-        // check if the ip address is already available in the cache
-        val key = CacheKey(ip, uid)
-        resultsCache.getIfPresent(key)?.let {
-            // return only if both ip and app(uid) matches
-            return it
-        }
-
-        if (appIpRules.contains(key)) {
-            val customIp = appIpRules[key]
-
-            if (customIp != null) {
-                val status = IpRuleStatus.getStatus(customIp.status)
-                resultsCache.put(key, status)
-                return status
-            }
-        }
-
-        var status = subnetMatch(uid, ip)
-
-        // status is not NONE, return the obtained status
-        if (status != IpRuleStatus.NONE) {
-            resultsCache.put(key, status)
-            return status
-        }
-
-        if (port != null) {
-            status = hasRule(uid, ip.asAddress().toNormalizedString(), null)
-            resultsCache.put(key, status)
-            return status
-        }
-
-        // no need to carry out below checks if ip is not IPv6
-        if (!IPUtil.isIpV6(ip.asAddress()) && !isIpv6ToV4FilterRequired()) {
-            resultsCache.put(key, status)
-            return status
-        }
-
-        // for IPv4 address in IPv6
-        var ipv4: IPAddress? = null
-        if (IPUtil.canMakeIpv4(ip.asAddress())) {
-            ipv4 = IPUtil.toIpV4(ip.asAddress())
-        }
-
-        if (ipv4 != null) {
-            status = hasRule(uid, ipv4.toNormalizedString(), ip.port)
-            // status is not NONE, return the obtained status
-            if (status != IpRuleStatus.NONE) {
-                resultsCache.put(key, status)
-                return status
-            }
-        } else {
-            // no-op
-        }
-
-        resultsCache.put(key, status)
-        return status
-    }
-
-    fun isIpRuleAvailable(uid: Int, ipString: String, port: Int?): IpRuleStatus {
-        val ip =
-            if (port == null) {
-                HostName(ipString)
-            } else {
-                HostName(IPAddressString(ipString).address, port)
-            }
-
-        val key = CacheKey(ip, uid)
-        val customIpObj =
-            appIpRules.getOrElse(key) {
-                return IpRuleStatus.NONE
-            }
-
-        return IpRuleStatus.getStatus(customIpObj.status)
-    }
-
-    private fun isIpv6ToV4FilterRequired(): Boolean {
-        return persistentState.filterIpv4inIpv6
-    }
-
-    fun deleteRulesByUid(uid: Int) {
-        io {
-            customIpRepository.deleteRulesByUid(uid)
-            appIpRules = appIpRules.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
-            wildCards = wildCards.filterKeys { it.uid != uid } as MutableMap<CacheKey, CustomIp>
-            resultsCache.invalidateAll()
-        }
-    }
-
-    fun deleteAllAppsRules() {
-        io {
-            customIpRepository.deleteAllAppsRules()
-            appIpRules.clear()
-            wildCards.clear()
-            resultsCache.invalidateAll()
-        }
-    }
-
-    suspend fun loadIpRules() {
-        if (appIpRules.isNotEmpty() || wildCards.isNotEmpty()) {
-            return
-        }
-        io {
-            val rules = customIpRepository.getIpRules()
-            // sort the rules by the network prefix length
-            val selector: (IPAddressString?) -> Int = { str -> str?.networkPrefixLength ?: 32 }
-            val subnetMap =
-                rules.sortedByDescending { selector(it.getCustomIpAddress().asAddressString()) }
-            subnetMap.forEach {
-                // isAnyLocal is true for rules like 0.0.0.0:443
-                if (
-                    it.getCustomIpAddress().asAddress().isMultiple ||
-                        it.getCustomIpAddress().asAddress().isAnyLocal
-                ) {
-                    wildCards[CacheKey(it.getCustomIpAddress(), it.uid)] = it
-                } else {
-                    appIpRules[CacheKey(it.getCustomIpAddress(), it.uid)] = it
+    suspend fun load(): Long {
+        iptree.clear()
+        db.getIpRules().forEach {
+            val ipstr = it.getCustomIpAddress().toNormalizedString()
+            val k = treeKey(ipstr)
+            val v = treeVal(it.uid, it.port, it.status)
+            if (!k.isNullOrEmpty()) {
+                try {
+                    logd("iptree.add($k, $v)")
+                    iptree.add(k, v)
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG_FIREWALL, "err iptree.add($k, $v)", e)
                 }
             }
         }
+        return iptree.len()
     }
 
-    fun constructCustomIpObject(
+    fun getCustomIpsLiveData(): LiveData<Int> {
+        return db.getCustomIpsLiveData()
+    }
+
+    private fun treeKey(ipstr: String): String? {
+        // "192/8" -> 0.0.0.192/32
+        // "*.*" -> 0.0.0.0/0
+        // "*.*.*.*" -> 0.0.0.0/0
+        // "0/24" -> 0.0.0.0/24
+        // "::" -> ::/128
+        // "::/1" -> ::/1
+        // assignPrefixForSingleBlock: equivalent CIDR address with a prefix length for which the
+        // address subnet block matches the range of values in this address.
+        // If no such prefix length exists, returns null.
+        // Examples:
+        // 1.2.3.4 returns 1.2.3.4/32
+        // 1.2.*.* returns 1.2.0.0/16
+        // 1.2.*.0/24 returns 1.2.0.0/16
+        // 1.2.*.4 returns null
+        // 1.2.252-255.* returns 1.2.252.0/22
+        // 1.2.3.4/x returns the same address
+        return ipaddr(ipstr)?.asAddress()?.assignPrefixForSingleBlock()?.toCanonicalString()
+    }
+
+    private fun treeValLike(uid: Int, port: Int): String {
+        return "$uid:$port"
+    }
+
+    private fun treeValStatus(v: String?): IpRuleStatus {
+        if (v.isNullOrEmpty()) {
+            return IpRuleStatus.NONE
+        }
+        try {
+            val items = v.split(":")
+            if (items.size != 3) {
+                return IpRuleStatus.NONE
+            }
+            return IpRuleStatus.getStatus(items[2].toIntOrNull())
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_FIREWALL, "err treeValStatus: ${e.message}")
+            return IpRuleStatus.NONE
+        }
+    }
+
+    private fun treeValsFromCsv(csv: String): List<String> {
+        return csv.split(Dnsx.Vsep)
+    }
+
+    private fun treeVal(uid: Int, port: Int, rule: Int): String {
+        return "$uid:$port:$rule"
+    }
+
+    suspend fun removeIpRule(uid: Int, ipstr: String, port: Int) {
+        Log.i(LOG_TAG_FIREWALL, "ip rule, rmv: $ipstr for uid: $uid")
+        if (ipstr.isEmpty()) {
+            return
+        }
+
+        db.deleteRule(uid, ipstr, port)
+
+        val k = treeKey(ipstr)
+        if (!k.isNullOrEmpty()) iptree.escLike(k, treeValLike(uid, port))
+
+        resultsCache.invalidateAll()
+    }
+
+    private suspend fun updateRule(uid: Int, ipaddr: String, port: Int, status: IpRuleStatus) {
+        Log.i(LOG_TAG_FIREWALL, "ip rules, update: $ipaddr for uid: $uid; status: ${status.name}")
+        val c = makeCustomIp(uid, ipaddr, port, status)
+        db.update(c)
+        val k = treeKey(ipaddr)
+        if (!k.isNullOrEmpty()) {
+            iptree.escLike(k, treeValLike(uid, port))
+            iptree.add(k, treeVal(uid, port, status.id))
+        }
+        resultsCache.invalidateAll()
+    }
+
+    suspend fun updateBypass(c: CustomIp) {
+        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.BYPASS_UNIVERSAL)
+    }
+
+    suspend fun updateTrust(c: CustomIp) {
+        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.TRUST)
+    }
+
+    suspend fun updateNoRule(c: CustomIp) {
+        return updateRule(c.uid, c.ipAddress, c.port, IpRuleStatus.NONE)
+    }
+
+    suspend fun updateBlock(customIp: CustomIp) {
+        return updateRule(customIp.uid, customIp.ipAddress, customIp.port, IpRuleStatus.BLOCK)
+    }
+
+    fun hasRule(uid: Int, ipstr: String, port: Int): IpRuleStatus {
+        val ip = ipaddr(ipstr, port) ?: return IpRuleStatus.NONE
+        val ck = CacheKey(ip, uid)
+
+        resultsCache.getIfPresent(ck)?.let {
+            // return only if both ip and app(uid) matches
+            logd("match in cache $uid $ipstr: $it")
+            return it
+        }
+
+        getMostSpecificRuleMatch(uid, ipstr, port).let {
+            logd("ip rule for $uid $ipstr $port => $it ??")
+            if (it != IpRuleStatus.NONE) {
+                resultsCache.put(ck, it)
+                return it
+            }
+        }
+        getMostSpecificRuleMatch(uid, ipstr).let {
+            logd("ip rule for $uid $ipstr => $it ??")
+            if (it != IpRuleStatus.NONE) {
+                resultsCache.put(ck, it)
+                return it
+            }
+        }
+        getMostSpecificRouteMatch(uid, ipstr, port).let {
+            logd("route rule for $uid $ipstr $port => $it ??")
+            if (it != IpRuleStatus.NONE) {
+                resultsCache.put(ck, it)
+                return it
+            }
+        }
+        getMostSpecificRouteMatch(uid, ipstr).let {
+            logd("route rule for $uid $ipstr => $it ??")
+            if (it != IpRuleStatus.NONE) {
+                resultsCache.put(ck, it)
+                return it
+            }
+        }
+        logd("hasRule? NO: $uid, $ipstr, $port")
+        return IpRuleStatus.NONE
+    }
+
+    fun ipaddr(ipstr: String, port: Int? = null): HostName? {
+        return try {
+            if (port == null) {
+                HostName(ipstr)
+            } else {
+                HostName(IPAddressString(ipstr).address, port)
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG_FIREWALL, "err ip-rule($ipstr, $port): ${e.message}")
+            null
+        }
+    }
+
+    fun getMostSpecificRuleMatch(uid: Int, ipstr: String, port: Int = 0): IpRuleStatus {
+        val k = treeKey(ipstr)
+        if (!k.isNullOrEmpty()) {
+            val vlike = treeValLike(uid, port)
+            // rules at the end of the list have higher precedence as they're more specific
+            // (think: 0.0.0.0/0 vs 1.1.1.1/32)
+            val x = iptree.getLike(k, vlike)
+            logd("getMostSpecificRuleMatch: $uid, $k, $vlike => $x")
+            return treeValsFromCsv(x)
+                .map { treeValStatus(it) }
+                .lastOrNull { it != IpRuleStatus.NONE } ?: IpRuleStatus.NONE
+        }
+        return IpRuleStatus.NONE
+    }
+
+    private fun getMostSpecificRouteMatch(uid: Int, ipstr: String, port: Int = 0): IpRuleStatus {
+        val k = treeKey(ipstr)
+        if (!k.isNullOrEmpty()) {
+            val vlike = treeValLike(uid, port)
+            // rules at the end of the list have higher precedence as they're more specific
+            // (think: 0.0.0.0/0 vs 1.1.1.1/32)
+            val x = iptree.valuesLike(k, vlike)
+            logd("getMostSpecificRouteMatch: $uid, $k, $vlike => $x")
+            return treeValsFromCsv(x)
+                .map { treeValStatus(it) }
+                .lastOrNull { it != IpRuleStatus.NONE } ?: IpRuleStatus.NONE
+        }
+        return IpRuleStatus.NONE
+    }
+
+    suspend fun deleteRulesByUid(uid: Int) {
+        db.getRulesByUid(uid).forEach {
+            val ipstr = it.getCustomIpAddress().toNormalizedString()
+            val k = treeKey(ipstr)
+            if (!k.isNullOrEmpty()) {
+                iptree.esc(k, treeVal(it.uid, it.port, it.status))
+            }
+        }
+        db.deleteRulesByUid(uid)
+        resultsCache.invalidateAll()
+    }
+
+    suspend fun deleteAllAppsRules() {
+        db.deleteAllAppsRules()
+        iptree.clear()
+        resultsCache.invalidateAll()
+    }
+
+    fun makeCustomIp(
         uid: Int,
         ipAddress: String,
         port: Int?,
@@ -376,68 +337,50 @@ object IpRulesManager : KoinComponent {
         return customIp
     }
 
-    fun addIpRule(uid: Int, ipAddress: String, port: Int?, status: IpRuleStatus) {
-        io {
-            Log.i(
-                LOG_TAG_FIREWALL,
-                "IP Rules, add rule for ($uid) ip: $ipAddress, $port with status: ${status.name}"
-            )
-            val customIpObj = constructCustomIpObject(uid, ipAddress, port, status)
-            customIpRepository.insert(customIpObj)
-            updateLocalCache(customIpObj)
-            resultsCache.invalidateAll()
+    suspend fun addIpRule(uid: Int, ipstr: String, port: Int?, status: IpRuleStatus) {
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "IP Rules, add rule for ($uid) ip: $ipstr, $port with status: ${status.name}"
+        )
+        val c = makeCustomIp(uid, ipstr, port, status)
+        db.insert(c)
+        val k = treeKey(ipstr)
+        if (!k.isNullOrEmpty()) {
+            iptree.escLike(k, treeValLike(uid, port ?: 0))
+            iptree.add(k, treeVal(uid, port ?: 0, status.id))
         }
+        resultsCache.invalidateAll()
     }
 
-    fun updateIpRule(prevRule: CustomIp, newRule: CustomIp) {
-        io {
-            Log.i(
-                LOG_TAG_FIREWALL,
-                "IP Rules, update rule for (${prevRule.uid}) ip: ${prevRule.getCustomIpAddress().asAddress().toNormalizedString()}, ${prevRule.port} with status: ${newRule.status}"
-            )
-            customIpRepository.deleteRule(
-                prevRule.uid,
-                prevRule.getCustomIpAddress().asAddress().toNormalizedString(),
-                prevRule.port
-            )
-            customIpRepository.insert(newRule)
-            updateLocalCache(newRule)
-            resultsCache.invalidateAll()
+    suspend fun updateUids(uids: List<Int>, newUids: List<Int>) {
+        for (i in uids.indices) {
+            val u = uids[i]
+            val n = newUids[i]
+            db.updateUid(u, n)
         }
+        resultsCache.invalidateAll()
+        load()
+        Log.i(LOG_TAG_FIREWALL, "ip rules updated")
     }
 
-    private fun subnetMatch(uid: Int, hostName: HostName): IpRuleStatus {
-        // TODO: subnet precedence should be taken care of.
-        // TODO: IP/16 and IP/24 is added to the rule.
-        wildCards.keys.forEach { w ->
-            val wc = w.hostName
-            if (wc.asAddress().contains(hostName.asAddress())) {
-                val rule = wildCards[w]
-                if (rule?.uid == uid && (wc.port == null || wc.port == hostName.port)) {
-                    return IpRuleStatus.getStatus(rule.status)
-                } else {
-                    // no-op
-                }
-            } else if (
-                wc.asAddress().isAnyLocal &&
-                    wc.asAddress().ipVersion == hostName.asAddress().ipVersion
-            ) {
-                // case where the default (0.0.0.0 / [::]) is treated as wildcard
-                val rule = wildCards[w]
-                if (uid == rule?.uid && wc.port == hostName.port) {
-                    return IpRuleStatus.getStatus(rule.status)
-                } else {
-                    // no-op
-                }
-            } else {
-                // no-op
-            }
+    suspend fun replaceIpRule(prevRule: CustomIp, newRule: CustomIp) {
+        val prevIpAddrStr = prevRule.getCustomIpAddress().asAddress().toNormalizedString()
+        val newIpAddrStr = newRule.getCustomIpAddress().asAddress().toNormalizedString()
+        Log.i(
+            LOG_TAG_FIREWALL,
+            "ip rule, update (${prevRule.uid}); ${prevIpAddrStr}:${prevRule.port}; new: ${newRule.status}"
+        )
+        db.deleteRule(prevRule.uid, prevIpAddrStr, prevRule.port)
+        db.insert(newRule)
+        val pk = treeKey(prevIpAddrStr)
+        if (!pk.isNullOrEmpty()) {
+            iptree.escLike(pk, treeValLike(prevRule.uid, prevRule.port))
         }
-
-        return IpRuleStatus.NONE
-    }
-
-    private fun io(f: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch { f() }
+        val nk = treeKey(newIpAddrStr)
+        if (!nk.isNullOrEmpty()) {
+            iptree.escLike(nk, treeValLike(newRule.uid, newRule.port))
+            iptree.add(nk, treeVal(newRule.uid, newRule.port, newRule.status))
+        }
+        resultsCache.invalidateAll()
     }
 }

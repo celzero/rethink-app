@@ -40,6 +40,8 @@ interface ProxyApplicationMappingDAO {
     @Query("delete from ProxyApplicationMapping where uid = :uid and packageName = :packageName")
     fun deleteByPackageName(uid: Int, packageName: String)
 
+    @Query("delete from ProxyApplicationMapping") fun deleteAll()
+
     @Query("select * from ProxyApplicationMapping")
     fun getWgAppMapping(): List<ProxyApplicationMapping>
 
@@ -76,4 +78,9 @@ interface ProxyApplicationMappingDAO {
 
     @Query("update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName")
     fun updateProxyForAllApps(cfgId: String, cfgName: String = "")
+
+    @Query(
+        "update ProxyApplicationMapping set proxyId = :cfgId, proxyName = :cfgName where proxyId = ''"
+    )
+    fun updateProxyForUnselectedApps(cfgId: String, cfgName: String = "")
 }

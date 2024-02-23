@@ -42,8 +42,9 @@ import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.blocklistDownloadBasePath
+import com.celzero.bravedns.util.Utilities.calculateMd5
+import com.celzero.bravedns.util.Utilities.getTagValueFromJson
 import com.celzero.bravedns.util.Utilities.tempDownloadBasePath
-import dnsx.Dnsx
 import okhttp3.ResponseBody
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -222,10 +223,7 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         if (DEBUG) OkHttpDebugLogging.enableTaskRunner()
 
         // create okhttp client with base url
-        val retrofit =
-            getBlocklistBaseBuilder(RetrofitManager.Companion.OkHttpDnsType.DEFAULT)
-                .build()
-                .create(IBlocklistDownload::class.java)
+        val retrofit = getBlocklistBaseBuilder().build().create(IBlocklistDownload::class.java)
         val response = retrofit.downloadLocalBlocklistFile(url, persistentState.appVersion, "")
 
         return if (response?.isSuccessful == true) {
@@ -356,16 +354,20 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
         try {
             val path: String =
                 blocklistDownloadBasePath(context, LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME, timestamp)
-            val braveDNS =
-                Dnsx.newBraveDNSLocal(
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_TD,
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_RD,
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG,
-                    path + Constants.ONDEVICE_BLOCKLIST_FILE_TAG
-                )
+            val tdmd5 = calculateMd5(path + Constants.ONDEVICE_BLOCKLIST_FILE_TD)
+            val rdmd5 = calculateMd5(path + Constants.ONDEVICE_BLOCKLIST_FILE_RD)
+            val remoteTdmd5 =
+                getTagValueFromJson(path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG, "tdmd5")
+            val remoteRdmd5 =
+                getTagValueFromJson(path + Constants.ONDEVICE_BLOCKLIST_FILE_BASIC_CONFIG, "rdmd5")
             if (DEBUG)
-                Log.d(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid? ${braveDNS != null}")
-            return braveDNS != null
+                Log.d(
+                    LOG_TAG_DOWNLOAD,
+                    "tdmd5: $tdmd5, rdmd5: $rdmd5, remotetd: $remoteTdmd5, remoterd: $remoteRdmd5"
+                )
+            val isDownloadValid = tdmd5 == remoteTdmd5 && rdmd5 == remoteRdmd5
+            Log.i(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid? $isDownloadValid")
+            return isDownloadValid
         } catch (e: Exception) {
             Log.e(LOG_TAG_DOWNLOAD, "AppDownloadManager isDownloadValid exception: ${e.message}", e)
         }
@@ -512,8 +514,6 @@ class LocalBlocklistCoordinator(val context: Context, workerParams: WorkerParame
     }
 
     private fun updatePersistenceOnCopySuccess(timestamp: Long) {
-        // recreate bravedns object ()
-        appConfig.recreateBraveDnsObj()
         persistentState.localBlocklistTimestamp = timestamp
         persistentState.blocklistEnabled = true
         // reset updatable time stamp

@@ -30,6 +30,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -42,7 +43,7 @@ import com.celzero.bravedns.databinding.ListItemCustomAllIpBinding
 import com.celzero.bravedns.databinding.ListItemCustomIpBinding
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
-import com.celzero.bravedns.ui.CustomRulesActivity
+import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.UIUtils.fetchColor
@@ -136,18 +137,20 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
     }
 
     private fun changeIpStatus(id: IpRulesManager.IpRuleStatus, customIp: CustomIp) {
-        when (id) {
-            IpRulesManager.IpRuleStatus.NONE -> {
-                noRuleIp(customIp)
-            }
-            IpRulesManager.IpRuleStatus.BLOCK -> {
-                blockIp(customIp)
-            }
-            IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                byPassUniversal(customIp)
-            }
-            IpRulesManager.IpRuleStatus.TRUST -> {
-                byPassAppRule(customIp)
+        io {
+            when (id) {
+                IpRulesManager.IpRuleStatus.NONE -> {
+                    noRuleIp(customIp)
+                }
+                IpRulesManager.IpRuleStatus.BLOCK -> {
+                    blockIp(customIp)
+                }
+                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                    byPassUniversal(customIp)
+                }
+                IpRulesManager.IpRuleStatus.TRUST -> {
+                    byPassAppRule(customIp)
+                }
             }
         }
     }
@@ -212,33 +215,44 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         }
     }
 
-    private fun byPassUniversal(customIp: CustomIp) {
-        IpRulesManager.byPassUniversal(customIp)
+    private suspend fun byPassUniversal(customIp: CustomIp) {
+        IpRulesManager.updateBypass(customIp)
     }
 
-    private fun byPassAppRule(customIp: CustomIp) {
-        IpRulesManager.trustIpRules(customIp)
+    private suspend fun byPassAppRule(customIp: CustomIp) {
+        IpRulesManager.updateTrust(customIp)
     }
 
-    private fun blockIp(customIp: CustomIp) {
-        IpRulesManager.blockIp(customIp)
+    private suspend fun blockIp(customIp: CustomIp) {
+        IpRulesManager.updateBlock(customIp)
     }
 
-    private fun noRuleIp(customIp: CustomIp) {
-        IpRulesManager.noRuleIp(customIp)
+    private suspend fun noRuleIp(customIp: CustomIp) {
+        IpRulesManager.updateNoRule(customIp)
     }
 
     inner class CustomIpsViewHolderWithHeader(private val b: ListItemCustomAllIpBinding) :
         RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customIp: CustomIp
+
         fun update(ci: CustomIp) {
-            b.customIpAppName.text = getAppName(ci.uid)
-            val appInfo = FirewallManager.getAppInfoByUid(ci.uid)
-            displayIcon(
-                Utilities.getIcon(context, appInfo?.packageName ?: "", appInfo?.appName ?: ""),
-                b.customIpAppIconIv
-            )
+            io {
+                val appNames = FirewallManager.getAppNamesByUid(ci.uid)
+                val appName = getAppName(ci.uid, appNames)
+                val appInfo = FirewallManager.getAppInfoByUid(ci.uid)
+                uiCtx {
+                    b.customIpAppName.text = appName
+                    displayIcon(
+                        Utilities.getIcon(
+                            context,
+                            appInfo?.packageName ?: "",
+                            appInfo?.appName ?: ""
+                        ),
+                        b.customIpAppIconIv
+                    )
+                }
+            }
 
             customIp = ci
             b.customIpLabelTv.text =
@@ -270,14 +284,12 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             b.customIpContainer.setOnClickListener { toggleActionsUi() }
         }
 
-        private fun getAppName(uid: Int): String {
+        private fun getAppName(uid: Int, appNames: List<String>): String {
             if (uid == UID_EVERYBODY) {
                 return context
                     .getString(R.string.firewall_act_universal_tab)
                     .replaceFirstChar(Char::titlecase)
             }
-
-            val appNames = FirewallManager.getAppNamesByUid(uid)
 
             if (appNames.isEmpty()) {
                 return context.getString(R.string.network_log_app_name_unnamed, "($uid)")
@@ -382,16 +394,12 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
-                IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port)
-                Toast.makeText(
-                        context,
-                        context.getString(
-                            R.string.univ_ip_delete_individual_toast,
-                            customIp.ipAddress
-                        ),
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
+                io { IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port) }
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.univ_ip_delete_individual_toast, customIp.ipAddress),
+                    Toast.LENGTH_SHORT
+                )
             }
 
             builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
@@ -486,6 +494,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         RecyclerView.ViewHolder(b.root) {
 
         private lateinit var customIp: CustomIp
+
         fun update(ci: CustomIp) {
             customIp = ci
             b.customIpLabelTv.text =
@@ -604,16 +613,12 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             builder.setMessage(R.string.univ_firewall_dialog_message)
             builder.setCancelable(true)
             builder.setPositiveButton(context.getString(R.string.lbl_delete)) { _, _ ->
-                IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port)
-                Toast.makeText(
-                        context,
-                        context.getString(
-                            R.string.univ_ip_delete_individual_toast,
-                            customIp.ipAddress
-                        ),
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
+                io { IpRulesManager.removeIpRule(customIp.uid, customIp.ipAddress, customIp.port) }
+                Utilities.showToastUiCentered(
+                    context,
+                    context.getString(R.string.univ_ip_delete_individual_toast, customIp.ipAddress),
+                    Toast.LENGTH_SHORT
+                )
             }
 
             builder.setNegativeButton(context.getString(R.string.lbl_cancel)) { _, _ ->
@@ -717,8 +722,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         lp.width = WindowManager.LayoutParams.MATCH_PARENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog.show()
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(true)
         dialog.window?.attributes = lp
 
         dBind.daciIpTitle.text = context.getString(R.string.ci_dialog_title)
@@ -807,22 +811,28 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         if (hostName == null) return
 
         val new =
-            IpRulesManager.constructCustomIpObject(
+            IpRulesManager.makeCustomIp(
                 prev.uid,
                 hostName.asAddress().toNormalizedString(),
                 hostName.port,
                 status
             )
-        IpRulesManager.updateIpRule(prev, new)
+        io { IpRulesManager.replaceIpRule(prev, new) }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
     }
 
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.IO) { f() }
+    }
+
     private fun ui(f: suspend () -> Unit) {
-        (context as CustomRulesActivity).lifecycleScope.launch {
-            withContext(Dispatchers.Main) { f() }
-        }
+        (context as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 }

@@ -18,7 +18,13 @@ package com.celzero.bravedns.database
 import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
 import com.celzero.bravedns.util.Constants
 
 @Dao
@@ -45,6 +51,12 @@ interface CustomDomainDAO {
 
     @Query("select count(*) from CustomDomain where uid = :uid")
     fun getAppWiseDomainRulesCount(uid: Int): LiveData<Int>
+
+    @Query("select * from CustomDomain where uid = :uid order by modifiedTs desc")
+    fun getDomainsByUID(uid: Int): List<CustomDomain>
+
+    @Query("update CustomDomain set uid = :newUid where uid = :uid")
+    fun updateUid(uid: Int, newUid: Int)
 
     @Query("select count(*) from CustomDomain where uid != ${Constants.UID_EVERYBODY}")
     fun getAllDomainRulesCount(): LiveData<Int>

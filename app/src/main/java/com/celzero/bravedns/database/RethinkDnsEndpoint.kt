@@ -18,7 +18,6 @@ package com.celzero.bravedns.database
 import android.content.Context
 import androidx.room.Entity
 import com.celzero.bravedns.R
-import com.celzero.bravedns.util.Constants
 
 @Entity(primaryKeys = ["name", "url", "uid"], tableName = "RethinkDnsEndpoint")
 class RethinkDnsEndpoint(
@@ -37,8 +36,7 @@ class RethinkDnsEndpoint(
         if (other !is RethinkDnsEndpoint) return false
         if (name != other.name) return false
         if (url != other.url) return false
-        if (uid != other.uid) return false
-        return true
+        return uid == other.uid
     }
 
     override fun hashCode(): Int {
@@ -54,8 +52,7 @@ class RethinkDnsEndpoint(
     }
 
     init {
-        if (modifiedDataTime != Constants.INIT_TIME_MS) this.modifiedDataTime = modifiedDataTime
-        else this.modifiedDataTime = System.currentTimeMillis()
+        this.modifiedDataTime = System.currentTimeMillis()
     }
 
     fun isEditable(context: Context): Boolean {

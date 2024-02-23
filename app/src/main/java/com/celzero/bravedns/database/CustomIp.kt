@@ -69,13 +69,12 @@ class CustomIp {
     }
 
     // chances of null pointer exception while converting the string object to
-    // HostName().address
-    // ref: https://seancfoley.github.io/IPAddress/
-    fun setCustomIpAddress(ipAddress: String) {
-        var ip = ipAddress
+    // HostName().address ref: https://seancfoley.github.io/IPAddress/
+    fun setCustomIpAddress(ipstr: String) {
+        var ip = ipstr
         try {
-            if (HostName(ipAddress).asAddress().isIPv4) {
-                if (ipAddress.count { it == '.' } < 3) {
+            if (HostName(ipstr).asAddress().isIPv4) {
+                if (ipstr.count { it == '.' } < 3) {
                     ip = getPaddedIp(ip)
                 }
             }
