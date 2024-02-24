@@ -69,7 +69,7 @@
     <string name="dc_block_heading">regras</string>
     <string name="dc_dns_website_heading">Mostrar ícone de site em registros do DNS (experimental)</string>
     <string name="about_github">Contribua no GitHub</string>
-    <string name="about_mozilla">Rethink é apoiado pela Mozilla Builders, OSOM Products Inc, FOSS United Foundation.</string>
+    <string name="about_mozilla">Rethink é apoiado por Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
     <string name="about_web">links</string>
     <string name="about_website">Visite rethinkdns.com</string>
     <string name="about_faq">Ver perguntas frequentes</string>
@@ -519,8 +519,8 @@
     <string name="ctbs_block_other_apps">Regras aplicadas para %1$s também serão aplicadas para %2$s outros apps</string>
     <string name="ctbs_dialog_negative_btn">Voltar</string>
     <string name="dns_log_dialog_positive">Apagar registros</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;: %2$s lista(s) de bloqueio&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s lista(s) de bloqueio</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip_no_answer">Sem resposta</string>
     <string name="dns_btm_resolved_crypt">resolvido <u>de forma anônima</u> %1$s por %2$s</string>
     <string name="hs_download_positive_play_store">Concluir a atualização</string>
@@ -979,4 +979,6 @@
     <string name="crypt_relay_france" translatable="true">Retransmissão DNS anonimizada hospedada em Paris, França, fornecida por https://cryptostrom.is/.</string>
     <string name="crypt_relay_sweden" translatable="true">Retransmissão DNS anonimizada hospedada na Suécia fornecida por https://cryptostrom.is/.</string>
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Excluir endpoint DNS sobre TLS da configuração salva.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Excluir endpoint DoT?</string>
 </resources>

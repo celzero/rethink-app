@@ -26,7 +26,7 @@
     <string name="about_bug_no_log_dialog_message">拎唔到崩潰日誌。請問您係咪要手動報告漏洞？</string>
     <string name="about_version">v%1$s</string>
     <string name="about_settings_vpn_profile">VPN 配置</string>
-    <string name="about_mozilla">Rethink 受到嚟自 Mozilla Builders、OSOM Products Inc 同 FOSS United 基金會嘅支援。</string>
+    <string name="about_mozilla">Rethink 受到嚟自 Mozilla Builders、FOSS United 基金會同 OSOM Products Inc 嘅支援。</string>
     <string name="about_twitter">喺 Twitter 度追蹤我哋</string>
     <string name="about_faq_link">https://www.rethinkdns.com/faq</string>
     <string name="dns_mode_info_title">DNS</string>
@@ -407,8 +407,8 @@
     <string name="ctbs_block_other_apps">應用喺 %1$s 嘅規則亦會應用喺其他 %2$s 個應用程式</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;：%2$s 份攔截清單&lt;/h3&gt;%3$s。&lt;br/&gt;&lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s 份攔截清單</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip">+%1$s 個其他 IP</string>
     <string name="dns_btm_resolved_crypt">%1$s 由 %2$s <u>匿名</u>解析</string>
     <string name="dns_btm_resolved_doh">%1$s 由 %2$s 解析</string>
