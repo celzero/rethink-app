@@ -80,7 +80,7 @@
     <string name="lbl_status" translatable="false">Status</string>
     <string name="lbl_remove" translatable="false">Remove</string>
     <string name="lbl_last" translatable="false">Last</string>
-    <string name="lbl_dot_abbr" translatable="false">Dns-over-TLS</string>
+    <string name="lbl_dot_abbr" translatable="false">DNS-over-TLS</string>
     <string name="lbl_dc" translatable="false">DC</string>
     <string name="lbl_dc_abbr" translatable="false">DNSCrypt</string>
     <string name="lbl_dp" translatable="false">DP</string>
@@ -331,7 +331,7 @@
     <string name="blocklist_update_check_failure" translatable="true">Something went wrong. Try again later!</string>
     <string name="blocklist_update_check_not_required" translatable="true">Blocklists are already at latest version.</string>
 
-    <string name="refresh_complete" translatable="true">App list re-sync complete.</string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast --> App list re-sync complete.</string>
 
     <string name="show_logs_disabled_network_message" translatable="true">Connection logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable on-device logging.</i></string>
     <string name="show_logs_disabled_dns_message" translatable="true">DNS request logging has been disabled. To re-enable, goto <i>Settings</i> and turn on <i>Enable on-device logging.</i></string>
@@ -469,7 +469,7 @@
     <string name="orbot_download_link_website" translatable="false">https://github.com/guardianproject/orbot/releases</string>
     <string name="orbot_install_activity_error" translatable="false">Something went wrong, try after sometime</string>
 
-    <string name="orbot_no_app_toast" translatable="false">Select atleast one app to enable Orbot</string>
+    <string name="orbot_no_app_toast" translatable="true">Add at least one app to enable Orbot</string>
 
     <string name="settings_orbot_heading" translatable="true">Setup Orbot</string>
     <string name="settings_orbot_header" translatable="true">Orbot\t\u276F</string>
@@ -516,12 +516,12 @@
     <string name="settings_go_log_heading" translatable="true">Log level</string>
     <string name="settings_go_log_desc" translatable="true">For debugging purposes</string>
 
-    <string name="settings_rinr_heading" translatable="false">Rethink within Rethink</string>
-    <string name="settings_rinr_desc_enabled" translatable="false">Rethink will route its own traffic through the VPN</string>
-    <string name="settings_rinr_desc_disabled" translatable="false">Rethink will not route its own traffic through the VPN</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Route Rethink\'s own traffic, like blocklist downloads, connectivity checks, DNS connections, back into the tunnel.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Routing Rethink\'s own traffic through the tunnel. Unless you know what you're doing, turn it off.</string>
 
-    <string name="settings_rinr_dialog_title" translatable="false">Rethink within Rethink</string>
-    <string name="settings_rinr_dialog_desc" translatable="false">To route Rethink\'s own traffic through the VPN, use all available networks setting should be enabled. Do you want to proceed?</string>
+    <string name="settings_rinr_dialog_title" translatable="false">Loopback (experimental)</string>
+    <string name="settings_rinr_dialog_desc" translatable="false">Also enables <!--settings_network_all_networks--> setting. Do you want to proceed?</string>
 
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
     <string name="settings_gologger_dialog_option_2" translatable="false">Debug</string>
@@ -649,7 +649,7 @@
     <string name="hsf_start_btn_state" translatable="true">start</string>
     <string name="hsf_stop_btn_state" translatable="true">stop</string>
 
-    <string name="hsf_uptime" translatable="false">(active %1$s; protos: %2$s; type: %3$s; mtu: %4$s)</string>
+    <string name="hsf_uptime" translatable="false">(active %1$s; protos: %2$s (%3$s); mtu: %4$s)</string>
     <string name="hsf_downtime" translatable="true">(inactive since %1$s)</string>
 
     <string name="logs_card_duration" translatable="true">since %1$s</string>
@@ -1181,13 +1181,13 @@
 
     <string name="cd_no_rules_text" translatable="true">No domain rules.</string>
 
-    <string name="cd_dialog_edit_title" translatable="false">Edit domain</string>
-    <string name="cd_toast_edit" translatable="false">Domain edited successfully</string>
-    <string name="cd_dialog_title" translatable="true">Add domain</string>
-    <string name="cd_dialog_desc" translatable="true">Custom URL(domain) or wild card to either allow or block. eg, *.test.com, test.com/test</string>
+    <string name="cd_dialog_edit_title" translatable="true">Edit domain rule</string>
+    <string name="cd_toast_edit" translatable="true">Edited</string>
+    <string name="cd_dialog_title" translatable="true">Add domain rule</string>
+    <string name="cd_dialog_desc" translatable="true">A URL or a domain name with an optional wildcard: *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint" translatable="true">Enter %1$s</string>
-    <string name="cd_dialog_error_invalid_domain" translatable="true">Invalid URL(domain).</string>
-    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Invalid wildcard.</string>
+    <string name="cd_dialog_error_invalid_domain" translatable="true">Invalid URL or domain name</string>
+    <string name="cd_dialog_error_invalid_wildcard" translatable="true">Invalid wildcard URL or domain</string>
 
     <string name="cd_blocked_initial" translatable="true">B</string>
 
@@ -1335,7 +1335,7 @@
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS booster</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Coalesce requests, cache responses, resilient error handling</string>
 
-    <string name="dc_refresh_toast" translatable="true">DNS refresh complete</string>
+    <string name="dc_refresh_toast" translatable="true">Refresh complete</string>
 
     <!-- local blocklist bottom sheet -->
     <string name="lbbs_enabled" translatable="true">Enabled</string>
@@ -1438,56 +1438,56 @@
     <string name="new_warp_error_toast" translatable="true">Unable to fetch WARP configuration</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Invalid WARP configuration</string>
 
-    <string name="one_wg_apps_added" translatable="false">All apps included</string>
+    <string name="one_wg_apps_added" translatable="false">Routing all apps</string>
 
-    <string name="wg_lockdown_dialog_title" translatable="false">Lockdown</string>
-    <string name="wg_lockdown_dialog_desc" translatable="false">If enabled, all requests from the selected apps will be forwarded to this WireGuard connection. If this configuration fails, it will result in a connection failure for the selected apps. Do you want to proceed?</string>
-    <string name="wg_lockdown_success_toast" translatable="false">Lockdown enabled</string>
+    <string name="wg_lockdown_dialog_title" translatable="false">Lockdown WireGuard</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Selected apps will only be routed through this WireGuard VPN, regardless of whether it is failing or connected.</string>
+    <string name="wg_lockdown_success_toast" translatable="false">Done</string>
 
-    <string name="one_wg_dialog_title" translatable="false">One WireGuard</string>
-    <string name="one_wg_dialog_desc" translatable="false">This will disable all other WireGuard configurations. All connections, including DNS, will be forwarded to this WireGuard configuration. Do you want to proceed?</string>
-    <string name="one_wg_success_toast" translatable="false">One WireGuard enabled</string>
+    <string name="one_wg_dialog_title" translatable="false">Mono WireGuard</string>
+    <string name="one_wg_dialog_desc" translatable="true">All connections from all apps, including DNS, will be routed to a single, active WireGuard VPN. Other active WireGuard VPNs, if any, will be stopped.</string>
+    <string name="one_wg_success_toast" translatable="false">Done</string>
 
-    <string name="catch_all_wg_dialog_title" translatable="false">Catch All</string>
-    <string name="catch_all_wg_dialog_desc" translatable="false">This will capture all the apps that are not part of other WireGuard configurations and forward those requests to this WireGuard connection. Do you want to proceed?</string>
-    <string name="catch_all_wg_success_toast" translatable="false">Catch All enabled</string>
+    <string name="catch_all_wg_dialog_title" translatable="false">Perma WireGuard</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">All connections and apps not routed by other WireGuard VPNs will be routed by this one.</string>
+    <string name="catch_all_wg_success_toast" translatable="false">Done</string>
 
-    <string name="catch_all_info_dialog_msg" translatable="false">This will capture all the apps that are not part of other WireGuard configurations and forward those requests to this WireGuard connection.</string>
-    <string name="one_wg_info_dialog_msg" translatable="false">This will disable all other WireGuard configurations. All connections, including DNS, will be forwarded to this WireGuard configuration.</string>
-    <string name="wg_lockdown_info_dialog_msg" translatable="false">If enabled, all requests from the selected apps will be forwarded to this WireGuard connection. If this configuration fails, it will result in a connection failure for the selected apps.</string>
+    <string name="catch_all_info_dialog_msg" translatable="false"><!-- same as catch_all_wg_dialog_desc -->All connections and apps not routed by other WireGuard VPNs will be routed by this one.</string>
+    <string name="one_wg_info_dialog_msg" translatable="false"><!--one_wg_dialog_desc-->All connections from all apps, including DNS...</string>
+    <string name="wg_lockdown_info_dialog_msg" translatable="false"><!-- wg_lockdown_dialog_desc -->...a connection failure for the selected apps.</string>
 
-    <string name="one_wg_error_toast" translatable="false">Please disable the one wireguard interface to use general interface</string>
+    <string name="one_wg_error_toast" translatable="true">Stop \"Mono WireGuard\" to use Mutli WireGuard feature</string>
 
     <string name="add_remove_apps" translatable="false">Add / Remove Apps (%1$s apps)</string>
     <string name="add_peer" translatable="true">Add Peer</string>
 
-    <string name="config_delete_dialog_desc" translatable="false">Are you sure you want to delete this Config?</string>
-    <string name="config_delete_dialog_title" translatable="false">Delete Config</string>
-    <string name="config_delete_success_toast" translatable="false">Config deleted</string>
-    <string name="config_add_success_toast" translatable="false">Config added</string>
+    <string name="config_delete_dialog_desc" translatable="false">Are you sure you want to delete this WireGuard VPN configuration?</string>
+    <string name="config_delete_dialog_title" translatable="false">Delete</string>
+    <string name="config_delete_success_toast" translatable="false">Done</string>
+    <string name="config_add_success_toast" translatable="false">Done</string>
 
     <string name="include_all_app_wg_dialog_title" translatable="false">Include all apps</string>
-    <string name="include_all_app_wg_dialog_desc" translatable="false">Tunnel all apps through this tunnel?</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="false">Use this WireGuard VPN for all apps?</string>
 
     <string name="exclude_all_app_wg_dialog_title" translatable="false">Exclude all apps</string>
-    <string name="exclude_all_app_wg_dialog_desc" translatable="false">Exclude all apps from this tunnel?</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="false">Exclude all apps from this WireGuard VPN?</string>
 
-    <string name="wireguard_enabled_failure" translatable="false">Turn off other proxies to enable WireGuard</string>
-    <string name="wireguard_disable_failure" translatable="false">Cannot disable WireGuard, catch-all is enabled</string>
+    <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
+    <string name="wireguard_disable_failure" translatable="false">A \"Perma WireGuard\" cannot be turned off</string>
 
-    <string name="wireguard_refresh_toast" translatable="false">Proxies refresh complete</string>
+    <string name="wireguard_refresh_toast" translatable="false"><!-- use dc_refresh_toast -->Refresh complete</string>
 
     <string name="wireguard_apps_proxy_map_desc" translatable="false">part of %1$s</string>
-    <string name="wg_apps_dialog_title_include" translatable="false">Include apps: %1$s</string>
-    <string name="wg_apps_dialog_title_exclude" translatable="false">Remove apps: %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="false">Include %1$s apps</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="false">Exclude %1$s apps</string>
 
-    <string name="wireguard_no_config_msg" translatable="false">No WireGuard configs</string>
-    <string name="wireguard_connection_error" translatable="false">Issue connecting to WireGuard configuration</string>
-    <string name="wireguard_disclaimer" translatable="false">This is an experimental WireGuard as TCP and UDP proxy. While DNS traffic is forwarded to %1$s, ICMP traffic (ex: ping) is sent to the underlying network.</string>
+    <string name="wireguard_no_config_msg" translatable="true">No WireGuard VPNs. Add some to get started.</string>
+    <string name="wireguard_connection_error" translatable="true">WireGuard VPN failing to connect</string>
+    <string name="wireguard_disclaimer" translatable="true">DNS is forwarded to %1$s, ICMP (ex: ping) is sent to the underlying network.</string>
 
-    <string name="wireguard_disable_title" translatable="false">Disable WireGuard</string>
-    <string name="wireguard_disable_message" translatable="false">Disable all active WireGuard connections?</string>
-    <string name="wireguard_disable_positive" translatable="false">Disable</string>
+    <string name="wireguard_disable_title" translatable="false">Stop WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">Stop all active WireGuard VPNs?</string>
+    <string name="wireguard_disable_positive" translatable="false">Stop</string>
 
     <!-- dns description -->
     <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>
