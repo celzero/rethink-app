@@ -17,6 +17,8 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import backend.Backend
+import backend.RDNS
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.FileTag
@@ -39,8 +41,6 @@ import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import dnsx.Dnsx
-import dnsx.RDNS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -376,9 +376,9 @@ object RethinkBlocklistManager : KoinComponent {
             if (DEBUG)
                 Log.d(
                     LoggerConstants.LOG_TAG_VPN,
-                    "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Dnsx.EB32)}"
+                    "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Backend.EB32)}"
                 )
-            getRDNS(type)?.flagsToStamp(flags, Dnsx.EB32) ?: ""
+            getRDNS(type)?.flagsToStamp(flags, Backend.EB32) ?: ""
         } catch (e: java.lang.Exception) {
             Log.e(LoggerConstants.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
             ""

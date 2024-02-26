@@ -72,17 +72,15 @@ import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.celzero.bravedns.viewmodel.AlertsViewModel
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -139,7 +137,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startFirewallActivity(FirewallActivity.Tabs.UNIVERSAL.screen)
         }
 
-        b.fhsCardAppsLl.setOnClickListener { startAppsActivity() }
+        b.fhsCardAppsCv.setOnClickListener { startAppsActivity() }
 
         b.fhsCardDnsLl.setOnClickListener {
             startDnsActivity(DnsDetailActivity.Tabs.CONFIGURE.screen)
@@ -411,6 +409,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private fun disableAppsCard() {
         b.fhsCardAppsStatus.visibility = View.GONE
+        b.fhsCardAppsStatusRl.visibility = View.GONE
+        b.fhsCardApps.visibility = View.VISIBLE
         b.fhsCardApps.text = getString(R.string.firewall_card_text_inactive)
     }
 
@@ -554,36 +554,45 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // exception that happened once when trying to filter the received object (t).
                 // creating a copy of the received value in a synchronized block.
                 synchronized(it) { copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList() }
-                val blockedApps =
-                    copy.filter { a ->
+                val blockedCount =
+                    copy.count { a ->
                         a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id
                     }
-                val whiteListApps =
-                    copy.filter { a ->
+                val bypassCount =
+                    copy.count { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
                             a.firewallStatus ==
                                 FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
                     }
-                val excludedApps =
-                    copy.filter { a ->
+                val excludedCount =
+                    copy.count { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
                     }
-                val isolateApps =
-                    copy.filter { a ->
+                val isolatedCount =
+                    copy.count { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.ISOLATE.id
                     }
+                val allApps = copy.count()
+                val allowedApps =
+                    allApps - (blockedCount + bypassCount + excludedCount + isolatedCount)
                 b.fhsCardAppsStatus.visibility = View.VISIBLE
-                b.fhsCardAppsStatus.text = copy.count().toString()
-                // getString(R.string.firewall_card_status_active, copy.count().toString())
+                b.fhsCardAppsStatusRl.visibility = View.VISIBLE
+                b.fhsCardAppsStatus.text =
+                    getString(R.string.two_argument, allowedApps.toString(), allApps.toString())
+                b.fhsCardAppsBlockedCount.text = blockedCount.toString()
+                b.fhsCardAppsBypassCount.text = bypassCount.toString()
+                b.fhsCardAppsExcludeCount.text = excludedCount.toString()
+                b.fhsCardAppsIsolatedCount.text = isolatedCount.toString()
                 b.fhsCardApps.text =
                     getString(
                         R.string.firewall_card_text_active,
-                        blockedApps.count().toString(),
-                        whiteListApps.count().toString(),
-                        excludedApps.count().toString(),
-                        isolateApps.count().toString()
+                        blockedCount.toString(),
+                        bypassCount.toString(),
+                        excludedCount.toString(),
+                        isolatedCount.toString()
                     )
-                b.fhsCardApps.isSelected = true
+                b.fhsCardApps.visibility = View.GONE
+                b.fhsCardAppsStatus.isSelected = true
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
             }

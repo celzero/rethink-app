@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -39,7 +40,6 @@ import com.celzero.bravedns.service.TcpProxyHelper
 import com.celzero.bravedns.util.LoggerConstants
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import ipn.Ipn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -180,7 +180,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             try {
                 val key = TcpProxyHelper.getPublicKey()
                 Log.d(LoggerConstants.LOG_TAG_PROXY, "Public Key: $key")
-                val encryptedKey = Ipn.newPipKey(key, "")
+                val encryptedKey = Backend.newPipKey(key, "")
                 val blind = encryptedKey.blind()
                 Log.d(LoggerConstants.LOG_TAG_PROXY, "Blind: $blind")
                 val path =

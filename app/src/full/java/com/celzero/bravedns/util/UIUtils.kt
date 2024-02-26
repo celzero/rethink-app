@@ -33,16 +33,15 @@ import android.widget.Toast
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
-import ipn.Ipn
 import java.util.Calendar
 import java.util.Date
-import java.util.TimeZone
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -84,16 +83,16 @@ object UIUtils {
 
     fun getProxyStatusStringRes(statusId: Long): Int {
         return when (statusId) {
-            Ipn.TUP -> {
+            Backend.TUP -> {
                 R.string.lbl_starting
             }
-            Ipn.TOK -> {
+            Backend.TOK -> {
                 R.string.dns_connected
             }
-            Ipn.TKO -> {
+            Backend.TKO -> {
                 R.string.status_failing
             }
-            Ipn.END -> {
+            Backend.END -> {
                 R.string.lbl_stopped
             }
             else -> {

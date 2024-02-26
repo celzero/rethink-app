@@ -18,6 +18,7 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomIp
@@ -26,7 +27,6 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import dnsx.Dnsx
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent
@@ -39,7 +39,7 @@ object IpRulesManager : KoinComponent {
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
-    private var iptree = Dnsx.newIpTree()
+    private var iptree = Backend.newIpTree()
 
     // key-value object for ip look-up
     data class CacheKey(val hostName: HostName, val uid: Int)
@@ -158,7 +158,7 @@ object IpRulesManager : KoinComponent {
     }
 
     private fun treeValsFromCsv(csv: String): List<String> {
-        return csv.split(Dnsx.Vsep)
+        return csv.split(Backend.Vsep)
     }
 
     private fun treeVal(uid: Int, port: Int, rule: Int): String {

@@ -29,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
@@ -42,7 +43,6 @@ import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dnsx.Dnsx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -126,7 +126,7 @@ class RethinkEndpointAdapter(
             if (!endpoint.isActive) return
 
             io {
-                val state = VpnController.getDnsStatus(Dnsx.Preferred)
+                val state = VpnController.getDnsStatus(Backend.Preferred)
                 val status = UIUtils.getDnsStatusStringRes(state)
 
                 uiCtx {

@@ -17,6 +17,7 @@
 package com.celzero.bravedns.service
 
 import android.content.Context
+import backend.DNSSummary
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.ConnTrackerMetaData
 import com.celzero.bravedns.data.ConnectionSummary
@@ -27,7 +28,6 @@ import com.celzero.bravedns.database.DnsLogRepository
 import com.celzero.bravedns.database.RethinkLog
 import com.celzero.bravedns.database.RethinkLogRepository
 import com.celzero.bravedns.util.NetLogBatcher
-import dnsx.Summary
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -139,7 +139,7 @@ internal constructor(
 
     // now, this method is doing multiple things which should be removed.
     // fixme: should intend to only write the logs to database.
-    fun processDnsLog(summary: Summary) {
+    fun processDnsLog(summary: DNSSummary) {
         val transaction = dnsLogTracker?.processOnResponse(summary) ?: return
 
         transaction.responseCalendar = Calendar.getInstance()

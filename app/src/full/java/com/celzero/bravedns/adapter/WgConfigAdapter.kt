@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
@@ -36,7 +37,6 @@ import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
-import ipn.Ipn
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -121,7 +121,7 @@ class WgConfigAdapter(private val context: Context) :
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
                     // show active status only if the status is TOK(connected), TUP (starting)
-                    if (statusId == Ipn.TOK || statusId == Ipn.TUP) {
+                    if (statusId == Backend.TOK || statusId == Backend.TUP) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.accentGood)
                     } else {

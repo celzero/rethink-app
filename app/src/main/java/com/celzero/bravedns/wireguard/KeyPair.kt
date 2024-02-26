@@ -18,8 +18,8 @@
  */
 package com.celzero.bravedns.wireguard
 
-import ipn.Ipn
-import ipn.Key
+import backend.Backend
+import backend.WgKey
 
 /**
  * Represents a Curve25519 key pair as used by WireGuard.
@@ -27,9 +27,9 @@ import ipn.Key
  * Instances of this class are immutable.
  */
 @NonNullForAll
-class KeyPair @JvmOverloads constructor(key: Key = Ipn.newPrivateKey()) {
-    private val privateKey: Key
-    private val publicKey: Key
+class KeyPair @JvmOverloads constructor(key: WgKey = Backend.newWgPrivateKey()) {
+    private val privateKey: WgKey
+    private val publicKey: WgKey
     /**
      * Creates a key pair using an existing private key.
      *
@@ -46,7 +46,7 @@ class KeyPair @JvmOverloads constructor(key: Key = Ipn.newPrivateKey()) {
      *
      * @return the private key
      */
-    fun getPrivateKey(): Key {
+    fun getPrivateKey(): WgKey {
         return privateKey
     }
 
@@ -55,7 +55,7 @@ class KeyPair @JvmOverloads constructor(key: Key = Ipn.newPrivateKey()) {
      *
      * @return the public key
      */
-    fun getPublicKey(): Key {
+    fun getPublicKey(): WgKey {
         return publicKey
     }
 }

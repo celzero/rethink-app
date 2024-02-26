@@ -18,8 +18,8 @@
  */
 package com.celzero.bravedns.wireguard
 
+import backend.Backend
 import com.celzero.bravedns.wireguard.BadConfigException.*
-import ipn.Ipn
 import java.net.InetAddress
 import java.util.*
 import java.util.stream.Collectors
@@ -360,7 +360,7 @@ class WgInterface private constructor(builder: Builder) {
         @Throws(BadConfigException::class)
         fun parsePrivateKey(privateKey: String?): Builder {
             return try {
-                val key = privateKey?.let { Ipn.newPrivateKeyOf(privateKey) }
+                val key = privateKey?.let { Backend.newWgPrivateKeyOf(privateKey) }
                 val keyPair = key?.let { KeyPair(it) }
                 setKeyPair(keyPair)
             } catch (e: Exception) {

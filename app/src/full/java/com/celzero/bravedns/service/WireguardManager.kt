@@ -17,6 +17,8 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import backend.Backend
+import backend.WgKey
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.IWireguardWarp
 import com.celzero.bravedns.customdownloader.RetrofitManager
@@ -30,8 +32,6 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import inet.ipaddr.IPAddressString
-import ipn.Ipn
-import ipn.Key
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -272,7 +272,7 @@ object WireguardManager : KoinComponent {
 
     suspend fun getNewWarpConfig(id: Int): Config? {
         try {
-            val privateKey = Ipn.newPrivateKey()
+            val privateKey = Backend.newWgPrivateKey()
             val publicKey = privateKey.mult().base64()
             val deviceName = android.os.Build.MODEL
             val locale = Locale.getDefault().toString()
@@ -376,7 +376,7 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    private fun parseNewConfigJsonResponse(privateKey: Key, jsonObject: JSONObject?): Config? {
+    private fun parseNewConfigJsonResponse(privateKey: WgKey, jsonObject: JSONObject?): Config? {
         // get the json tag "wgconf" from the response
         if (jsonObject == null) {
             Log.e(LOG_TAG_PROXY, "new warp config json object is null")
@@ -416,7 +416,7 @@ object WireguardManager : KoinComponent {
         // increment the id and add the config
         lastAddedConfigId += 1
         val id = lastAddedConfigId
-        val name = config.getName().ifEmpty { "${Ipn.WG}$id" }
+        val name = config.getName().ifEmpty { "${Backend.WG}$id" }
         config.setName(name)
         config.setId(id)
         io { writeConfigAndUpdateDb(config) }

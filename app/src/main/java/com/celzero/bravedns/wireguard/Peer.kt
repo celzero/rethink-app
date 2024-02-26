@@ -18,10 +18,10 @@
  */
 package com.celzero.bravedns.wireguard
 
+import backend.Backend
+import backend.WgKey
 import com.celzero.bravedns.wireguard.BadConfigException.*
 import inet.ipaddr.IPAddressString
-import ipn.Ipn
-import ipn.Key
 import java.util.*
 import java.util.function.Consumer
 
@@ -44,8 +44,8 @@ class Peer private constructor(builder: Builder) {
      * @return the persistent keepalive, or `Optional.empty()` if none is configured
      */
     val persistentKeepalive: Optional<Int>
-    private val preSharedKey: Optional<Key>
-    private val publicKey: Key
+    private val preSharedKey: Optional<WgKey>
+    private val publicKey: WgKey
 
     init {
         // Defensively copy to ensure immutability even if the Builder is reused.
@@ -97,7 +97,7 @@ class Peer private constructor(builder: Builder) {
      *
      * @return the pre-shared key, or `Optional.empty()` if none is configured
      */
-    fun getPreSharedKey(): Optional<Key> {
+    fun getPreSharedKey(): Optional<WgKey> {
         return preSharedKey
     }
 
@@ -106,7 +106,7 @@ class Peer private constructor(builder: Builder) {
      *
      * @return the public key
      */
-    fun getPublicKey(): Key {
+    fun getPublicKey(): WgKey {
         return publicKey
     }
 
@@ -156,7 +156,7 @@ class Peer private constructor(builder: Builder) {
             sb.append("PersistentKeepalive = ").append(pk).append('\n')
         }
         preSharedKey.ifPresent(
-            Consumer<Key> { psk: Key ->
+            Consumer<WgKey> { psk: WgKey ->
                 sb.append("PreSharedKey = ").append(psk.base64()).append('\n')
             }
         )
@@ -183,7 +183,7 @@ class Peer private constructor(builder: Builder) {
             sb.append("persistent_keepalive_interval=").append(pk).append('\n')
         }
         preSharedKey.ifPresent(
-            Consumer<Key> { psk: Key -> sb.append("preshared_key=").append(psk.hex()).append('\n') }
+            Consumer<WgKey> { psk: WgKey -> sb.append("preshared_key=").append(psk.hex()).append('\n') }
         )
         return sb.toString()
     }
@@ -202,10 +202,10 @@ class Peer private constructor(builder: Builder) {
         var persistentKeepalive = Optional.empty<Int>()
 
         // Defaults to not present.
-        var preSharedKey: Optional<Key> = Optional.empty<Key>()
+        var preSharedKey: Optional<WgKey> = Optional.empty<WgKey>()
 
         // No default; must be provided before building.
-        var publicKey: Key? = null
+        var publicKey: WgKey? = null
 
         fun addAllowedIp(allowedIp: InetNetwork): Builder {
             allowedIps.add(allowedIp)
@@ -285,7 +285,7 @@ class Peer private constructor(builder: Builder) {
         @Throws(BadConfigException::class)
         fun parsePreSharedKey(preSharedKey: String): Builder {
             return try {
-                val k = Ipn.newPrivateKeyOf(preSharedKey)
+                val k = Backend.newWgPrivateKeyOf(preSharedKey)
                 setPreSharedKey(k)
             } catch (e: Exception) {
                 throw BadConfigException(Section.PEER, Location.PRE_SHARED_KEY, e)
@@ -295,7 +295,7 @@ class Peer private constructor(builder: Builder) {
         @Throws(BadConfigException::class)
         fun parsePublicKey(publicKey: String): Builder {
             return try {
-                val k = Ipn.newPrivateKeyOf(publicKey)
+                val k = Backend.newWgPrivateKeyOf(publicKey)
                 setPublicKey(k)
             } catch (e: Exception) {
                 throw BadConfigException(Section.PEER, Location.PUBLIC_KEY, e)
@@ -326,12 +326,12 @@ class Peer private constructor(builder: Builder) {
             return this
         }
 
-        fun setPreSharedKey(preSharedKey: Key): Builder {
-            this.preSharedKey = Optional.of<Key>(preSharedKey)
+        fun setPreSharedKey(preSharedKey: WgKey): Builder {
+            this.preSharedKey = Optional.of<WgKey>(preSharedKey)
             return this
         }
 
-        fun setPublicKey(publicKey: Key?): Builder {
+        fun setPublicKey(publicKey: WgKey?): Builder {
             this.publicKey = publicKey
             return this
         }

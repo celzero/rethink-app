@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import backend.Backend
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
@@ -17,7 +18,6 @@ import com.celzero.bravedns.database.TcpProxyEndpoint
 import com.celzero.bravedns.database.TcpProxyRepository
 import com.celzero.bravedns.scheduler.PaymentWorker
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
-import dnsx.Dnsx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,7 +37,7 @@ object TcpProxyHelper : KoinComponent {
 
     private val tcpProxies = mutableSetOf<TcpProxyEndpoint>()
 
-    private var cfIpTrie: dnsx.IpTree = Dnsx.newIpTree()
+    private var cfIpTrie: backend.IpTree = Backend.newIpTree()
 
     private const val DEFAULT_ID = 0
     const val PAYMENT_WORKER_TAG = "payment_worker_tag"
@@ -104,7 +104,7 @@ object TcpProxyHelper : KoinComponent {
     }
 
     private fun loadTrie() {
-        cfIpTrie = Dnsx.newIpTree()
+        cfIpTrie = Backend.newIpTree()
         cfIpAddresses.forEach { cfIpTrie.set(it, "") }
         if (DEBUG) Log.d(LOG_TAG_PROXY, "loadTrie: loading trie for cloudflare ips")
     }

@@ -19,12 +19,12 @@ import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
-import dnsx.Dnsx
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.net.MalformedURLException
@@ -36,7 +36,7 @@ object DomainRulesManager : KoinComponent {
 
     private val db by inject<CustomDomainRepository>()
 
-    private var trie: dnsx.RadixTree = Dnsx.newRadixTree()
+    private var trie: backend.RadixTree = Backend.newRadixTree()
 
     enum class Status(val id: Int) {
         NONE(0),

@@ -37,12 +37,7 @@ class FirewallSettingsFragment : Fragment(R.layout.fragment_firewall_settings) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
         setupClickListeners()
-    }
-
-    private fun initView() {
-        // TODO - remove the hardcoded strings
     }
 
     private fun setupClickListeners() {

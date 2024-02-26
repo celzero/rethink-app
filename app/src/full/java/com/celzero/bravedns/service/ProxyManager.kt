@@ -16,13 +16,13 @@
 package com.celzero.bravedns.service
 
 import android.util.Log
+import backend.Backend
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.AppInfo
 import com.celzero.bravedns.database.ProxyAppMappingRepository
 import com.celzero.bravedns.database.ProxyApplicationMapping
 import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
-import ipn.Ipn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -260,7 +260,7 @@ object ProxyManager : KoinComponent {
     fun isIpnProxy(ipnProxyId: String): Boolean {
         if (ipnProxyId.isEmpty()) return false
         // if id is not Ipn.Base, Ipn.Block, Ipn.Exit then it is proxied
-        return ipnProxyId != Ipn.Base && ipnProxyId != Ipn.Block && ipnProxyId != Ipn.Exit
+        return ipnProxyId != Backend.Base && ipnProxyId != Backend.Block && ipnProxyId != Backend.Exit
     }
 
     private fun io(f: suspend () -> Unit) {
