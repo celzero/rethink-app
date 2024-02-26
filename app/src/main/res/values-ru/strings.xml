@@ -981,4 +981,6 @@
     <string name="logs_card_duration" translatable="true">с %1$s</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Сделать уведомление постоянным</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Постоянное уведомление</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Удалить конечную точку DoT?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Удалить DNS через конечную точку TLS из сохраненной конфигурации.</string>
 </resources>
