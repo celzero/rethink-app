@@ -445,7 +445,7 @@
     <string name="about_faq">Просмотреть часто задаваемые вопросы</string>
     <string name="about_email">Отправьте нам электронное письмо</string>
     <string name="about_settings_notification">Параметры уведомлений</string>
-    <string name="about_mozilla">Rethink поддерживается благодаря Mozilla Builders, OSOM Products Inc, FOSS United Foundation.</string>
+    <string name="about_mozilla">Rethink поддерживается благодаря Mozilla Builders, FOSS United Foundation, OSOM Products Inc.</string>
     <string name="about_dialog_positive_button">Поехали</string>
     <string name="about_app_update_check">Проверить наличие обновлений</string>
     <string name="about_mail_bugreport_subject">[Rethink]: Отчет об ошибке</string>
@@ -456,14 +456,14 @@
     <string name="about_mail_bugreport_text">Отправить это письмо по адресу: hello@celzero.com</string>
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="cd_custom_doh_dialog_title">URL пользовательского сервера</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt; /font&gt;&lt;/u&gt;: %2$s blocklist(s)&lt;/h3&gt;%3$s.&lt;br/&gt;&lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s спис(ок/ка/ков) блокировки</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
     <string name="univ_view_blocked_ip">Правила для IP и портов</string>
     <string name="univ_delete_firewall_dialog_message">Удаление этих правил позволит любому приложению подключаться к заблокированным IP-адресам.</string>
     <string name="dns_connected_rethink_plus">Подключено. Используется списков блокировки: %1$s</string>
     <string name="dns_proxy_dialog_message_no_app">IP-адрес: %1$s
 \n
 \nНомер порта: %2$s</string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="univ_firewall_rule_3">Блокировать, когда исходное приложение неизвестно</string>
     <string name="dns_proxy_name">Имя доверенного лица</string>
     <string name="fapps_filter_parent_installed">Установленные</string>
