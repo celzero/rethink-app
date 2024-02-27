@@ -320,7 +320,7 @@
     <string name="local_blocklist_download_desc">Baixar listas de bloqueio (cerca de 60MB) para usar esta funcionalidade\?</string>
     <string name="blocklist_update_check_failure">Algo deu errado. Tente de novo mais tarde!</string>
     <string name="blocklist_update_check_not_required">As listas de bloqueio já estão na versão mais recente.</string>
-    <string name="refresh_complete">Nova sincronização da lista de apps concluída.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> A ressincronização da lista de aplicativos foi concluída.</string>
     <string name="show_logs_disabled_network_message">Registro da conexão foi desativado. Para reativar, vá para <i>Configurações</i> e toque no <i>Ativar registros no dispositivo.</i></string>
     <string name="configure_dns_connected_doh_status">DNS sobre HTTPS</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
@@ -639,11 +639,11 @@
     <string name="cd_toast_deleted">Domínio removido da lista personalizada</string>
     <string name="cd_toast_added">Domínio adicionado com sucesso</string>
     <string name="cd_remove_dialog_title">Apagar domínio\?</string>
-    <string name="cd_dialog_title">Adicionar domínio</string>
-    <string name="cd_dialog_desc">URL(domínio) personalizada ou wildcard para permitir ou bloquear. p.ex., *.test.com, test.com/test</string>
+    <string name="cd_dialog_title">Adicionar regra de domínio</string>
+    <string name="cd_dialog_desc">Um URL ou nome de domínio com um curinga opcional: *.test.com, test.com/test</string>
     <string name="cd_dialog_edittext_hint">Digite %1$s</string>
-    <string name="cd_dialog_error_invalid_domain">URL(domínio) inválida.</string>
-    <string name="cd_dialog_error_invalid_wildcard">Wildcard inválido.</string>
+    <string name="cd_dialog_error_invalid_domain">URL ou nome de domínio inválido</string>
+    <string name="cd_dialog_error_invalid_wildcard">URL curinga ou domínio inválido</string>
     <string name="cd_blocked_initial">B</string>
     <string name="cd_no_rule_initial">N</string>
     <string name="cd_no_rule_txt">Nenhuma regra</string>
@@ -881,7 +881,7 @@
     <string name="unknown_error" translatable="true">Erro desconhecido</string>
     <string name="import_error" translatable="true">Não foi possível importar o túnel: %s</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Configuração WARP inválida</string>
-    <string name="wireguard_no_config_msg">Nenhuma configuração do WireGuard</string>
+    <string name="wireguard_no_config_msg">Sem VPNs WireGuard. Adicione alguns para começar.</string>
     <string name="crypt_relay_singapore" translatable="true">Retransmissão DNS anonimizada hospedada em Cingapura.</string>
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="rbl_privacy_desc" description="The text appears as blocklists description in configure screen" translatable="true">Bloquear attentionware, spyware, scareware.</string>
@@ -889,7 +889,7 @@
     <string name="cd_deleted_toast" translatable="true">Excluiu todas as regras de domínio</string>
     <string name="ada_delete_logs_dialog_title" description="Appears as dialog title to clear the logs in app specific screen" translatable="true">Limpar registros</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funciona apenas com DNS da Rethink</string>
-    <string name="dc_refresh_toast" translatable="true">Atualização de DNS concluída</string>
+    <string name="dc_refresh_toast" translatable="true">Atualização concluída</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">Impulsionador de DNS</string>
     <string name="brbs_backup_restore_desc" translatable="true">Não funciona em versões de aplicativos ou dispositivos</string>
     <string name="ssv_most_contacted_ips_heading" description="This label will appear on the stats screen as a header for most visited ips" translatable="true">ips mais contatados</string>
@@ -913,7 +913,7 @@
     <string name="add_remove_apps" translatable="true">Adicionar/remover aplicativos (%1$s aplicativos)</string>
     <string name="config_add_success_toast">Configuração adicionada</string>
     <string name="include_all_app_wg_dialog_title">Incluir todos os aplicativos</string>
-    <string name="wireguard_enabled_failure">Desativar outros proxies para ativar o WireGuard</string>
+    <string name="wireguard_enabled_failure">Desativar outros proxies ativos para ativar o WireGuard</string>
     <string name="wireguard_refresh_toast">Atualização de proxies concluída</string>
     <string name="http_proxy_dialog_desc" translatable="true">URL de configuração do formulário,&lt;protocol&gt;://&lt;username&gt;:&lt;password&gt;@&lt;domain-or-ip&gt;:&lt;port&gt;&lt;path&gt;. Exemplo: http://proxy.example.com:8080/</string>
     <string name="fapps_bypass_dns_firewall_dialog_title" translatable="true">Ignorar aplicativos</string>
@@ -939,7 +939,7 @@
     <string name="config_delete_dialog_title">Excluir configuração</string>
     <string name="wireguard_description" translatable="true">WireGuard como proxy.</string>
     <string name="include_all_app_wg_dialog_desc">Adicionar todos os aplicativos através deste túnel?</string>
-    <string name="wireguard_disclaimer">Este é um WireGuard experimental como proxy TCP e UDP. Enquanto o tráfego DNS é encaminhado para %1$s, o tráfego ICMP (ex: ping) é enviado para a rede subjacente.</string>
+    <string name="wireguard_disclaimer">DNS encaminhado para %1$s, ICMP (ex: ping) enviado para a rede subjacente.</string>
     <string name="cloudflare_dns_desc" translatable="true">Não bloqueia nenhuma solicitação de DNS. Usa o endpoint DNS 1.1.1.1 da Cloudflare.</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">O filtro familiar bloqueia o acesso a todos os sites adultos, pornográficos e explícitos. Ele também bloqueia domínios proxy e VPN que poderiam ser usados para contornar nossos filtros. Sites de conteúdo misto (como Reddit) também são bloqueados. Google, Bing e Youtube estão configurados para o modo de segurança.</string>
     <string name="quad9_dns_desc" translatable="true">A Quad9 encaminha as suas consultas DNS através de uma rede segura de servidores em todo o mundo.</string>
@@ -968,7 +968,7 @@
     <string name="config_delete_success_toast">Configuração excluída</string>
     <string name="exclude_all_app_wg_dialog_title">Remover todos os aplicativos</string>
     <string name="exclude_all_app_wg_dialog_desc">Remover todos os aplicativos deste túnel?</string>
-    <string name="wireguard_connection_error">Problema ao conectar-se à configuração do WireGuard</string>
+    <string name="wireguard_connection_error">WireGuard VPN falhando ao conectar</string>
     <string name="cloudflare_family_dns_desc" translatable="true">Bloqueia malware e conteúdo adulto. Usa o endpoint DNS 1.1.1.3 da Cloudflare.</string>
     <string name="cloudflare_security_dns_desc" translatable="true">Bloqueia conteúdo malicioso. Usa o endpoint DNS 1.1.1.2 da Cloudflare.</string>
     <string name="google_dns_desc" translatable="true">Não bloqueia nenhuma solicitação de DNS. Usa o endpoint DNS do Google.</string>
@@ -981,4 +981,15 @@
     <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112.112</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Excluir endpoint DNS sobre TLS da configuração salva.</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">Excluir endpoint DoT?</string>
+    <string name="orbot_no_app_toast" translatable="true">Adicione pelo menos um aplicativo para ativar o Orbot</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
+    <string name="cd_dialog_edit_title" translatable="true">Editar regra de domínio</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">Encaminhe o próprio tráfego do Rethink, como downloads de listas de bloqueio, verificações de conectividade, conexões DNS, de volta ao túnel.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Roteando o próprio tráfego do Rethink através do túnel. A menos que você saiba o que está fazendo, desligue-o.</string>
+    <string name="cd_toast_edit" translatable="true">Editado</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Os aplicativos selecionados serão roteados apenas por meio desta VPN WireGuard, independentemente de ela estar com falha ou conectada.</string>
+    <string name="one_wg_dialog_desc" translatable="true">Todas as conexões de todos os aplicativos, incluindo DNS, serão roteadas para uma única VPN WireGuard ativa. Outras VPNs WireGuard ativas, se houver, serão interrompidas.</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">Todas as conexões e aplicativos não roteados por outras VPNs WireGuard serão roteados por esta.</string>
+    <string name="one_wg_error_toast" translatable="true">Desativar o \"Mono WireGuard\" para usar o recurso Mutli WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">Desativar todas as VPNs WireGuard ativas?</string>
 </resources>

@@ -990,11 +990,11 @@
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Enruta el tráfico propio de Rethink, como descargas de listas de bloqueo, comprobaciones de conectividad, conexiones DNS, de vuelta al túnel.</string>
     <string name="cd_dialog_edit_title" translatable="true">Editar la regla del dominio</string>
-    <string name="cd_toast_edit" translatable="true">Editada</string>
+    <string name="cd_toast_edit" translatable="true">Editado</string>
     <string name="wg_lockdown_dialog_desc" translatable="true">Las aplicaciones seleccionadas sólo se enrutarán a través de esta VPN de WireGuard, independientemente de si falla o está conectada.</string>
     <string name="one_wg_dialog_desc" translatable="true">Todas las conexiones de todas las aplicaciones, incluyendo DNS, serán enrutadas a una única VPN WireGuard activa. Las demás VPN de WireGuard activas, si las hay, se detendrán.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas las conexiones y aplicaciones no enrutadas por otras VPN de WireGuard serán enrutadas por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Detener \"Mono WireGuard\" para utilizar la función Mutli WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">¿Detener todas las VPN activas de WireGuard?</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Enrutar el propio tráfico de Rethink a través del túnel. A menos que sepas lo que haces, desactívalo.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Enrutar el propio tráfico de Rethink a través del túnel. A menos que sepa lo que hace, desactívelo.</string>
 </resources>
