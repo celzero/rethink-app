@@ -41,8 +41,8 @@ import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.databinding.TransactionRowBinding
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.ui.bottomsheet.DnsBlocklistBottomSheet
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS_LOG
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS_LOG
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.google.gson.Gson
 
@@ -154,7 +154,7 @@ class DnsQueryAdapter(val context: Context, val loadFavIcon: Boolean) :
         private fun openBottomSheet(dnsLog: DnsLog) {
             if (context !is FragmentActivity) {
                 Log.wtf(
-                    LoggerConstants.LOG_TAG_UI,
+                    Logger.LOG_TAG_UI,
                     "Can not open bottom sheet. Context is not attached to activity"
                 )
                 return

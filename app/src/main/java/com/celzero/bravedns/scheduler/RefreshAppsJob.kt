@@ -21,7 +21,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.RefreshDatabase
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_SCHEDULER
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_SCHEDULER
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

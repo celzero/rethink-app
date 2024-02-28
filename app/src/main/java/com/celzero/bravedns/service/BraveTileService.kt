@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.celzero.bravedns.service
 
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build

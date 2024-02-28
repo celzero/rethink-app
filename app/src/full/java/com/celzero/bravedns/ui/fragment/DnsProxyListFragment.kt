@@ -36,7 +36,7 @@ import com.celzero.bravedns.database.DnsProxyEndpoint
 import com.celzero.bravedns.databinding.DialogSetDnsProxyBinding
 import com.celzero.bravedns.databinding.FragmentDnsProxyListBinding
 import com.celzero.bravedns.service.FirewallManager
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.DnsProxyEndpointViewModel
 import inet.ipaddr.IPAddressString
@@ -166,19 +166,19 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                     errorTxt.text = getString(R.string.cd_dns_proxy_error_text_2)
                 }
             } catch (e: NumberFormatException) {
-                Log.w(LoggerConstants.LOG_TAG_UI, "Error: ${e.message}", e)
+                Log.w(Logger.LOG_TAG_UI, "Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.cd_dns_proxy_error_text_3)
                 isPortValid = false
             }
 
             if (isPortValid && isIpValid) {
                 // Do the DNS Proxy setting there
-                if (DEBUG) Log.d(LoggerConstants.LOG_TAG_UI, "new value inserted into DNSProxy")
+                if (DEBUG) Log.d(Logger.LOG_TAG_UI, "new value inserted into DNSProxy")
                 insertDNSProxyEndpointDB(mode, name, appName, ip, port)
                 dialog.dismiss()
             } else {
                 Log.i(
-                    LoggerConstants.LOG_TAG_UI,
+                    Logger.LOG_TAG_UI,
                     "cannot insert invalid dns-proxy IPs: $name, $appName"
                 )
             }
@@ -220,7 +220,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                 )
             appConfig.insertDnsproxyEndpoint(dnsProxyEndpoint)
             if (DEBUG)
-                Log.d(LoggerConstants.LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
+                Log.d(Logger.LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
         }
     }
 

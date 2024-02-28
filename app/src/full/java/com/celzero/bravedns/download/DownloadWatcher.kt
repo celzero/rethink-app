@@ -22,7 +22,7 @@ import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
 import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit
 

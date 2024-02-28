@@ -45,7 +45,7 @@ import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.InternetProtocol.Companion.getInternetProtocol
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.PcapMode
 import com.celzero.bravedns.util.Utilities.isAtleastQ
@@ -390,8 +390,7 @@ internal constructor(
         return when (persistentState.braveMode) {
             // Case: app mode - firewall, DNS mode should be none.
             BraveMode.FIREWALL.mode -> TunDnsMode.NONE
-            BraveMode.DNS.mode -> determineTunDnsMode()
-            BraveMode.DNS_FIREWALL.mode -> determineTunDnsMode()
+            BraveMode.DNS.mode, BraveMode.DNS_FIREWALL.mode -> determineTunDnsMode()
             else -> {
                 Log.wtf(LOG_TAG_VPN, "Invalid brave mode: ${persistentState.braveMode}")
                 TunDnsMode.NONE

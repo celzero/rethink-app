@@ -47,7 +47,7 @@ class RemoteFileTagUtil : KoinComponent {
                     Constants.PACKAGED_REMOTE_FILETAG_TIMESTAMP
             } catch (e: IOException) {
                 Log.e(
-                    LoggerConstants.LOG_TAG_DOWNLOAD,
+                    Logger.LOG_TAG_DOWNLOAD,
                     "Issue moving file from asset folder: ${e.message}",
                     e
                 )

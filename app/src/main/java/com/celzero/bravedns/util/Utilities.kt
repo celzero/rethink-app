@@ -28,6 +28,7 @@ import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.LinkProperties
+import android.net.Network
 import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
@@ -55,22 +56,17 @@ import com.celzero.bravedns.util.Constants.Companion.MISSING_UID
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV4
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_IP_IPV6
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.google.common.base.CharMatcher
 import com.google.common.net.InternetDomainName
 import com.google.gson.JsonParser
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddress
 import inet.ipaddr.IPAddressString
-import kotlinx.coroutines.launch
-import okio.HashingSink
-import okio.blackholeSink
-import okio.buffer
-import okio.source
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -83,6 +79,11 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.ln
+import kotlinx.coroutines.launch
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
 
 object Utilities {
 
@@ -446,9 +447,9 @@ object Utilities {
         try {
             return context.packageManager.getPackagesForUid(uid)
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.w(LoggerConstants.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
+            Log.w(Logger.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
         } catch (e: SecurityException) {
-            Log.w(LoggerConstants.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
+            Log.w(Logger.LOG_TAG_FIREWALL_LOG, "Package Not Found: " + e.message)
         }
         return null
     }
@@ -774,5 +775,9 @@ object Utilities {
             Log.e(LOG_TAG_DOWNLOAD, "err parsing the json file: ${e.message}", e)
         }
         return tagValue
+    }
+
+    fun isNetworkSame(n1: Network?, n2: Network?): Boolean {
+        return n1?.networkHandle == n2?.networkHandle
     }
 }

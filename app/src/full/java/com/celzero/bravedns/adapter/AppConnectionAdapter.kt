@@ -31,7 +31,7 @@ import com.celzero.bravedns.data.AppConnection
 import com.celzero.bravedns.databinding.ListItemAppConnDetailsBinding
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.bottomsheet.AppConnectionBottomSheet
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
 
@@ -101,7 +101,7 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
 
         private fun openBottomSheet(appConn: AppConnection) {
             if (context !is AppCompatActivity) {
-                Log.wtf(LoggerConstants.LOG_TAG_UI, "Error opening the app conn bottom sheet")
+                Log.wtf(Logger.LOG_TAG_UI, "Error opening the app conn bottom sheet")
                 return
             }
 

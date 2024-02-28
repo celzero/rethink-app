@@ -35,7 +35,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.ODoHEndpoint
 import com.celzero.bravedns.databinding.ListItemEndpointBinding
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DNS
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.UIUtils.getDnsStatusStringRes
 import com.celzero.bravedns.util.Utilities

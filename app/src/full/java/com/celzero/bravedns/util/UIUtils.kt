@@ -145,7 +145,7 @@ object UIUtils {
                 context.getString(R.string.vpn_profile_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LoggerConstants.LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
+            Log.w(Logger.LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
         }
     }
 
@@ -159,7 +159,7 @@ object UIUtils {
                 context.getString(R.string.intent_launch_error, url),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+            Log.w(Logger.LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -175,7 +175,7 @@ object UIUtils {
                 Toast.LENGTH_SHORT
             )
             Log.w(
-                LoggerConstants.LOG_TAG_VPN,
+                Logger.LOG_TAG_VPN,
                 "Failure opening network setting screen: ${e.message}",
                 e
             )
@@ -217,7 +217,7 @@ object UIUtils {
             intent.data = Uri.fromParts("package", packageName, null)
             context.startActivity(intent)
         } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
-            Log.w(LoggerConstants.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
+            Log.w(Logger.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
             Utilities.showToastUiCentered(
                 context,
                 context.getString(R.string.ctbs_app_info_not_available_toast),
@@ -271,7 +271,7 @@ object UIUtils {
 
         if (isDgaDomain(dnsLog.queryStr)) return
 
-        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
+        if (DEBUG) Log.d(Logger.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
 
         // fetch fav icon in background using glide
         FavIconDownloader(context, dnsLog.queryStr).run()

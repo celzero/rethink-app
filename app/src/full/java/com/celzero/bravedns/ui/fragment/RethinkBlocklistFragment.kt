@@ -58,8 +58,8 @@ import com.celzero.bravedns.util.Constants.Companion.DEFAULT_RDNS_REMOTE_DNS_NAM
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
 import com.celzero.bravedns.util.Constants.Companion.RETHINK_STAMP_VERSION
 import com.celzero.bravedns.util.CustomLinearLayoutManager
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
 import com.celzero.bravedns.util.Utilities.getRemoteBlocklistStamp
@@ -789,7 +789,7 @@ class RethinkBlocklistFragment :
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
             Log.i(
-                LoggerConstants.LOG_TAG_DOWNLOAD,
+                Logger.LOG_TAG_DOWNLOAD,
                 "WorkManager state: ${workInfo.state} for $CUSTOM_DOWNLOAD"
             )
             if (
@@ -817,7 +817,7 @@ class RethinkBlocklistFragment :
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
             Log.i(
-                LoggerConstants.LOG_TAG_DOWNLOAD,
+                Logger.LOG_TAG_DOWNLOAD,
                 "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG"
             )
             if (
@@ -844,7 +844,7 @@ class RethinkBlocklistFragment :
                 val workInfo = workInfoList[0]
                 if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
                     Log.i(
-                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager completed - $FILE_TAG"
                     )
                     onDownloadSuccess()
@@ -858,12 +858,12 @@ class RethinkBlocklistFragment :
                     workManager.pruneWork()
                     workManager.cancelAllWorkByTag(FILE_TAG)
                     Log.i(
-                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager failed - $FILE_TAG"
                     )
                 } else {
                     Log.i(
-                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        Logger.LOG_TAG_DOWNLOAD,
                         "AppDownloadManager Work Manager - $FILE_TAG, ${workInfo.state}"
                     )
                 }

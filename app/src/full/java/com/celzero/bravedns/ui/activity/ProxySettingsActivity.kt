@@ -53,9 +53,9 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
@@ -258,7 +258,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
             b.wgRefresh.clearAnimation()
             showToastUiCentered(
                 this,
-                getString(R.string.wireguard_refresh_toast),
+                getString(R.string.dc_refresh_toast),
                 Toast.LENGTH_SHORT
             )
         }
@@ -451,6 +451,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayTcpProxyUi() {
+        // v055b, no-op
+        return
+
         val tcpProxies = TcpProxyHelper.getActiveTcpProxy()
         if (tcpProxies == null || !tcpProxies.isActive) {
             b.settingsActivityTcpProxyDesc.text =
@@ -728,7 +731,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
                 }
             } catch (e: NumberFormatException) {
-                Log.w(LoggerConstants.LOG_TAG_VPN, "Error: ${e.message}", e)
+                Log.w(Logger.LOG_TAG_VPN, "Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
                 isValid = false
             }

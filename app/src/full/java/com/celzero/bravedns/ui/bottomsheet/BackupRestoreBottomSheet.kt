@@ -52,7 +52,7 @@ import com.celzero.bravedns.backup.BackupHelper.Companion.INTENT_TYPE_XZIP
 import com.celzero.bravedns.backup.RestoreAgent
 import com.celzero.bravedns.databinding.ActivityBackupRestoreBinding
 import com.celzero.bravedns.service.PersistentState
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_BACKUP_RESTORE
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay

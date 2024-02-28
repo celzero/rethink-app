@@ -24,7 +24,7 @@ import com.celzero.bravedns.database.AppInfoRepository
 import com.celzero.bravedns.database.ConnectionTrackerRepository
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -54,13 +54,13 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
                 val download = currentDataUsage.downloadBytes + it.downloadBytes
                 if (DEBUG)
                     Log.d(
-                        LoggerConstants.LOG_TAG_SCHEDULER,
+                        Logger.LOG_TAG_SCHEDULER,
                         "Data usage for ${it.uid}, $upload, $download"
                     )
                 appInfoRepository.updateDataUsageByUid(it.uid, upload, download)
             } catch (e: Exception) {
                 Log.e(
-                    LoggerConstants.LOG_TAG_SCHEDULER,
+                    Logger.LOG_TAG_SCHEDULER,
                     "Exception in data usage updater: ${e.message}",
                     e
                 )
@@ -68,7 +68,7 @@ class DataUsageUpdater(context: Context, workerParams: WorkerParameters) :
         }
         persistentState.prevDataUsageCheck = currentTimestamp
         Log.i(
-            LoggerConstants.LOG_TAG_SCHEDULER,
+            Logger.LOG_TAG_SCHEDULER,
             "Data usage updated for all apps at $currentTimestamp"
         )
     }

@@ -26,7 +26,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.celzero.bravedns.databinding.DialogWgAddPeerBinding
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.util.ErrorMessages
@@ -108,7 +108,7 @@ class WgAddPeerDialog(
                     this.dismiss()
                 }
             } catch (e: Throwable) {
-                Log.e(LoggerConstants.LOG_TAG_PROXY, "Error while adding peer", e)
+                Log.e(Logger.LOG_TAG_PROXY, "Error while adding peer", e)
                 Utilities.showToastUiCentered(
                     context,
                     ErrorMessages[context, e],

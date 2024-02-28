@@ -29,8 +29,7 @@ class ProxyApplicationMapping {
 
     override fun equals(other: Any?): Boolean {
         if (other !is ProxyApplicationMapping) return false
-        if (packageName != other.packageName) return false
-        return true
+        return packageName == other.packageName
     }
 
     override fun hashCode(): Int {
