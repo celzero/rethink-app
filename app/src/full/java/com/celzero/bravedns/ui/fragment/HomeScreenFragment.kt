@@ -511,6 +511,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
     }
 
+    private var retryCountForDnsStatus: Int = 0
+
     private fun updateUiWithDnsStates(dnsName: String) {
         // get the status from go to check if the dns transport is added or not
         val id =
@@ -520,13 +522,27 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             } else {
                 Backend.Preferred
             }
-        val status = VpnController.getDnsStatus(id)
-        // status null means the dns transport is not available / different id is usedE
-        if (status == null) {
-            // also stop observing the median value, as the dns is not connected
-            persistentState.median.removeObservers(viewLifecycleOwner)
-            b.fhsCardDnsLatency.text = getString(R.string.failed_using_default)
-            b.fhsCardDnsLatency.isSelected = true
+
+        if (VpnController.isOn()) {
+            val status = VpnController.getDnsStatus(id)
+            // status null means the dns transport is not available / different id is usedE
+            if (status == null) {
+                if (retryCountForDnsStatus < 5) {
+                    retryCountForDnsStatus++
+                    delay(TimeUnit.SECONDS.toMillis(1), lifecycleScope) {
+                        if (isAdded) {
+                            updateUiWithDnsStates(dnsName)
+                        }
+                    }
+                }
+                b.fhsCardDnsLatency.visibility = View.GONE
+                b.fhsCardDnsFailure.visibility = View.VISIBLE
+                b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
+                b.fhsCardDnsLatency.isSelected = true
+            } else {
+                b.fhsCardDnsLatency.visibility = View.VISIBLE
+                b.fhsCardDnsFailure.visibility = View.GONE
+            }
         }
         b.fhsCardDnsConnectedDns.text = dnsName
         b.fhsCardDnsConnectedDns.isSelected = true

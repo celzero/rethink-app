@@ -211,6 +211,8 @@ class GoVpnAdapter : KoinComponent {
                 url = url?.replace("https", "http")
             }
             val ips: String = getIpString(context, url)
+            // add replaces the existing transport with the same id if successful
+            // so no need to remove the transport before adding
             Intra.addDoHTransport(tunnel, id, url, ips)
             Log.i(LOG_TAG_VPN, "new doh: $id (${doh?.dohName}), url: $url, ips: $ips")
         } catch (e: Exception) {
@@ -229,6 +231,8 @@ class GoVpnAdapter : KoinComponent {
                 url = "tls://$url"
             }
             val ips: String = getIpString(context, url)
+            // add replaces the existing transport with the same id if successful
+            // so no need to remove the transport before adding
             Intra.addDoTTransport(tunnel, id, url, ips)
             Log.i(LOG_TAG_VPN, "new dot: $id (${dot?.name}), url: $url, ips: $ips")
         } catch (e: Exception) {
@@ -243,6 +247,8 @@ class GoVpnAdapter : KoinComponent {
             val proxy = odoh?.proxy
             val resolver = odoh?.resolver
             val proxyIps = ""
+            // add replaces the existing transport with the same id if successful
+            // so no need to remove the transport before adding
             Intra.addODoHTransport(tunnel, id, proxy, resolver, proxyIps)
             Log.i(LOG_TAG_VPN, "new odoh: $id (${odoh?.name}), p: $proxy, r: $resolver")
         } catch (e: Exception) {
@@ -256,7 +262,7 @@ class GoVpnAdapter : KoinComponent {
             val dc = appConfig.getConnectedDnscryptServer()
             val url = dc.dnsCryptURL
             // add replaces the existing transport with the same id if successful
-            /// so no need to remove the transport before adding
+            // so no need to remove the transport before adding
             Intra.addDNSCryptTransport(tunnel, id, url)
             Log.i(LOG_TAG_VPN, "new dnscrypt: $id (${dc.dnsCryptName}), url: $url")
         } catch (e: Exception) {
@@ -271,6 +277,8 @@ class GoVpnAdapter : KoinComponent {
     private suspend fun addDnsProxyTransport(id: String) {
         try {
             val dnsProxy = appConfig.getSelectedDnsProxyDetails() ?: return
+            // add replaces the existing transport with the same id if successful
+            // so no need to remove the transport before adding
             Intra.addDNSProxy(tunnel, id, dnsProxy.proxyIP, dnsProxy.proxyPort.toString())
             Log.i(
                 LOG_TAG_VPN,
@@ -278,8 +286,8 @@ class GoVpnAdapter : KoinComponent {
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy failure", e)
-            showDnsProxyConnectionFailureToast()
             getResolver()?.remove(id)
+            showDnsProxyConnectionFailureToast()
         }
     }
 

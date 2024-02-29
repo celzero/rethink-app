@@ -162,42 +162,35 @@ class DnsSettingsFragment :
             AppConfig.DnsType.DOH -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitle.text = connectedDns
             }
             AppConfig.DnsType.DOT -> {
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_dot)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitle.text = connectedDns
             }
             AppConfig.DnsType.DNSCRYPT -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_crypt_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitle.text = connectedDns
             }
             AppConfig.DnsType.DNS_PROXY -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitle.text = connectedDns
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_doh_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitle.text = connectedDns
             }
             AppConfig.DnsType.SYSTEM_DNS -> {
                 b.connectedStatusTitleUrl.text =
                     resources.getString(R.string.configure_dns_connected_dns_proxy_status)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitle.text = connectedDns
             }
             AppConfig.DnsType.ODOH -> {
                 b.connectedStatusTitleUrl.text = resources.getString(R.string.lbl_odoh)
-                b.connectedStatusTitle.text =
-                    resources.getString(R.string.configure_dns_connection_name, connectedDns)
+                b.connectedStatusTitle.text = connectedDns
             }
         }
     }

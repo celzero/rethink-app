@@ -106,11 +106,21 @@
                             android:layout_marginTop="10dp"
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"
-                            android:padding="5dp"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp"
                             android:singleLine="true"
-                            android:textSize="@dimen/rethink_header_text" />
+                            android:textSize="@dimen/extra_large_font_text_view" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/fhs_card_dns_failure"
+                            style="@style/TextAppearance.Widget.HomeScreen.Desc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/fhs_card_dns_title"
+                            android:layout_marginStart="7dp"
+                            android:layout_marginTop="10dp"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:singleLine="true"
+                            android:textSize="@dimen/extra_large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_dns_connected_dns"
@@ -124,8 +134,8 @@
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"
-                            android:padding="5dp"
                             android:maxLines="2"
+                            android:padding="5dp"
                             android:textSize="@dimen/default_font_text_view" />
 
 
@@ -294,8 +304,8 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="10dp"
                             android:ellipsize="marquee"
-                            android:maxLines="2"
                             android:marqueeRepeatLimit="marquee_forever"
+                            android:maxLines="2"
                             android:textSize="@dimen/extra_large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
@@ -303,9 +313,9 @@
                             style="@style/TextAppearance.Widget.HomeScreen.Desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="10dp"
-                            android:layout_alignParentBottom="true"
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"
@@ -769,9 +779,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:text="KB/S"
                 android:alpha="0.75"
                 android:fontFamily="sans-serif-smallcaps"
+                android:text="KB/S"
                 android:textColor="?attr/primaryTextColor"
                 android:textSize="@dimen/mini_font_text_view" />
 
