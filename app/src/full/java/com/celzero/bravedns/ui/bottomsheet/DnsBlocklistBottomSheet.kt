@@ -443,8 +443,7 @@ class DnsBlocklistBottomSheet : BottomSheetDialogFragment() {
         }
 
         if (log!!.isAnonymized()) { // anonymized queries answered by dns-crypt
-            val u = uptime + " " + log!!.relayIP
-            val text = getString(R.string.dns_btm_resolved_crypt, u, log!!.serverIP)
+            val text = getString(R.string.dns_btm_resolved_crypt, uptime, log!!.serverIP, log!!.relayIP)
             b.dnsBlockBlockedDesc.text = updateHtmlEncodedText(text)
         } else if (log!!.isLocallyAnswered()) { // usually happens when there is a network failure
             b.dnsBlockBlockedDesc.text = getString(R.string.dns_btm_resolved_doh_no_server, uptime)

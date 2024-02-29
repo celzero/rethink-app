@@ -219,7 +219,12 @@ object WireguardManager : KoinComponent {
     }
 
     fun canDisableAllActiveConfigs(): Boolean {
-        return mappings.any { it.isActive && !it.isCatchAll }
+        mappings.forEach {
+            if (it.isActive && it.isCatchAll) {
+                return false
+            }
+        }
+        return true
     }
 
     fun getConfigName(id: Int): String {

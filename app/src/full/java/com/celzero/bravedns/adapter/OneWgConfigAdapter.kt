@@ -133,12 +133,7 @@ class OneWgConfigAdapter(private val context: Context) :
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNegative)
                     }
-                    b.interfaceStatus.text =
-                        context.getString(
-                            R.string.ci_ip_label,
-                            context.getString(R.string.lbl_status),
-                            context.getString(resId).replaceFirstChar(Char::titlecase)
-                        )
+                    b.interfaceStatus.text = context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
                     b.interfaceStatus.text =
                         context.getString(
@@ -153,12 +148,7 @@ class OneWgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
-                b.interfaceStatus.text =
-                    context.getString(
-                        R.string.ci_ip_label,
-                        context.getString(R.string.lbl_status),
-                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
-                    )
+                b.interfaceStatus.text = context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 

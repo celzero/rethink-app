@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="true"
             app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="true"
             app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="true"
             app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
@@ -172,7 +172,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="true"
             app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
@@ -216,7 +216,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="true"
             app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
@@ -259,7 +259,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="true"
             app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
@@ -301,9 +301,8 @@
             android:id="@+id/fs_logs_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
             app:cardCornerRadius="8dp"
-            app:cardElevation="8dp"
+            app:cardElevation="4dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout

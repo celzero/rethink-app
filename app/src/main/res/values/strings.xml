@@ -98,7 +98,7 @@
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
     <string name="single_argument" translatable="false">%1$s</string>
     <string name="two_argument_space" translatable="false">%1$s %2$s</string>
-    <string name="two_argument_colon" translatable="false">%1$s :%2$s</string>
+    <string name="two_argument_colon" translatable="false">%1$s: %2$s</string>
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
     <string name="three_argument" translatable="false">%1$s %2$s %3$s</string>
     <string name="three_argument_colon" translatable="false">%1$s:%2$s:%3$s</string>
@@ -451,7 +451,7 @@
     <string name="orbot_bs_status_trying_connect" translatable="true">Setting up Orbot…</string>
 
     <string name="orbot_stop_dialog_title" translatable="true">Manual intervention required</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s\n\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s\n%2$s</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink has stopped forwarding connections to Orbot, but Orbot maybe running in the background.</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink is setup to forward DNS queries to Orbot. Change as required.</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Stop Orbot</string>
@@ -900,7 +900,7 @@
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">No Answer</string>
 
     <!-- DNS log bottom sheet -->
-    <string name="dns_btm_resolved_crypt" translatable="true">resolved <u>anonymously</u> %1$s by %2$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">resolved <u>anonymously</u> %1$s by %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">resolved %1$s by %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">resolved %1$s</string>
 
@@ -1454,6 +1454,7 @@
     <string name="one_wg_error_toast" translatable="true">To switch to Advanced, stop WireGuard in Simple mode</string>
 
     <string name="add_remove_apps" translatable="true">Add / Remove (%1$s apps)</string>
+    <string name="routing_remaining_apps" translatable="true">Routing remaining apps</string>
     <string name="add_peer" translatable="true">Add Peer</string>
 
     <string name="config_delete_dialog_desc" translatable="true">Are you sure you want to delete this WireGuard VPN configuration?</string>

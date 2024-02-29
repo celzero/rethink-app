@@ -87,16 +87,6 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import rnet.ServerSummary
-import rnet.Tab
 import java.io.IOException
 import java.net.InetAddress
 import java.net.SocketException
@@ -108,6 +98,18 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import rnet.ServerSummary
+import rnet.Tab
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -1206,10 +1208,14 @@ class BraveVPNService :
                 io("startVpn") {
                     // refresh should happen before restartVpn, otherwise the new vpn will not
                     // have app, ip, domain rules. See RefreshDatabase#refresh
-                    rdb.refresh(RefreshDatabase.ACTION_REFRESH_AUTO) { restartVpn(opts) }
+                    rdb.refresh(RefreshDatabase.ACTION_REFRESH_AUTO) {
+                        restartVpn(opts)
+                        // call this *after* a new vpn is created #512
+                        uiCtx("observers") {
+                            observeChanges()
+                        }
+                    }
                 }
-                // call this *after* a new vpn is created #512
-                observeChanges()
             }
         }
         return Service.START_STICKY
@@ -2285,6 +2291,10 @@ class BraveVPNService :
 
     private fun ui(f: suspend () -> Unit) = vpnScope.launch(Dispatchers.Main) { f() }
 
+    private suspend fun uiCtx(s: String, f: suspend () -> Unit) {
+        withContext(CoroutineName(s) + Dispatchers.Main) { f() }
+    }
+
     override fun onQuery(fqdn: String?, qtype: Long): backend.DNSOpts = runBlocking {
         // queryType: see ResourceRecordTypes.kt
         logd("onQuery: rcvd query: $fqdn, qtype: $qtype")
@@ -2886,7 +2896,7 @@ class BraveVPNService :
         io("updateWg") { vpnAdapter?.setWireguardTunnelModeIfNeeded(tunProxyMode) }
     }
 
-    suspend fun getDnsStatus(id: String): Long? {
+    fun getDnsStatus(id: String): Long? {
         return vpnAdapter?.getDnsStatus(id)
     }
 

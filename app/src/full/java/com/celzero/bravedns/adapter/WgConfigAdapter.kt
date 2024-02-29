@@ -104,21 +104,14 @@ class WgConfigAdapter(private val context: Context) :
         private fun updateUi(config: WgConfigFiles, appsCount: Int) {
             if (config.isCatchAll) {
                 b.interfaceCatchAll.visibility = View.VISIBLE
-                b.interfaceCatchAll.text =
-                    context.getString(
-                        R.string.ci_ip_label,
-                        context.getString(R.string.catch_all_wg_dialog_title),
-                        context.getString(R.string.dc_local_block_enabled)
-                    )
+                b.interfaceLockdown.visibility = View.GONE
+                b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
+                b.interfaceCatchAll.text = context.getString(R.string.catch_all_wg_dialog_title)
+                return // no need to update the apps count
             } else if (config.isLockdown) {
                 b.interfaceCatchAll.visibility = View.GONE
                 b.interfaceLockdown.visibility = View.VISIBLE
-                b.interfaceLockdown.text =
-                    context.getString(
-                        R.string.ci_ip_label,
-                        context.getString(R.string.firewall_rule_global_lockdown),
-                        context.getString(R.string.dc_local_block_enabled)
-                    )
+                b.interfaceLockdown.text = context.getString(R.string.firewall_rule_global_lockdown)
             } else {
                 b.interfaceCatchAll.visibility = View.GONE
                 b.interfaceLockdown.visibility = View.GONE
@@ -145,42 +138,28 @@ class WgConfigAdapter(private val context: Context) :
                     // change the color based on the status
                     if (statusId == Backend.TOK) {
                         b.interfaceDetailCard.strokeColor =
-                            UIUtils.fetchColor(context, R.attr.chipTextPositive)
+                            UIUtils.fetchColor(context, R.attr.accentGood)
                     } else if (statusId == Backend.TUP) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.chipTextNeutral)
                     } else {
                         b.interfaceDetailCard.strokeColor =
-                            UIUtils.fetchColor(context, R.attr.chipTextNegative)
+                            UIUtils.fetchColor(context, R.attr.accentBad)
                     }
                     b.interfaceStatus.text =
-                        context.getString(
-                            R.string.ci_ip_label,
-                            context.getString(R.string.lbl_status),
-                            context.getString(resId).replaceFirstChar(Char::titlecase)
-                        )
+                        context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
                     b.interfaceDetailCard.strokeColor =
-                        UIUtils.fetchColor(context, R.attr.chipBgColorNegative)
+                        UIUtils.fetchColor(context, R.attr.accentBad)
                     b.interfaceStatus.text =
-                        context.getString(
-                            R.string.ci_ip_label,
-                            context.getString(R.string.lbl_status),
-                            context
-                                .getString(R.string.status_failing)
-                                .replaceFirstChar(Char::titlecase)
-                        )
+                        context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
                 }
             } else {
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
                 b.interfaceStatus.text =
-                    context.getString(
-                        R.string.ci_ip_label,
-                        context.getString(R.string.lbl_status),
-                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
-                    )
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 

@@ -105,7 +105,6 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.lockdownRl.visibility = View.VISIBLE
             b.catchAllRl.visibility = View.VISIBLE
             b.oneWgInfoTv.visibility = View.GONE
-            handleAppsCount()
         } else if (wgType.isOneWg()) {
             b.wgHeaderTv.text =
                 getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
@@ -128,8 +127,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             if (mapping.isCatchAll) {
                 b.lockdownCheck.isEnabled = false
                 b.applicationsBtn.isEnabled = false
+                b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
             }
             b.lockdownCheck.isChecked = mapping.isLockdown
+        }
+
+        if (shouldObserveAppsCount()) {
+            handleAppsCount()
+        } else {
+            b.applicationsBtn.isEnabled = false
+            // texts are updated based on the catch all and one-wg
         }
 
         /*if (config == null && configId == WARP_ID) {
@@ -141,6 +148,10 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             return
         }
         prefillConfig(config)
+    }
+
+    private fun shouldObserveAppsCount(): Boolean {
+        return !wgType.isOneWg() && !b.catchAllCheck.isChecked
     }
 
     private fun prefillConfig(config: Config) {
@@ -349,6 +360,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             uiCtx {
                 b.lockdownCheck.isEnabled = !enabled
                 b.applicationsBtn.isEnabled = !enabled
+                b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
                 if (enabled) {
                     Utilities.showToastUiCentered(
                         this,
