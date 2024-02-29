@@ -20,14 +20,21 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityOtherDnsListBinding
+import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.PersistentState
+import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.UIUtils.fetchColor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
 class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
@@ -108,7 +115,7 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
     override fun onResume() {
         super.onResume()
         resetUi()
-        highlightSelectedUi()
+        updateSelectedStatus()
     }
 
     private fun resetUi() {
@@ -132,48 +139,87 @@ class DnsListActivity : AppCompatActivity(R.layout.activity_other_dns_list) {
         b.abbrRethinkDns.setTextColor(fetchColor(this, R.attr.primaryTextColor))
     }
 
-    private fun highlightSelectedUi() {
+    private fun updateSelectedStatus() {
+        io {
+            // always use the id as Dnsx.Preffered as it is the primary dns id for now
+            val state = VpnController.getDnsStatus(Backend.Preferred)
+            val working =
+                if (state == null) {
+                    false
+                } else {
+                    when (Transaction.Status.fromId(state)) {
+                        Transaction.Status.COMPLETE,
+                        Transaction.Status.START -> {
+                            true
+                        }
+                        else -> {
+                            false
+                        }
+                    }
+                }
+            uiCtx { highlightSelectedUi(working) }
+        }
+    }
+
+    private fun highlightSelectedUi(working: Boolean) {
+        val strokeColor: Int
+        val textColor: Int
+        if (working) {
+            strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+            textColor = fetchColor(this, R.attr.secondaryTextColor)
+        } else {
+            strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentBad)
+            textColor = fetchColor(this, R.attr.accentBad)
+        }
+
         when (appConfig.getDnsType()) {
             AppConfig.DnsType.DOH -> {
-                b.cardDoh.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDoh.strokeColor = strokeColor
                 b.cardDoh.strokeWidth = 2
-                b.initialDoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-                b.abbrDoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDoh.setTextColor(textColor)
+                b.abbrDoh.setTextColor(textColor)
             }
             AppConfig.DnsType.DNS_PROXY -> {
-                b.cardDnsproxy.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDnsproxy.strokeColor = strokeColor
                 b.cardDnsproxy.strokeWidth = 2
-                b.initialDnsproxy.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-                b.abbrDnsproxy.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDnsproxy.setTextColor(textColor)
+                b.abbrDnsproxy.setTextColor(textColor)
             }
             AppConfig.DnsType.DNSCRYPT -> {
-                b.cardDnscrypt.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDnscrypt.strokeColor = strokeColor
                 b.cardDnscrypt.strokeWidth = 2
-                b.initialDnscrypt.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-                b.abbrDnscrypt.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDnscrypt.setTextColor(textColor)
+                b.abbrDnscrypt.setTextColor(textColor)
             }
             AppConfig.DnsType.DOT -> {
-                b.cardDot.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardDot.strokeColor = strokeColor
                 b.cardDot.strokeWidth = 2
-                b.initialDot.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-                b.abbrDot.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialDot.setTextColor(textColor)
+                b.abbrDot.setTextColor(textColor)
             }
             AppConfig.DnsType.ODOH -> {
-                b.cardOdoh.strokeColor = UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardOdoh.strokeColor = strokeColor
                 b.cardOdoh.strokeWidth = 2
-                b.initialOdoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-                b.abbrOdoh.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialOdoh.setTextColor(textColor)
+                b.abbrOdoh.setTextColor(textColor)
             }
             AppConfig.DnsType.RETHINK_REMOTE -> {
-                b.cardRethinkDns.strokeColor =
-                    UIUtils.fetchToggleBtnColors(this, R.color.accentGood)
+                b.cardRethinkDns.strokeColor = strokeColor
                 b.cardRethinkDns.strokeWidth = 2
-                b.initialRethinkDns.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
-                b.abbrRethinkDns.setTextColor(fetchColor(this, R.attr.secondaryTextColor))
+                b.initialRethinkDns.setTextColor(textColor)
+                b.abbrRethinkDns.setTextColor(textColor)
             }
             else -> {
                 // no-op
             }
         }
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }
