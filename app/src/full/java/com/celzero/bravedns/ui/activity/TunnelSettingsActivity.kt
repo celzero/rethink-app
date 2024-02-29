@@ -104,7 +104,11 @@ class TunnelSettingsActivity : AppCompatActivity(R.layout.activity_tunnel_settin
             if (isChecked && !persistentState.useMultipleNetworks) {
                 val alertBuilder = MaterialAlertDialogBuilder(this)
                 alertBuilder.setTitle(getString(R.string.settings_rinr_dialog_title))
-                val msg = getString(R.string.settings_rinr_dialog_desc, getString(R.string.settings_network_all_networks))
+                val msg =
+                    getString(
+                        R.string.settings_rinr_dialog_desc,
+                        getString(R.string.settings_network_all_networks)
+                    )
                 alertBuilder.setMessage(msg)
                 alertBuilder.setPositiveButton(getString(R.string.lbl_proceed)) { dialog, _ ->
                     dialog.dismiss()

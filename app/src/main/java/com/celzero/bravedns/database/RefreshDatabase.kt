@@ -213,11 +213,11 @@ internal constructor(
     ): Set<FirewallManager.AppInfoTuple> {
         return if (ignoreUid) {
             val oldpkgs = old.map { it.packageName }.toSet()
-            latest.filter { !oldpkgs.contains(it.packageName) }
+            latest
+                .filter { !oldpkgs.contains(it.packageName) }
                 .toHashSet() // latest apps not found in old
         } else {
-            latest.filter{ !old.contains(it) }
-            .toHashSet()
+            latest.filter { !old.contains(it) }.toHashSet()
         }
     }
 
@@ -229,11 +229,10 @@ internal constructor(
         return if (ignoreUid) {
             val latestpkgs = latest.map { it.packageName }.toSet()
             old.filter { !latestpkgs.contains(it.packageName) && !isNonApp(it.packageName) }
-            .toHashSet()
+                .toHashSet()
         } else {
             // extract old apps that are not latest
-            old.filter { !latest.contains(it) && !isNonApp(it.packageName) }
-            .toHashSet()
+            old.filter { !latest.contains(it) && !isNonApp(it.packageName) }.toHashSet()
         }
     }
 
@@ -490,8 +489,7 @@ internal constructor(
 
         val notificationManager =
             context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
-        if (DEBUG)
-            Log.d(Logger.LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
+        if (DEBUG) Log.d(Logger.LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
         val intent = Intent(context, NotificationHandlerDialog::class.java)
         intent.putExtra(
@@ -570,8 +568,7 @@ internal constructor(
 
         val notificationManager =
             context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
-        if (DEBUG)
-            Log.d(Logger.LOG_TAG_VPN, "New app installed: $appName, show notification")
+        if (DEBUG) Log.d(Logger.LOG_TAG_VPN, "New app installed: $appName, show notification")
 
         val intent = Intent(context, NotificationHandlerDialog::class.java)
         intent.putExtra(

@@ -134,11 +134,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                 timestamp
             )
         } catch (e: IOException) {
-            Log.w(
-                Logger.LOG_TAG_DOWNLOAD,
-                "could not create filetag.json at version $timestamp",
-                e
-            )
+            Log.w(Logger.LOG_TAG_DOWNLOAD, "could not create filetag.json at version $timestamp", e)
         }
         return false
     }

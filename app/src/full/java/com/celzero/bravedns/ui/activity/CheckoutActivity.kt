@@ -95,9 +95,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             handleKeys()
         }
 
-        UUID.randomUUID().toString().let { uuid ->
-            Log.d(Logger.LOG_TAG_PROXY, "UUID: $uuid")
-        }
+        UUID.randomUUID().toString().let { uuid -> Log.d(Logger.LOG_TAG_PROXY, "UUID: $uuid") }
         generateRandomHexToken(TOKEN_LENGTH).let { token ->
             Log.d(Logger.LOG_TAG_PROXY, "Token: $token")
         }

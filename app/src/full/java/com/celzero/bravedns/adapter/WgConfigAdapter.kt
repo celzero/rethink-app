@@ -128,7 +128,9 @@ class WgConfigAdapter(private val context: Context) :
             if (appsCount == 0) {
                 b.interfaceAppsCount.setTextColor(UIUtils.fetchColor(context, R.attr.accentBad))
             } else {
-                b.interfaceAppsCount.setTextColor(UIUtils.fetchColor(context, R.attr.primaryLightColorText))
+                b.interfaceAppsCount.setTextColor(
+                    UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                )
             }
         }
 

@@ -76,10 +76,7 @@ class NotificationHandlerDialog : AppCompatActivity() {
     }
 
     private fun trampoline(trampolineType: TrampolineType) {
-        Log.i(
-            Logger.LOG_TAG_VPN,
-            "act on notification, notification type: $trampolineType"
-        )
+        Log.i(Logger.LOG_TAG_VPN, "act on notification, notification type: $trampolineType")
         when (trampolineType) {
             TrampolineType.ACCESSIBILITY_SERVICE_FAILURE_DIALOG -> {
                 handleAccessibilitySettings()

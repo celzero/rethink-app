@@ -39,10 +39,7 @@ object EncryptedFileManager {
         var config: Config? = null
         try {
             val dir = File(fileToRead)
-            Log.d(
-                Logger.LOG_TAG_PROXY,
-                "Encrypted File Read1: $fileToRead, ${dir.absolutePath}"
-            )
+            Log.d(Logger.LOG_TAG_PROXY, "Encrypted File Read1: $fileToRead, ${dir.absolutePath}")
             val masterKey =
                 MasterKey.Builder(ctx.applicationContext)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -57,10 +54,7 @@ object EncryptedFileManager {
                     .build()
 
             if (DEBUG) {
-                Log.d(
-                    Logger.LOG_TAG_PROXY,
-                    "Encrypted File Read: ${dir.absolutePath}, $fileToRead"
-                )
+                Log.d(Logger.LOG_TAG_PROXY, "Encrypted File Read: ${dir.absolutePath}, $fileToRead")
             }
             val inputStream = encryptedFile.openFileInput()
             val byteArrayOutputStream = ByteArrayOutputStream()

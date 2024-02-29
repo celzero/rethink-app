@@ -174,11 +174,7 @@ object UIUtils {
                 context.getString(R.string.private_dns_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(
-                Logger.LOG_TAG_VPN,
-                "Failure opening network setting screen: ${e.message}",
-                e
-            )
+            Log.w(Logger.LOG_TAG_VPN, "Failure opening network setting screen: ${e.message}", e)
         }
     }
 

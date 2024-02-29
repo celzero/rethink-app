@@ -390,7 +390,8 @@ internal constructor(
         return when (persistentState.braveMode) {
             // Case: app mode - firewall, DNS mode should be none.
             BraveMode.FIREWALL.mode -> TunDnsMode.NONE
-            BraveMode.DNS.mode, BraveMode.DNS_FIREWALL.mode -> determineTunDnsMode()
+            BraveMode.DNS.mode,
+            BraveMode.DNS_FIREWALL.mode -> determineTunDnsMode()
             else -> {
                 Log.wtf(LOG_TAG_VPN, "Invalid brave mode: ${persistentState.braveMode}")
                 TunDnsMode.NONE

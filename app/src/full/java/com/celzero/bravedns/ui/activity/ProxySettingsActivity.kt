@@ -256,11 +256,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         delay(REFRESH_TIMEOUT, lifecycleScope) {
             b.wgRefresh.isEnabled = true
             b.wgRefresh.clearAnimation()
-            showToastUiCentered(
-                this,
-                getString(R.string.dc_refresh_toast),
-                Toast.LENGTH_SHORT
-            )
+            showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
     }
 

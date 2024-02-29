@@ -625,11 +625,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
-            Log.w(
-                Logger.LOG_TAG_VPN,
-                "Failure opening rethink download link: ${e.message}",
-                e
-            )
+            Log.w(Logger.LOG_TAG_VPN, "Failure opening rethink download link: ${e.message}", e)
         }
     }
 

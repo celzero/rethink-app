@@ -103,7 +103,7 @@ class CustomIp {
             return cidr
         }
         // Pad the IP address with zeros if not fully specified
-        while (ipParts.size <  4) {
+        while (ipParts.size < 4) {
             ipParts.add("*")
         }
         // Reassemble the IP address
@@ -112,5 +112,4 @@ class CustomIp {
         if (parts.size < 2) return paddedIp
         return "$paddedIp/${parts[1]}"
     }
-
 }

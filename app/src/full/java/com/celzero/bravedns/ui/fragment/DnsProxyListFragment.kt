@@ -177,10 +177,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                 insertDNSProxyEndpointDB(mode, name, appName, ip, port)
                 dialog.dismiss()
             } else {
-                Log.i(
-                    Logger.LOG_TAG_UI,
-                    "cannot insert invalid dns-proxy IPs: $name, $appName"
-                )
+                Log.i(Logger.LOG_TAG_UI, "cannot insert invalid dns-proxy IPs: $name, $appName")
             }
         }
 
@@ -219,8 +216,7 @@ class DnsProxyListFragment : Fragment(R.layout.fragment_dns_proxy_list) {
                     latency = 0
                 )
             appConfig.insertDnsproxyEndpoint(dnsProxyEndpoint)
-            if (DEBUG)
-                Log.d(Logger.LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
+            if (DEBUG) Log.d(Logger.LOG_TAG_UI, "Insert into DNSProxy database- $appName, $port")
         }
     }
 

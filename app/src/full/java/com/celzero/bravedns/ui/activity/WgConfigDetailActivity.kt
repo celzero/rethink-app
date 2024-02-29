@@ -164,7 +164,8 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         if (wgType.isOneWg()) {
             b.dnsServersLabel.visibility = View.VISIBLE
             b.dnsServersText.visibility = View.VISIBLE
-            b.dnsServersText.text = wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
+            b.dnsServersText.text =
+                wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
         } else {
             b.dnsServersLabel.visibility = View.GONE
             b.dnsServersText.visibility = View.GONE

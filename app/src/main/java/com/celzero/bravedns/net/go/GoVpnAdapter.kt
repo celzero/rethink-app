@@ -49,12 +49,12 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.celzero.bravedns.wireguard.Config
 import intra.Intra
 import intra.Tunnel
-import java.net.URI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.net.URI
 
 /**
  * This is a VpnAdapter that captures all traffic and routes it through a go-tun2socks instance with
@@ -987,7 +987,6 @@ class GoVpnAdapter : KoinComponent {
             Log.e(LOG_TAG_VPN, "err getP50: ${e.message}", e)
         }
     }
-
 
     private fun getResolver(): backend.DNSResolver? {
         try {

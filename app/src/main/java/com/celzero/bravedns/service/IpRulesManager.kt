@@ -363,11 +363,7 @@ object IpRulesManager : KoinComponent {
         Log.i(LOG_TAG_FIREWALL, "ip rules updated")
     }
 
-    suspend fun replaceIpRule(
-        prevRule: CustomIp,
-        ipString: String,
-        newStatus: IpRuleStatus
-    ) {
+    suspend fun replaceIpRule(prevRule: CustomIp, ipString: String, newStatus: IpRuleStatus) {
         val host = HostName(ipString)
         val prevIpAddrStr = prevRule.getCustomIpAddress().asAddress().toNormalizedString()
         val newIpAddrStr = host.asAddress().toNormalizedString()

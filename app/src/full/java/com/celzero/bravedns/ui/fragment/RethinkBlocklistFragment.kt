@@ -816,10 +816,7 @@ class RethinkBlocklistFragment :
         workManager.getWorkInfosByTagLiveData(DOWNLOAD_TAG).observe(viewLifecycleOwner) {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
-            Log.i(
-                Logger.LOG_TAG_DOWNLOAD,
-                "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG"
-            )
+            Log.i(Logger.LOG_TAG_DOWNLOAD, "WorkManager state: ${workInfo.state} for $DOWNLOAD_TAG")
             if (
                 WorkInfo.State.ENQUEUED == workInfo.state ||
                     WorkInfo.State.RUNNING == workInfo.state

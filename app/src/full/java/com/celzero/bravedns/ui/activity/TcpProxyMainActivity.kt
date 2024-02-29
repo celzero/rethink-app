@@ -66,10 +66,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
             return
         }
 
-        Log.i(
-            Logger.LOG_TAG_UI,
-            "displayTcpProxyUi: ${tcpProxies.name}, ${tcpProxies.url}"
-        )
+        Log.i(Logger.LOG_TAG_UI, "displayTcpProxyUi: ${tcpProxies.name}, ${tcpProxies.url}")
         b.tcpProxySwitch.isChecked = true
         b.tcpProxyStatus.text = "Active" // getString(R.string.tcp_proxy_description_active)
     }

@@ -554,8 +554,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG)
-                    Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                if (DEBUG) Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -602,8 +601,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG)
-                    Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                if (DEBUG) Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()
             }

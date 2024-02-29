@@ -78,15 +78,13 @@ import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineName
-import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import kotlin.coroutines.CoroutineContext
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -751,7 +749,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         b.fhsInternetSpeed.text =
             getString(
                 R.string.two_argument_space,
-                getString(R.string.two_argument_space, txBytes, getString(R.string.symbol_black_up)),
+                getString(
+                    R.string.two_argument_space,
+                    txBytes,
+                    getString(R.string.symbol_black_up)
+                ),
                 getString(
                     R.string.two_argument_space,
                     rxBytes,
@@ -1195,7 +1197,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
     }
-    
+
     private fun ui(n: String, f: suspend () -> Unit): Job {
         val cctx = CoroutineName(n) + Dispatchers.Main
         return lifecycleScope.launch(cctx) { f() }

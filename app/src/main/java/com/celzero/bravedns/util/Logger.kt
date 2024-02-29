@@ -20,7 +20,7 @@ import com.celzero.bravedns.service.PersistentState
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class Logger: KoinComponent {
+class Logger : KoinComponent {
     private val persistentState by inject<PersistentState>()
     private var configuredLogLevel = persistentState.goLoggerLevel
 

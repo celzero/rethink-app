@@ -183,7 +183,9 @@ class Peer private constructor(builder: Builder) {
             sb.append("persistent_keepalive_interval=").append(pk).append('\n')
         }
         preSharedKey.ifPresent(
-            Consumer<WgKey> { psk: WgKey -> sb.append("preshared_key=").append(psk.hex()).append('\n') }
+            Consumer<WgKey> { psk: WgKey ->
+                sb.append("preshared_key=").append(psk.hex()).append('\n')
+            }
         )
         return sb.toString()
     }

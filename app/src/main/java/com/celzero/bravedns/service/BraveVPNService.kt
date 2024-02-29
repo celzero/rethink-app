@@ -30,7 +30,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.TrafficStats
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -77,7 +76,6 @@ import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
-import com.celzero.bravedns.util.Utilities.humanReadableByteCount
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
@@ -89,6 +87,16 @@ import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import intra.Bridge
 import intra.SocketSummary
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
+import org.koin.android.ext.android.inject
+import rnet.ServerSummary
+import rnet.Tab
 import java.io.IOException
 import java.net.InetAddress
 import java.net.SocketException
@@ -100,16 +108,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.withLock
-import org.koin.android.ext.android.inject
-import rnet.ServerSummary
-import rnet.Tab
 
 class BraveVPNService :
     VpnService(), ConnectionMonitor.NetworkListener, Bridge, OnSharedPreferenceChangeListener {
@@ -183,7 +181,6 @@ class BraveVPNService :
 
     var underlyingNetworks: ConnectionMonitor.UnderlyingNetworks? = null
     private var previousSetMtu: Int = 0
-
 
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 

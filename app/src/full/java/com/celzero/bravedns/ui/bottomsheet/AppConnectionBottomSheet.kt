@@ -197,10 +197,7 @@ class AppConnectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun applyIpRule(status: IpRulesManager.IpRuleStatus) {
-        Log.i(
-            Logger.LOG_TAG_FIREWALL,
-            "ip rule for uid: $uid, ip: $ipAddress (${status.name})"
-        )
+        Log.i(Logger.LOG_TAG_FIREWALL, "ip rule for uid: $uid, ip: $ipAddress (${status.name})")
         ipRule = status
         // set port number as null for all the rules applied from this screen
         io { IpRulesManager.addIpRule(uid, ipAddress, null, status) }
