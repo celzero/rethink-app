@@ -33,7 +33,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_weight="0"
-            android:alpha="0.75"
+            android:alpha="0.9"
             android:ellipsize="none"
             android:gravity="center"
             android:minWidth="40dp"

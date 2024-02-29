@@ -27,6 +27,7 @@
             android:layout_height="32dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"
+            android:alpha="0.9"
             android:contentDescription="@string/apps_icon_content_desc"
             android:src="@drawable/default_app_icon" />
 
@@ -111,6 +112,7 @@
                         android:ellipsize="none"
                         android:gravity="center"
                         android:maxHeight="16dp"
+                        android:alpha="0.9"
                         android:minWidth="16dp"
                         android:maxWidth="32dp"
                         android:singleLine="true"
