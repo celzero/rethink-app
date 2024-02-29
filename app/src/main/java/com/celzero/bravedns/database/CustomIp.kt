@@ -20,7 +20,7 @@ import androidx.room.Entity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.Constants.Companion.UNSPECIFIED_PORT
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 
@@ -50,8 +50,7 @@ class CustomIp {
 
     override fun equals(other: Any?): Boolean {
         if (other !is CustomIp) return false
-        if (ipAddress != other.ipAddress && uid != other.uid) return false
-        return true
+        return !(ipAddress != other.ipAddress && uid != other.uid)
     }
 
     override fun hashCode(): Int {
@@ -74,13 +73,11 @@ class CustomIp {
         var ip = ipstr
         try {
             if (HostName(ipstr).asAddress().isIPv4) {
-                if (ipstr.count { it == '.' } < 3) {
-                    ip = getPaddedIp(ip)
-                }
+                ip = padIpv4Cidr(ipstr)
             }
             this.ipAddress = HostName(ip).asAddress().toNormalizedString()
         } catch (ignored: NullPointerException) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "Invalid IP address added", ignored)
+            Log.e(Logger.LOG_TAG_VPN, "Invalid IP address added", ignored)
             this.ipAddress = ""
         }
     }
@@ -91,17 +88,29 @@ class CustomIp {
             val y = hostName.asAddress().assignPrefixForSingleBlock().toString()
             val x = hostName.port
         } catch (ignored: NullPointerException) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "Invalid IP address added", ignored)
+            Log.e(Logger.LOG_TAG_VPN, "Invalid IP address added", ignored)
             this.ipAddress = ""
         }
     }
 
-    private fun getPaddedIp(ip: String): String {
-        return if (ip.contains("/")) {
-            val index = ip.indexOf("/")
-            ip.substring(0, index) + ".*" + ip.substring(index)
-        } else {
-            "$ip.*"
+    private fun padIpv4Cidr(cidr: String): String {
+        // remove port number from the IP address
+        val ip = cidr.split(":")[0]
+        val plaincidr = ip.replace("[", "").replace("]", "")
+        val parts = plaincidr.split("/")
+        val ipParts = parts[0].split(".").toMutableList()
+        if (ipParts.size == 4) {
+            return cidr
         }
+        // Pad the IP address with zeros if not fully specified
+        while (ipParts.size <  4) {
+            ipParts.add("*")
+        }
+        // Reassemble the IP address
+        val paddedIp = ipParts.joinToString(".")
+        // Reassemble the CIDR string
+        if (parts.size < 2) return paddedIp
+        return "$paddedIp/${parts[1]}"
     }
+
 }

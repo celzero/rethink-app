@@ -46,7 +46,7 @@ import com.celzero.bravedns.service.DomainRulesManager.isWildCardEntry
 import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
@@ -111,7 +111,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
         } else if (holder is CustomDomainViewHolderWithoutHeader) {
             holder.update(customDomain)
         } else {
-            Log.w(LoggerConstants.LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+            Log.w(Logger.LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
             return
         }
     }
@@ -496,6 +496,11 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                 }
 
                 if (isChecked) {
+                    // See CustomIpAdapter.kt for the same code (ipRulesGroupListener)
+                    val hasStatusChanged = customDomain.status != statusId.id
+                    if (!hasStatusChanged) {
+                        return@OnButtonCheckedListener
+                    }
                     val t = toggleBtnUi(statusId)
                     // update toggle button
                     selectToggleBtnUi(b, t)
@@ -647,6 +652,11 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
                 }
 
                 if (isChecked) {
+                    // See CustomIpAdapter.kt for the same code (ipRulesGroupListener)
+                    val hasStatusChanged = customDomain.status != statusId.id
+                    if (!hasStatusChanged) {
+                        return@OnButtonCheckedListener
+                    }
                     val t = toggleBtnUi(statusId)
                     // update toggle button
                     selectToggleBtnUi(b, t)
