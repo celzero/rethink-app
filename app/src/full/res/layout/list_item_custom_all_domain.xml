@@ -5,6 +5,12 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="1dp">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:alpha="0.2"
+        android:background="?attr/primaryLightColorText" />
+
     <LinearLayout
         android:id="@+id/custom_domain_app_name_container"
         android:layout_width="match_parent"
