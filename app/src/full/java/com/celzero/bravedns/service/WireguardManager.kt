@@ -26,7 +26,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.wireguard.BadConfigException
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
@@ -119,6 +119,11 @@ object WireguardManager : KoinComponent {
             Log.e(LOG_TAG_PROXY, "getConfigFilesById: wg not found: $id, ${configs.size}")
         }
         return config
+    }
+
+    fun isAnyWgActive(): Boolean {
+        val m = mappings.filter { it.isActive }
+        return m.isNotEmpty()
     }
 
     fun getEnabledConfigs(): List<Config> {
@@ -728,9 +733,7 @@ object WireguardManager : KoinComponent {
     }
 
     fun getOneWireGuardProxyId(): Int? {
-        val id = mappings.find { it.oneWireGuard && it.isActive }?.id
-        if (DEBUG) Log.d(LOG_TAG_PROXY, "flow: getOneWireGuardProxyId: $id")
-        return id ?: return null
+        return mappings.find { it.oneWireGuard && it.isActive }?.id
     }
 
     fun getCatchAllWireGuardProxyId(): Int? {

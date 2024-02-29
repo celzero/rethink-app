@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
@@ -26,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
@@ -116,14 +118,26 @@ class OneWgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
-
+                b.interfaceAppsCount.visibility = View.VISIBLE
+                b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    // change the color based on the status
+                    if (statusId == Backend.TOK) {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextPositive)
+                    } else if (statusId == Backend.TUP) {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextNeutral)
+                    } else {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextNegative)
+                    }
                     b.interfaceStatus.text =
                         context.getString(
-                            R.string.about_version_install_source,
-                            context.getString(resId).replaceFirstChar(Char::titlecase),
-                            appsCount
+                            R.string.ci_ip_label,
+                            context.getString(R.string.lbl_status),
+                            context.getString(resId).replaceFirstChar(Char::titlecase)
                         )
                 } else {
                     b.interfaceStatus.text =
@@ -137,12 +151,13 @@ class OneWgConfigAdapter(private val context: Context) :
                 }
             } else {
                 b.interfaceDetailCard.strokeWidth = 0
+                b.interfaceAppsCount.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
                 b.interfaceStatus.text =
                     context.getString(
-                        R.string.about_version_install_source,
-                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase),
-                        appsCount
+                        R.string.ci_ip_label,
+                        context.getString(R.string.lbl_status),
+                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
                     )
             }
         }

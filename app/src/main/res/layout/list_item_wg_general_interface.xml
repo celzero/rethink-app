@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/background">
+    android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/interface_detail_card"
@@ -12,9 +11,10 @@
         android:layout_margin="8dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="8dp"
         app:cardElevation="8dp"
         app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent"
@@ -43,26 +43,27 @@
                     android:id="@+id/interface_name_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginEnd="1dp"
-                    android:padding="10dp"
-                    android:textSize="@dimen/heading_font_text_view" />
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:padding="5dp"
+                    android:textAppearance="?attr/textAppearanceHeadline6"
+                    android:textColor="?attr/secondaryTextColor" />
 
                 <TextView
                     android:id="@+id/interface_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"
                     android:textSize="@dimen/default_font_text_view" />
 
                 <TextView
-                    android:id="@+id/interface_proxy_status"
+                    android:id="@+id/interface_apps_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"
@@ -72,7 +73,7 @@
                     android:id="@+id/interface_lockdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"
@@ -82,7 +83,7 @@
                     android:id="@+id/interface_catch_all"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"

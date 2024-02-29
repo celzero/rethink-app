@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/wg_no_config_text"
@@ -49,24 +50,24 @@
         app:singleSelection="true">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/wg_general_toggle_btn"
-            style="@style/toggleButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="125dp"
-            android:tag="1"
-            android:text="@string/lbl_default"
-            android:textColor="?attr/defaultToggleBtnTxt"
-            app:cornerRadius="16dp" />
-
-        <com.google.android.material.button.MaterialButton
             android:id="@+id/one_wg_toggle_btn"
             style="@style/toggleButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="125dp"
+            android:tag="1"
+            android:text="@string/rt_list_simple_btn_txt"
+            android:textColor="?attr/defaultToggleBtnTxt"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/wg_general_toggle_btn"
+            style="@style/toggleButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="125dp"
             android:tag="2"
-            android:text="@string/lbl_one_wg"
+            android:text="@string/lbl_advanced"
             android:textColor="?attr/defaultToggleBtnTxt"
             app:cornerRadius="16dp" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
