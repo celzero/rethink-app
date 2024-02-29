@@ -105,7 +105,9 @@ class ODoHEndpointAdapter(
                 "connected to ODoH: ${endpoint.name} isSelected? ${endpoint.isSelected}"
             )
             if (endpoint.isSelected) {
-                updateSelectedStatus()
+                // update the status after 1 second
+                val scope = (context as LifecycleOwner).lifecycleScope
+                Utilities.delay(1000L, scope) { updateSelectedStatus() }
             }
 
             // Shows either the info/delete icon for the DoH entries.

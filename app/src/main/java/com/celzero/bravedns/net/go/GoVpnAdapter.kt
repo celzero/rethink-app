@@ -255,7 +255,8 @@ class GoVpnAdapter : KoinComponent {
         try {
             val dc = appConfig.getConnectedDnscryptServer()
             val url = dc.dnsCryptURL
-            getResolver()?.remove(id)
+            // add replaces the existing transport with the same id if successful
+            /// so no need to remove the transport before adding
             Intra.addDNSCryptTransport(tunnel, id, url)
             Log.i(LOG_TAG_VPN, "new dnscrypt: $id (${dc.dnsCryptName}), url: $url")
         } catch (e: Exception) {

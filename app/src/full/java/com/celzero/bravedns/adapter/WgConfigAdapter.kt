@@ -106,6 +106,9 @@ class WgConfigAdapter(private val context: Context) :
                 b.interfaceCatchAll.visibility = View.VISIBLE
                 b.interfaceLockdown.visibility = View.GONE
                 b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
+                b.interfaceAppsCount.setTextColor(
+                    UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                )
                 b.interfaceCatchAll.text = context.getString(R.string.catch_all_wg_dialog_title)
                 return // no need to update the apps count
             } else if (config.isLockdown) {

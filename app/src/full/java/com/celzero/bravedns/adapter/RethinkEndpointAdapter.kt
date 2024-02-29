@@ -119,7 +119,13 @@ class RethinkEndpointAdapter(
             // Shows either the info/delete icon for the DoH entries.
             showIcon(endpoint)
 
-            updateBlocklistStatusText(endpoint)
+            if (endpoint.isActive) {
+                // update the status after 1 second
+                val scope = (context as LifecycleOwner).lifecycleScope
+                Utilities.delay(1000L, scope) { updateBlocklistStatusText(endpoint) }
+            } else {
+                updateBlocklistStatusText(endpoint)
+            }
         }
 
         private fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {

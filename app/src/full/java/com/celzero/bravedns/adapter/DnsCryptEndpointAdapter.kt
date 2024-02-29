@@ -115,7 +115,9 @@ class DnsCryptEndpointAdapter(
             b.dnsCryptEndpointListActionImage.isChecked = endpoint.isSelected
 
             if (endpoint.isSelected) {
-                updateSelectedStatus()
+                // update the status after 1 second
+                val scope = (context as LifecycleOwner).lifecycleScope
+                Utilities.delay(1000L, scope) { updateSelectedStatus() }
             } else {
                 b.dnsCryptEndpointListUrlExplanation.text = ""
             }
