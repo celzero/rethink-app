@@ -360,7 +360,11 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             uiCtx {
                 b.lockdownCheck.isEnabled = !enabled
                 b.applicationsBtn.isEnabled = !enabled
-                b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
+                if (enabled) {
+                    b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
+                } else {
+                    handleAppsCount()
+                }
                 if (enabled) {
                     Utilities.showToastUiCentered(
                         this,
