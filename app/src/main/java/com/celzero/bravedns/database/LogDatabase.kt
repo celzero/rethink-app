@@ -31,7 +31,7 @@ import com.celzero.bravedns.util.Utilities
 
 @Database(
     entities = [ConnectionTracker::class, DnsLog::class, RethinkLog::class],
-    version = 7,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
