@@ -214,8 +214,8 @@ dependencies {
 
     // Tun2socks (https://jitpack.io/#celzero/firestack)
     // implementation project(":tun2socks")
-    download 'com.github.celzero:firestack:f1e1a596df@aar'
-    implementation 'com.github.celzero:firestack:f1e1a596df@aar'
+    download 'com.github.celzero:firestack:8dc7dafcaa@aar'
+    implementation 'com.github.celzero:firestack:8dc7dafcaa@aar'
 
     // Work manager
     implementation('androidx.work:work-runtime-ktx:2.9.0') {
