@@ -716,8 +716,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     data class TxRx(
-        val tx: Long = TrafficStats.getTotalRxBytes(),
-        val rx: Long = TrafficStats.getTotalTxBytes(),
+        val tx: Long = TrafficStats.getTotalTxBytes(),
+        val rx: Long = TrafficStats.getTotalRxBytes(),
         val time: Long = SystemClock.elapsedRealtime()
     )
 
@@ -739,11 +739,11 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             return
         }
 
-        val rx = curr.rx - txRx.rx
         val tx = curr.tx - txRx.tx
+        val rx = curr.rx - txRx.rx
         txRx = curr
-        val rxBytes = String.format("%.2f", ((rx / dur) / 1000.0))
         val txBytes = String.format("%.2f", ((tx / dur) / 1000.0))
+        val rxBytes = String.format("%.2f", ((rx / dur) / 1000.0))
         b.fhsInternetSpeed.visibility = View.VISIBLE
         b.fhsInternetSpeedUnit.visibility = View.VISIBLE
         b.fhsInternetSpeed.text =
