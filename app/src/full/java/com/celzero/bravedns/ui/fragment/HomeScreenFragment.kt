@@ -25,9 +25,11 @@ import android.content.res.TypedArray
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.TrafficStats
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.Log
 import android.util.TypedValue
@@ -62,8 +64,8 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -75,12 +77,16 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineName
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import kotlin.coroutines.CoroutineContext
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -408,7 +414,6 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disableAppsCard() {
-        b.fhsCardAppsStatus.visibility = View.GONE
         b.fhsCardAppsStatusRl.visibility = View.GONE
         b.fhsCardApps.visibility = View.VISIBLE
         b.fhsCardApps.text = getString(R.string.firewall_card_text_inactive)
@@ -575,10 +580,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 val allApps = copy.count()
                 val allowedApps =
                     allApps - (blockedCount + bypassCount + excludedCount + isolatedCount)
-                b.fhsCardAppsStatus.visibility = View.VISIBLE
+                b.fhsCardAllowedApps.visibility = View.VISIBLE
                 b.fhsCardAppsStatusRl.visibility = View.VISIBLE
-                b.fhsCardAppsStatus.text =
-                    getString(R.string.two_argument, allowedApps.toString(), allApps.toString())
+                b.fhsCardAllowedApps.text = allowedApps.toString()
+                b.fhsCardAppsAllApps.text = allApps.toString()
                 b.fhsCardAppsBlockedCount.text = blockedCount.toString()
                 b.fhsCardAppsBypassCount.text = bypassCount.toString()
                 b.fhsCardAppsExcludeCount.text = excludedCount.toString()
@@ -592,7 +597,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                         isolatedCount.toString()
                     )
                 b.fhsCardApps.visibility = View.GONE
-                b.fhsCardAppsStatus.isSelected = true
+                b.fhsCardAllowedApps.isSelected = true
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
             }
@@ -693,6 +698,66 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         updateCardsUi()
         syncDnsStatus()
         handleLockdownModeIfNeeded()
+        startTrafficStats()
+    }
+
+    private lateinit var trafficStatsTicker: Job
+
+    private fun startTrafficStats() {
+        trafficStatsTicker =
+            ui("trafficStatsTicker") {
+                while (true) {
+                    fetchTrafficStats()
+                    kotlinx.coroutines.delay(1500L)
+                }
+            }
+    }
+
+    private fun stopTrafficStats() {
+        trafficStatsTicker.cancel()
+    }
+
+    data class TxRx(
+        val tx: Long = TrafficStats.getTotalRxBytes(),
+        val rx: Long = TrafficStats.getTotalTxBytes(),
+        val time: Long = SystemClock.elapsedRealtime()
+    )
+
+    private var txRx = TxRx()
+
+    private fun fetchTrafficStats() {
+        val curr = TxRx()
+        if (txRx.time <= 0L) {
+            txRx = curr
+            b.fhsInternetSpeed.visibility = View.GONE
+            b.fhsInternetSpeedUnit.visibility = View.GONE
+            return
+        }
+        val dur = (curr.time - txRx.time) / 1000L
+
+        if (dur <= 0) {
+            b.fhsInternetSpeed.visibility = View.GONE
+            b.fhsInternetSpeedUnit.visibility = View.GONE
+            return
+        }
+
+        val rx = curr.rx - txRx.rx
+        val tx = curr.tx - txRx.tx
+        txRx = curr
+        val rxBytes = String.format("%.2f", ((rx / dur) / 1000.0))
+        val txBytes = String.format("%.2f", ((tx / dur) / 1000.0))
+        b.fhsInternetSpeed.visibility = View.VISIBLE
+        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        b.fhsInternetSpeed.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.two_argument_space, txBytes, getString(R.string.symbol_black_up)),
+                getString(
+                    R.string.two_argument_space,
+                    rxBytes,
+                    getString(R.string.symbol_black_down)
+                )
+            )
     }
 
     /**
@@ -730,6 +795,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     override fun onPause() {
         super.onPause()
         stopShimmer()
+        stopTrafficStats()
     }
 
     private fun startDnsActivity(screenToLoad: Int) {
@@ -1128,5 +1194,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+    
+    private fun ui(n: String, f: suspend () -> Unit): Job {
+        val cctx = CoroutineName(n) + Dispatchers.Main
+        return lifecycleScope.launch(cctx) { f() }
     }
 }
