@@ -272,7 +272,6 @@
     <string name="orbot_website_link">https://guardianproject.info/apps/org.torproject.android/</string>
     <string name="settings_autostart_bootup_desc">Ao ligar o dispositivo, inicia o RethinkDNS caso tenha estado em execução ao desligar.</string>
     <string name="settings_check_update_desc">Verifica automaticamente se existem atualizações da aplicação uma vez por semana.</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="orbot">Orbot</string>
     <string name="settings_ip_network_desc">Escolha entre as versões do Protocolo de Internet.</string>
     <string name="settings_ptrans_desc">Traduzir o tráfego IPv6 de saída para IPv4 no dispositivo. Ative se estiver conectado a uma rede apenas com IPv4.</string>

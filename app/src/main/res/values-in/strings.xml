@@ -37,7 +37,6 @@
     <string name="univ_firewall_dialog_title">Hapus aturan IP\?</string>
     <string name="connection_http3">HTTP3</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="always_on_dialog_positive_btn">Masuk ke Pengaturan</string>
     <string name="settings_enable_logs">Aktifkan pencatatan riwayat di perangkat</string>
@@ -846,7 +845,6 @@
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Sambungan ini diblokir karena <i>domain</i> diblokir oleh DNS pilihan pengguna.<br/><br/> Untuk mengubah perilaku ini, buka tab <i>Konfigurasi DNS</i>.</string>
     <string name="lbl_maybe_blocked" translatable="true">Mungkin Diblokir</string>
     <string name="lbl_network" translatable="true">jaringan</string>
-    <string name="trusted_domains_desc" translatable="true">Akan lebih baik jika menggunakan <u>Layanan DNS Rethink</u> untuk memercayai aturan nama domain.</string>
     <string name="settings_allow_lan_heading" translatable="true">Jangan merutekan IP Pribadi (eksperimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Kecualikan rute LAN, loopback, multicast, dan link-lokal dari terowongan VPN Rethink.</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Abaikan DNS &amp; aturan firewall untuk aplikasi <i>tercantum</i>\?</string>
@@ -899,7 +897,6 @@
     <string name="new_warp_error_toast" translatable="true">Tidak dapat memperoleh konfigurasi WARP</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Konfigurasi WARP tidak valid</string>
     <string name="add_remove_apps" translatable="true">Tambah / Hapus Aplikasi (%1$s aplikasi)</string>
-    <string name="config_delete_success_toast">Konfigurasi dihapus</string>
     <string name="bad_config_explanation_pka" translatable="true">: Harus berupa bilangan bulat positif tidak melebihi 65535</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Jangan memvalidasi sertifikat TLS server (dimungkinkan hanya jika Anda tahu apa yang Anda lakukan)</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Kunci tidak valid</string>

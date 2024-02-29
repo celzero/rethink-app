@@ -615,7 +615,6 @@
     <string name="next">التالي</string>
     <string name="slide_2_title">أهلاً وسهلاً</string>
     <string name="block">احظر</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="slide_1_desc">تطبيق RethinkDNS هو تطبيق مفتوح المصدر مدعم ببرنامج Mozilla Builders MVP.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">انقر لتغيير إعداد الحماية</string>
     <string name="status_no_internet">لا يوجد إنترنت</string>

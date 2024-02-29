@@ -62,7 +62,6 @@
     <string name="title_about">О приложении</string>
     <string name="next">Следующий</string>
     <string name="slide_1_title">Свободный и с открытым исходным кодом</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline.">ожидание</string>
     <string name="status_dns_server_down">dns-сервер не работает</string>
     <string name="status_protected_with_proxy">защищено прокси</string>
@@ -852,7 +851,6 @@
     <string name="brbs_backup_restore_desc" translatable="true">Не работает в разных версиях приложения или на разных устройствах</string>
     <string name="lbl_maybe_blocked" translatable="true">Может быть заблокирован</string>
     <string name="lbl_network" translatable="true">Cеть</string>
-    <string name="trusted_domains_desc" translatable="true">Правило доверенного домена работает лучше с <u>Rethink DNS</u>.</string>
     <string name="settings_allow_lan_heading" translatable="true">Не маршрутизировать частные IP-адреса (экспериментально)</string>
     <string name="bypass_dns_firewall_tooltip">%1$s работает только с Rethink DNS</string>
     <string name="settings_allow_lan_desc" translatable="true">Исключить маршруты LAN, loopback, multicast, link-local из VPN-туннеля Rethink.</string>
@@ -896,7 +894,6 @@
     <string name="add_peer" translatable="true">Добавить пир</string>
     <string name="config_delete_dialog_desc">Вы уверены, что хотите удалить данную конфигурацию\?</string>
     <string name="config_delete_dialog_title">Удалить конфигурацию</string>
-    <string name="config_delete_success_toast">Конфигурация удалена</string>
     <string name="wireguard_enabled_failure">Выключите другие прокси, чтобы включить WireGuard</string>
     <string name="wireguard_no_config_msg">Нет конфигураций WireGuard</string>
     <string name="wireguard_connection_error">Проблемы с соединением к конфигурации WireGuard</string>

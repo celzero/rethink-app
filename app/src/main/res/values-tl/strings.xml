@@ -29,7 +29,6 @@
     <string name="slide_2_desc" translatable="true">Ang Rethink ay ang pinakamadaling paraan upang magmonitor ng network activity, mag-bypass ng Internet censorship, at firewall apps sa iyong Android device.</string>
     <string name="slide_1_title" translatable="true">Libre at Open Source</string>
     <string name="slide_1_desc" translatable="true">Ang Rethink ay isang open source na software na sinusuportahan ng programa ng Mozilla Builders MVP.</string>
-    <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
     <string name="allow" translatable="true">pahintulutan</string>
     <string name="block" translatable="true">harangan</string>

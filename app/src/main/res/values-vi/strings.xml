@@ -59,7 +59,6 @@
     <string name="slide_1_desc" translatable="true">Rethink là ứng dụng mã nguồn mở được hỗ trợ bởi chương trình Mozilla Builders MVP.</string>
     <string name="slide_2_desc" translatable="true">Rethink là cách dễ nhất để giám sát hoạt động mạng, vượt qua kiểm duyệt internet và áp dụng tường lửa lên các ứng dụng trên thiết bị Android của bạn</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
-    <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
     <string name="hybrid_mode_notification_title" translatable="true">Được bảo vệ! Đã kết nối đến DNS + tường lửa</string>
     <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">đang chờ</string>
     <string name="status_dns_server_down" translatable="true">Máy chủ DNS đang ngưng hoạt động</string>
@@ -506,7 +505,6 @@
     <string name="firewall_status_block_metered" translatable="true">Bị chặn trên các mạng có đồng hồ đo (di động)</string>
     <string name="settings_ptrans_desc" translatable="true">Chuyển đổi lưu lượng gửi từ IPv6 sang IPv4 trên thiết bị. Tắt nếu kết nối của bạn chỉ hỗ trợ IPv4.</string>
     <string name="hsf_exclude_error" translatable="true">Không thể loại trừ ở chế độ khóa VPN</string>
-    <string name="trusted_domains_desc" translatable="true">Những quy tắc miền tin cậy chỉ hoạt động với <u>Rethink\'s DNS</u></string>
     <string name="settings_ptrans_heading" translatable="true">Bắt buộc đầu ra IPv4</string>
     <string name="settings_allow_lan_desc" translatable="true">Loại trừ LAN, lặp lại, các tuyến liên kết cục bộ từ đường hầm VPN của Rethink.</string>
     <string name="settings_lock_down_mode_desc" translatable="true">Một số tùy chọn bị tắt khi VPN ở chế độ khóa.<u>Xem cài đặt VPN</u></string>

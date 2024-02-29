@@ -29,7 +29,6 @@
     <string name="slide_2_desc">Rethink - це найпростіший спосіб моніторингу мережевої активності, обходу інтернет-цензури та брандмауерів на вашому Android пристрої.</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">дозволити</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="bypass_universal">універсальний обхід</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Натисніть, щоб змінити налаштування захисту</string>
     <string name="hybrid_mode_notification_title">Захищено! Підключено до DNS + Брандмауер.</string>
@@ -430,7 +429,6 @@
     <string name="settings_vpn_heading" translatable="true">vpn</string>
     <string name="download_update_dialog_message_ok" translatable="true">Ви вже використовуєте останню версію.</string>
     <string name="search_universal_ips" translatable="true"><font size="12">Пошук IP</font></string>
-    <string name="trusted_domains_desc" translatable="true">Правило дозволу домену краще працює з <u>Rethink\'s DNS</u>.</string>
     <string name="download_update_dialog_message_ok_title" translatable="true">Актуально!</string>
     <string name="info_dialog_url_copy_toast_msg" translatable="true">URL-адреса скопійована</string>
     <string name="orbot_install_dialog_positive" translatable="true">Встановлення</string>

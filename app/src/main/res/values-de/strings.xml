@@ -7,7 +7,6 @@
     <string name="about_title_desc">Netzwerkbedrohungen erkennen und blockieren</string>
     <string name="pause_title_desc">Pausieren…</string>
     <string name="txt_home">Startseite</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Warnung: Rethink wurde deaktiviert</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Tippen zum ändern der Schutzeinstellung</string>
     <string name="universal_firewall_explanation">Anwendung von Firewall-Regeln auf alle Anwendungen auf der Grundlage von Geräteereignissen, z. B. Firewall, wenn das Gerät gesperrt ist oder wenn eine bestimmte Anwendung nicht verwendet wird.</string>
@@ -853,7 +852,6 @@
     <string name="bypass_dns_firewall_tooltip">%1$s funktioniert nur mit Rethink\'s DNS</string>
     <string name="settings_allow_lan_heading" translatable="true">Private IPs nicht umlenken (experimentell)</string>
     <string name="settings_allow_lan_desc" translatable="true">LAN, Loopback und link-local Routen von Rethinks VPN ausschließen.</string>
-    <string name="trusted_domains_desc" translatable="true">Die Regel zum Vertrauen der Domäne funktioniert nur mit der <u>Rethink DNS</u>.</string>
     <string name="lbl_import" translatable="true">Importieren</string>
     <string name="lbl_socks5" translatable="true">SOCKS5</string>
     <string name="lbl_http" translatable="true">HTTP</string>
@@ -880,7 +878,6 @@
     <string name="lbl_select_all" translatable="true">Alles auswählen</string>
     <string name="lbl_create" translatable="true">Erstellen</string>
     <string name="lbl_random" translatable="true">(Direkt)</string>
-    <string name="config_delete_success_toast">Konfiguration gelöscht</string>
     <string name="bad_config_explanation_pka" translatable="true">: Muss positiv sein und darf nicht mehr als 65535 betragen</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Server-TLS-Zertifikate nicht validieren (nur aktivieren, wenn Sie wissen, was Sie tun)</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Ungültiger Schlüssel</string>

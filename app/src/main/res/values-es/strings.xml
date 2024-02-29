@@ -119,7 +119,6 @@
     <string name="finish">Finalizar</string>
     <string name="slide_2_desc">Rethink es la forma más fácil de supervisar la actividad de la red, evitar la censura de Internet y controlar las aplicaciones de su dispositivo Android.</string>
     <string name="slide_1_title">Código libre y abierto</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">permitir</string>
     <string name="block">bloquear</string>
@@ -851,7 +850,6 @@
     <string name="brbs_backup_restore_desc" translatable="true">No funciona en todas las versiones de la aplicación ni en todos los dispositivos</string>
     <string name="settings_allow_lan_heading" translatable="true">No enrutar IPs privadas (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Excluye las rutas LAN, loopback, multicast, enlace-local del túnel VPN de Rethink.</string>
-    <string name="trusted_domains_desc" translatable="true">La regla del dominio de confianza funciona mejor con el DNS de <u>Rethink</u>.</string>
     <string name="lbl_network" translatable="true">red</string>
     <string name="bypass_dns_firewall_tooltip">%1$s funciona sólo con el DNS de Rethink</string>
     <string name="lbl_maybe_blocked" translatable="true">Posiblemente bloqueado</string>
@@ -951,7 +949,6 @@
     <string name="config_delete_dialog_desc">¿Está seguro que quiere borrar esta configuración\?</string>
     <string name="config_add_success_toast">Configuración añadida</string>
     <string name="config_delete_dialog_title">Borrar la configuración</string>
-    <string name="config_delete_success_toast">Configuración eliminada</string>
     <string name="include_all_app_wg_dialog_title">Incluir todas las aplicaciones</string>
     <string name="add_peer" translatable="true">Añadir par</string>
     <string name="exclude_all_app_wg_dialog_title">Excluir todas las aplicaciones</string>

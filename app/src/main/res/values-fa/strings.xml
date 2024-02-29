@@ -45,7 +45,6 @@
     <string name="status_protected_with_socks5_private_dns">محافظت شده با socks5 و dns خصوصی</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit.">محافظت نشده</string>
     <string name="notification_action_stop_vpn">متوقف کردن</string>
-    <string name="rethink_plus">RethinkDNS پلاس</string>
     <string name="notification_action_dns_firewall_mode">DNS + دیوار آتش</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">برای تغییر تنظیمات حفاظت ضربه بزنید</string>
     <string name="notification_action_dns_mode">DNS</string>
@@ -184,7 +183,6 @@
     <string name="search_dns_logs" translatable="true"><font size="12">جستجوی نام دامنه یا آی‌پی‌ها </font></string>
     <string name="search_custom_domains" translatable="true"><font size="12">جستجوی نامهای دامنه</font></string>
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">جستجوی فهرست‌های مسدود</font></string>
-    <string name="trusted_domains_desc" translatable="true">قانون اعتبار دامنه فقط با <u>Rethink\'s DNS</u> کار می کند.</string>
     <string name="app_mode_wireguard" translatable="true">VPN (شبکه خصوصی مجازی)</string>
     <string name="settings_vpn_heading" translatable="true">vpn</string>
     <string name="settings_enable_logs" translatable="true">فعال کردن گزارش‌گیری روی دستگاه</string>
