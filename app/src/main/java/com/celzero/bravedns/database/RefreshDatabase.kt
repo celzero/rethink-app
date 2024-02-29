@@ -47,8 +47,8 @@ import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.ui.NotificationHandlerDialog
 import com.celzero.bravedns.util.AndroidUidConfig
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_DB
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_APP_DB
 import com.celzero.bravedns.util.PlayStoreCategory
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -56,7 +56,6 @@ import com.celzero.bravedns.util.Utilities.getActivityPendingIntent
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastT
 import com.celzero.bravedns.util.Utilities.isNonApp
-import com.google.common.collect.Sets
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -214,11 +213,11 @@ internal constructor(
     ): Set<FirewallManager.AppInfoTuple> {
         return if (ignoreUid) {
             val oldpkgs = old.map { it.packageName }.toSet()
-            latest
-                .filter { !oldpkgs.contains(it.packageName) }
-                .toSet() // latest apps not found in old
+            latest.filter { !oldpkgs.contains(it.packageName) }
+                .toHashSet() // latest apps not found in old
         } else {
-            Sets.difference(latest, old)
+            latest.filter{ !old.contains(it) }
+            .toHashSet()
         }
     }
 
@@ -229,10 +228,12 @@ internal constructor(
     ): Set<FirewallManager.AppInfoTuple> {
         return if (ignoreUid) {
             val latestpkgs = latest.map { it.packageName }.toSet()
-            old.filter { !latestpkgs.contains(it.packageName) && !isNonApp(it.packageName) }.toSet()
+            old.filter { !latestpkgs.contains(it.packageName) && !isNonApp(it.packageName) }
+            .toHashSet()
         } else {
             // extract old apps that are not latest
-            Sets.difference(old, latest).filter { !isNonApp(it.packageName) }.toSet()
+            old.filter { !latest.contains(it) && !isNonApp(it.packageName) }
+            .toHashSet()
         }
     }
 
@@ -391,26 +392,20 @@ internal constructor(
                 .forEach { ProxyManager.addNewApp(it) } // it may be null, esp for non-apps
             return
         }
+
+        ProxyManager.purgeDupsBeforeRefresh()
+
         // remove the apps from proxy mapping which are not tracked by app info repository
-        val proxyMap = ProxyManager.getProxyMapping()
-        val del = findPackagesToDelete(proxyMap, trackedApps)
-        del.forEach { ProxyManager.deleteApp(it) }
+        val pxm = ProxyManager.getProxyMapping()
+        val del = findPackagesToDelete(pxm, trackedApps)
         val add =
-            findPackagesToAdd(proxyMap, trackedApps).map { FirewallManager.getAppInfoByUid(it.uid) }
-        add.forEach { if (it != null) ProxyManager.addNewApp(it) }
+            findPackagesToAdd(pxm, trackedApps).map { FirewallManager.getAppInfoByUid(it.uid) }
+        ProxyManager.deleteMappings(del)
+        ProxyManager.addMappings(add)
         Log.i(
             "AppDatabase",
-            "refreshing proxy mapping, size: ${proxyMap.size}, trackedApps: ${trackedApps.size}"
+            "refreshing proxy mapping, size: ${pxm.size}, trackedApps: ${trackedApps.size}"
         )
-        /*remove duplicate uid, packageName entries from proxy mapping also delete from database
-        val proxyMappingSet = proxyMapping.toHashSet()
-        proxyMappingSet.forEach {
-            if (
-                proxyMapping.count { p -> p.uid == it.uid && p.packageName == it.packageName } > 1
-            ) {
-                ProxyManager.deleteApp(FirewallManager.AppInfoTuple(it.uid, it.packageName))
-            }
-        }*/
     }
 
     private suspend fun insertUnknownApp(uid: Int) {
@@ -496,7 +491,7 @@ internal constructor(
         val notificationManager =
             context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         if (DEBUG)
-            Log.d(LoggerConstants.LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
+            Log.d(Logger.LOG_TAG_VPN, "Number of new apps: $appSize, show notification")
 
         val intent = Intent(context, NotificationHandlerDialog::class.java)
         intent.putExtra(
@@ -576,7 +571,7 @@ internal constructor(
         val notificationManager =
             context.getSystemService(VpnService.NOTIFICATION_SERVICE) as NotificationManager
         if (DEBUG)
-            Log.d(LoggerConstants.LOG_TAG_VPN, "New app installed: $appName, show notification")
+            Log.d(Logger.LOG_TAG_VPN, "New app installed: $appName, show notification")
 
         val intent = Intent(context, NotificationHandlerDialog::class.java)
         intent.putExtra(
