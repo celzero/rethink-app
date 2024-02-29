@@ -388,8 +388,8 @@
 
     <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Chirayu Desai</b><br/><br/>
         1. <i>New feature</i>: Support for anonymizing <i>Oblivious DNS-over-HTTPS</i>.<br/>
-        2. <i>New feature</i>: Support for <i>DNS-over-TLS</i>.</br>
-        3. <i>New feature</i>: Simple and Advanced WireGuard modes.</br>
+        2. <i>New feature</i>: Support for <i>DNS-over-TLS</i>.<br/>
+        3. <i>New feature</i>: Simple and Advanced WireGuard modes.<br/>
         4. <i>New feature</i>: Show bandwidth in Stats screen.<br/>
         5. <i>New feature</i>: Support all proxies including Orbot even in <i>VPN Lockdown</i> mode.<br/>
         6. <i>New feature</i>: Monitor Rethink\'s network traffic using Rethink!<br/>
