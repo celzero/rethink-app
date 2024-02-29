@@ -48,34 +48,36 @@
                 app:cornerRadius="16dp" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/recycler_scroll_header_simple"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/lb_list_toggle_group"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/recycler_view_header_bg"
-            android:paddingStart="10dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="5dp"
-            android:textColor="?attr/primaryTextColor" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/lb_apply_container"
-            android:layout_below="@id/recycler_scroll_header_simple"
-            android:orientation="vertical"
+            android:layout_below="@id/lb_list_toggle_group"
             android:visibility="visible">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lb_simple_recycler_packs"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true" />
 
-        <LinearLayout
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/recycler_scroll_header_simple"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/recycler_view_header_bg"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:textColor="?attr/primaryTextColor"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/lb_adv_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -94,7 +96,6 @@
                 app:cardCornerRadius="16dp">
 
                 <LinearLayout
-
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="start"
@@ -147,6 +148,7 @@
                 android:id="@+id/lb_advanced_filter_label_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/lb_adv_search_cv"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:fontFamily="sans-serif"
@@ -155,10 +157,20 @@
                 android:textAlignment="textStart"
                 android:textSize="@dimen/default_font_text_view" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/lb_advanced_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/lb_advanced_filter_label_tv"
+                android:clickable="true"
+                android:focusable="true" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/recycler_scroll_header_adv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/lb_advanced_filter_label_tv"
+                android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
                 android:background="@drawable/recycler_view_header_bg"
                 android:paddingStart="10dp"
@@ -167,12 +179,7 @@
                 android:paddingBottom="5dp"
                 android:textColor="?attr/primaryTextColor"
                 android:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/lb_advanced_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/lb_apply_container"

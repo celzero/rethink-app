@@ -215,6 +215,7 @@ class GoVpnAdapter : KoinComponent {
             Log.i(LOG_TAG_VPN, "new doh: $id (${doh?.dohName}), url: $url, ips: $ips")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: doh failure", e)
+            getResolver()?.remove(id)
         }
     }
 
@@ -232,6 +233,7 @@ class GoVpnAdapter : KoinComponent {
             Log.i(LOG_TAG_VPN, "new dot: $id (${dot?.name}), url: $url, ips: $ips")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dot failure", e)
+            getResolver()?.remove(id)
         }
     }
 
@@ -245,6 +247,7 @@ class GoVpnAdapter : KoinComponent {
             Log.i(LOG_TAG_VPN, "new odoh: $id (${odoh?.name}), p: $proxy, r: $resolver")
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: odoh failure", e)
+            getResolver()?.remove(id)
         }
     }
 
@@ -252,10 +255,12 @@ class GoVpnAdapter : KoinComponent {
         try {
             val dc = appConfig.getConnectedDnscryptServer()
             val url = dc.dnsCryptURL
+            getResolver()?.remove(id)
             Intra.addDNSCryptTransport(tunnel, id, url)
             Log.i(LOG_TAG_VPN, "new dnscrypt: $id (${dc.dnsCryptName}), url: $url")
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt failure", e)
+            Log.e(LOG_TAG_VPN, "connect-tunnel: dns crypt failure for $id", e)
+            getResolver()?.remove(id)
             showDnscryptConnectionFailureToast()
         }
         // setDnscryptRelaysIfAny() is expected to catch exceptions
@@ -273,6 +278,7 @@ class GoVpnAdapter : KoinComponent {
         } catch (e: Exception) {
             Log.e(LOG_TAG_VPN, "connect-tunnel: dns proxy failure", e)
             showDnsProxyConnectionFailureToast()
+            getResolver()?.remove(id)
         }
     }
 
@@ -682,9 +688,19 @@ class GoVpnAdapter : KoinComponent {
 
     fun getDnsStatus(id: String): Long? {
         try {
-            return getResolver()?.get(id)?.status()
+            val transport = getResolver()?.get(id)
+            val tid = transport?.id()
+            val status = transport?.status()
+            if (DEBUG) Log.d(LOG_TAG_VPN, "dns status($id): $tid, $status")
+            // some special transports like blockfree, preferred,alg etc are handled specially.
+            // in those cases, if the transport id is not there, it will serve the default transport
+            // so return null in those cases
+            if (tid != id) {
+                return null
+            }
+            return status
         } catch (e: Exception) {
-            Log.e(LOG_TAG_VPN, "err getDnsStatus($id): ${e.message}", e)
+            Log.e(LOG_TAG_VPN, "err dns status($id): ${e.message}", e)
         }
         return null
     }

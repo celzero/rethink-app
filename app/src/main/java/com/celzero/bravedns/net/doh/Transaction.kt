@@ -49,7 +49,7 @@ class Transaction {
 
         companion object {
             fun fromId(id: Long): Status {
-                for (status in values()) {
+                for (status in entries) {
                     if (status.id == id) {
                         return status
                     }
@@ -62,7 +62,9 @@ class Transaction {
     enum class TransportType(val type: String) {
         DOH(Backend.DOH),
         DNS_CRYPT(Backend.DNSCrypt),
-        DNS_PROXY(Backend.DNS53);
+        DNS_PROXY(Backend.DNS53),
+        DOT(Backend.DOT),
+        ODOH(Backend.ODOH);
 
         companion object {
             fun getType(type: String): TransportType {
@@ -70,6 +72,8 @@ class Transaction {
                     Backend.DOH -> DOH
                     Backend.DNSCrypt -> DNS_CRYPT
                     Backend.DNS53 -> DNS_PROXY
+                    Backend.DOT -> DOT
+                    Backend.ODOH -> ODOH
                     else -> DOH
                 }
             }

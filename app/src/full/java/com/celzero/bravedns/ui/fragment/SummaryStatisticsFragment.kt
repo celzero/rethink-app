@@ -249,7 +249,7 @@ class SummaryStatisticsFragment : Fragment(R.layout.fragment_summary_statistics)
             ColorStateList.valueOf(
                 UIUtils.fetchToggleBtnColors(requireContext(), R.color.accentGood)
             )
-        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.primaryTextColor))
+        mb.setTextColor(UIUtils.fetchColor(requireContext(), R.attr.homeScreenHeaderTextColor))
     }
 
     private fun unselectToggleBtnUi(mb: MaterialButton) {

@@ -30,6 +30,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.TrafficStats
 import android.net.VpnService
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -70,15 +71,17 @@ import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.InternetProtocol
 import com.celzero.bravedns.util.KnownPorts
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.NotificationActionType
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.UIUtils.getAccentColor
 import com.celzero.bravedns.util.Utilities
+import com.celzero.bravedns.util.Utilities.humanReadableByteCount
 import com.celzero.bravedns.util.Utilities.isAtleastO
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isMissingOrInvalidUid
+import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.google.common.collect.Sets
@@ -181,6 +184,7 @@ class BraveVPNService :
     var underlyingNetworks: ConnectionMonitor.UnderlyingNetworks? = null
     private var previousSetMtu: Int = 0
 
+
     private var accessibilityListener: AccessibilityManager.AccessibilityStateChangeListener? = null
 
     enum class State {
@@ -201,7 +205,7 @@ class BraveVPNService :
     override fun bind4(who: String, fid: Long) {
         val rinr = persistentState.routeRethinkInRethink
         logd("protect: $who, $fid, rinr? $rinr")
-        if (who != Backend.Exit && rinr) {
+        if (rinr && who != Backend.Exit) {
             // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
             return
         }
@@ -235,7 +239,7 @@ class BraveVPNService :
     override fun bind6(who: String, fid: Long) {
         val rinr = persistentState.routeRethinkInRethink
         logd("protect: $who, $fid, rinr? $rinr")
-        if (who != Backend.Exit && rinr) {
+        if (rinr && who != Backend.Exit) {
             // do not proceed if rethink within rethink is enabled and proxyId(who) is not exit
             return
         }
@@ -1117,6 +1121,8 @@ class BraveVPNService :
         if (persistentState.persistentNotification) {
             notification.flags = Notification.FLAG_ONGOING_EVENT
             builder.setOngoing(true)
+        } else {
+            builder.setOngoing(false)
         }
         return notification
     }
@@ -2085,7 +2091,7 @@ class BraveVPNService :
                         return underlyingNetworks?.ipv6Net?.firstOrNull() != null
                     }
                     underlyingNetworks?.ipv6Net?.forEach {
-                        if (it.network == activeNetwork) {
+                        if (isNetworkSame(it.network, activeNetwork)) {
                             Log.i(
                                 LOG_TAG_VPN,
                                 "r6: Active network ok: ${it.network.networkHandle}, ${activeNetwork.networkHandle}"
@@ -2134,7 +2140,7 @@ class BraveVPNService :
 
                     underlyingNetworks?.ipv4Net?.forEach {
                         Log.i(LOG_TAG_VPN, "r4: IPv4 network: ${it.network.networkHandle}")
-                        if (it.network == activeNetwork) {
+                        if (isNetworkSame(it.network, activeNetwork)) {
                             Log.i(LOG_TAG_VPN, "r4: IPv4 network is reachable")
                             return true
                         }
@@ -2497,6 +2503,7 @@ class BraveVPNService :
             Log.i(LOG_TAG_VPN, "received null summary for socket")
             return
         }
+
         // set the flag as null, will calculate the flag based on the target
         val connectionSummary =
             ConnectionSummary(
@@ -2687,31 +2694,12 @@ class BraveVPNService :
                 return persistAndConstructFlowResponse(connTracker, proxyId, connId, uid)
             } else {
                 // in some configurations the allowed ips will not be 0.0.0.0/0, so the connection
-                // will be dropped, in those cases, check if the wireguard is in lockdown mode,
-                // if not then return base (connection will be forwarded to base proxy), if yes,
-                // mark the connection as no route available and block the connection
-                val cf =
-                    WireguardManager.getConfigFilesById(id)
-                        ?: return persistAndConstructFlowResponse(
-                            connTracker,
-                            Backend.Base,
-                            connId,
-                            uid
-                        )
-
-                return if (cf.isLockdown) {
-                    logd(
-                        "flow: one-wireguard is enabled, but no route/proxy available, returning Ipn.Block, $connId, $uid"
-                    )
-                    connTracker.blockedByRule = FirewallRuleset.RULE13.id
-                    connTracker.isBlocked = true
-                    persistAndConstructFlowResponse(connTracker, Backend.Block, connId, uid)
-                } else {
-                    logd(
-                        "flow: one-wireguard is enabled, but no route/proxy available, returning Ipn.Base, $connId, $uid"
-                    )
-                    persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
-                }
+                // will be dropped, in those cases, return base (connection will be forwarded to
+                // base proxy)
+                logd(
+                    "flow: one-wireguard is enabled, but no route/proxy available, returning Ipn.Base, $connId, $uid"
+                )
+                return persistAndConstructFlowResponse(connTracker, Backend.Base, connId, uid)
             }
         }
 

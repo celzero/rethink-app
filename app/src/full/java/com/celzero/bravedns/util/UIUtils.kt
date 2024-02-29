@@ -48,11 +48,11 @@ import java.util.regex.Pattern
 object UIUtils {
 
     fun getDnsStatusStringRes(status: Long?): Int {
-        if (status == null) return R.string.rt_filter_parent_selected
+        if (status == null) return R.string.failed_using_default
 
         return when (Transaction.Status.fromId(status)) {
             Transaction.Status.START -> {
-                R.string.rt_filter_parent_selected
+                R.string.lbl_starting
             }
             Transaction.Status.COMPLETE -> {
                 R.string.dns_connected

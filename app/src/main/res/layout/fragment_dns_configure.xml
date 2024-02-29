@@ -49,8 +49,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
+            android:clipToPadding="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -83,8 +84,8 @@
                             android:enabled="false"
                             android:minHeight="48dp"
                             android:padding="10dp"
-                            android:visibility="gone"
-                            android:text="@string/lbl_wireguard" />
+                            android:text="@string/lbl_wireguard"
+                            android:visibility="gone" />
 
                         <RadioButton
                             android:id="@+id/network_dns_rb"
@@ -192,8 +193,9 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
+            android:clipToPadding="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -346,8 +348,9 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
+            android:clipToPadding="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
