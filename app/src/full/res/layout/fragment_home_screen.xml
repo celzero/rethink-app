@@ -125,7 +125,7 @@
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"
                             android:padding="5dp"
-                            android:singleLine="true"
+                            android:maxLines="2"
                             android:textSize="@dimen/default_font_text_view" />
 
 
@@ -294,18 +294,18 @@
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="10dp"
                             android:ellipsize="marquee"
+                            android:maxLines="2"
                             android:marqueeRepeatLimit="marquee_forever"
-                            android:singleLine="true"
-                            android:textSize="@dimen/heading_font_text_view" />
+                            android:textSize="@dimen/extra_large_font_text_view" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/fhs_card_other_proxy_count"
                             style="@style/TextAppearance.Widget.HomeScreen.Desc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/fhs_card_proxy_count"
                             android:layout_marginStart="10dp"
                             android:layout_marginTop="10dp"
+                            android:layout_alignParentBottom="true"
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:marqueeRepeatLimit="marquee_forever"

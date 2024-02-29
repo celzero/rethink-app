@@ -42,6 +42,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -77,14 +78,14 @@ import com.celzero.bravedns.util.Utilities.showToastUiCentered
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -369,15 +370,67 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun observeProxyStates() {
         persistentState.proxyStatus.observe(viewLifecycleOwner) {
             if (it != -1) {
-                b.fhsCardProxyCount.text = getString(R.string.lbl_active)
-                b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                b.fhsCardOtherProxyCount.text = getString(it)
+                updateUiWithProxyStates(it)
             } else {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                 b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                 b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
             }
         }
+    }
+
+    private fun updateUiWithProxyStates(resId: Int) {
+        // get proxy type from app config
+        val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
+
+        if (proxyType.isProxyTypeWireguard()) {
+            val proxies = WireguardManager.getEnabledConfigs()
+            var active = 0
+            var failing = 0
+            proxies.forEach {
+                val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
+                val status = VpnController.getProxyStatusById(proxyId)
+                if (status != null) {
+                    // consider starting and up as active
+                    if (status == Backend.TOK || status == Backend.TUP) {
+                        active++
+                    } else {
+                        failing++
+                    }
+                } else {
+                    failing++
+                }
+            }
+            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+            // show as 3 active 1 failing, if failing is 0 show as 4 active
+            if (failing > 0) {
+                b.fhsCardProxyCount.text =
+                    getString(
+                        R.string.orbot_stop_dialog_message_combo,
+                        getString(
+                            R.string.two_argument_space,
+                            active.toString(),
+                            getString(R.string.lbl_active)
+                        ),
+                        getString(
+                            R.string.two_argument_space,
+                            failing.toString(),
+                            getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                        )
+                    )
+            } else {
+                b.fhsCardProxyCount.text =
+                    getString(
+                        R.string.two_argument_space,
+                        active.toString(),
+                        getString(R.string.lbl_active)
+                    )
+            }
+        } else {
+            b.fhsCardProxyCount.text = getString(R.string.lbl_active)
+        }
+        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+        b.fhsCardOtherProxyCount.text = getString(resId)
     }
 
     private fun unobserveProxyStates() {
@@ -454,9 +507,29 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            b.fhsCardDnsConnectedDns.text = it
-            b.fhsCardDnsConnectedDns.isSelected = true
+            updateUiWithDnsStates(it)
         }
+    }
+
+    private fun updateUiWithDnsStates(dnsName: String) {
+        // get the status from go to check if the dns transport is added or not
+        val id =
+            if (WireguardManager.oneWireGuardEnabled()) {
+                val id = WireguardManager.getOneWireGuardProxyId() ?: Backend.Preferred
+                "${ProxyManager.ID_WG_BASE}${id}"
+            } else {
+                Backend.Preferred
+            }
+        val status = VpnController.getDnsStatus(id)
+        // status null means the dns transport is not available / different id is usedE
+        if (status == null) {
+            // also stop observing the median value, as the dns is not connected
+            persistentState.median.removeObservers(viewLifecycleOwner)
+            b.fhsCardDnsLatency.text = getString(R.string.failed_using_default)
+            b.fhsCardDnsLatency.isSelected = true
+        }
+        b.fhsCardDnsConnectedDns.text = dnsName
+        b.fhsCardDnsConnectedDns.isSelected = true
     }
 
     private fun observeLogsCount() {

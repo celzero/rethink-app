@@ -125,28 +125,23 @@ class RethinkEndpointAdapter(
         private fun updateBlocklistStatusText(endpoint: RethinkDnsEndpoint) {
             if (!endpoint.isActive) return
 
-            io {
-                val state = VpnController.getDnsStatus(Backend.Preferred)
-                val status = UIUtils.getDnsStatusStringRes(state)
+            val state = VpnController.getDnsStatus(Backend.Preferred)
+            val status = UIUtils.getDnsStatusStringRes(state)
+            // show the status as it is if it is not connected
+            if (status != R.string.dns_connected) {
+                b.rethinkEndpointListUrlExplanation.text =
+                    context.getString(status).replaceFirstChar(Char::titlecase)
+                return
+            }
 
-                uiCtx {
-                    // show the status as it is if it is not connected
-                    if (status != R.string.dns_connected) {
-                        b.rethinkEndpointListUrlExplanation.text =
-                            context.getString(status).replaceFirstChar(Char::titlecase)
-                        return@uiCtx
-                    }
-
-                    if (endpoint.blocklistCount > 0) {
-                        b.rethinkEndpointListUrlExplanation.text =
-                            context.getString(
-                                R.string.dns_connected_rethink_plus,
-                                endpoint.blocklistCount.toString()
-                            )
-                    } else {
-                        b.rethinkEndpointListUrlExplanation.text = context.getString(status)
-                    }
-                }
+            if (endpoint.blocklistCount > 0) {
+                b.rethinkEndpointListUrlExplanation.text =
+                    context.getString(
+                        R.string.dns_connected_rethink_plus,
+                        endpoint.blocklistCount.toString()
+                    )
+            } else {
+                b.rethinkEndpointListUrlExplanation.text = context.getString(status)
             }
         }
 
