@@ -19,7 +19,7 @@ def gitVersion = providers.exec {
 try {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } catch (Exception ex) {
-    logger.warn("No keys.  Release disabled: $ex.message")
+    logger.info("missing keystore prop: $ex.message")
     keystoreProperties['keyAlias'] = ''
     keystoreProperties['keyPassword'] = ''
     keystoreProperties['storeFile'] = '/dev/null'
@@ -45,6 +45,13 @@ android {
             storeFile file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
         }
+        // archive.is/wlwD8
+        alpha {
+            keyAlias System.getenv("ALPHA_KS_ALIAS") // rdnsAlpha
+            keyPassword System.getenv("ALPHA_KS_PASSPHRASE")
+            storeFile System.getenv("ALPHA_KS_FILE") // rdnsAlpha.jks in app/
+            storePassword System.getenv("ALPHA_KS_STORE_PASSPHRASE")
+        }
     }
 
     buildTypes {
@@ -59,9 +66,12 @@ android {
             matchingFallbacks = ['debug']
             initWith buildTypes.debug
         }
-        nightly {
+        alpha {
+            // archive.is/y8uCB
+            applicationIdSuffix ".alpha"
             minifyEnabled true
             shrinkResources true
+            signingConfig signingConfigs.alpha
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -158,7 +168,7 @@ dependencies {
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
     fullImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
-    // For liveData implementation
+    // LiveData
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
 
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -173,7 +183,7 @@ dependencies {
     fullImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
     fullImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
 
-    // For paging - connection tracker
+    // Pagers Views
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     fullImplementation 'androidx.fragment:fragment-ktx:1.6.2'
     implementation 'com.google.android.material:material:1.11.0'
@@ -185,35 +195,34 @@ dependencies {
     fullImplementation 'com.squareup.retrofit2:retrofit:2.9.0'
     fullImplementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    // Glide implementation
+    // Glide
     fullImplementation('com.github.bumptech.glide:glide:4.16.0') {
         exclude group: 'glide-parent'
     }
     fullImplementation('com.github.bumptech.glide:okhttp3-integration:4.16.0') {
         exclude group: 'glide-parent'
     }
-    // Ref - https://stackoverflow.com/questions/46638056/how-to-use-glidemodule-on-glide-4/46638213#46638213
+    // Ref: https://stackoverflow.com/a/46638213
     kspFull 'com.github.bumptech.glide:compiler:4.15.1'
 
     // Swipe button animation
     fullImplementation 'com.facebook.shimmer:shimmer:0.5.0'
 
-    // Koin core features
+    // Koin core
     download 'io.insert-koin:koin-core:3.2.0'
     implementation 'io.insert-koin:koin-core:3.4.3'
-    // Koin main features for Android (Scope,ViewModel ...)
+    // Koin main (Scope, ViewModel ...)
     download 'io.insert-koin:koin-android:3.2.0'
     implementation 'io.insert-koin:koin-android:3.4.3'
 
     download 'hu.autsoft:krate:2.0.0'
     implementation 'hu.autsoft:krate:2.0.0'
 
-    // To use only without reflection variants of viewBinding
+    // viewBinding without reflection
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
 
-    // Tun2socks (https://jitpack.io/#celzero/firestack)
-    // implementation project(":tun2socks")
+    // from: https://jitpack.io/#celzero/firestack
     download 'com.github.celzero:firestack:72eb7e4898@aar'
     implementation 'com.github.celzero:firestack:72eb7e4898@aar'
 
@@ -244,7 +253,7 @@ dependencies {
 
     playImplementation 'com.google.android.play:core:1.10.3' // for new version updater
 
-    // for encrypted file management
+    // for encrypting wireguard configuration files
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
     androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha03")
