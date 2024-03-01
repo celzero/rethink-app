@@ -25,4 +25,4 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       if: success()
-      run: ./gradlew assembleWebsiteAlpha --debug --warning-mode all
+      run: ./gradlew assembleWebsiteFullAlpha --info --warning-mode all
