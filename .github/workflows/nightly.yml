@@ -19,7 +19,7 @@ jobs:
 
 
   build:
-    name: Generate Nightly Build
+    name: Weeklies
     runs-on: ubuntu-latest
     needs: evaluateChanges
     if: needs.evaluateChanges.outputs.SHOULD_BUILD == 'true'
@@ -50,8 +50,7 @@ jobs:
               -F chat_id="$TELEGRAM_CHAT_ID" \
               -F "caption=Size: $(ls -l --block-size=K "$apk_path" | awk '{ print $5 }')" \
               -F parse_mode=HTML \
-              -F document=@"$apk_path"
-            rm "$apk_path"
+              -F document=@"$apk_path" || true
           done
         
       # github.com/actions/upload-artifact
