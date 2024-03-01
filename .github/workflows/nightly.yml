@@ -56,6 +56,12 @@ jobs:
           VERSION_CODE: ${{ github.run_number }}
           # version-code: archive.is/y8uCB
 
+      - name: Grab APK
+        run: |
+          apk_path="$(find . -type f -iname '*.apk' | head -n1)"
+          echo $apk_path
+          echo "APKFILE=${apk_path}" >> $GITHUB_ENV
+
       # github.com/actions/upload-artifact
       - name: Artifact
         uses: actions/upload-artifact@v3
