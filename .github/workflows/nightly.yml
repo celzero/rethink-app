@@ -1,9 +1,9 @@
-name: Weekly debug
+name: Monthly alpha
 
 on:
   workflow_dispatch: # to be able to run it manually
   schedule:
-    - cron: '53 21 9,18,27 * *' # on 12, 27 every month
+    - cron: '53 21 27 * *' # on 27 every month
 
 jobs:
   evaluateChanges:
@@ -15,21 +15,20 @@ jobs:
       - name: Check
         id: check
         run: |
-          echo shouldBuild=false >> $GITHUB_OUTPUT
-
+          echo shouldBuild=true >> $GITHUB_OUTPUT
 
   build:
-    name: Weeklies
+    name: Monthlies
     runs-on: ubuntu-latest
     needs: evaluateChanges
     if: needs.evaluateChanges.outputs.SHOULD_BUILD == 'true'
     env:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-      SCHEDULED_BUILD_VARIANT: "assembleWebsiteFullDebug"
+      SCHEDULED_BUILD_VARIANT: "assembleWebsiteFullAlpha"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
@@ -39,25 +38,52 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Alpha keystore
+        run: |
+          echo "${{ secrets.ALPHA_KS_ASC }}" > alphaKeystore.jks.asc
+          gpg -d --passphrase "${{ secrets.ALPHA_KS_PASSPHRASE }}" --batch alphaKeystore.jks.asc > app/rdnsAlpha.jks
+          wc -wcl alphaKeystore.jks.asc app/rdnsAlpha.jks
+
       - name: Build & notify 
         if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT && env.TELEGRAM_TOKEN
         run: |
-          for TASK in $SCHEDULED_BUILD_VARIANT; do
-            ./gradlew $TASK
-            apk_path="$(find . -type f -iname *.apk)"
-            echo $apk_path
-            curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
-              -F chat_id="$TELEGRAM_CHAT_ID" \
-              -F "caption=Size: $(ls -l --block-size=K "$apk_path" | awk '{ print $5 }')" \
-              -F parse_mode=HTML \
-              -F document=@"$apk_path" || true
-          done
-        
+          ./gradlew ${SCHEDULED_BUILD_VARIANT} --debug --warning-mode all
+        env:
+          ALPHA_KS_ALIAS: ${{ vars.ALPHA_KS_ALIAS }}
+          ALPHA_KS_FILE: ${{ vars.ALPHA_KS_FILE }}
+          ALPHA_KS_STORE_PASSPHRASE: ${{ secrets.ALPHA_KS_STORE_PASSPHRASE }}
+          ALPHA_KS_PASSPHRASE: ${{ secrets.ALPHA_KS_PASSPHRASE }}
+          VERSION_CODE: ${{ github.run_number }}
+          # version-code: archive.is/y8uCB
+
       # github.com/actions/upload-artifact
-      - name: Upload
+      - name: Artifact
         uses: actions/upload-artifact@v3
         if: success()
         with:
           name: rdns-${{ github.sha }}
-          path: app-*.apk
+          path: ${{ env.APKFILE }}
           if-no-files-found: error
+
+      # github.com/softprops/action-gh-release
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          files: |
+            ${{ env. APKFILE }}
+ 
+      - name: Telegram
+        run: |
+          # exit okay on errors
+          set +e
+          apk_path="$(find . -type f -iname '*.apk' | head -n1)"
+          echo $apk_path
+          echo "APKFILE=${apk_path}" >> $GITHUB_ENV
+          curl https://api.telegram.org/bot$TELEGRAM_TOKEN/sendDocument \
+            -F chat_id="$TELEGRAM_CHAT_ID" \
+            -F "caption=Size: $(ls -l --block-size=K "$apk_path" | awk '{ print $5 }')" \
+            -F parse_mode=HTML \
+            -F document=@"$apk_path"
+
+          
