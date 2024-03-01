@@ -69,7 +69,7 @@
         android:id="@+id/text_input_layout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/cd_dns_crypt_resolver_heading"
+        android:hint="@string/cd_doh_dialog_resolver_url"
         app:hintTextColor="?attr/accentGood"
         app:layout_constraintTop_toBottomOf="@id/text_input_layout1">
 
@@ -83,6 +83,7 @@
             android:layout_marginBottom="10dp"
             android:inputType="textUri"
             android:maxLines="2"
+            android:text="https://"
             android:padding="10dp"
             android:textColor="?attr/primaryTextColor"
             android:textSize="@dimen/large_font_text_view"

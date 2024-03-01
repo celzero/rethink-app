@@ -33,14 +33,14 @@ import com.celzero.bravedns.database.ODoHEndpoint
 import com.celzero.bravedns.databinding.DialogSetCustomOdohBinding
 import com.celzero.bravedns.databinding.FragmentOdohListBinding
 import com.celzero.bravedns.viewmodel.ODoHEndpointViewModel
+import java.net.MalformedURLException
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.net.MalformedURLException
-import java.net.URL
 
 class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
     private val b by viewBinding(FragmentOdohListBinding::bind)
@@ -99,8 +99,14 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
         val customResolver = dialogBinding.dialogCustomResolverEditText
         val progressBar = dialogBinding.dialogCustomUrlLoading
         val errorTxt = dialogBinding.dialogCustomUrlFailureText
+        val hintInputLayout = dialogBinding.textInputLayout1
 
-        heading.text = getString(R.string.lbl_add) + " " + getString(R.string.lbl_odoh)
+        heading.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.lbl_add).replaceFirstChar(Char::uppercase),
+                getString(R.string.lbl_odoh)
+            )
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
@@ -112,6 +118,10 @@ class ODoHListFragment : Fragment(R.layout.fragment_odoh_list) {
                 )
             }
         }
+
+        hintInputLayout.hint =
+            getString(R.string.settings_proxy_header).replaceFirstChar(Char::uppercase) +
+                getString(R.string.lbl_optional)
 
         customName.setText(getString(R.string.lbl_odoh), TextView.BufferType.EDITABLE)
         applyURLBtn.setOnClickListener {

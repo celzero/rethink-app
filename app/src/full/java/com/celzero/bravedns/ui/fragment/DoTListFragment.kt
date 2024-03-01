@@ -98,7 +98,12 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
         val errorTxt = dialogBinding.dialogCustomUrlFailureText
         val checkBox = dialogBinding.dialogSecureCheckbox
 
-        heading.text = getString(R.string.lbl_add) + " " + getString(R.string.lbl_dot)
+        heading.text =
+            getString(
+                R.string.two_argument_space,
+                getString(R.string.lbl_add).replaceFirstChar(Char::titlecase),
+                getString(R.string.lbl_dot)
+            )
         // fetch the count from repository and increment by 1 to show the
         // next doh name in the dialog
         io {
@@ -111,6 +116,7 @@ class DoTListFragment : Fragment(R.layout.fragment_dot_list) {
             }
         }
 
+        customURL.setText("")
         customName.setText(getString(R.string.lbl_dot), TextView.BufferType.EDITABLE)
         applyURLBtn.setOnClickListener {
             val url = customURL.text.toString()
