@@ -52,7 +52,9 @@ jobs:
           ALPHA_KS_ALIAS: ${{ vars.ALPHA_KS_ALIAS }}
           ALPHA_KS_FILE: ${{ vars.ALPHA_KS_FILE }}
           ALPHA_KS_STORE_PASSPHRASE: ${{ secrets.ALPHA_KS_STORE_PASSPHRASE }}
-          ALPHA_KS_PASSPHRASE: $ {{ secrets.ALPHA_KS_PASSPHRASE }}
+          ALPHA_KS_PASSPHRASE: ${{ secrets.ALPHA_KS_PASSPHRASE }}
+          VERSION_CODE: ${{ github.run_number }}
+          # version-code: archive.is/y8uCB
 
       # github.com/actions/upload-artifact
       - name: Artifact

@@ -49,7 +49,8 @@ android {
         alpha {
             keyAlias System.getenv("ALPHA_KS_ALIAS") // rdnsAlpha
             keyPassword System.getenv("ALPHA_KS_PASSPHRASE")
-            storeFile System.getenv("ALPHA_KS_FILE") // rdnsAlpha.jks in app/
+            // https://stackoverflow.com/a/34640602
+            storeFile file(String.valueOf(System.getenv("ALPHA_KS_FILE"))) // rdnsAlpha.jks in app/
             storePassword System.getenv("ALPHA_KS_STORE_PASSPHRASE")
         }
     }
@@ -72,6 +73,7 @@ android {
             minifyEnabled true
             shrinkResources true
             signingConfig signingConfigs.alpha
+            versionCode System.getenv("VERSION_CODE")
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -121,9 +123,9 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            versionCode = 33
-            versionName = gitVersion
-            vectorDrawables.useSupportLibrary = true
+            versionCode System.getenv("VERSION_CODE")
+            versionName gitVersion
+            vectorDrawables.useSupportLibrary true
         }
     }
     lintOptions {
