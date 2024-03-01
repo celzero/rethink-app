@@ -1,29 +1,21 @@
-name: Nightly
+name: Weekly debug
 
 on:
   workflow_dispatch: # to be able to run it manually
   schedule:
-    - cron: '0 0 * * *' # once a day
+    - cron: '53 21 9,18,27 * *' # on 12, 27 every month
 
 jobs:
   evaluateChanges:
-    name: Evaluate changes for run or skipping nightly build
+    name: Evaluate changes
     runs-on: ubuntu-latest
     outputs:
       SHOULD_BUILD: ${{ steps.check.outputs.shouldBuild }}
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-
       - name: Check
         id: check
         run: |
-          if [[ $(git rev-list --after="24 hours" main) ]]; then
-            echo shouldBuild=true >> $GITHUB_OUTPUT
-          else
-            echo shouldBuild=false >> $GITHUB_OUTPUT
-          fi
+          echo shouldBuild=false >> $GITHUB_OUTPUT
 
 
   build:
@@ -32,21 +24,22 @@ jobs:
     needs: evaluateChanges
     if: needs.evaluateChanges.outputs.SHOULD_BUILD == 'true'
     env:
-      TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-      SCHEDULED_BUILD_VARIANT: ${{ vars.SCHEDULED_BUILD_VARIANT }}
+      SCHEDULED_BUILD_VARIANT: "assembleWebsiteFullDebug"
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1
 
-      - name: set up JDK
+      - name: JDK17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build and send apks to telegram
+      - name: Build & notify 
         if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT && env.TELEGRAM_TOKEN
         run: |
           for TASK in $SCHEDULED_BUILD_VARIANT; do
@@ -60,3 +53,12 @@ jobs:
               -F document=@"$apk_path"
             rm "$apk_path"
           done
+        
+      # github.com/actions/upload-artifact
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: rdns-${{ github.sha }}
+          path: app-*.apk
+          if-no-files-found: error
