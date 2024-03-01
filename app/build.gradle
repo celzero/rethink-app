@@ -123,9 +123,9 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            versionCode System.getenv("VERSION_CODE")
-            versionName gitVersion
-            vectorDrawables.useSupportLibrary true
+            versionCode = System.getenv("VERSION_CODE")
+            versionName = gitVersion
+            vectorDrawables.useSupportLibrary = true
         }
     }
     lintOptions {
