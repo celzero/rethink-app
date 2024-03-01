@@ -16,6 +16,25 @@ def gitVersion = providers.exec {
     commandLine("git", "describe", "--tags", "--always")
 }.standardOutput.asText.get().toString().trim()
 
+// for github builds, the version code is set in the github action via env
+// for local builds, the version code is set in gradle.properties
+def getVersionCode = {
+    def code = 0
+    try {
+        // parseInt throws NumberFormatException if the string does not contain a parsable integer
+        // but "as Integer" is a wrapper class, which silently returns null
+        code = Integer.parseInt(System.getenv("VERSION_CODE"))
+        logger.info("env version code: $code")
+    } catch (NumberFormatException ex) {
+        logger.info("missing env version code: $ex.message")
+    }
+    if (code == 0) {
+        code = project.properties['VERSION_CODE'] as Integer
+        logger.info("project properties version code: $code")
+    }
+    return code
+}
+
 try {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } catch (Exception ex) {
@@ -73,7 +92,6 @@ android {
             minifyEnabled true
             shrinkResources true
             signingConfig signingConfigs.alpha
-            versionCode System.getenv("VERSION_CODE")
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -123,7 +141,8 @@ android {
             dimension "releaseType"
             // getPackageInfo().versionCode not returning the correct value (in prod builds) when
             // value is set in AndroidManifest.xml so setting it here
-            versionCode = Integer.parseInt(System.getenv("VERSION_CODE"))
+            // for buildtype alpha, versionCode is set in env overriding gradle.properties
+            versionCode = getVersionCode()
             versionName = gitVersion
             vectorDrawables.useSupportLibrary = true
         }
@@ -223,7 +242,7 @@ dependencies {
     // viewBinding without reflection
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate:1.5.9'
     fullImplementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
-    
+
     // from: https://jitpack.io/#celzero/firestack
     download 'com.github.celzero:firestack:8dc7dafcaa@aar'
     implementation 'com.github.celzero:firestack:8dc7dafcaa@aar'
