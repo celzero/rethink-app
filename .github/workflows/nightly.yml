@@ -15,8 +15,7 @@ jobs:
       - name: Check
         id: check
         run: |
-          echo shouldBuild=false >> $GITHUB_OUTPUT
-
+          echo shouldBuild=true >> $GITHUB_OUTPUT
 
   build:
     name: Monthlies
