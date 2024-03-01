@@ -47,7 +47,7 @@ jobs:
       - name: Build & notify 
         if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT && env.TELEGRAM_TOKEN
         run: |
-          ./gradlew $SCHEDULED_BUILD_VARIANT
+          ./gradlew ${SCHEDULED_BUILD_VARIANT} -v
         env:
           ALPHA_KS_ALIAS: ${{ vars.ALPHA_KS_ALIAS }}
           ALPHA_KS_FILE: ${{ vars.ALPHA_KS_FILE }}
