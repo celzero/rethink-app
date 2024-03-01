@@ -35,7 +35,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/one_wg_check"
                 android:orientation="vertical"
-                android:padding="15dp">
+                android:padding="5dp">
 
                 <TextView
                     android:id="@+id/interface_name_text"
@@ -51,7 +51,7 @@
                     android:id="@+id/interface_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"
@@ -61,7 +61,7 @@
                     android:id="@+id/interface_apps_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:padding="5dp"
                     android:textColor="?attr/primaryLightColorText"

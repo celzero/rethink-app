@@ -93,6 +93,7 @@
     <string name="lbl_private" translatable="true">private</string>
     <string name="lbl_secure" translatable="true">secure</string>
     <string name="lbl_anonymous" translatable="true">anonymous</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>

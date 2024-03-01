@@ -89,7 +89,6 @@
                 android:id="@+id/other_settings_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp"
                 app:cardUseCompatPadding="true"
@@ -110,8 +109,8 @@
                         android:layout_marginStart="15dp"
                         android:layout_marginEnd="15dp"
                         android:background="?android:attr/selectableItemBackground"
-                        android:paddingTop="15dp"
-                        android:paddingBottom="15dp">
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -143,8 +142,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:padding="10dp" />
+                            android:layout_centerVertical="true" />
 
                     </RelativeLayout>
 
@@ -155,8 +153,8 @@
                         android:layout_marginStart="15dp"
                         android:layout_marginEnd="15dp"
                         android:background="?android:attr/selectableItemBackground"
-                        android:paddingTop="15dp"
-                        android:paddingBottom="15dp">
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -188,8 +186,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:padding="10dp" />
+                            android:layout_centerVertical="true" />
 
                     </RelativeLayout>
 
@@ -200,8 +197,8 @@
                         android:layout_marginStart="15dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginEnd="15dp"
-                        android:paddingTop="15dp"
-                        android:paddingBottom="15dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
                         android:text="@string/one_wg_dialog_desc"
                         android:textColor="?attr/primaryLightColorText"
                         android:textSize="@dimen/default_font_text_view" />
@@ -215,7 +212,6 @@
                         android:layout_marginStart="30dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginEnd="30dp"
-                        android:layout_marginBottom="10dp"
                         android:alpha="0.75"
                         android:background="@drawable/rectangle_border_background"
                         android:foreground="?attr/selectableItemBackground"
@@ -234,7 +230,6 @@
                 android:id="@+id/interface_detail_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="8dp"
                 app:cardUseCompatPadding="true"
@@ -244,7 +239,10 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="15dp">
+                    android:paddingTop="15dp"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:paddingBottom="20dp">
 
                     <RelativeLayout
                         android:id="@+id/config_title_layout"

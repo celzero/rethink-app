@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -120,6 +122,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
         val config = WireguardManager.getConfigById(configId)
         val mapping = WireguardManager.getConfigFilesById(configId)
+
+        if (config == null) {
+            finish()
+            return
+        }
+
         // handleWarpConfigView()
         if (mapping != null) {
             // if catch all is enabled, disable the add apps button and lockdown
@@ -143,10 +151,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             showNewWarpConfigLayout()
             return@uiCtx
         }*/
-        if (config == null) {
-            finish()
-            return
-        }
+
         prefillConfig(config)
     }
 
@@ -329,16 +334,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
     }
 
     private fun updateLockdown(enabled: Boolean) {
-        io {
-            WireguardManager.updateLockdownConfig(configId, enabled)
-            uiCtx {
-                Utilities.showToastUiCentered(
-                    this,
-                    getString(R.string.config_add_success_toast),
-                    Toast.LENGTH_SHORT
-                )
-            }
-        }
+        io { WireguardManager.updateLockdownConfig(configId, enabled) }
     }
 
     /* private fun updateOneWireGuard(enabled: Boolean) {
@@ -356,22 +352,32 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun updateCatchAll(enabled: Boolean) {
         io {
-            WireguardManager.updateCatchAllConfig(configId, enabled)
-            uiCtx {
-                b.lockdownCheck.isEnabled = !enabled
-                b.applicationsBtn.isEnabled = !enabled
-                if (enabled) {
-                    b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
-                } else {
-                    handleAppsCount()
+            val config = WireguardManager.getConfigFilesById(configId)
+            if (config == null) {
+                Log.e(Logger.LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
+                return@io
+            }
+            if (WireguardManager.canEnableConfig(config)) {
+                WireguardManager.updateCatchAllConfig(configId, enabled)
+                uiCtx {
+                    b.lockdownCheck.isEnabled = !enabled
+                    b.applicationsBtn.isEnabled = !enabled
+                    if (enabled) {
+                        b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
+                    } else {
+                        handleAppsCount()
+                    }
                 }
-                if (enabled) {
+            } else {
+                uiCtx {
                     Utilities.showToastUiCentered(
                         this,
-                        getString(R.string.config_add_success_toast),
-                        Toast.LENGTH_SHORT
+                        getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
                     )
+                    b.catchAllCheck.isChecked = false
                 }
+                return@io
             }
         }
     }

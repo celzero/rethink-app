@@ -99,7 +99,7 @@ class OneWgConfigAdapter(private val context: Context) :
             val id = ProxyManager.ID_WG_BASE + config.id
             val apps = ProxyManager.getAppCountForProxy(id).toString()
             val statusId = VpnController.getProxyStatusById(id)
-            if (statusId == null) {
+            if (statusId == null && config.isActive) {
                 WireguardManager.disableConfig(config)
             }
             updateStatusUi(config, statusId, apps)

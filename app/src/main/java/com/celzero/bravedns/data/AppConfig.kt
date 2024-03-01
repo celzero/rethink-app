@@ -1017,7 +1017,7 @@ internal constructor(
 
     fun canEnableWireguardProxy(): Boolean {
         val proxyProvider = ProxyProvider.getProxyProvider(persistentState.proxyProvider)
-        return canEnableProxy() &&
+        return !getBraveMode().isDnsMode() &&
             (proxyProvider.isProxyProviderNone() || proxyProvider.isProxyProviderWireguard())
     }
 
