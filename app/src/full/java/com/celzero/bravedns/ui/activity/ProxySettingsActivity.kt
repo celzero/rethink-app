@@ -693,15 +693,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         headerTxt.text = getString(R.string.settings_dns_proxy_dialog_header)
         headerDesc.text = getString(R.string.settings_dns_proxy_dialog_app_desc)
 
-        if (!endpoint.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
-            portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
-            userNameEditText.setText(endpoint.userName.toString(), TextView.BufferType.EDITABLE)
-        } else {
-            ipAddressEditText.setText(Constants.SOCKS_DEFAULT_IP, TextView.BufferType.EDITABLE)
-            portEditText.setText(Constants.SOCKS_DEFAULT_PORT, TextView.BufferType.EDITABLE)
-        }
-
         applyURLBtn.setOnClickListener {
             var port: Int? = 0
             var isValid: Boolean
@@ -883,17 +874,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         headerTxt.text = getString(R.string.http_proxy_dialog_heading)
         headerDesc.text = getString(R.string.http_proxy_dialog_desc)
-
-        if (!endpoint.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
-        }
-
-        if (!endpoint.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
-            portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
-        } else {
-            ipAddressEditText.setText(defaultHost, TextView.BufferType.EDITABLE)
-        }
 
         applyURLBtn.setOnClickListener {
             host = ipAddressEditText.text.toString()
