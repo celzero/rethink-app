@@ -887,7 +887,6 @@
     <string name="ada_app_firewall" translatable="true">Güvenlik Duvarı</string>
     <string name="logs_card_dns_count" translatable="true">%1$s sorgular</string>
     <string name="firewall_rule_trusted_domain_desc" translatable="true">Bu bağlantı, <i>alan adının</i> Güvenilir alan olarak ayarlandığı için izin verildi.<br/><br/> Değiştirmek için <i>Uygulama Özel Güvenlik Duvarı</i> ekranına gidin.</string>
-    <string name="wireguard_refresh_toast">Proxy\'lerin yenilenmesi tamamlandı</string>
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">en çok iletişim kurulan alan adları</string>
     <string name="lbl_day" translatable="true">gün</string>
     <string name="lbl_fast" translatable="true">hızlı</string>

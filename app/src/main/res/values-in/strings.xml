@@ -936,7 +936,6 @@
     <string name="bad_config_explanation_udp_port" translatable="true">: Harus berupa port UDP yang valid</string>
     <string name="google_dns_desc" translatable="true">Tidak memblokir permintaan DNS apa pun. Titik akhir menggunakan DNS Google.</string>
     <string name="bad_config_reason_invalid_value" translatable="true">Nilai tidak valid</string>
-    <string name="wireguard_refresh_toast">Pembaruan proksi selesai</string>
     <string name="unknown_error" translatable="true">Kesalahan tidak diketahui</string>
     <string name="crypt_relay_sweden" translatable="true">Penghubung DNS anonim yang dihosting di Swedia yang disediakan oleh https://cryptostrom.is/.</string>
     <string name="include_all_app_wg_dialog_title">Sertakan semua aplikasi</string>

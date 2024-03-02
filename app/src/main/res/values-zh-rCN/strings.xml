@@ -973,6 +973,5 @@
     <string name="crypt_relay_singapore" translatable="true">于新加坡托管的匿名 DNS 中继。</string>
     <string name="settings_go_log_desc" translatable="true">便于调试</string>
     <string name="settings_go_log_heading" translatable="true">日志级别</string>
-    <string name="wireguard_refresh_toast">代理刷新完毕</string>
     <string name="logs_card_duration" translatable="true">自 %1$s 以来</string>
 </resources>
