@@ -159,7 +159,7 @@
     <string name="local_blocklist_redownload_desc" translatable="true">ऑन-डिवाइस ब्लॉकलिस्ट पहले से ही नवीनतम संस्करण v%1$s पर हैं।</string>
     <string name="blocklist_update_check_failure" translatable="true">कुछ गलत हो गया। बाद में पुन: प्रयास करे!</string>
     <string name="blocklist_update_check_not_required" translatable="true">ब्लॉकलिस्ट पहले से ही नवीनतम संस्करण पे हैं।</string>
-    <string name="refresh_complete" translatable="true">ऐप सूची पुन: समन्वयन खत्म।</string>
+    <string name="refresh_complete" translatable="true"><!-- use dc_refresh_toast -->ऐप सूची पुन: समन्वयन खत्म।</string>
     <string name="show_logs_disabled_network_message" translatable="true">कनेक्शन लॉगिंग अक्षम कर दी गई है। पुन: सक्षम करने के लिए, <i>सेटिंग्स</i> पर जाएं और चालू करें <i>ऑन-डिवाइस लॉगिंग।</i></string>
     <string name="configure_dns_connected_doh_status" translatable="true">डीएनएस ओवर एचटीटीपीएस</string>
     <string name="download_update_dialog_title" translatable="true">नई अपडेट!</string>
@@ -872,4 +872,6 @@
     <string name="status_protected_with_wg_private_dns" translatable="true">वायरगार्ड और प्राइवेट डीएनएस से सेक्योर</string>
     <string name="lbl_listen_port" translatable="true">लिसन पोर्ट</string>
     <string name="lbl_random" translatable="true">(बेतरतीब)</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">डियोटी एंडपॉइंट हटाएं?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">सहेजे गए कॉन्फ़िगरेशन से टीएलएस एंडपॉइंट पर डीएनएस हटाएं।</string>
 </resources>
