@@ -17,6 +17,8 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import backend.Backend
+import backend.RDNS
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.data.FileTag
@@ -32,15 +34,13 @@ import com.celzero.bravedns.database.RethinkRemoteFileTagRepository
 import com.celzero.bravedns.util.Constants.Companion.LOCAL_BLOCKLIST_DOWNLOAD_FOLDER_NAME
 import com.celzero.bravedns.util.Constants.Companion.ONDEVICE_BLOCKLIST_FILE_TAG
 import com.celzero.bravedns.util.Constants.Companion.REMOTE_BLOCKLIST_DOWNLOAD_FOLDER_NAME
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Utilities
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import dnsx.Dnsx
-import dnsx.RDNS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -186,11 +186,11 @@ object RethinkBlocklistManager : KoinComponent {
                     )
                 }
             )
-            Log.i(LoggerConstants.LOG_TAG_DNS, "New Local blocklist files inserted into database")
+            Log.i(Logger.LOG_TAG_DNS, "New Local blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
             Log.e(
-                LoggerConstants.LOG_TAG_DNS,
+                Logger.LOG_TAG_DNS,
                 "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
                 ioException
             )
@@ -246,7 +246,7 @@ object RethinkBlocklistManager : KoinComponent {
                 dbFileTagRemote.add(r)
                 // if (DEBUG) Log.d(LoggerConstants.LOG_TAG_DNS, "Remote file tag: $r")
                 Log.i(
-                    LoggerConstants.LOG_TAG_DNS,
+                    Logger.LOG_TAG_DNS,
                     "Remote file tag: ${r.group}, ${r.pack}, ${r.simpleTagId}, ${r.level}, ${r.value}, ${r.entries}, ${r.isSelected}, ${r.show}, ${r.subg}, ${r.uname}, ${r.url}, ${r.vname}"
                 )
             }
@@ -270,11 +270,11 @@ object RethinkBlocklistManager : KoinComponent {
                     )
                 }
             )
-            Log.i(LoggerConstants.LOG_TAG_DNS, "New Remote blocklist files inserted into database")
+            Log.i(Logger.LOG_TAG_DNS, "New Remote blocklist files inserted into database")
             return true
         } catch (ioException: IOException) {
             Log.e(
-                LoggerConstants.LOG_TAG_DNS,
+                Logger.LOG_TAG_DNS,
                 "Failure reading json file, blocklist type: remote, timestamp: $timestamp",
                 ioException
             )
@@ -375,12 +375,12 @@ object RethinkBlocklistManager : KoinComponent {
             val flags = convertListToCsv(fileValues)
             if (DEBUG)
                 Log.d(
-                    LoggerConstants.LOG_TAG_VPN,
-                    "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Dnsx.EB32)}"
+                    Logger.LOG_TAG_VPN,
+                    "${type.name} flags: $flags, ${getRDNS(type)?.flagsToStamp(flags, Backend.EB32)}"
                 )
-            getRDNS(type)?.flagsToStamp(flags, Dnsx.EB32) ?: ""
+            getRDNS(type)?.flagsToStamp(flags, Backend.EB32) ?: ""
         } catch (e: java.lang.Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
+            Log.e(Logger.LOG_TAG_VPN, "err stamp2tags: ${e.message}, $e")
             ""
         }
     }
@@ -389,7 +389,7 @@ object RethinkBlocklistManager : KoinComponent {
         return try {
             convertCsvToList(getRDNS(type)?.stampToFlags(stamp))
         } catch (e: Exception) {
-            Log.e(LoggerConstants.LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e")
+            Log.e(Logger.LOG_TAG_VPN, "err tags2stamp: ${e.message}, $e")
             setOf()
         }
     }

@@ -22,6 +22,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.data.AppConfig
@@ -29,14 +30,13 @@ import com.celzero.bravedns.databinding.ActivityWgConfigEditorBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.activity.WgConfigDetailActivity.Companion.INTENT_EXTRA_WG_TYPE
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.clipboardCopy
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.WgInterface
 import com.celzero.bravedns.wireguard.util.ErrorMessages
-import ipn.Ipn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -127,7 +127,7 @@ class WgConfigEditorActivity : AppCompatActivity(R.layout.activity_wg_config_edi
 
     private fun setupClickListeners() {
         b.privateKeyTextLayout.setEndIconOnClickListener {
-            val key = Ipn.newPrivateKey()
+            val key = Backend.newWgPrivateKey()
             val privateKey = key.base64()
             val publicKey = key.mult().base64()
             b.privateKeyText.setText(privateKey.toString())

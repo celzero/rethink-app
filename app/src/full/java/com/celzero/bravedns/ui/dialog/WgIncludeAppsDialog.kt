@@ -37,7 +37,7 @@ import com.celzero.bravedns.R
 import com.celzero.bravedns.database.RefreshDatabase
 import com.celzero.bravedns.databinding.WgAppsIncludeDialogBinding
 import com.celzero.bravedns.service.ProxyManager
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
 import com.google.android.material.chip.Chip
@@ -277,8 +277,8 @@ class WgIncludeAppsDialog(
 
     private fun showConfirmationDialog() {
         val builder = MaterialAlertDialogBuilder(context)
-        builder.setTitle("Include remaining apps")
-        builder.setMessage("Include all apps that are not part of any proxy")
+        builder.setTitle(context.getString(R.string.remaining_apps_dialog_title))
+        builder.setMessage(context.getString(R.string.remaining_apps_dialog_desc))
         builder.setCancelable(true)
         builder.setPositiveButton(context.getString(R.string.lbl_include)) { _, _ ->
             io {

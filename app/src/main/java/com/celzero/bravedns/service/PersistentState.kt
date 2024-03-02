@@ -242,7 +242,7 @@ class PersistentState(context: Context) : SimpleKrate(context), KoinComponent {
     var biometricAuth by booleanPref("biometric_authentication").withDefault<Boolean>(false)
 
     // enable dns alg
-    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(true)
+    var enableDnsAlg by booleanPref("dns_alg").withDefault<Boolean>(false)
 
     // dns crypt relay server
     var dnscryptRelays by stringPref("dnscrypt_relay").withDefault<String>("")

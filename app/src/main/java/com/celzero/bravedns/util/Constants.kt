@@ -127,8 +127,8 @@ class Constants {
 
         const val RETHINK_SEARCH_URL = "https://rethinkdns.com/search?s="
 
-        // default filetag.json for remote blocklist (stored in assets folder) (v055)
-        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1690926960536
+        // default filetag.json for remote blocklist (stored in assets folder) (v055b)
+        const val PACKAGED_REMOTE_FILETAG_TIMESTAMP: Long = 1707429361312
 
         // rethinkdns sponsor link
         const val RETHINKDNS_SPONSOR_LINK = "https://svc.rethinkdns.com/r/sponsor"

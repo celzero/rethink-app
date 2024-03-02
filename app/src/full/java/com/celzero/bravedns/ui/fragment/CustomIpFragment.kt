@@ -247,7 +247,7 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
             }
 
             dBind.daciIpEditText.text.clear()
-            insertCustomIp(hostName, status)
+            insertCustomIp(ipString, hostName?.port, status)
         }
     }
 
@@ -262,10 +262,10 @@ class CustomIpFragment : Fragment(R.layout.fragment_custom_ip), SearchView.OnQue
         }
     }
 
-    private fun insertCustomIp(ip: HostName?, status: IpRulesManager.IpRuleStatus) {
+    private fun insertCustomIp(ip: String, port: Int?, status: IpRulesManager.IpRuleStatus) {
         if (ip == null) return
 
-        io { IpRulesManager.addIpRule(uid, ip.asAddress().toNormalizedString(), ip.port, status) }
+        io { IpRulesManager.addIpRule(uid, ip, port, status) }
         Utilities.showToastUiCentered(
             requireContext(),
             getString(R.string.ci_dialog_added_success),

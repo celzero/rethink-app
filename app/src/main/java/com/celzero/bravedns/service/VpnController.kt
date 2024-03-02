@@ -22,11 +22,11 @@ import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import backend.RDNS
 import com.celzero.bravedns.R
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Utilities
-import dnsx.RDNS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -275,7 +275,7 @@ object VpnController : KoinComponent {
         braveVpnService?.closeConnectionsIfNeeded(uid)
     }
 
-    suspend fun getDnsStatus(id: String): Long? {
+    fun getDnsStatus(id: String): Long? {
         return braveVpnService?.getDnsStatus(id)
     }
 

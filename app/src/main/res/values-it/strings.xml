@@ -29,7 +29,6 @@
     <string name="slide_2_desc">Rethink è il modo più semplice per monitorare l\'attività di rete, aggirare la censura di Internet e attivare un firewall per le app del tuo dispositivo Android.</string>
     <string name="slide_1_title">"Gratuito e  con sorgente pubblica"</string>
     <string name="slide_1_desc">Rethink è un software con sorgente pubblica sostenuto dal programma Mozilla Builders MVP.</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="allow">consenti</string>
     <string name="bypass_universal">aggira regole universali</string>
@@ -813,7 +812,6 @@
     <string name="lbl_rules" translatable="true">regole</string>
     <string name="lbl_network" translatable="true">rete</string>
     <string name="bypass_dns_firewall" translatable="true">bypassare dns e firewall</string>
-    <string name="trusted_domains_desc" translatable="true">La regola del dominio di fiducia funziona meglio con il DNS <u>Rethink</u>.</string>
     <string name="settings_allow_lan_heading" translatable="true">Non instradare IP privati (sperimentale)</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">Non è possibile impostare le proxy quando la VPN funziona in modalità solo DNS.</string>
     <string name="settings_pcap_heading" translatable="true">Acquisizione pacchetti</string>

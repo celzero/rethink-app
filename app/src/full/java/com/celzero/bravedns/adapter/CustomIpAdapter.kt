@@ -45,7 +45,7 @@ import com.celzero.bravedns.service.FirewallManager
 import com.celzero.bravedns.service.IpRulesManager
 import com.celzero.bravedns.ui.activity.CustomRulesActivity
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.Utilities
@@ -108,7 +108,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 holder.update(customIp)
             }
             else -> {
-                Log.w(LoggerConstants.LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
+                Log.w(Logger.LOG_TAG_UI, "unknown view holder in CustomDomainRulesAdapter")
                 return
             }
         }
@@ -355,7 +355,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
         private val ipRulesGroupListener =
             MaterialButtonToggleGroup.OnButtonCheckedListener { group, checkedId, isChecked ->
                 val b: MaterialButton = b.customIpToggleGroup.findViewById(checkedId)
-
                 val statusId = findSelectedIpRule(getTag(b.tag))
                 // delete button
                 if (statusId == null && isChecked) {
@@ -370,13 +369,21 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 }
 
                 if (isChecked) {
-                    val t = getToggleBtnUiParams(statusId)
-                    // update the toggle button
-                    selectToggleBtnUi(b, t)
-                    // update the status in desc and status flag (N/B/BU)
-                    updateStatusUi(statusId)
+                    // checked change listener is called multiple times, even for position change
+                    // so, check if the status has changed or not
+                    // also see CustomDomainAdapter#domainRulesGroupListener
+                    val hasStatusChanged = customIp.status != statusId.id
+                    if (hasStatusChanged) {
+                        val t = getToggleBtnUiParams(statusId)
+                        // update the toggle button
+                        selectToggleBtnUi(b, t)
+                        // update the status in desc and status flag (N/B/BU)
+                        updateStatusUi(statusId)
 
-                    changeIpStatus(statusId, customIp)
+                        changeIpStatus(statusId, customIp)
+                    } else {
+                        // no-op
+                    }
                 } else {
                     unselectToggleBtnUi(b)
                 }
@@ -589,13 +596,18 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 }
 
                 if (isChecked) {
-                    val t = getToggleBtnUiParams(statusId)
-                    // update the toggle button
-                    selectToggleBtnUi(b, t)
-                    // update the status in desc and status flag (N/B/BU)
-                    updateStatusUi(statusId)
+                    val hasStatusChanged = customIp.status != statusId.id
+                    if (hasStatusChanged) {
+                        val t = getToggleBtnUiParams(statusId)
+                        // update the toggle button
+                        selectToggleBtnUi(b, t)
+                        // update the status in desc and status flag (N/B/BU)
+                        updateStatusUi(statusId)
 
-                    changeIpStatus(statusId, customIp)
+                        changeIpStatus(statusId, customIp)
+                    } else {
+                        // no-op
+                    }
                 } else {
                     unselectToggleBtnUi(b)
                 }
@@ -748,7 +760,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
         dBind.daciBlockBtn.setOnClickListener {
             handleIp(dBind, customIp, IpRulesManager.IpRuleStatus.BLOCK)
-            dialog.dismiss()
         }
 
         dBind.daciTrustBtn.setOnClickListener {
@@ -757,7 +768,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             } else {
                 handleIp(dBind, customIp, IpRulesManager.IpRuleStatus.TRUST)
             }
-            dialog.dismiss()
         }
 
         dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
@@ -788,7 +798,7 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
                 return@ui
             }
 
-            updateCustomIp(customIp, hostName, status)
+            updateCustomIp(customIp, ipString, status)
         }
     }
 
@@ -805,19 +815,10 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
     private fun updateCustomIp(
         prev: CustomIp,
-        hostName: HostName?,
+        ipString: String,
         status: IpRulesManager.IpRuleStatus
     ) {
-        if (hostName == null) return
-
-        val new =
-            IpRulesManager.makeCustomIp(
-                prev.uid,
-                hostName.asAddress().toNormalizedString(),
-                hostName.port,
-                status
-            )
-        io { IpRulesManager.replaceIpRule(prev, new) }
+        io { IpRulesManager.replaceIpRule(prev, ipString, status) }
     }
 
     private suspend fun ioCtx(f: suspend () -> Unit) {

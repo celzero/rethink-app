@@ -20,7 +20,7 @@ import android.util.Log
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.AppDatabase
 import com.celzero.bravedns.service.VpnController
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -98,12 +98,12 @@ class BackupHelper {
         }
 
         fun stopVpn(context: Context) {
-            Log.i(LoggerConstants.LOG_TAG_BACKUP_RESTORE, "calling vpn stop from backup helper")
+            Log.i(Logger.LOG_TAG_BACKUP_RESTORE, "calling vpn stop from backup helper")
             VpnController.stop(context)
         }
 
         fun startVpn(context: Context) {
-            Log.i(LoggerConstants.LOG_TAG_BACKUP_RESTORE, "calling vpn start from backup helper")
+            Log.i(Logger.LOG_TAG_BACKUP_RESTORE, "calling vpn start from backup helper")
             VpnController.start(context)
         }
 

@@ -18,15 +18,15 @@ package com.celzero.bravedns.service
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomIp
 import com.celzero.bravedns.database.CustomIpRepository
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_FIREWALL
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_FIREWALL
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import dnsx.Dnsx
 import inet.ipaddr.HostName
 import inet.ipaddr.IPAddressString
 import org.koin.core.component.KoinComponent
@@ -39,7 +39,7 @@ object IpRulesManager : KoinComponent {
     // max size of ip request look-up cache
     private const val CACHE_MAX_SIZE = 10000L
 
-    private var iptree = Dnsx.newIpTree()
+    private var iptree = Backend.newIpTree()
 
     // key-value object for ip look-up
     data class CacheKey(val hostName: HostName, val uid: Int)
@@ -158,7 +158,7 @@ object IpRulesManager : KoinComponent {
     }
 
     private fun treeValsFromCsv(csv: String): List<String> {
-        return csv.split(Dnsx.Vsep)
+        return csv.split(Backend.Vsep)
     }
 
     private fun treeVal(uid: Int, port: Int, rule: Int): String {
@@ -180,7 +180,7 @@ object IpRulesManager : KoinComponent {
     }
 
     private suspend fun updateRule(uid: Int, ipaddr: String, port: Int, status: IpRuleStatus) {
-        Log.i(LOG_TAG_FIREWALL, "ip rules, update: $ipaddr for uid: $uid; status: ${status.name}")
+        Log.i(LOG_TAG_FIREWALL, "ip rule, update: $ipaddr for uid: $uid; status: ${status.name}")
         val c = makeCustomIp(uid, ipaddr, port, status)
         db.update(c)
         val k = treeKey(ipaddr)
@@ -310,7 +310,7 @@ object IpRulesManager : KoinComponent {
         resultsCache.invalidateAll()
     }
 
-    fun makeCustomIp(
+    private fun makeCustomIp(
         uid: Int,
         ipAddress: String,
         port: Int?,
@@ -340,7 +340,7 @@ object IpRulesManager : KoinComponent {
     suspend fun addIpRule(uid: Int, ipstr: String, port: Int?, status: IpRuleStatus) {
         Log.i(
             LOG_TAG_FIREWALL,
-            "IP Rules, add rule for ($uid) ip: $ipstr, $port with status: ${status.name}"
+            "ip rule, add rule for ($uid) ip: $ipstr, $port with status: ${status.name}"
         )
         val c = makeCustomIp(uid, ipstr, port, status)
         db.insert(c)
@@ -363,14 +363,16 @@ object IpRulesManager : KoinComponent {
         Log.i(LOG_TAG_FIREWALL, "ip rules updated")
     }
 
-    suspend fun replaceIpRule(prevRule: CustomIp, newRule: CustomIp) {
+    suspend fun replaceIpRule(prevRule: CustomIp, ipString: String, newStatus: IpRuleStatus) {
+        val host = HostName(ipString)
         val prevIpAddrStr = prevRule.getCustomIpAddress().asAddress().toNormalizedString()
-        val newIpAddrStr = newRule.getCustomIpAddress().asAddress().toNormalizedString()
+        val newIpAddrStr = host.asAddress().toNormalizedString()
         Log.i(
             LOG_TAG_FIREWALL,
-            "ip rule, update (${prevRule.uid}); ${prevIpAddrStr}:${prevRule.port}; new: ${newRule.status}"
+            "ip rule, replace (${prevRule.uid}); ${prevIpAddrStr}:${prevRule.port}; new: $newIpAddrStr, ${newStatus.name}"
         )
         db.deleteRule(prevRule.uid, prevIpAddrStr, prevRule.port)
+        val newRule = makeCustomIp(prevRule.uid, ipString, host.port, newStatus)
         db.insert(newRule)
         val pk = treeKey(prevIpAddrStr)
         if (!pk.isNullOrEmpty()) {
@@ -378,8 +380,8 @@ object IpRulesManager : KoinComponent {
         }
         val nk = treeKey(newIpAddrStr)
         if (!nk.isNullOrEmpty()) {
-            iptree.escLike(nk, treeValLike(newRule.uid, newRule.port))
-            iptree.add(nk, treeVal(newRule.uid, newRule.port, newRule.status))
+            iptree.escLike(nk, treeValLike(prevRule.uid, host.port ?: 0))
+            iptree.add(nk, treeVal(prevRule.uid, host.port ?: 0, newStatus.id))
         }
         resultsCache.invalidateAll()
     }

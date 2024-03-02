@@ -1,4 +1,4 @@
-name: Monthly debug
+name: Monthly alpha
 
 on:
   workflow_dispatch: # to be able to run it manually
@@ -47,7 +47,7 @@ jobs:
       - name: Build & notify 
         if: env.TELEGRAM_CHAT_ID && env.SCHEDULED_BUILD_VARIANT && env.TELEGRAM_TOKEN
         run: |
-          ./gradlew ${SCHEDULED_BUILD_VARIANT} -v
+          ./gradlew ${SCHEDULED_BUILD_VARIANT} --info --warning-mode all
         env:
           ALPHA_KS_ALIAS: ${{ vars.ALPHA_KS_ALIAS }}
           ALPHA_KS_FILE: ${{ vars.ALPHA_KS_FILE }}
@@ -55,6 +55,12 @@ jobs:
           ALPHA_KS_PASSPHRASE: ${{ secrets.ALPHA_KS_PASSPHRASE }}
           VERSION_CODE: ${{ github.run_number }}
           # version-code: archive.is/y8uCB
+
+      - name: Grab APK
+        run: |
+          apk_path="$(find . -type f -iname '*.apk' | head -n1)"
+          echo $apk_path
+          echo "APKFILE=${apk_path}" >> $GITHUB_ENV
 
       # github.com/actions/upload-artifact
       - name: Artifact

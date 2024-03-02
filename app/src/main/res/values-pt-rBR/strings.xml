@@ -174,7 +174,6 @@
     <string name="title_about">Sobre</string>
     <string name="app_name">RethinkDNS</string>
     <string name="title_settings">Configurações</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="accessibility_service_description">Rethink usa o serviço de acessibilidade para detectar e implementar firewall para aplicativos em segundo plano. Rethink não coleta nem vende qualquer tipo de informação.</string>
     <string name="always_on_dialog_lockdown_stop_message">Rethink está executando a VPN no modo <i>restrito</i>. Ao interrompê-lo você perderá a conexão com a internet neste perfil de usuário. Você quer continuar mesmo assim?</string>
     <string name="orbot_none">Nenhum (padrão)</string>
@@ -797,7 +796,6 @@
     <string name="cd_dns_alg_heading" translatable="true">Filtragem de DNS avançada (experimental)</string>
     <string name="lbl_maybe_blocked" translatable="true">Talvez bloqueado</string>
     <string name="lbl_network" translatable="true">rede</string>
-    <string name="trusted_domains_desc" translatable="true">A regra de domínio confiável funciona melhor com <u>Rethink\'s DNS</u>.</string>
     <string name="lbl_import" translatable="true">Importar</string>
     <string name="lbl_qr_code" translatable="true">Código QR</string>
     <string name="lbl_addresses" translatable="true">Endereços</string>
@@ -965,7 +963,6 @@
     <string name="no_configs_error" translatable="true">Nenhuma configuração encontrada</string>
     <string name="bad_extension_error" translatable="true">O arquivo deve ser \".conf\" ou \".zip\"</string>
     <string name="config_delete_dialog_desc">Tem certeza de que deseja excluir esta configuração?</string>
-    <string name="config_delete_success_toast">Configuração excluída</string>
     <string name="exclude_all_app_wg_dialog_title">Remover todos os aplicativos</string>
     <string name="exclude_all_app_wg_dialog_desc">Remover todos os aplicativos deste túnel?</string>
     <string name="wireguard_connection_error">WireGuard VPN falhando ao conectar</string>

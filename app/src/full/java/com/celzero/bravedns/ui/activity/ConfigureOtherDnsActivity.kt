@@ -116,7 +116,7 @@ class ConfigureOtherDnsActivity : AppCompatActivity(R.layout.activity_configure_
     private fun getDnsTypeName(type: Int): String {
         return when (DnsScreen.getDnsType(type)) {
             DnsScreen.DOH -> getString(R.string.other_dns_list_tab1)
-            DnsScreen.DNS_CRYPT -> getString(R.string.other_dns_list_tab2)
+            DnsScreen.DNS_CRYPT -> getString(R.string.dc_dns_crypt)
             DnsScreen.DNS_PROXY -> getString(R.string.other_dns_list_tab3)
             DnsScreen.DOT -> getString(R.string.lbl_dot)
             DnsScreen.ODOH -> getString(R.string.lbl_odoh)

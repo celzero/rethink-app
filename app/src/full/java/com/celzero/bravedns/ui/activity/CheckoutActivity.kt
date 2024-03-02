@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -36,10 +37,9 @@ import com.celzero.bravedns.databinding.ActivityCheckoutProxyBinding
 import com.celzero.bravedns.service.EncryptedFileManager
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.fetchColor
-import ipn.Ipn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,11 +95,9 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             handleKeys()
         }
 
-        UUID.randomUUID().toString().let { uuid ->
-            Log.d(LoggerConstants.LOG_TAG_PROXY, "UUID: $uuid")
-        }
+        UUID.randomUUID().toString().let { uuid -> Log.d(Logger.LOG_TAG_PROXY, "UUID: $uuid") }
         generateRandomHexToken(TOKEN_LENGTH).let { token ->
-            Log.d(LoggerConstants.LOG_TAG_PROXY, "Token: $token")
+            Log.d(Logger.LOG_TAG_PROXY, "Token: $token")
         }
         setSpannablePricing(b.plan1MonthButton, "1 Month / 1.99", "( 1.99 / month )")
         setSpannablePricing(b.plan3MonthsButton, "3 Months / 3.99", "( 1.33 / month )")
@@ -108,7 +106,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
 
     private fun handlePaymentStatusUi() {
         val paymentStatus: TcpProxyHelper.PaymentStatus = TcpProxyHelper.getTcpProxyPaymentStatus()
-        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_PROXY, "Payment Status: $paymentStatus")
+        if (DEBUG) Log.d(Logger.LOG_TAG_PROXY, "Payment Status: $paymentStatus")
         when (paymentStatus) {
             TcpProxyHelper.PaymentStatus.INITIATED -> {
                 b.paymentAwaitingContainer.visibility = View.VISIBLE
@@ -151,7 +149,7 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
             workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
             Log.i(
-                LoggerConstants.LOG_TAG_PROXY,
+                Logger.LOG_TAG_PROXY,
                 "WorkManager state: ${workInfo.state} for ${TcpProxyHelper.PAYMENT_WORKER_TAG}"
             )
             if (
@@ -179,10 +177,10 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
         io {
             try {
                 val key = TcpProxyHelper.getPublicKey()
-                Log.d(LoggerConstants.LOG_TAG_PROXY, "Public Key: $key")
-                val encryptedKey = Ipn.newPipKey(key, "")
+                Log.d(Logger.LOG_TAG_PROXY, "Public Key: $key")
+                val encryptedKey = Backend.newPipKey(key, "")
                 val blind = encryptedKey.blind()
-                Log.d(LoggerConstants.LOG_TAG_PROXY, "Blind: $blind")
+                Log.d(Logger.LOG_TAG_PROXY, "Blind: $blind")
                 val path =
                     File(
                         this.filesDir.canonicalPath +
@@ -193,9 +191,9 @@ class CheckoutActivity : AppCompatActivity(R.layout.activity_checkout_proxy) {
                     )
                 EncryptedFileManager.writeTcpConfig(this, blind, TcpProxyHelper.PIP_KEY_FILE_NAME)
                 val content = EncryptedFileManager.read(this, path)
-                Log.d(LoggerConstants.LOG_TAG_PROXY, "Content: $content")
+                Log.d(Logger.LOG_TAG_PROXY, "Content: $content")
             } catch (e: Exception) {
-                Log.e(LoggerConstants.LOG_TAG_PROXY, "Exception in handleKeys: ${e.message}", e)
+                Log.e(Logger.LOG_TAG_PROXY, "Exception in handleKeys: ${e.message}", e)
             }
         }
     }

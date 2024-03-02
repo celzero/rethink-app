@@ -109,7 +109,6 @@
     <string name="lbl_very" translatable="true">매우</string>
     <string name="bsct_block_ip" translatable="true"><u>이 앱</u>에서 <u>이 IP</u>를 차단 및 신뢰합니다.</string>
     <string name="status_exposed" description="This is a large message in a scary color.  It indicates that DNS queries can be surveilled or modified in transit." translatable="true">보호되지 않음</string>
-    <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
     <string name="dns_explanation_connected" description="The message will be shown when the DNS is connected" translatable="true">RethinkDNS 및 방화벽에 연결됨</string>
     <string name="allow" translatable="true">허용</string>
     <string name="dns_mode_info_explanation_new" translatable="true">DNS 요청을 모니터링, 차단 및 암호화합니다.</string>

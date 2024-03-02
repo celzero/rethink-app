@@ -33,27 +33,26 @@ import android.widget.Toast
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.DnsLog
 import com.celzero.bravedns.glide.FavIconDownloader
 import com.celzero.bravedns.net.doh.Transaction
 import com.celzero.bravedns.service.DnsLogTracker
-import ipn.Ipn
 import java.util.Calendar
 import java.util.Date
-import java.util.TimeZone
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object UIUtils {
 
     fun getDnsStatusStringRes(status: Long?): Int {
-        if (status == null) return R.string.rt_filter_parent_selected
+        if (status == null) return R.string.failed_using_default
 
         return when (Transaction.Status.fromId(status)) {
             Transaction.Status.START -> {
-                R.string.rt_filter_parent_selected
+                R.string.lbl_starting
             }
             Transaction.Status.COMPLETE -> {
                 R.string.dns_connected
@@ -84,16 +83,16 @@ object UIUtils {
 
     fun getProxyStatusStringRes(statusId: Long): Int {
         return when (statusId) {
-            Ipn.TUP -> {
+            Backend.TUP -> {
                 R.string.lbl_starting
             }
-            Ipn.TOK -> {
+            Backend.TOK -> {
                 R.string.dns_connected
             }
-            Ipn.TKO -> {
+            Backend.TKO -> {
                 R.string.status_failing
             }
-            Ipn.END -> {
+            Backend.END -> {
                 R.string.lbl_stopped
             }
             else -> {
@@ -146,7 +145,7 @@ object UIUtils {
                 context.getString(R.string.vpn_profile_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LoggerConstants.LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
+            Log.w(Logger.LOG_TAG_VPN, "Failure opening app info: ${e.message}", e)
         }
     }
 
@@ -160,7 +159,7 @@ object UIUtils {
                 context.getString(R.string.intent_launch_error, url),
                 Toast.LENGTH_SHORT
             )
-            Log.w(LoggerConstants.LOG_TAG_UI, "activity not found ${e.message}", e)
+            Log.w(Logger.LOG_TAG_UI, "activity not found ${e.message}", e)
         }
     }
 
@@ -175,11 +174,7 @@ object UIUtils {
                 context.getString(R.string.private_dns_error),
                 Toast.LENGTH_SHORT
             )
-            Log.w(
-                LoggerConstants.LOG_TAG_VPN,
-                "Failure opening network setting screen: ${e.message}",
-                e
-            )
+            Log.w(Logger.LOG_TAG_VPN, "Failure opening network setting screen: ${e.message}", e)
         }
     }
 
@@ -218,7 +213,7 @@ object UIUtils {
             intent.data = Uri.fromParts("package", packageName, null)
             context.startActivity(intent)
         } catch (e: Exception) { // ActivityNotFoundException | NullPointerException
-            Log.w(LoggerConstants.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
+            Log.w(Logger.LOG_TAG_FIREWALL, "Failure calling app info: ${e.message}", e)
             Utilities.showToastUiCentered(
                 context,
                 context.getString(R.string.ctbs_app_info_not_available_toast),
@@ -272,7 +267,7 @@ object UIUtils {
 
         if (isDgaDomain(dnsLog.queryStr)) return
 
-        if (DEBUG) Log.d(LoggerConstants.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
+        if (DEBUG) Log.d(Logger.LOG_TAG_UI, "Glide - fetchFavIcon():${dnsLog.queryStr}")
 
         // fetch fav icon in background using glide
         FavIconDownloader(context, dnsLog.queryStr).run()

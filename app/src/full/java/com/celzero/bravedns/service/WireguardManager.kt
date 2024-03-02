@@ -17,6 +17,8 @@ package com.celzero.bravedns.service
 
 import android.content.Context
 import android.util.Log
+import backend.Backend
+import backend.WgKey
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.IWireguardWarp
 import com.celzero.bravedns.customdownloader.RetrofitManager
@@ -24,14 +26,12 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.database.WgConfigFilesRepository
 import com.celzero.bravedns.util.Constants.Companion.WIREGUARD_FOLDER_NAME
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
 import com.celzero.bravedns.wireguard.BadConfigException
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import inet.ipaddr.IPAddressString
-import ipn.Ipn
-import ipn.Key
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -119,6 +119,11 @@ object WireguardManager : KoinComponent {
             Log.e(LOG_TAG_PROXY, "getConfigFilesById: wg not found: $id, ${configs.size}")
         }
         return config
+    }
+
+    fun isAnyWgActive(): Boolean {
+        val m = mappings.filter { it.isActive }
+        return m.isNotEmpty()
     }
 
     fun getEnabledConfigs(): List<Config> {
@@ -214,7 +219,12 @@ object WireguardManager : KoinComponent {
     }
 
     fun canDisableAllActiveConfigs(): Boolean {
-        return mappings.any { it.isActive && !it.isCatchAll }
+        mappings.forEach {
+            if (it.isActive && it.isCatchAll) {
+                return false
+            }
+        }
+        return true
     }
 
     fun getConfigName(id: Int): String {
@@ -272,7 +282,7 @@ object WireguardManager : KoinComponent {
 
     suspend fun getNewWarpConfig(id: Int): Config? {
         try {
-            val privateKey = Ipn.newPrivateKey()
+            val privateKey = Backend.newWgPrivateKey()
             val publicKey = privateKey.mult().base64()
             val deviceName = android.os.Build.MODEL
             val locale = Locale.getDefault().toString()
@@ -376,7 +386,7 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    private fun parseNewConfigJsonResponse(privateKey: Key, jsonObject: JSONObject?): Config? {
+    private fun parseNewConfigJsonResponse(privateKey: WgKey, jsonObject: JSONObject?): Config? {
         // get the json tag "wgconf" from the response
         if (jsonObject == null) {
             Log.e(LOG_TAG_PROXY, "new warp config json object is null")
@@ -416,7 +426,7 @@ object WireguardManager : KoinComponent {
         // increment the id and add the config
         lastAddedConfigId += 1
         val id = lastAddedConfigId
-        val name = config.getName().ifEmpty { "${Ipn.WG}$id" }
+        val name = config.getName().ifEmpty { "${Backend.WG}$id" }
         config.setName(name)
         config.setId(id)
         io { writeConfigAndUpdateDb(config) }
@@ -728,9 +738,7 @@ object WireguardManager : KoinComponent {
     }
 
     fun getOneWireGuardProxyId(): Int? {
-        val id = mappings.find { it.oneWireGuard && it.isActive }?.id
-        if (DEBUG) Log.d(LOG_TAG_PROXY, "flow: getOneWireGuardProxyId: $id")
-        return id ?: return null
+        return mappings.find { it.oneWireGuard && it.isActive }?.id
     }
 
     fun getCatchAllWireGuardProxyId(): Int? {

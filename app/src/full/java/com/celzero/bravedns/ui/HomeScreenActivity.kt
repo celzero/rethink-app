@@ -63,11 +63,11 @@ import com.celzero.bravedns.ui.activity.PauseActivity
 import com.celzero.bravedns.ui.activity.WelcomeActivity
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.PKG_NAME_PLAY_STORE
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_APP_UPDATE
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_BACKUP_RESTORE
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_APP_UPDATE
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_BACKUP_RESTORE
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.Utilities
@@ -625,11 +625,7 @@ class HomeScreenActivity : AppCompatActivity(R.layout.activity_home_screen) {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showToastUiCentered(this, getString(R.string.no_browser_error), Toast.LENGTH_SHORT)
-            Log.w(
-                LoggerConstants.LOG_TAG_VPN,
-                "Failure opening rethink download link: ${e.message}",
-                e
-            )
+            Log.w(Logger.LOG_TAG_VPN, "Failure opening rethink download link: ${e.message}", e)
         }
     }
 

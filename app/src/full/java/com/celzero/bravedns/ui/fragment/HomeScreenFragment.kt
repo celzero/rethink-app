@@ -25,9 +25,11 @@ import android.content.res.TypedArray
 import android.icu.text.CompactDecimalFormat
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.TrafficStats
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.Log
 import android.util.TypedValue
@@ -40,6 +42,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import backend.Backend
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.celzero.bravedns.R
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
@@ -62,8 +65,8 @@ import com.celzero.bravedns.ui.activity.WgMainActivity
 import com.celzero.bravedns.ui.bottomsheet.HomeScreenSettingBottomSheet
 import com.celzero.bravedns.util.*
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.UIUtils.openNetworkSettings
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -72,17 +75,17 @@ import com.celzero.bravedns.util.Utilities.getPrivateDnsMode
 import com.celzero.bravedns.util.Utilities.isOtherVpnHasAlwaysOn
 import com.celzero.bravedns.util.Utilities.isPrivateDnsActive
 import com.celzero.bravedns.util.Utilities.showToastUiCentered
-import com.celzero.bravedns.viewmodel.AlertsViewModel
 import com.facebook.shimmer.Shimmer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private val b by viewBinding(FragmentHomeScreenBinding::bind)
@@ -139,7 +142,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
             startFirewallActivity(FirewallActivity.Tabs.UNIVERSAL.screen)
         }
 
-        b.fhsCardAppsLl.setOnClickListener { startAppsActivity() }
+        b.fhsCardAppsCv.setOnClickListener { startAppsActivity() }
 
         b.fhsCardDnsLl.setOnClickListener {
             startDnsActivity(DnsDetailActivity.Tabs.CONFIGURE.screen)
@@ -367,15 +370,67 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     private fun observeProxyStates() {
         persistentState.proxyStatus.observe(viewLifecycleOwner) {
             if (it != -1) {
-                b.fhsCardProxyCount.text = getString(R.string.lbl_active)
-                b.fhsCardOtherProxyCount.visibility = View.VISIBLE
-                b.fhsCardOtherProxyCount.text = getString(it)
+                updateUiWithProxyStates(it)
             } else {
                 b.fhsCardProxyCount.text = getString(R.string.lbl_inactive)
                 b.fhsCardOtherProxyCount.visibility = View.VISIBLE
                 b.fhsCardOtherProxyCount.text = getString(R.string.lbl_disabled)
             }
         }
+    }
+
+    private fun updateUiWithProxyStates(resId: Int) {
+        // get proxy type from app config
+        val proxyType = AppConfig.ProxyType.of(appConfig.getProxyType())
+
+        if (proxyType.isProxyTypeWireguard()) {
+            val proxies = WireguardManager.getEnabledConfigs()
+            var active = 0
+            var failing = 0
+            proxies.forEach {
+                val proxyId = "${ProxyManager.ID_WG_BASE}${it.getId()}"
+                val status = VpnController.getProxyStatusById(proxyId)
+                if (status != null) {
+                    // consider starting and up as active
+                    if (status == Backend.TOK || status == Backend.TUP) {
+                        active++
+                    } else {
+                        failing++
+                    }
+                } else {
+                    failing++
+                }
+            }
+            b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+            // show as 3 active 1 failing, if failing is 0 show as 4 active
+            if (failing > 0) {
+                b.fhsCardProxyCount.text =
+                    getString(
+                        R.string.orbot_stop_dialog_message_combo,
+                        getString(
+                            R.string.two_argument_space,
+                            active.toString(),
+                            getString(R.string.lbl_active)
+                        ),
+                        getString(
+                            R.string.two_argument_space,
+                            failing.toString(),
+                            getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
+                        )
+                    )
+            } else {
+                b.fhsCardProxyCount.text =
+                    getString(
+                        R.string.two_argument_space,
+                        active.toString(),
+                        getString(R.string.lbl_active)
+                    )
+            }
+        } else {
+            b.fhsCardProxyCount.text = getString(R.string.lbl_active)
+        }
+        b.fhsCardOtherProxyCount.visibility = View.VISIBLE
+        b.fhsCardOtherProxyCount.text = getString(resId)
     }
 
     private fun unobserveProxyStates() {
@@ -410,7 +465,8 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     }
 
     private fun disableAppsCard() {
-        b.fhsCardAppsStatus.visibility = View.GONE
+        b.fhsCardAppsStatusRl.visibility = View.GONE
+        b.fhsCardApps.visibility = View.VISIBLE
         b.fhsCardApps.text = getString(R.string.firewall_card_text_inactive)
     }
 
@@ -451,9 +507,45 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         }
 
         appConfig.getConnectedDnsObservable().observe(viewLifecycleOwner) {
-            b.fhsCardDnsConnectedDns.text = it
-            b.fhsCardDnsConnectedDns.isSelected = true
+            updateUiWithDnsStates(it)
         }
+    }
+
+    private var retryCountForDnsStatus: Int = 0
+
+    private fun updateUiWithDnsStates(dnsName: String) {
+        // get the status from go to check if the dns transport is added or not
+        val id =
+            if (WireguardManager.oneWireGuardEnabled()) {
+                val id = WireguardManager.getOneWireGuardProxyId() ?: Backend.Preferred
+                "${ProxyManager.ID_WG_BASE}${id}"
+            } else {
+                Backend.Preferred
+            }
+
+        if (VpnController.isOn()) {
+            val status = VpnController.getDnsStatus(id)
+            // status null means the dns transport is not available / different id is usedE
+            if (status == null) {
+                if (retryCountForDnsStatus < 5) {
+                    retryCountForDnsStatus++
+                    delay(TimeUnit.SECONDS.toMillis(1), lifecycleScope) {
+                        if (isAdded) {
+                            updateUiWithDnsStates(dnsName)
+                        }
+                    }
+                }
+                b.fhsCardDnsLatency.visibility = View.GONE
+                b.fhsCardDnsFailure.visibility = View.VISIBLE
+                b.fhsCardDnsFailure.text = getString(R.string.failed_using_default)
+                b.fhsCardDnsLatency.isSelected = true
+            } else {
+                b.fhsCardDnsLatency.visibility = View.VISIBLE
+                b.fhsCardDnsFailure.visibility = View.GONE
+            }
+        }
+        b.fhsCardDnsConnectedDns.text = dnsName
+        b.fhsCardDnsConnectedDns.isSelected = true
     }
 
     private fun observeLogsCount() {
@@ -554,36 +646,45 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
                 // exception that happened once when trying to filter the received object (t).
                 // creating a copy of the received value in a synchronized block.
                 synchronized(it) { copy = mutableListOf<AppInfo>().apply { addAll(it) }.toList() }
-                val blockedApps =
-                    copy.filter { a ->
+                val blockedCount =
+                    copy.count { a ->
                         a.connectionStatus != FirewallManager.ConnectionStatus.ALLOW.id
                     }
-                val whiteListApps =
-                    copy.filter { a ->
+                val bypassCount =
+                    copy.count { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.BYPASS_UNIVERSAL.id ||
                             a.firewallStatus ==
                                 FirewallManager.FirewallStatus.BYPASS_DNS_FIREWALL.id
                     }
-                val excludedApps =
-                    copy.filter { a ->
+                val excludedCount =
+                    copy.count { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.EXCLUDE.id
                     }
-                val isolateApps =
-                    copy.filter { a ->
+                val isolatedCount =
+                    copy.count { a ->
                         a.firewallStatus == FirewallManager.FirewallStatus.ISOLATE.id
                     }
-                b.fhsCardAppsStatus.visibility = View.VISIBLE
-                b.fhsCardAppsStatus.text = copy.count().toString()
-                // getString(R.string.firewall_card_status_active, copy.count().toString())
+                val allApps = copy.count()
+                val allowedApps =
+                    allApps - (blockedCount + bypassCount + excludedCount + isolatedCount)
+                b.fhsCardAllowedApps.visibility = View.VISIBLE
+                b.fhsCardAppsStatusRl.visibility = View.VISIBLE
+                b.fhsCardAllowedApps.text = allowedApps.toString()
+                b.fhsCardAppsAllApps.text = allApps.toString()
+                b.fhsCardAppsBlockedCount.text = blockedCount.toString()
+                b.fhsCardAppsBypassCount.text = bypassCount.toString()
+                b.fhsCardAppsExcludeCount.text = excludedCount.toString()
+                b.fhsCardAppsIsolatedCount.text = isolatedCount.toString()
                 b.fhsCardApps.text =
                     getString(
                         R.string.firewall_card_text_active,
-                        blockedApps.count().toString(),
-                        whiteListApps.count().toString(),
-                        excludedApps.count().toString(),
-                        isolateApps.count().toString()
+                        blockedCount.toString(),
+                        bypassCount.toString(),
+                        excludedCount.toString(),
+                        isolatedCount.toString()
                     )
-                b.fhsCardApps.isSelected = true
+                b.fhsCardApps.visibility = View.GONE
+                b.fhsCardAllowedApps.isSelected = true
             } catch (e: Exception) { // NoSuchElementException, ConcurrentModification
                 Log.e(LOG_TAG_VPN, "error retrieving value from appInfos observer ${e.message}", e)
             }
@@ -684,6 +785,70 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
         updateCardsUi()
         syncDnsStatus()
         handleLockdownModeIfNeeded()
+        startTrafficStats()
+    }
+
+    private lateinit var trafficStatsTicker: Job
+
+    private fun startTrafficStats() {
+        trafficStatsTicker =
+            ui("trafficStatsTicker") {
+                while (true) {
+                    fetchTrafficStats()
+                    kotlinx.coroutines.delay(1500L)
+                }
+            }
+    }
+
+    private fun stopTrafficStats() {
+        trafficStatsTicker.cancel()
+    }
+
+    data class TxRx(
+        val tx: Long = TrafficStats.getTotalTxBytes(),
+        val rx: Long = TrafficStats.getTotalRxBytes(),
+        val time: Long = SystemClock.elapsedRealtime()
+    )
+
+    private var txRx = TxRx()
+
+    private fun fetchTrafficStats() {
+        val curr = TxRx()
+        if (txRx.time <= 0L) {
+            txRx = curr
+            b.fhsInternetSpeed.visibility = View.GONE
+            b.fhsInternetSpeedUnit.visibility = View.GONE
+            return
+        }
+        val dur = (curr.time - txRx.time) / 1000L
+
+        if (dur <= 0) {
+            b.fhsInternetSpeed.visibility = View.GONE
+            b.fhsInternetSpeedUnit.visibility = View.GONE
+            return
+        }
+
+        val tx = curr.tx - txRx.tx
+        val rx = curr.rx - txRx.rx
+        txRx = curr
+        val txBytes = String.format("%.2f", ((tx / dur) / 1000.0))
+        val rxBytes = String.format("%.2f", ((rx / dur) / 1000.0))
+        b.fhsInternetSpeed.visibility = View.VISIBLE
+        b.fhsInternetSpeedUnit.visibility = View.VISIBLE
+        b.fhsInternetSpeed.text =
+            getString(
+                R.string.two_argument_space,
+                getString(
+                    R.string.two_argument_space,
+                    txBytes,
+                    getString(R.string.symbol_black_up)
+                ),
+                getString(
+                    R.string.two_argument_space,
+                    rxBytes,
+                    getString(R.string.symbol_black_down)
+                )
+            )
     }
 
     /**
@@ -721,6 +886,7 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
     override fun onPause() {
         super.onPause()
         stopShimmer()
+        stopTrafficStats()
     }
 
     private fun startDnsActivity(screenToLoad: Int) {
@@ -1119,5 +1285,10 @@ class HomeScreenFragment : Fragment(R.layout.fragment_home_screen) {
 
     private suspend fun uiCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun ui(n: String, f: suspend () -> Unit): Job {
+        val cctx = CoroutineName(n) + Dispatchers.Main
+        return lifecycleScope.launch(cctx) { f() }
     }
 }

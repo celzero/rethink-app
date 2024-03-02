@@ -18,6 +18,7 @@ package com.celzero.bravedns.adapter
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
@@ -25,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgGeneralInterfaceBinding
@@ -36,7 +38,6 @@ import com.celzero.bravedns.ui.activity.WgConfigEditorActivity.Companion.INTENT_
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.util.Utilities.delay
-import ipn.Ipn
 
 class WgConfigAdapter(private val context: Context) :
     PagingDataAdapter<WgConfigFiles, WgConfigAdapter.WgInterfaceViewHolder>(DIFF_CALLBACK) {
@@ -60,7 +61,8 @@ class WgConfigAdapter(private val context: Context) :
                     return (oldConnection.id == newConnection.id &&
                         oldConnection.name == newConnection.name &&
                         oldConnection.isActive == newConnection.isActive &&
-                        oldConnection.isCatchAll == newConnection.isCatchAll)
+                        oldConnection.isCatchAll == newConnection.isCatchAll &&
+                        oldConnection.isLockdown == newConnection.isLockdown)
                 }
             }
     }
@@ -87,95 +89,80 @@ class WgConfigAdapter(private val context: Context) :
         fun update(config: WgConfigFiles) {
             b.interfaceNameText.text = config.name
             b.interfaceSwitch.isChecked = config.isActive
-            val lockdown =
-                context.getString(
-                    R.string.ci_ip_label,
-                    context.getString(R.string.firewall_rule_global_lockdown),
-                    config.isLockdown.toString()
-                )
-            b.interfaceLockdown.text = lockdown
-            b.interfaceCatchAll.text =
-                context.getString(
-                    R.string.ci_ip_label,
-                    context.getString(R.string.catch_all_wg_dialog_title),
-                    config.isCatchAll.toString()
-                )
             updateStatus(config)
             setupClickListeners(config)
         }
 
         private fun updateStatus(config: WgConfigFiles) {
             val id = ProxyManager.ID_WG_BASE + config.id
-            val apps = ProxyManager.getAppCountForProxy(id).toString()
+            val appsCount = ProxyManager.getAppCountForProxy(id)
             val statusId = VpnController.getProxyStatusById(id)
-            updateStatusUI(config, statusId, apps)
+            updateUi(config, appsCount)
+            updateStatusUi(config, statusId)
         }
 
-        private fun updateStatusUI(config: WgConfigFiles, statusId: Long?, apps: String) {
+        private fun updateUi(config: WgConfigFiles, appsCount: Int) {
+            if (config.isCatchAll) {
+                b.interfaceCatchAll.visibility = View.VISIBLE
+                b.interfaceLockdown.visibility = View.GONE
+                b.interfaceAppsCount.text = context.getString(R.string.routing_remaining_apps)
+                b.interfaceAppsCount.setTextColor(
+                    UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                )
+                b.interfaceCatchAll.text = context.getString(R.string.catch_all_wg_dialog_title)
+                return // no need to update the apps count
+            } else if (config.isLockdown) {
+                b.interfaceCatchAll.visibility = View.GONE
+                b.interfaceLockdown.visibility = View.VISIBLE
+                b.interfaceLockdown.text = context.getString(R.string.firewall_rule_global_lockdown)
+            } else {
+                b.interfaceCatchAll.visibility = View.GONE
+                b.interfaceLockdown.visibility = View.GONE
+            }
+            b.interfaceAppsCount.text =
+                context.getString(R.string.firewall_card_status_active, appsCount.toString())
+            if (appsCount == 0) {
+                b.interfaceAppsCount.setTextColor(UIUtils.fetchColor(context, R.attr.accentBad))
+            } else {
+                b.interfaceAppsCount.setTextColor(
+                    UIUtils.fetchColor(context, R.attr.primaryLightColorText)
+                )
+            }
+        }
+
+        private fun updateStatusUi(config: WgConfigFiles, statusId: Long?) {
             if (context !is LifecycleOwner) return
 
-            val appsCount = context.getString(R.string.firewall_card_status_active, apps)
             if (config.isActive) {
                 b.interfaceSwitch.isChecked = true
                 b.interfaceDetailCard.strokeWidth = 2
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
-                    // show active status only if the status is TOK(connected), TUP (starting)
-                    if (statusId == Ipn.TOK || statusId == Ipn.TUP) {
+                    // change the color based on the status
+                    if (statusId == Backend.TOK) {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.accentGood)
+                    } else if (statusId == Backend.TUP) {
+                        b.interfaceDetailCard.strokeColor =
+                            UIUtils.fetchColor(context, R.attr.chipTextNeutral)
                     } else {
                         b.interfaceDetailCard.strokeColor =
                             UIUtils.fetchColor(context, R.attr.accentBad)
                     }
-                    b.interfaceProxyStatus.text =
-                        context.getString(
-                            R.string.ci_ip_label,
-                            context.getString(R.string.lbl_status),
-                            context.getString(resId).replaceFirstChar(Char::titlecase)
-                        )
                     b.interfaceStatus.text =
-                        context.getString(
-                            R.string.about_version_install_source,
-                            context.getString(resId).replaceFirstChar(Char::titlecase),
-                            appsCount
-                        )
+                        context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
                     b.interfaceDetailCard.strokeColor =
                         UIUtils.fetchColor(context, R.attr.accentBad)
-                    b.interfaceProxyStatus.text =
-                        context.getString(
-                            R.string.ci_ip_label,
-                            context.getString(R.string.lbl_status),
-                            context
-                                .getString(R.string.status_failing)
-                                .replaceFirstChar(Char::titlecase)
-                        )
                     b.interfaceStatus.text =
-                        context.getString(
-                            R.string.about_version_install_source,
-                            context
-                                .getString(R.string.status_failing)
-                                .replaceFirstChar(Char::titlecase),
-                            appsCount
-                        )
+                        context.getString(R.string.status_failing).replaceFirstChar(Char::titlecase)
                 }
             } else {
                 b.interfaceDetailCard.strokeColor = UIUtils.fetchColor(context, R.attr.background)
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceSwitch.isChecked = false
-                b.interfaceProxyStatus.text =
-                    context.getString(
-                        R.string.ci_ip_label,
-                        context.getString(R.string.lbl_status),
-                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
-                    )
                 b.interfaceStatus.text =
-                    context.getString(
-                        R.string.about_version_install_source,
-                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase),
-                        appsCount
-                    )
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 

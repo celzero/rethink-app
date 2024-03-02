@@ -93,8 +93,8 @@
             android:layout_height="wrap_content"
             android:clipToPadding="true"
             app:cardBackgroundColor="?attr/background"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
             app:cardUseCompatPadding="true"
             app:strokeColor="?attr/secondaryTextColor"
             app:strokeWidth="1dp">

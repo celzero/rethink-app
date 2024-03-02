@@ -15,7 +15,6 @@
     <string name="about_title_desc">偵測並攔截網路威脅，保護您的安全</string>
     <string name="slide_2_desc">Rethink 是現 Android 裝置上最易使用的監測網路活動、繞過互聯網審查與攔截應用程式的防火牆軟體。</string>
     <string name="accessibility_service_description">請授權 Rethink 使用無障礙服務，以偵測並攔截背景應用程式。 Rethink 並不會竊取或販賣您的任何資訊。</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="bypass_universal">無條件放行</string>
     <string name="exclude">排除</string>
@@ -854,7 +853,6 @@
     <string name="settings_allow_lan_desc" translatable="true">將 LAN 、環回、多播與本地鏈路路由排除於 Rethink 的 VPN 隧道外。</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 僅於 Rethink 的 DNS 上生效</string>
     <string name="lbl_network" translatable="true">網路</string>
-    <string name="trusted_domains_desc" translatable="true">信任網域規則配合 <u>Rethink 的 DNS 服務</u>更有效。</string>
     <string name="http_proxy_dialog_desc" translatable="true">設定符合下述格式的 URL ： &lt;協定&gt;://&lt;帳號&gt;:&lt;密碼&gt;@&lt;網域或 IP&gt;:&lt;埠&gt;&lt;路徑&gt; 。例如：http://proxy.example.com:8080/</string>
     <string name="lbl_applications" translatable="true">應用程式</string>
     <string name="lbl_persistent_keepalive" translatable="true">持續保持活動間隔</string>
@@ -946,7 +944,6 @@
     <string name="add_remove_apps" translatable="true">添加/移除應用程式（ %1$s 個應用程式）</string>
     <string name="add_peer" translatable="true">添加對等端點</string>
     <string name="config_delete_dialog_desc">您是否仍想刪除此配置？</string>
-    <string name="config_delete_success_toast">配置已刪除</string>
     <string name="config_add_success_toast">配置已添加</string>
     <string name="config_delete_dialog_title">刪除配置</string>
     <string name="include_all_app_wg_dialog_title">包含所有應用程式</string>

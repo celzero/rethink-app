@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
@@ -26,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import backend.Backend
 import com.celzero.bravedns.R
 import com.celzero.bravedns.database.WgConfigFiles
 import com.celzero.bravedns.databinding.ListItemWgOneInterfaceBinding
@@ -62,6 +64,7 @@ class OneWgConfigAdapter(private val context: Context) :
                     newConnection: WgConfigFiles
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
+                        oldConnection.name == newConnection.name &&
                         oldConnection.isActive == newConnection.isActive &&
                         oldConnection.oneWireGuard == newConnection.oneWireGuard)
                 }
@@ -97,7 +100,7 @@ class OneWgConfigAdapter(private val context: Context) :
             val id = ProxyManager.ID_WG_BASE + config.id
             val apps = ProxyManager.getAppCountForProxy(id).toString()
             val statusId = VpnController.getProxyStatusById(id)
-            if (statusId == null) {
+            if (statusId == null && config.isActive) {
                 WireguardManager.disableConfig(config)
             }
             updateStatusUi(config, statusId, apps)
@@ -116,15 +119,23 @@ class OneWgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeColor = fetchColor(context, R.color.accentGood)
                 b.interfaceDetailCard.strokeWidth = 2
                 b.oneWgCheck.isChecked = true
-
+                b.interfaceAppsCount.visibility = View.VISIBLE
+                b.interfaceAppsCount.text = context.getString(R.string.one_wg_apps_added)
                 if (statusId != null) {
                     val resId = UIUtils.getProxyStatusStringRes(statusId)
+                    // change the color based on the status
+                    if (statusId == Backend.TOK) {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextPositive)
+                    } else if (statusId == Backend.TUP) {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextNeutral)
+                    } else {
+                        b.interfaceDetailCard.strokeColor =
+                            fetchColor(context, R.attr.chipTextNegative)
+                    }
                     b.interfaceStatus.text =
-                        context.getString(
-                            R.string.about_version_install_source,
-                            context.getString(resId).replaceFirstChar(Char::titlecase),
-                            appsCount
-                        )
+                        context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
                     b.interfaceStatus.text =
                         context.getString(
@@ -137,13 +148,10 @@ class OneWgConfigAdapter(private val context: Context) :
                 }
             } else {
                 b.interfaceDetailCard.strokeWidth = 0
+                b.interfaceAppsCount.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
                 b.interfaceStatus.text =
-                    context.getString(
-                        R.string.about_version_install_source,
-                        context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase),
-                        appsCount
-                    )
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 

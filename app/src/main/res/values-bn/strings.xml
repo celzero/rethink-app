@@ -112,7 +112,6 @@
     <string name="dns_btm_sheet_chip">+%1$s অন্যান্য আইপি</string>
     <string name="univ_firewall_rule_9">মিটারযুক্ত (মোবাইল) নেটওয়ার্কে ব্লক করুন</string>
     <string name="univ_firewall_rule_10">বাইপাস করা অ্যাপ এবং আইপি ছাড়া সব ব্লক করুন</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="status_app_error">অ্যাপ ত্রুটি</string>
     <string name="hybrid_mode_info_title">DNS + ফায়ারওয়াল</string>
     <string name="alert_permission_accessibility">অনুমতি - অ্যাক্সেসযোগ্যতা</string>

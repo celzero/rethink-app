@@ -22,7 +22,7 @@ import com.celzero.bravedns.service.WireguardManager.SEC_WARP_ID
 import com.celzero.bravedns.service.WireguardManager.WARP_ID
 import com.celzero.bravedns.service.WireguardManager.isWarpWorking
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.ProxyAppsMappingViewModel
@@ -66,10 +66,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
             return
         }
 
-        Log.i(
-            LoggerConstants.LOG_TAG_UI,
-            "displayTcpProxyUi: ${tcpProxies.name}, ${tcpProxies.url}"
-        )
+        Log.i(Logger.LOG_TAG_UI, "displayTcpProxyUi: ${tcpProxies.name}, ${tcpProxies.url}")
         b.tcpProxySwitch.isChecked = true
         b.tcpProxyStatus.text = "Active" // getString(R.string.tcp_proxy_description_active)
     }
@@ -262,7 +259,7 @@ class TcpProxyMainActivity : AppCompatActivity(R.layout.activity_tcp_proxy) {
 
     private suspend fun fetchWarpConfigFromServer() {
         val config = WireguardManager.getNewWarpConfig(SEC_WARP_ID)
-        Log.i(LoggerConstants.LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
+        Log.i(Logger.LOG_TAG_PROXY, "new config from server: ${config?.getName()}")
         if (config == null) {
             showConfigCreationError()
             return

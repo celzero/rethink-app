@@ -96,7 +96,6 @@
     <string name="finish">搞掂</string>
     <string name="slide_2_title">歡迎</string>
     <string name="slide_1_title">自由同開放原始碼</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">警告： Rethink 已被停用</string>
     <string name="dns_mode_notification_title">保護緊！連線咗去快速而且安全嘅 DNS。</string>
@@ -850,7 +849,6 @@
     <string name="brbs_backup_restore_desc" translatable="true">冇得跨版本跨設備用</string>
     <string name="lbl_maybe_blocked" translatable="true">或已攔截</string>
     <string name="lbl_network" translatable="true">網絡</string>
-    <string name="trusted_domains_desc" translatable="true">信任網域規則夾埋 <u>Rethink 嘅 DNS 服務</u>一齊用更有效。</string>
     <string name="settings_allow_lan_desc" translatable="true">將 LAN、環回、多播同本地鏈路路由排除喺 Rethink 嘅 VPN 隧道外面。</string>
     <string name="bypass_dns_firewall_tooltip">%1$s 只會喺 Rethink 嘅 DNS 度有效</string>
     <string name="settings_allow_lan_heading" translatable="true">唔好路由專有 IP（實驗性）</string>
@@ -952,7 +950,6 @@
     <string name="add_peer" translatable="true">加對等端點</string>
     <string name="config_delete_dialog_title">剷走配置</string>
     <string name="key_length_explanation_binary" translatable="true">：WireGuard 密鑰必須係 32 位元組</string>
-    <string name="config_delete_success_toast">配置剷走咗</string>
     <string name="include_all_app_wg_dialog_title">包括所有應用程式</string>
     <string name="new_warp_invalid_config_toast" translatable="true">冇效嘅 WARP 配置</string>
     <string name="config_add_success_toast">配置添加咗</string>

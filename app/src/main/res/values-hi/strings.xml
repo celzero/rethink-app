@@ -16,7 +16,6 @@
     <string name="slide_2_desc">रीथिंक नेटवर्क गतिविधि की निगरानी करने, इंटरनेट सेंसरशिप को बायपास करने, और आपके एंड्रॉइड डिवाइस पर ऐप्स फ़ायरवॉल करने का सबसे आसान तरीका है।</string>
     <string name="slide_1_title">नि: शुल्क और ओपन सोर्स</string>
     <string name="slide_1_desc">रीथिंक एक ओपन सोर्स सॉफ्टवेयर है जो मोज़िला बिल्डर्स एमवीपी प्रोग्राम द्वारा समर्थित है।</string>
-    <string name="rethink_plus">रीथिंकडीएनएस प्लस</string>
     <string name="rdns_plus">आरडीएनएस प्लस</string>
     <string name="allow">अनुमति दें</string>
     <string name="block">ब्लॉक करें</string>
@@ -826,7 +825,6 @@
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">यूनीवर्सल डीएनएस और फायरवॉल नियमों को बायपास करेगा</string>
     <string name="brbs_backup_restore_desc" translatable="true">सभी ऐप वर्जन और डिवाइस पे एक साथ काम नहीं करता</string>
     <string name="lbl_maybe_blocked" translatable="true">शायद ब्लॉक किया</string>
-    <string name="trusted_domains_desc" translatable="true">ट्रस्ट डोमेन रूल <u>रीथिंक के डीएनएस</u> के साथ बेहतर काम करता है।</string>
     <string name="settings_allow_lan_heading" translatable="true">निजी आइपी रूट ना करे (प्रयोग)</string>
     <string name="settings_allow_lan_desc" translatable="true">रीथिंक के वीपीएन टनल से लैन, लूपबैक, और लिंक-लोकल रूट बाहर रखे।</string>
     <string name="lbl_network" translatable="true">नेटवर्क</string>

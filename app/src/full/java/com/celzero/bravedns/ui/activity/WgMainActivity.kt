@@ -36,7 +36,7 @@ import com.celzero.bravedns.data.AppConfig
 import com.celzero.bravedns.databinding.ActivityWireguardMainBinding
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.WireguardManager
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.QrCodeFromFileScanner
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.TunnelImporter
@@ -78,17 +78,17 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                         val qrCodeFromFileScanner =
                             QrCodeFromFileScanner(contentResolver, QRCodeReader())
                         val result = qrCodeFromFileScanner.scan(data)
-                        Log.i(LoggerConstants.LOG_TAG_PROXY, "result: $result, data: $data")
+                        Log.i(Logger.LOG_TAG_PROXY, "result: $result, data: $data")
                         if (result != null) {
                             withContext(Dispatchers.Main) {
-                                Log.i(LoggerConstants.LOG_TAG_PROXY, "result: ${result.text}")
+                                Log.i(Logger.LOG_TAG_PROXY, "result: ${result.text}")
                                 TunnelImporter.importTunnel(result.text) {
                                     Utilities.showToastUiCentered(
                                         this@WgMainActivity,
                                         it.toString(),
                                         Toast.LENGTH_LONG
                                     )
-                                    Log.e(LoggerConstants.LOG_TAG_PROXY, it.toString())
+                                    Log.e(Logger.LOG_TAG_PROXY, it.toString())
                                 }
                             }
                         } else {
@@ -102,7 +102,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                                 message,
                                 Toast.LENGTH_LONG
                             )
-                            Log.e(LoggerConstants.LOG_TAG_PROXY, message)
+                            Log.e(Logger.LOG_TAG_PROXY, message)
                         }
                     } catch (e: Exception) {
                         val message =
@@ -115,11 +115,11 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                             message,
                             Toast.LENGTH_LONG
                         )
-                        Log.e(LoggerConstants.LOG_TAG_PROXY, e.message, e)
+                        Log.e(Logger.LOG_TAG_PROXY, e.message, e)
                     }
                 } else {
                     TunnelImporter.importTunnel(contentResolver, data) {
-                        Log.e(LoggerConstants.LOG_TAG_PROXY, it.toString())
+                        Log.e(Logger.LOG_TAG_PROXY, it.toString())
                         Utilities.showToastUiCentered(
                             this@WgMainActivity,
                             it.toString(),
@@ -141,7 +141,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
                             it.toString(),
                             Toast.LENGTH_LONG
                         )
-                        Log.e(LoggerConstants.LOG_TAG_PROXY, it.toString())
+                        Log.e(Logger.LOG_TAG_PROXY, it.toString())
                     }
                 }
             }
@@ -173,11 +173,10 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         setOneWgAdapter()
         setGeneralAdapter()
 
-        val type = WireguardManager.oneWireGuardEnabled()
-        if (type) {
-            showOneWgToggle()
-        } else {
+        if (WireguardManager.isAnyWgActive() && !WireguardManager.oneWireGuardEnabled()) {
             showGeneralToggle()
+        } else {
+            showOneWgToggle()
         }
     }
 
@@ -224,7 +223,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     private fun selectToggleBtnUi(b: MaterialButton) {
         b.backgroundTintList =
             ColorStateList.valueOf(fetchToggleBtnColors(this, R.color.accentGood))
-        b.setTextColor(UIUtils.fetchColor(this, R.attr.primaryTextColor))
+        b.setTextColor(UIUtils.fetchColor(this, R.attr.homeScreenHeaderTextColor))
     }
 
     private fun unselectToggleBtnUi(b: MaterialButton) {
@@ -276,8 +275,17 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
     }
 
     private fun observeDnsName() {
-        appConfig.getConnectedDnsObservable().observe(this) {
-            b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
+        if (WireguardManager.oneWireGuardEnabled()) {
+            val activeConfigs = WireguardManager.getEnabledConfigs()
+            val isAnyConfigActive = activeConfigs.isNotEmpty()
+            if (isAnyConfigActive) {
+                val dnsName = activeConfigs.first().getName()
+                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, dnsName)
+            }
+        } else {
+            appConfig.getConnectedDnsObservable().observe(this) {
+                b.wgWireguardDisclaimer.text = getString(R.string.wireguard_disclaimer, it)
+            }
         }
     }
 
@@ -331,7 +339,7 @@ class WgMainActivity : AppCompatActivity(R.layout.activity_wireguard_main) {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.wireguard_disable_title))
             .setMessage(getString(R.string.wireguard_disable_message))
-            .setPositiveButton(getString(R.string.wireguard_disable_positive)) { _, _ ->
+            .setPositiveButton(getString(R.string.always_on_dialog_positive)) { _, _ ->
                 // disable all configs
                 io {
                     if (WireguardManager.canDisableAllActiveConfigs()) {

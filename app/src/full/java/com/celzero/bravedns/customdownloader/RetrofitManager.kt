@@ -17,7 +17,7 @@ package com.celzero.bravedns.customdownloader
 
 import android.util.Log
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -114,7 +114,7 @@ class RetrofitManager {
                     }
                 } catch (e: Exception) {
                     Log.e(
-                        LoggerConstants.LOG_TAG_DOWNLOAD,
+                        Logger.LOG_TAG_DOWNLOAD,
                         "Exception while getting custom dns: ${e.message}",
                         e
                     )
@@ -128,7 +128,7 @@ class RetrofitManager {
                 InetAddress.getByName(ip)
             } catch (e: Exception) {
                 Log.e(
-                    LoggerConstants.LOG_TAG_DOWNLOAD,
+                    Logger.LOG_TAG_DOWNLOAD,
                     "Exception while getting ip address: ${e.message}",
                     e
                 )

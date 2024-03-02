@@ -252,7 +252,6 @@
     <string name="lbl_rules" translatable="true">כללים</string>
     <string name="lbl_configure" translatable="true">הגדר</string>
     <string name="slide_1_desc" translatable="true">Rethink היא תוכנת קוד פתוח המגובה על ידי תוכנית MVP של Mozilla Builders.</string>
-    <string name="rethink_plus" translatable="true">RETHINKDNS Plus</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
     <string name="bypass_universal" translatable="true">עוקף אוניברסלי</string>
     <string name="lbl_applications" translatable="true">יישומים</string>

@@ -48,7 +48,7 @@ import com.celzero.bravedns.ui.activity.AppInfoActivity
 import com.celzero.bravedns.ui.activity.NetworkLogsActivity
 import com.celzero.bravedns.ui.fragment.SummaryStatisticsFragment.SummaryStatisticsType
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchToggleBtnColors
 import com.celzero.bravedns.util.UIUtils.getCountryNameFromFlag
 import com.celzero.bravedns.util.Utilities
@@ -554,8 +554,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG)
-                    Log.d(LoggerConstants.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                if (DEBUG) Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 displayDuckduckgoFavIcon(duckDuckGoUrl, duckduckgoDomainURL)
             }
         }
@@ -602,8 +601,7 @@ class SummaryStatisticsAdapter(
                         }
                     )
             } catch (e: Exception) {
-                if (DEBUG)
-                    Log.d(LoggerConstants.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
+                if (DEBUG) Log.d(Logger.LOG_TAG_DNS_LOG, "Error loading icon, load flag instead")
                 showFlag()
                 hideFavIcon()
             }

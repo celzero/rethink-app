@@ -54,8 +54,8 @@ import com.celzero.bravedns.service.AppUpdater
 import com.celzero.bravedns.ui.HomeScreenActivity
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.RETHINKDNS_SPONSOR_LINK
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.UIUtils.openVpnProfile
 import com.celzero.bravedns.util.UIUtils.sendEmailIntent
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -470,7 +470,7 @@ class AboutFragment : Fragment(R.layout.fragment_about), View.OnClickListener, K
         ) { workInfoList ->
             val workInfo = workInfoList?.getOrNull(0) ?: return@observe
             Log.i(
-                LoggerConstants.LOG_TAG_SCHEDULER,
+                Logger.LOG_TAG_SCHEDULER,
                 "WorkManager state: ${workInfo.state} for ${WorkScheduler.APP_EXIT_INFO_ONE_TIME_JOB_TAG}"
             )
             if (WorkInfo.State.SUCCEEDED == workInfo.state) {

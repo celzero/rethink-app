@@ -100,7 +100,6 @@
     <string name="brbs_restore_no_uri_toast">Przywracanie nie powiodło się; spróbuj ponownie</string>
     <string name="title_statistics">Statystyki</string>
     <string name="slide_2_title">Witaj</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="rdns_plus">RDNS Plus</string>
     <string name="isolate">izoluj</string>
     <string name="alert_permission_accessibility">Pozwolenie - Dostępność</string>
@@ -830,7 +829,6 @@
     <string name="rt_chip_check_update" translatable="true">Sprawdź aktualizacje</string>
     <string name="lbl_network" translatable="true">sieć</string>
     <string name="lbl_maybe_blocked" translatable="true">Prawdopodobnie zablokowane</string>
-    <string name="config_delete_success_toast">Konfiguracja usunięta</string>
     <string name="bad_config_explanation_pka" translatable="true">: Musi być dodatnia i nie większa niż 65535</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Nie weryfikuj certyfikatów TLS serwera (włącz tylko, jeśli wiesz, co robisz).</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Nieprawidłowy klucz</string>
@@ -929,7 +927,6 @@
     <string name="invalid_file_error" translatable="true">nieprawidłowy plik</string>
     <string name="include_all_app_wg_dialog_desc">Tunelować wszystkie aplikacje przez ten tunel?</string>
     <string name="key_length_error" translatable="true">Nieprawidłowa długość klucza</string>
-    <string name="trusted_domains_desc" translatable="true">Reguła domeny zaufania działa lepiej z <u>Rethink\'s DNS</u>.</string>
     <string name="config_delete_dialog_title">Usuń konfigurację</string>
     <string name="logs_card_duration" translatable="true">od %1$s</string>
     <string name="lbl_very" translatable="true">bardzo</string>

@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v4
     - name: set up JDK
       uses: actions/setup-java@v3
       with:
@@ -23,5 +24,5 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      if: ${{ vars.VARIANT }}
-      run: ./gradlew ${{ vars.VARIANT }}
+      if: success()
+      run: ./gradlew assembleWebsiteFullAlpha --info --warning-mode all

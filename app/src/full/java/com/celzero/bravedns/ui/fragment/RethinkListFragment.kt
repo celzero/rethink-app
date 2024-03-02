@@ -48,7 +48,7 @@ import com.celzero.bravedns.ui.activity.ConfigureRethinkBasicActivity.Companion.
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.MAX_ENDPOINT
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities
 import com.celzero.bravedns.viewmodel.RethinkEndpointViewModel
@@ -147,7 +147,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
     private fun isBlocklistUpdateAvailable(): Boolean {
         if (DEBUG)
             Log.d(
-                LoggerConstants.LOG_TAG_DOWNLOAD,
+                Logger.LOG_TAG_DOWNLOAD,
                 "Update available? newest: ${persistentState.newestRemoteBlocklistTimestamp}, available: ${persistentState.remoteBlocklistTimestamp}"
             )
         return (persistentState.newestRemoteBlocklistTimestamp != INIT_TIME_MS &&
@@ -266,7 +266,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             .observe(viewLifecycleOwner) { workInfoList ->
                 val workInfo = workInfoList?.getOrNull(0) ?: return@observe
                 Log.i(
-                    LoggerConstants.LOG_TAG_DOWNLOAD,
+                    Logger.LOG_TAG_DOWNLOAD,
                     "WorkManager state: ${workInfo.state} for ${RemoteBlocklistCoordinator.REMOTE_DOWNLOAD_WORKER}"
                 )
                 if (
@@ -297,7 +297,7 @@ class RethinkListFragment : Fragment(R.layout.fragment_rethink_list) {
             }
 
         appDownloadManager.downloadRequired.observe(viewLifecycleOwner) {
-            Log.i(LoggerConstants.LOG_TAG_DNS, "Check for blocklist update, status: $it")
+            Log.i(Logger.LOG_TAG_DNS, "Check for blocklist update, status: $it")
             if (it == null) return@observe
 
             when (it) {

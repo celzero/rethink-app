@@ -20,7 +20,7 @@
             android:id="@+id/ss_icon_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:alpha="0.7"
+            android:alpha="0.9"
             android:layout_centerVertical="true">
 
             <ImageView

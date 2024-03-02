@@ -19,7 +19,6 @@
     <string name="lbl_ip_rules" translatable="true">IP ルール</string>
     <string name="lbl_domain_rules" translatable="true">ドメインルール</string>
     <string name="slide_1_desc" translatable="true">Rethink は、Mozilla Builders MVP プログラムによって支援されているオープンソースソフトウェアです。</string>
-    <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
     <string name="rdns_plus" translatable="true">RDNS Plus</string>
     <string name="allow" translatable="true">許可</string>
     <string name="untracked" translatable="true">未追跡</string>

@@ -19,6 +19,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,7 @@ import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.service.WireguardManager.INVALID_CONF_ID
 import com.celzero.bravedns.ui.dialog.WgAddPeerDialog
 import com.celzero.bravedns.ui.dialog.WgIncludeAppsDialog
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils
 import com.celzero.bravedns.util.Utilities
@@ -101,12 +103,16 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun init() {
         if (wgType.isDefault()) {
-            b.lockdownLl.visibility = View.VISIBLE
-            b.catchAllLl.visibility = View.VISIBLE
-            handleAppsCount()
+            b.wgHeaderTv.text = getString(R.string.lbl_advanced).replaceFirstChar(Char::titlecase)
+            b.lockdownRl.visibility = View.VISIBLE
+            b.catchAllRl.visibility = View.VISIBLE
+            b.oneWgInfoTv.visibility = View.GONE
         } else if (wgType.isOneWg()) {
-            b.lockdownLl.visibility = View.GONE
-            b.catchAllLl.visibility = View.GONE
+            b.wgHeaderTv.text =
+                getString(R.string.rt_list_simple_btn_txt).replaceFirstChar(Char::titlecase)
+            b.lockdownRl.visibility = View.GONE
+            b.catchAllRl.visibility = View.GONE
+            b.oneWgInfoTv.visibility = View.VISIBLE
             b.applicationsBtn.isEnabled = false
             b.applicationsBtn.text = getString(R.string.one_wg_apps_added)
         } else {
@@ -116,6 +122,12 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         }
         val config = WireguardManager.getConfigById(configId)
         val mapping = WireguardManager.getConfigFilesById(configId)
+
+        if (config == null) {
+            finish()
+            return
+        }
+
         // handleWarpConfigView()
         if (mapping != null) {
             // if catch all is enabled, disable the add apps button and lockdown
@@ -123,20 +135,28 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             if (mapping.isCatchAll) {
                 b.lockdownCheck.isEnabled = false
                 b.applicationsBtn.isEnabled = false
+                b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
             }
             b.lockdownCheck.isChecked = mapping.isLockdown
-            b.oneWgCheck.isChecked = mapping.oneWireGuard
+        }
+
+        if (shouldObserveAppsCount()) {
+            handleAppsCount()
+        } else {
+            b.applicationsBtn.isEnabled = false
+            // texts are updated based on the catch all and one-wg
         }
 
         /*if (config == null && configId == WARP_ID) {
             showNewWarpConfigLayout()
             return@uiCtx
         }*/
-        if (config == null) {
-            finish()
-            return
-        }
+
         prefillConfig(config)
+    }
+
+    private fun shouldObserveAppsCount(): Boolean {
+        return !wgType.isOneWg() && !b.catchAllCheck.isChecked
     }
 
     private fun prefillConfig(config: Config) {
@@ -156,6 +176,17 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             b.addressesText.text = wgInterface?.getAddresses()?.joinToString { it.toString() }
         }
         setPeersAdapter()
+        // show dns servers if in one-wg mode
+        if (wgType.isOneWg()) {
+            b.dnsServersLabel.visibility = View.VISIBLE
+            b.dnsServersText.visibility = View.VISIBLE
+            b.dnsServersText.text =
+                wgInterface?.dnsServers?.joinToString { it.hostAddress?.toString() ?: "" }
+        } else {
+            b.dnsServersLabel.visibility = View.GONE
+            b.dnsServersText.visibility = View.GONE
+        }
+
         // uncomment this if we want to show the dns servers, listen port and mtu
         /*if (wgInterface?.dnsServers?.isEmpty() == true) {
                     b.dnsServersText.visibility = View.GONE
@@ -297,123 +328,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
             )
         }
 
-        b.lockdownCheck.setOnClickListener {
-            if (b.lockdownCheck.isChecked) {
-                b.lockdownCheck.isChecked = false
-                showConfirmationDialog(
-                    getString(R.string.wg_lockdown_dialog_title),
-                    getString(R.string.wg_lockdown_dialog_desc),
-                    1
-                )
-            } else {
-                updateLockdown(false)
-            }
-        }
+        b.lockdownCheck.setOnClickListener { updateLockdown(b.lockdownCheck.isChecked) }
 
-        b.catchAllCheck.setOnClickListener {
-            if (b.catchAllCheck.isChecked) {
-                b.catchAllCheck.isChecked = false
-                showConfirmationDialog(
-                    getString(R.string.catch_all_wg_dialog_title),
-                    getString(R.string.catch_all_wg_dialog_desc),
-                    3
-                )
-            } else {
-                updateCatchAll(false)
-            }
-        }
-
-        b.oneWgCheck.setOnClickListener {
-            // for now, there is no need to show the confirmation for one-wireguard,
-            // it will be handled by the toggled state in WgMainActivity
-            /*if (b.oneWgCheck.isChecked) {
-                b.oneWgCheck.isChecked = false
-                showConfirmationDialog(
-                    getString(R.string.one_wg_dialog_title),
-                    getString(R.string.one_wg_dialog_desc),
-                    2
-                )
-            } else {
-                // enable add apps button, if one-wireguard is disabled
-                handleAppsCount()
-                updateOneWireGuard(false)
-            }*/
-        }
-
-        b.lockdownInfo.setOnClickListener {
-            showInfoDialog(
-                getString(R.string.wg_lockdown_dialog_title),
-                getString(R.string.wg_lockdown_info_dialog_msg)
-            )
-        }
-
-        b.oneWgInfo.setOnClickListener {
-            showInfoDialog(
-                getString(R.string.one_wg_dialog_title),
-                getString(R.string.one_wg_info_dialog_msg)
-            )
-        }
-
-        b.catchAllInfo.setOnClickListener {
-            showInfoDialog(
-                getString(R.string.catch_all_wg_dialog_title),
-                getString(R.string.catch_all_info_dialog_msg)
-            )
-        }
-    }
-
-    private fun showConfirmationDialog(title: String, message: String, type: Int) {
-        // type represents, 1 - lock, 2- one-wireguard, 3 - catch all
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.lbl_proceed)) { _, _ ->
-            when (type) {
-                1 -> {
-                    b.lockdownCheck.isChecked = true
-                    updateLockdown(true)
-                }
-                2 -> {
-                    // b.oneWgCheck.isChecked = true
-                    // updateOneWireGuard(true)
-                }
-                3 -> {
-                    b.catchAllCheck.isChecked = true
-                    updateCatchAll(true)
-                }
-            }
-        }
-
-        builder.setNegativeButton(getString(R.string.lbl_cancel)) { _, _ ->
-            // no-op
-        }
-        builder.create().show()
-    }
-
-    private fun showInfoDialog(title: String, message: String) {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setCancelable(true)
-        builder.setPositiveButton(getString(R.string.fapps_info_dialog_positive_btn)) { _, _ ->
-            // no-op
-        }
-
-        builder.create().show()
+        b.catchAllCheck.setOnClickListener { updateCatchAll(b.catchAllCheck.isChecked) }
     }
 
     private fun updateLockdown(enabled: Boolean) {
-        io {
-            WireguardManager.updateLockdownConfig(configId, enabled)
-            uiCtx {
-                Utilities.showToastUiCentered(
-                    this,
-                    getString(R.string.wg_lockdown_success_toast),
-                    Toast.LENGTH_SHORT
-                )
-            }
-        }
+        io { WireguardManager.updateLockdownConfig(configId, enabled) }
     }
 
     /* private fun updateOneWireGuard(enabled: Boolean) {
@@ -431,17 +352,32 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
 
     private fun updateCatchAll(enabled: Boolean) {
         io {
-            WireguardManager.updateCatchAllConfig(configId, enabled)
-            uiCtx {
-                b.lockdownCheck.isEnabled = !enabled
-                b.applicationsBtn.isEnabled = !enabled
-                if (enabled) {
+            val config = WireguardManager.getConfigFilesById(configId)
+            if (config == null) {
+                Log.e(Logger.LOG_TAG_PROXY, "updateCatchAll: config not found for $configId")
+                return@io
+            }
+            if (WireguardManager.canEnableConfig(config)) {
+                WireguardManager.updateCatchAllConfig(configId, enabled)
+                uiCtx {
+                    b.lockdownCheck.isEnabled = !enabled
+                    b.applicationsBtn.isEnabled = !enabled
+                    if (enabled) {
+                        b.applicationsBtn.text = getString(R.string.routing_remaining_apps)
+                    } else {
+                        handleAppsCount()
+                    }
+                }
+            } else {
+                uiCtx {
                     Utilities.showToastUiCentered(
                         this,
-                        getString(R.string.catch_all_wg_success_toast),
-                        Toast.LENGTH_SHORT
+                        getString(R.string.wireguard_enabled_failure),
+                        Toast.LENGTH_LONG
                     )
+                    b.catchAllCheck.isChecked = false
                 }
+                return@io
             }
         }
     }
@@ -468,7 +404,7 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
                 uiCtx {
                     Utilities.showToastUiCentered(
                         this,
-                        getString(R.string.config_delete_success_toast),
+                        getString(R.string.config_add_success_toast),
                         Toast.LENGTH_SHORT
                     )
                     finish()

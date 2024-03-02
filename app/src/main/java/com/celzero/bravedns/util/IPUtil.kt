@@ -124,7 +124,7 @@ class IPUtil {
             val listResult: MutableList<CIDR> = ArrayList()
             if (DEBUG)
                 Log.d(
-                    LoggerConstants.LOG_TAG_VPN,
+                    Logger.LOG_TAG_VPN,
                     "toCIDR(" + start.hostAddress + "," + end.hostAddress + ")"
                 )
             var from: Long = inet2long(start)
@@ -142,7 +142,7 @@ class IPUtil {
                 from += 2.0.pow((32 - prefix).toDouble()).toLong()
             }
             if (DEBUG) {
-                for (cidr in listResult) Log.d(LoggerConstants.LOG_TAG_VPN, cidr.toString())
+                for (cidr in listResult) Log.d(Logger.LOG_TAG_VPN, cidr.toString())
             }
             return listResult
         }
@@ -195,7 +195,7 @@ class IPUtil {
                 address = InetAddress.getByName(ip)
                 this.prefix = prefix
             } catch (ex: UnknownHostException) {
-                Log.e(LoggerConstants.LOG_TAG_VPN, "error parsing CIDR, $ip, $prefix, $ex")
+                Log.e(Logger.LOG_TAG_VPN, "error parsing CIDR, $ip, $prefix, $ex")
             }
         }
 

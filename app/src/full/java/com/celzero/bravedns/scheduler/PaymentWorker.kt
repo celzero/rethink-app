@@ -24,8 +24,8 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.customdownloader.ITcpProxy
 import com.celzero.bravedns.customdownloader.RetrofitManager
 import com.celzero.bravedns.service.TcpProxyHelper
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_DOWNLOAD
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DOWNLOAD
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import retrofit2.converter.gson.GsonConverterFactory
@@ -83,7 +83,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
             val response = retrofitInterface.getPaymentStatus(refId)
             if (DEBUG)
                 Log.d(
-                    LoggerConstants.LOG_TAG_PROXY,
+                    Logger.LOG_TAG_PROXY,
                     "getPaymentStatusFromServer: ${response?.headers()}, ${response?.message()}, ${response?.raw()?.request?.url}"
                 )
 
@@ -95,7 +95,7 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                     TcpProxyHelper.PaymentStatus.values().find { it.name == paymentStatusString }
                         ?: TcpProxyHelper.PaymentStatus.NOT_PAID
                 Log.i(
-                    LoggerConstants.LOG_TAG_PROXY,
+                    Logger.LOG_TAG_PROXY,
                     "getPaymentStatusFromServer: status: $status, paymentStatus: $paymentStatus"
                 )
                 if (paymentStatus.isPaid() || paymentStatus.isFailed()) {
@@ -103,13 +103,13 @@ class PaymentWorker(val context: Context, workerParameters: WorkerParameters) :
                 }
             } else {
                 Log.w(
-                    LoggerConstants.LOG_TAG_PROXY,
+                    Logger.LOG_TAG_PROXY,
                     "unsuccessful response for ${response?.raw()?.request?.url}"
                 )
             }
         } catch (e: Exception) {
             Log.w(
-                LoggerConstants.LOG_TAG_PROXY,
+                Logger.LOG_TAG_PROXY,
                 "getPaymentStatusFromServer: exception while checking payment status",
                 e
             )

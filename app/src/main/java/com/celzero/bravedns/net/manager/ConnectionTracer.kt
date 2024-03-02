@@ -8,16 +8,16 @@ import android.text.TextUtils
 import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_VPN
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_VPN
 import com.celzero.bravedns.util.Protocol
 import com.celzero.bravedns.util.Utilities.isUnspecifiedIp
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import inet.ipaddr.IPAddressString
-import java.net.InetSocketAddress
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import java.net.InetSocketAddress
+import java.util.concurrent.TimeUnit
 
 class ConnectionTracer(ctx: Context) {
 

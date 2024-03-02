@@ -24,7 +24,7 @@ import com.celzero.bravedns.download.BlocklistDownloadHelper
 import com.celzero.bravedns.service.PersistentState
 import com.celzero.bravedns.service.RethinkBlocklistManager
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
+import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.RemoteFileTagUtil
 import com.celzero.bravedns.util.Utilities
 import com.google.gson.JsonObject
@@ -81,7 +81,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             }
         } catch (ex: CancellationException) {
             Log.e(
-                LoggerConstants.LOG_TAG_DOWNLOAD,
+                Logger.LOG_TAG_DOWNLOAD,
                 "Local blocklist download, received cancellation exception: ${ex.message}",
                 ex
             )
@@ -90,7 +90,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
     }
 
     private suspend fun downloadRemoteBlocklist(timestamp: Long): Boolean {
-        Log.i(LoggerConstants.LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
+        Log.i(Logger.LOG_TAG_DOWNLOAD, "Download remote blocklist: $timestamp")
 
         val retrofit =
             RetrofitManager.getBlocklistBaseBuilder()
@@ -105,7 +105,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             )
 
         Log.i(
-            LoggerConstants.LOG_TAG_DOWNLOAD,
+            Logger.LOG_TAG_DOWNLOAD,
             "Response received on remote blocklist request: ${response?.isSuccessful}"
         )
 
@@ -114,7 +114,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             isDownloadSuccess
         } else {
             Log.i(
-                LoggerConstants.LOG_TAG_DOWNLOAD,
+                Logger.LOG_TAG_DOWNLOAD,
                 "Remote blocklist download failure, call? ${response?.body()}, response: $response "
             )
             false
@@ -134,11 +134,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
                 timestamp
             )
         } catch (e: IOException) {
-            Log.w(
-                LoggerConstants.LOG_TAG_DOWNLOAD,
-                "could not create filetag.json at version $timestamp",
-                e
-            )
+            Log.w(Logger.LOG_TAG_DOWNLOAD, "could not create filetag.json at version $timestamp", e)
         }
         return false
     }
@@ -162,7 +158,7 @@ class RemoteBlocklistCoordinator(val context: Context, workerParams: WorkerParam
             return filePath
         } catch (e: IOException) {
             Log.e(
-                LoggerConstants.LOG_TAG_DOWNLOAD,
+                Logger.LOG_TAG_DOWNLOAD,
                 "Could not create remote blocklist folder/file: $timestamp" + e.message,
                 e
             )

@@ -33,9 +33,10 @@ import android.system.OsConstants.RT_SCOPE_UNIVERSE
 import android.util.Log
 import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.util.InternetProtocol
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_CONNECTION
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_CONNECTION
 import com.celzero.bravedns.util.Utilities.isAtleastQ
 import com.celzero.bravedns.util.Utilities.isAtleastS
+import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
 import kotlinx.coroutines.async
@@ -495,13 +496,14 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
         ) {
             val testReachability: Boolean = opPrefs.testReachability
             val dualStack: Boolean = opPrefs.dualStack
-            val ipv6: LinkedHashSet<NetworkProperties> = linkedSetOf()
-            val ipv4: LinkedHashSet<NetworkProperties> = linkedSetOf()
 
             val activeNetwork = connectivityManager.activeNetwork // null in vpn lockdown mode
 
+            trackedIpv4Networks.clear()
+            trackedIpv6Networks.clear()
+
             networks.forEach outer@{ prop ->
-                var network: Network? = prop.network
+                val network: Network? = prop.network
 
                 val lp = connectivityManager.getLinkProperties(network)
                 if (lp == null) {
@@ -509,14 +511,25 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     return@outer
                 }
 
-                if (network == activeNetwork) {
+                val isActive = isNetworkSame(network, activeNetwork)
+                if (isActive) {
                     if (DEBUG) Log.d(LOG_TAG_CONNECTION, "processing active network: $network")
                 }
-                var checked4 = false
-                var checked6 = false
+
+                if (testReachability) {
+                    val has4 = isIPv4Reachable(network, isActive)
+                    val has6 = isIPv6Reachable(network, isActive)
+                    if (has4) trackedIpv4Networks.add(prop)
+                    if (has6) trackedIpv6Networks.add(prop)
+                    Log.i(LOG_TAG_CONNECTION, "nw: has4? $has4, has6? $has6, $prop")
+                    return@outer
+                }
+
+                var has4 = false
+                var has6 = false
 
                 lp.linkAddresses.forEach inner@{ addr ->
-                    if (checked4 && checked6) return@outer
+                    if (has4 && has6) return@outer
                     // skip if the address scope is not RT_SCOPE_UNIVERSE, as there are some
                     // addresses which are not reachable outside the network but we will end up
                     // adding those address for ipv4/ipv6 mode, reachability check will fail in
@@ -531,38 +544,28 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
 
                     val address = IPAddressString(addr.address.hostAddress?.toString())
 
-                    if (address.isIPv6 && !ipv6.contains(prop)) {
-                        checked6 = true
-                        var y = !testReachability
-                        if (!testReachability) {
+                    if (hasInternet(network) == true) {
+                        if (address.isIPv6) {
+                            has6 = true
+                            trackedIpv6Networks.add(prop)
+                            Log.i(
+                                LOG_TAG_CONNECTION,
+                                "adding ipv6(${trackedIpv6Networks.size}): $prop; for $address"
+                            )
+                        } else if (address.isIPv4) {
+                            has4 = true
                             // see #createNetworksSet for why we are using hasInternet
-                            if (hasInternet(network) == true) ipv6.add(prop)
-                        } else if (isIPv6Reachable(network)) {
-                            // in auto mode, do network validation ourselves
-                            ipv6.add(prop)
-                            y = true
+                            trackedIpv4Networks.add(prop)
+                            Log.i(
+                                LOG_TAG_CONNECTION,
+                                "adding ipv4(${trackedIpv4Networks.size}): $prop; for $address"
+                            )
+                        } else {
+                            Log.i(LOG_TAG_CONNECTION, "unknown lnaddr: $network; $address")
                         }
-                        Log.i(LOG_TAG_CONNECTION, "adding ipv6: $prop; works? $y for $address")
-                    } else if (address.isIPv4 && !ipv4.contains(prop)) {
-                        checked4 = true
-                        var y = !testReachability
-                        if (!testReachability) {
-                            // see #createNetworksSet for why we are using hasInternet
-                            if (hasInternet(network) == true) ipv4.add(prop)
-
-                        } else if (isIPv4Reachable(network)) {
-                            // in auto mode, do network validation ourselves
-                            ipv4.add(prop)
-                            y = true
-                        }
-                        Log.i(LOG_TAG_CONNECTION, "adding ipv4(${ipv4.size}): $prop; works? $y for $address")
-                    } else {
-                        Log.i(LOG_TAG_CONNECTION, "unknown: $network; $address")
                     }
                 }
             }
-            trackedIpv4Networks = ipv4
-            trackedIpv6Networks = ipv6
 
             redoReachabilityIfNeeded(trackedIpv4Networks, trackedIpv6Networks, opPrefs)
 
@@ -611,7 +614,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             val newNetworks: LinkedHashSet<NetworkProperties> = linkedSetOf()
             // add active network first, then add non metered networks, then metered networks
             val activeNetwork = connectivityManager.activeNetwork
-            val n = networks.firstOrNull { it.network == activeNetwork }
+            val n = networks.firstOrNull { isNetworkSame(it.network, activeNetwork) }
             if (n != null) {
                 newNetworks.add(n)
             }
@@ -689,7 +692,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     } else {
                         null
                     }
-                if (it.networkHandle == activeNetwork?.networkHandle) {
+                if (isNetworkSame(it, activeNetwork)) {
                     return@forEach
                 }
 
@@ -706,43 +709,51 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             return newNetworks
         }
 
-        private fun isIPv4Reachable(nw: Network?, ping: Boolean = false): Boolean = runBlocking {
-            coroutineScope {
-                // select the first reachable IP / domain and return true if any of them is
-                // reachable
-                select<Boolean> {
-                        ip4probes.forEach { ip ->
-                            async {
-                                    if (ping) {
-                                        isReachable(ip)
-                                    } else {
-                                        isReachableTcp(nw, ip)
+        private fun isIPv4Reachable(nw: Network?, isActive: Boolean = false): Boolean =
+            runBlocking {
+                coroutineScope {
+                    // select the first reachable IP / domain and return true if any of them is
+                    // reachable
+                    select<Boolean> {
+                            ip4probes.forEach { ip ->
+                                async {
+                                        var ok = false
+                                        if (isActive) {
+                                            ok = isReachable(ip)
+                                        }
+                                        if (!ok) {
+                                            isReachableTcp(nw, ip)
+                                        }
+                                        ok
                                     }
-                                }
-                                .onAwait { it }
+                                    .onAwait { it }
+                            }
                         }
-                    }
-                    .also { coroutineContext.cancelChildren() }
+                        .also { coroutineContext.cancelChildren() }
+                }
             }
-        }
 
-        private fun isIPv6Reachable(nw: Network?, ping: Boolean = false): Boolean = runBlocking {
-            coroutineScope {
-                select<Boolean> {
-                        ip6probes.forEach { ip ->
-                            async {
-                                    if (ping) {
-                                        isReachable(ip)
-                                    } else {
-                                        isReachableTcp(nw, ip)
+        private fun isIPv6Reachable(nw: Network?, isActive: Boolean = false): Boolean =
+            runBlocking {
+                coroutineScope {
+                    select<Boolean> {
+                            ip6probes.forEach { ip ->
+                                async {
+                                        var ok = false
+                                        if (isActive) {
+                                            ok = isReachable(ip)
+                                        }
+                                        if (!ok) {
+                                            isReachableTcp(nw, ip)
+                                        }
+                                        ok
                                     }
-                                }
-                                .onAwait { it }
+                                    .onAwait { it }
+                            }
                         }
-                    }
-                    .also { coroutineContext.cancelChildren() }
+                        .also { coroutineContext.cancelChildren() }
+                }
             }
-        }
 
         private fun isReachableTcp(nw: Network?, host: String): Boolean {
             try {

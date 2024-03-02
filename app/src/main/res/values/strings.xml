@@ -76,28 +76,30 @@
     <string name="lbl_save" translatable="true">save</string>
     <string name="lbl_dot" translatable="false">DoT</string>
     <string name="lbl_odoh" translatable="false">ODoH</string>
-    <string name="lbl_cache" translatable="false">Cache</string>
-    <string name="lbl_status" translatable="false">Status</string>
-    <string name="lbl_remove" translatable="false">Remove</string>
-    <string name="lbl_last" translatable="false">Last</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_remove" translatable="true">Remove</string>
+    <string name="lbl_last" translatable="true">Last</string>
     <string name="lbl_dot_abbr" translatable="false">DNS-over-TLS</string>
     <string name="lbl_dc" translatable="false">DC</string>
     <string name="lbl_dc_abbr" translatable="false">DNSCrypt</string>
-    <string name="lbl_dp" translatable="false">DP</string>
+    <string name="lbl_dp" translatable="false">DNS 53</string>
     <string name="lbl_dp_abbr" translatable="false">DNS Proxy</string>
     <string name="lbl_odoh_abbr" translatable="false">Oblivious DNS-over-HTTPS</string>
     <string name="lbl_rdns" translatable="false">RDNS</string>
-    <string name="lbl_default" translatable="false">Default</string>
-    <string name="lbl_one_wg" translatable="false">One WG</string>
-    <string name="lbl_starting" translatable="false">Starting</string>
-    <string name="lbl_overall" translatable="false">Overall</string>
-    <string name="lbl_stopped" translatable="false">Stopped</string>
+    <string name="lbl_starting" translatable="true">Starting</string>
+    <string name="lbl_overall" translatable="true">Overall</string>
+    <string name="lbl_stopped" translatable="true">Stopped</string>
+    <string name="lbl_private" translatable="true">private</string>
+    <string name="lbl_secure" translatable="true">secure</string>
+    <string name="lbl_anonymous" translatable="true">anonymous</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
 
     <string name="symbol_upload" translatable="false">%1$s 🔺</string>
     <string name="symbol_download" translatable="false">%1$s 🔻</string>
     <string name="single_argument" translatable="false">%1$s</string>
     <string name="two_argument_space" translatable="false">%1$s %2$s</string>
-    <string name="two_argument_colon" translatable="false">%1$s :%2$s</string>
+    <string name="two_argument_colon" translatable="false">%1$s: %2$s</string>
     <string name="two_argument" translatable="false">%1$s / %2$s</string>
     <string name="three_argument" translatable="false">%1$s %2$s %3$s</string>
     <string name="three_argument_colon" translatable="false">%1$s:%2$s:%3$s</string>
@@ -109,6 +111,9 @@
     <string name="symbol_global" translatable="false">🌐</string>
     <string name="symbol_clock" translatable="false">🕒</string>
     <string name="symbol_hyphen" translatable="false">-</string>
+    <string name="symbol_slash" translatable="false">/</string>
+    <string name="symbol_black_down" translatable="false">\u25be</string>
+    <string name="symbol_black_up" translatable="false">\u25b4</string>
 
     <string name="numeric_one" translatable="false">1</string>
     <string name="numeric_twenty_four" translatable="false">24</string>
@@ -120,8 +125,7 @@
     <string name="slide_1_title" translatable="true">Free and Open Source</string>
     <string name="slide_1_desc" translatable="true">Rethink is an open source software backed by Mozilla Builders MVP program.</string>
 
-    <string name="rethink_plus" translatable="true">RethinkDNS Plus</string>
-    <string name="rdns_plus" translatable="true">RDNS Plus</string>
+    <string name="rdns_plus" translatable="false">RDNS Plus</string>
 
     <string-array name="firewall_rules">
         <item>Allow</item>
@@ -164,7 +168,7 @@
 
     <string name="pause_mode_notification_title" translatable="true">Paused! Blocked apps will continue to be firewalled.</string>
 
-    <string name="status_waiting" description="This text appears during the connection process if Intra needs user permission or the phone is offline." translatable="true">
+    <string name="status_waiting" description="This text appears during the connection process if Rethink needs user permission or the phone is offline." translatable="true">
     waiting
     </string>
 
@@ -172,9 +176,11 @@
     failing
     </string>
 
-    <string name="status_protected" description="This is a large message in a reassuring color.  It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">
+    <string name="status_protected" description="This is a large message in a reassuring color. It indicates that DNS queries can't be surveilled or modified in transit." translatable="true">
     protected
     </string>
+
+    <string name="failed_using_default" translatable="true">Failed: using fallback DNS</string>
 
     <string name="status_app_error" translatable="true">app error</string>
 
@@ -363,8 +369,6 @@
     <string name="search_rethinkplus_file_tag" translatable="true"><font size="12">Search blocklists</font></string>
     <string name="search_proxy_add_apps" translatable="true">Search apps by name</string>
 
-    <string name="trusted_domains_desc" translatable="true">The trust domain rule works better with <u>Rethink\'s DNS</u>.</string>
-
     <string name="app_mode_dns_low_battery" translatable="true">DNS (battery saver)</string>
     <string name="app_mode_dns" translatable="true">DNS</string>
     <string name="app_mode_firewall" translatable="true">Firewall</string>
@@ -383,21 +387,21 @@
 
     <string name="app_mode_choose" translatable="true">Choose mode</string>
 
-    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Jason A. Donenfeld</b><br/><br/>
-        1. <i>New feature</i>: Multi-VPN support with any number of WireGuard upstreams.<br/>
-        2. <i>New feature</i>: Active (open) connection indicator in Network Logs.</br>
-        3. <i>New feature</i>: Restrict Tor-as-a-proxy (Orbot) to specific apps.<br/>
-        4. <i>New feature</i>: Stats UI now shows Geo IP based grouping.<br/>
-        5. <i>New feature</i>: Show data usage in Network Logs: upload and download bytes per-request.<br/>
-        6. <i>New feature</i>: Per app upload and download stats.<br/>
-        7. <i>New feature</i>: Support for local DNS-over-HTTPS (non-public) resolvers.<br/>
-        8. Super detailed on-demand bug reports for better diagnostics.<br/>
-        9. DNS Booster is now enabled by default.<br/>
-        10. Improved UI to manage per-app IP and Domain rules.<br/>
-        11. Bigger UI tiles on the homescreen.<br/>
-        12. Firewall UI refresh.<br/>
-        13. <i>Bug fix</i>: Make HTTP Proxy work for CONNECT tunnels.<br/>
-        14. <i>Bug fix</i>: Trust (allowlisting) domains now works with third-party DNS resolvers.<br/><br/>
+    <string name="whats_new_version_update" translatable="true"><![CDATA[<b>Chirayu Desai</b><br/><br/>
+        1. <i>New feature</i>: Support for anonymizing <i>Oblivious DNS-over-HTTPS</i>.<br/>
+        2. <i>New feature</i>: Support for <i>DNS-over-TLS</i>.<br/>
+        3. <i>New feature</i>: Simple and Advanced WireGuard modes.<br/>
+        4. <i>New feature</i>: Show bandwidth in Stats screen.<br/>
+        5. <i>New feature</i>: Support all proxies including Orbot even in <i>VPN Lockdown</i> mode.<br/>
+        6. <i>New feature</i>: Monitor Rethink\'s network traffic using Rethink!<br/>
+        7. <i>New feature</i>: Forward DNS over active proxies like WireGuard.<br/>
+        8. <i>New feature</i>: Same version backup & restore across devices.<br/>
+        9. Improved <i>bug report</i> generation.<br/>
+        10. Better handling of dual-stack IP networks.<br/>
+        11. <i>Bug fix</i>: Minor bug fixes in handling of multicast DNS.<br/>
+        12. <i>Bug fix</i>: Auto-recover connectivity for WireGuard VPNs.<br/>
+        13. <i>Bug fix</i>: Fix incorrectly blocked app notifications.<br/><br/>
+
         <a href="https://svc.rethinkdns.com/r/translate">Help translate this app</a>]]>
     </string>
 
@@ -448,7 +452,7 @@
     <string name="orbot_bs_status_trying_connect" translatable="true">Setting up Orbot…</string>
 
     <string name="orbot_stop_dialog_title" translatable="true">Manual intervention required</string>
-    <string name="orbot_stop_dialog_message_combo" translatable="true">%1$s\n\n%2$s</string>
+    <string name="orbot_stop_dialog_message_combo" translatable="false">%1$s\n%2$s</string>
     <string name="orbot_stop_dialog_message" translatable="true">Rethink has stopped forwarding connections to Orbot, but Orbot maybe running in the background.</string>
     <string name="orbot_stop_dialog_dns_message" translatable="true">Rethink is setup to forward DNS queries to Orbot. Change as required.</string>
     <string name="orbot_stop_dialog_negative" translatable="true">Stop Orbot</string>
@@ -518,10 +522,10 @@
 
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Route Rethink\'s own traffic, like blocklist downloads, connectivity checks, DNS connections, back into the tunnel.</string>
-    <string name="settings_rinr_desc_disabled" translatable="true">Routing Rethink\'s own traffic through the tunnel. Unless you know what you're doing, turn it off.</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">Routing Rethink\'s own traffic through the tunnel. Unless you know what you\'re doing, turn it off.</string>
 
-    <string name="settings_rinr_dialog_title" translatable="false">Loopback (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="false">Also enables <!--settings_network_all_networks--> setting. Do you want to proceed?</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">Also enables<!--settings_network_all_networks--> %1$s setting. Do you want to proceed?</string>
 
     <string name="settings_gologger_dialog_option_1" translatable="false">Verbose</string>
     <string name="settings_gologger_dialog_option_2" translatable="false">Debug</string>
@@ -649,7 +653,7 @@
     <string name="hsf_start_btn_state" translatable="true">start</string>
     <string name="hsf_stop_btn_state" translatable="true">stop</string>
 
-    <string name="hsf_uptime" translatable="false">(active %1$s; protos: %2$s (%3$s); mtu: %4$s)</string>
+    <string name="hsf_uptime" translatable="false">(active %1$s; protos: %2$s; %3$s; mtu: %4$s)</string>
     <string name="hsf_downtime" translatable="true">(inactive since %1$s)</string>
 
     <string name="logs_card_duration" translatable="true">since %1$s</string>
@@ -897,7 +901,7 @@
     <string name="dns_btm_sheet_chip_no_answer" translatable="true">No Answer</string>
 
     <!-- DNS log bottom sheet -->
-    <string name="dns_btm_resolved_crypt" translatable="true">resolved <u>anonymously</u> %1$s by %2$s</string>
+    <string name="dns_btm_resolved_crypt" translatable="true">resolved <u>anonymously</u> %1$s by %2$s via %3$s</string>
     <string name="dns_btm_resolved_doh" translatable="true">resolved %1$s by %2$s</string>
     <string name="dns_btm_resolved_doh_no_server" translatable="true">resolved %1$s</string>
 
@@ -1353,7 +1357,7 @@
     <string name="brbs_backup_desc" translatable="true">Backup app settings, network, and dns logs</string>
     <string name="brbs_restore_title" translatable="true">Restore</string>
     <string name="brbs_restore_desc" translatable="true">Restore from a backup file</string>
-    <string name="brbs_backup_restore_desc" translatable="true">Doesn\'t work across app versions or devices</string>
+    <string name="brbs_backup_restore_desc" translatable="true">Doesn\'t work across app versions</string>
 
     <string name="brbs_backup_dialog_title" translatable="true">Take backup</string>
     <string name="brbs_backup_dialog_message" translatable="true">Backs up app settings, network, and dns logs to a file. This will restart the VPN.</string>
@@ -1438,56 +1442,50 @@
     <string name="new_warp_error_toast" translatable="true">Unable to fetch WARP configuration</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Invalid WARP configuration</string>
 
-    <string name="one_wg_apps_added" translatable="false">Routing all apps</string>
+    <string name="one_wg_apps_added" translatable="true">Routing all apps</string>
 
-    <string name="wg_lockdown_dialog_title" translatable="false">Lockdown WireGuard</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Selected apps will only be routed through this WireGuard VPN, regardless of whether it is failing or connected.</string>
-    <string name="wg_lockdown_success_toast" translatable="false">Done</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Lockdown</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Selected apps will only be routed through this WireGuard VPN, regardless of whether the VPN is failing or connected.</string>
 
-    <string name="one_wg_dialog_title" translatable="false">Mono WireGuard</string>
     <string name="one_wg_dialog_desc" translatable="true">All connections from all apps, including DNS, will be routed to a single, active WireGuard VPN. Other active WireGuard VPNs, if any, will be stopped.</string>
-    <string name="one_wg_success_toast" translatable="false">Done</string>
 
-    <string name="catch_all_wg_dialog_title" translatable="false">Perma WireGuard</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Always-on</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">All connections and apps not routed by other WireGuard VPNs will be routed by this one.</string>
-    <string name="catch_all_wg_success_toast" translatable="false">Done</string>
 
-    <string name="catch_all_info_dialog_msg" translatable="false"><!-- same as catch_all_wg_dialog_desc -->All connections and apps not routed by other WireGuard VPNs will be routed by this one.</string>
-    <string name="one_wg_info_dialog_msg" translatable="false"><!--one_wg_dialog_desc-->All connections from all apps, including DNS...</string>
-    <string name="wg_lockdown_info_dialog_msg" translatable="false"><!-- wg_lockdown_dialog_desc -->...a connection failure for the selected apps.</string>
+    <string name="one_wg_error_toast" translatable="true">To switch to Advanced, stop WireGuard in Simple mode</string>
 
-    <string name="one_wg_error_toast" translatable="true">Stop \"Mono WireGuard\" to use Mutli WireGuard feature</string>
-
-    <string name="add_remove_apps" translatable="false">Add / Remove Apps (%1$s apps)</string>
+    <string name="add_remove_apps" translatable="true">Add / Remove (%1$s apps)</string>
+    <string name="routing_remaining_apps" translatable="true">Routing remaining apps</string>
     <string name="add_peer" translatable="true">Add Peer</string>
 
-    <string name="config_delete_dialog_desc" translatable="false">Are you sure you want to delete this WireGuard VPN configuration?</string>
-    <string name="config_delete_dialog_title" translatable="false">Delete</string>
-    <string name="config_delete_success_toast" translatable="false">Done</string>
-    <string name="config_add_success_toast" translatable="false">Done</string>
+    <string name="config_delete_dialog_desc" translatable="true">Are you sure you want to delete this WireGuard VPN configuration?</string>
+    <string name="config_delete_dialog_title" translatable="true">Delete</string>
+    <string name="config_add_success_toast" translatable="true">Done</string>
 
-    <string name="include_all_app_wg_dialog_title" translatable="false">Include all apps</string>
-    <string name="include_all_app_wg_dialog_desc" translatable="false">Use this WireGuard VPN for all apps?</string>
+    <string name="include_all_app_wg_dialog_title" translatable="true">Include all apps</string>
+    <string name="include_all_app_wg_dialog_desc" translatable="true">Use this WireGuard VPN for all apps?</string>
 
-    <string name="exclude_all_app_wg_dialog_title" translatable="false">Exclude all apps</string>
-    <string name="exclude_all_app_wg_dialog_desc" translatable="false">Exclude all apps from this WireGuard VPN?</string>
+    <string name="exclude_all_app_wg_dialog_title" translatable="true">Exclude all apps</string>
+    <string name="exclude_all_app_wg_dialog_desc" translatable="true">Exclude all apps from this WireGuard VPN?</string>
 
     <string name="wireguard_enabled_failure" translatable="true">Stop other active proxies to enable WireGuard</string>
-    <string name="wireguard_disable_failure" translatable="false">A \"Perma WireGuard\" cannot be turned off</string>
+    <string name="wireguard_disable_failure" translatable="true">\"Always-on WireGuard\" cannot be turned off</string>
 
-    <string name="wireguard_refresh_toast" translatable="false"><!-- use dc_refresh_toast -->Refresh complete</string>
-
-    <string name="wireguard_apps_proxy_map_desc" translatable="false">part of %1$s</string>
-    <string name="wg_apps_dialog_title_include" translatable="false">Include %1$s apps</string>
-    <string name="wg_apps_dialog_title_exclude" translatable="false">Exclude %1$s apps</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">part of %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Include %1$s apps</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Exclude %1$s apps</string>
 
     <string name="wireguard_no_config_msg" translatable="true">No WireGuard VPNs. Add some to get started.</string>
     <string name="wireguard_connection_error" translatable="true">WireGuard VPN failing to connect</string>
     <string name="wireguard_disclaimer" translatable="true">DNS is forwarded to %1$s, ICMP (ex: ping) is sent to the underlying network.</string>
 
-    <string name="wireguard_disable_title" translatable="false">Stop WireGuard</string>
+    <string name="wireguard_disable_title" translatable="true">Stop WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">Stop all active WireGuard VPNs?</string>
-    <string name="wireguard_disable_positive" translatable="false">Stop</string>
+
+    <string name="lbl_remaining_apps" translatable="true">Remaining apps</string>
+
+    <string name="remaining_apps_dialog_title" translatable="true">Include remaining apps</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Include all remaining apps not routed by any other Proxy</string>
 
     <!-- dns description -->
     <string name="cloudflare_dns_desc" translatable="true">Does not block any DNS requests. Uses Cloudflare\'s 1.1.1.1 DNS endpoint.</string>

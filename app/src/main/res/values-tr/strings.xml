@@ -11,7 +11,6 @@
     <string name="finish">Bitir</string>
     <string name="slide_1_title">Ücretsiz ve Açık Kaynaklı</string>
     <string name="slide_1_desc">Rethink, Mozilla Builders MVP programı tarafından desteklenen açık kaynaklı bir yazılımdır.</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="untracked">izlenmiyor</string>
     <string name="warning_title" description="Status indicator text shown in a warning notification.">Uyarı: Rethink devre dışı bırakıldı</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Koruma ayarını değiştirmek için dokunun</string>
@@ -778,7 +777,6 @@
     <string name="lbl_domain_rules" translatable="true">Alan Adı Kuralları</string>
     <string name="lbl_blocked" translatable="true">Engellenen</string>
     <string name="lbl_action_required" translatable="true">Eylem Gerekli</string>
-    <string name="config_delete_success_toast">Yapılandırma silindi</string>
     <string name="bad_config_explanation_pka" translatable="true">: Pozitif olmalı ve 65535\'ten fazla olmamalıdır</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Sunucu TLS sertifikalarını doğrulamayın (yalnızca ne yaptığınızı biliyorsanız etkinleştirin)</string>
     <string name="bad_config_reason_invalid_key" translatable="true">Geçersiz anahtar</string>
@@ -935,7 +933,6 @@
     <string name="settings_pcap_dialog_option_2" translatable="true">Logcat Çıktısı</string>
     <string name="key_length_error" translatable="true">Yanlış anahtar uzunluğu</string>
     <string name="fapps_info_metered_msg" translatable="true">Ölçülü (Mobil) ağda İzin Ver / Engelle.</string>
-    <string name="trusted_domains_desc" translatable="true">Güven etki alanı kuralı <u>Rethink\'in DNS</u>\'si ile daha iyi çalışır.</string>
     <string name="config_delete_dialog_title">Yapılandırmayı sil</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">Paket yakalama devre dışı</string>
     <string name="logs_card_duration" translatable="true">%1$s\'den beri</string>

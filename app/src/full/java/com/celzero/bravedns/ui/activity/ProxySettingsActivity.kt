@@ -53,9 +53,9 @@ import com.celzero.bravedns.service.VpnController
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.ui.bottomsheet.OrbotBottomSheet
 import com.celzero.bravedns.util.Constants
-import com.celzero.bravedns.util.LoggerConstants
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_PROXY
-import com.celzero.bravedns.util.LoggerConstants.Companion.LOG_TAG_UI
+import com.celzero.bravedns.util.Logger
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_PROXY
+import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_UI
 import com.celzero.bravedns.util.OrbotHelper
 import com.celzero.bravedns.util.Themes.Companion.getCurrentTheme
 import com.celzero.bravedns.util.UIUtils
@@ -256,11 +256,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         delay(REFRESH_TIMEOUT, lifecycleScope) {
             b.wgRefresh.isEnabled = true
             b.wgRefresh.clearAnimation()
-            showToastUiCentered(
-                this,
-                getString(R.string.wireguard_refresh_toast),
-                Toast.LENGTH_SHORT
-            )
+            showToastUiCentered(this, getString(R.string.dc_refresh_toast), Toast.LENGTH_SHORT)
         }
     }
 
@@ -451,6 +447,9 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
     }
 
     private fun displayTcpProxyUi() {
+        // v055b, no-op
+        return
+
         val tcpProxies = TcpProxyHelper.getActiveTcpProxy()
         if (tcpProxies == null || !tcpProxies.isActive) {
             b.settingsActivityTcpProxyDesc.text =
@@ -694,15 +693,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
         headerTxt.text = getString(R.string.settings_dns_proxy_dialog_header)
         headerDesc.text = getString(R.string.settings_dns_proxy_dialog_app_desc)
 
-        if (!endpoint.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
-            portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
-            userNameEditText.setText(endpoint.userName.toString(), TextView.BufferType.EDITABLE)
-        } else {
-            ipAddressEditText.setText(Constants.SOCKS_DEFAULT_IP, TextView.BufferType.EDITABLE)
-            portEditText.setText(Constants.SOCKS_DEFAULT_PORT, TextView.BufferType.EDITABLE)
-        }
-
         applyURLBtn.setOnClickListener {
             var port: Int? = 0
             var isValid: Boolean
@@ -728,7 +718,7 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
                     errorTxt.text = getString(R.string.settings_http_proxy_error_text1)
                 }
             } catch (e: NumberFormatException) {
-                Log.w(LoggerConstants.LOG_TAG_VPN, "Error: ${e.message}", e)
+                Log.w(Logger.LOG_TAG_VPN, "Error: ${e.message}", e)
                 errorTxt.text = getString(R.string.settings_http_proxy_error_text2)
                 isValid = false
             }
@@ -884,17 +874,6 @@ class ProxySettingsActivity : AppCompatActivity(R.layout.fragment_proxy_configur
 
         headerTxt.text = getString(R.string.http_proxy_dialog_heading)
         headerDesc.text = getString(R.string.http_proxy_dialog_desc)
-
-        if (!endpoint.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
-        }
-
-        if (!endpoint.proxyIP.isNullOrBlank()) {
-            ipAddressEditText.setText(endpoint.proxyIP, TextView.BufferType.EDITABLE)
-            portEditText.setText(endpoint.proxyPort.toString(), TextView.BufferType.EDITABLE)
-        } else {
-            ipAddressEditText.setText(defaultHost, TextView.BufferType.EDITABLE)
-        }
 
         applyURLBtn.setOnClickListener {
             host = ipAddressEditText.text.toString()

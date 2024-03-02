@@ -580,7 +580,6 @@
     <string name="app_name_small_case">rethink</string>
     <string name="title_about">关于</string>
     <string name="next">下一步</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="isolate">隔离</string>
     <string name="dns_mode_notification_title">已保护！已连接至快速且安全的 DNS 。</string>
     <string name="accessibility_service_description">请授权 Rethink 使用无障碍服务，以监测并拦截后台应用程序。 Rethink 并不会窃取或贩卖任何您的信息。</string>
@@ -852,7 +851,6 @@
     <string name="bypass_dns_firewall_tooltip">%1$s 仅于 Rethink 的 DNS 生效</string>
     <string name="lbl_maybe_blocked" translatable="true">或已拦截</string>
     <string name="lbl_network" translatable="true">网络</string>
-    <string name="trusted_domains_desc" translatable="true">信任域名规则配合 <u>Rethink 的 DNS 服务</u>更有效。</string>
     <string name="settings_allow_lan_desc" translatable="true">将局域网、环回、多播与本地链路路由排除于 Rethink 的 VPN 隧道外。</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由私有 IP （实验性）</string>
     <string name="lbl_delete" translatable="true">删除</string>
@@ -952,7 +950,6 @@
     <string name="new_warp_error_toast" translatable="true">无法获取 WARP 配置</string>
     <string name="new_warp_invalid_config_toast" translatable="true">无效 WARP 配置</string>
     <string name="add_remove_apps" translatable="true">添加/移除应用（ %1$s 个应用）</string>
-    <string name="config_delete_success_toast">配置已删除</string>
     <string name="config_add_success_toast">配置已添加</string>
     <string name="include_all_app_wg_dialog_title">包含所有应用</string>
     <string name="exclude_all_app_wg_dialog_desc">是否从此隧道排除所有应用？</string>

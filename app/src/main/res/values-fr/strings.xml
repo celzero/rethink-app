@@ -6,7 +6,6 @@
     <string name="title_settings">Paramètres</string>
     <string name="txt_home">Accueil</string>
     <string name="pause_title_desc">faire une sieste…</string>
-    <string name="rethink_plus">RethinkDNS Plus</string>
     <string name="notification_action_resume_vpn">REPRENDRE</string>
     <string name="slide_1_title">Libre et Open Source</string>
     <string name="slide_1_desc">Rethink est un logiciel open source soutenu par le programme Mozilla Builders MVP.</string>
@@ -849,7 +848,6 @@
     <string name="firewall_rule_domain_trusted_univ_desc" translatable="true">Cette connexion a été bloquée parce que le domaine <i/> est défini comme étant de confiance dans les règles du domaine universel.<br/><br/> Pour modifier ce comportement, allez sur l\'onglet <i>Configure DNS</i>.</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">contournera les règles universelles de DNS et de pare-feu</string>
     <string name="lbl_network" translatable="true">réseau</string>
-    <string name="trusted_domains_desc" translatable="true">La règle du domaine de confiance fonctionne mieux avec <u>le DNS de Rethink</u>.</string>
     <string name="lbl_maybe_blocked" translatable="true">Peut-être bloqué</string>
     <string name="bypass_dns_firewall_tooltip">%1$s fonctionne uniquement avec le DNS de Rethink</string>
     <string name="settings_allow_lan_heading" translatable="true">Ne pas acheminer les IP privées (expérimental)</string>
@@ -899,7 +897,6 @@
     <string name="bad_config_reason_syntax_error" translatable="true">Erreur de syntaxe</string>
     <string name="lbl_listen_port" translatable="true">Port d\'écoute</string>
     <string name="lbl_random" translatable="true">(aléatoire)</string>
-    <string name="config_delete_success_toast">Configuration supprimée</string>
     <string name="bad_config_explanation_pka" translatable="true">: Doit être positif et pas plus de 65535</string>
     <string name="cd_doh_dialog_checkbox_desc" translatable="true">Ne pas validez les certificats TLS du serveur (uniquement si vous savez ce que vous faites)</string>
     <string name="crypt_adguard_desc" translatable="true">Protège votre appareil des logiciels malveillants et plus encore.</string>
