@@ -760,7 +760,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
 
         dBind.daciBlockBtn.setOnClickListener {
             handleIp(dBind, customIp, IpRulesManager.IpRuleStatus.BLOCK)
-            dialog.dismiss()
         }
 
         dBind.daciTrustBtn.setOnClickListener {
@@ -769,7 +768,6 @@ class CustomIpAdapter(private val context: Context, private val type: CustomRule
             } else {
                 handleIp(dBind, customIp, IpRulesManager.IpRuleStatus.TRUST)
             }
-            dialog.dismiss()
         }
 
         dBind.daciCancelBtn.setOnClickListener { dialog.dismiss() }
