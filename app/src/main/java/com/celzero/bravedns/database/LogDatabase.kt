@@ -39,7 +39,6 @@ abstract class LogDatabase : RoomDatabase() {
 
     companion object {
         const val LOGS_DATABASE_NAME = "rethink_logs.db"
-        private const val DATABASE_PATH = "database/logs_v7.db"
         private const val PRAGMA = "pragma wal_checkpoint(full)"
         private const val TABLE_NAME_DNS_LOGS = "DnsLogs"
         // previous table name for dns logs
@@ -65,7 +64,6 @@ abstract class LogDatabase : RoomDatabase() {
                     LOGS_DATABASE_NAME
                 )
                 .setJournalMode(JournalMode.AUTOMATIC)
-                .createFromAsset(DATABASE_PATH)
                 .addCallback(roomCallback)
                 .addMigrations(MIGRATION_2_3)
                 .addMigrations(MIGRATION_3_4)

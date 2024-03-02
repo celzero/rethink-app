@@ -383,6 +383,8 @@ internal constructor(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
         emptyAll: Boolean
     ) {
+        if (trackedApps.isEmpty()) return
+
         // remove all apps from proxy mapping and add the apps from tracked apps
         if (emptyAll) {
             ProxyManager.clear()
