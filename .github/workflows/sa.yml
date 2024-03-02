@@ -14,5 +14,7 @@ jobs:
 
       - name: "run"
         uses: natiginfo/action-detekt-all@1.23.4
-        env:
-          DETEKT_CONFIG: .github/detekt-config.yml
+        # from: https://github.com/natiginfo/action-detekt-all
+        with:
+          args: --config detekt-config.yml
+
