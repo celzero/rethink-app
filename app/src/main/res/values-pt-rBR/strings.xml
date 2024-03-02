@@ -988,4 +988,15 @@
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas as conexões e aplicativos não roteados por outras VPNs WireGuard serão roteados por esta.</string>
     <string name="one_wg_error_toast" translatable="true">Desativar o \"Mono WireGuard\" para usar o recurso Mutli WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">Desativar todas as VPNs WireGuard ativas?</string>
+    <string name="lbl_last" translatable="true">Última</string>
+    <string name="lbl_stopped" translatable="true">Encerrado</string>
+    <string name="lbl_private" translatable="true">Particular</string>
+    <string name="lbl_secure" translatable="true">seguro</string>
+    <string name="lbl_peer" translatable="true">Par</string>
+    <string name="lbl_status" translatable="true">Status</string>
+    <string name="lbl_starting" translatable="true">Iniciando</string>
+    <string name="lbl_remove" translatable="true">Remover</string>
+    <string name="lbl_anonymous" translatable="true">anônimo</string>
+    <string name="failed_using_default" translatable="true">Falha: usando DNS substituto</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
 </resources>
