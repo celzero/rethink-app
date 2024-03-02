@@ -64,6 +64,7 @@ class OneWgConfigAdapter(private val context: Context) :
                     newConnection: WgConfigFiles
                 ): Boolean {
                     return (oldConnection.id == newConnection.id &&
+                        oldConnection.name == newConnection.name &&
                         oldConnection.isActive == newConnection.isActive &&
                         oldConnection.oneWireGuard == newConnection.oneWireGuard)
                 }
@@ -133,7 +134,8 @@ class OneWgConfigAdapter(private val context: Context) :
                         b.interfaceDetailCard.strokeColor =
                             fetchColor(context, R.attr.chipTextNegative)
                     }
-                    b.interfaceStatus.text = context.getString(resId).replaceFirstChar(Char::titlecase)
+                    b.interfaceStatus.text =
+                        context.getString(resId).replaceFirstChar(Char::titlecase)
                 } else {
                     b.interfaceStatus.text =
                         context.getString(
@@ -148,7 +150,8 @@ class OneWgConfigAdapter(private val context: Context) :
                 b.interfaceDetailCard.strokeWidth = 0
                 b.interfaceAppsCount.visibility = View.GONE
                 b.oneWgCheck.isChecked = false
-                b.interfaceStatus.text = context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
+                b.interfaceStatus.text =
+                    context.getString(R.string.lbl_disabled).replaceFirstChar(Char::titlecase)
             }
         }
 
