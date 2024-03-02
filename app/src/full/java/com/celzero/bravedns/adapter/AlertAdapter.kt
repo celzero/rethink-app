@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 package com.celzero.bravedns.adapter
 
 import android.content.Context
@@ -58,7 +59,8 @@ class AlertAdapter(
             }
             b.title.text = alert.alertTitle
             val message = ""
-            /*when (AlertCategory.valueOf(alert.alertCategory)) {
+            */
+/*when (AlertCategory.valueOf(alert.alertCategory)) {
                 AlertCategory.DNS ->
                     "List of domains blocked in past one hour. Click to <<see more>>..."
                 AlertCategory.FIREWALL ->
@@ -66,7 +68,8 @@ class AlertAdapter(
                 AlertCategory.APP ->
                     "List of apps blocked in past one hour. Click to <<see more>>..."
                 else -> "Unknown category"
-            }*/
+            }*//*
+
             b.description.text = message
             b.descriptionMore.text = alert.alertMessage
             b.priority.text = alert.alertSeverity.lowercase().replaceFirstChar(Char::uppercase)
@@ -97,7 +100,8 @@ class AlertAdapter(
         private fun showActionDialog(category: AlertCategory) {
             // show dialog with actions to be taken on the alert
             val message = ""
-            /*when (category) {
+            */
+/*when (category) {
                 AlertCategory.DNS ->
                     "Some actions to be taken on the alert \n\n 1. Allow the connection \n\n 2. Block the connection \n\n 3. Allow all connections from this domain \n\n 4. Block all connections from this domain"
                 AlertCategory.FIREWALL ->
@@ -105,7 +109,8 @@ class AlertAdapter(
                 AlertCategory.APP ->
                     "Some actions to be taken on the alert \n\n 1. Allow the connection \n\n 2. Block the connection \n\n 3. Allow all connections from this app \n\n 4. Block all connections from this app"
                 else -> "Unknown category"
-            }*/
+            }*//*
+
             MaterialAlertDialogBuilder(context)
                 .setTitle("Actions")
                 .setMessage(message)
@@ -118,3 +123,4 @@ class AlertAdapter(
         }
     }
 }
+*/
