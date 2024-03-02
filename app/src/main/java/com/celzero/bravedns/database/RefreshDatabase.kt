@@ -376,6 +376,8 @@ internal constructor(
         // may already have been purged by RestoreAgent.startRestore() -> wireguardCleanup()
         if (rmv) {
             WireguardManager.restoreProcessDeleteWireGuardEntries()
+        } else {
+            if (DEBUG) Log.d(LOG_TAG_APP_DB, "removeWireGuardProfilesIfNeeded: no-op")
         }
     }
 
@@ -383,7 +385,12 @@ internal constructor(
         trackedApps: Set<FirewallManager.AppInfoTuple>,
         emptyAll: Boolean
     ) {
-        if (trackedApps.isEmpty()) return
+        // trackedApps is empty, the installed apps are yet to be added to the database
+        // so no need to refresh the proxy mapping when the tracked apps are empty
+        if (trackedApps.isEmpty()) {
+            Log.i(LOG_TAG_APP_DB, "refreshProxyMapping: trackedApps is empty")
+            return
+        }
 
         // remove all apps from proxy mapping and add the apps from tracked apps
         if (emptyAll) {
