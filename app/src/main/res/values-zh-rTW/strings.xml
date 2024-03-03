@@ -584,8 +584,8 @@
     <string name="ctbs_block_other_apps">應用於 %1$s 的規則亦會應用於其他 %2$s 個應用程式</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;：%2$s 個攔截清單&lt;/h3&gt;%3$s。&lt;br/&gt;&lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s 份攔截清單</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip">+%1$s 個其他 IP</string>
     <string name="dns_btm_sheet_chip_no_answer">無應答</string>
     <string name="dns_btm_resolved_crypt">%1$s 由 %2$s 自 %3$s <u>匿名</u>地解析</string>
