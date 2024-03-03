@@ -222,7 +222,7 @@
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>
-    <string name="whats_new_version_update">&lt;b&gt;傑森・A・多南菲爾德&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意數量 WireGuard 上游的多 VPN 支援。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內的活動連線指示器。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor （ Orbot ）代理指定應用程式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區現可依據 IP 地理位址顯示分組。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內顯示資料使用情況：分請求統計上載下載位元組。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分應用程式統計上載下載。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支援本地 DNS over HTTPS （非公開）解析服務。&lt;br/&gt; 8. 非常精細的按需漏洞報告，以更好地診斷問題。&lt;br/&gt; 9. DNS 加速器現默認啓用。&lt;br/&gt; 10. 爲分 IP 與網域而改進的 UI 。&lt;br/&gt; 11. 首頁上更大的 UI 塊。&lt;br/&gt; 12. 煥然一新的防火牆 UI 。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：使 HTTP 代理在 CONNECT 隧道上工作。&lt;br/&gt; 14. &lt;i&gt;漏洞修復&lt;/i&gt;：信任網域現也可在第三方 DNS 解析服務上工作。&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;協助翻譯此應用程式&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;齊拉尤・德塞&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：支援可匿名的&lt;i&gt;無曉型 DNS-over-HTTPS&lt;/i&gt;。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：支援&lt;i&gt;DNS-over-TLS&lt;/i&gt;。&lt;br/&gt; 3. &lt;i&gt;新特性&lt;/i&gt;： WireGuard 簡易模式與進階模式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區現顯示流量。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：無論 &lt;i&gt;VPN 閉關&lt;/i&gt;模式是否激活，支援包含 Orbot 等的所有代理。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：使用 Rethink 監測 Rethink 的網路流量！&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：將 DNS 經如 WireGuard 的活動代理轉送。&lt;br/&gt; 8. &lt;i&gt;新特性&lt;/i&gt;：跨裝置同版本備份與恢復。&lt;br/&gt; 9. 改進&lt;i&gt;漏洞報告&lt;/i&gt;的生成。&lt;br/&gt; 10. 對雙棧 IP 網路的更好支援。&lt;br/&gt; 11. &lt;i&gt;漏洞修復&lt;/i&gt;：對多播 DNS 支援的微小修復。&lt;br/&gt; 12. &lt;i&gt;漏洞修復&lt;/i&gt;：對 WireGuard VPN 的連線自動恢復。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：修復不正確攔截的應用程式通知。&lt;br/&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;協助翻譯此應用程式&lt;/a&gt;</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
@@ -584,7 +584,7 @@
     <string name="ctbs_block_other_apps">應用於 %1$s 的規則亦會應用於其他 %2$s 個應用程式</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
-    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>: %2$s 份攔截清單</h3>%3$s.<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>：%2$s 份攔截清單</h3>%3$s。<br/><br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip">+%1$s 個其他 IP</string>
     <string name="dns_btm_sheet_chip_no_answer">無應答</string>
@@ -953,7 +953,7 @@
     <string name="wireguard_enabled_failure">停用其他活動代理以啓用 WireGuard</string>
     <string name="wireguard_no_config_msg">無 WireGuard VPN 。添加一些配置以開始連線。</string>
     <string name="wireguard_connection_error">連線至 WireGuard VPN 時出錯</string>
-    <string name="wireguard_disclaimer">DNS 被轉送至 %1$s ，而 ICMP （如： ping ）將從底層網路發送。</string>
+    <string name="wireguard_disclaimer">DNS 被轉送至 %1$s ，而 ICMP （例如 ping ）將從底層網路發送。</string>
     <string name="cloudflare_dns_desc" translatable="true">不攔截任何 DNS 請求。使用 Cloudflare 的 1.1.1.1 DNS 端點。</string>
     <string name="cloudflare_family_dns_desc" translatable="true">攔截惡意軟體與成人內容。使用 Cloudflare 的 1.1.1.3 DNS 端點。</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">家庭篩檢器攔截對所有成人、色情與露骨網站的訪問。其亦將攔截可用於繞行篩檢器的代理與 VPN 網域。包含混合內容的網站（如 Reddit ）也被攔截。 Google 、 Bing 與 YouTube 被設定爲安全模式。</string>
@@ -980,7 +980,7 @@
     <string name="lbl_last" translatable="true">最後</string>
     <string name="lbl_starting" translatable="true">啓動中</string>
     <string name="lbl_overall" translatable="true">總共</string>
-    <string name="lbl_private" translatable="true">保密</string>
+    <string name="lbl_private" translatable="true">私密</string>
     <string name="lbl_secure" translatable="true">安全</string>
     <string name="lbl_anonymous" translatable="true">匿名</string>
     <string name="failed_using_default" translatable="true">失敗：使用後備 DNS</string>
@@ -996,7 +996,7 @@
     <string name="lbl_remaining_apps" translatable="true">餘下應用</string>
     <string name="remaining_apps_dialog_title" translatable="true">包含所有餘下應用</string>
     <string name="remaining_apps_dialog_desc" translatable="true">包含所有未被其他代理路由的應用程式</string>
-    <string name="lbl_stopped" translatable="true">停止</string>
+    <string name="lbl_stopped" translatable="true">已停止</string>
     <string name="lbl_peer" translatable="true">對等端</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">持久通知</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">使通知變得持久</string>
@@ -1007,7 +1007,7 @@
     <string name="wg_lockdown_dialog_title" translatable="true">閉關</string>
     <string name="wg_lockdown_dialog_desc" translatable="true">所選應用程式將只由此 WireGuard VPN 路由，無論此 VPN 是否成功連線。</string>
     <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s 的一部分</string>
-    <string name="settings_rinr_desc_enabled" translatable="true">將如攔截清單、連線檢查與 DNS 連線等的 Rethink 自身流量路由回隧道。</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">將如下載攔截清單、連線檢查與 DNS 連線等的 Rethink 自身流量路由回隧道。</string>
     <string name="settings_rinr_desc_disabled" translatable="true">將 Rethink 自身的流量路由入隧道。若您不瞭解您在做什麼，請不要啓用。</string>
     <string name="settings_rinr_dialog_title" translatable="true">回送（實驗性）</string>
     <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在內的來自所有應用程式的流量將被單個活躍的 WireGuard VPN 路由。其他活躍的 WireGuard VPN 將被停止。</string>
