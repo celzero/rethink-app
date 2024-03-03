@@ -1004,4 +1004,5 @@
     <string name="lbl_stopped" translatable="true">Detenido</string>
     <string name="lbl_secure" translatable="true">seguro</string>
     <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="failed_using_default" translatable="true">Failed: using fallback DNS</string>
 </resources>
