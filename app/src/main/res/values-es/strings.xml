@@ -980,8 +980,8 @@
     <string name="logs_card_duration" translatable="true">desde el %1$s</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Hacer que la notificación sea persistente</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificación persistente</string>
-    <string name="dot_custom_url_remove_dialog_title" translatable="true">¿Borrar el punto final DoT?</string>
-    <string name="dot_custom_url_remove_dialog_message" translatable="true">Elimine el punto final de la DNS sobre TLS de la configuración guardada.</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">¿Eliminar el punto final DoT?</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Elimina el punto final de la DNS sobre TLS de la configuración guardada.</string>
     <string name="orbot_no_app_toast" translatable="true">Añadir al menos una aplicación para habilitar Orbot</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Enruta el tráfico propio de Rethink, como descargas de listas de bloqueo, comprobaciones de conectividad, conexiones DNS, de vuelta al túnel.</string>
