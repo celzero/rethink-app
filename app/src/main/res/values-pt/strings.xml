@@ -898,4 +898,5 @@
     <string name="lbl_save" translatable="true">guardar</string>
     <string name="search_proxy_add_apps" translatable="true">Procurar aplicações por nome</string>
     <string name="public_key_copy_toast_msg" translatable="true">Chave pública copiada.</string>
+    <string name="lbl_overall" translatable="true">Em geral</string>
 </resources>
