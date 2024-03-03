@@ -939,7 +939,6 @@
     <string name="lbl_auto" translatable="true">(auto)</string>
     <string name="bad_config_explanation_udp_port" translatable="true">: Doit être un numéro de port UDP valide</string>
     <string name="google_dns_desc" translatable="true">Ne bloque aucune demande DNS. Utilisez le paramètre DNS de Google.</string>
-    <string name="wireguard_refresh_toast">Actualisation des proxys terminée</string>
     <string name="unknown_error" translatable="true">Erreur inconnue</string>
     <string name="crypt_relay_sweden" translatable="true">Relais DNS anonyme hébergé en Suède fourni par https://cryptostrom.is/.</string>
     <string name="include_all_app_wg_dialog_title">Inclure toutes les applications</string>

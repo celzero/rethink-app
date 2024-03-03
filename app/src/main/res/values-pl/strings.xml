@@ -894,7 +894,6 @@
     <string name="google_dns_desc" translatable="true">Nie blokuje żadnych żądań DNS. Używa punktu końcowego DNS Google.</string>
     <string name="settings_allow_lan_desc" translatable="true">Wyklucz trasy LAN, pętlę zwrotną, multiemisję i łącza lokalne z tunelu VPN firmy Rethink.</string>
     <string name="bad_config_reason_invalid_value" translatable="true">Nieprawidłowa wartość</string>
-    <string name="wireguard_refresh_toast">Odświeżanie proxy zakończone</string>
     <string name="lbl_day" translatable="true">dzień</string>
     <string name="lbl_fast" translatable="true">szybki</string>
     <string name="unknown_error" translatable="true">Nieznany błąd</string>

@@ -978,7 +978,6 @@
     <string name="settings_go_log_heading" translatable="true">Nivel de registro</string>
     <string name="settings_go_log_desc" translatable="true">Para la depuración</string>
     <string name="logs_card_duration" translatable="true">desde el %1$s</string>
-    <string name="wireguard_refresh_toast">Actualización de los proxies completada</string>
     <string name="settings_app_notification_persistent_desc" translatable="true">Hacer que la notificación sea persistente</string>
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificación persistente</string>
     <string name="dot_custom_url_remove_dialog_title" translatable="true">¿Borrar el punto final DoT?</string>

@@ -972,6 +972,5 @@
     <string name="google_dns_desc" translatable="true">唔攔截任何 DNS 請求。用 Google 嘅 DNS 端點。</string>
     <string name="settings_go_log_desc" translatable="true">為咗調試</string>
     <string name="settings_go_log_heading" translatable="true">日誌級別</string>
-    <string name="wireguard_refresh_toast">代理刷新完</string>
     <string name="logs_card_duration" translatable="true">由 %1$s 以來</string>
 </resources>
