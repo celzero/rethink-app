@@ -1011,4 +1011,12 @@
     <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
     <string name="settings_rinr_dialog_title" translatable="true">Bucle invertido (experimental)</string>
     <string name="settings_rinr_dialog_desc" translatable="true">También habilita<!--settings_network_all_networks--> la configuración %1$s. ¿Quieres proceder?</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Excluye %1$s aplicaciones</string>
+    <string name="wireguard_disable_title" translatable="true">Detener WireGuard</string>
+    <string name="lbl_remaining_apps" translatable="true">Aplicaciones restantes</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Incluye todas las aplicaciones restantes no enrutadas por ningún otro proxy</string>
+    <string name="wireguard_disable_failure" translatable="true">No se pudo detener \"WireGuard siempre activo\"</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Incluir las aplicaciones restantes</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">incluye %1$s aplicaciones</string>
 </resources>
