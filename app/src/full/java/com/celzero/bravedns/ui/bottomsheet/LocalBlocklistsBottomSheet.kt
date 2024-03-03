@@ -431,15 +431,20 @@ class LocalBlocklistsBottomSheet : BottomSheetDialogFragment() {
                         persistentState.localBlocklistTimestamp
                     )
                 }
+
             if (blocklistsExist) {
-                setBraveDnsLocal()
+                // now, rdnslocal obj is required to get/set the stamp from blocklists
+                // see RDNS#flagsToStamp, RDNS#stampToFlags
+                setBraveDnsLocal() // set remote blocklist even if stamp is not available
                 if (isLocalBlocklistStampAvailable()) {
                     updateLocalBlocklistUi()
                 } else {
+                    // stamp is not available, show user the configure screen
                     invokeRethinkActivity()
                 }
             } else {
-                removeBraveDnsLocal()
+                // no local blocklists found, prompt user to download
+                invokeRethinkActivity()
             }
         }
     }
