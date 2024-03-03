@@ -993,4 +993,15 @@
     <string name="one_wg_error_toast" translatable="true">Detener \"Mono WireGuard\" para utilizar la función Mutli WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">¿Detener todas las VPN activas de WireGuard?</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Enrutar el propio tráfico de Rethink a través del túnel. A menos que sepa lo que hace, desactívelo.</string>
+    <string name="lbl_remove" translatable="true">Quitar</string>
+    <string name="lbl_last" translatable="true">Última</string>
+    <string name="lbl_overall" translatable="true">En conjunto</string>
+    <string name="lbl_private" translatable="true">privado</string>
+    <string name="lbl_anonymous" translatable="true">anónimo</string>
+    <string name="lbl_peer" translatable="true">Pares</string>
+    <string name="lbl_status" translatable="true">Situación</string>
+    <string name="lbl_starting" translatable="true">Comenzando</string>
+    <string name="lbl_stopped" translatable="true">Detenido</string>
+    <string name="lbl_secure" translatable="true">seguro</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
 </resources>
