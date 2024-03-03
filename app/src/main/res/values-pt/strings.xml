@@ -12,7 +12,7 @@
     <string name="slide_2_desc">O Rethink é a forma mais fácil de monitorizar a atividade da rede, contornar a censura da Internet e bloquear com a firewall as aplicações no seu dispositivo Android.</string>
     <string name="slide_1_title">Código livre e aberto</string>
     <string name="slide_1_desc">O Rethink é um programa de código aberto apoiado pelo programa Mozilla Builders MVP.</string>
-    <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: RethinkDNS foi desativado</string>
+    <string name="warning_title" description="Status indicator text shown in a warning notification.">Aviso: Rethink foi desativado</string>
     <string name="exclude">excluir</string>
     <string name="pause_mode_notification_title">Pausado! Firewall continua a bloquear aplicações.</string>
     <string name="notification_content" description="Indicates what will happen if the user taps the notification.">Toque aqui para alterar a configuração de proteção</string>
@@ -48,13 +48,13 @@
 \n <u>##5</u>: Bloqueia as ligações quando a aplicação de origem é desconhecida (firewall universal).
 \n<u>##6</u>: Bloqueia todo o tráfego UDP exceto DNS (firewall universal).
 \n <u>#7</u>: Bloqueia ligações quando o DNS é contornado (firewall universal).</string>
-    <string name="whats_new_version_update">&lt;b&gt;Super-Carregado!&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Novo recurso&lt;/i&gt;: filtragem avançada de DNS; aplicar regras de domínio apenas quando as aplicações se conectam.&lt;br/&gt; 2. &lt;i&gt;Novo recurso&lt;/i&gt;: permitir ou negar domínios por aplicalção.&lt;br/&gt; 3. &lt;i&gt;Novo recurso&lt;/i&gt;: permitir ou negar domínios para todas as aplicações.&lt;br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: ignorar as regras de DNS e firewall por aplicação.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: captura de pacotes (PCAP).&lt;br/&gt; 6. &lt;i&gt;Novo recurso&lt;/i&gt;: DNS Booster; agrupar solicitações, armazenar respostas em cache.&lt;br/&gt; 7. &lt;i&gt;Novo recurso&lt;/i&gt;: editar regras de domínio e IP.&lt;br/&gt; 8. E outras pequenas alterações na interface do utilizador e correções.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajude a traduzir esta aplicação&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para anonimização do &lt;i&gt;Oblivious DNS-over-HTTPS&lt;/i&gt;.&lt;br/&gt; 2. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para &lt;i&gt;DNS-over-TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Novo recurso&lt;/i&gt;: Modos WireGuard simples e avançado.&lt;br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: Mostrar largura de banda na tela Stats.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte a todos os proxies, incluindo Orbot, mesmo no modo &lt;i&gt;VPN Lockdown&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Nova funcionalidade&lt;/i&gt;: Monitorar o tráfego de rede do Rethink usando o Rethink!&lt;br/&gt; 7. &lt;i&gt;Novo recurso&lt;/i&gt;: Encaminhar DNS através de proxies activos como o WireGuard.&lt;br/&gt; 8. &lt;i&gt;Novo recurso&lt;/i&gt;: Backup e restauração da mesma versão entre dispositivos.&lt;br/&gt; 9. Geração aprimorada de &lt;i&gt;relatórios de erros&lt;/i&gt;.&lt;br/&gt; 10. Melhor manuseio de redes IP de pilha dupla.&lt;br/&gt; 11. &lt;i&gt;Correção de bugs&lt;/i&gt;: Pequenas correções de bugs no manuseio de DNS multicast.&lt;br/&gt; 12. &lt;i&gt;Correção de bugs&lt;/i&gt;: Recuperação automática de conetividade para VPNs WireGuard.&lt;br/&gt; 13. &lt;i&gt;Correção de erros&lt;/i&gt;: Correção de notificações de aplicações incorretamente bloqueadas.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ajuda a traduzir esta aplicação&lt;/a&gt;</string>
     <string name="relative_time_yesterday">Ontem</string>
     <string name="always_on_dialog_heading">Desativar VPN sempre ativa</string>
     <string name="always_on_dialog">A opção \"VPN sempre ativa\" está ativada neste dispositivo. Para iniciar o Rethink, vá às configurações de VPN do Android e desative a opção \"VPN sempre ativa\".</string>
     <string name="always_on_dialog_stop_heading">VPN sempre ativa</string>
     <string name="always_on_dialog_stop_message">A opção \"VPN sempre ativa\" das configurações de VPN do Android está ativada para o RethinkDNS. Quer mesmo parar o RethinkDNS\?</string>
-    <string name="always_on_dialog_lockdown_stop_message">O RethinkDNS está a executar a VPN no modo <i>bloqueado</i>. Se o parar não terá ligação à Internet neste perfil de utilizador. Quer mesmo parar\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">O Rethink está a executar a VPN no modo <i>bloqueado</i>. Se o parar não terá ligação à Internet neste perfil de utilizador. Quer mesmo parar?</string>
     <string name="blocklist_update_check_not_required">As listas de bloqueio já são da última versão.</string>
     <string name="download_update_dialog_message">Está disponível uma nova versão da aplicação para descarregar a partir do site. Quer continuar\?</string>
     <string name="local_blocklist_redownload_desc">As listas de bloqueio no dispositivo já são da última versão v%1$s.</string>
@@ -159,12 +159,12 @@
     <string name="local_blocklist_download_desc">Descarregar as listas de bloqueio (cerca de 60MB) para utilizar esta funcionalidade\?</string>
     <string name="local_blocklist_redownload">Atualizado!</string>
     <string name="blocklist_update_check_failure">Algo correu mal. Tente novamente mais tarde!</string>
-    <string name="refresh_complete">Nova sincronização da lista de aplicações concluída.</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> Re-sincronização da lista de aplicações concluída.</string>
     <string name="configure_dns_connected_dns_crypt_status">DNSCrypt</string>
     <string name="configure_dns_connected_dns_proxy_status">Proxy DNS</string>
     <string name="configure_dns_connection_name">Conectado a %1$s</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s resolvedores</string>
-    <string name="http_proxy_dialog_heading">Definir proxy HTTP(S)</string>
+    <string name="http_proxy_dialog_heading">Definir proxy HTTP(S) CONNECT</string>
     <string name="download_update_dialog_title">Nova atualização!</string>
     <string name="download_update_dialog_message_ok_title">Atualizado!</string>
     <string name="download_update_dialog_message_ok">Já tem a versão mais recente.</string>
@@ -283,7 +283,7 @@
     <string name="accessibility_service_description">O Rethink usa o serviço de acessibilidade para detetar e proteger aplicações em segundo plano. O Rethink não recolhe nem vende nenhuma informação.</string>
     <string name="orbot_both">Proxy TCP + HTTP</string>
     <string name="app_name_small_case">rethink</string>
-    <string name="settings_lock_down_mode_desc">Não é possível permitir ignorar quando a VPN está no modo bloqueado. <u>Ir às configurações da VPN</u>.</string>
+    <string name="settings_lock_down_mode_desc">Determinadas opções desactivadas quando a VPN está em modo de bloqueio. <u>Ver Configurações de VPN</u>.</string>
     <string name="settings_https_desc">Esta configuração é apenas uma recomendação e é possível que as aplicações a ignorem. As aplicações que utilizam proxy HTTP(S) ignorarão as regras da Firewall e do DNS.</string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_stop_dialog_message">O RethinkDNS parou de encaminhar conexões para o Orbot, mas o Orbot pode estar a ser executado em segundo plano.</string>
@@ -322,7 +322,7 @@
     <string name="orbot_socks5_desc">Encaminha todas as conexões TCP para o Orbot.</string>
     <string name="orbot_stop_dialog_title">Intervenção manual necessária</string>
     <string name="untracked">não rastreado</string>
-    <string name="settings_allow_bypass_heading">Permitir ignorar</string>
+    <string name="settings_allow_bypass_heading">Permitir a visibilidade da rede</string>
     <string name="settings_socks5_heading">Configurar proxy SOCKS5</string>
     <string name="orbot_socks5">Proxy de apenas TCP</string>
     <string name="orbot_stop_dialog_message_combo">%1$s
@@ -330,7 +330,7 @@
 \n%2$s</string>
     <string name="orbot_install_dialog_positive">Instalar</string>
     <string name="settings_socks5_disabled_error">Conectado ao %1$s. Desligue-o para continuar.</string>
-    <string name="settings_allow_bypass_desc">Permite que as aplicações ignorem a firewall do RethinkDNS. Algumas aplicações de conferências áudio/vídeo como o Zoom e o WhatsApp podem necessitar de contornar a firewall para funcionar corretamente.</string>
+    <string name="settings_allow_bypass_desc">Permitir que as aplicações solicitantes acedam a todas as redes disponíveis. Estas aplicações podem contornar o túnel VPN do Rethink a pedido. Algumas aplicações de conferência de áudio/vídeo, como o Zoom e o Meet, podem exigir isto para funcionarem corretamente.</string>
     <string name="orbot_http_desc">Recomenda que as aplicações utilizem o proxy HTTP do Orbot.</string>
     <string name="settings_orbot_desc">Orbot em modo não VPN com HTTPS/SOCKS5.</string>
     <string name="settings_autostart_bootup_heading">Arranque automático ao ligar (experimental)</string>
@@ -837,7 +837,7 @@
     <string name="brbs_backup_restore_desc" translatable="true">Não funciona em versões de aplicações ou dispositivos</string>
     <string name="ada_app_firewall" translatable="true">Firewall</string>
     <string name="dc_refresh_toast" translatable="true">Atualização de DNS concluída</string>
-    <string name="settings_lock_down_proxy_desc" translatable="true">Não é possível configurar proxies quando a VPN está a ser executada no modo apenas DNS ou no modo de bloqueio. <u>Ir às configurações de VPN</u></string>
+    <string name="settings_lock_down_proxy_desc" translatable="true">Não é possível configurar proxies quando a VPN está a funcionar apenas no modo DNS.</string>
     <string name="settings_default_dns_heading" translatable="true">Escolha o DNS alternativo</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s regras universais</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Ignorar DNS universal e regras de firewall para aplicações <i>listadas</i>\?</string>
@@ -874,4 +874,28 @@
     <string name="lbl_private" translatable="true">privado</string>
     <string name="lbl_secure" translatable="true">seguro</string>
     <string name="lbl_starting" translatable="true">A iniciar</string>
+    <string name="status_protected_with_wg_private_dns" translatable="true">protegido com wireguard &amp; dns privado</string>
+    <string name="http_proxy_dialog_desc" translatable="true">URL de configuração do formulário, &lt;protocolo&gt;://&lt;nome de utilizador&gt;:&lt;palavra-passe&gt;@&lt;domínio-ou-ip&gt;:&lt;porta&gt;&lt;caminho&gt;. Exemplo: http://proxy.example.com:8080/</string>
+    <string name="lbl_preshared_key" translatable="true">Chave pré-partilhada</string>
+    <string name="lbl_allowed_ips" translatable="true">IPs permitidos</string>
+    <string name="failed_using_default" translatable="true">Falha: a utilizar DNS de recurso</string>
+    <string name="status_protected_with_wg" translatable="true">protegido com wireguard</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">Eliminar o ponto final DNS sobre TLS da configuração guardada.</string>
+    <string name="settings_allow_lan_heading" translatable="true">Não encaminhar IPs privados (experimental)</string>
+    <string name="settings_allow_lan_desc" translatable="true">Excluir rotas LAN, loopback, multicast e link-local do túnel VPN do Rethink.</string>
+    <string name="lbl_listen_port" translatable="true">Porta de escuta</string>
+    <string name="lbl_mtu" translatable="true">MTU</string>
+    <string name="lbl_auto" translatable="true">(auto)</string>
+    <string name="lbl_generated" translatable="true">(gerado)</string>
+    <string name="lbl_socks5" translatable="true">SOCKS5</string>
+    <string name="lbl_http" translatable="true">HTTP</string>
+    <string name="lbl_http_socks5" translatable="true">HTTPS &amp; SOCKS5</string>
+    <string name="lbl_hour" translatable="true">hr</string>
+    <string name="lbl_day" translatable="true">dia</string>
+    <string name="lbl_insecure" translatable="true">(inseguro)</string>
+    <string name="lbl_optional" translatable="true">(opcional)</string>
+    <string name="lbl_persistent_keepalive" translatable="true">Continuação persistente</string>
+    <string name="lbl_save" translatable="true">guardar</string>
+    <string name="search_proxy_add_apps" translatable="true">Procurar aplicações por nome</string>
+    <string name="public_key_copy_toast_msg" translatable="true">Chave pública copiada.</string>
 </resources>
