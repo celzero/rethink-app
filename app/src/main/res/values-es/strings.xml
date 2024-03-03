@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Jason A. Donenfeld&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva función&lt;/i&gt;: Soporte Multi-VPN con cualquier número de conexiones simultáneas WireGuard.&lt;br/&gt; 2. &lt;i &gt;Nueva función&lt;/i&gt;: indicador de conexión activa (abierta) en los registros de red.&lt;/br&gt; 3. &lt;i&gt;Nueva función&lt;/i&gt;: restringir Tor-como-un-proxy (Orbot) a aplicaciones específicas.&lt; br/&gt; 4. &lt;i&gt;Nueva función&lt;/i&gt;: Las estadísticas muestran ahora agrupaciones basadas en Geolocalización IP.&lt;br/&gt; 5. &lt;i&gt;Nueva función&lt;/i&gt;: Mostrar el uso de datos en los registros de red: bytes de carga y descarga por solicitud.&lt;br/&gt; 6. &lt;i&gt;Nueva función&lt;/i&gt;: Estadísticas de carga y descarga por aplicación.&lt;br/&gt; 7. &lt;i&gt;Nueva función&lt;/i&gt;: Compatibilidad con servidores locales DNS sobre HTTPS (no públicos).&lt;br/&gt; 8. Informes de errores a la carta superdetallados para un mejor diagnóstico.&lt;br/&gt; 9. Refuerzo DNS está ahora activado por defecto.&lt;br/&gt; 10. Mejora de la interfaz para gestionar las reglas de IP y dominio por aplicación.&lt;br/&gt; 11. Mosaicos más grandes en la pantalla de inicio.&lt;br/&gt; 12. Actualización de la interfaz del cortafuegos.&lt; br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: Hacer que HTTP Proxy funcione para túneles CONECTADOS.&lt;br/&gt; 14. &lt;i&gt;Corrección de errores&lt;/i&gt;: Los dominios de confianza (permitir listas) funcionan ahora con los servidores DNS de terceros.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayuda a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para anonimizar &lt;i&gt;DNS inconsciente a través de HTTPS.&lt;/i&gt;&lt;br/&gt; 2. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para &lt;i&gt;DNS sobre TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Nueva característica&lt;/i&gt;: modos WireGuard simple y avanzado.&lt;br/&gt; 4. &lt;i&gt;Nueva característica&lt;/i&gt;: Mostrar ancho de banda en la pantalla de estadísticas.&lt;br/&gt; 5. &lt;i&gt;Nueva característica&lt;/i&gt;: admite todos los proxies, incluido Orbot, incluso en modo &lt;i&gt;de bloqueo de VPN&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Nueva característica&lt;/i&gt;: ¡Monitoree el tráfico de red usando Rethink!&lt;br/&gt; 7. &lt;i&gt;Nueva característica&lt;/i&gt;: Reenviar DNS a través de proxies activos como WireGuard.&lt;br/&gt; 8. &lt;i&gt;Nueva característica&lt;/i&gt;: Copia de seguridad y restauración de la misma versión en todos los dispositivos.&lt;br/&gt; 9. Se ha mejorado la generación de &lt;i&gt;informes de errores&lt;/i&gt;.&lt;br/&gt; 10. Mejor manejo de redes IP de doble pila.&lt;br/&gt; 11. &lt;i&gt;Corrección de errores&lt;/i&gt;: Correcciones de errores menores en el manejo de DNS de multidifusión.&lt;br/&gt; 12. &lt;i&gt;Corrección de errores&lt;/i&gt;: Recuperación automática de la conectividad para las VPN de WireGuard.&lt;br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: Solucione las notificaciones de aplicaciones bloqueadas incorrectamente.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayude a traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -194,7 +194,7 @@
     <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip">+%1$s Otras IPs</string>
     <string name="dns_btm_sheet_chip_no_answer">Sin respuesta</string>
-    <string name="dns_btm_resolved_crypt">resuelto <u>anónimamente</u> %1$s por %2$s</string>
+    <string name="dns_btm_resolved_crypt">resuelto <u>de forma anónima</u> %1$s por %2$s a través de %3$s</string>
     <string name="dns_btm_resolved_doh">resuelto %1$s por %2$s</string>
     <string name="dns_btm_resolved_doh_no_server">resuelto %1$s</string>
     <string name="hs_download_positive_default">aceptar</string>
@@ -847,7 +847,7 @@
     <string name="dc_setting_dns_cache_heading" translatable="true">Refuerzo DNS</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">Fusionar peticiones, respuestas en caché, gestión de errores resistentes</string>
     <string name="settings_lock_down_proxy_desc" translatable="true">No se pueden configurar proxies cuando la VPN se ejecuta en modo sólo DNS.</string>
-    <string name="brbs_backup_restore_desc" translatable="true">No funciona en todas las versiones de la aplicación ni en todos los dispositivos</string>
+    <string name="brbs_backup_restore_desc" translatable="true">No funciona en todas las versiones de la aplicación</string>
     <string name="settings_allow_lan_heading" translatable="true">No enrutar IPs privadas (experimental)</string>
     <string name="settings_allow_lan_desc" translatable="true">Excluye las rutas LAN, loopback, multicast, enlace-local del túnel VPN de Rethink.</string>
     <string name="lbl_network" translatable="true">red</string>
@@ -943,7 +943,7 @@
     <string name="setup_wireguard" translatable="true">Configurar WireGuard</string>
     <string name="wireguard_description" translatable="true">WireGuard como un proxy.</string>
     <string name="new_warp_config_desc" translatable="true">Obtener la configuración WARP del servidor</string>
-    <string name="add_remove_apps" translatable="true">Añadir / Eliminar aplicaciones (%1$s aplicaciones)</string>
+    <string name="add_remove_apps" translatable="true">Añadir / Eliminar (%1$s aplicaciones)</string>
     <string name="new_warp_error_toast" translatable="true">No se puede recuperar la configuración WARP</string>
     <string name="new_warp_invalid_config_toast" translatable="true">Configuración WARP no válida</string>
     <string name="config_delete_dialog_desc">¿Está seguro que quiere borrar esta configuración\?</string>
@@ -987,10 +987,10 @@
     <string name="settings_rinr_desc_enabled" translatable="true">Enruta el tráfico propio de Rethink, como descargas de listas de bloqueo, comprobaciones de conectividad, conexiones DNS, de vuelta al túnel.</string>
     <string name="cd_dialog_edit_title" translatable="true">Editar la regla del dominio</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
-    <string name="wg_lockdown_dialog_desc" translatable="true">Las aplicaciones seleccionadas sólo se enrutarán a través de esta VPN de WireGuard, independientemente de si falla o está conectada.</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">Las aplicaciones seleccionadas sólo se enrutarán a través de esta VPN de WireGuard, independientemente de si la VPN falla o está conectada.</string>
     <string name="one_wg_dialog_desc" translatable="true">Todas las conexiones de todas las aplicaciones, incluyendo DNS, serán enrutadas a una única VPN WireGuard activa. Las demás VPN de WireGuard activas, si las hay, se detendrán.</string>
     <string name="catch_all_wg_dialog_desc" translatable="true">Todas las conexiones y aplicaciones no enrutadas por otras VPN de WireGuard serán enrutadas por esta.</string>
-    <string name="one_wg_error_toast" translatable="true">Detener \"Mono WireGuard\" para utilizar la función Mutli WireGuard</string>
+    <string name="one_wg_error_toast" translatable="true">Para cambiar a Avanzado, detenga WireGuard en modo Simple</string>
     <string name="wireguard_disable_message" translatable="true">¿Detener todas las VPN activas de WireGuard?</string>
     <string name="settings_rinr_desc_disabled" translatable="true">Enrutar el propio tráfico de Rethink a través del túnel. A menos que sepa lo que hace, desactívelo.</string>
     <string name="lbl_remove" translatable="true">Quitar</string>
@@ -1004,5 +1004,11 @@
     <string name="lbl_stopped" translatable="true">Detenido</string>
     <string name="lbl_secure" translatable="true">seguro</string>
     <string name="lbl_cache" translatable="true">Cache</string>
-    <string name="failed_using_default" translatable="true">Failed: using fallback DNS</string>
+    <string name="failed_using_default" translatable="true">Falló: usando DNS alternativas</string>
+    <string name="one_wg_apps_added" translatable="true">Enrutar todas las aplicaciones</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Aislamiento</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">Siempre activo</string>
+    <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Bucle invertido (experimental)</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">También habilita<!--settings_network_all_networks--> la configuración %1$s. ¿Quieres proceder?</string>
 </resources>
