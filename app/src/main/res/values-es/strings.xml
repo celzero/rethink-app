@@ -999,7 +999,7 @@
     <string name="lbl_private" translatable="true">privado</string>
     <string name="lbl_anonymous" translatable="true">anónimo</string>
     <string name="lbl_peer" translatable="true">Pares</string>
-    <string name="lbl_status" translatable="true">Situación</string>
+    <string name="lbl_status" translatable="true">Estado</string>
     <string name="lbl_starting" translatable="true">Comenzando</string>
     <string name="lbl_stopped" translatable="true">Detenido</string>
     <string name="lbl_secure" translatable="true">seguro</string>

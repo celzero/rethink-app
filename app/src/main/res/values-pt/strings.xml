@@ -866,4 +866,12 @@
     <string name="lbl_app_wise" translatable="true">por aplicação</string>
     <string name="lbl_sec" translatable="true">seg</string>
     <string name="lbl_min" translatable="true">min</string>
+    <string name="lbl_last" translatable="true">Último</string>
+    <string name="lbl_stopped" translatable="true">Parado</string>
+    <string name="lbl_cache" translatable="true">Cache</string>
+    <string name="lbl_status" translatable="true">Estado</string>
+    <string name="lbl_remove" translatable="true">Remover</string>
+    <string name="lbl_private" translatable="true">privado</string>
+    <string name="lbl_secure" translatable="true">seguro</string>
+    <string name="lbl_starting" translatable="true">A iniciar</string>
 </resources>
