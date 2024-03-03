@@ -117,7 +117,7 @@
     <string name="fapps_unmetered_unblock_dialog_message">Permitir conexões em rede ilimitada (Wi-Fi) para aplicativos <i>listados</i>\?</string>
     <string name="fapps_firewall_filter_hint">Mostrando todos os aplicativos</string>
     <string name="firewall_rule_exempt_dns_proxied">DNS com proxy</string>
-    <string name="firewall_rule_no_rule_desc">Nenhuma regra do firewall correspondeu a esta conexão.</string>
+    <string name="firewall_rule_no_rule_desc">Nenhuma regra de firewall correspondeu a esta conexão.</string>
     <string name="firewall_rule_block_dns_bypass">DNS ignorado</string>
     <string name="firewall_rule_global_lockdown">Restrito</string>
     <string name="firewall_rule_block_app_mobile_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>limitada</i>.<br/><br/> Para alterar, vá para a guia <i>Todos os aplicativos</i>.</string>
@@ -132,11 +132,11 @@
     <string name="notif_channel_vpn_failure">VPN inativa</string>
     <string name="notif_channel_proxy_failure">Alertas de proxy</string>
     <string name="socks5_proxy_toast_parameter">Proxy SOCKS5</string>
-    <string name="dns_proxy_connection_failure_lockdown">Ao excluir %1$s para %2$s no modo restrito você pode causar problemas de conectividade com a internet.</string>
+    <string name="dns_proxy_connection_failure_lockdown">Excluir %1$s de %2$s no modo de bloqueio pode causar problemas de conectividade com a Internet.</string>
     <string name="orbot_toast_parameter">Tor-como-proxy</string>
     <string name="update_complete_snack_message">Nova versão baixada.</string>
-    <string name="update_complete_action_snack">RESTART</string>
-    <string name="system_dns_connection_failure">Não é possível determinar o servidor de DNS atual</string>
+    <string name="update_complete_action_snack">REINICIAR</string>
+    <string name="system_dns_connection_failure">Não foi possível determinar o servidor DNS atual</string>
     <string name="copy_clipboard_label">URL</string>
     <string name="category_name_sys_apps">Aplicativos do sistema</string>
     <string name="category_name_others">Outros</string>
@@ -568,24 +568,24 @@
     <string name="fapps_metered_unblock_dialog_title">Permitir em redes limitadas</string>
     <string name="fapps_metered_unblock_dialog_message">Permitir conexões em redes limitada (móvel) para aplicativos <i>listados</i>\?</string>
     <string name="fapps_firewall_filter_desc">Mostrando aplicativos: <u>%1$s</u>, %2$s</string>
-    <string name="fapps_firewall_filter_desc_category">Mostrando aplicativos (<u>%1$s</u>, %2$s) em categorias: %3$s</string>
+    <string name="fapps_firewall_filter_desc_category">Mostrando aplicativos (<u>%1$s</u>, %2$s) nas categorias: %3$s</string>
     <string name="unicode_warning_sign">⚠</string>
     <string name="unicode_question_sign">❔</string>
     <string name="fav_icon">fav_icon</string>
     <string name="rules_load_failure_heading">Observação</string>
     <string name="network_log_app_name_unnamed">Sem nome (%1$s)</string>
-    <string name="dns_crypt_connection_failure">Erro ao conectar a servidor de DNSCrypt.</string>
-    <string name="dns_proxy_connection_failure">Erro ao conectar a servidor proxy de DNS.</string>
+    <string name="dns_crypt_connection_failure">Erro ao conectar ao servidor DNSCrypt.</string>
+    <string name="dns_proxy_connection_failure">Erro ao conectar ao servidor proxy DNS.</string>
     <string name="fapps_info_dialog_message">Impedir que aplicativos se conectem à Internet. Limitar o acesso à Internet ajuda a evitar o uso indesejado de dados, além de economizar bateria.</string>
-    <string name="dns_proxy_toast_parameter">Proxy de DNS</string>
+    <string name="dns_proxy_toast_parameter">Proxy DNS</string>
     <string name="settings_local_blocklist_in_use">%1$s listas de bloqueio em uso</string>
-    <string name="settings_local_blocklist_dialog_positive">Baixar</string>
+    <string name="settings_local_blocklist_dialog_positive">Download</string>
     <string name="settings_local_blocklist_version">Versão: v%1$s</string>
     <string name="accessibility_notification_content">O serviço de acessibilidade do Rethink parou ou travou. Não bloqueia mais aplicativos em segundo plano. Toque para reativar.</string>
     <string name="accessibility_failure_toast">O serviço de acessibilidade do Rethink parou ou travou. Não bloqueia mais aplicativos em segundo plano.</string>
     <string name="coming_soon_toast">em breve</string>
     <string name="pause_text">pausado</string>
-    <string name="pause_desc">Observação: os aplicativos bloqueados %1$s continuarão sendo protegidos por firewall.</string>
+    <string name="pause_desc">Observação: %1$s aplicativos bloqueados continuarão protegidos por firewall.</string>
     <string name="other_dns_list_tab1">DoH</string>
     <string name="other_dns_list_tab2">Dnscrypt</string>
     <string name="other_dns_list_tab3">Proxy DNS</string>
@@ -602,8 +602,8 @@
     <string name="firewall_rule_foreground">Aplicativo não está em uso</string>
     <string name="firewall_rule_unknown">Fonte desconhecida</string>
     <string name="firewall_rule_block_udp_ntp">UDP bloqueado</string>
-    <string name="firewall_rule_block_app_desc">Uma regra do firewall definida pelo usuário bloqueou este <i>aplicativo</i>.<br/><br/> Para alterar, acesse <i>Todos os aplicativos</i>.</string>
-    <string name="firewall_rule_new_app_desc">Este aplicativo fez a conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
+    <string name="firewall_rule_block_app_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i>.<br/><br/> Para alterar, acesse <i>Todos os aplicativos</i>.</string>
+    <string name="firewall_rule_new_app_desc">Este aplicativo fez uma conexão pela <i>primeira</i> vez.<br/><br/> Para alterar, vá para a guia <i>Universal</i>.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Uma regra de firewall definida pelo usuário bloqueou este <i>aplicativo</i> ao tentar se conectar em uma rede <i>ilimitada</i>.<br/><br/> Para alterar, vá para a guia <i>Todos os aplicativos</i>.</string>
     <string name="firewall_rule_isolate_desc">Uma regra de firewall definida pelo usuário bloqueou a conexão deste <i>aplicativo</i> com outros <i>IPs ignorados</i>.<br/><br/> Para alterar, acesse a guia <i>Todos os aplicativos</i>.</string>
     <string name="firewall_rule_block_ip_univ_desc">Uma regra do firewall definida pelo usuário bloqueou o <i>IP / Porta de destino</i>.<br/><br/> Para alterar, acesse <i>Universal</i>.</string>
@@ -738,7 +738,7 @@
     <string name="rt_filter_desc_subgroups">Mostrando <u>%1$s</u> listas de bloqueio no grupo: %2$s e subgrupo: %3$s</string>
     <string name="notif_download_cancel_content">Download cancelado.</string>
     <string name="intent_launch_error">Não foi possível abrir %1$s</string>
-    <string name="firewall_rule_block_univ_ip">IP / porta (universal)</string>
+    <string name="firewall_rule_block_univ_ip">IP / Porta (Universal)</string>
     <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para anonimato de &lt;i&gt;DNS sobre HTTPS esquecido&lt;/i&gt;.&lt;br/&gt; 2. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte para &lt;i&gt;DNS-over-TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Novo recurso&lt;/i&gt;: Modos WireGuard simples e avançados.&lt; br/&gt; 4. &lt;i&gt;Novo recurso&lt;/i&gt;: Mostrar largura de banda na tela de estatísticas.&lt;br/&gt; 5. &lt;i&gt;Novo recurso&lt;/i&gt;: Suporte a todos os proxies, incluindo Orbot, mesmo no modo &lt;i&gt;VPN Restrito&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Novo recurso&lt;/i&gt;: Monitore o tráfego de rede do Rethink usando Rethink!&lt;br/&gt; 7. &lt;i&gt;Novo recurso&lt;/i&gt;: Encaminhe DNS através de proxies ativos como WireGuard.&lt;br/&gt; 8. &lt;i&gt;Novo recurso&lt;/i&gt;: Backup e restauração da mesma versão em todos os dispositivos.&lt;br/&gt; 9. Geração aprimorada de &lt;i&gt;relatórios de bugs&lt;/i&gt;.&lt;br/&gt; 10. Melhor manuseio de redes IP de pilha dupla.&lt;br/&gt; 11. &lt;i&gt;Correção de bug&lt;/i&gt;: Pequenas correções de bugs no manuseio de DNS multicast.&lt;br/&gt; 12. &lt;i&gt;Correção de bug&lt;/i&gt;: Conectividade de recuperação automática para VPNs WireGuard.&lt;br/&gt; 13. &lt;i&gt;Correção de bug&lt;/i&gt;: Notificações de aplicativos bloqueadas incorretamente.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns. com/r/translate&gt;Ajude a traduzir este aplicativo&lt;/a&gt;</string>
     <string name="private_dns_dialog_heading">Desativar DNS Privado</string>
     <string name="private_dns_dialog_desc">As configurações de DNS do Rethink são substituídas pelo \"DNS Privado\" do Android.
@@ -857,7 +857,7 @@
     <string name="ssv_most_contacted_domain_heading" description="This label will appear on the stats screen as a header for most visited domains" translatable="true">domínios mais contatados</string>
     <string name="ssv_app_blocked_heading" description="This label will appear on the stats screen as a header for blocked applications." translatable="true">aplicativos mais bloqueados</string>
     <string name="firewall_rule_dns_blocked" translatable="true">DNS bloqueado</string>
-    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domínio (univ)</string>
+    <string name="firewall_rule_domain_blocked_univ" translatable="true">Domínio (Univ)</string>
     <string name="lbl_mtu" translatable="true">MTU</string>
     <string name="lbl_auto" translatable="true">(auto)</string>
     <string name="lbl_include" translatable="true">Incluir</string>
@@ -945,11 +945,11 @@
     <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no–dnssec/no–log/no–filter/ecs 9.9.9.12 – 149.112.112.12</string>
     <string name="fapps_bypass_block_dialog_message" translatable="true">Ignorar regras de firewall universais para aplicativos <i>listados</i>\?</string>
     <string name="fapps_bypass_dns_firewall_dialog_message" translatable="true">Ignorar regras universais de DNS e firewall para aplicativos <i>listados</i>\?</string>
-    <string name="fapps_exclude_block_dialog_message" translatable="true">Remover aplicativos <i>listados</i> do DNS e do Firewall?</string>
+    <string name="fapps_exclude_block_dialog_message" translatable="true">Excluir aplicativos <i>listados</i> do DNS e do Firewall?</string>
     <string name="firewall_rule_bypass_dns_firewall" translatable="true">Aplicativo ignorado</string>
     <string name="firewall_rule_trusted_domain" translatable="true">Domínio confiável (Aplicativo)</string>
     <string name="firewall_rule_block_domain" translatable="true">Domínio (Aplicativo)</string>
-    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domínio confiável (univ)</string>
+    <string name="firewall_rule_domain_trusted_univ" translatable="true">Domínio confiável (Univ)</string>
     <string name="firewall_rule_bypass_dns_firewall_desc" translatable="true">Esta conexão foi permitida porque o <i>aplicativo de origem</i> está configurado para <i>ignorar regras de DNS e firewall</i>.<br/><br/> Para alterar, vá para a tela <i>Firewall específico do aplicativo </i> .</string>
     <string name="firewall_rule_proxied" translatable="true">Proxied</string>
     <string name="firewall_rule_dns_blocked_desc" translatable="true">Esta conexão foi bloqueada porque o <i>domínio</i> está bloqueado pelo DNS preferencial do usuário.<br/><br/> Para alterar esse comportamento, vá para a guia <i>Configurar DNS</i>.</string>
