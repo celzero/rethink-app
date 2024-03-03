@@ -67,7 +67,7 @@
     <string name="firewall_act_network_monitor_tab">網路</string>
     <string name="dns_act_configure_tab">配置</string>
     <string name="univ_firewall_dialog_title">是否刪除 IP 規則？</string>
-    <string name="doh_custom_url_remove_dialog_title">是否刪除 DNS 端點？</string>
+    <string name="doh_custom_url_remove_dialog_title">是否刪除 DoH 端點？</string>
     <string name="doh_custom_url_remove_success">端點已刪除。</string>
     <string name="dns_crypt_custom_url_remove_dialog_title">是否刪除 DNSCrypt 解析服務？</string>
     <string name="dns_crypt_url_remove_success">DNSCrypt 解析服務已刪除。</string>
@@ -82,7 +82,7 @@
     <string name="local_blocklist_redownload">已爲最新！</string>
     <string name="local_blocklist_redownload_desc">本地攔截清單已爲最新版本 v%1$s 。</string>
     <string name="blocklist_update_check_not_required">攔截清單已爲最新版本。</string>
-    <string name="refresh_complete">應用程式列表已重新同步完畢。</string>
+    <string name="refresh_complete"><!-- use dc_refresh_toast --> 應用程式列表已重新同步完畢。</string>
     <string name="blocklist_update_check_failure">似乎有什麼出錯了。請稍後重試！</string>
     <string name="show_logs_disabled_dns_message">DNS 請求日誌已被禁用。若您想要重新啓用，請至<i>設定</i>並打開<i>啓用本地日誌</i>。</string>
     <string name="configure_dns_crypt">DNSCrypt: %1$s 解析服務</string>
@@ -222,7 +222,7 @@
     <string name="orbot_install_dialog_message">Orbot 將 Tor 的特性與功能帶入 Android 。</string>
     <string name="orbot_install_dialog_positive">安裝</string>
     <string name="orbot_install_activity_error">似乎出了一些問題，請稍後再試</string>
-    <string name="whats_new_version_update">&lt;b&gt;傑森・A・多南菲爾德&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：任意數量 WireGuard 上游的多 VPN 支援。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內的活動連線指示器。&lt;/br&gt; 3. &lt;i&gt;新特性&lt;/i&gt;：限制 Tor （ Orbot ）代理指定應用程式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區現可依據 IP 地理位址顯示分組。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：網路日誌內顯示資料使用情況：分請求統計上載下載位元組。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：分應用程式統計上載下載。&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：支援本地 DNS over HTTPS （非公開）解析服務。&lt;br/&gt; 8. 非常精細的按需漏洞報告，以更好地診斷問題。&lt;br/&gt; 9. DNS 加速器現默認啓用。&lt;br/&gt; 10. 爲分 IP 與網域而改進的 UI 。&lt;br/&gt; 11. 首頁上更大的 UI 塊。&lt;br/&gt; 12. 煥然一新的防火牆 UI 。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：使 HTTP 代理在 CONNECT 隧道上工作。&lt;br/&gt; 14. &lt;i&gt;漏洞修復&lt;/i&gt;：信任網域現也可在第三方 DNS 解析服務上工作。&lt;/br&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;協助翻譯此應用程式&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;齊拉尤・德塞&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;新特性&lt;/i&gt;：支援可匿名的&lt;i&gt;無曉型 DNS-over-HTTPS&lt;/i&gt;。&lt;br/&gt; 2. &lt;i&gt;新特性&lt;/i&gt;：支援&lt;i&gt;DNS-over-TLS&lt;/i&gt;。&lt;br/&gt; 3. &lt;i&gt;新特性&lt;/i&gt;： WireGuard 簡易模式與進階模式。&lt;br/&gt; 4. &lt;i&gt;新特性&lt;/i&gt;：統計區現顯示流量。&lt;br/&gt; 5. &lt;i&gt;新特性&lt;/i&gt;：無論 &lt;i&gt;VPN 閉關&lt;/i&gt;模式是否激活，支援包含 Orbot 等的所有代理。&lt;br/&gt; 6. &lt;i&gt;新特性&lt;/i&gt;：使用 Rethink 監測 Rethink 的網路流量！&lt;br/&gt; 7. &lt;i&gt;新特性&lt;/i&gt;：將 DNS 經如 WireGuard 的活動代理轉送。&lt;br/&gt; 8. &lt;i&gt;新特性&lt;/i&gt;：跨裝置同版本備份與恢復。&lt;br/&gt; 9. 改進&lt;i&gt;漏洞報告&lt;/i&gt;的生成。&lt;br/&gt; 10. 對雙棧 IP 網路的更好支援。&lt;br/&gt; 11. &lt;i&gt;漏洞修復&lt;/i&gt;：對多播 DNS 支援的微小修復。&lt;br/&gt; 12. &lt;i&gt;漏洞修復&lt;/i&gt;：對 WireGuard VPN 的連線自動恢復。&lt;br/&gt; 13. &lt;i&gt;漏洞修復&lt;/i&gt;：修復不正確攔截的應用程式通知。&lt;br/&gt;&lt;/br&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;協助翻譯此應用程式&lt;/a&gt;</string>
     <string name="settings_orbot_header">Orbot\t❯</string>
     <string name="settings_orbot_desc">在非 VPN 模式下使用 HTTPS/SOCKS5 的 Orbot。</string>
     <string name="settings_network_all_networks">使用所有可用網路（實驗性）</string>
@@ -262,7 +262,7 @@
     <string name="category_name_non_app_sys">系統服務</string>
     <string name="cd_toast_added">網域已添加</string>
     <string name="cd_remove_dialog_title">是否刪除網域？</string>
-    <string name="cd_dialog_desc">指定自訂 URL （網域）或通配符以放行或攔截，如 *.test.com 或 test.com/test</string>
+    <string name="cd_dialog_desc">一個 URL 或網域，可帶有通配符，如 *.test.com 或 test.com/test</string>
     <string name="ci_bypass_universal_initial">繞</string>
     <string name="ci_bypass_universal_txt">無條件放行</string>
     <string name="bsac_title_desc">規則僅應用於此應用程式。</string>
@@ -336,7 +336,7 @@
     <string name="firewall_rule_global_lockdown_desc">此連線因全局閉關模式而被攔截。<br/><br/>若需更改，請至<i>全局</i>選項卡。</string>
     <string name="notif_dialog_pause_dialog_neutral">顯示</string>
     <string name="notif_channed_desc_download">提示本地攔截清單下載進度</string>
-    <string name="cd_dialog_error_invalid_wildcard">無效通配符。</string>
+    <string name="cd_dialog_error_invalid_wildcard">無效通配符、 URL 或網域。</string>
     <string name="ada_app_status_unknown">未知</string>
     <string name="rt_dialog_title">儲存更改</string>
     <string name="new_app_notification_action_deny">繼續攔截</string>
@@ -351,7 +351,7 @@
     <string name="firewall_rule_block_app_unmetered_desc">一項用戶定義的防火牆規則在此<i>應用程式</i>嘗試連線至<i>非計費網路</i>時將其攔截。<br/><br/>若需更改，請移步<i>所有應用程式</i>選項卡。</string>
     <string name="notif_channel_firewall_alerts">防火牆警報</string>
     <string name="notif_channel_download">下載警報</string>
-    <string name="cd_dialog_title">添加網域</string>
+    <string name="cd_dialog_title">添加網域規則</string>
     <string name="ci_dialog_added_success">已將 IP 加入清單</string>
     <string name="ada_ip_no_connection">此應用程式無網路日誌。</string>
     <string name="rt_download">下載攔截清單</string>
@@ -366,7 +366,7 @@
     <string name="firewall_rule_bypass_universal_ip_desc">此連線因此<i>目標 IP</i> 被設定爲繞過所有全局規則而被放行。<br/><br/>若需更改，請移步<i>全局</i>選項卡。</string>
     <string name="notif_channel_proxy_failure">代理警報</string>
     <string name="notif_channel_desc_vpn_failure">在 Rethink 被 Android 或其他 VPN 應用程式停止時提醒我</string>
-    <string name="cd_dialog_error_invalid_domain">無效 URL （網域）。</string>
+    <string name="cd_dialog_error_invalid_domain">無效 URL 或網域。</string>
     <string name="ci_no_rules_text">無 IP 或埠規則。</string>
     <string name="ada_firewall_status">此應用程式<b><i>%1$s</i></b>。</string>
     <string name="ada_app_dns_settings">DNS 設定</string>
@@ -521,7 +521,7 @@
     <string name="about_settings_notification">通知設定</string>
     <string name="about_whats_new">%1$s 的新內容</string>
     <string name="about_twitter">在 Twitter 上追蹤我們</string>
-    <string name="about_mozilla">Rethink 受來自 Mozilla Builders 、 OSOM Products Inc 與 FOSS United 基金會的支援。</string>
+    <string name="about_mozilla">Rethink 受來自 Mozilla Builders 、 FOSS United 基金會與 OSOM Products Inc 的支援。</string>
     <string name="about_app_update_check">檢查應用程式更新</string>
     <string name="about_app_contributors">作者</string>
     <string name="about_dialog_positive_button">一起出發</string>
@@ -584,11 +584,11 @@
     <string name="ctbs_block_other_apps">應用於 %1$s 的規則亦會應用於其他 %2$s 個應用程式</string>
     <string name="ctbs_dialog_negative_btn">返回</string>
     <string name="dns_log_dialog_positive">刪除日誌</string>
-    <string name="dns_btm_sheet_dialog_message"> <Data> &lt;h3&gt;&lt;u&gt;&lt;font size=8&gt;%1$s&lt;/font&gt;&lt;/u&gt;：%2$s 個攔截清單&lt;/h3&gt;%3$s。&lt;br/&gt;&lt;br/&gt;</Data> </string>
-    <string name="dns_btm_sheet_dialog_ips"> <Data> %1$s %2$s &lt;br/&gt;</Data> </string>
+    <string name="dns_btm_sheet_dialog_message"> \u0020<Data><![CDATA[ <h3><u><font size="8">%1$s</font></u>：%2$s 份攔截清單</h3>%3$s。<br/><br/>]]></Data> \u0020</string>
+    <string name="dns_btm_sheet_dialog_ips"> \u0020<Data><![CDATA[ %1$s %2$s <br/>]]></Data> \u0020</string>
     <string name="dns_btm_sheet_chip">+%1$s 個其他 IP</string>
     <string name="dns_btm_sheet_chip_no_answer">無應答</string>
-    <string name="dns_btm_resolved_crypt">%1$s 由 %2$s <u>匿名</u>地解析</string>
+    <string name="dns_btm_resolved_crypt">%1$s 由 %2$s 自 %3$s <u>匿名</u>地解析</string>
     <string name="dns_btm_resolved_doh">%1$s 由 %2$s 解析</string>
     <string name="dns_btm_resolved_doh_no_server">已解析 %1$s</string>
     <string name="dns_btm_record_type">請求類型： %1$s</string>
@@ -829,8 +829,8 @@
     <string name="settings_pcap_dialog_option_2" translatable="true">輸出至 Logcat</string>
     <string name="rules_card_domain_count" translatable="true">%1$s 項網域規則</string>
     <string name="firewall_card_universal_rules" translatable="true">%1$s 項通用規則</string>
-    <string name="logs_card_network_count" translatable="true">%1$s 個連線</string>
-    <string name="logs_card_dns_count" translatable="true">%1$s 個查詢</string>
+    <string name="logs_card_network_count" translatable="true">%1$s 條連線</string>
+    <string name="logs_card_dns_count" translatable="true">%1$s 次查詢</string>
     <string name="cd_dns_alg_desc" translatable="true">爲 DNS 請求指定唯一 IP</string>
     <string name="hsf_packet_capture_chip_disabled_toast" translatable="true">資料包捕獲已禁用</string>
     <string name="cd_dns_alg_heading" translatable="true">進階 DNS 過濾（實驗性）</string>
@@ -843,11 +843,11 @@
     <string name="firewall_rule_domain_blocked_univ_desc" translatable="true">此連線因<i>網域</i>被通用網域規則攔截而被攔截。<br/><br/>若需變更此行爲，請移步 <i>DNS 配置</i>選項卡。</string>
     <string name="ada_app_bypass_dns_firewall" translatable="true">繞過 DNS 與防火牆</string>
     <string name="ada_app_status_bypass_dns_firewall" translatable="true">將繞過通用 DNS 與防火牆規則</string>
-    <string name="dc_refresh_toast" translatable="true">DNS 刷新完畢</string>
+    <string name="dc_refresh_toast" translatable="true">刷新完畢</string>
     <string name="dc_setting_dns_cache_heading" translatable="true">DNS 加速器</string>
     <string name="dc_setting_dns_cache_desc" translatable="true">合併請求、快取應答、彈性應對錯誤</string>
     <string name="ada_app_firewall" translatable="true">防火牆</string>
-    <string name="brbs_backup_restore_desc" translatable="true">無法跨版本跨設備使用</string>
+    <string name="brbs_backup_restore_desc" translatable="true">無法跨版本使用</string>
     <string name="lbl_maybe_blocked" translatable="true">或已攔截</string>
     <string name="settings_allow_lan_heading" translatable="true">勿路由專有 IP （實驗性）</string>
     <string name="settings_allow_lan_desc" translatable="true">將 LAN 、環回、多播與本地鏈路路由排除於 Rethink 的 VPN 隧道外。</string>
@@ -941,7 +941,7 @@
     <string name="new_warp_config_desc" translatable="true">從伺服器獲取 WARP 配置</string>
     <string name="new_warp_error_toast" translatable="true">無法獲取 WARP 配置</string>
     <string name="new_warp_invalid_config_toast" translatable="true">無效 WARP 配置</string>
-    <string name="add_remove_apps" translatable="true">添加/移除應用程式（ %1$s 個應用程式）</string>
+    <string name="add_remove_apps" translatable="true">添加/移除（ %1$s 個應用程式）</string>
     <string name="add_peer" translatable="true">添加對等端點</string>
     <string name="config_delete_dialog_desc">您是否仍想刪除此配置？</string>
     <string name="config_add_success_toast">配置已添加</string>
@@ -950,10 +950,10 @@
     <string name="include_all_app_wg_dialog_desc">是否通過此隧道代理所有應用程式？</string>
     <string name="exclude_all_app_wg_dialog_desc">是否從此隧道排除所有應用程式？</string>
     <string name="exclude_all_app_wg_dialog_title">排除所有應用程式</string>
-    <string name="wireguard_enabled_failure">關閉其他代理以啓用 WireGuard</string>
-    <string name="wireguard_no_config_msg">無 WireGuard 配置</string>
-    <string name="wireguard_connection_error">連線至 WireGuard 配置時出錯</string>
-    <string name="wireguard_disclaimer">此爲實驗性的 WireGuard 作 TCP 與 UDP 代理。當 DNS 流量被轉送至 %1$s 時， ICMP 流量將從底層網路發送。</string>
+    <string name="wireguard_enabled_failure">停用其他活動代理以啓用 WireGuard</string>
+    <string name="wireguard_no_config_msg">無 WireGuard VPN 。添加一些配置以開始連線。</string>
+    <string name="wireguard_connection_error">連線至 WireGuard VPN 時出錯</string>
+    <string name="wireguard_disclaimer">DNS 被轉送至 %1$s ，而 ICMP （例如 ping ）將從底層網路發送。</string>
     <string name="cloudflare_dns_desc" translatable="true">不攔截任何 DNS 請求。使用 Cloudflare 的 1.1.1.1 DNS 端點。</string>
     <string name="cloudflare_family_dns_desc" translatable="true">攔截惡意軟體與成人內容。使用 Cloudflare 的 1.1.1.3 DNS 端點。</string>
     <string name="cleanbrowsing_family_dns_desc" translatable="true">家庭篩檢器攔截對所有成人、色情與露骨網站的訪問。其亦將攔截可用於繞行篩檢器的代理與 VPN 網域。包含混合內容的網站（如 Reddit ）也被攔截。 Google 、 Bing 與 YouTube 被設定爲安全模式。</string>
@@ -974,4 +974,45 @@
     <string name="settings_go_log_desc" translatable="true">便於調試</string>
     <string name="settings_go_log_heading" translatable="true">日誌層級</string>
     <string name="logs_card_duration" translatable="true">自 %1$s 以來</string>
+    <string name="lbl_cache" translatable="true">快取</string>
+    <string name="lbl_status" translatable="true">狀態</string>
+    <string name="lbl_remove" translatable="true">移除</string>
+    <string name="lbl_last" translatable="true">最後</string>
+    <string name="lbl_starting" translatable="true">啓動中</string>
+    <string name="lbl_overall" translatable="true">總共</string>
+    <string name="lbl_private" translatable="true">私密</string>
+    <string name="lbl_secure" translatable="true">安全</string>
+    <string name="lbl_anonymous" translatable="true">匿名</string>
+    <string name="failed_using_default" translatable="true">失敗：使用後備 DNS</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">是否刪除 DoT 端點？</string>
+    <string name="dot_custom_url_remove_dialog_message" translatable="true">於已儲存的配置中刪除此 DNS over TLS 端點。</string>
+    <string name="orbot_no_app_toast" translatable="true">添加至少一個應用程式以啓用 Orbot</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">這會同時啓用「<!--settings_network_all_networks--> %1$s」設定。您是否想要繼續？</string>
+    <string name="routing_remaining_apps" translatable="true">路由餘下所有應用程式</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">包含 %1$s 個應用</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">排除 %1$s 個應用</string>
+    <string name="wireguard_disable_title" translatable="true">停止 WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">是否停止所有活躍 WireGuard VPN ？</string>
+    <string name="lbl_remaining_apps" translatable="true">餘下應用</string>
+    <string name="remaining_apps_dialog_title" translatable="true">包含所有餘下應用</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">包含所有未被其他代理路由的應用程式</string>
+    <string name="lbl_stopped" translatable="true">已停止</string>
+    <string name="lbl_peer" translatable="true">對等端</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">持久通知</string>
+    <string name="settings_app_notification_persistent_desc" translatable="true">使通知變得持久</string>
+    <string name="cd_dialog_edit_title" translatable="true">編輯網域規則</string>
+    <string name="cd_toast_edit" translatable="true">已編輯</string>
+    <string name="settings_rinr_heading" translatable="true">回送（實驗性）</string>
+    <string name="one_wg_apps_added" translatable="true">正在路由所有應用程式</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">閉關</string>
+    <string name="wg_lockdown_dialog_desc" translatable="true">所選應用程式將只由此 WireGuard VPN 路由，無論此 VPN 是否成功連線。</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">%1$s 的一部分</string>
+    <string name="settings_rinr_desc_enabled" translatable="true">將如下載攔截清單、連線檢查與 DNS 連線等的 Rethink 自身流量路由回隧道。</string>
+    <string name="settings_rinr_desc_disabled" translatable="true">將 Rethink 自身的流量路由入隧道。若您不瞭解您在做什麼，請不要啓用。</string>
+    <string name="settings_rinr_dialog_title" translatable="true">回送（實驗性）</string>
+    <string name="one_wg_dialog_desc" translatable="true">包括 DNS 在內的來自所有應用程式的流量將被單個活躍的 WireGuard VPN 路由。其他活躍的 WireGuard VPN 將被停止。</string>
+    <string name="catch_all_wg_dialog_desc" translatable="true">所有未被其他 WireGuard VPN 路由的應用程式的連線將經此 VPN 路由。</string>
+    <string name="one_wg_error_toast" translatable="true">停用簡單模式的 WireGuard 以切換至進階模式</string>
+    <string name="catch_all_wg_dialog_title" translatable="true">永久連線</string>
+    <string name="wireguard_disable_failure" translatable="true">無法關閉「永久連線的 WireGuard 」</string>
 </resources>
