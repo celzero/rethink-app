@@ -988,4 +988,5 @@
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Incluir aplicações %1$s</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Excluir aplicativos %1$s</string>
 </resources>
