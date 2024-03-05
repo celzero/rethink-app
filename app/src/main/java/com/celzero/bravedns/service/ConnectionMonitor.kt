@@ -39,6 +39,13 @@ import com.celzero.bravedns.util.Utilities.isAtleastS
 import com.celzero.bravedns.util.Utilities.isNetworkSame
 import com.google.common.collect.Sets
 import inet.ipaddr.IPAddressString
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.selects.select
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.Closeable
 import java.io.IOException
 import java.net.DatagramSocket
@@ -47,13 +54,6 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
-import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.selects.select
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
     ConnectivityManager.NetworkCallback(), KoinComponent {

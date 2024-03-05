@@ -26,13 +26,13 @@ import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Logger.Companion.LOG_TAG_DNS
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.MalformedURLException
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 object DomainRulesManager : KoinComponent {
 
