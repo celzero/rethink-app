@@ -987,4 +987,5 @@
     <string name="settings_app_notification_persistent_heading" translatable="true">Notificação persistente</string>
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Incluir aplicativos %1$s</string>
+    <string name="cd_toast_edit" translatable="true">Editado</string>
 </resources>
