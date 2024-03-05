@@ -35,6 +35,7 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock.elapsedRealtime
+import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
@@ -99,7 +100,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -1211,9 +1211,7 @@ class BraveVPNService :
                     rdb.refresh(RefreshDatabase.ACTION_REFRESH_AUTO) {
                         restartVpn(opts)
                         // call this *after* a new vpn is created #512
-                        uiCtx("observers") {
-                            observeChanges()
-                        }
+                        uiCtx("observers") { observeChanges() }
                     }
                 }
             }
@@ -2009,9 +2007,6 @@ class BraveVPNService :
             var builder: VpnService.Builder = newBuilder().setSession("Rethink").setMtu(mtu)
 
             var has6 = route6()
-            // always add ipv4 to the route, even though there is no ipv4 address
-            // ICMPv6 is not handled in underlying tun2socks, so add ipv4 route even if the
-            // selected protocol type is ipv6
             var has4 = route4()
 
             Log.i(LOG_TAG_VPN, "Building vpn for v4? $has4, v6? $has6")
@@ -2325,8 +2320,12 @@ class BraveVPNService :
 
     // function to decide which transport id to return on Dns only mode
     private fun getTransportIdForDnsMode(fqdn: String): backend.DNSOpts {
+        // in vpn-lockdown mode+appPause , use system dns if the app is paused to mimic
+        // as if the apps are excluded from vpn
+        val useSystemDns =
+            appConfig.isSystemDns() || (isAppPaused() && VpnController.isVpnLockdown())
         // system dns is treated as special in GoTun2Socks, so return as Dnsx.System if enabled
-        if (appConfig.isSystemDns()) {
+        if (useSystemDns) {
             return prepareDnsxNsOpts(Backend.System)
         }
         // check for global domain rules
