@@ -979,4 +979,12 @@
     <string name="config_delete_dialog_title" translatable="true">Eliminar</string>
     <string name="config_add_success_toast" translatable="true">Concluído</string>
     <string name="wireguard_disable_failure" translatable="true">\"WireGuard sempre ligado\" não pode ser desligado</string>
+    <string name="cd_dialog_edit_title" translatable="true">Editar regra de domínio</string>
+    <string name="lbl_peer" translatable="true">Peer</string>
+    <string name="dot_custom_url_remove_dialog_title" translatable="true">Excluir ponto final DoT?</string>
+    <string name="settings_rinr_dialog_title" translatable="true">Loopback (experimental)</string>
+    <string name="wireguard_apps_proxy_map_desc" translatable="true">parte de %1$s</string>
+    <string name="settings_app_notification_persistent_heading" translatable="true">Notificação persistente</string>
+    <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
+    <string name="wg_apps_dialog_title_include" translatable="true">Incluir aplicativos %1$s</string>
 </resources>
