@@ -5,8 +5,8 @@
     <string name="fapps_unmetered_block_dialog_message">¿Bloquear las conexiones en la red sin límites (WiFi) para las aplicaciones en la <i>lista</i>\?</string>
     <string name="unicode_question_sign">❔</string>
     <string name="network_log_app_name_unnamed">Sin nombre (%1$s)</string>
-    <string name="dns_proxy_connection_failure_lockdown">La exclusión de %1$s para %2$s en modo de aislamiento puede causar problemas de conectividad a Internet.</string>
-    <string name="hs_btm_sheet_lock_down">No se puede cambiar de modo cuando la VPN está en <i>aislamiento</i>. Pulse para <u>editar los ajustes de la VPN</u>.</string>
+    <string name="dns_proxy_connection_failure_lockdown">La exclusión de %1$s para %2$s en modo de bloqueo puede causar problemas de conectividad a Internet.</string>
+    <string name="hs_btm_sheet_lock_down">No se puede cambiar de modo cuando la VPN está en <i>bloqueo</i>. Pulse para <u>editar los ajustes de la VPN</u>.</string>
     <string name="firewall_rule_isolate">Aislamiento</string>
     <string name="firewall_rule_block_udp_ntp_desc">Una regla del cortafuegos activada por el usuario bloqueó esta conexión <i>UDP</i>.<br/><br/> Para cambiarla, vaya a la pestaña <i>Universal</i>.</string>
     <string name="firewall_rule_bypass_universal_ip">IP omitida</string>
@@ -35,7 +35,7 @@
 \nNúmero de puerto: %2$s</string>
     <string name="dns_proxy_dialog_header_dns">Añadir proxy DNS</string>
     <string name="cd_toast_added">Dominio añadido con éxito</string>
-    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para anonimizar &lt;i&gt;DNS inconsciente a través de HTTPS.&lt;/i&gt;&lt;br/&gt; 2. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para &lt;i&gt;DNS sobre TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Nueva característica&lt;/i&gt;: modos WireGuard simple y avanzado.&lt;br/&gt; 4. &lt;i&gt;Nueva característica&lt;/i&gt;: Mostrar ancho de banda en la pantalla de estadísticas.&lt;br/&gt; 5. &lt;i&gt;Nueva característica&lt;/i&gt;: admite todos los proxies, incluido Orbot, incluso en modo &lt;i&gt;de bloqueo de VPN&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Nueva característica&lt;/i&gt;: ¡Monitoree el tráfico de red usando Rethink!&lt;br/&gt; 7. &lt;i&gt;Nueva característica&lt;/i&gt;: Reenviar DNS a través de proxies activos como WireGuard.&lt;br/&gt; 8. &lt;i&gt;Nueva característica&lt;/i&gt;: Copia de seguridad y restauración de la misma versión en todos los dispositivos.&lt;br/&gt; 9. Se ha mejorado la generación de &lt;i&gt;informes de errores&lt;/i&gt;.&lt;br/&gt; 10. Mejor manejo de redes IP de doble pila.&lt;br/&gt; 11. &lt;i&gt;Corrección de errores&lt;/i&gt;: Correcciones de errores menores en el manejo de DNS de multidifusión.&lt;br/&gt; 12. &lt;i&gt;Corrección de errores&lt;/i&gt;: Recuperación automática de la conectividad para las VPN de WireGuard.&lt;br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: Solucione las notificaciones de aplicaciones bloqueadas incorrectamente.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayude a traducir esta aplicación&lt;/a&gt;</string>
+    <string name="whats_new_version_update">&lt;b&gt;Chirayu Desai&lt;/b&gt;&lt;br/&gt;&lt;br/&gt; 1. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para anonimizar &lt;i&gt;DNS inconsciente a través de HTTPS.&lt;/i&gt;&lt;br/&gt; 2. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporte para &lt;i&gt;DNS sobre TLS&lt;/i&gt;.&lt;br/&gt; 3. &lt;i&gt;Nueva característica&lt;/i&gt;: modos WireGuard simple y avanzado.&lt;br/&gt; 4. &lt;i&gt;Nueva característica&lt;/i&gt;: Mostrar ancho de banda en la pantalla de estadísticas.&lt;br/&gt; 5. &lt;i&gt;Nueva característica&lt;/i&gt;: Soporta todos los proxies, incluyendo Orbot, incluso en modo &lt;i&gt;de bloqueo de VPN&lt;/i&gt;.&lt;br/&gt; 6. &lt;i&gt;Nueva característica&lt;/i&gt;: ¡Monitoree el tráfico de red usando Rethink!&lt;br/&gt; 7. &lt;i&gt;Nueva característica&lt;/i&gt;: Reenviar DNS a través de proxies activos como WireGuard.&lt;br/&gt; 8. &lt;i&gt;Nueva característica&lt;/i&gt;: Copia de seguridad y restauración de la misma versión en todos los dispositivos.&lt;br/&gt; 9. Se ha mejorado la generación de &lt;i&gt;informes de errores&lt;/i&gt;.&lt;br/&gt; 10. Mejor manejo de redes IP de doble pila.&lt;br/&gt; 11. &lt;i&gt;Corrección de errores&lt;/i&gt;: Correcciones de errores menores en el manejo de DNS de multidifusión.&lt;br/&gt; 12. &lt;i&gt;Corrección de errores&lt;/i&gt;: Recuperación automática de la conectividad para las VPN de WireGuard.&lt;br/&gt; 13. &lt;i&gt;Corrección de errores&lt;/i&gt;: Solucione las notificaciones de aplicaciones bloqueadas incorrectamente.&lt;br/&gt;&lt;br/&gt; &lt;a href=https://svc.rethinkdns.com/r/translate&gt;Ayude a traducir esta aplicación&lt;/a&gt;</string>
     <string name="dc_dns_leaks_desc">Cuando está activado, Rethink captura todos los paquetes en el puerto 53 y los reenvía a un punto de acceso DNS establecido por el usuario</string>
     <string name="about_settings_app_info">Información de la aplicación</string>
     <string name="settings_orbot_disabled_error">Desactive el proxy HTTP(S) y/o SOCKS5 para continuar con la configuración de Tor-como-un-proxy.</string>
@@ -43,7 +43,7 @@
     <string name="about_translate_link">https://svc.rethinkdns.com/r/translate</string>
     <string name="always_on_dialog_heading">Desactivar la VPN siempre activa</string>
     <string name="always_on_dialog_stop_heading">VPN siempre activa</string>
-    <string name="always_on_dialog_lockdown_stop_message">Rethink está ejecutando la VPN en modo <i>Aislamiento</i>. Detenerlo provocaría la pérdida de conectividad a Internet en este perfil de usuario. ¿Desea continuar de todas formas\?</string>
+    <string name="always_on_dialog_lockdown_stop_message">Rethink está ejecutando la VPN en modo <i>Bloqueo</i>. Detenerlo provocaría la pérdida de conectividad a Internet en este perfil de usuario. ¿Desea continuar de todas formas?</string>
     <string name="firewall_act_universal_tab">universal</string>
     <string name="always_on_dialog_neutral">Ajustes</string>
     <string name="univ_firewall_dialog_title">¿Borrar la regla IP\?</string>
@@ -283,13 +283,13 @@
     <string name="firewall_rule_exempt_dns_proxied">Proxy DNS</string>
     <string name="firewall_rule_exempt_orbot_setup">Configuración de Orbot</string>
     <string name="firewall_rule_block_http">HTTP inseguro</string>
-    <string name="firewall_rule_global_lockdown">Aislamiento</string>
+    <string name="firewall_rule_global_lockdown">Bloqueo</string>
     <string name="firewall_rule_no_rule_desc">Ninguna regla del cortafuegos coincide con esta conexión.</string>
     <string name="firewall_rule_block_app_desc">Una regla del cortafuegos activada por el usuario ha bloqueado esta aplicación <i/> .<br/><br/> Para cambiarla, vaya a la pestaña <i>Todas las aplicaciones</i>.</string>
     <string name="firewall_rule_new_app_desc">Esta aplicación hizo la conexión la <i>primera vez</i>.<br/><br/> Para cambiar vaya a la pestaña <i>Universal</i>.</string>
     <string name="firewall_rule_block_app_unmetered_desc">Una regla del cortafuegos activada por el usuario ha bloqueado esta <i>aplicación</i> al intentar conectarse a la red <i>Sin límites</i>.<br/><br/> Para cambiarla, vaya a la pestaña <i>Todas las aplicaciones</i>.</string>
     <string name="firewall_rule_block_app_mobile_desc">Una regla del cortafuegos activada por el usuario ha bloqueado esta <i>aplicación</i> al intentar conectarse a la red <i>Con límites</i>.<br/><br/> Para cambiarla, vaya a la pestaña <i>Todas las aplicaciones</i>.</string>
-    <string name="firewall_rule_isolate_desc">Una regla del cortafuegos activada por el usuario ha aislado esta <i>aplicación</i> que está conectando a otras <i>IPs omitidas</i>.<br/><br/> Para cambiarla, vaya a la pestaña <i>Todas las aplicaciones</i>.</string>
+    <string name="firewall_rule_isolate_desc">Una regla del cortafuegos activada por el usuario ha bloqueado esta <i>aplicación</i> que está conectando a otras <i>IPs omitidas</i>.<br/><br/> Para cambiarla, vaya a la pestaña <i>Todas las aplicaciones</i>.</string>
     <string name="firewall_rule_block_ip_desc">Una regla del cortafuegos activada por el usuario ha bloqueado la <i>IP destino</i> .<br/><br/> Para cambiarla vaya a la pantalla <i>Cortafuegos específico de la aplicación</i>.</string>
     <string name="firewall_rule_foreground_desc">Esta conexión estaba bloqueada porque la aplicación de origen <i>no esta en primer plano</i>.<br/><br/> Para cambiar este comportamiento vaya a la pestaña <i>Universal</i>.</string>
     <string name="firewall_rule_unknown_desc">Esta conexión fue bloqueada porque no se pudo determinar la <i>aplicación de origen</i>.<br/><br/> Para cambiar este comportamiento, vaya a la pestaña <i>Universal</i>.</string>
@@ -385,7 +385,6 @@
     <string name="about_mail_bugreport_text">Envíe este correo electrónico a : hello@celzero.com</string>
     <string name="settings_notification_dialog_option_2">"
 \nDNS / DNS + Cortafuegos:
-\n
 \nMuestra dos botones para cambiar rápidamente entre el modo DNS de ahorro de batería y el modo normal DNS + Firewall."</string>
     <string name="settings_selected_theme">Tema actual: %1$s</string>
     <string name="dns_crypt_relay_remove_dialog_title">¿Borrar el repetidor DNSCrypt\?</string>
@@ -441,11 +440,9 @@
     <string name="settings_notification_dialog_title">Elija la acción de notificación</string>
     <string name="settings_notification_dialog_option_1">"
 \nPausa / Parar (por defecto):
-\n
 \nMuestra dos botones, para pausar y detener rápidamente Rethink."</string>
     <string name="settings_notification_dialog_option_3">"
 \nNinguno:
-\n
 \nNo muestra ningún botón.
 \n"</string>
     <string name="firewall_card_status_active">%1$s aplicaciones</string>
@@ -473,7 +470,7 @@
     <string name="hsf_pause_vpn_failure">No se puede pausar: Rethink no está activo</string>
     <string name="dc_other_dns_heading">tipo</string>
     <string name="dc_custom_dns_radio">Otros DNS</string>
-    <string name="hsf_exclude_error">La exclusión no es posible en el modo de aislamiento VPN</string>
+    <string name="hsf_exclude_error">La exclusión no es posible en el modo bloqueo de VPN</string>
     <string name="dc_dns_website_heading">Mostrar el icono del sitio web en los registros de DNS (en pruebas)</string>
     <string name="dc_rethink_dns_radio">Rethink DNS</string>
     <string name="dc_entries">%1$s entradas »</string>
@@ -536,7 +533,7 @@
     <string name="firewall_rule_block_univ_ip">IP / Puerto (Universal)</string>
     <string name="firewall_rule_block_ip_univ_desc">Una regla del cortafuegos activada por el usuario ha bloqueado la <i>IP destino / Puerto</i>.<br/><br/> Para cambiarla vaya a la pestaña <i>Universal</i>.</string>
     <string name="firewall_rule_exempt_orbot_setup_desc">Esta conexión fue permitida porque la configuración <i>Tor-como-un-proxy en un clic</i> a través de Orbot estaba en curso.</string>
-    <string name="firewall_rule_global_lockdown_desc">Esta conexión fue bloqueada porque el aislamiento universal está configurado.<br/><br/> Para cambiarlo vaya a la pestaña <i>Universal</i>.</string>
+    <string name="firewall_rule_global_lockdown_desc">Esta conexión fue bloqueada porque el bloqueo universal está configurado.<br/><br/> Para cambiarlo vaya a la pestaña <i>Universal</i>.</string>
     <string name="new_app_notification_action_toast_allow">Conexión de red permitida para la aplicación</string>
     <string name="notif_channel_firewall_alerts">Alertas de cortafuegos</string>
     <string name="notif_channel_proxy_failure">Alertas de proxy</string>
@@ -672,7 +669,7 @@
     <string name="orbot_status_arg_2">TCP</string>
     <string name="orbot_title">Orbot y Proxies</string>
     <string name="settings_allow_bypass_desc">Permite a las aplicaciones solicitantes acceder a todas las redes disponibles. Estas aplicaciones pueden eludir el túnel VPN bajo demanda de Rethink. Algunas aplicaciones de audio/vídeo conferencia como Zoom y Meet pueden requerir esto para funcionar correctamente.</string>
-    <string name="settings_lock_down_mode_desc">Ciertas opciones están desactivadas cuando la VPN está en modo aislamiento. <u>Ver los ajustes de la VPN</u>.</string>
+    <string name="settings_lock_down_mode_desc">Ciertas opciones están desactivadas cuando la VPN está en modo bloqueo. <u>Ver los ajustes de la VPN</u>.</string>
     <string name="settings_ip_network_desc">Elija entre las versiones del Protocolo de Internet.</string>
     <string name="orbot_none">Ninguna (por defecto)</string>
     <string name="orbot_stop_dialog_message">Rethink ha dejado de reenviar conexiones a Orbot, pero Orbot podría estar funcionando en segundo plano.</string>
@@ -767,7 +764,7 @@
     <string name="fapps_info_isolate_msg">Bloquear todo excepto IPs de confianza.</string>
     <string name="fapps_info_metered_msg">Permitir/Bloquear en red con límites (Móvil).</string>
     <string name="fapps_bypass_block_dialog_title">Omitir aplicaciones</string>
-    <string name="fapps_isolate_block_dialog_title">Aislamiento de las aplicaciones</string>
+    <string name="fapps_isolate_block_dialog_title">Aislamiento de aplicaciones</string>
     <string name="fapps_exclude_block_dialog_message">¿Excluir las aplicaciones en la <i>lista</i> del DNS y Firewall\?</string>
     <string name="ci_trust_rule">Confiar</string>
     <string name="ssv_app_network_activity_heading" description="This label will appear on the stats screen as a header for allowed apps." translatable="true">aplicaciones más permitidas</string>
@@ -983,7 +980,7 @@
     <string name="dot_custom_url_remove_dialog_title" translatable="true">¿Eliminar el punto final DoT?</string>
     <string name="dot_custom_url_remove_dialog_message" translatable="true">Elimina el punto final de la DNS sobre TLS de la configuración guardada.</string>
     <string name="orbot_no_app_toast" translatable="true">Añadir al menos una aplicación para habilitar Orbot</string>
-    <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
+    <string name="settings_rinr_heading" translatable="true">Bucle invertido \"Loopback\" (experimental)</string>
     <string name="settings_rinr_desc_enabled" translatable="true">Enruta el tráfico propio de Rethink, como descargas de listas de bloqueo, comprobaciones de conectividad, conexiones DNS, de vuelta al túnel.</string>
     <string name="cd_dialog_edit_title" translatable="true">Editar la regla del dominio</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
@@ -1006,11 +1003,11 @@
     <string name="lbl_cache" translatable="true">Cache</string>
     <string name="failed_using_default" translatable="true">Falló: usando DNS alternativas</string>
     <string name="one_wg_apps_added" translatable="true">Enrutar todas las aplicaciones</string>
-    <string name="wg_lockdown_dialog_title" translatable="true">Aislamiento</string>
+    <string name="wg_lockdown_dialog_title" translatable="true">Bloqueo</string>
     <string name="catch_all_wg_dialog_title" translatable="true">Siempre activo</string>
     <string name="routing_remaining_apps" translatable="true">Enrutamiento de las aplicaciones restantes</string>
     <string name="settings_rinr_dialog_title" translatable="true">Bucle invertido (experimental)</string>
-    <string name="settings_rinr_dialog_desc" translatable="true">También habilita<!--settings_network_all_networks--> la configuración %1$s. ¿Quieres proceder?</string>
+    <string name="settings_rinr_dialog_desc" translatable="true">También activa el ajuste <!--settings_network_all_networks--> de %1$s. ¿Quiere proceder?</string>
     <string name="wg_apps_dialog_title_exclude" translatable="true">Excluye %1$s aplicaciones</string>
     <string name="wireguard_disable_title" translatable="true">Detener WireGuard</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicaciones restantes</string>
