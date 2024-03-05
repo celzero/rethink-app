@@ -34,6 +34,7 @@ import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.celzero.bravedns.R
@@ -51,7 +52,6 @@ import com.celzero.bravedns.ui.bottomsheet.RethinkListBottomSheet
 import com.celzero.bravedns.util.Constants
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.VIEW_PAGER_SCREEN_TO_LOAD
-import com.celzero.bravedns.util.CustomLinearLayoutManager
 import com.celzero.bravedns.util.Themes
 import com.celzero.bravedns.util.UIUtils.openAndroidAppInfo
 import com.celzero.bravedns.util.UIUtils.updateHtmlEncodedText
@@ -576,10 +576,10 @@ class AppInfoActivity :
 
     private fun showNetworkLogsIfAny(uid: Int) {
         networkLogsViewModel.setUid(uid)
-        b.aadConnDetailRecycler.setHasFixedSize(false)
-        val layoutManager = CustomLinearLayoutManager(this)
+        b.aadConnDetailRecycler.setHasFixedSize(true)
+        val layoutManager = LinearLayoutManager(this)
         b.aadConnDetailRecycler.layoutManager = layoutManager
-        val recyclerAdapter = AppConnectionAdapter(this, uid)
+        val recyclerAdapter = AppConnectionAdapter(this, this, uid)
         networkLogsViewModel.appNetworkLogs.observe(this) {
             recyclerAdapter.submitData(this.lifecycle, it)
         }
@@ -588,7 +588,6 @@ class AppInfoActivity :
         val itemAnimator = DefaultItemAnimator()
         itemAnimator.changeDuration = 1500
         b.aadConnDetailRecycler.itemAnimator = itemAnimator
-        networkLogsViewModel.setFilter("")
     }
 
     private fun toggleNetworkLogState(state: Boolean) {

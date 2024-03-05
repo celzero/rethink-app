@@ -23,6 +23,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -34,8 +36,11 @@ import com.celzero.bravedns.ui.bottomsheet.AppConnectionBottomSheet
 import com.celzero.bravedns.util.Logger
 import com.celzero.bravedns.util.UIUtils.fetchColor
 import com.celzero.bravedns.util.Utilities.removeBeginningTrailingCommas
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class AppConnectionAdapter(val context: Context, val uid: Int) :
+class AppConnectionAdapter(val context: Context, val lifecycleOwner: LifecycleOwner, val uid: Int) :
     PagingDataAdapter<AppConnection, AppConnectionAdapter.ConnectionDetailsViewHolder>(
         DIFF_CALLBACK
     ),
@@ -48,7 +53,7 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
                 override fun areItemsTheSame(
                     oldConnection: AppConnection,
                     newConnection: AppConnection
-                ) = oldConnection.ipAddress == newConnection.ipAddress
+                ) = oldConnection == newConnection
 
                 override fun areContentsTheSame(
                     oldConnection: AppConnection,
@@ -124,16 +129,14 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
 
         private fun displayTransactionDetails(appConnection: AppConnection) {
             b.acdCount.text = appConnection.count.toString()
-            b.acdFlag.text = appConnection.flag
             b.acdIpAddress.text = appConnection.ipAddress
-            val rule = IpRulesManager.getMostSpecificRuleMatch(uid, appConnection.ipAddress)
-            updateStatusUi(rule)
             if (!appConnection.appOrDnsName.isNullOrEmpty()) {
                 b.acdDomainName.visibility = View.VISIBLE
                 b.acdDomainName.text = beautifyDomainString(appConnection.appOrDnsName)
             } else {
                 b.acdDomainName.visibility = View.GONE
             }
+            updateStatusUi(appConnection.uid, appConnection.ipAddress)
         }
 
         private fun beautifyDomainString(d: String): String {
@@ -142,26 +145,31 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
             return removeBeginningTrailingCommas(d).replace(",,", ",").replace(",", ", ")
         }
 
-        private fun updateStatusUi(status: IpRulesManager.IpRuleStatus) {
-            when (status) {
-                IpRulesManager.IpRuleStatus.NONE -> {
-                    b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
-                }
-                IpRulesManager.IpRuleStatus.BLOCK -> {
-                    b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
-                }
-                IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
-                    b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
-                }
-                IpRulesManager.IpRuleStatus.TRUST -> {
-                    b.acdFlag.text = context.getString(R.string.ci_trust_initial)
+        private fun updateStatusUi(uid: Int, ipAddress: String) {
+            io {
+                val status = IpRulesManager.getMostSpecificRuleMatch(uid, ipAddress)
+                uiCtx {
+                    when (status) {
+                        IpRulesManager.IpRuleStatus.NONE -> {
+                            b.acdFlag.text = context.getString(R.string.ci_no_rule_initial)
+                        }
+                        IpRulesManager.IpRuleStatus.BLOCK -> {
+                            b.acdFlag.text = context.getString(R.string.ci_blocked_initial)
+                        }
+                        IpRulesManager.IpRuleStatus.BYPASS_UNIVERSAL -> {
+                            b.acdFlag.text = context.getString(R.string.ci_bypass_universal_initial)
+                        }
+                        IpRulesManager.IpRuleStatus.TRUST -> {
+                            b.acdFlag.text = context.getString(R.string.ci_trust_initial)
+                        }
+                    }
+
+                    // returns the text and background color for the button
+                    val t = getToggleBtnUiParams(status)
+                    b.acdFlag.setTextColor(t.txtColor)
+                    b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
                 }
             }
-
-            // returns the text and background color for the button
-            val t = getToggleBtnUiParams(status)
-            b.acdFlag.setTextColor(t.txtColor)
-            b.acdFlag.backgroundTintList = ColorStateList.valueOf(t.bgColor)
         }
 
         private fun getToggleBtnUiParams(id: IpRulesManager.IpRuleStatus): ToggleBtnUi {
@@ -196,5 +204,13 @@ class AppConnectionAdapter(val context: Context, val uid: Int) :
 
     override fun notifyDataset(position: Int) {
         this.notifyItemChanged(position)
+    }
+
+    private suspend fun uiCtx(f: suspend () -> Unit) {
+        withContext(Dispatchers.Main) { f() }
+    }
+
+    private fun io(f: suspend () -> Unit) {
+        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { f() }
     }
 }

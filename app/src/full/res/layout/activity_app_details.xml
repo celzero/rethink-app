@@ -541,6 +541,7 @@
                                     android:layout_gravity="start"
                                     android:focusable="false"
                                     android:fontFamily="sans-serif"
+                                    android:textSize="@dimen/default_font_text_view"
                                     android:isScrollContainer="true"
                                     app:iconifiedByDefault="false"
                                     app:queryHint="@string/search_universal_ips" />
