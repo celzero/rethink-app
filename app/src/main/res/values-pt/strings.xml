@@ -103,7 +103,8 @@
     <string name="settings_theme_dialog_themes_4">Preto profundo</string>
     <string name="settings_notification_dialog_option_1">"
 \nPausar / parar (predefinido):
-\nMostra dois botões, para pausar e parar o RethinkDNS rapidamente."</string>
+\n
+\nMostra dois botões, para pausar e parar o Rethink rapidamente."</string>
     <string name="dc_other_dns_heading">tipo</string>
     <string name="settings_ip_text_ipv4">IPv4</string>
     <string name="settings_notification_dialog_option_2">"
@@ -291,10 +292,10 @@
     <string name="settings_https_desc">Reencaminhar as ligações para o ponto final HTTP(S) CONNECT.</string>
     <string name="orbot_http">Proxy HTTP</string>
     <string name="orbot_stop_dialog_message">O Rethink parou de encaminhar conexões para o Orbot, mas o Orbot pode estar a ser executado em segundo plano.</string>
-    <string name="orbot_explanation">O Orbot é uma aplicação de proxy gratuita que permite que as outras aplicações usem a Internet de forma mais <u>segura</u>.
+    <string name="orbot_explanation">O Orbot é uma aplicação proxy gratuita que permite que outras aplicações utilizem a Internet de forma mais <u>segura</u>.
 \nO Orbot usa o <u>Tor</u> para encriptar o seu tráfego na Internet, ajudando a <u>contornar a censura</u> e proteger contra várias formas de <u>vigilância na rede</u> que ameaçam a liberdade e a privacidade das pessoas.
-\n<u>Proxy TCP</u>: o RethinkDNS reencaminha apenas conexões TCP de todas as aplicações, exceto as excluídas do Orbot.
-\n<u>Proxy HTTP</u>: o RethinkDNS <i>configura</i> um proxy HTTP, mas não força as aplicações a uzá-lo. Normalmente os navegadores como o Chrome e o Firefox usam-no. As aplicações que usam o proxy HTTP(S) ignorarão as regras da firewall e DNS.</string>
+\n<u>Proxy TCP</u>: O Rethink <i>encaminha para o Orbot</i> apenas as conexões TCP das aplicações incluídas.
+\n<u>Proxy HTTP</u>: o Rethink <i>configura</i> um proxy HTTP, mas não força as aplicações a uzá-lo. Normalmente os navegadores como o Chrome e o Firefox usam-no. As aplicações que usam o proxy HTTP(S) ignorarão as regras da firewall e DNS.</string>
     <string name="settings_custom_downloader_heading">Usar o descarregador da aplicação</string>
     <string name="orbot_both_desc">Todas as anteriores.</string>
     <string name="orbot_none">Nenhuma (predefinido)</string>
@@ -853,7 +854,7 @@
     <string name="lbl_private_key" translatable="true">Chave privada</string>
     <string name="lbl_random" translatable="true">(aleatório)</string>
     <string name="lbl_very" translatable="true">muito</string>
-    <string name="lbl_maybe_blocked" translatable="true">Talvez esteja bloqueado</string>
+    <string name="lbl_maybe_blocked" translatable="true">Talvez bloqueado</string>
     <string name="lbl_network" translatable="true">rede</string>
     <string name="lbl_create" translatable="true">Criar</string>
     <string name="lbl_wireguard" translatable="true">WireGuard</string>
@@ -995,6 +996,23 @@
     <string name="wireguard_disable_title" translatable="true">Parar WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">Parar todas as VPNs WireGuard ativas?</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicações restantes</string>
-    <string name="remaining_apps_dialog_title" translatable="true">Incluir aplicativos restantes</string>
-    <string name="remaining_apps_dialog_desc" translatable="true">Inclua todos os aplicativos restantes não encaminhados por qualquer outro Proxy</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Incluir aplicações restantes</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Inclua todas as aplicações restantes não encaminhadas por qualquer outro Proxy</string>
+    <string name="crypt_adguard_family_desc" translatable="true">Adguard DNS com pesquisa segura e bloqueio de conteúdos para adultos.</string>
+    <string name="crypt_quad9_security_desc" translatable="true">Quad9 (anycast) dnssec/no–log/filter 9.9.9.9 – 149.112.112.9 – 149.112.112</string>
+    <string name="crypt_relay_netherlands" translatable="true">Relé DNS anónimo alojado nos Países Baixos</string>
+    <string name="crypt_relay_sweden" translatable="true">Relé DNS anónimo alojado na Suécia fornecido por https://cryptostrom.is/.</string>
+    <string name="crypt_cleanbrowsing_family_desc" translatable="true">Bloqueia o acesso a todos os sítios para adultos, pornográficos e explícitos. Também bloqueia domínios proxy e VPN que são utilizados para contornar os filtros. Os sítios de conteúdo misto (como o Reddit) também são bloqueados. O Google, o Bing e o Youtube estão definidos para o modo de segurança.</string>
+    <string name="crypt_quad9_desc" translatable="true">Quad9 (anycast) no-dnssec/no-log/no-filter/ecs 9.9.9.12 – 149.112.112.12</string>
+    <string name="crypt_relay_france" translatable="true">Relé DNS anónimo alojado em Paris, França fornecido por https://cryptostrom.is/.</string>
+    <string name="crypt_relay_us" translatable="true">Relé DNS anónimo alojado nos EUA - Los Angeles, CA fornecido por https://cryptostrom.is/.</string>
+    <string name="crypt_relay_singapore" translatable="true">Relé DNS anónimo alojado na Singapura.</string>
+    <string name="cloudflare_dns_desc" translatable="true">Não bloqueia nenhuma solicitação de DNS. Usa o endpoint DNS do Cloudflare 1.1.1.1.</string>
+    <string name="cloudflare_family_dns_desc" translatable="true">Bloqueia malware e conteúdo adulto. Usa o endpoint DNS do Cloudflare 1.1.1.3.</string>
+    <string name="cloudflare_security_dns_desc" translatable="true">Bloqueia conteúdo malicioso. Usa o endpoint DNS do Cloudflare 1.1.1.2.</string>
+    <string name="google_dns_desc" translatable="true">Não bloqueia quaisquer solicitações de DNS. Usa o endpoint DNS do Google.</string>
+    <string name="cleanbrowsing_family_dns_desc" translatable="true">O filtro familiar bloqueia o acesso a todos os sítios para adultos, pornográficos e explícitos. Bloqueia também os domínios proxy e VPN que podem ser utilizados para contornar os nossos filtros. Os sítios de conteúdo misto (como o Reddit) também são bloqueados. O Google, o Bing e o Youtube estão definidos para o modo de segurança.</string>
+    <string name="cleanbrowsing_adult_dns_desc" translatable="true">O filtro para adultos bloqueia o acesso a todos os sítios para adultos, pornográficos e explícitos. Não bloqueia proxies ou VPNs, nem sites de conteúdo misto. Sítios como o Reddit são permitidos. O Google e o Bing estão definidos para o modo de segurança.</string>
+    <string name="quad9_dns_desc" translatable="true">A Quad9 encaminha as suas consultas DNS através de uma rede segura de servidores em todo o mundo.</string>
+    <string name="crypt_adguard_desc" translatable="true">Protege o seu dispositivo contra malware e muito mais.</string>
 </resources>
