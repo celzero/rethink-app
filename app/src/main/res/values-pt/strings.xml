@@ -995,4 +995,6 @@
     <string name="wireguard_disable_title" translatable="true">Parar WireGuard</string>
     <string name="wireguard_disable_message" translatable="true">Parar todas as VPNs WireGuard ativas?</string>
     <string name="lbl_remaining_apps" translatable="true">Aplicações restantes</string>
+    <string name="remaining_apps_dialog_title" translatable="true">Incluir aplicativos restantes</string>
+    <string name="remaining_apps_dialog_desc" translatable="true">Inclua todos os aplicativos restantes não encaminhados por qualquer outro Proxy</string>
 </resources>
