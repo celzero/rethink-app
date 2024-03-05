@@ -993,4 +993,5 @@
     <string name="wireguard_connection_error" translatable="true">Falha na ligação da VPN WireGuard</string>
     <string name="wireguard_disclaimer" translatable="true">O DNS é reencaminhado para %1$s, o ICMP (ex: ping) é enviado para a rede subjacente.</string>
     <string name="wireguard_disable_title" translatable="true">Parar WireGuard</string>
+    <string name="wireguard_disable_message" translatable="true">Parar todas as VPNs WireGuard ativa?</string>
 </resources>
