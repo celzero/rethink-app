@@ -988,5 +988,9 @@
     <string name="settings_rinr_heading" translatable="true">Loopback (experimental)</string>
     <string name="wg_apps_dialog_title_include" translatable="true">Incluir aplicações %1$s</string>
     <string name="cd_toast_edit" translatable="true">Editado</string>
-    <string name="wg_apps_dialog_title_exclude" translatable="true">Excluir aplicativos %1$s</string>
+    <string name="wg_apps_dialog_title_exclude" translatable="true">Excluir aplicações %1$s</string>
+    <string name="wireguard_no_config_msg" translatable="true">Não há VPNs Wireguard. Adicione alguns para começar.</string>
+    <string name="wireguard_connection_error" translatable="true">Falha na ligação da VPN WireGuard</string>
+    <string name="wireguard_disclaimer" translatable="true">O DNS é reencaminhado para %1$s, o ICMP (ex: ping) é enviado para a rede subjacente.</string>
+    <string name="wireguard_disable_title" translatable="true">Parar WireGuard</string>
 </resources>
