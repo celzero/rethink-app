@@ -100,7 +100,7 @@ class WgAddPeerDialog(
                 val newPeer = builder.build()
 
                 ui {
-                    io {
+                    ioCtx {
                         if (wgPeer != null && isEditing)
                             WireguardManager.deletePeer(configId, wgPeer)
                         WireguardManager.addPeer(configId, newPeer)
@@ -123,7 +123,7 @@ class WgAddPeerDialog(
         (activity as LifecycleOwner).lifecycleScope.launch(Dispatchers.Main) { f() }
     }
 
-    private suspend fun io(f: suspend () -> Unit) {
+    private suspend fun ioCtx(f: suspend () -> Unit) {
         withContext(Dispatchers.IO) { f() }
     }
 }

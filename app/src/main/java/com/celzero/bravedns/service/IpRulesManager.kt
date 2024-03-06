@@ -380,8 +380,8 @@ object IpRulesManager : KoinComponent {
         }
         val nk = treeKey(newIpAddrStr)
         if (!nk.isNullOrEmpty()) {
-            iptree.escLike(nk, treeValLike(prevRule.uid, host.port ?: 0))
-            iptree.add(nk, treeVal(prevRule.uid, host.port ?: 0, newStatus.id))
+            iptree.escLike(nk, treeValLike(newRule.uid, host.port ?: 0))
+            iptree.add(nk, treeVal(newRule.uid, host.port ?: 0, newStatus.id))
         }
         resultsCache.invalidateAll()
     }

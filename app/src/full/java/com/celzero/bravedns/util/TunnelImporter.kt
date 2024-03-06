@@ -28,16 +28,16 @@ import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.service.WireguardManager
 import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.util.ErrorMessages
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 object TunnelImporter : KoinComponent {
 
@@ -132,14 +132,18 @@ object TunnelImporter : KoinComponent {
             }
         }
 
-    fun importTunnel(configText: String, messageCallback: (CharSequence) -> Unit) {
-        try {
-            if (DEBUG) Log.d(Logger.LOG_TAG_PROXY, "Importing tunnel: $configText")
-            val config =
-                Config.parse(ByteArrayInputStream(configText.toByteArray(StandardCharsets.UTF_8)))
-            WireguardManager.addConfig(config)
-        } catch (e: Throwable) {
-            onTunnelImportFinished(listOf(e), messageCallback)
+    suspend fun importTunnel(configText: String, messageCallback: (CharSequence) -> Unit) {
+        withContext(Dispatchers.IO) {
+            try {
+                if (DEBUG) Log.d(Logger.LOG_TAG_PROXY, "Importing tunnel: $configText")
+                val config =
+                    Config.parse(
+                        ByteArrayInputStream(configText.toByteArray(StandardCharsets.UTF_8))
+                    )
+                WireguardManager.addConfig(config)
+            } catch (e: Throwable) {
+                onTunnelImportFinished(listOf(e), messageCallback)
+            }
         }
     }
 

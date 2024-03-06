@@ -503,7 +503,7 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             trackedIpv6Networks.clear()
 
             networks.forEach outer@{ prop ->
-                val network: Network? = prop.network
+                val network: Network = prop.network
 
                 val lp = connectivityManager.getLinkProperties(network)
                 if (lp == null) {
@@ -516,17 +516,23 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                     if (DEBUG) Log.d(LOG_TAG_CONNECTION, "processing active network: $network")
                 }
 
+                var has4 = false
+                var has6 = false
+
                 if (testReachability) {
-                    val has4 = isIPv4Reachable(network, isActive)
-                    val has6 = isIPv6Reachable(network, isActive)
+                    // for active network, ICMP echo is additionally used with TCP and UDP checks
+                    // but ICMP echo will always return reachable when app is in rinr mode
+                    // so till we have checks for rinr mode, we should not use ICMP reachability
+                    val canUseIcmp = false // for now, need to check for rinr mode
+                    val useIcmp = isActive && canUseIcmp
+                    has4 = probeConnectivity(ip4probes, network, useIcmp)
+                    has6 = probeConnectivity(ip6probes, network, useIcmp)
                     if (has4) trackedIpv4Networks.add(prop)
                     if (has6) trackedIpv6Networks.add(prop)
                     Log.i(LOG_TAG_CONNECTION, "nw: has4? $has4, has6? $has6, $prop")
-                    return@outer
+                    if (has4 || has6) return@outer
+                    // else: fall-through to check reachability with network capabilities
                 }
-
-                var has4 = false
-                var has6 = false
 
                 lp.linkAddresses.forEach inner@{ addr ->
                     if (has4 && has6) return@outer
@@ -709,53 +715,34 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
             return newNetworks
         }
 
-        private fun isIPv4Reachable(nw: Network?, isActive: Boolean = false): Boolean =
-            runBlocking {
-                coroutineScope {
-                    // select the first reachable IP / domain and return true if any of them is
-                    // reachable
-                    select<Boolean> {
-                            ip4probes.forEach { ip ->
-                                async {
-                                        var ok = false
-                                        if (isActive) {
-                                            ok = isReachable(ip)
-                                        }
-                                        if (!ok) {
-                                            isReachableTcp(nw, ip)
-                                        }
-                                        ok
+        private fun probeConnectivity(
+            probes: Collection<String>,
+            nw: Network?,
+            isActive: Boolean = false
+        ): Boolean = runBlocking {
+            coroutineScope {
+                // select the first reachable IP / domain and return true if any of them is
+                // reachable
+                select<Boolean> {
+                        probes.forEach { ip ->
+                            async {
+                                    var ok = false
+                                    if (isActive) {
+                                        ok = isReachable(ip)
                                     }
-                                    .onAwait { it }
-                            }
-                        }
-                        .also { coroutineContext.cancelChildren() }
-                }
-            }
-
-        private fun isIPv6Reachable(nw: Network?, isActive: Boolean = false): Boolean =
-            runBlocking {
-                coroutineScope {
-                    select<Boolean> {
-                            ip6probes.forEach { ip ->
-                                async {
-                                        var ok = false
-                                        if (isActive) {
-                                            ok = isReachable(ip)
-                                        }
-                                        if (!ok) {
-                                            isReachableTcp(nw, ip)
-                                        }
-                                        ok
+                                    if (!ok) {
+                                        ok = isReachableTcpUdp(nw, ip)
                                     }
-                                    .onAwait { it }
-                            }
+                                    ok
+                                }
+                                .onAwait { it }
                         }
-                        .also { coroutineContext.cancelChildren() }
-                }
+                    }
+                    .also { coroutineContext.cancelChildren() }
             }
+        }
 
-        private fun isReachableTcp(nw: Network?, host: String): Boolean {
+        private fun isReachableTcpUdp(nw: Network?, host: String): Boolean {
             try {
                 // https://developer.android.com/reference/android/net/Network#bindSocket(java.net.Socket)
                 TrafficStats.setThreadStatsTag(Thread.currentThread().id.toIntOrDefault())
@@ -808,19 +795,20 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 socket.connect(s, onesec)
                 val c = socket.isConnected
                 val b = socket.isBound
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "tcpEcho: $host, ${nw?.networkHandle}: $c, $b")
+                if (DEBUG)
+                    Log.d(LOG_TAG_CONNECTION, "tcpEcho80: $host, ${nw?.networkHandle}: $c, $b")
 
                 return true
             } catch (e: IOException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho: ${e.message}, ${e.cause}")
+                Log.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
                 val cause: Throwable = e.cause ?: return false
 
                 return (cause is ErrnoException && cause.errno == ECONNREFUSED)
             } catch (e: IllegalArgumentException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho: ${e.message}, ${e.cause}")
+                Log.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
                 return false
             } catch (e: SecurityException) {
-                Log.w(LOG_TAG_CONNECTION, "err tcpEcho: ${e.message}, ${e.cause}")
+                Log.w(LOG_TAG_CONNECTION, "err tcpEcho80: ${e.message}, ${e.cause}")
                 return false
             } finally {
                 clos(socket)
@@ -838,10 +826,18 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 socket.connect(s)
                 val c = socket.isConnected
                 val b = socket.isBound
-                if (DEBUG) Log.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw?.networkHandle}: $c, $b")
+                if (DEBUG)
+                    Log.d(LOG_TAG_CONNECTION, "tcpEcho53: $host, ${nw?.networkHandle}: $c, $b")
                 return true
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}")
+            } catch (e: IOException) {
+                Log.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
+                val cause: Throwable = e.cause ?: return false
+
+                return (cause is ErrnoException && cause.errno == ECONNREFUSED)
+            } catch (e: IllegalArgumentException) {
+                Log.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
+            } catch (e: SecurityException) {
+                Log.w(LOG_TAG_CONNECTION, "err tcpEcho53: ${e.message}, ${e.cause}")
             } finally {
                 clos(socket)
             }
@@ -861,8 +857,15 @@ class ConnectionMonitor(context: Context, networkListener: NetworkListener) :
                 val b = socket.isBound
                 if (DEBUG) Log.d(LOG_TAG_CONNECTION, "udpEcho: $host, ${nw?.networkHandle}: $c, $b")
                 return true
-            } catch (e: Exception) {
-                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}")
+            } catch (e: IOException) {
+                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
+                val cause: Throwable = e.cause ?: return false
+
+                return (cause is ErrnoException && cause.errno == ECONNREFUSED)
+            } catch (e: IllegalArgumentException) {
+                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
+            } catch (e: SecurityException) {
+                Log.w(LOG_TAG_CONNECTION, "err udpEcho: ${e.message}, ${e.cause}")
             } finally {
                 clos(socket)
             }

@@ -154,7 +154,7 @@ class CustomDomainAdapter(val context: Context, val rule: CustomRulesActivity.RU
     }
 
     private suspend fun whitelist(cd: CustomDomain) {
-        DomainRulesManager.whitelist(cd)
+        DomainRulesManager.trust(cd)
     }
 
     private suspend fun block(cd: CustomDomain) {

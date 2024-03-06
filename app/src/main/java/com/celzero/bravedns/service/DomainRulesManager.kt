@@ -21,6 +21,7 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import backend.Backend
 import com.celzero.bravedns.R
+import com.celzero.bravedns.RethinkDnsApplication.Companion.DEBUG
 import com.celzero.bravedns.database.CustomDomain
 import com.celzero.bravedns.database.CustomDomainRepository
 import com.celzero.bravedns.util.Constants
@@ -30,6 +31,7 @@ import org.koin.core.component.inject
 import java.net.MalformedURLException
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object DomainRulesManager : KoinComponent {
@@ -37,6 +39,13 @@ object DomainRulesManager : KoinComponent {
     private val db by inject<CustomDomainRepository>()
 
     private var trie: backend.RadixTree = Backend.newRadixTree()
+    // map to store the trusted domains with set of uids
+    private val trustedMap: MutableMap<String, Set<Int>> = ConcurrentHashMap()
+
+    // regex to check if url is valid wildcard domain
+    // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
+    // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
+    private val wcRegex = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
 
     enum class Status(val id: Int) {
         NONE(0),
@@ -85,24 +94,33 @@ object DomainRulesManager : KoinComponent {
 
     // update the cache with the domain and its status based on the domain type
     private fun updateTrie(cd: CustomDomain) {
-        val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+        val key = mkTrieKey(cd.domain, cd.uid)
         trie.set(key, cd.status.toString())
     }
 
-    private fun mkTrieKey(_domain: String, uid: Int): String {
+    private fun mkTrieKey(d: String, uid: Int): String {
         // *.google.co.uk -> .google.co.uk,<uid>
         // not supported by IpTrie: google.* -> google.,<uid>
-        val domain = _domain.removePrefix("*")
+        val domain = d.removePrefix("*")
         return domain.lowercase(Locale.ROOT) + "," + uid
     }
 
     suspend fun load(): Long {
         trie.clear()
+        trustedMap.clear()
         db.getAllCustomDomains().forEach { cd ->
-            val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+            val key = mkTrieKey(cd.domain, cd.uid)
             trie.set(key, cd.status.toString())
+            maybeAddToTrustedMap(cd)
         }
         return trie.len()
+    }
+
+    private fun maybeAddToTrustedMap(cd: CustomDomain) {
+        if (cd.status == Status.TRUST.id) {
+            val domain = cd.domain.lowercase(Locale.ROOT)
+            trustedMap[cd.domain] = trustedMap.getOrDefault(domain, emptySet()).plus(cd.uid)
+        }
     }
 
     fun status(d: String, uid: Int): Status {
@@ -121,12 +139,11 @@ object DomainRulesManager : KoinComponent {
         }
 
         // check if the received domain is matching with the custom wildcard
-        val match = matchesWildcard(domain, uid)
-        return match
+        return matchesWildcard(domain, uid)
     }
 
     private fun matchesWildcard(domain: String, uid: Int): Status {
-        val key = mkTrieKey(domain.lowercase(Locale.ROOT), uid)
+        val key = mkTrieKey(domain, uid)
         val match = trie.getAny(key) // matches the longest prefix
 
         if (match.isNullOrEmpty()) {
@@ -137,7 +154,7 @@ object DomainRulesManager : KoinComponent {
     }
 
     fun getDomainRule(domain: String, uid: Int): Status {
-        val key = mkTrieKey(domain.lowercase(Locale.ROOT), uid)
+        val key = mkTrieKey(domain, uid)
         val match = trie.get(key)
         if (match.isNullOrEmpty()) {
             return Status.NONE
@@ -145,25 +162,22 @@ object DomainRulesManager : KoinComponent {
         return Status.getStatus(match.toIntOrNull())
     }
 
-    fun isDomainTrusted(_domain: String?): Boolean {
-        if (_domain.isNullOrEmpty()) {
+    fun isDomainTrusted(d: String?): Boolean {
+        if (d.isNullOrEmpty()) {
             return false
         }
-
-        val domain = _domain.lowercase(Locale.ROOT)
-        val key = mkTrieKey(domain, Constants.UID_EVERYBODY)
-        val match = trie.get(key)
-        if (match.isNullOrEmpty()) {
-            return false
-        }
-        return Status.TRUST.id == match.toIntOrNull()
+        val domain = d.lowercase(Locale.ROOT)
+        val match = trustedMap.containsKey(domain)
+        if (DEBUG) Log.d(LOG_TAG_DNS, "isDomainTrusted: $domain: $match")
+        return match
     }
 
-    suspend fun whitelist(cd: CustomDomain) {
+    suspend fun trust(cd: CustomDomain) {
         cd.status = Status.TRUST.id
         cd.modifiedTs = Calendar.getInstance().timeInMillis
         dbInsertOrUpdate(cd)
         updateTrie(cd)
+        maybeUpdateTrustedMap(cd.uid, cd.domain, Status.TRUST)
     }
 
     suspend fun changeStatus(
@@ -173,15 +187,17 @@ object DomainRulesManager : KoinComponent {
         type: DomainType,
         status: Status
     ) {
-        val cd = constructObject(domain, uid, ips, type, status.id)
+        val cd = mkCustomDomain(domain, uid, ips, type, status.id)
         dbInsertOrUpdate(cd)
         updateTrie(cd)
+        maybeUpdateTrustedMap(uid, domain, status)
     }
 
     suspend fun block(domain: String, uid: Int, ips: String = "", type: DomainType) {
-        val cd = constructObject(domain, uid, ips, type, Status.BLOCK.id)
+        val cd = mkCustomDomain(domain, uid, ips, type, Status.BLOCK.id)
         dbInsertOrUpdate(cd)
         updateTrie(cd)
+        maybeUpdateTrustedMap(uid, domain, Status.BLOCK)
     }
 
     suspend fun block(cd: CustomDomain) {
@@ -189,6 +205,7 @@ object DomainRulesManager : KoinComponent {
         cd.modifiedTs = Calendar.getInstance().timeInMillis
         dbInsertOrUpdate(cd)
         updateTrie(cd)
+        maybeUpdateTrustedMap(cd.uid, cd.domain, Status.BLOCK)
     }
 
     suspend fun noRule(cd: CustomDomain) {
@@ -196,12 +213,23 @@ object DomainRulesManager : KoinComponent {
         cd.modifiedTs = Calendar.getInstance().timeInMillis
         dbInsertOrUpdate(cd)
         updateTrie(cd)
+        maybeUpdateTrustedMap(cd.uid, cd.domain, Status.NONE)
     }
 
     suspend fun addDomainRule(d: String, status: Status, type: DomainType, uid: Int) {
-        val cd = constructObject(d, uid, "", type, status.id)
+        val cd = mkCustomDomain(d, uid, "", type, status.id)
         dbInsertOrUpdate(cd)
         updateTrie(cd)
+        maybeUpdateTrustedMap(uid, d, status)
+    }
+
+    private fun maybeUpdateTrustedMap(uid: Int, domain: String, status: Status) {
+        val d = domain.lowercase(Locale.ROOT)
+        if (status == Status.TRUST) {
+            trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).plus(uid)
+        } else {
+            trustedMap[d] = trustedMap.getOrDefault(d, emptySet()).minus(uid)
+        }
     }
 
     suspend fun updateDomainRule(
@@ -210,10 +238,12 @@ object DomainRulesManager : KoinComponent {
         type: DomainType,
         prevDomain: CustomDomain
     ) {
-        val cd = constructObject(d, prevDomain.uid, "", type, status.id)
+        val cd = mkCustomDomain(d, prevDomain.uid, "", type, status.id)
         dbUpdate(prevDomain, cd)
         removeFromTrie(prevDomain)
+        removeIfInTrustedMap(prevDomain.uid, prevDomain.domain)
         updateTrie(cd)
+        maybeUpdateTrustedMap(cd.uid, cd.domain, Status.BLOCK)
     }
 
     private suspend fun dbInsertOrUpdate(cd: CustomDomain) {
@@ -231,21 +261,45 @@ object DomainRulesManager : KoinComponent {
     suspend fun deleteDomain(cd: CustomDomain) {
         dbDelete(cd)
         removeFromTrie(cd)
+        removeIfInTrustedMap(cd.uid, cd.domain)
+    }
+
+    private fun removeIfInTrustedMap(uid: Int, domain: String) {
+        val d = domain.lowercase(Locale.ROOT)
+        val trustedUids = trustedMap.getOrDefault(d, emptySet()).minus(uid)
+        if (trustedUids.isEmpty()) {
+            trustedMap.remove(d)
+        } else {
+            trustedMap[d] = trustedUids
+        }
+    }
+
+    private fun clearTrustedMap(uid: Int) {
+        trustedMap.forEach { (domain, uids) ->
+            val newUids = uids.minus(uid)
+            if (newUids.isEmpty()) {
+                trustedMap.remove(domain)
+            } else {
+                trustedMap[domain] = newUids
+            }
+        }
     }
 
     suspend fun deleteRulesByUid(uid: Int) {
         db.deleteRulesByUid(uid)
         val rulesDeleted = trie.delAll(uid.toString())
         Log.i(LOG_TAG_DNS, "rules deleted from trie for $uid: $rulesDeleted")
+        clearTrustedMap(uid)
     }
 
     suspend fun deleteAllRules() {
         db.deleteAllRules()
         trie.clear()
+        trustedMap.clear()
     }
 
     private fun removeFromTrie(cd: CustomDomain) {
-        val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+        val key = mkTrieKey(cd.domain, cd.uid)
         trie.del(key)
     }
 
@@ -271,6 +325,7 @@ object DomainRulesManager : KoinComponent {
 
     suspend fun updateUid(uid: Int, newUid: Int) {
         clearTrie(uid)
+        clearTrustedMap(uid)
         db.updateUid(uid, newUid)
         rehydrateFromDB(newUid)
     }
@@ -287,8 +342,9 @@ object DomainRulesManager : KoinComponent {
         val selector: (String) -> Int = { str -> str.length }
         val desc = doms.sortedByDescending { selector(it.domain) }
         desc.forEach { cd ->
-            val key = mkTrieKey(cd.domain.lowercase(Locale.ROOT), cd.uid)
+            val key = mkTrieKey(cd.domain, cd.uid)
             trie.set(key, cd.status.toString())
+            maybeAddToTrustedMap(cd)
         }
     }
 
@@ -297,14 +353,10 @@ object DomainRulesManager : KoinComponent {
     }
 
     fun isWildCardEntry(url: String): Boolean {
-        // regex to check if url is valid wildcard domain
-        // valid wildcard domain: *.example.com, *.example.co.in, *.do-main.com
-        // RFC 1035: https://tools.ietf.org/html/rfc1035#section-2.3.4
-        val p = Pattern.compile("^(\\*\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]+$")
-        return p.matcher(url).matches()
+        return wcRegex.matcher(url).matches()
     }
 
-    private fun constructObject(
+    private fun mkCustomDomain(
         domain: String,
         uid: Int,
         ips: String = "",

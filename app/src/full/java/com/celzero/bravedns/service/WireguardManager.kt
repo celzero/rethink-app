@@ -32,6 +32,12 @@ import com.celzero.bravedns.wireguard.Config
 import com.celzero.bravedns.wireguard.Peer
 import com.celzero.bravedns.wireguard.WgInterface
 import inet.ipaddr.IPAddressString
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArraySet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,12 +45,6 @@ import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
-import java.util.Locale
-import java.util.concurrent.CopyOnWriteArraySet
 
 object WireguardManager : KoinComponent {
 
@@ -418,7 +418,7 @@ object WireguardManager : KoinComponent {
         return cfg
     }
 
-    fun addConfig(config: Config?): Config? {
+    suspend fun addConfig(config: Config?): Config? {
         if (config == null) {
             Log.e(LOG_TAG_PROXY, "error adding config")
             return null
@@ -429,7 +429,7 @@ object WireguardManager : KoinComponent {
         val name = config.getName().ifEmpty { "${Backend.WG}$id" }
         config.setName(name)
         config.setId(id)
-        io { writeConfigAndUpdateDb(config) }
+        writeConfigAndUpdateDb(config)
         if (DEBUG) Log.d(LOG_TAG_PROXY, "add config: ${config.getId()}, ${config.getName()}")
         return config
     }
@@ -574,7 +574,7 @@ object WireguardManager : KoinComponent {
         }
     }
 
-    fun addPeer(id: Int, peer: Peer) {
+    suspend fun addPeer(id: Int, peer: Peer) {
         // add the peer to the config
         val cfg: Config
         val config = configs.find { it.getId() == id }
@@ -592,11 +592,11 @@ object WireguardManager : KoinComponent {
                 .setInterface(config.getInterface())
                 .addPeers(newPeers)
                 .build()
-        Log.i(LOG_TAG_PROXY, "adding peer for config: $id, ${cfg.getName()}")
-        io { writeConfigAndUpdateDb(cfg) }
+        Log.i(LOG_TAG_PROXY, "adding peer for config: $id, ${cfg.getName()}, ${newPeers.size}")
+        writeConfigAndUpdateDb(cfg)
     }
 
-    fun deletePeer(id: Int, peer: Peer) {
+    suspend fun deletePeer(id: Int, peer: Peer) {
         // delete the peer from the config
         val cfg: Config
         val config = configs.find { it.getId() == id }
@@ -629,7 +629,7 @@ object WireguardManager : KoinComponent {
                 .addPeers(peers)
                 .build()
         Log.i(LOG_TAG_PROXY, "deleting peer for config: $id, ${cfg.getName()}")
-        io { writeConfigAndUpdateDb(cfg) }
+        writeConfigAndUpdateDb(cfg)
     }
 
     private suspend fun writeConfigAndUpdateDb(cfg: Config, serverResponse: String = "") {

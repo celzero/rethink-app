@@ -423,7 +423,13 @@ class WgConfigDetailActivity : AppCompatActivity(R.layout.activity_wg_detail) {
         val addPeerDialog = WgAddPeerDialog(this, themeId, configId, null)
         addPeerDialog.setCanceledOnTouchOutside(false)
         addPeerDialog.show()
-        addPeerDialog.setOnDismissListener { wgPeersAdapter?.dataChanged() }
+        addPeerDialog.setOnDismissListener {
+            if (wgPeersAdapter != null) {
+                wgPeersAdapter?.dataChanged()
+            } else {
+                setPeersAdapter()
+            }
+        }
     }
 
     private fun setPeersAdapter() {

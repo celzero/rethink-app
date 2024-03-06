@@ -52,8 +52,10 @@ object FirewallManager : KoinComponent {
 
     // lo part is the uid within the user and hi part is the userId
     // androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/os/UserHandle.java#224
-    fun appId(uid: Int): Int {
-        return uid % PER_USER_RANGE
+    fun appId(uid: Int, mainUserOnly: Boolean = false): Int {
+        if (mainUserOnly) return uid % PER_USER_RANGE
+
+        return uid
     }
 
     // hi part is the userId and lo part is the uid within the user

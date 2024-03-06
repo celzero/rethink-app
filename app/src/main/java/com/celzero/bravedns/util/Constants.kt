@@ -151,6 +151,9 @@ class Constants {
         // invalid application uid
         const val INVALID_UID = -1
 
+        // android primary user
+        const val PRIMARY_USER = 0
+
         // missing uid, used when the uid is undermined. see ConnectionTracer#getUidQ()
         // changing this requires changes in RethinkDnsEndpointDao file
         const val MISSING_UID = -2000

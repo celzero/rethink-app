@@ -336,9 +336,11 @@ class RestoreAgent(val context: Context, workerParams: WorkerParameters) :
             val versionDetails = metadata.split("|")
             if (versionDetails[0].isEmpty()) return false
 
+            val version = versionDetails[0].split(":")[1].toIntOrNull() ?: 0
+
             // backup version should be equal to minVersionSupported (prior to that version
             // there is only one database), so do not consider the backups prior to that
-            return (versionDetails[0].split(":")[1].toIntOrNull() ?: 0) >= minVersionSupported
+            return version >= minVersionSupported && persistentState.appVersion >= version
         } catch (e: Exception) {
             Log.e(LOG_TAG_BACKUP_RESTORE, "error while reading metadata, reason? ${e.message}", e)
             return false
