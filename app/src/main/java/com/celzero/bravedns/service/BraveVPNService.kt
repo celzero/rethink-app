@@ -35,6 +35,8 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock.elapsedRealtime
+import android.os.UserHandle
+import android.os.UserManager
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
@@ -66,6 +68,7 @@ import com.celzero.bravedns.util.Constants.Companion.INIT_TIME_MS
 import com.celzero.bravedns.util.Constants.Companion.INVALID_UID
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_NAME
 import com.celzero.bravedns.util.Constants.Companion.NOTIF_INTENT_EXTRA_ACCESSIBILITY_VALUE
+import com.celzero.bravedns.util.Constants.Companion.PRIMARY_USER
 import com.celzero.bravedns.util.Constants.Companion.UID_EVERYBODY
 import com.celzero.bravedns.util.IPUtil
 import com.celzero.bravedns.util.InternetProtocol
@@ -1142,8 +1145,13 @@ class BraveVPNService :
         return Utilities.getApplicationInfo(this, this.packageName)?.uid ?: INVALID_UID
     }
 
+    private fun isPrimaryUser(): Boolean {
+        return FirewallManager.userId(rethinkUid) == PRIMARY_USER
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         rethinkUid = getRethinkUid()
+        Log.i(LOG_TAG_VPN, "onStartCommand, us: $rethinkUid, primary? ${isPrimaryUser()}")
 
         VpnController.onConnectionStateChanged(State.NEW)
 
@@ -1421,8 +1429,7 @@ class BraveVPNService :
     fun closeConnectionsIfNeeded(uid: Int) { // can be invalid uid, in which case, no-op
         if (uid == INVALID_UID) return
 
-        // get app id from uid
-        val uid0 = FirewallManager.appId(uid)
+        val uid0 = FirewallManager.appId(uid, isPrimaryUser())
 
         val ids: MutableList<String> = mutableListOf()
         // when there is a change in firewall rule for uid, close all the existing connections
@@ -1974,7 +1981,7 @@ class BraveVPNService :
 
     private fun handleVpnServiceOnAppStateChange() { // paused or resumed
         io("appStateChange") { restartVpnWithExistingAppConfig() }
-        notificationManager.notify(SERVICE_ID, updateNotificationBuilder())
+        ui { notificationManager.notify(SERVICE_ID, updateNotificationBuilder()) }
     }
 
     // The VPN service and tun2socks must agree on the layout of the network.  By convention, we
@@ -2539,7 +2546,7 @@ class BraveVPNService :
             } else {
                 // other apps summary
                 // convert the uid to app id
-                val uid = FirewallManager.appId(s.uid.toInt())
+                val uid = FirewallManager.appId(s.uid.toInt(), isPrimaryUser())
                 val key = CidKey(connectionSummary.connId, uid)
                 trackedCids.remove(key)
                 netLogTracker.updateIpSummary(connectionSummary)
@@ -2584,7 +2591,7 @@ class BraveVPNService :
                 fip
             }
         var uid = getUid(_uid, protocol, srcIp, srcPort, dstIp, dstPort)
-        uid = FirewallManager.appId(uid)
+        uid = FirewallManager.appId(uid, isPrimaryUser())
         val userId = FirewallManager.userId(uid)
 
         // generates a random 8-byte value, converts it to hexadecimal, and then
@@ -2868,7 +2875,7 @@ class BraveVPNService :
 
     fun hasCid(connId: String, uid: Int): Boolean {
         // get app id from uid
-        val uid0 = FirewallManager.appId(uid)
+        val uid0 = FirewallManager.appId(uid, isPrimaryUser())
         val key = CidKey(connId, uid0)
         return trackedCids.contains(key)
     }
